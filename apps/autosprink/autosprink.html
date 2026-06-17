@@ -663,7 +663,6 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'; // HF-G1-COUPLE
 import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from 'opengeometry';
 import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
@@ -821,33 +820,17 @@ let planGroup = null, planVisible = true, lastPlanBbox = null; // HF-A1-UNDERLAY
 // (GET /api/parts -> /parts/<key>.stl). Falls back to a primitive when no part
 // is available. Generated parts are best-effort, NOT manufacturer-exact.
 let headPartGeo = null, partsSource = 'primitive';
-let partsManifest = null;          // cached GET /api/parts response
-const partGeoCache = {};           // componentKey -> normalized BufferGeometry | null (attempted)
-
-// Normalize a loaded STL: center at origin, OpenSCAD Z-up -> three Y-up, scale to ~targetFt.
-function normalizePartGeo(geo, targetFt) {
-  geo.computeBoundingBox();
-  const bb = geo.boundingBox, size = new THREE.Vector3(), center = new THREE.Vector3();
-  bb.getSize(size); bb.getCenter(center);
-  geo.translate(-center.x, -center.y, -center.z);
-  geo.rotateX(-Math.PI / 2);
-  const maxDim = Math.max(size.x, size.y, size.z) || 1;
-  const sc = targetFt / maxDim; geo.scale(sc, sc, sc); geo.computeVertexNormals();
-  return geo;
-}
+const partGeoCache = {};           // componentKey -> true-scale BufferGeometry | null (attempted)
 
 // Load + cache the part mesh for a registry component key (best-effort, fail-soft).
-// Returns the normalized geometry, or null (caller renders a marked primitive).
-async function loadPartGeo(key, targetFt) {
+// Returns the true-scale geometry, or null (caller renders a marked primitive).
+async function loadPartGeo(key) {
   if (key in partGeoCache) return partGeoCache[key];
   partGeoCache[key] = null; // mark attempted up-front
   try {
-    if (!partsManifest) partsManifest = await api('/parts');
-    const entry = (partsManifest.components || []).find((c) => c.key === key && c.present && c.file);
-    if (!entry) return null;
-    const geo = normalizePartGeo(await new STLLoader().loadAsync('/' + String(entry.file).replace(/^\/+/, '')), targetFt);
-    partGeoCache[key] = geo;
-    return geo;
+    const res = await hfPartMeshes.load(key);
+    partGeoCache[key] = res.geometry || null;
+    return partGeoCache[key];
   } catch (e) { return null; }
 }
 
@@ -3598,11 +3581,7 @@ async function applyGenerated(data) {
   // (riser_assembly/valve_alarm_check/fdc/fitting_tee) so renderModel can
   // instance them synchronously; missing parts fall back to a marked primitive.
   const compKeys = [...new Set((cadModel.solids || []).filter((s) => s.kind === 'component').map((s) => s.componentKey))];
-  // HF-G1-COUPLE: realistic per-component target sizes (the old flat 2.5 ft made
-  // every fitting an oversized barrel at close-up). Inferred typical envelope
-  // sizes, NOT manufacturer-exact (needs-verification surfaces in the Inspector).
-  const COMP_TARGET_FT = { riser_assembly: 3.0, valve_alarm_check: 1.2, fdc: 1.5, fitting_tee: 0.8, fitting_elbow_90: 0.55, fitting_coupling: 0.45, fitting_reducer: 0.4 };
-  await Promise.all(compKeys.map((k) => loadPartGeo(k, COMP_TARGET_FT[k] || 1.5)));
+  await Promise.all(compKeys.map((k) => loadPartGeo(k)));
   await preloadDetailMeshes(); // HF-C1-PARTMESH: real coupling/hanger/tee/elbow meshes for the detail pass
   renderModel(cadModel);
   await renderRealOrFixtureUnderlay(floorPlan); // HF-B1-PDFUNDERLAY: REAL sheets when the project has them

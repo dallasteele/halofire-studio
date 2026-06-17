@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-06-16",
+  "worldUnits": "1 unit = 1 ft",
+  "tolerance": 0.05,
+  "summary": {
+    "auditableRegistryParts": 22,
+    "skippedRegistryParts": 12,
+    "offScaleParts": 0
+  },
+  "runtimeFixes": [
+    {
+      "surface": "autosprink.html component preload path",
+      "before": "loaded STL meshes and normalized them to arbitrary target envelopes",
+      "after": "loads the canonical true-scale part-mesh loader so registry component meshes stay in feet with mm->ft conversion"
+    }
+  ],
+  "offScaleParts": []
+}
