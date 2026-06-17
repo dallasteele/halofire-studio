@@ -346,3 +346,100 @@ export function validateBuildingModel(model) {
   });
   return true;
 }
+
+export const BuildingModelSchema = Object.freeze({
+  units: 'ft',
+  requiredArrays: ['walls', 'columns', 'doors', 'openings', 'rooms', 'zones'],
+  requiredObjects: ['shell', 'grid'],
+});
+
+function clonePoint(pt) {
+  return Array.isArray(pt) ? [Number(pt[0]), Number(pt[1])] : pt;
+}
+
+function cloneWallLike(item) {
+  if (!item || typeof item !== 'object') return item;
+  const out = { ...item };
+  if (item.a) out.a = clonePoint(item.a);
+  if (item.b) out.b = clonePoint(item.b);
+  if (item.position) out.position = clonePoint(item.position);
+  if (Array.isArray(item.openings)) out.openings = item.openings.map((op) => ({ ...op }));
+  return out;
+}
+
+export function createBuildingModel(seed = {}) {
+  return {
+    units: 'ft',
+    shell: { outline: [], areaSqft: 0, bbox: null },
+    grid: { xs: [], ys: [], labels: { cols: [], rows: [] } },
+    zones: [],
+    walls: [],
+    columns: [],
+    doors: [],
+    openings: [],
+    rooms: [],
+    diagnostics: [],
+    meta: {},
+    ...seed,
+  };
+}
+
+export function mergeIntoModel(model, patch = {}) {
+  const next = createBuildingModel(model || {});
+  for (const [key, value] of Object.entries(patch || {})) {
+    if (Array.isArray(value)) {
+      const prev = Array.isArray(next[key]) ? next[key] : [];
+      next[key] = prev.concat(value.map((item) => cloneWallLike(item)));
+      continue;
+    }
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      next[key] = { ...(next[key] || {}), ...value };
+      continue;
+    }
+    next[key] = value;
+  }
+  return next;
+}
+
+export function validateBuildingModel(model) {
+  if (!model || typeof model !== 'object') {
+    throw new Error('BuildingModel must be an object');
+  }
+  if (!model.shell || !Array.isArray(model.shell.outline) || model.shell.outline.length < 4) {
+    throw new Error('BuildingModel.shell.outline must have at least 4 points');
+  }
+  if (!Array.isArray(model.walls) || model.walls.length === 0) {
+    throw new Error('BuildingModel.walls must be a non-empty array');
+  }
+  if (!Array.isArray(model.rooms)) {
+    throw new Error('BuildingModel.rooms must be an array');
+  }
+  const story = {
+    level: 0,
+    baseElevationFt: 0,
+    ceilingHeightFt: 14,
+    spaces: model.rooms.map((room, index) => ({
+      name: room.label || room.name || `Space ${index + 1}`,
+      polygon: room.poly || room.polygon,
+      hazard: room.hazard || 'ordinary',
+    })),
+    walls: model.walls.map((wall) => ({
+      a: wall.a,
+      b: wall.b,
+      thicknessFt: wall.thicknessFt || 0.5,
+      type: wall.type || 'interior',
+      openings: Array.isArray(wall.openings) ? wall.openings : [],
+    })),
+    columns: model.columns.map((column) => ({
+      x: column.x,
+      y: column.y,
+      sizeFt: column.sizeFt || 1,
+    })),
+  };
+  normalizeBuilding({
+    name: model.name || 'Plan Building',
+    units: model.units || 'ft',
+    stories: [story],
+  });
+  return true;
+}
