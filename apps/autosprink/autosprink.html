@@ -26,7 +26,7 @@
     radial-gradient(900px 600px at 15% 110%, rgba(90,169,230,0.05), transparent 55%),
     var(--bg);}
   /* ====== APPLE-GLASS APP FRAME (chrome / menubar / toolbar / body / statusbar) ====== */
-  #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:42px 34px 40px 1fr 30px;height:100vh;width:100vw}
+  #app{display:grid;grid-template-columns:1fr;grid-template-rows:42px 34px 40px minmax(0,1fr);height:100vh;width:100vw}
 
   /* ---- TOP CHROME (header) ---- */
   header{grid-column:1/-1;grid-row:1;z-index:100;display:flex;align-items:center;gap:16px;padding:0 16px;
@@ -75,11 +75,33 @@
   #toolBar .tb-spacer{flex:1}
   #toolBar .tb-readout{display:flex;gap:14px;color:var(--faint);font-variant-numeric:tabular-nums;font-size:11px;padding-right:4px}
   #toolBar .tb-readout b{color:var(--muted);font-weight:600}
-  /* ---- BODY DOCKS (left aside | viewport | right aside) ---- */
-  aside.left{grid-column:1;grid-row:4;border-right:1px solid var(--line)}
-  aside.right{grid-column:3;grid-row:4;border-left:1px solid var(--line)}
-  aside.left,aside.right{position:relative;z-index:10}
-  #canvasWrap{grid-column:2;grid-row:4}
+  /* ---- BODY DOCKS (dock root with left | center | right | bottom) ---- */
+  #dockRootMount{grid-column:1/-1;grid-row:4;min-height:0}
+  .dock-root{display:grid;grid-template-columns:320px minmax(0,1fr) 360px;grid-template-rows:minmax(0,1fr) 132px;gap:10px;height:100%;padding:10px}
+  .dock-region{min-width:0;min-height:0}
+  .dock-region-left{grid-column:1;grid-row:1}
+  .dock-region-center{grid-column:2;grid-row:1}
+  .dock-region-right{grid-column:3;grid-row:1}
+  .dock-region-bottom{grid-column:1/-1;grid-row:2}
+  .dock-group{display:flex;flex-direction:column;height:100%;min-height:0;background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.34)), rgba(18,22,28,0.88);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-panel);overflow:hidden}
+  .dock-group-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  .dock-group-title{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .dock-tabs{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .dock-tab{background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:8px;color:var(--muted);padding:5px 9px;font-size:11px;cursor:pointer}
+  .dock-tab.on{background:rgba(217,164,65,0.16);border-color:rgba(217,164,65,0.32);color:var(--gold-bright)}
+  .dock-panels{flex:1;min-height:0;position:relative}
+  .dock-panel{height:100%;overflow:auto;padding:12px}
+  .dock-panel[hidden]{display:none}
+  .dock-empty{color:var(--muted);font-size:12px}
+  .dock-details-title{font-size:13px;font-weight:700;color:var(--bright);margin-bottom:10px}
+  .outliner-root{font-size:12px}
+  .outliner-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .outliner-branch{display:flex;flex-direction:column;gap:6px}
+  .outliner-heading{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .outliner-node{width:100%;text-align:left;background:rgba(255,255,255,0.03);border:1px solid transparent;border-radius:8px;color:var(--text);padding:6px 8px;cursor:pointer}
+  .outliner-node:hover{border-color:var(--line-strong);background:rgba(255,255,255,0.06)}
+  .outliner-node.selected{border-color:rgba(90,169,230,0.45);background:rgba(90,169,230,0.14);color:var(--bright)}
+  .dock-project{display:flex;flex-direction:column;gap:12px}
   .seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
   .seg button{background:var(--panel2);color:var(--muted);border:none;padding:5px 11px;font-size:12px;cursor:pointer}
   .seg button.on{background:var(--gold-dim);color:var(--gold-bright)}
@@ -88,11 +110,11 @@
     display:flex;flex-direction:column;gap:10px}
   aside::-webkit-scrollbar{width:8px}
   aside::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:6px}
-  /* ---- STATUS BAR (bottom command line) ---- */
-  #statusBar{grid-column:1/-1;grid-row:5;z-index:10;display:flex;align-items:center;gap:12px;padding:0 12px;
+  /* ---- CONSOLE / COMMAND BAR ---- */
+  #statusBar{z-index:10;display:flex;align-items:center;gap:12px;padding:10px 12px;height:100%;
     background:linear-gradient(180deg, rgba(18,22,28,0.82), rgba(11,14,18,0.9));
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
-    border-top:1px solid var(--line);color:var(--muted);font-size:11px}
+    color:var(--muted);font-size:11px;border-radius:10px}
   #statusBar .cmd{display:flex;align-items:center;gap:8px;flex:1;color:var(--faint);margin:0}
   #statusBar .cmd .prompt{color:var(--gold);font-family:var(--mono);white-space:nowrap}
   #statusBar #hfCmdLine{flex:1;min-width:120px;background:rgba(0,0,0,0.28);border:1px solid var(--line);
@@ -154,7 +176,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   button.act{width:100%;background:var(--fire);color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-size:13px;margin-top:10px}
   button.act:hover{filter:brightness(1.1)} button.act:disabled{opacity:.5;cursor:wait}
   button.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
-  #canvasWrap{position:relative;background:#08080b}
+  #canvasWrap{position:relative;background:#08080b;height:100%;min-height:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow-panel)}
   #canvas{width:100%;height:100%;display:block}
   /* HF-UXCLEAN §1: legend + render status DOCKED in the right results panel —
      never absolute over the viewport canvas. */
@@ -385,136 +407,12 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <div class="tb-readout"><span><b>X</b> 124.0 ft</span><span><b>Y</b> 86.5 ft</span><span><b>Z</b> 0.0 ft</span><span><b>Scale</b> 1 : 96</span></div>
   </div>
 
-  <aside class="left">
-    <!-- THIS JOB -->
-    <section class="panel">
-      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">This Job</span><span class="pbtn">⌄</span></div>
-      <div class="pbody">
-        <div class="job-title">Home Depot — Rexburg</div>
-        <div class="job-sub">Distribution Center · Rexburg, ID</div>
-        <div class="well">
-          <div class="job-row"><span class="k">State</span><span class="v">ID · 21 ft pipe stock</span></div>
-          <div class="job-row"><span class="k">Bid value</span><span class="v">$842,500</span></div>
-          <div class="job-row"><span class="k">Phase</span><span class="v"><span class="chip info"><span class="gl"></span> Takeoff</span></span></div>
-          <div class="job-row"><span class="k">Due</span><span class="v">Jun 24, 2026</span></div>
-        </div>
-      </div>
-    </section>
+  <div id="dockRootMount" data-dock-root></div>
+</div>
 
-    <!-- NEXT ACTIONS -->
-    <section class="panel">
-      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Next Actions</span><span class="pbtn">⌄</span></div>
-      <div class="pbody">
-        <div class="task"><span class="ico pend">○</span><span class="tx"><span class="t">Generate layout from plan</span><span class="d">No layout yet — start the AutoDraw pass.</span></span></div>
-        <div class="task"><span class="ico warn">⚠</span><span class="tx"><span class="t">Square footage doesn't match the proposal</span><span class="d">Plan reads 84,200 sq ft · proposal lists 81,900.</span></span></div>
-        <div class="task"><span class="ico pend">○</span><span class="tx"><span class="t">Awaiting AHJ approval</span><span class="d">Attach the AHJ approval packet when received.</span></span></div>
-      </div>
-    </section>
-
-    <!-- TOOLS · DESIGN (engine project + design controls preserved) -->
-    <section class="panel">
-      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Tools · Design</span><span class="pbtn">⌄</span></div>
-      <div class="pbody">
-    <h3 style="margin-top:0">Project</h3>
-    <select id="projectTarget">
-      <option value="Home Depot - Rexburg ID">Home Depot - Rexburg ID</option>
-      <option value="The Cooperative 1881 - Salt Lake City UT">The Cooperative 1881 - Salt Lake City UT</option>
-    </select>
-    <h3>Design</h3>
-    <label>Source</label>
-    <select id="planSource">
-      <option value="builtin">Selected project built-in plan</option>
-      <option value="svg">Import SVG (single space)…</option>
-      <option value="building">Building drawing (multi-space SVG)…</option>
-      <option value="dxf">Import DXF (single space)…</option>
-      <option value="building-dxf">Building drawing (multi-space DXF)…</option>
-      <option value="pdf">Import vector PDF (plan set)…</option>
-    </select>
-    <div id="svgBox" style="display:none">
-      <label>Feet per drawing unit</label>
-      <input id="unitsPerPx" type="number" value="1" step="0.1">
-      <label id="drawingLabel">SVG (rect / polygon / path)</label>
-      <textarea id="svgInput" placeholder='&lt;svg&gt;&lt;rect x="0" y="0" width="60" height="40" data-hazard="ordinary"/&gt;&lt;/svg&gt;'></textarea>
-    </div>
-    <div id="pdfBox" style="display:none">
-      <label>PDF page (0-based index)</label>
-      <input id="pdfPageIndex" type="number" value="0" min="0" step="1">
-      <label>Drawing scale (feet per PDF point)</label>
-      <input id="pdfScale" type="number" value="" step="0.001" placeholder="e.g. 0.0833 (1 pt = 1 in @ 1:1)">
-      <label>Extraction mode</label>
-      <select id="pdfExtract">
-        <option value="vector">Whole vector bbox</option>
-        <option value="dominant">Dominant plan cluster</option>
-        <option value="fullExtent">Full plan extent</option>
-        <option value="outline">Wall-network outline</option>
-        <option value="wallLayer">Lineweight/color wall layer</option>
-        <option value="sam">OpenClaw/SAM 3.1 if reachable</option>
-      </select>
-      <label>Vector PDF plan</label>
-      <input id="pdfFile" type="file" accept="application/pdf,.pdf">
-      <button class="act ghost" id="pdfInspectBtn" type="button">Inspect pages</button>
-      <div id="pdfPageList" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
-      <iframe id="pdfPreview" title="Selected PDF page preview" style="width:100%;height:170px;margin-top:6px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)"></iframe>
-      <button class="act ghost" id="pdfCandidateBtn" type="button">Review boundary candidates</button>
-      <div id="pdfBoundaryCandidates" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
-      <button class="act ghost" id="pdfDecisionBtn" type="button">Save selected boundary decision</button>
-      <button class="act ghost" id="pdfDecisionLoadBtn" type="button">Load saved boundary decision</button>
-      <div id="pdfDecisionStatus" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
-      <p style="font-size:11px;opacity:.75;margin:6px 0 0">
-        Extracts the plan's real vector geometry. The footprint shown is a
-        best-effort <b>bbox of the extracted geometry</b> — not a full room
-        segmentation, and not an AHJ/PE/accurate drawing. The scale is
-        operator-supplied (never guessed); enter the drawing's real scale.
-      </p>
-    </div>
-
-    <div id="sourceLockNote">Source locked: AI-pulled email PDF (bid-originated project)</div>
-
-    <label>Hazard class (NFPA 13)</label>
-    <select id="hazard">
-      <option value="">From plan</option>
-      <option value="light">Light Hazard</option>
-      <option value="ordinary">Ordinary Hazard</option>
-      <option value="extra">Extra Hazard</option>
-    </select>
-    <label>Markup %</label>
-    <input id="markup" type="number" value="25" min="0" max="100">
-
-    <button class="act" id="genBtn">⚡ Generate Layout</button>
-    <button class="act ghost" id="regenBtn" style="display:none;font-size:11px;padding:7px">↻ Regenerate (replace saved layout)</button>
-
-    <!-- HF-UXCLEAN §1: level switcher + plan-extraction stats + needs-verification
-         banner DOCKED in the left tools panel (was a floating viewport overlay). -->
-    <div id="levelPanel"></div>
-      </div>
-    </section>
-
-    <!-- LAYERS (engine #layers host preserved) -->
-    <section class="panel">
-      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Layers</span><span class="pbtn">⌄</span></div>
-      <div class="pbody">
-        <div id="layers"></div>
-      </div>
-    </section>
-
-    <!-- PROPERTIES -->
-    <section class="panel">
-      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Properties</span><span class="pbtn">⌄</span></div>
-      <div class="pbody">
-        <p class="note">No element selected. Click a part in the viewport to inspect it.</p>
-        <p class="note" style="margin-top:8px;color:var(--faint)">True NFPA pipe scale (thin at building scale) — the only render mode.</p>
-        <div class="warn" id="exportMsg"></div>
-      </div>
-    </section>
-  </aside>
-
+<template id="dock-center-viewport-template">
   <div id="canvasWrap">
     <canvas id="canvas"></canvas>
-    <!-- HF-UXCLEAN §1: viewport renders ONLY the model. The app menu bar moved to
-         #menuChrome above the canvas; #status + #legend moved to the right panel.
-         The ONLY edge controls allowed here are the #cadBar view toolbar +
-         (future) orientation cube / scale bar. -->
-    <!-- HF-A1-CADBAR compact view toolbar (apple-glass) -->
     <div id="cadBar">
       <div class="seg" id="viewSeg">
         <button data-view="2d" title="2D plan drafting — pan + zoom only, no orbit">2D</button>
@@ -530,110 +428,210 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <button id="ifcBtn" disabled>IFC</button>
       <button id="stlBtn" disabled>STL</button>
     </div>
-    <!-- HF-UXCLEAN §1 / design-system z-20 edge controls: orientation cube (top-right)
-         + scale bar (bottom-left). Both are non-occluding, edge-anchored, in-viewport. -->
     <div id="viewCube" title="Orientation cube — click a face for an ortho view, a corner for 3D"></div>
     <div id="scaleBar" aria-label="viewport scale bar">
       <div id="scaleBarTrack"><span id="scaleBarTick" class="sb-tick sb-tick-l"></span><span id="scaleBarTick2" class="sb-tick sb-tick-r"></span></div>
       <div id="scaleBarLabel">—</div>
     </div>
   </div>
+</template>
 
-  <aside class="right">
-    <!-- HF-INSPTABS: tabbed Inspector. Panels wrap the original sections; all IDs preserved. -->
-    <div id="inspTabs" role="tablist">
-      <button data-panel="inspector" class="on">Inspector</button>
-      <button data-panel="layout">Layout</button>
-      <button data-panel="hydraulics">Pipe&nbsp;Sched · Hydraulics</button>
-      <button data-panel="compliance">Compliance</button>
-      <button data-panel="submittal">Submittal</button>
-    </div>
-    <div class="insp-panel on" data-panel="inspector">
-      <!-- HF-D1-INSPDOCK (PRIORITIES 3c): Inspector docked in the results panel, not over the viewport -->
-      <div id="inspector">
-        <div id="inspHeader"><span id="inspTitle">Inspector</span><button id="inspClose" title="Deselect (Esc)">×</button></div>
-        <div id="inspBody"></div>
+<template id="dock-left-project-template">
+  <div class="dock-project">
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">This Job</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+        <div class="job-title">Home Depot — Rexburg</div>
+        <div class="job-sub">Distribution Center · Rexburg, ID</div>
+        <div class="well">
+          <div class="job-row"><span class="k">State</span><span class="v">ID · 21 ft pipe stock</span></div>
+          <div class="job-row"><span class="k">Bid value</span><span class="v">$842,500</span></div>
+          <div class="job-row"><span class="k">Phase</span><span class="v"><span class="chip info"><span class="gl"></span> Takeoff</span></span></div>
+          <div class="job-row"><span class="k">Due</span><span class="v">Jun 24, 2026</span></div>
+        </div>
       </div>
-      <!-- HF-UXCLEAN §1: render status + colour legend DOCKED here, never over the canvas. -->
-      <div id="status">initializing OpenGeometry kernel…</div>
-      <div id="legend">
-        <div><span class="sw" style="background:#6b7280"></span>building shell</div>
-        <div><span class="sw" style="background:#E53935"></span>cross-main / riser</div>
-        <div><span class="sw" style="background:#3b82f6"></span>branch lines</div>
-        <div><span class="sw" style="background:#22d3ee"></span>drops</div>
-        <div><span class="sw" style="background:#ff3b30"></span>sprinkler heads</div>
+    </section>
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Next Actions</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+        <div class="task"><span class="ico pend">○</span><span class="tx"><span class="t">Generate layout from plan</span><span class="d">No layout yet — start the AutoDraw pass.</span></span></div>
+        <div class="task"><span class="ico warn">⚠</span><span class="tx"><span class="t">Square footage doesn't match the proposal</span><span class="d">Plan reads 84,200 sq ft · proposal lists 81,900.</span></span></div>
+        <div class="task"><span class="ico pend">○</span><span class="tx"><span class="t">Awaiting AHJ approval</span><span class="d">Attach the AHJ approval packet when received.</span></span></div>
       </div>
-    </div>
-    <div class="insp-panel" data-panel="layout">
-      <h3>Layout</h3>
-      <div id="layout"><span class="muted" style="font-size:12px">Generate a layout to begin.</span></div>
-    </div>
-    <div class="insp-panel" data-panel="hydraulics">
-      <h3>Pipe Schedule (NFPA-13)</h3>
-      <div id="pipes"><span class="muted" style="font-size:12px">—</span></div>
-      <h3 style="display:flex;align-items:center;justify-content:space-between">Apply Pipe Schedule (cascade)
-        <button id="applyScheduleBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Apply schedule</button>
-      </h3>
-      <div id="scheduleLegend"><span class="muted" style="font-size:12px">Apply Pipe Schedule to size the whole system by NFPA head-count.</span></div>
-      <h3 style="display:flex;align-items:center;justify-content:space-between">Smart Pipe (topology)
-        <button id="smartPipeToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Color by role</button>
-      </h3>
-      <div id="smartPipe"><span class="muted" style="font-size:12px">Generate a layout to classify pipe roles.</span></div>
-      <h3 style="display:flex;align-items:center;justify-content:space-between">Coverage &amp; spacing (NFPA-13)
-        <button id="coverageToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Show coverage</button>
-      </h3>
-      <div id="coverage"><span class="muted" style="font-size:12px">Generate a layout to compute coverage.</span></div>
-      <h3>Hydraulics (NFPA-13, est.)</h3>
-      <div id="hydraulics"><span class="muted" style="font-size:12px">—</span></div>
-      <h3 style="display:flex;align-items:center;justify-content:space-between">Network solve (Phase 3)
-        <button id="hydraulicSolveBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Re-solve</button>
-      </h3>
-      <div id="hydraulicPanel"><span class="muted" style="font-size:12px">Generate a layout to solve hydraulics.</span></div>
-      <h3 style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap">Remote area (NFPA-13 demand)
-        <span style="display:flex;gap:4px">
-          <button id="remoteAreaRectBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Draw rect</button>
-          <button id="remoteAreaPolyBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Polygon</button>
-          <button id="remoteAreaBoxBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Design box</button>
-          <button id="remoteAreaClearBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Clear</button>
-        </span>
-      </h3>
-      <div id="remoteArea"><span class="muted" style="font-size:12px">Draw a remote-area boundary to compute the design demand.</span></div>
-      <h3>Water supplies (NFPA-13/20)</h3>
-      <div id="supplyPanel"><span class="muted" style="font-size:12px">Generate a layout to evaluate supply vs demand.</span></div>
-      <h3 style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap">Node tags &amp; condition
-        <span style="display:flex;gap:4px">
-          <button id="nodeTagsToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">P/Q/V tags</button>
-          <button id="colorConditionToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Color by velocity</button>
-        </span>
-      </h3>
-      <div id="conditionPanel"><span class="muted" style="font-size:12px">Solve hydraulics, then toggle tags / color-by-condition.</span></div>
-      <h3 style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap">NFPA hydraulic report
-        <span style="display:flex;gap:4px">
-          <button id="reportPrintBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Print</button>
-          <button id="reportExportBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Export .html</button>
-        </span>
-      </h3>
-      <div id="reportPanel"><span class="muted" style="font-size:12px">Solve hydraulics to build the NFPA calculation report.</span></div>
-    </div>
-    <div class="insp-panel" data-panel="compliance">
-      <h3>Compliance (NFPA-13, geometric)</h3>
-      <div id="compliance"><span class="muted" style="font-size:12px">—</span></div>
-    </div>
-    <div class="insp-panel" data-panel="submittal">
-      <h3>Auto Bid</h3>
-      <div id="bid"></div>
-      <div id="bom"></div>
-      <div class="warn" id="warn"></div>
-      <h3>Submittal</h3>
-      <button id="submitBtn" disabled style="width:100%;margin-bottom:4px">Download submittal (.json)</button>
-      <div class="muted" style="font-size:10px">Best-effort internal-alpha package — NOT a stamped/sealed submittal, NOT AHJ/PE approved, NOT permit-ready.</div>
-    </div>
-  </aside>
+    </section>
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Project</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+        <h3 style="margin-top:0">Project</h3>
+        <select id="projectTarget">
+          <option value="Home Depot - Rexburg ID">Home Depot - Rexburg ID</option>
+          <option value="The Cooperative 1881 - Salt Lake City UT">The Cooperative 1881 - Salt Lake City UT</option>
+        </select>
+        <h3>Design</h3>
+        <label>Source</label>
+        <select id="planSource">
+          <option value="builtin">Selected project built-in plan</option>
+          <option value="svg">Import SVG (single space)…</option>
+          <option value="building">Building drawing (multi-space SVG)…</option>
+          <option value="dxf">Import DXF (single space)…</option>
+          <option value="building-dxf">Building drawing (multi-space DXF)…</option>
+          <option value="pdf">Import vector PDF (plan set)…</option>
+        </select>
+        <div id="svgBox" style="display:none">
+          <label>Feet per drawing unit</label>
+          <input id="unitsPerPx" type="number" value="1" step="0.1">
+          <label id="drawingLabel">SVG (rect / polygon / path)</label>
+          <textarea id="svgInput" placeholder='&lt;svg&gt;&lt;rect x="0" y="0" width="60" height="40" data-hazard="ordinary"/&gt;&lt;/svg&gt;'></textarea>
+        </div>
+        <div id="pdfBox" style="display:none">
+          <label>PDF page (0-based index)</label>
+          <input id="pdfPageIndex" type="number" value="0" min="0" step="1">
+          <label>Drawing scale (feet per PDF point)</label>
+          <input id="pdfScale" type="number" value="" step="0.001" placeholder="e.g. 0.0833 (1 pt = 1 in @ 1:1)">
+          <label>Extraction mode</label>
+          <select id="pdfExtract">
+            <option value="vector">Whole vector bbox</option>
+            <option value="dominant">Dominant plan cluster</option>
+            <option value="fullExtent">Full plan extent</option>
+            <option value="outline">Wall-network outline</option>
+            <option value="wallLayer">Lineweight/color wall layer</option>
+            <option value="sam">OpenClaw/SAM 3.1 if reachable</option>
+          </select>
+          <label>Vector PDF plan</label>
+          <input id="pdfFile" type="file" accept="application/pdf,.pdf">
+          <button class="act ghost" id="pdfInspectBtn" type="button">Inspect pages</button>
+          <div id="pdfPageList" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
+          <iframe id="pdfPreview" title="Selected PDF page preview" style="width:100%;height:170px;margin-top:6px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)"></iframe>
+          <button class="act ghost" id="pdfCandidateBtn" type="button">Review boundary candidates</button>
+          <div id="pdfBoundaryCandidates" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
+          <button class="act ghost" id="pdfDecisionBtn" type="button">Save selected boundary decision</button>
+          <button class="act ghost" id="pdfDecisionLoadBtn" type="button">Load saved boundary decision</button>
+          <div id="pdfDecisionStatus" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
+          <p style="font-size:11px;opacity:.75;margin:6px 0 0">
+            Extracts the plan's real vector geometry. The footprint shown is a
+            best-effort <b>bbox of the extracted geometry</b> — not a full room
+            segmentation, and not an AHJ/PE/accurate drawing. The scale is
+            operator-supplied (never guessed); enter the drawing's real scale.
+          </p>
+        </div>
+        <div id="sourceLockNote">Source locked: AI-pulled email PDF (bid-originated project)</div>
+        <label>Hazard class (NFPA 13)</label>
+        <select id="hazard">
+          <option value="">From plan</option>
+          <option value="light">Light Hazard</option>
+          <option value="ordinary">Ordinary Hazard</option>
+          <option value="extra">Extra Hazard</option>
+        </select>
+        <label>Markup %</label>
+        <input id="markup" type="number" value="25" min="0" max="100">
+        <button class="act" id="genBtn">⚡ Generate Layout</button>
+        <button class="act ghost" id="regenBtn" style="display:none;font-size:11px;padding:7px">↻ Regenerate (replace saved layout)</button>
+        <div id="levelPanel"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Layers</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+        <div id="layers"></div>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Properties</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+        <p class="note">No element selected. Click a part in the viewport to inspect it.</p>
+        <p class="note" style="margin-top:8px;color:var(--faint)">True NFPA pipe scale (thin at building scale) — the only render mode.</p>
+        <div class="warn" id="exportMsg"></div>
+      </div>
+    </section>
+  </div>
+</template>
 
-  <!-- STATUS / BOTTOM DOCK: real command line + live cursor coords + snap/ortho
-       state. The command line invokes a tool by name ("pipe","move","zoom e") OR
-       feeds COORDINATES to the active draw ("12,8" abs · "@10,0" rel · "10<45"
-       polar). #hfCmdPrompt echoes the active draw prompt (AutoSPRINK-style). -->
+<template id="dock-right-details-template">
+  <div>
+    <div id="status">initializing OpenGeometry kernel…</div>
+    <div id="dockDetailsRoot"></div>
+  </div>
+</template>
+
+<template id="dock-right-inspector-template">
+  <div id="inspector">
+    <div id="inspHeader"><span id="inspTitle">Inspector</span><button id="inspClose" title="Deselect (Esc)">×</button></div>
+    <div id="inspBody"></div>
+  </div>
+</template>
+
+<template id="dock-right-layout-template">
+  <h3>Layout</h3>
+  <div id="layout"><span class="muted" style="font-size:12px">Generate a layout to begin.</span></div>
+</template>
+
+<template id="dock-right-pipe-sched-template">
+  <h3>Pipe Schedule (NFPA-13)</h3>
+  <div id="pipes"><span class="muted" style="font-size:12px">—</span></div>
+  <h3 style="display:flex;align-items:center;justify-content:space-between">Apply Pipe Schedule (cascade)
+    <button id="applyScheduleBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Apply schedule</button>
+  </h3>
+  <div id="scheduleLegend"><span class="muted" style="font-size:12px">Apply Pipe Schedule to size the whole system by NFPA head-count.</span></div>
+  <h3 style="display:flex;align-items:center;justify-content:space-between">Smart Pipe (topology)
+    <button id="smartPipeToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Color by role</button>
+  </h3>
+  <div id="smartPipe"><span class="muted" style="font-size:12px">Generate a layout to classify pipe roles.</span></div>
+  <h3 style="display:flex;align-items:center;justify-content:space-between">Coverage &amp; spacing (NFPA-13)
+    <button id="coverageToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Show coverage</button>
+  </h3>
+  <div id="coverage"><span class="muted" style="font-size:12px">Generate a layout to compute coverage.</span></div>
+</template>
+
+<template id="dock-right-hydraulics-template">
+  <h3>Hydraulics (NFPA-13, est.)</h3>
+  <div id="hydraulics"><span class="muted" style="font-size:12px">—</span></div>
+  <h3 style="display:flex;align-items:center;justify-content:space-between">Network solve (Phase 3)
+    <button id="hydraulicSolveBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Re-solve</button>
+  </h3>
+  <div id="hydraulicPanel"><span class="muted" style="font-size:12px">Generate a layout to solve hydraulics.</span></div>
+  <h3 style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap">Remote area (NFPA-13 demand)
+    <span style="display:flex;gap:4px">
+      <button id="remoteAreaRectBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Draw rect</button>
+      <button id="remoteAreaPolyBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Polygon</button>
+      <button id="remoteAreaBoxBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Design box</button>
+      <button id="remoteAreaClearBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Clear</button>
+    </span>
+  </h3>
+  <div id="remoteArea"><span class="muted" style="font-size:12px">Draw a remote-area boundary to compute the design demand.</span></div>
+  <h3>Water supplies (NFPA-13/20)</h3>
+  <div id="supplyPanel"><span class="muted" style="font-size:12px">Generate a layout to evaluate supply vs demand.</span></div>
+  <h3 style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap">Node tags &amp; condition
+    <span style="display:flex;gap:4px">
+      <button id="nodeTagsToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">P/Q/V tags</button>
+      <button id="colorConditionToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Color by velocity</button>
+    </span>
+  </h3>
+  <div id="conditionPanel"><span class="muted" style="font-size:12px">Solve hydraulics, then toggle tags / color-by-condition.</span></div>
+  <h3 style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap">NFPA hydraulic report
+    <span style="display:flex;gap:4px">
+      <button id="reportPrintBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Print</button>
+      <button id="reportExportBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Export .html</button>
+    </span>
+  </h3>
+  <div id="reportPanel"><span class="muted" style="font-size:12px">Solve hydraulics to build the NFPA calculation report.</span></div>
+</template>
+
+<template id="dock-right-compliance-template">
+  <h3>Compliance (NFPA-13, geometric)</h3>
+  <div id="compliance"><span class="muted" style="font-size:12px">—</span></div>
+</template>
+
+<template id="dock-right-submittal-template">
+  <h3>Auto Bid</h3>
+  <div id="bid"></div>
+  <div id="bom"></div>
+  <div class="warn" id="warn"></div>
+  <h3>Submittal</h3>
+  <button id="submitBtn" disabled style="width:100%;margin-bottom:4px">Download submittal (.json)</button>
+  <div class="muted" style="font-size:10px">Best-effort internal-alpha package — NOT a stamped/sealed submittal, NOT AHJ/PE approved, NOT permit-ready.</div>
+</template>
+
+<template id="dock-bottom-console-template">
   <footer id="statusBar">
     <form class="cmd" id="hfCmdForm" autocomplete="off">
       <span class="prompt" id="hfCmdPrompt">Command:</span>
@@ -648,7 +646,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <span class="seg-s">Units: ft (true scale)</span>
     <a href="#" class="seg-s" id="hfLogExpand">▴ Expand log</a>
   </footer>
-</div>
+</template>
 
 <script src="/public/halofire-menubar.js"></script>
 <script type="importmap">
@@ -669,6 +667,9 @@ import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from
 import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
 import { demoTimeline } from '/src/engine/demo-timeline.js';
 import { summarizeExportArtifact, buildExportProofMessage } from '/src/ui/export-proof.js';
+import { renderDockRoot } from '/src/ui/dock/dock-system.js';
+import { renderOutliner } from '/src/ui/dock/outliner-panel.js';
+import { renderDetails } from '/src/ui/dock/details-panel.js';
 // HF-A1-UNDERLAY: built-in plan fixtures (same module the server uses) for the floor-plan ground underlay.
 import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '/src/data/floorplans.js';
 // HF-B1-PDFUNDERLAY (Stream B): REAL plan-sheet PDF underlays + multi-level scaffold.
@@ -758,6 +759,96 @@ try{
 const token = null;
 const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
 const $ = (id) => document.getElementById(id);
+
+const studioDock = {
+  root: null,
+  mounts: {},
+  selectedSolidIndex: null,
+  selectedElement: null,
+};
+
+function cloneTemplate(id) {
+  const tpl = $(id);
+  if (!tpl || !(tpl instanceof HTMLTemplateElement)) throw new Error(`Missing template: ${id}`);
+  return tpl.content.firstElementChild.cloneNode(true);
+}
+
+function mountStudioDock() {
+  const root = $('dockRootMount');
+  if (!root || root.children.length) return;
+
+  const viewportMount = cloneTemplate('dock-center-viewport-template');
+  const outlinerMount = document.createElement('div');
+  outlinerMount.id = 'dockOutlinerRoot';
+  const projectMount = cloneTemplate('dock-left-project-template');
+  const detailsMount = cloneTemplate('dock-right-details-template');
+  const inspectorMount = cloneTemplate('dock-right-inspector-template');
+  const layoutMount = cloneTemplate('dock-right-layout-template');
+  const pipeSchedMount = cloneTemplate('dock-right-pipe-sched-template');
+  const hydraulicsMount = cloneTemplate('dock-right-hydraulics-template');
+  const complianceMount = cloneTemplate('dock-right-compliance-template');
+  const submittalMount = cloneTemplate('dock-right-submittal-template');
+  const consoleMount = cloneTemplate('dock-bottom-console-template');
+
+  studioDock.root = renderDockRoot(root, {
+    center: { mount: viewportMount },
+    left: {
+      title: 'Left Dock',
+      activeId: 'outliner',
+      tabs: [
+        { id: 'outliner', label: 'Outliner', mount: outlinerMount },
+        { id: 'project', label: 'Project', mount: projectMount },
+      ],
+    },
+    right: {
+      title: 'Right Dock',
+      activeId: 'details',
+      tabs: [
+        { id: 'details', label: 'Details', mount: detailsMount },
+        { id: 'inspector', label: 'Inspector', mount: inspectorMount },
+        { id: 'layout', label: 'Layout', mount: layoutMount },
+        { id: 'pipe-sched', label: 'Pipe Sched', mount: pipeSchedMount },
+        { id: 'hydraulics', label: 'Hydraulics', mount: hydraulicsMount },
+        { id: 'compliance', label: 'Compliance', mount: complianceMount },
+        { id: 'submittal', label: 'Submittal', mount: submittalMount },
+      ],
+    },
+    bottom: {
+      title: 'Bottom Dock',
+      activeId: 'console',
+      tabs: [{ id: 'console', label: 'Console', mount: consoleMount }],
+    },
+  });
+
+  studioDock.mounts = {
+    outliner: $('dockOutlinerRoot'),
+    details: $('dockDetailsRoot'),
+  };
+}
+
+mountStudioDock();
+function syncDockDetails() {
+  if (!studioDock.mounts.details) return;
+  renderDetails(studioDock.mounts.details, studioDock.selectedElement);
+}
+
+function refreshOutliner() {
+  if (!studioDock.mounts.outliner) return;
+  if (studioDock.selectedSolidIndex == null) delete studioDock.mounts.outliner.dataset.selectedSolidIndex;
+  else studioDock.mounts.outliner.dataset.selectedSolidIndex = String(studioDock.selectedSolidIndex);
+  renderOutliner(studioDock.mounts.outliner, currentCadModel, (ref) => {
+    if (!ref || ref.solidIndex == null) return;
+    selectSolidRef(ref, false);
+  });
+}
+
+function setDockSelection(details, solidIndex) {
+  studioDock.selectedElement = details || null;
+  studioDock.selectedSolidIndex = Number.isInteger(solidIndex) ? solidIndex : null;
+  syncDockDetails();
+  refreshOutliner();
+}
+
 function currentProjectName() {
   return $('projectTarget') ? $('projectTarget').value : HOME_DEPOT;
 }
@@ -1075,6 +1166,8 @@ async function initStudio() {
   ogReady = true;
   await loadPartMeshes(); // best-effort; heads render as a real part mesh when available
   $('status').textContent = 'OpenGeometry ready' + (headPartGeo ? ` · head part: ${partsSource}` : '');
+  syncDockDetails();
+  refreshOutliner();
 }
 function onResize() {
   const c = $('canvas'); const w = c.clientWidth, h = c.clientHeight;
@@ -1704,6 +1797,7 @@ function alignNetworkToExtractedPlate(floorPlan) {
 function renderModel(cadModel, opts) {
   clearSelection(false); // HF-A1-SELECT: model rebuild invalidates the selection
   currentCadModel = cadModel;
+  setDockSelection(null, null);
   // HF-PHASE2-SMARTPIPE: classify every pipe by TOPOLOGY and tag solid.smartRole
   // BEFORE the render loop, so addPipe can color by role and the BOM/hydraulics
   // can read the role off each solid. Pure + deterministic; fail-soft on error.
@@ -3006,6 +3100,7 @@ function clearSelection(restoreTarget) {
   curSel = null;
   curSelKey = null;
   curSelSolid = null; // HF-W1-CMD
+  setDockSelection(null, null);
   try { if (typeof clearGrips === 'function') clearGrips(); } catch (_) {} // HF-W2: remove endpoint grips
   // contract #7: deselect restores the PRIOR pivot (set only if a frame ever
   // ran) with a short tween; camera position stays put — all camera ops keep working.
@@ -3025,9 +3120,82 @@ function openInspector(title, rows, verifyNote) {
     .map((r) => `<div class="kv"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')
     + (verifyNote ? `<div class="nv-flag">⚠ NEEDS-VERIFICATION — ${verifyNote}</div>` : '');
   $('inspector').classList.add('open');
-  // HF-D1-INSPDOCK: the Inspector is docked at the top of the right results
-  // panel — bring it into view there (never floats over the viewport).
-  const rp = document.querySelector('aside.right'); if (rp) rp.scrollTop = 0;
+  const rp = studioDock.root && studioDock.root.regions ? studioDock.root.regions.right : null;
+  if (rp) rp.scrollTop = 0;
+}
+
+function worldPointForSolid(solid) {
+  try {
+    if (Array.isArray(solid.position)) return new THREE.Vector3(...W(solid.position));
+    if (Array.isArray(solid.from) && Array.isArray(solid.to)) {
+      const a = new THREE.Vector3(...W(solid.from));
+      const b = new THREE.Vector3(...W(solid.to));
+      return a.add(b).multiplyScalar(0.5);
+    }
+    if (Array.isArray(solid.center)) return new THREE.Vector3(...W([solid.center[0], solid.center[1], (solid.baseZ || 0) + ((solid.heightFt || 0) / 2)]));
+    if (Number.isFinite(solid.x) && Number.isFinite(solid.y)) return new THREE.Vector3(...W([solid.x, solid.y, (solid.baseZ || 0) + ((solid.heightFt || 0) / 2)]));
+  } catch (_) {}
+  return new THREE.Vector3();
+}
+
+function findRenderedSolidHitByIndex(solidIndex) {
+  const solid = currentCadModel && Array.isArray(currentCadModel.solids) ? currentCadModel.solids[solidIndex] : null;
+  if (!solid || !modelGroup) return null;
+  let found = null;
+  modelGroup.traverse((obj) => {
+    if (found) return;
+    if (obj.userData && obj.userData.hfPart && obj.userData.hfPart.solid === solid) {
+      found = { part: obj.userData.hfPart, point: worldPointForSolid(solid), obj };
+      return;
+    }
+    if (obj.userData && obj.userData.hfInstanced && Array.isArray(obj.userData.hfInstanced.solids)) {
+      const idx = obj.userData.hfInstanced.solids.indexOf(solid);
+      if (idx >= 0) found = { inst: obj.userData.hfInstanced, idx, point: worldPointForSolid(solid), obj };
+    }
+  });
+  return found;
+}
+
+function applyFoundSelection(found, frameAfter) {
+  if (!found) { clearSelection(true); return false; }
+  const foundKey = (found.obj ? found.obj.uuid : 'x') + ':' + (found.idx !== undefined && found.idx !== null ? found.idx : '-');
+  if (frameAfter && inspectState && curSelKey === foundKey) { clearSelection(true); return false; }
+  const info = describeHit(found);
+  if (!info) { clearSelection(true); return false; }
+  applyHighlight(found);
+  let axis = null;
+  const sol = found.part ? (found.part.solid || null) : ((found.inst && found.inst.solids) ? found.inst.solids[found.idx] : null);
+  if (sol && Array.isArray(sol.from) && Array.isArray(sol.to)) {
+    const aw = W(sol.from), bw = W(sol.to);
+    axis = new THREE.Vector3(bw[0] - aw[0], bw[1] - aw[1], bw[2] - aw[2]);
+  }
+  curSel = { center: info.center.clone(), sizeFt: info.sizeFt, title: info.title, axis };
+  curSelKey = foundKey;
+  curSelSolid = sol || (found.part ? found.part.solid : null) || null;
+  try { if (typeof refreshGrips === 'function') refreshGrips(); } catch (_) {}
+  window.__lastSelection = window.__lastSelection || null;
+  openInspector(info.title, info.rows, info.verify);
+  const solidIndex = curSelSolid && currentCadModel && Array.isArray(currentCadModel.solids)
+    ? currentCadModel.solids.indexOf(curSelSolid)
+    : null;
+  setDockSelection({ title: info.title, rows: info.rows, verify: info.verify }, solidIndex);
+  selectedCount += 1;
+  window.__lastSelection = { title: info.title, center: [info.center.x, info.center.y, info.center.z], n: selectedCount };
+  if (frameAfter) {
+    enterInspect(found);
+    frameSelected(true);
+  } else if (inspectState) {
+    enterInspect(found);
+  }
+  return true;
+}
+
+function selectSolidRef(ref, frameAfter) {
+  if (!ref || !Number.isInteger(ref.solidIndex)) return false;
+  const found = findRenderedSolidHitByIndex(ref.solidIndex);
+  if (!found) return false;
+  if (studioDock.root) studioDock.root.activate('right', 'details');
+  return applyFoundSelection(found, !!frameAfter);
 }
 
 // HF-W2: raycast the extracted-building overlay (planGroup) for a selectable part.
@@ -3234,41 +3402,7 @@ function handleCanvasClick(e, frameAfter) {
   // living in planGroup — so the plan-comprehension geometry is selectable/inspectable too.
   if (!found) found = pickBuildPart();
   if (!found) { clearSelection(true); return; } // empty click deselects + restores orbit target
-  // HF-D1-INSPDOCK (contract 3b): double-click the SAME part again while in
-  // x-ray inspect = deselect-all (restores opacities, highlight, prior pivot).
-  const foundKey = (found.obj ? found.obj.uuid : 'x') + ':' + (found.idx !== undefined && found.idx !== null ? found.idx : '-');
-  if (frameAfter && inspectState && curSelKey === foundKey) { clearSelection(true); return; }
-  const info = describeHit(found);
-  if (!info) { clearSelection(true); return; }
-  applyHighlight(found); // contract #1: the PART ITSELF is recolored (no bounding box)
-  // Primary axis (world) for the front-facing inspect view — derived from the
-  // picked solid's from/to when it is a run of pipe; null for point-like parts.
-  let axis = null;
-  const sol = found.part ? (found.part.solid || null) : ((found.inst && found.inst.solids) ? found.inst.solids[found.idx] : null);
-  if (sol && Array.isArray(sol.from) && Array.isArray(sol.to)) {
-    const aw = W(sol.from), bw = W(sol.to);
-    axis = new THREE.Vector3(bw[0] - aw[0], bw[1] - aw[1], bw[2] - aw[2]);
-  }
-  curSel = { center: info.center.clone(), sizeFt: info.sizeFt, title: info.title, axis };
-  curSelKey = foundKey; // HF-D1-INSPDOCK
-  // HF-W1-CMD: remember the picked SOLID OBJECT so edit ops can resolve its
-  // index in currentCadModel.solids by identity (the viewer hands us the exact
-  // object reference from the live model — see addPipe/addInstanced*).
-  curSelSolid = sol || (found.part ? found.part.solid : null) || null;
-  try { if (typeof refreshGrips === 'function') refreshGrips(); } catch (_) {} // HF-W2: show endpoint grips for the picked run
-  window.__lastSelection = window.__lastSelection || null; // (set below)
-  openInspector(info.title, info.rows, info.verify);
-  // contract #1: NO controls.target change here — selection is camera-neutral,
-  // so contract #2 (click a different part at its unchanged screen position,
-  // re-select forever) holds naturally. Pivot/framing live in frameSelected().
-  selectedCount += 1;
-  window.__lastSelection = { title: info.title, center: [info.center.x, info.center.y, info.center.z], n: selectedCount };
-  if (frameAfter) {
-    enterInspect(found);  // contract #3b: dblclick = x-ray isolation
-    frameSelected(true);  // + tween to a front-facing framed view
-  } else if (inspectState) {
-    enterInspect(found);  // plain click while inspecting retargets the isolation to the new part
-  }
+  applyFoundSelection(found, frameAfter);
 }
 
 // ── data + actions ──
@@ -3651,6 +3785,8 @@ async function applyGenerated(data) {
     const gtl = window.__geomTakeoff;
     const geomNote = gtl ? ` · ${gtl.couplings} couplings · ${gtl.hangers} hangers` : '';
     $('status').textContent = `rendered ${cadModel.counts.heads} heads · ${cadModel.counts.pipes} pipe segments · ${headsNote}${compNote}${geomNote}`;
+    refreshOutliner();
+    syncDockDetails();
 }
 
 // ── HF-A1-AUTOLOAD: per-(project target + source) layout persistence ──
@@ -8383,13 +8519,13 @@ function viewWalkthrough() {
 
 // ── WINDOW panel toggles — real DOM show/hide on the actual Studio panels ──
 function toggleAside(side) {
-  const a = document.querySelector('aside.' + side);
+  const a = document.querySelector(side === 'left' ? '.dock-region-left' : '.dock-region-right');
   if (!a) { $('status').textContent = `${side} panel not found`; return; }
   const hidden = a.style.display === 'none';
   a.style.display = hidden ? '' : 'none';
   window.__hfPanelState = window.__hfPanelState || {};
   window.__hfPanelState[side] = hidden ? 'shown' : 'hidden';
-  $('status').textContent = `${side === 'left' ? 'Left (job/actions)' : 'Right (inspector/BOM)'} panel ${hidden ? 'shown' : 'hidden'}`;
+  $('status').textContent = `${side === 'left' ? 'Left dock' : 'Right dock'} ${hidden ? 'shown' : 'hidden'}`;
 }
 function windowOpenDrawings() {
   // Real: surface the saved-layout / levels panel (the closest analog to MDI child docs).
@@ -8753,15 +8889,12 @@ window.__hfDraw = { setDrawTool: (t) => setDrawTool(t), commitPipe, commitWall, 
   const _orig = setDrawTool;
   window.__syncToolBar = (tool) => { const b = tool ? tb.querySelector(`[data-draw="${tool}"]`) : selectBtn; if (b) setActive(b); };
 })();
-// HF-INSPTABS: tabbed right Inspector + auto-switch so results never hide in an inactive tab.
+// Docked right-panel auto-switch so fresh content surfaces in the active dock group.
 (function wireInspectorTabs() {
-  const tabs = document.getElementById('inspTabs'); if (!tabs) return;
-  const panels = document.querySelectorAll('.insp-panel');
   function show(name) {
-    tabs.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.panel === name));
-    panels.forEach((p) => p.classList.toggle('on', p.dataset.panel === name));
+    if (!studioDock.root) return;
+    studioDock.root.activate('right', name === 'pipe-sched' ? 'pipe-sched' : name);
   }
-  tabs.addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) show(b.dataset.panel); });
   window.__inspTab = show;
   // Auto-switch to a content tab only AFTER the user starts interacting, so init-time
   // population (which fills #layout on load) doesn't hijack the Inspector default.
