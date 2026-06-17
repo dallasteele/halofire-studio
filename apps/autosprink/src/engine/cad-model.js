@@ -21,6 +21,7 @@
 import { layoutRoom } from './sprinkler-layout.js';
 import { layoutBuilding } from './system-layout.js';
 import { getComponent } from '../components/registry.js';
+import { createFittingPlacement, normalizeRunAxis, stablePerpendicularAxis } from './fitting-orient.js';
 
 // NFPA 13 schedule pipe sizing — max sprinklers served by a steel pipe size.
 // Public code values. Returned diameter is the smallest size that covers count.
@@ -485,14 +486,18 @@ export function buildCadModel(floorPlan) {
  * @param {Array} branchLines branch lines, each with `.row`/`.y`/`.startX`/`.endX`/`.diameterIn`
  */
 function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchZ, mainDia, branchLines) {
-  const place = (key, name, position) => {
+  const place = (key, name, position, placement = null) => {
     const def = getComponent(key);
     if (!def) return; // fail-closed: skip unknown registry keys
     solids.push({
       kind: 'component', name: `${prefix}${name}`, layer: 'COMPONENTS',
       componentKey: key, category: def.category, position,
+      ...(placement ? { placement } : {}),
     });
   };
+  const mainRunAxis = normalizeRunAxis([0, 1, 0]);
+  const branchRunAxis = normalizeRunAxis([1, 0, 0]);
+  const downAxis = [0, 0, -1];
 
   // System riser assembly at the riser top (where the riser meets the cross-main).
   place('riser_assembly', 'riser-assembly', [mainX, y0, mainZ]);
@@ -502,25 +507,50 @@ function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchZ, mainDia
   place('fdc', 'fdc', [mainX, y0, 0]);
   // A tee at each branch-to-cross-main junction (the riser-tie top points).
   for (const b of branchLines) {
-    place('fitting_tee', `tee-main-${b.row}`, [mainX, b.y, mainZ]);
+    place(
+      'fitting_tee',
+      `tee-main-${b.row}`,
+      [mainX, b.y, mainZ],
+      createFittingPlacement('fitting_tee', mainRunAxis, downAxis, { fittingType: 'tee-main' }),
+    );
   }
 
   // 90° elbow at the riser top turn (vertical riser -> horizontal cross-main),
   // co-located with the riser assembly but a distinct fitting marker.
-  place('fitting_elbow_90', 'elbow-riser-top', [mainX, y0, mainZ]);
+  place(
+    'fitting_elbow_90',
+    'elbow-riser-top',
+    [mainX, y0, mainZ],
+    createFittingPlacement('fitting_elbow_90', mainRunAxis, downAxis, { fittingType: 'riser-top-elbow' }),
+  );
 
   for (const b of branchLines) {
     // 90° elbow at the far (end-of-line) end of each branch run, where the
     // branch turns/terminates. Derived from the branch endX coordinate.
-    place('fitting_elbow_90', `elbow-branch-${b.row}`, [round(b.endX), b.y, branchZ]);
+    place(
+      'fitting_elbow_90',
+      `elbow-branch-${b.row}`,
+      [round(b.endX), b.y, branchZ],
+      createFittingPlacement('fitting_elbow_90', branchRunAxis, downAxis, { fittingType: 'branch-end-elbow' }),
+    );
     // Coupling at the interior midpoint of each branch run (pipe-stick joint),
     // derived from startX/endX — never invented.
     const midX = round((b.startX + b.endX) / 2);
-    place('fitting_coupling', `coupling-branch-${b.row}`, [midX, b.y, branchZ]);
+    place(
+      'fitting_coupling',
+      `coupling-branch-${b.row}`,
+      [midX, b.y, branchZ],
+      createFittingPlacement('fitting_coupling', branchRunAxis, stablePerpendicularAxis(branchRunAxis), { fittingType: 'branch-coupling' }),
+    );
     // Concentric reducer only where the branch is genuinely smaller than the
     // cross-main it ties into (a real size change). Equal diameters -> none.
     if (b.diameterIn < mainDia) {
-      place('fitting_reducer', `reducer-branch-${b.row}`, [mainX, b.y, branchZ]);
+      place(
+        'fitting_reducer',
+        `reducer-branch-${b.row}`,
+        [mainX, b.y, branchZ],
+        createFittingPlacement('fitting_reducer', branchRunAxis, stablePerpendicularAxis(branchRunAxis), { fittingType: 'branch-reducer' }),
+      );
     }
   }
 }
