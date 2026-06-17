@@ -20,11 +20,12 @@
     --shadow-overlay:0 1px 0 var(--line) inset, 0 16px 48px rgba(0,0,0,0.50);
     --shadow-recess:0 1px 0 rgba(0,0,0,0.40) inset, 0 -1px 0 rgba(255,255,255,0.03) inset;
   }
-  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:12px;-webkit-font-smoothing:antialiased}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   body{background:
     radial-gradient(1200px 700px at 70% -10%, rgba(217,164,65,0.06), transparent 60%),
     radial-gradient(900px 600px at 15% 110%, rgba(90,169,230,0.05), transparent 55%),
-    var(--bg);}
+    var(--bg);
+    font:400 var(--type-md) var(--font);}
   /* ====== APPLE-GLASS APP FRAME (chrome / menubar / toolbar / body / statusbar) ====== */
   #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:42px 34px 40px 1fr 30px;height:100vh;width:100vw}
 
@@ -64,8 +65,8 @@
     background:linear-gradient(180deg, rgba(20,24,30,0.7), rgba(13,16,20,0.82));
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
     border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:visible;white-space:nowrap}
-  #toolBar .tb-label{font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin:0 2px 0 6px}
-  #toolBar .tool{display:inline-flex;align-items:center;gap:6px;height:26px;font-size:11px;color:var(--muted);
+  #toolBar .tb-label{font:600 var(--type-xs) var(--font);letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin:0 2px 0 6px}
+  #toolBar .tool{display:inline-flex;align-items:center;gap:6px;height:26px;font:600 var(--type-sm) var(--font);color:var(--muted);
     background:transparent;border:1px solid transparent;border-radius:var(--r-control);padding:0 9px;cursor:pointer;
     line-height:1.1;transition:background .12s,border-color .12s,color .12s}
   #toolBar .tool:hover{color:var(--text);background:rgba(255,255,255,.05);border-color:var(--line)}
@@ -112,7 +113,7 @@
   .phead{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);user-select:none}
   .phead .grip{display:flex;flex-direction:column;gap:2px}
   .phead .grip i{width:11px;height:1.5px;background:var(--faint);border-radius:2px;display:block}
-  .phead .ptitle{font-size:10.5px;letter-spacing:0.9px;text-transform:uppercase;color:var(--muted);font-weight:600;flex:1}
+  .phead .ptitle{font:600 var(--type-lg) var(--font);letter-spacing:0.9px;text-transform:uppercase;color:var(--muted);flex:1}
   .phead .pbtn{color:var(--faint)}
   .pbody{padding:10px}
   .well{background:rgba(14,17,21,0.85);border-radius:var(--r-control);box-shadow:var(--shadow-recess);padding:9px 10px}
