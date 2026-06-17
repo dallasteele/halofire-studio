@@ -697,7 +697,7 @@ import { buildBuildingLevels } from '/src/engine/building-levels.js';
 // HF-E1-PLANBUILD (Stream D/E): build REAL per-level 3D from the extracted plan
 // (building-from-plan.js), with the sheet registered UNDER it at the drawing-derived
 // true scale. Replaces the margin-box for Cooperative 1881.
-import { buildBuildingFromPlans, computePlanUnderlayTransform, unionFootprintCenter, planBounds } from '/src/engine/building-from-plan.js';
+import { buildRealBuilding, computePlanUnderlayTransform, unionFootprintCenter, planBounds } from '/src/engine/building-from-plan.js';
 import { manifestForProject, sheetsForLevel } from '/src/data/plan-manifest.js';
 // HF-C1-PARTMESH (Stream C): true-scale real CAD part meshes (mm->ft, Y-up)
 // with Inspector provenance; primitives stay as flagged fallback.
@@ -2752,17 +2752,87 @@ async function renderPlanComprehensionBuild(name) {
 
   let api;
   try {
-    api = buildBuildingFromPlans(THREE, levelPlans, {
-      mergeGeometries,            // HF-G1-COUPLE merger — collapse thousands of walls to 1 mesh/level
-      wallMergeThreshold: 600,
-      wallHeightFt: 9, wallThicknessFt: 0.5, slabThicknessFt: 0.75,
+    // STEP-3 real PDF->CAD wiring: Cooperative 1881 uses the page-8 extracted LevelPlan
+    // directly, via buildRealBuilding, so the viewport shows standing wall solids + the
+    // real perimeter shell traced from the extracted plan rather than the older scaffold path.
+    const primaryLevel = levelPlans.find((l) => Number(l.level) === 1) || levelPlans[0];
+    const root = buildRealBuilding(THREE, primaryLevel.plan, {
+      elevationFt: primaryLevel.elevationFt,
+      wallHeightFt: 10,
+      wallThicknessFt: 0.5,
     });
-  } catch (e) { window.__planBuildError = 'buildBuildingFromPlans: ' + String(e.message || e); return false; }
+    const b = planBounds(primaryLevel.plan.footprintFt);
+    api = {
+      root,
+      levels: [{
+        level: primaryLevel.level,
+        name: primaryLevel.name,
+        elevationFt: primaryLevel.elevationFt,
+        group: root,
+        counts: {
+          walls: root.userData?.summary?.wallSolids || 0,
+          wallRuns: root.userData?.summary?.wallRunsCount || 0,
+          wallSegmentsRaw: Array.isArray(primaryLevel.plan.walls) ? primaryLevel.plan.walls.length : 0,
+          wallSource: Array.isArray(primaryLevel.plan.wallRuns) && primaryLevel.plan.wallRuns.length ? 'wall-runs' : 'wall-segments',
+          rooms: Array.isArray(primaryLevel.plan.rooms) ? primaryLevel.plan.rooms.length : 0,
+          stairs: Array.isArray(primaryLevel.plan.stairs) ? primaryLevel.plan.stairs.length : 0,
+          doors: 0, openings: 0, fixtures: 0, wallsFull: 0,
+        },
+        wallRunsMeta: primaryLevel.plan.wallRunsMeta || null,
+        recallPct: (primaryLevel.plan.wallsFullMeta && Number.isFinite(primaryLevel.plan.wallsFullMeta.recallPct))
+          ? primaryLevel.plan.wallsFullMeta.recallPct : null,
+        recallMeasure: (primaryLevel.plan.wallsFullMeta && primaryLevel.plan.wallsFullMeta.recallMeasure) || null,
+        fixtureCounts: primaryLevel.plan.fixtureCounts || null,
+        doorExtraction: primaryLevel.plan.doorExtraction || null,
+      }],
+      setActiveLevel(levelOrAll) { root.visible = levelOrAll === 'all' || Number(levelOrAll) === Number(primaryLevel.level); },
+      setLevelVisible(level, visible) { if (Number(level) === Number(primaryLevel.level)) root.visible = !!visible; },
+      setLayerVisible(layerName, visible) {
+        root.traverse((o) => {
+          if (o && o.name === layerName && o.userData && o.userData.toggleKey !== undefined) o.visible = !!visible;
+        });
+      },
+      bounds: b,
+      summary: {
+        levelCount: 1,
+        bounds: { widthFt: Math.round(b.widthFt * 100) / 100, depthFt: Math.round(b.depthFt * 100) / 100 },
+        perLevel: [{
+          level: primaryLevel.level,
+          elevationFt: primaryLevel.elevationFt,
+          ...{
+            walls: root.userData?.summary?.wallSolids || 0,
+            wallRuns: root.userData?.summary?.wallRunsCount || 0,
+            wallSegmentsRaw: Array.isArray(primaryLevel.plan.walls) ? primaryLevel.plan.walls.length : 0,
+            wallSource: Array.isArray(primaryLevel.plan.wallRuns) && primaryLevel.plan.wallRuns.length ? 'wall-runs' : 'wall-segments',
+            rooms: Array.isArray(primaryLevel.plan.rooms) ? primaryLevel.plan.rooms.length : 0,
+            stairs: Array.isArray(primaryLevel.plan.stairs) ? primaryLevel.plan.stairs.length : 0,
+            doors: 0, openings: 0, fixtures: 0, wallsFull: 0,
+          },
+          recallPct: (primaryLevel.plan.wallsFullMeta && Number.isFinite(primaryLevel.plan.wallsFullMeta.recallPct))
+            ? primaryLevel.plan.wallsFullMeta.recallPct : null,
+        }],
+        extractionCompleteness: {
+          wallRuns: root.userData?.summary?.wallRunsCount || 0,
+          wallSegmentsRaw: Array.isArray(primaryLevel.plan.walls) ? primaryLevel.plan.walls.length : 0,
+          wallSource: Array.isArray(primaryLevel.plan.wallRuns) && primaryLevel.plan.wallRuns.length ? 'wall-runs' : 'wall-segments',
+          wallRunsMeta: primaryLevel.plan.wallRunsMeta || null,
+          wallRecallPct: (primaryLevel.plan.wallsFullMeta && Number.isFinite(primaryLevel.plan.wallsFullMeta.recallPct))
+            ? primaryLevel.plan.wallsFullMeta.recallPct : null,
+          recallMeasure: (primaryLevel.plan.wallsFullMeta && primaryLevel.plan.wallsFullMeta.recallMeasure) || null,
+          doors: 0, openings: 0, fixtures: 0, recoveredWalls: 0,
+          confidentDoors: null, suspectDoors: null, fixtureCounts: primaryLevel.plan.fixtureCounts || null,
+          level: primaryLevel.level, needsVerification: true,
+        },
+        needsVerification: true,
+        provenance: 'built from extracted LevelPlan via buildRealBuilding — true scale derived from sheet, needs-verification',
+      },
+    };
+  } catch (e) { window.__planBuildError = 'buildRealBuilding: ' + String(e.message || e); return false; }
 
-  const center = unionFootprintCenter(levelPlans) || { cx: 0, cy: 0 };
+  const center = unionFootprintCenter([{ plan: levelPlans.find((l) => Number(l.level) === 1)?.plan || levelPlans[0].plan }]) || { cx: 0, cy: 0 };
   planGroup.add(api.root);
   planGroup.visible = planVisible;
-  planBuildState = { project: name, data, levelPlans, api, center, activeLevel: 1, loadedSheets: new Set(), failures: [] };
+  planBuildState = { project: name, data, levelPlans: [levelPlans.find((l) => Number(l.level) === 1) || levelPlans[0]], api, center, activeLevel: 1, loadedSheets: new Set(), failures: [] };
 
   // Frame on the built geometry's bbox (world coords = plan - center), so Fit + plan view work.
   const b = api.bounds;
@@ -2807,7 +2877,7 @@ async function renderPlanComprehensionBuild(name) {
     const insp = $('inspector'), it = $('inspTitle'), ib = $('inspBody');
     return { open: insp && insp.classList.contains('open'), title: it ? it.textContent : '', bodyText: ib ? ib.textContent : '', userData: door.userData };
   };
-  $('status').textContent = `built ${api.summary.levelCount} levels from the extracted plan (floor 1: parking plate + stair cores + rooms) — needs-verification`;
+  $('status').textContent = 'built floor 1 from the extracted plan (real wall runs + perimeter shell) — needs-verification';
   return true;
 }
 

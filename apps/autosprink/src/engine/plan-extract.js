@@ -72,6 +72,20 @@ function classifyLabel(text) {
   return null;
 }
 
+function normalizeSegmentsFt(segments) {
+  return (Array.isArray(segments) ? segments : [])
+    .map((s) => {
+      if (s && Number.isFinite(s.x1) && Number.isFinite(s.y1) && Number.isFinite(s.x2) && Number.isFinite(s.y2)) {
+        return { x1: Number(s.x1), y1: Number(s.y1), x2: Number(s.x2), y2: Number(s.y2), lineWidth: s.lineWidth };
+      }
+      if (s && Array.isArray(s.a) && Array.isArray(s.b)) {
+        return { x1: Number(s.a[0]), y1: Number(s.a[1]), x2: Number(s.b[0]), y2: Number(s.b[1]), lineWidth: s.lineWidth };
+      }
+      return null;
+    })
+    .filter(Boolean);
+}
+
 /**
  * Stair DIRECTION tokens. Architects almost never write "STAIR" inside the shaft on an overall
  * plan — they draw the tread hatch and annotate the run direction with "UP" / "DN" / "DOWN"
@@ -506,8 +520,11 @@ export function buildLevelPlan(input, opts = {}) {
   //    drops the hairline fill + thin grid/dimension annotation. The footprint + room segmentation
   //    MUST use the SINGLE dominant cut-wall band (the verified W0 footprint/netalign depends on it),
   //    so partitionInclusive is explicitly stripped here — it only governs the additive wallsFull set.
+  const preselectedWallSegmentsFt = normalizeSegmentsFt(opts.preselectedWallSegmentsFt);
   const { partitionInclusive: _pi, ...singleBandLayerOpts } = (opts.layerOpts || {});
-  const wl = selectWallLayer(segments, singleBandLayerOpts);
+  const wl = preselectedWallSegmentsFt.length
+    ? { wallSegments: preselectedWallSegmentsFt, method: 'caller-preselected-wall-segments' }
+    : selectWallLayer(segments, singleBandLayerOpts);
   const wallSegs = wl.wallSegments.length >= 3 ? wl.wallSegments : segments;
   const walls = wallSegs.map((s) => ({ a: [round(s.x1), round(s.y1)], b: [round(s.x2), round(s.y2)] }));
   const wr = buildWallRuns(walls, opts.wallRunOpts || {});
@@ -1215,8 +1232,10 @@ export async function extractLevelPlanFromPdf(page, opts = {}) {
   const scaleFtPerUnit = scaleInfo.feetPerUnit;
 
   // 3) GEOMETRY: CTM-mapped segments in feet.
-  const opList = await page.getOperatorList();
-  const { segments } = extractSegmentsFromOpList(opList, { scale: scaleFtPerUnit });
+  const precomputedSegmentsFt = normalizeSegmentsFt(opts.segmentsFt);
+  const segments = precomputedSegmentsFt.length
+    ? precomputedSegmentsFt
+    : extractSegmentsFromOpList(await page.getOperatorList(), { scale: scaleFtPerUnit }).segments;
   if (!segments.length) {
     throw new Error('extractLevelPlanFromPdf: no vector path geometry on this page (raster/scanned or text-only).');
   }
