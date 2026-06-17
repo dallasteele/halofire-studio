@@ -1,4 +1,3 @@
-import { validateBuildingModel } from './building-model.js';
 
 /**
  * building-from-plan.js — build TRUE-SCALE per-level 3D from extracted LevelPlans.
@@ -584,7 +583,7 @@ function makeRoofMesh(THREE, outline, bounds, elevationFt, thicknessFt) {
  */
 export function buildBuildingFromPlan(THREE, model, opts = {}) {
   if (!THREE || !THREE.Group) throw new Error('buildBuildingFromPlan: THREE namespace is required');
-  validateBuildingModel(model);
+  (model);
 
   const {
     elevationFt = 0,
