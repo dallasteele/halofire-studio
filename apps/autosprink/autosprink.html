@@ -651,6 +651,33 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 </div>
 
 <script src="/public/halofire-menubar.js"></script>
+<script>
+window.__hfErrs = window.__hfErrs || [];
+(function(){
+  function record(kind, payload) {
+    const detail = payload && typeof payload === 'object'
+      ? {
+          message: typeof payload.message === 'string' ? payload.message : String(payload),
+          filename: payload.filename || payload.sourceURL || null,
+          lineno: payload.lineno || payload.line || null,
+          colno: payload.colno || payload.column || null,
+        }
+      : { message: String(payload) };
+    window.__hfErrs.push({ kind, ...detail });
+    if (!document.title.startsWith('[HF-ERR] ')) {
+      document.title = '[HF-ERR] ' + document.title;
+    }
+  }
+
+  window.addEventListener('error', function(event) {
+    record('error', event);
+  });
+
+  window.addEventListener('unhandledrejection', function(event) {
+    record('unhandledrejection', event.reason || 'Unhandled promise rejection');
+  });
+})();
+</script>
 <script type="importmap">
 {
   "imports": {
@@ -723,6 +750,7 @@ import { solveNetwork, solveWithUpsizing, buildGraph } from '/src/engine/network
 // transform of the solve result into a printable summary + node-analysis +
 // pipe-data report (header carries the NOT-stamped engineering-aid disclaimer).
 import { buildHydraulicReport, renderReportHtml } from '/src/engine/nfpa-report.js';
+import { getBom, getNfpaReport } from '/src/engine/adapter.js';
 // HF-PHASE3-HARDY-CROSS: REAL Hardy-Cross loop/grid balance. Identifies the
 // independent loops of the network (cyclomatic μ = E−N+components) and, for a
 // looped/gridded system, iterates each loop to Σh_f→0 (continuity ΣQ=0 held by
