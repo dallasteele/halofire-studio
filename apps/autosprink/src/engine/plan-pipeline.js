@@ -70,6 +70,72 @@ function attachOpeningsToWalls(walls, openings) {
   }));
 }
 
+function withWallIds(walls) {
+  return (Array.isArray(walls) ? walls : []).map((wall, index) => ({
+    id: wall.id || `wall-${index + 1}`,
+    ...wall,
+  }));
+}
+
+function inferColumnsFromGridWalls(grid, walls, shellBbox, opts = {}) {
+  const candidates = buildCandidateColumnPoints(grid);
+  const wallSegs = (Array.isArray(walls) ? walls : []).map(toSeg).filter((wall) => wall && Number.isFinite(wall.x1));
+  const proximityFt = Number.isFinite(opts.proximityFt) ? Number(opts.proximityFt) : 3;
+  if (candidates.length === 0 || wallSegs.length === 0 || !shellBbox) return [];
+  return candidates
+    .filter((candidate) => pointInBbox([candidate.x, candidate.y], shellBbox))
+    .map((candidate) => {
+      let best = Infinity;
+      for (const wall of wallSegs) {
+        const dx = wall.x2 - wall.x1;
+        const dy = wall.y2 - wall.y1;
+        const wx = candidate.x - wall.x1;
+        const wy = candidate.y - wall.y1;
+        const c1 = dx * wx + dy * wy;
+        if (c1 <= 0) {
+          best = Math.min(best, Math.hypot(candidate.x - wall.x1, candidate.y - wall.y1));
+          continue;
+        }
+        const c2 = dx * dx + dy * dy;
+        if (c2 <= c1) {
+          best = Math.min(best, Math.hypot(candidate.x - wall.x2, candidate.y - wall.y2));
+          continue;
+        }
+        const t = c1 / c2;
+        const px = wall.x1 + t * dx;
+        const py = wall.y1 + t * dy;
+        best = Math.min(best, Math.hypot(candidate.x - px, candidate.y - py));
+      }
+      return { candidate, best };
+    })
+    .filter(({ best }) => best <= proximityFt)
+    .map(({ candidate, best }, index) => ({
+      id: `column-${index + 1}`,
+      x: round(candidate.x),
+      y: round(candidate.y),
+      sizeFt: 1,
+      confidence: 'low',
+      source: 'grid-wall-proximity-fallback',
+      hostDistanceFt: round(best),
+      needsVerification: true,
+    }));
+}
+
+function nearestWallIndex(walls, position) {
+  if (!Array.isArray(walls) || !Array.isArray(position)) return null;
+  let bestIndex = null;
+  let best = Infinity;
+  walls.forEach((wall, index) => {
+    const mid = midpoint(wall);
+    const d = pointDistance(mid, position);
+    if (d < best) {
+      best = d;
+      bestIndex = index;
+    }
+  });
+  return bestIndex;
+}
+
 function resolvePdfPath(pdfPath) {
   const candidates = [];
   if (pdfPath) {
@@ -188,7 +254,7 @@ export async function buildModelFromPlan(pdfPath, pageNum, opts = {}) {
     openings: [],
   }));
   model = mergeIntoModel(model, {
-    walls: pruneOrphanWalls(mergedWalls, 3),
+    walls: withWallIds(pruneOrphanWalls(mergedWalls, 3)),
   });
   passesRun.push('pass3-walls');
   recordVerify(model, 'pass3-walls', diagnostics);
@@ -218,6 +284,17 @@ export async function buildModelFromPlan(pdfPath, pageNum, opts = {}) {
       confidence: column.confidence,
     })),
   });
+  if (model.columns.length === 0) {
+    const fallbackColumns = inferColumnsFromGridWalls(model.grid, model.walls, model.shell.bbox, opts.columnFallbackOpts || {});
+    if (fallbackColumns.length > 0) {
+      model = mergeIntoModel(model, { columns: fallbackColumns });
+      diagnostics.push({
+        pass: 'pass4-columns',
+        severity: 'warning',
+        message: `Column pass fell back to grid/wall proximity because validated structural markers were unavailable in this workspace (${fallbackColumns.length} inferred columns).`,
+      });
+    }
+  }
   if (markerRes.markers.length === 0) {
     diagnostics.push({
       pass: 'pass4-columns',
@@ -240,10 +317,15 @@ export async function buildModelFromPlan(pdfPath, pageNum, opts = {}) {
   }
   const doors = (Array.isArray(doorRes.doors) ? doorRes.doors : [])
     .filter((door) => Number.isFinite(door.hostWallDistFt) ? door.hostWallDistFt <= 3 : true)
-    .map((door) => ({
-      ...door,
-      widthFt: Number.isFinite(door.widthFt) ? door.widthFt : Number(door.width) || null,
-    }));
+    .map((door) => {
+      const hostWall = nearestWallIndex(model.walls, door.position);
+      return {
+        ...door,
+        hostWall,
+        widthFt: Number.isFinite(door.widthFt) ? door.widthFt : Number(door.width) || null,
+        hostWallId: Number.isInteger(hostWall) ? model.walls[hostWall]?.id || null : null,
+      };
+    });
   model = mergeIntoModel(model, { doors });
   passesRun.push('pass5-doors');
   recordVerify(model, 'pass5-doors', diagnostics);
@@ -267,7 +349,11 @@ export async function buildModelFromPlan(pdfPath, pageNum, opts = {}) {
         hostWall = index;
       }
     });
-    return { ...opening, hostWall };
+    return {
+      ...opening,
+      hostWall,
+      hostWallId: Number.isInteger(hostWall) ? model.walls[hostWall]?.id || null : null,
+    };
   });
   model = mergeIntoModel(model, { openings });
   model.walls = attachOpeningsToWalls(model.walls, model.openings);
