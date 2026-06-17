@@ -38,6 +38,7 @@ const DEFAULTS = Object.freeze({
   perpTolFt: 0.25,   // collinear pieces share a perpendicular coordinate within this band
   gapFt: 1.0,        // merge pieces whose along-axis gap is <= this (bridges hairline breaks)
   minRunFt: 2.0,     // drop runs shorter than a real wall stub (sub-2ft = dimension tick / glyph)
+  orphanTolFt: 3.0,  // drop isolated runs whose endpoints connect to no other run within this radius
 });
 
 function round(n) { return Math.round((Number(n) + Number.EPSILON) * 1e4) / 1e4; }
@@ -88,6 +89,31 @@ function mergeAxisRuns(segs, axis, perpTolFt, gapFt, minRunFt) {
   return runs;
 }
 
+function hasNearbyEndpoint(runs, runIndex, endpoint, orphanTolFt) {
+  for (let i = 0; i < runs.length; i++) {
+    if (i === runIndex) continue;
+    const other = runs[i];
+    const da = Math.hypot(endpoint[0] - other.a[0], endpoint[1] - other.a[1]);
+    if (da <= orphanTolFt) return true;
+    const db = Math.hypot(endpoint[0] - other.b[0], endpoint[1] - other.b[1]);
+    if (db <= orphanTolFt) return true;
+  }
+  return false;
+}
+
+function dropOrphanRuns(runs, orphanTolFt) {
+  if (!(orphanTolFt > 0) || runs.length <= 1) return { runs, orphanRunsDropped: 0 };
+  const kept = [];
+  let orphanRunsDropped = 0;
+  for (let i = 0; i < runs.length; i++) {
+    const run = runs[i];
+    const keep = hasNearbyEndpoint(runs, i, run.a, orphanTolFt) || hasNearbyEndpoint(runs, i, run.b, orphanTolFt);
+    if (keep) kept.push(run);
+    else orphanRunsDropped += 1;
+  }
+  return { runs: kept, orphanRunsDropped };
+}
+
 /**
  * PURE. Merge fragmented wall segments into wall RUNS, excluding non-wall ink.
  *
@@ -96,7 +122,7 @@ function mergeAxisRuns(segs, axis, perpTolFt, gapFt, minRunFt) {
  * @returns {{
  *   runs: Array<{a:[number,number], b:[number,number], axis:'H'|'V', lengthFt:number}>,
  *   meta: { inputSegments, horizontal, vertical, diagonalDropped, degenerateDropped,
- *           shortRunsDropped, runCount, totalRunLengthFt, params, method, provenance, needsVerification }
+ *           shortRunsDropped, orphanRunsDropped, runCount, totalRunLengthFt, params, method, provenance, needsVerification }
  * }}
  */
 export function buildWallRuns(walls, opts = {}) {
@@ -104,6 +130,7 @@ export function buildWallRuns(walls, opts = {}) {
   const perpTolFt = Number.isFinite(opts.perpTolFt) ? opts.perpTolFt : DEFAULTS.perpTolFt;
   const gapFt = Number.isFinite(opts.gapFt) ? opts.gapFt : DEFAULTS.gapFt;
   const minRunFt = Number.isFinite(opts.minRunFt) ? opts.minRunFt : DEFAULTS.minRunFt;
+  const orphanTolFt = Number.isFinite(opts.orphanTolFt) ? opts.orphanTolFt : DEFAULTS.orphanTolFt;
 
   const input = Array.isArray(walls) ? walls : [];
   const H = [], V = [];
@@ -130,12 +157,14 @@ export function buildWallRuns(walls, opts = {}) {
   for (const r of vRuns) {
     runs.push({ a: [round(r.coord), round(r.lo)], b: [round(r.coord), round(r.hi)], axis: 'V', lengthFt: round(r.hi - r.lo) });
   }
+  const orphanFiltered = dropOrphanRuns(runs, orphanTolFt);
+  const finalRuns = orphanFiltered.runs;
   // Deterministic order: by axis, then position.
-  runs.sort((p, q) => (p.axis < q.axis ? -1 : p.axis > q.axis ? 1 : 0) || p.a[0] - q.a[0] || p.a[1] - q.a[1]);
+  finalRuns.sort((p, q) => (p.axis < q.axis ? -1 : p.axis > q.axis ? 1 : 0) || p.a[0] - q.a[0] || p.a[1] - q.a[1]);
 
-  const totalRunLengthFt = round(runs.reduce((acc, r) => acc + r.lengthFt, 0));
+  const totalRunLengthFt = round(finalRuns.reduce((acc, r) => acc + r.lengthFt, 0));
   return {
-    runs,
+    runs: finalRuns,
     meta: {
       inputSegments: input.length,
       horizontal: H.length,
@@ -143,11 +172,13 @@ export function buildWallRuns(walls, opts = {}) {
       diagonalDropped,
       degenerateDropped,
       shortRunsDropped,
-      runCount: runs.length,
+      orphanRunsDropped: orphanFiltered.orphanRunsDropped,
+      runCount: finalRuns.length,
       totalRunLengthFt,
-      params: { axisTolFt, perpTolFt, gapFt, minRunFt },
+      params: { axisTolFt, perpTolFt, gapFt, minRunFt, orphanTolFt },
       method: 'collinear-merge of single-band cut-wall segments into axis-aligned wall RUNS; ' +
-        'diagonals (door-swing arcs/hatch) dropped, sub-minRunFt stubs (dimension ticks/glyphs) dropped',
+        'diagonals (door-swing arcs/hatch) dropped, sub-minRunFt stubs (dimension ticks/glyphs) dropped, ' +
+        'isolated orphan runs with no endpoint connection within orphanTolFt dropped',
       provenance: 'reconstructed wall runs from real vector cut-wall segments — needs-verification; ' +
         'NOT AHJ/PE/manufacturer-exact/AutoSprink-parity. Non-wall ink EXCLUDED, never re-labeled.',
       needsVerification: true,

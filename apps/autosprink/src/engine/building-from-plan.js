@@ -20,6 +20,8 @@
  * manufacturer-exact / AutoSprink parity.
  */
 
+import { buildWallRuns } from './plan-wall-runs.js';
+
 const SLAB_COLOR = 0x2dd4bf;
 const WALL_COLOR = 0x8b9bb4;
 const KIND_COLORS = Object.freeze({
@@ -40,6 +42,32 @@ const KIND_COLORS = Object.freeze({
 
 function kindColor(kind) {
   return KIND_COLORS[kind] || KIND_COLORS.unknown;
+}
+
+function resolveWallSource(plan) {
+  if (Array.isArray(plan.wallRuns) && plan.wallRuns.length) {
+    return {
+      wallSource: plan.wallRuns,
+      usingRuns: true,
+      wallRunsCount: plan.wallRuns.length,
+      wallRunsMeta: plan.wallRunsMeta || null,
+    };
+  }
+  const rawWalls = Array.isArray(plan.walls) ? plan.walls.filter((seg) => seg && Array.isArray(seg.a) && Array.isArray(seg.b)) : [];
+  if (!rawWalls.length) {
+    return { wallSource: [], usingRuns: false, wallRunsCount: 0, wallRunsMeta: null };
+  }
+  const derived = buildWallRuns(rawWalls);
+  return {
+    wallSource: derived.runs,
+    usingRuns: true,
+    wallRunsCount: derived.runs.length,
+    wallRunsMeta: {
+      ...derived.meta,
+      derivedAtRender: true,
+      source: 'building-from-plan fallback from raw plan.walls',
+    },
+  };
 }
 
 /**
@@ -461,8 +489,9 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     // excluded — a plausible count of REAL walls) over the thousands of fragmented `walls`
     // segments. Each run extrudes as one continuous wall box. Falls back to `walls` only if no
     // runs were computed (older data). The fragmented `walls` set is no longer the headline.
-    const wallSource = (Array.isArray(plan.wallRuns) && plan.wallRuns.length) ? plan.wallRuns : plan.walls;
-    const usingRuns = (Array.isArray(plan.wallRuns) && plan.wallRuns.length) ? true : false;
+    const resolvedWalls = resolveWallSource(plan);
+    const wallSource = resolvedWalls.wallSource;
+    const usingRuns = resolvedWalls.usingRuns;
     if (includeWalls && wallMat && THREE.BoxGeometry && Array.isArray(wallSource)) {
       const validWalls = wallSource.filter((seg) => seg && Array.isArray(seg.a) && Array.isArray(seg.b));
       const doMerge = typeof mergeGeometries === 'function' && validWalls.length >= wallMergeThreshold;
@@ -590,11 +619,11 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
         doors: doorCount, openings: openingCount, fixtures: fixtureCount,
         wallsFull: wallsFullCount,
         // RECORE: the honest primary wall count is the merged wall RUNS (when present).
-        wallRuns: (Array.isArray(plan.wallRuns) ? plan.wallRuns.length : 0),
+        wallRuns: resolvedWalls.wallRunsCount,
         wallSegmentsRaw: (Array.isArray(plan.walls) ? plan.walls.length : 0),
         wallSource: usingRuns ? 'wall-runs' : 'wall-segments',
       },
-      wallRunsMeta: plan.wallRunsMeta || null,
+      wallRunsMeta: resolvedWalls.wallRunsMeta,
       // HF-W2: honest recall of the rendered recovered-wall set vs the sheet wall-ink.
       recallPct: (plan.wallsFullMeta && Number.isFinite(plan.wallsFullMeta.recallPct))
         ? plan.wallsFullMeta.recallPct : null,
