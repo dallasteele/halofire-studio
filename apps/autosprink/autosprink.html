@@ -651,6 +651,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 </div>
 
 <script src="/public/halofire-menubar.js"></script>
+<script type="module" src="/src/ui/dock/dock-system.js"></script>
 <script type="importmap">
 {
   "imports": {
@@ -8792,6 +8793,8 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     if (m && Array.isArray(m.items)) atTop ? m.items.unshift(...items) : m.items.push(...items);
   };
   addItems('view', [
+    { id: 'view.layouts', name: 'Layout presets', desc: sdesc },
+    { id: 'view.layout-edit-mode', name: 'Layout Edit Mode (Shift+F11)', desc: sdesc },
     { id: 'view.mode-3d', name: '3D (Perspective)', desc: sdesc },
     { id: 'view.mode-top', name: 'Top (Plan)', desc: sdesc },
     { id: 'view.mode-iso', name: 'Isometric (frame all)', desc: sdesc },
@@ -9168,6 +9171,23 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
   // HF-PHASE1-CMD: expose the menu-action map so the status-bar command line can
   // dispatch a tool/command by name (e.g. "move", "offset", "dimension").
   window.__hfActions = actions;
+  try {
+    if (window.HFDockSystem && typeof window.HFDockSystem.mountDockSystem === 'function') {
+      const consolePanel = document.createElement('section');
+      window.__hfDock = window.HFDockSystem.mountDockSystem({
+        window,
+        document,
+        statusEl: $('status'),
+        panels: [
+          { id: 'job-tools', selector: 'aside.left', title: 'Job / Tools', defaultDock: 'left', badge: 'Left Dock' },
+          { id: 'inspector-stack', selector: 'aside.right', title: 'Inspector / Results', defaultDock: 'right', badge: 'Right Dock' },
+          { id: 'console', element: consolePanel, kind: 'builtin-console', title: 'Console', defaultDock: 'bottom', badge: 'Bottom Dock' },
+        ],
+      });
+      document.body.appendChild(consolePanel);
+      window.__hfDock.connectActions(actions);
+    }
+  } catch (e) { window.__hfDockError = String(e && e.message || e); }
   try {
     window.__menuBar = window.HFMenuBar.mount($('menuBarHost'), { actions });
     window.__menuBarStats = window.__menuBar.stats();
