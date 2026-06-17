@@ -1,241 +1,251 @@
-/**
- * Building model (internal alpha, best-effort, dependency-free, deterministic).
- *
- * A richer-than-floorplan schema describing a multi-story building with
- * multiple spaces, interior + exterior walls, wall openings (doors/windows),
- * and structural columns. Plain data only — no OpenGeometry / browser deps;
- * the browser renders what these engines emit.
- *
- * Schema:
- *   building = {
- *     name, units:'ft',
- *     stories: [{
- *       level:int, baseElevationFt:number, ceilingHeightFt:number,
- *       spaces: [{ name, polygon:[[x,y],...], hazard }],
- *       walls:  [{ a:[x,y], b:[x,y], thicknessFt, type:'exterior'|'interior',
- *                  openings:[{offsetFt, widthFt, heightFt, sill?:number, type:'door'|'window'}] }],
- *       columns:[{ x, y, sizeFt }],
- *     }],
- *   }
- *
- * normalizeBuilding(spec): validates/cleans, applies defaults (hazard
- * 'ordinary', wall thicknessFt 0.5, wall type 'interior', ceilingHeightFt 14,
- * baseElevationFt 0), drops degenerate spaces (<3 verts) and zero-length walls,
- * and clamps each opening's offset/width so it stays within its wall.
- *
- * buildingFromFloorPlan(floorPlan): backward-compat helper that converts a
- * legacy {rooms} or {floors} floor plan into a building (each room -> one space;
- * the room perimeter -> exterior walls; no interior walls/openings/columns) so
- * the rest of the pipeline can consume either shape.
- *
- * This is NOT a CAD-grade model and infers nothing beyond what it is given;
- * all claim gates remain fail-closed.
- */
+import { z } from 'zod';
 
-const VALID_HAZARDS = new Set(['light', 'ordinary', 'extra']);
-const VALID_WALL_TYPES = new Set(['exterior', 'interior']);
-const VALID_OPENING_TYPES = new Set(['door', 'window']);
+const PROVENANCE_SOURCES = [
+  'plan-extract',
+  'structure-from-plan',
+  'door-extractor',
+  'zone-classifier',
+  'sam3',
+  'manual',
+];
 
-const DEFAULTS = Object.freeze({
-  hazard: 'ordinary',
-  thicknessFt: 0.5,
-  wallType: 'interior',
-  ceilingHeightFt: 14,
-  baseElevationFt: 0,
+const POINT_SCHEMA = z.tuple([z.number().finite(), z.number().finite()]);
+
+const ProvenanceSchema = z.object({
+  source: z.enum(PROVENANCE_SOURCES),
+  confidence: z.number().min(0).max(1),
+  needsVerification: z.boolean(),
+}).strict();
+
+const ShellSchema = z.object({
+  outline: z.array(POINT_SCHEMA),
+  heightFt: z.number().finite().nonnegative(),
+  provenance: ProvenanceSchema,
+}).strict();
+
+const WallRunSchema = z.object({
+  id: z.string().min(1),
+  a: POINT_SCHEMA,
+  b: POINT_SCHEMA,
+  thicknessFt: z.number().finite().positive(),
+  heightFt: z.number().finite().positive(),
+  zoneId: z.string().min(1).optional(),
+  provenance: ProvenanceSchema,
+}).strict();
+
+const ColumnSchema = z.object({
+  id: z.string().min(1),
+  x: z.number().finite(),
+  y: z.number().finite(),
+  sizeFt: z.number().finite().positive(),
+  gridLabel: z.string().min(1).optional(),
+  provenance: ProvenanceSchema,
+}).strict();
+
+const DoorSchema = z.object({
+  id: z.string().min(1),
+  wallId: z.string().min(1),
+  position: POINT_SCHEMA,
+  widthFt: z.number().finite().positive(),
+  swingDir: z.enum(['in', 'out']),
+  hingeSide: z.enum(['left', 'right']),
+  provenance: ProvenanceSchema,
+}).strict();
+
+const OpeningSchema = z.object({
+  id: z.string().min(1),
+  wallId: z.string().min(1),
+  position: POINT_SCHEMA,
+  widthFt: z.number().finite().positive(),
+  heightFt: z.number().finite().positive(),
+  kind: z.enum(['window', 'pass-through']),
+  provenance: ProvenanceSchema,
+}).strict();
+
+const RoomSchema = z.object({
+  id: z.string().min(1),
+  polygon: z.array(POINT_SCHEMA),
+  kind: z.string().min(1),
+  label: z.string().min(1).optional(),
+  areaSqft: z.number().finite().nonnegative(),
+  zoneId: z.string().min(1).optional(),
+  provenance: ProvenanceSchema,
+}).strict();
+
+const ZoneSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(['parking', 'lobby', 'unit', 'corridor', 'stair', 'mech', 'storage', 'restroom', 'other']),
+  polygon: z.array(POINT_SCHEMA),
+  provenance: ProvenanceSchema,
+}).strict();
+
+const StairSchema = z.object({
+  id: z.string().min(1),
+  polygon: z.array(POINT_SCHEMA),
+  kind: z.enum(['open', 'enclosed']),
+  floors: z.number().int().positive(),
+  provenance: ProvenanceSchema,
+}).strict();
+
+const MetaSchema = z.object({
+  sourceSheet: z.string(),
+  scaleFtPerUnit: z.number().finite().positive(),
+  scaleText: z.string(),
+  generatedAt: z.string(),
+}).strict();
+
+const ELEMENT_KEYS = ['shell', 'walls', 'columns', 'doors', 'openings', 'rooms', 'zones', 'stairs'];
+
+function addIssue(ctx, path, message) {
+  ctx.addIssue({
+    code: z.ZodIssueCode.custom,
+    path,
+    message,
+  });
+}
+
+export const BuildingModelSchema = z.object({
+  shell: ShellSchema,
+  walls: z.array(WallRunSchema),
+  columns: z.array(ColumnSchema),
+  doors: z.array(DoorSchema),
+  openings: z.array(OpeningSchema),
+  rooms: z.array(RoomSchema),
+  zones: z.array(ZoneSchema),
+  stairs: z.array(StairSchema),
+  meta: MetaSchema,
+}).strict().superRefine((model, ctx) => {
+  for (const key of ELEMENT_KEYS) {
+    const value = model[key];
+    if (Array.isArray(value)) {
+      value.forEach((element, index) => {
+        if (!element || typeof element !== 'object' || !('provenance' in element)) {
+          addIssue(ctx, [key, index, 'provenance'], `${key}[${index}] is missing provenance`);
+        }
+      });
+      continue;
+    }
+    if (!value || typeof value !== 'object' || !('provenance' in value)) {
+      addIssue(ctx, [key, 'provenance'], `${key} is missing provenance`);
+    }
+  }
+
+  const wallIds = new Set(model.walls.map((wall) => wall.id));
+  model.doors.forEach((door, index) => {
+    if (!wallIds.has(door.wallId)) {
+      addIssue(ctx, ['doors', index, 'wallId'], `Door ${door.id} references unknown wallId ${door.wallId}`);
+    }
+  });
+  model.openings.forEach((opening, index) => {
+    if (!wallIds.has(opening.wallId)) {
+      addIssue(ctx, ['openings', index, 'wallId'], `Opening ${opening.id} references unknown wallId ${opening.wallId}`);
+    }
+  });
+
+  if (model.zones.length > 0) {
+    const zoneIds = new Set(model.zones.map((zone) => zone.id));
+    model.rooms.forEach((room, index) => {
+      if (!room.zoneId) {
+        addIssue(ctx, ['rooms', index, 'zoneId'], `Room ${room.id} must reference a zone when zones are present`);
+      } else if (!zoneIds.has(room.zoneId)) {
+        addIssue(ctx, ['rooms', index, 'zoneId'], `Room ${room.id} references unknown zoneId ${room.zoneId}`);
+      }
+    });
+  }
 });
 
-function round(n) {
-  return Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+const DEFAULT_PROVENANCE = Object.freeze({
+  source: 'manual',
+  confidence: 0,
+  needsVerification: true,
+});
+
+const DEFAULT_BUILDING_MODEL = Object.freeze({
+  shell: {
+    outline: [],
+    heightFt: 0,
+    provenance: DEFAULT_PROVENANCE,
+  },
+  walls: [],
+  columns: [],
+  doors: [],
+  openings: [],
+  rooms: [],
+  zones: [],
+  stairs: [],
+  meta: {
+    sourceSheet: '',
+    scaleFtPerUnit: 1,
+    scaleText: '',
+    generatedAt: '',
+  },
+});
+
+function isPlainObject(value) {
+  return value != null && typeof value === 'object' && !Array.isArray(value);
 }
 
-function cleanVertex(pt) {
-  if (!Array.isArray(pt) || pt.length < 2 || !Number.isFinite(Number(pt[0])) || !Number.isFinite(Number(pt[1]))) {
-    return null;
+function cloneValue(value) {
+  if (Array.isArray(value)) return value.map(cloneValue);
+  if (isPlainObject(value)) {
+    const out = {};
+    for (const [key, child] of Object.entries(value)) out[key] = cloneValue(child);
+    return out;
   }
-  return [Number(pt[0]), Number(pt[1])];
+  return value;
 }
 
-function cleanHazard(h) {
-  const v = String(h == null ? '' : h).toLowerCase();
-  return VALID_HAZARDS.has(v) ? v : DEFAULTS.hazard;
-}
-
-function wallLength(a, b) {
-  return Math.hypot(b[0] - a[0], b[1] - a[1]);
-}
-
-/** Clean a single opening against its host wall length; returns null if unusable. */
-function cleanOpening(op, len) {
-  if (!op || typeof op !== 'object') return null;
-  let widthFt = Number(op.widthFt);
-  if (!Number.isFinite(widthFt) || widthFt <= 0) return null;
-  let offsetFt = Number(op.offsetFt);
-  if (!Number.isFinite(offsetFt) || offsetFt < 0) offsetFt = 0;
-  // Clamp so the opening stays within the wall span [0, len].
-  if (widthFt > len) widthFt = len;
-  if (offsetFt + widthFt > len) offsetFt = Math.max(0, len - widthFt);
-  if (widthFt <= 0) return null;
-  const heightFt = Number.isFinite(Number(op.heightFt)) && Number(op.heightFt) > 0 ? Number(op.heightFt) : 7;
-  const type = VALID_OPENING_TYPES.has(String(op.type).toLowerCase()) ? String(op.type).toLowerCase() : 'door';
-  const out = {
-    offsetFt: round(offsetFt),
-    widthFt: round(widthFt),
-    heightFt: round(heightFt),
-    type,
-  };
-  if (Number.isFinite(Number(op.sill))) out.sill = round(Number(op.sill));
-  return out;
-}
-
-/** Clean a wall; returns null if zero-length or malformed. */
-function cleanWall(wall) {
-  if (!wall || typeof wall !== 'object') return null;
-  const a = cleanVertex(wall.a);
-  const b = cleanVertex(wall.b);
-  if (!a || !b) return null;
-  const len = wallLength(a, b);
-  if (len < 1e-9) return null; // zero-length
-  const thicknessFt = Number.isFinite(Number(wall.thicknessFt)) && Number(wall.thicknessFt) > 0
-    ? Number(wall.thicknessFt)
-    : DEFAULTS.thicknessFt;
-  const type = VALID_WALL_TYPES.has(String(wall.type).toLowerCase()) ? String(wall.type).toLowerCase() : DEFAULTS.wallType;
-  const openings = Array.isArray(wall.openings)
-    ? wall.openings.map((o) => cleanOpening(o, len)).filter(Boolean)
-    : [];
-  return { a, b, thicknessFt: round(thicknessFt), type, openings };
-}
-
-/** Clean a space polygon; returns null if degenerate (<3 verts). */
-function cleanSpace(space, index) {
-  if (!space || typeof space !== 'object') return null;
-  const polygon = Array.isArray(space.polygon)
-    ? space.polygon.map(cleanVertex).filter(Boolean)
-    : [];
-  if (polygon.length < 3) return null;
-  return {
-    name: space.name || `Space ${index + 1}`,
-    polygon,
-    hazard: cleanHazard(space.hazard),
-  };
-}
-
-function cleanColumn(col) {
-  if (!col || typeof col !== 'object') return null;
-  const x = Number(col.x);
-  const y = Number(col.y);
-  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
-  const sizeFt = Number.isFinite(Number(col.sizeFt)) && Number(col.sizeFt) > 0 ? Number(col.sizeFt) : 1;
-  return { x, y, sizeFt: round(sizeFt) };
-}
-
-function cleanStory(story, index) {
-  const level = Number.isFinite(Number(story.level)) ? Math.trunc(Number(story.level)) : index;
-  const baseElevationFt = Number.isFinite(Number(story.baseElevationFt))
-    ? Number(story.baseElevationFt)
-    : DEFAULTS.baseElevationFt;
-  const ceilingHeightFt = Number.isFinite(Number(story.ceilingHeightFt)) && Number(story.ceilingHeightFt) > 0
-    ? Number(story.ceilingHeightFt)
-    : DEFAULTS.ceilingHeightFt;
-  const spaces = (Array.isArray(story.spaces) ? story.spaces : [])
-    .map((sp, i) => cleanSpace(sp, i))
-    .filter(Boolean);
-  const walls = (Array.isArray(story.walls) ? story.walls : [])
-    .map(cleanWall)
-    .filter(Boolean);
-  const columns = (Array.isArray(story.columns) ? story.columns : [])
-    .map(cleanColumn)
-    .filter(Boolean);
-  return { level, baseElevationFt, ceilingHeightFt, spaces, walls, columns };
-}
-
-/**
- * Validate + clean a building spec. Throws if there are no stories.
- * @param {object} spec
- * @returns {{name:string, units:string, stories:Array}}
- */
-export function normalizeBuilding(spec) {
-  if (!spec || !Array.isArray(spec.stories) || spec.stories.length === 0) {
-    throw new Error('Building must have a non-empty stories array');
-  }
-  const stories = spec.stories.map((story, i) => cleanStory(story || {}, i));
-  return {
-    name: spec.name || 'Imported Building',
-    units: spec.units || 'ft',
-    stories,
-  };
-}
-
-/** Perimeter exterior walls for a room polygon (no openings). */
-function perimeterWalls(polygon) {
-  const walls = [];
-  for (let i = 0; i < polygon.length; i++) {
-    const a = polygon[i];
-    const b = polygon[(i + 1) % polygon.length];
-    if (wallLength(a, b) < 1e-9) continue;
-    walls.push({ a: [a[0], a[1]], b: [b[0], b[1]], thicknessFt: DEFAULTS.thicknessFt, type: 'exterior', openings: [] });
-  }
-  return walls;
-}
-
-/** Convert a list of legacy rooms into a story (spaces + perimeter exterior walls). */
-function storyFromRooms(rooms, storyMeta) {
-  const spaces = [];
-  const walls = [];
-  rooms.forEach((room, i) => {
-    const polygon = (Array.isArray(room.polygon) ? room.polygon.map(cleanVertex).filter(Boolean) : []);
-    if (polygon.length < 3) return;
-    spaces.push({
-      name: room.name || `Space ${i + 1}`,
-      polygon,
-      hazard: cleanHazard(room.hazard),
-    });
-    walls.push(...perimeterWalls(polygon));
+function mergeArrayById(base, patch) {
+  const seeded = Array.isArray(base) ? base.map(cloneValue) : [];
+  const indexById = new Map();
+  seeded.forEach((item, index) => {
+    if (isPlainObject(item) && typeof item.id === 'string' && item.id.length > 0) {
+      indexById.set(item.id, index);
+    }
   });
-  return {
-    level: storyMeta.level,
-    baseElevationFt: storyMeta.baseElevationFt,
-    ceilingHeightFt: storyMeta.ceilingHeightFt,
-    spaces,
-    walls,
-    columns: [],
-  };
+  for (const item of patch) {
+    if (isPlainObject(item) && typeof item.id === 'string' && indexById.has(item.id)) {
+      const index = indexById.get(item.id);
+      seeded[index] = mergeValues(seeded[index], item);
+    } else {
+      seeded.push(cloneValue(item));
+      if (isPlainObject(item) && typeof item.id === 'string' && item.id.length > 0) {
+        indexById.set(item.id, seeded.length - 1);
+      }
+    }
+  }
+  return seeded;
 }
 
-/**
- * Backward-compat: convert a legacy {rooms} or {floors} floor plan into a
- * building. Each room becomes a space; the room perimeter becomes exterior
- * walls; no interior walls, openings, or columns are inferred.
- * @param {object} floorPlan
- * @returns {{name:string, units:string, stories:Array}}
- */
-export function buildingFromFloorPlan(floorPlan) {
-  if (!floorPlan || typeof floorPlan !== 'object') {
-    throw new Error('floorPlan must be an object');
+function mergeValues(base, patch) {
+  if (patch === undefined) return cloneValue(base);
+  if (Array.isArray(base) && Array.isArray(patch)) return mergeArrayById(base, patch);
+  if (isPlainObject(base) && isPlainObject(patch)) {
+    const out = cloneValue(base);
+    for (const [key, value] of Object.entries(patch)) {
+      out[key] = key in out ? mergeValues(out[key], value) : cloneValue(value);
+    }
+    return out;
   }
-  const name = floorPlan.name || 'Imported Building';
-  const units = floorPlan.units || 'ft';
+  return cloneValue(patch);
+}
 
-  let stories;
-  if (Array.isArray(floorPlan.floors) && floorPlan.floors.length > 0) {
-    stories = floorPlan.floors.map((floor, i) => storyFromRooms(
-      Array.isArray(floor.rooms) ? floor.rooms : [],
-      {
-        level: Number.isFinite(Number(floor.level)) ? Math.trunc(Number(floor.level)) : i,
-        baseElevationFt: Number.isFinite(Number(floor.baseElevationFt)) ? Number(floor.baseElevationFt) : DEFAULTS.baseElevationFt,
-        ceilingHeightFt: Number.isFinite(Number(floor.ceilingHeightFt)) && Number(floor.ceilingHeightFt) > 0
-          ? Number(floor.ceilingHeightFt)
-          : DEFAULTS.ceilingHeightFt,
-      },
-    ));
-  } else if (Array.isArray(floorPlan.rooms) && floorPlan.rooms.length > 0) {
-    stories = [storyFromRooms(floorPlan.rooms, {
-      level: 0,
-      baseElevationFt: DEFAULTS.baseElevationFt,
-      ceilingHeightFt: DEFAULTS.ceilingHeightFt,
-    })];
-  } else {
-    throw new Error('floorPlan must have a non-empty rooms or floors array');
-  }
+export function validateBuildingModel(model) {
+  return BuildingModelSchema.parse(model);
+}
 
-  return normalizeBuilding({ name, units, stories });
+export function createBuildingModel(seed = {}) {
+  return validateBuildingModel(mergeValues(DEFAULT_BUILDING_MODEL, seed));
+}
+
+export function mergeIntoModel(model, patch = {}) {
+  return validateBuildingModel(mergeValues(validateBuildingModel(model), patch));
+}
+
+export function normalizeBuilding() {
+  throw new Error('normalizeBuilding was replaced by createBuildingModel/validateBuildingModel for the canonical BuildingModel schema');
+}
+
+export function buildingFromFloorPlan() {
+  throw new Error('buildingFromFloorPlan was removed from building-model.js; write canonical BuildingModel data instead');
 }
