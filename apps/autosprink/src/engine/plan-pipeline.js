@@ -101,7 +101,7 @@ function orphanWallIds(walls, shellBbox, tolerance = 0.35) {
   return out;
 }
 
-function validateBuildingModel(model, stage) {
+export function validateBuildingModel(model, stage) {
   const diagnostics = [];
   const push = (code, message, details = {}) => diagnostics.push({ stage, level: 'error', code, message, details });
 
