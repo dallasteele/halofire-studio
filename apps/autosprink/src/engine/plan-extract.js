@@ -702,6 +702,8 @@ export function buildLevelPlan(input, opts = {}) {
     },
     wallBboxFt,
     walls,
+    // Compatibility alias for callers/tests that still consume the explicit feet-suffixed wall field.
+    wallsFt: walls,
     wallRuns,
     wallRunsMeta,
     ...(wallsFull ? { wallsFull, wallsFullMeta } : {}),

@@ -59,12 +59,63 @@ const PDFJS_OPS_FALLBACK = Object.freeze({
   setStrokeColorN: 'setStrokeColorN',
 });
 
+const PDFJS_OPS_REAL = Object.freeze({
+  moveTo: 13,
+  lineTo: 14,
+  curveTo: 15,
+  curveTo2: 16,
+  curveTo3: 17,
+  closePath: 18,
+  rectangle: 19,
+  save: 10,
+  restore: 11,
+  transform: 12,
+  setLineWidth: 2,
+  setStrokeRGBColor: 58,
+  setStrokeColor: 52,
+  setStrokeColorN: 53,
+  constructPath: 91,
+});
+
 let OPS = PDFJS_OPS_FALLBACK;
 try {
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
   if (pdfjs && pdfjs.OPS) OPS = pdfjs.OPS;
 } catch {
   // Pure tests can still exercise non-pdfjs code paths with the fallback table.
+}
+
+const OP_NAMES = Object.freeze([
+  'moveTo',
+  'lineTo',
+  'curveTo',
+  'curveTo2',
+  'curveTo3',
+  'closePath',
+  'rectangle',
+  'save',
+  'restore',
+  'transform',
+  'setLineWidth',
+  'setStrokeRGBColor',
+  'setStrokeColor',
+  'setStrokeColorN',
+  'constructPath',
+]);
+
+const OP_CODE_SET = Object.freeze(Object.fromEntries(
+  OP_NAMES.map((name) => {
+    const codes = new Set();
+    for (const code of [OPS[name], PDFJS_OPS_FALLBACK[name], PDFJS_OPS_REAL[name]]) {
+      if (code != null) codes.add(code);
+    }
+    return [name, codes];
+  }),
+));
+
+function isPdfOp(fn, name) {
+  const codes = OP_CODE_SET[name];
+  return !!codes && codes.has(fn);
 }
 
 // pdfjs-internal DrawOPS codes for the v6 constructPath path buffer. These are a
@@ -212,6 +263,7 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
   };
 
   const emit = (x1, y1, x2, y2) => {
+    if (![x1, y1, x2, y2].every(Number.isFinite)) return;
     const seg = {
       x1: round(x1 * scale),
       y1: round(y1 * scale),
@@ -291,33 +343,23 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
   const walkLegacyConstructPath = (subOps, coords) => {
     let c = 0;
     for (const sub of subOps) {
-      switch (sub) {
-        case OPS.moveTo:
-          moveTo(coords[c], coords[c + 1]);
-          c += 2;
-          break;
-        case OPS.lineTo:
-          lineTo(coords[c], coords[c + 1]);
-          c += 2;
-          break;
-        case OPS.curveTo: // 6 coords, endpoint
-          lineTo(coords[c + 4], coords[c + 5]);
-          c += 6;
-          break;
-        case OPS.curveTo2: // 4 coords, endpoint at [2],[3]
-        case OPS.curveTo3:
-          lineTo(coords[c + 2], coords[c + 3]);
-          c += 4;
-          break;
-        case OPS.rectangle:
-          rectangle(coords[c], coords[c + 1], coords[c + 2], coords[c + 3]);
-          c += 4;
-          break;
-        case OPS.closePath:
-          closePath();
-          break;
-        default:
-          break;
+      if (isPdfOp(sub, 'moveTo')) {
+        moveTo(coords[c], coords[c + 1]);
+        c += 2;
+      } else if (isPdfOp(sub, 'lineTo')) {
+        lineTo(coords[c], coords[c + 1]);
+        c += 2;
+      } else if (isPdfOp(sub, 'curveTo')) { // 6 coords, endpoint
+        lineTo(coords[c + 4], coords[c + 5]);
+        c += 6;
+      } else if (isPdfOp(sub, 'curveTo2') || isPdfOp(sub, 'curveTo3')) { // 4 coords, endpoint at [2],[3]
+        lineTo(coords[c + 2], coords[c + 3]);
+        c += 4;
+      } else if (isPdfOp(sub, 'rectangle')) {
+        rectangle(coords[c], coords[c + 1], coords[c + 2], coords[c + 3]);
+        c += 4;
+      } else if (isPdfOp(sub, 'closePath')) {
+        closePath();
       }
     }
   };
@@ -325,35 +367,25 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
   for (let k = 0; k < fnArray.length; k++) {
     const fn = fnArray[k];
     const args = argsArray[k] || [];
-    switch (fn) {
-      case OPS.moveTo:
-        moveTo(args[0], args[1]);
-        break;
-      case OPS.lineTo:
-        lineTo(args[0], args[1]);
-        break;
-      case OPS.curveTo:
-        lineTo(args[4], args[5]);
-        break;
-      case OPS.curveTo2:
-      case OPS.curveTo3:
-        lineTo(args[2], args[3]);
-        break;
-      case OPS.rectangle:
-        rectangle(args[0], args[1], args[2], args[3]);
-        break;
-      case OPS.closePath:
-        closePath();
-        break;
-      case OPS.constructPath:
+    if (isPdfOp(fn, 'moveTo')) {
+      moveTo(args[0], args[1]);
+    } else if (isPdfOp(fn, 'lineTo')) {
+      lineTo(args[0], args[1]);
+    } else if (isPdfOp(fn, 'curveTo')) {
+      lineTo(args[4], args[5]);
+    } else if (isPdfOp(fn, 'curveTo2') || isPdfOp(fn, 'curveTo3')) {
+      lineTo(args[2], args[3]);
+    } else if (isPdfOp(fn, 'rectangle')) {
+      rectangle(args[0], args[1], args[2], args[3]);
+    } else if (isPdfOp(fn, 'closePath')) {
+      closePath();
+    } else if (isPdfOp(fn, 'constructPath')) {
         constructPathDispatch(args, walkDrawBuffer, walkLegacyConstructPath);
-        break;
-      case OPS.save:
+    } else if (isPdfOp(fn, 'save')) {
         // Push a copy of the CTM AND the graphics state (lineWidth + color).
         ctmStack.push(ctm.slice());
         gsStack.push({ lineWidth: gsLineWidth, strokeColor: gsStrokeColor });
-        break;
-      case OPS.restore:
+    } else if (isPdfOp(fn, 'restore')) {
         // Pop back to the saved CTM + graphics state (defensive: ignore unbalanced).
         if (ctmStack.length) ctm = ctmStack.pop();
         if (gsStack.length) {
@@ -361,33 +393,23 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
           gsLineWidth = g.lineWidth;
           gsStrokeColor = g.strokeColor;
         }
-        break;
-      case OPS.transform:
+    } else if (isPdfOp(fn, 'transform')) {
         // Pre-multiply the supplied matrix into the CTM, exactly as the renderer does.
         if (args.length >= 6) {
           multiplyCtm([args[0], args[1], args[2], args[3], args[4], args[5]]);
         }
-        break;
-      case OPS.setLineWidth: {
+    } else if (isPdfOp(fn, 'setLineWidth')) {
         // T34: track the current stroke lineWidth (in user-space units as authored;
         // we tag the relative band, not an absolute mm — the histogram groups by it).
         const w = Number(args[0]);
         if (Number.isFinite(w)) gsLineWidth = w;
-        break;
-      }
-      case OPS.setStrokeRGBColor:
-      case OPS.setStrokeColor:
-      case OPS.setStrokeColorN: {
+    } else if (isPdfOp(fn, 'setStrokeRGBColor') || isPdfOp(fn, 'setStrokeColor') || isPdfOp(fn, 'setStrokeColorN')) {
         // T34: track the current stroke color. In pdfjs v6 all of these arrive as
         // OPS.setStrokeRGBColor with a hex-string arg; older/raw forms (packed int or
         // [r,g,b]) and the colorspace-dependent setStrokeColor/N are normalized here.
         const c = normalizeStrokeColorArg(args);
         // A null (pattern / transparent / undecodable) leaves the prior color stable.
         if (c !== null) gsStrokeColor = c;
-        break;
-      }
-      default:
-        break; // ignore text/image/other state ops
     }
   }
 
@@ -1428,6 +1450,15 @@ const WALL_LAYER_NOTE =
 export function selectWallLayer(segments, opts = {}) {
   const heavyQuantile = Number.isFinite(opts.heavyQuantile) ? Number(opts.heavyQuantile) : 0.5;
   const connectTolFt = Number.isFinite(opts.connectTolFt) ? Number(opts.connectTolFt) : 1.5;
+  const coherentLenExactMaxMembers = Number.isFinite(opts.coherentLenExactMaxMembers)
+    ? Number(opts.coherentLenExactMaxMembers)
+    : 2000;
+  const colorFallbackMinAreaFrac = Number.isFinite(opts.colorFallbackMinAreaFrac)
+    ? Number(opts.colorFallbackMinAreaFrac)
+    : 0.5;
+  const colorFallbackMinCount = Number.isFinite(opts.colorFallbackMinCount)
+    ? Number(opts.colorFallbackMinCount)
+    : 100;
 
   const segs = Array.isArray(segments) ? segments : [];
   const segLen = (s) => Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
@@ -1536,7 +1567,35 @@ export function selectWallLayer(segments, opts = {}) {
   // --- FALLBACK: no lineWidth tags at all -> single group, select it ----------
   const withWidth = groupsArr.filter((g) => g.lineWidth != null);
   if (withWidth.length === 0) {
-    // No graphics-state lineweight info; the whole geometry is one layer.
+    // Some real pdfjs runtimes preserve stroke COLOR but not a stable lineWidth tag.
+    // In that case, choose the densest building-scale colored band instead of the raw
+    // largest group, which is often a full-sheet annotation/hairline overlay.
+    const colored = groupsArr.filter((g) => g.strokeColor != null);
+    if (colored.length > 0) {
+      const bboxArea = (g) => {
+        const b = boundingBox(g.members);
+        return b.widthFt * b.heightFt;
+      };
+      const maxArea = Math.max(...colored.map((g) => bboxArea(g)));
+      const eligible = colored.filter((g) =>
+        g.members.length >= colorFallbackMinCount && bboxArea(g) >= maxArea * colorFallbackMinAreaFrac,
+      );
+      const pool = eligible.length > 0 ? eligible : colored;
+      let best = null;
+      let bestScore = -Infinity;
+      let bestTotal = -Infinity;
+      for (const g of pool) {
+        const area = Math.max(bboxArea(g), 1e-9);
+        const score = g.totalLen / area;
+        if (score > bestScore + 1e-12 || (Math.abs(score - bestScore) <= 1e-12 && g.totalLen > bestTotal)) {
+          best = g;
+          bestScore = score;
+          bestTotal = g.totalLen;
+        }
+      }
+      if (best) return finalize(best, 'color-band-density-fallback');
+    }
+    // No usable graphics-state split; the whole geometry is one layer.
     const only = groupsArr[0];
     return finalize(only, 'single-group');
   }
@@ -1586,7 +1645,12 @@ export function selectWallLayer(segments, opts = {}) {
   let bestScore = -Infinity;
   let bestWidth = -Infinity;
   for (const g of candidates) {
-    const score = coherentLen(g.members);
+    // Large real sheets can carry thousands of cut-wall fragments in the winning band.
+    // Ranking those bands by exact endpoint-connectivity becomes the runtime bottleneck;
+    // once a group is this large, its drawn length is already a stable proxy for "is this
+    // the dominant structural band?" and avoids turning the real-PDF gate into an O(n^2)
+    // wall-layer pass.
+    const score = g.members.length > coherentLenExactMaxMembers ? g.totalLen : coherentLen(g.members);
     // Greatest coherent connected length wins; ties break toward heavier lineWidth.
     if (score > bestScore + 1e-9 || (Math.abs(score - bestScore) <= 1e-9 && g.lineWidth > bestWidth)) {
       bestScore = score;
