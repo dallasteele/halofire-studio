@@ -558,32 +558,60 @@ export function escutcheonScad() {
 
 /**
  * Drop nipple — short threaded pipe nipple from a branch tee/reducer down to a
- * head. Bore at the real pipe OD, real short-nipple length, threaded end-bands.
+ * head. Bore at the real pipe OD, real short-nipple length, with helical male
+ * NPT threads at both ends instead of stacked ridge bands.
  * @param {{nominalIn?:number,lengthIn?:number}} p
  */
 export function dropNippleScad(p = {}) {
   const nominalIn = num(p.nominalIn, 1);
   const lengthIn = num(p.lengthIn, NIPPLE_DIMS.default_len.value);
+  const nps = nearestNps(nominalIn);
   const odIn = pipeOdIn(nominalIn);
-  const wallIn = PIPE_WALL_IN[40][nearestNps(nominalIn)] || 0.133;
+  const wallIn = PIPE_WALL_IN[40][nps] || 0.133;
   const boreIn = odIn - 2 * wallIn;
   const tLen = NIPPLE_DIMS.thread_len.value;
+  const tpi =
+    NIPPLE_DIMS.thread_tpi_by_nps[nps] && Number.isFinite(NIPPLE_DIMS.thread_tpi_by_nps[nps].value)
+      ? NIPPLE_DIMS.thread_tpi_by_nps[nps].value
+      : 11.5;
+  const pitchIn = 1 / tpi;
+  const threadHeightIn = 0.8 / tpi;
+  const taperDiamPerIn = NIPPLE_DIMS.thread_taper_diam_per_in.value;
+  const threadMajorTipIn = Math.max(odIn - taperDiamPerIn * tLen, boreIn + threadHeightIn * 2.1);
+  const threadMinorTipIn = Math.max(threadMajorTipIn - threadHeightIn * 2, boreIn + 0.02);
+  const threadMinorBodyIn = Math.max(odIn - threadHeightIn * 2, boreIn + 0.02);
+  const centerLenIn = Math.max(0, lengthIn - tLen * 2);
+  const turns = tLen * tpi;
+  const slices = Math.max(72, Math.ceil(turns * 24));
   const od = mm(odIn);
   const bore = mm(boreIn);
   const len = mm(lengthIn);
-  const bandLen = mm(tLen);
+  const pitch = mm(pitchIn);
+  const threadLen = mm(tLen);
+  const centerLen = mm(centerLenIn);
+  const threadDepth = mm(threadHeightIn);
+  const threadScale = (threadMinorBodyIn / threadMinorTipIn).toFixed(6);
   return (
     header(`Drop nipple — ${nominalIn}", ${lengthIn}" long`, [
-      `Sch 40 pipe OD ${odIn}", threaded ${tLen}" each end`,
+      `Sch 40 pipe OD ${odIn}", male NPT threads ${tLen}" each end`,
+      `${nps}" NPT thread pitch ${tpi} TPI, taper ${taperDiamPerIn}" per inch on diameter`,
     ]) +
     [
       `module drop_nipple() {`,
+      `  module tapered_thread_segment() {`,
+      `    union() {`,
+      `      cylinder(h = ${threadLen}, d1 = ${mm(threadMinorTipIn)}, d2 = ${mm(threadMinorBodyIn)});`,
+      `      linear_extrude(height = ${threadLen}, twist = ${(turns * 360).toFixed(2)}, slices = ${slices}, scale = ${threadScale})`,
+      `        translate([${mm(threadMinorTipIn / 2)}, 0, 0]) polygon(points = [[0, 0], [${threadDepth}, ${(Number(pitch) / 2).toFixed(2)}], [0, ${pitch}]]);`,
+      `    }`,
+      `  }`,
       `  difference() {`,
       `    union() {`,
-      `      cylinder(h = ${len}, d = ${od});`,
-      `      // threaded end-bands (short ridge each end, not a star body)`,
-      `      cylinder(h = ${bandLen}, d = ${mm(odIn * 1.05)});`,
-      `      translate([0, 0, ${mm(lengthIn - tLen)}]) cylinder(h = ${bandLen}, d = ${mm(odIn * 1.05)});`,
+      `      if (${centerLenIn.toFixed(4)} > 0) translate([0, 0, ${threadLen}]) cylinder(h = ${centerLen}, d = ${od});`,
+      `      // helical NPT thread at the lower end`,
+      `      tapered_thread_segment();`,
+      `      // mirrored helical NPT thread at the upper end`,
+      `      translate([0, 0, ${len}]) mirror([0, 0, 1]) tapered_thread_segment();`,
       `    }`,
       `    translate([0, 0, -1]) cylinder(h = ${mm(lengthIn + 0.08)}, d = ${bore});`,
       `  }`,
