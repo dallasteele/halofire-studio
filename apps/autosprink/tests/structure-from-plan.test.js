@@ -4,6 +4,7 @@ import {
   deriveScaleFromText,
   extractStructuralGrid,
   parseMemberTags,
+  detectColumnMarkers,
   detectColumns,
   detectBeams,
   buildStructureLayer,
@@ -108,18 +109,35 @@ describe('parseMemberTags', () => {
 
 describe('detectColumns', () => {
   const grid = { xs: [0, 20], ys: [0, 20], labels: { cols: ['1', '2'], rows: ['A', 'B'] } };
-  // A dense marker cluster of short segments at grid intersection (0,0); the other 3 intersections
-  // have no markers (no fabrication there).
   const markerAt = (cx, cy) => {
-    const segs = [];
-    for (let i = 0; i < 8; i++) segs.push({ x1: cx - 0.5, y1: cy + i * 0.1 - 0.4, x2: cx + 0.5, y2: cy + i * 0.1 - 0.4 });
-    return segs;
+    const minX = cx - 0.75;
+    const maxX = cx + 0.75;
+    const minY = cy - 0.75;
+    const maxY = cy + 0.75;
+    return [
+      { x1: minX, y1: minY, x2: maxX, y2: minY },
+      { x1: maxX, y1: minY, x2: maxX, y2: maxY },
+      { x1: maxX, y1: maxY, x2: minX, y2: maxY },
+      { x1: minX, y1: maxY, x2: minX, y2: minY },
+    ];
   };
+  const hollowTickAt = (cx, cy) => ([
+    { x1: cx - 0.75, y1: cy, x2: cx, y2: cy },
+    { x1: cx, y1: cy, x2: cx, y2: cy + 0.75 },
+    { x1: cx - 0.55, y1: cy + 0.2, x2: cx + 0.2, y2: cy + 0.2 },
+    { x1: cx - 0.2, y1: cy - 0.55, x2: cx - 0.2, y2: cy + 0.2 },
+  ]);
+
+  it('rejects open corner ticks in the filled-blob gate', () => {
+    const r = detectColumnMarkers([{ x: 0, y: 0 }], hollowTickAt(0, 0), {});
+    expect(r.markers).toHaveLength(0);
+  });
   it('emits a column ONLY where marker linework exists at a grid intersection', () => {
     const segs = markerAt(0, 0);
     const r = detectColumns(grid, segs, [], { minMarkerSegs: 4, markerRadiusFt: 2.5 });
     expect(r.columns.length).toBe(1);
     expect(r.columns[0]).toMatchObject({ x: 0, y: 0, grid: { col: '1', row: 'A' } });
+    expect(r.columns[0].fillRatio).toBeGreaterThanOrEqual(0.6);
   });
   it('tags a column with the nearest column-role member size', () => {
     const segs = markerAt(0, 0);
@@ -195,9 +213,16 @@ describe('matchGridOffset (register structure -> architectural grid)', () => {
 describe('buildStructureLayer + nearestMember', () => {
   // Synthetic structural sheet: 2x2 grid, one column marker, two beams, a beam member tag.
   const grid2 = (cx, cy) => {
-    const segs = [];
-    for (let i = 0; i < 8; i++) segs.push({ x1: cx - 0.5, y1: cy + i * 0.1 - 0.4, x2: cx + 0.5, y2: cy + i * 0.1 - 0.4 });
-    return segs;
+    const minX = cx - 0.75;
+    const maxX = cx + 0.75;
+    const minY = cy - 0.75;
+    const maxY = cy + 0.75;
+    return [
+      { x1: minX, y1: minY, x2: maxX, y2: minY },
+      { x1: maxX, y1: minY, x2: maxX, y2: maxY },
+      { x1: maxX, y1: maxY, x2: minX, y2: maxY },
+      { x1: minX, y1: maxY, x2: minX, y2: minY },
+    ];
   };
   const segments = [
     ...grid2(0, 0),
