@@ -509,6 +509,34 @@ export function buildLevelPlan(input, opts = {}) {
   const { partitionInclusive: _pi, ...singleBandLayerOpts } = (opts.layerOpts || {});
   const wl = selectWallLayer(segments, singleBandLayerOpts);
   const wallSegs = wl.wallSegments.length >= 3 ? wl.wallSegments : segments;
+  const walls = wallSegs.map((s) => ({ a: [round(s.x1), round(s.y1)], b: [round(s.x2), round(s.y2)] }));
+  const wr = buildWallRuns(walls, opts.wallRunOpts || {});
+  const wallRuns = wr.runs;
+  const wallRunsMeta = wr.meta;
+
+  if (opts.wallRunsOnly === true) {
+    return {
+      scaleFtPerUnit: round(scaleFtPerUnit),
+      scaleText: scaleText || `feetPerUnit=${round(scaleFtPerUnit)}`,
+      walls,
+      wallsFt: walls,
+      wallRuns,
+      wallRunsMeta,
+      counts: {
+        segments: segments.length,
+        wallSegments: wallSegs.length,
+        wallRuns: wallRuns.length,
+      },
+      wallLayer: { method: wl.method, chosen: wl.chosen },
+      provenance: PROVENANCE_BASE + ' — wall-runs-only fast path',
+      needsVerification: true,
+      notes: {
+        wallRuns: 'Fast-path extraction for raw wall segments + merged wall runs only. ' +
+          'Uses the real vector wall layer and buildWallRuns, but intentionally skips rooms, ' +
+          'stairs, parking, and footprint inference to keep the real-PDF step-2 gate bounded.',
+      },
+    };
+  }
 
   // 2) FOOTPRINT: enclosed rectilinear outline of the dominant connected wall network.
   const outline = buildingOutlinePolygon(wallSegs, opts.outlineOpts || {});
@@ -612,19 +640,6 @@ export function buildLevelPlan(input, opts = {}) {
     }
   }
 
-  // Walls emitted as {a,b,thickness?} pairs (the wall-layer segments).
-  const walls = wallSegs.map((s) => ({ a: [round(s.x1), round(s.y1)], b: [round(s.x2), round(s.y2)] }));
-
-  // RECORE: collapse the FRAGMENTED single-band cut-wall segments into real wall RUNS, with
-  // non-wall exclusion (diagonals = door-swing arcs/hatch dropped; sub-2ft stubs = dimension
-  // ticks/glyphs dropped). This is the HONEST structure — a plausible count of actual walls
-  // (envelope + partitions), NOT the tens-of-thousands of ink fragments. Rendered as the
-  // primary walls; `wallsFull` (the over-inclusive lineweight union) is retained only as an
-  // OFF-by-default diagnostic overlay. needs-verification.
-  const wr = buildWallRuns(walls, opts.wallRunOpts || {});
-  const wallRuns = wr.runs;
-  const wallRunsMeta = wr.meta;
-
   // RECALL-COMPLETE wall set (W2): the proven single-band `walls` above is the dominant cut-wall
   // lineweight — it keeps footprint/room segmentation stable (it is what the verified W0 footprint
   // and netalign depend on) but UNDER-captures interior partition + core walls (~71% wall recall
@@ -702,7 +717,6 @@ export function buildLevelPlan(input, opts = {}) {
     },
     wallBboxFt,
     walls,
-    // Compatibility alias for callers/tests that still consume the explicit feet-suffixed wall field.
     wallsFt: walls,
     wallRuns,
     wallRunsMeta,
@@ -1113,6 +1127,7 @@ export function mergeWingPlans(wingA, wingB, reg, meta = {}) {
     footprintAreaReliable: false, // a union of two wing envelopes — bbox only, not an enclosed trace
     footprintBboxFt: { widthFt, heightFt, minX: round(uMinX), minY: round(uMinY), maxX: round(uMaxX), maxY: round(uMaxY) },
     walls,
+    wallsFt: walls,
     wallRuns: wrMerged.runs,
     wallRunsMeta: wrMerged.meta,
     ...(wallsFull ? { wallsFull, wallsFullMeta: { merged: true, count: wallsFull.length, note: 'Partition-inclusive recall-complete wall set, both wings merged (wing B translated). Rendering + recall only; footprint uses single-band walls. needs-verification.' } } : {}),

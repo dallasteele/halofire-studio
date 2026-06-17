@@ -349,10 +349,10 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
       } else if (isPdfOp(sub, 'lineTo')) {
         lineTo(coords[c], coords[c + 1]);
         c += 2;
-      } else if (isPdfOp(sub, 'curveTo')) { // 6 coords, endpoint
+      } else if (isPdfOp(sub, 'curveTo')) {
         lineTo(coords[c + 4], coords[c + 5]);
         c += 6;
-      } else if (isPdfOp(sub, 'curveTo2') || isPdfOp(sub, 'curveTo3')) { // 4 coords, endpoint at [2],[3]
+      } else if (isPdfOp(sub, 'curveTo2') || isPdfOp(sub, 'curveTo3')) {
         lineTo(coords[c + 2], coords[c + 3]);
         c += 4;
       } else if (isPdfOp(sub, 'rectangle')) {
@@ -380,7 +380,7 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
     } else if (isPdfOp(fn, 'closePath')) {
       closePath();
     } else if (isPdfOp(fn, 'constructPath')) {
-        constructPathDispatch(args, walkDrawBuffer, walkLegacyConstructPath);
+      constructPathDispatch(args, walkDrawBuffer, walkLegacyConstructPath);
     } else if (isPdfOp(fn, 'save')) {
         // Push a copy of the CTM AND the graphics state (lineWidth + color).
         ctmStack.push(ctm.slice());
@@ -1567,9 +1567,6 @@ export function selectWallLayer(segments, opts = {}) {
   // --- FALLBACK: no lineWidth tags at all -> single group, select it ----------
   const withWidth = groupsArr.filter((g) => g.lineWidth != null);
   if (withWidth.length === 0) {
-    // Some real pdfjs runtimes preserve stroke COLOR but not a stable lineWidth tag.
-    // In that case, choose the densest building-scale colored band instead of the raw
-    // largest group, which is often a full-sheet annotation/hairline overlay.
     const colored = groupsArr.filter((g) => g.strokeColor != null);
     if (colored.length > 0) {
       const bboxArea = (g) => {
@@ -1595,7 +1592,6 @@ export function selectWallLayer(segments, opts = {}) {
       }
       if (best) return finalize(best, 'color-band-density-fallback');
     }
-    // No usable graphics-state split; the whole geometry is one layer.
     const only = groupsArr[0];
     return finalize(only, 'single-group');
   }
@@ -1645,11 +1641,6 @@ export function selectWallLayer(segments, opts = {}) {
   let bestScore = -Infinity;
   let bestWidth = -Infinity;
   for (const g of candidates) {
-    // Large real sheets can carry thousands of cut-wall fragments in the winning band.
-    // Ranking those bands by exact endpoint-connectivity becomes the runtime bottleneck;
-    // once a group is this large, its drawn length is already a stable proxy for "is this
-    // the dominant structural band?" and avoids turning the real-PDF gate into an O(n^2)
-    // wall-layer pass.
     const score = g.members.length > coherentLenExactMaxMembers ? g.totalLen : coherentLen(g.members);
     // Greatest coherent connected length wins; ties break toward heavier lineWidth.
     if (score > bestScore + 1e-9 || (Math.abs(score - bestScore) <= 1e-9 && g.lineWidth > bestWidth)) {
