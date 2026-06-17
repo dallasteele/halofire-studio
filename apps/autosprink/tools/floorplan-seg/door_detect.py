@@ -263,7 +263,11 @@ def _serialize_door(candidate: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def run_door_detection(raster_path: Path | str = DEFAULT_RASTER, out_dir: Path | str = DEFAULT_OUT_DIR) -> dict[str, Any]:
+def run_door_detection(
+    raster_path: Path | str = DEFAULT_RASTER,
+    out_dir: Path | str = DEFAULT_OUT_DIR,
+    focus_bbox_px: tuple[int, int, int, int] | None = None,
+) -> dict[str, Any]:
     raster_path = Path(raster_path)
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -299,6 +303,10 @@ def run_door_detection(raster_path: Path | str = DEFAULT_RASTER, out_dir: Path |
 
     candidates: list[dict[str, Any]] = []
     for x_px, y_px, radius_px in raw_circles:
+        if focus_bbox_px is not None:
+            x1, y1, x2, y2 = focus_bbox_px
+            if not (x1 <= x_px <= x2 and y1 <= y_px <= y2):
+                continue
         x_ft, y_ft = _px_to_ft(x_px, y_px, bbox, width, height)
         radius_ft = _px_radius_to_ft(radius_px, bbox, width)
         host = _best_host_wall(x_ft, y_ft, walls)
@@ -395,6 +403,7 @@ def run_door_detection(raster_path: Path | str = DEFAULT_RASTER, out_dir: Path |
         "overlayPath": str(overlay_path),
         "doorsPath": str(json_path),
         "doors": doors,
+        "focusBboxPx": list(focus_bbox_px) if focus_bbox_px is not None else None,
         "metrics": {
             "rawCircles": len(raw_circles),
             "candidateDoors": len(candidates),
