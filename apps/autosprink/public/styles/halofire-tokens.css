@@ -84,6 +84,12 @@
   --hf-font-ui: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --hf-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, 'Cascadia Code', monospace;
 
+  /* studio chrome typography */
+  --type-xs: 10px/1.4;
+  --type-sm: 12px/1.45;
+  --type-md: 13px/1.5;
+  --type-lg: 14px/1.5;
+
   /* 4px spacing scale */
   --hf-space-px: 1px;
   --hf-space-0_5: 0.125rem;
