@@ -193,12 +193,16 @@ export const HANGER_DIMS = Object.freeze({
 export const NIPPLE_DIMS = Object.freeze({
   default_len: dim(6.0, SPEC, 'representative short drop nipple length'),
   thread_len: dim(0.55, SPEC, 'NPT engagement each end'),
+  thread_tpi_by_nps: Object.freeze({
+    1: dim(11.5, SPEC, '1" NPT external thread pitch (ANSI/ASME B1.20.1)'),
+  }),
+  thread_taper_diam_per_in: dim(1 / 16, SPEC, 'NPT taper on diameter: 3/4" per foot'),
 });
 
 /** Reducer (concentric) spec: ASME B16.4 reducing coupling overall length. */
 export const REDUCER_DIMS = Object.freeze({
   // length grows with the larger size; B16.4 reducing-coupling band lengths
-  lengthByLargeNps: Object.freeze({ 1.25: 1.94, 1.5: 2.0, 2: 2.25, 2.5: 2.62, 3: 2.88, 4: 3.5 }),
+  lengthByLargeNps: Object.freeze({ 1: 2.0, 1.25: 1.94, 1.5: 2.0, 2: 2.25, 2.5: 2.62, 3: 2.88, 4: 3.5 }),
 });
 
 /** Threaded-coupling spec (ASME B16.4 Class 150 straight coupling) length. */

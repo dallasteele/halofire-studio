@@ -20,11 +20,12 @@
     --shadow-overlay:0 1px 0 var(--line) inset, 0 16px 48px rgba(0,0,0,0.50);
     --shadow-recess:0 1px 0 rgba(0,0,0,0.40) inset, 0 -1px 0 rgba(255,255,255,0.03) inset;
   }
-  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:12px;-webkit-font-smoothing:antialiased}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   body{background:
     radial-gradient(1200px 700px at 70% -10%, rgba(217,164,65,0.06), transparent 60%),
     radial-gradient(900px 600px at 15% 110%, rgba(90,169,230,0.05), transparent 55%),
-    var(--bg);}
+    var(--bg);
+    font:400 var(--type-md) var(--font);}
   /* ====== APPLE-GLASS APP FRAME (chrome / menubar / toolbar / body / statusbar) ====== */
   #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:42px 34px 40px 1fr 30px;height:100vh;width:100vw}
 
@@ -59,12 +60,31 @@
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
     border-bottom:1px solid var(--line)}
   /* ---- TOOLBAR (draw / edit / snap / readout) ---- */
-  #toolBar{grid-column:1/-1;grid-row:3;position:relative;z-index:90;display:flex;align-items:center;gap:6px;
-    padding:0 10px;
+  #toolBar{grid-column:1/-1;grid-row:3;position:relative;z-index:90;display:flex;flex-direction:column;align-items:stretch;gap:6px;
+    padding:8px 10px;
     background:linear-gradient(180deg, rgba(20,24,30,0.7), rgba(13,16,20,0.82));
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
-    border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:visible;white-space:nowrap}
-  #toolBar .tb-label{font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin:0 2px 0 6px}
+    border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:visible}
+  #toolBar .hf-toolbar-shell{display:flex;flex-direction:column;gap:6px;min-width:max-content}
+  #toolBar .hf-toolbar-row{display:flex;align-items:center;gap:8px;min-width:max-content}
+  #toolBar .hf-toolbar-mode-cluster,
+  #toolBar .hf-toolbar-action-cluster,
+  #toolBar .hf-toolbar-utility-cluster{display:flex;align-items:center;gap:6px}
+  #toolBar .hf-toolbar-mode,
+  #toolBar .hf-toolbar-action{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:3px 11px 3px 5px;border-radius:10px;
+    border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;line-height:1.1;
+    transition:background .12s,border-color .12s,color .12s,box-shadow .12s}
+  #toolBar .hf-toolbar-mode:hover,
+  #toolBar .hf-toolbar-action:hover{color:var(--text);background:rgba(255,255,255,.05);border-color:var(--line)}
+  #toolBar .hf-toolbar-mode.is-active{color:var(--bright);background:rgba(90,169,230,.12);border-color:rgba(90,169,230,.34);box-shadow:0 0 0 1px rgba(90,169,230,.12) inset}
+  #toolBar .hf-toolbar-action.is-active{color:var(--gold-bright);background:var(--gold-dim);border-color:rgba(217,164,65,0.35)}
+  #toolBar .hf-toolbar-mode-ico,
+  #toolBar .hf-toolbar-action-ico{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;height:28px;border-radius:8px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:currentColor}
+  #toolBar .hf-toolbar-mode-ico svg,
+  #toolBar .hf-toolbar-action-ico svg{width:16px;height:16px;display:block}
+  #toolBar .hf-toolbar-mode-text,
+  #toolBar .hf-toolbar-action-text{font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
   #toolBar .tool{display:inline-flex;align-items:center;gap:6px;height:26px;font-size:11px;color:var(--muted);
     background:transparent;border:1px solid transparent;border-radius:var(--r-control);padding:0 9px;cursor:pointer;
     line-height:1.1;transition:background .12s,border-color .12s,color .12s}
@@ -72,7 +92,8 @@
   #toolBar .tool.on{color:var(--gold-bright);background:var(--gold-dim);border-color:rgba(217,164,65,0.35)}
   #toolBar .tool.toggle.on{color:var(--info);background:rgba(90,169,230,0.14);border-color:rgba(90,169,230,0.3)}
   #toolBar .tb-sep{width:1px;height:20px;background:var(--line);margin:0 8px;flex:0 0 auto}
-  #toolBar .tb-spacer{flex:1}
+  #toolBar .tb-spacer,
+  #toolBar .hf-toolbar-spacer{flex:1}
   #toolBar .tb-readout{display:flex;gap:14px;color:var(--faint);font-variant-numeric:tabular-nums;font-size:11px;padding-right:4px}
   #toolBar .tb-readout b{color:var(--muted);font-weight:600}
   /* ---- BODY DOCKS (left aside | viewport | right aside) ---- */
@@ -112,7 +133,7 @@
   .phead{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);user-select:none}
   .phead .grip{display:flex;flex-direction:column;gap:2px}
   .phead .grip i{width:11px;height:1.5px;background:var(--faint);border-radius:2px;display:block}
-  .phead .ptitle{font-size:10.5px;letter-spacing:0.9px;text-transform:uppercase;color:var(--muted);font-weight:600;flex:1}
+  .phead .ptitle{font:600 var(--type-lg) var(--font);letter-spacing:0.9px;text-transform:uppercase;color:var(--muted);flex:1}
   .phead .pbtn{color:var(--faint)}
   .pbody{padding:10px}
   .well{background:rgba(14,17,21,0.85);border-radius:var(--r-control);box-shadow:var(--shadow-recess);padding:9px 10px}
@@ -354,36 +375,8 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   <!-- HF-UXCLEAN §1: app menu bar docks in this chrome strip ABOVE the canvas
        (spans the canvas column), never overlaying the viewport interior. -->
   <div id="menuChrome"><div id="menuBarHost"></div></div>
-  <!-- HF-TOOLBAR: draw/edit tools (wired to setDrawTool / editDelete). -->
-  <div id="toolBar">
-    <button class="tool on" data-act="select" title="Select &amp; orbit — click parts to inspect">Select</button>
-    <button class="tool" data-act="move" title="Move selection — pick a base point, then a destination">Move</button>
-    <button class="tool" data-act="copy" title="Copy selection — pick a base point, then a destination">Copy</button>
-    <button class="tool" data-act="delete" title="Delete the selected part (Del)">Delete</button>
-    <span class="tb-sep"></span>
-    <span class="tb-label">Draw</span>
-    <button class="tool" data-draw="wall" title="Draw Wall — click vertices, Enter/double-click finishes">Wall</button>
-    <button class="tool" data-draw="pipe" title="Draw Pipe — click vertices, Enter/double-click finishes">Pipe</button>
-    <button class="tool" data-draw="head" title="Place Head — click to place">Head</button>
-    <button class="tool" data-draw="fitting" title="Add Fitting — click to place">Drop</button>
-    <button class="tool" data-draw="door" title="Add Door — click to place">Door</button>
-    <span class="tb-sep"></span>
-    <span class="tb-label">Edit</span>
-    <button class="tool" data-act="measure" title="Measure distance + angle between two points">Measure</button>
-    <button class="tool" data-act="trim" title="Trim / Extend — pick a run, then a boundary run">Trim</button>
-    <button class="tool" data-act="offset" title="Offset — parallel copy of the selected run at a typed distance">Offset</button>
-    <button class="tool" data-act="array" title="Array — rectangular grid of copies of the selection">Array</button>
-    <button class="tool" data-act="mirror" title="Mirror selection across a picked 2-point axis">Mirror</button>
-    <span class="tb-sep"></span>
-    <button class="tool toggle on" id="snapToggleBtn" title="Object snap master on/off (endpoint, midpoint, intersection, perpendicular, node, extension, grid)">Snap</button>
-    <button class="tool" id="snapSettingsBtn" title="Object-snap settings — enable / disable each snap type">⚙</button>
-    <button class="tool toggle" id="gridToggleBtn" title="Grid 1ft (display only)">Grid 1ft</button>
-    <button class="tool toggle on" id="orthoToggleBtn" title="Ortho — lock draw to H/V">Ortho</button>
-    <button class="tool toggle" id="polarToggleBtn" title="Polar tracking — snap draw direction to angle increments">Polar 45°</button>
-    <button class="tool" id="polarSettingsBtn" title="Polar angle increment (90/45/30/22.5/15°)">⚙</button>
-    <span class="tb-spacer"></span>
-    <div class="tb-readout"><span><b>X</b> 124.0 ft</span><span><b>Y</b> 86.5 ft</span><span><b>Z</b> 0.0 ft</span><span><b>Scale</b> 1 : 96</span></div>
-  </div>
+  <!-- HF-TOOLBAR: UE5-style mode-aware toolbar shell mounted by src/ui/dock/toolbar.js. -->
+  <div id="toolBar"></div>
 
   <aside class="left">
     <!-- THIS JOB -->
@@ -651,6 +644,33 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 </div>
 
 <script src="/public/halofire-menubar.js"></script>
+<script>
+window.__hfErrs = window.__hfErrs || [];
+(function(){
+  function record(kind, payload) {
+    const detail = payload && typeof payload === 'object'
+      ? {
+          message: typeof payload.message === 'string' ? payload.message : String(payload),
+          filename: payload.filename || payload.sourceURL || null,
+          lineno: payload.lineno || payload.line || null,
+          colno: payload.colno || payload.column || null,
+        }
+      : { message: String(payload) };
+    window.__hfErrs.push({ kind, ...detail });
+    if (!document.title.startsWith('[HF-ERR] ')) {
+      document.title = '[HF-ERR] ' + document.title;
+    }
+  }
+
+  window.addEventListener('error', function(event) {
+    record('error', event);
+  });
+
+  window.addEventListener('unhandledrejection', function(event) {
+    record('unhandledrejection', event.reason || 'Unhandled promise rejection');
+  });
+})();
+</script>
 <script type="importmap">
 {
   "imports": {
@@ -663,12 +683,12 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'; // HF-G1-COUPLE
 import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from 'opengeometry';
 import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
 import { demoTimeline } from '/src/engine/demo-timeline.js';
 import { summarizeExportArtifact, buildExportProofMessage } from '/src/ui/export-proof.js';
+import { renderToolbar } from '/src/ui/dock/toolbar.js';
 // HF-A1-UNDERLAY: built-in plan fixtures (same module the server uses) for the floor-plan ground underlay.
 import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '/src/data/floorplans.js';
 // HF-B1-PDFUNDERLAY (Stream B): REAL plan-sheet PDF underlays + multi-level scaffold.
@@ -682,6 +702,7 @@ import { manifestForProject, sheetsForLevel } from '/src/data/plan-manifest.js';
 // HF-C1-PARTMESH (Stream C): true-scale real CAD part meshes (mm->ft, Y-up)
 // with Inspector provenance; primitives stay as flagged fallback.
 import { createPartMeshLoader } from '/src/engine/part-meshes.js';
+import { selectionBracketCornerSegments, selectionBracketWorldSize } from '/src/engine/sel-bracket.js';
 // HF-W1 (Stream W1): the EDIT ENGINE — snapshot command stack + pure cadModel
 // edit ops (ported from apps/cad history.ts + store.ts) and the pure snap
 // engine. All viewer-side preview/raycast/DOM wiring stays inline below.
@@ -723,6 +744,7 @@ import { solveNetwork, solveWithUpsizing, buildGraph } from '/src/engine/network
 // transform of the solve result into a printable summary + node-analysis +
 // pipe-data report (header carries the NOT-stamped engineering-aid disclaimer).
 import { buildHydraulicReport, renderReportHtml } from '/src/engine/nfpa-report.js';
+import { getBom, getNfpaReport } from '/src/engine/adapter.js';
 // HF-PHASE3-HARDY-CROSS: REAL Hardy-Cross loop/grid balance. Identifies the
 // independent loops of the network (cyclomatic μ = E−N+components) and, for a
 // looped/gridded system, iterates each loop to Σh_f→0 (continuity ΣQ=0 held by
@@ -740,6 +762,7 @@ import { computeRemoteArea, autoRemoteArea, polygonArea, pointInPolygon, rectRin
 // demand point → the binding (governing) supply + supply-vs-demand graph data.
 // Validated against hand calcs in tests/supplies.test.js.
 import { buildSupply, evaluateSupplies, supplyDemandCurve, defaultCityWaterSpec, SUPPLY_DISCLAIMER } from '/src/engine/supplies.js';
+import { fittingBasis } from '/src/engine/fitting-orient.js';
 
 // HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
 // (leaf + swing arc), recovered partition-inclusive WALLS, and FIXTURES/cores are
@@ -819,33 +842,17 @@ let planGroup = null, planVisible = true, lastPlanBbox = null; // HF-A1-UNDERLAY
 // (GET /api/parts -> /parts/<key>.stl). Falls back to a primitive when no part
 // is available. Generated parts are best-effort, NOT manufacturer-exact.
 let headPartGeo = null, partsSource = 'primitive';
-let partsManifest = null;          // cached GET /api/parts response
-const partGeoCache = {};           // componentKey -> normalized BufferGeometry | null (attempted)
-
-// Normalize a loaded STL: center at origin, OpenSCAD Z-up -> three Y-up, scale to ~targetFt.
-function normalizePartGeo(geo, targetFt) {
-  geo.computeBoundingBox();
-  const bb = geo.boundingBox, size = new THREE.Vector3(), center = new THREE.Vector3();
-  bb.getSize(size); bb.getCenter(center);
-  geo.translate(-center.x, -center.y, -center.z);
-  geo.rotateX(-Math.PI / 2);
-  const maxDim = Math.max(size.x, size.y, size.z) || 1;
-  const sc = targetFt / maxDim; geo.scale(sc, sc, sc); geo.computeVertexNormals();
-  return geo;
-}
+const partGeoCache = {};           // componentKey -> true-scale BufferGeometry | null (attempted)
 
 // Load + cache the part mesh for a registry component key (best-effort, fail-soft).
-// Returns the normalized geometry, or null (caller renders a marked primitive).
-async function loadPartGeo(key, targetFt) {
+// Returns the true-scale geometry, or null (caller renders a marked primitive).
+async function loadPartGeo(key) {
   if (key in partGeoCache) return partGeoCache[key];
   partGeoCache[key] = null; // mark attempted up-front
   try {
-    if (!partsManifest) partsManifest = await api('/parts');
-    const entry = (partsManifest.components || []).find((c) => c.key === key && c.present && c.file);
-    if (!entry) return null;
-    const geo = normalizePartGeo(await new STLLoader().loadAsync('/' + String(entry.file).replace(/^\/+/, '')), targetFt);
-    partGeoCache[key] = geo;
-    return geo;
+    const res = await hfPartMeshes.load(key);
+    partGeoCache[key] = res.geometry || null;
+    return partGeoCache[key];
   } catch (e) { return null; }
 }
 
@@ -980,7 +987,7 @@ async function initStudio() {
   let fpsFrames = 0, fpsLast = performance.now();
   (function loop(now) {
     try { if (typeof faceGripsToCamera === 'function') faceGripsToCamera(); } catch (_) { /* grips optional */ }
-    requestAnimationFrame(loop); stepCamTween(now || performance.now()); controls.update(); renderer.render(scene, camera);
+    requestAnimationFrame(loop); stepCamTween(now || performance.now()); controls.update(); updateSelectionBracket(); renderer.render(scene, camera);
     try { updateViewCube(); } catch (_) { /* cube optional */ }
     try { updateScaleBar(); } catch (_) { /* scale bar optional */ }
     try { if (window.__hfRepositionAnnotations) window.__hfRepositionAnnotations(); } catch (_) { /* annotation overlay optional */ }
@@ -1317,6 +1324,24 @@ function hangerRingGeo(r) { // band-hanger ring around the pipe, axis along run
   g.rotateZ(Math.PI / 2); return g;
 }
 
+function worldAxisFromEngine(axis) {
+  if (!Array.isArray(axis) || axis.length !== 3) return null;
+  return new THREE.Vector3(axis[0], axis[2], axis[1]);
+}
+
+function detailQuaternionFor(item) {
+  const runAxis = item.runAxis || (item.info && item.info.runAxis);
+  const outletAxis = item.outletAxis || (item.info && item.info.outletAxis);
+  if (!Array.isArray(runAxis) || !Array.isArray(outletAxis)) return null;
+  const basis = fittingBasis(runAxis, outletAxis);
+  const xAxis = worldAxisFromEngine(basis.xAxis);
+  const yAxis = worldAxisFromEngine(basis.yAxis);
+  const zAxis = worldAxisFromEngine(basis.zAxis);
+  if (!xAxis || !yAxis || !zAxis) return null;
+  const mat = new THREE.Matrix4().makeBasis(xAxis, yAxis, zAxis);
+  return new THREE.Quaternion().setFromRotationMatrix(mat);
+}
+
 // One InstancedMesh from prebuilt items [{p:[wx,wy,wz], rotY, sy, info}].
 function instancedDetail(geo, color, items, kind, fittingType) {
   const mat = new THREE.MeshStandardMaterial({ color, metalness: 0.55, roughness: 0.45 });
@@ -1324,7 +1349,9 @@ function instancedDetail(geo, color, items, kind, fittingType) {
   const d = new THREE.Object3D();
   items.forEach((it, i) => {
     d.position.set(it.p[0], it.p[1], it.p[2]);
-    d.rotation.set(0, it.rotY || 0, 0);
+    const q = detailQuaternionFor(it);
+    if (q) d.quaternion.copy(q);
+    else d.rotation.set(0, it.rotY || 0, 0);
     d.scale.set(1, it.sy || 1, 1);
     d.updateMatrix(); inst.setMatrixAt(i, d.matrix);
   });
@@ -1513,7 +1540,7 @@ function renderGeometryDetail(cadModel, ceilFt) {
         const back = end === 'to' ? host.u : [-host.u[0], -host.u[1], -host.u[2]];
         const rotY = rotYFor(back[0], back[1]);
         push('elbowDown', hr.toFixed(3), () => elbowGeo(hr, Math.max(0.3, hr * 2.4), stubLen, false), 0xc9a84c, {
-          p: wp, rotY,
+          p: wp, rotY, runAxis: [back[0], back[1], 0], outletAxis: [0, 0, -1],
           info: { p: wp, label: 'End-of-line elbow (turn down to drop)', verify: 'inferred end-of-line turn-down fitting; not mfg-exact', rows: [
             ['Type', '90° elbow, branch end -> drop'], ['Run size', `${host.s.diameterIn}"`], ['Drop size', `${drec.s.diameterIn}"`], ['Plan coords (ft)', fmtP(top)],
           ] },
@@ -1522,7 +1549,7 @@ function renderGeometryDetail(cadModel, ceilFt) {
       } else { // mid-run: reducing tee on the branch, branch port down to the drop
         const rotY = rotYFor(host.u[0], host.u[1]);
         push('teeDown', hr.toFixed(3) + '/' + dropR.toFixed(3), () => teeGeo(hr, dropR, stubLen, false), 0xc9a84c, {
-          p: wp, rotY,
+          p: wp, rotY, runAxis: [host.u[0], host.u[1], 0], outletAxis: [0, 0, -1],
           info: { p: wp, label: 'Branch tee (drop take-off)', verify: 'inferred reducing tee at the branch x drop junction; not mfg-exact', rows: [
             ['Type', 'Tee, branch run x drop outlet'], ['Run size', `${host.s.diameterIn}"`], ['Outlet size', `${drec.s.diameterIn}"`], ['Plan coords (ft)', fmtP(top)],
           ] },
@@ -1530,13 +1557,28 @@ function renderGeometryDetail(cadModel, ceilFt) {
         nTee += 1;
       }
     }
-    // reducing fitting just above the head (drop bottom)
-    const wb = W(bot);
-    const redLen = Math.min(0.16, Math.max(0.08, drec.len * 0.25));
-    push('reducer', dropR.toFixed(3), () => { const g = new THREE.CylinderGeometry(dropR * 1.18, dropR * 0.72, redLen, 12); return g; }, 0xc9a84c, {
-      p: [wb[0], wb[1] + redLen / 2 + 0.02, wb[2]],
-      info: { p: wb, label: 'Reducing fitting (drop -> head)', verify: 'inferred drop-to-head reducer; head thread size not mfg-exact', rows: [
-        ['Type', 'Reducer, drop nipple -> sprinkler head'], ['Drop size', `${drec.s.diameterIn}"`], ['Plan coords (ft)', fmtP(bot)],
+    // reducing fitting between the nipple end and the head connection point
+    const reducer = drec.s && drec.s.reducer && typeof drec.s.reducer === 'object' ? drec.s.reducer : null;
+    const redLen = reducer && reducer.lengthFt > 0 ? reducer.lengthFt : Math.min(0.16, Math.max(0.08, drec.len * 0.25));
+    const redTopR = reducer && reducer.topOdIn > 0 ? ((reducer.topOdIn / 12) / 2) * pipeVizScale : dropR * 1.18;
+    const redBotR = reducer && reducer.bottomOdIn > 0 ? ((reducer.bottomOdIn / 12) / 2) * pipeVizScale : dropR * 0.72;
+    const redCenter = reducer && Array.isArray(reducer.center)
+      ? W(reducer.center)
+      : (() => {
+          const wb = W(bot);
+          return [wb[0], wb[1] + redLen / 2, wb[2]];
+        })();
+    const redInfoPt = reducer && Array.isArray(reducer.headPort) ? reducer.headPort : bot;
+    push('reducer', `${redTopR.toFixed(3)}/${redBotR.toFixed(3)}`, () => new THREE.CylinderGeometry(redTopR, redBotR, redLen, 12), 0xc9a84c, {
+      p: redCenter,
+      info: { p: W(redInfoPt), label: 'Reducing fitting (drop -> head)', verify: reducer ? 'spec-derived drop-to-head reducer from drop size and head thread size; not manufacturer-exact' : 'inferred drop-to-head reducer; head thread size not mfg-exact', rows: [
+        ['Type', 'Reducer, drop nipple -> sprinkler head'],
+        ['Drop size', `${drec.s.diameterIn}"`],
+        ['Reducer length', `${Math.round(redLen * 12 * 100) / 100}"`],
+        ['Top OD', reducer ? `${reducer.topOdIn}"` : 'inferred'],
+        ['Bottom OD', reducer ? `${reducer.bottomOdIn}"` : 'inferred'],
+        ['Head thread', reducer ? `${reducer.headThreadIn}" NPT` : 'assumed'],
+        ['Plan coords (ft)', fmtP(redInfoPt)],
       ] },
     });
     nReducer += 1;
@@ -1562,7 +1604,7 @@ function renderGeometryDetail(cadModel, ceilFt) {
       const mr = renderedPipeR(main.s.diameterIn, false);
       const wp = W(top);
       push('teeDown', mr.toFixed(3) + '/' + tieR.toFixed(3), () => teeGeo(mr, tieR, Math.max(0.18, tieR * 1.2), false), 0xc9a84c, {
-        p: wp, rotY: rotYFor(main.u[0], main.u[1]),
+        p: wp, rotY: rotYFor(main.u[0], main.u[1]), runAxis: [main.u[0], main.u[1], 0], outletAxis: [0, 0, -1],
         info: { p: wp, label: 'Cross-main tee (branch tie)', verify: 'inferred tee at the cross-main x riser-tie junction; not mfg-exact', rows: [
           ['Type', 'Tee, cross-main x riser tie'], ['Run size', `${main.s.diameterIn}"`], ['Outlet size', `${tie.s.diameterIn}"`], ['Plan coords (ft)', fmtP(top)],
         ] },
@@ -1575,7 +1617,7 @@ function renderGeometryDetail(cadModel, ceilFt) {
       const into = end === 'from' ? branch.u : [-branch.u[0], -branch.u[1], -branch.u[2]]; // direction INTO the branch run
       const wp = W(bot);
       push('elbowUp', tieR.toFixed(3), () => elbowGeo(tieR, Math.max(0.3, tieR * 2.4), Math.max(0.18, tieR * 1.2), true), 0xc9a84c, {
-        p: wp, rotY: rotYFor(-into[0], -into[1]), // leg occupies local -X -> point it along the branch
+        p: wp, rotY: rotYFor(-into[0], -into[1]), runAxis: [-into[0], -into[1], 0], outletAxis: [0, 0, 1], // leg occupies local -X -> point it along the branch
         info: { p: wp, label: 'Riser-tie elbow (tie -> branch)', verify: 'inferred vertical-to-horizontal elbow; not mfg-exact', rows: [
           ['Type', '90° elbow, riser tie -> branch line'], ['Size', `${tie.s.diameterIn}" / ${branch.s.diameterIn}"`], ['Plan coords (ft)', fmtP(bot)],
         ] },
@@ -2836,6 +2878,50 @@ let camTween = null; // in-flight frame tween, stepped from the render loop
 const SEL_COLOR = new THREE.Color(0x00e676);
 const selMeshMat = new THREE.MeshStandardMaterial({ color: SEL_COLOR.clone(), emissive: 0x0a3c22, metalness: 0.35, roughness: 0.5 });
 let selHL = null; // { kind:'mesh', mesh, origMat } | { kind:'inst', inst, idx }
+let selBracket = null;
+
+function ensureSelectionBracket() {
+  if (selBracket || !scene) return selBracket;
+  const pts = [];
+  for (const seg of selectionBracketCornerSegments()) {
+    pts.push(new THREE.Vector3(seg[0], seg[1], seg[2]), new THREE.Vector3(seg[3], seg[4], seg[5]));
+  }
+  const geometry = new THREE.BufferGeometry().setFromPoints(pts);
+  const material = new THREE.LineBasicMaterial({
+    color: SEL_COLOR.clone(),
+    transparent: true,
+    opacity: 0.95,
+    depthTest: false,
+  });
+  selBracket = new THREE.LineSegments(geometry, material);
+  selBracket.name = 'hfSelectionBracket';
+  selBracket.renderOrder = 1100;
+  selBracket.visible = false;
+  selBracket.raycast = () => {};
+  scene.add(selBracket);
+  return selBracket;
+}
+
+function hideSelectionBracket() {
+  if (selBracket) selBracket.visible = false;
+}
+
+function updateSelectionBracket() {
+  if (!curSel || !camera || !renderer) { hideSelectionBracket(); return; }
+  const bracket = ensureSelectionBracket();
+  if (!bracket) return;
+  const canvas = renderer.domElement;
+  const rect = canvas && typeof canvas.getBoundingClientRect === 'function' ? canvas.getBoundingClientRect() : null;
+  const viewportHeightPx = Math.max(
+    1,
+    Math.round((rect && rect.height ? rect.height : canvas.clientHeight || canvas.height || 1) * (window.devicePixelRatio || 1)),
+  );
+  const worldSize = selectionBracketWorldSize(camera, curSel.center, viewportHeightPx, { pixelSize: 10 });
+  bracket.position.copy(curSel.center);
+  bracket.quaternion.copy(camera.quaternion);
+  bracket.scale.setScalar(Math.max(0.01, worldSize));
+  bracket.visible = true;
+}
 
 function applyHighlight(found) {
   clearHighlight();
@@ -3003,6 +3089,7 @@ function clearSelection(restoreTarget) {
   try { if (typeof clearSetHighlight === 'function') clearSetHighlight(); } catch (_) {} // HF-W3-SEL: clear multi-select set recolor
   if (typeof hfSelSet !== 'undefined') hfSelSet = []; // HF-W3-SEL: empty the selection set
   const insp = $('inspector'); if (insp) insp.classList.remove('open');
+  hideSelectionBracket();
   curSel = null;
   curSelKey = null;
   curSelSolid = null; // HF-W1-CMD
@@ -3257,6 +3344,7 @@ function handleCanvasClick(e, frameAfter) {
   curSelSolid = sol || (found.part ? found.part.solid : null) || null;
   try { if (typeof refreshGrips === 'function') refreshGrips(); } catch (_) {} // HF-W2: show endpoint grips for the picked run
   window.__lastSelection = window.__lastSelection || null; // (set below)
+  updateSelectionBracket();
   openInspector(info.title, info.rows, info.verify);
   // contract #1: NO controls.target change here — selection is camera-neutral,
   // so contract #2 (click a different part at its unchanged screen position,
@@ -3515,11 +3603,7 @@ async function applyGenerated(data) {
   // (riser_assembly/valve_alarm_check/fdc/fitting_tee) so renderModel can
   // instance them synchronously; missing parts fall back to a marked primitive.
   const compKeys = [...new Set((cadModel.solids || []).filter((s) => s.kind === 'component').map((s) => s.componentKey))];
-  // HF-G1-COUPLE: realistic per-component target sizes (the old flat 2.5 ft made
-  // every fitting an oversized barrel at close-up). Inferred typical envelope
-  // sizes, NOT manufacturer-exact (needs-verification surfaces in the Inspector).
-  const COMP_TARGET_FT = { riser_assembly: 3.0, valve_alarm_check: 1.2, fdc: 1.5, fitting_tee: 0.8, fitting_elbow_90: 0.55, fitting_coupling: 0.45, fitting_reducer: 0.4 };
-  await Promise.all(compKeys.map((k) => loadPartGeo(k, COMP_TARGET_FT[k] || 1.5)));
+  await Promise.all(compKeys.map((k) => loadPartGeo(k)));
   await preloadDetailMeshes(); // HF-C1-PARTMESH: real coupling/hanger/tee/elbow meshes for the detail pass
   renderModel(cadModel);
   await renderRealOrFixtureUnderlay(floorPlan); // HF-B1-PDFUNDERLAY: REAL sheets when the project has them
@@ -6500,7 +6584,7 @@ function setDrawTool(tool) {
     : 'draw tool off';
   window.__hfDrawTool = drawTool;
   document.body.style.cursor = drawTool ? 'crosshair' : '';
-  if (window.__syncToolBar) try { window.__syncToolBar(MULTI_SEG(drawTool) || drawTool === 'head' || drawTool === 'fitting' || drawTool === 'door' ? drawTool : null); } catch (_) {}
+  if (window.__syncToolBar) try { window.__syncToolBar(MULTI_SEG(drawTool) || drawTool === 'head' || drawTool === 'fitting' || drawTool === 'door' || drawTool === 'measure' ? drawTool : null); } catch (_) {}
   try { if (typeof updateCmdPrompt === 'function') updateCmdPrompt(); } catch (_) {}
 }
 function clearDrawPreview() { if (drawPreview) { scene.remove(drawPreview); try { drawPreview.geometry && drawPreview.geometry.dispose(); } catch (_) {} drawPreview = null; } }
@@ -8730,28 +8814,45 @@ window.__hfEditProps = (solidIndex, patch) => {
   return lastPropsEdit;
 };
 window.__hfDraw = { setDrawTool: (t) => setDrawTool(t), commitPipe, commitWall, commitHead }; // headless hooks
-// HF-TOOLBAR: wire the draw/edit toolbar to the real tool functions (no dead stubs).
-(function wireToolBar() {
+// HF-TOOLBAR: mount the mode-aware toolbar and wire it to the real tool functions.
+(function mountToolbar() {
   const tb = document.getElementById('toolBar'); if (!tb) return;
-  const setActive = (btn) => tb.querySelectorAll('.tool').forEach((b) => b.classList.toggle('on', b === btn));
-  const selectBtn = tb.querySelector('[data-act="select"]');
-  tb.addEventListener('click', (e) => {
-    const btn = e.target.closest('.tool'); if (!btn) return;
-    const act = btn.dataset.act;
-    if (btn.dataset.draw) { setDrawTool(btn.dataset.draw); setActive(btn); }
-    else if (act === 'select') { setDrawTool(null); setActive(btn); }
-    else if (act === 'delete') { editDelete(); /* selection-op; tool stays as-is */ }
-    else if (act === 'measure') { startMeasure(); setActive(btn); }
-    else if (act === 'trim') { startTrim(); setActive(btn); }
-    else if (act === 'offset') { startOffset(); }
-    else if (act === 'array') { doArray(); }
-    else if (act === 'mirror') { startMirrorLine(); setActive(btn); }
-    else if (act === 'move') { startCopyMoveBase(false); setActive(btn); }
-    else if (act === 'copy') { startCopyMoveBase(true); setActive(btn); }
+  const utilitiesMarkup = `
+    <button class="tool toggle on" id="snapToggleBtn" title="Object snap master on/off (endpoint, midpoint, intersection, perpendicular, node, extension, grid)">Snap</button>
+    <button class="tool" id="snapSettingsBtn" title="Object-snap settings — enable / disable each snap type">⚙</button>
+    <button class="tool toggle" id="gridToggleBtn" title="Grid 1ft (display only)">Grid 1ft</button>
+    <button class="tool toggle on" id="orthoToggleBtn" title="Ortho — lock draw to H/V">Ortho</button>
+    <button class="tool toggle" id="polarToggleBtn" title="Polar tracking — snap draw direction to angle increments">Polar 45°</button>
+    <button class="tool" id="polarSettingsBtn" title="Polar angle increment (90/45/30/22.5/15°)">⚙</button>
+  `;
+  const readoutMarkup = '<div class="tb-readout"><span><b>X</b> 124.0 ft</span><span><b>Y</b> 86.5 ft</span><span><b>Z</b> 0.0 ft</span><span><b>Scale</b> 1 : 96</span></div>';
+  const toolbar = renderToolbar(tb, {
+    mode: 'SELECT',
+    activeAction: 'select',
+    utilitiesMarkup,
+    readoutMarkup,
+    actions: {
+      select: () => setDrawTool(null),
+      move: () => startCopyMoveBase(false),
+      copy: () => startCopyMoveBase(true),
+      delete: () => editDelete(),
+      wall: () => setDrawTool('wall'),
+      pipe: () => setDrawTool('pipe'),
+      head: () => setDrawTool('head'),
+      drop: () => setDrawTool('fitting'),
+      door: () => setDrawTool('door'),
+      measure: () => startMeasure(),
+      trim: () => startTrim(),
+      offset: () => startOffset(),
+      array: () => doArray(),
+      mirror: () => startMirrorLine(),
+    },
   });
-  // keep the toolbar's active highlight in sync if a draw tool ends (Esc) elsewhere.
-  const _orig = setDrawTool;
-  window.__syncToolBar = (tool) => { const b = tool ? tb.querySelector(`[data-draw="${tool}"]`) : selectBtn; if (b) setActive(b); };
+  window.__syncToolBar = (tool) => {
+    if (tool === 'wall' || tool === 'pipe' || tool === 'head' || tool === 'door' || tool === 'measure') toolbar.setActiveAction(tool);
+    else if (tool === 'fitting') toolbar.setActiveAction('drop');
+    else toolbar.setActiveAction('select');
+  };
 })();
 // HF-INSPTABS: tabbed right Inspector + auto-switch so results never hide in an inactive tab.
 (function wireInspectorTabs() {
