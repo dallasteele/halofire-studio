@@ -59,12 +59,31 @@
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
     border-bottom:1px solid var(--line)}
   /* ---- TOOLBAR (draw / edit / snap / readout) ---- */
-  #toolBar{grid-column:1/-1;grid-row:3;position:relative;z-index:90;display:flex;align-items:center;gap:6px;
-    padding:0 10px;
+  #toolBar{grid-column:1/-1;grid-row:3;position:relative;z-index:90;display:flex;flex-direction:column;align-items:stretch;gap:6px;
+    padding:8px 10px;
     background:linear-gradient(180deg, rgba(20,24,30,0.7), rgba(13,16,20,0.82));
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
-    border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:visible;white-space:nowrap}
-  #toolBar .tb-label{font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin:0 2px 0 6px}
+    border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:visible}
+  #toolBar .hf-toolbar-shell{display:flex;flex-direction:column;gap:6px;min-width:max-content}
+  #toolBar .hf-toolbar-row{display:flex;align-items:center;gap:8px;min-width:max-content}
+  #toolBar .hf-toolbar-mode-cluster,
+  #toolBar .hf-toolbar-action-cluster,
+  #toolBar .hf-toolbar-utility-cluster{display:flex;align-items:center;gap:6px}
+  #toolBar .hf-toolbar-mode,
+  #toolBar .hf-toolbar-action{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:3px 11px 3px 5px;border-radius:10px;
+    border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;line-height:1.1;
+    transition:background .12s,border-color .12s,color .12s,box-shadow .12s}
+  #toolBar .hf-toolbar-mode:hover,
+  #toolBar .hf-toolbar-action:hover{color:var(--text);background:rgba(255,255,255,.05);border-color:var(--line)}
+  #toolBar .hf-toolbar-mode.is-active{color:var(--bright);background:rgba(90,169,230,.12);border-color:rgba(90,169,230,.34);box-shadow:0 0 0 1px rgba(90,169,230,.12) inset}
+  #toolBar .hf-toolbar-action.is-active{color:var(--gold-bright);background:var(--gold-dim);border-color:rgba(217,164,65,0.35)}
+  #toolBar .hf-toolbar-mode-ico,
+  #toolBar .hf-toolbar-action-ico{display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;height:28px;border-radius:8px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:currentColor}
+  #toolBar .hf-toolbar-mode-ico svg,
+  #toolBar .hf-toolbar-action-ico svg{width:16px;height:16px;display:block}
+  #toolBar .hf-toolbar-mode-text,
+  #toolBar .hf-toolbar-action-text{font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
   #toolBar .tool{display:inline-flex;align-items:center;gap:6px;height:26px;font-size:11px;color:var(--muted);
     background:transparent;border:1px solid transparent;border-radius:var(--r-control);padding:0 9px;cursor:pointer;
     line-height:1.1;transition:background .12s,border-color .12s,color .12s}
@@ -72,7 +91,8 @@
   #toolBar .tool.on{color:var(--gold-bright);background:var(--gold-dim);border-color:rgba(217,164,65,0.35)}
   #toolBar .tool.toggle.on{color:var(--info);background:rgba(90,169,230,0.14);border-color:rgba(90,169,230,0.3)}
   #toolBar .tb-sep{width:1px;height:20px;background:var(--line);margin:0 8px;flex:0 0 auto}
-  #toolBar .tb-spacer{flex:1}
+  #toolBar .tb-spacer,
+  #toolBar .hf-toolbar-spacer{flex:1}
   #toolBar .tb-readout{display:flex;gap:14px;color:var(--faint);font-variant-numeric:tabular-nums;font-size:11px;padding-right:4px}
   #toolBar .tb-readout b{color:var(--muted);font-weight:600}
   /* ---- BODY DOCKS (left aside | viewport | right aside) ---- */
@@ -354,36 +374,8 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   <!-- HF-UXCLEAN §1: app menu bar docks in this chrome strip ABOVE the canvas
        (spans the canvas column), never overlaying the viewport interior. -->
   <div id="menuChrome"><div id="menuBarHost"></div></div>
-  <!-- HF-TOOLBAR: draw/edit tools (wired to setDrawTool / editDelete). -->
-  <div id="toolBar">
-    <button class="tool on" data-act="select" title="Select &amp; orbit — click parts to inspect">Select</button>
-    <button class="tool" data-act="move" title="Move selection — pick a base point, then a destination">Move</button>
-    <button class="tool" data-act="copy" title="Copy selection — pick a base point, then a destination">Copy</button>
-    <button class="tool" data-act="delete" title="Delete the selected part (Del)">Delete</button>
-    <span class="tb-sep"></span>
-    <span class="tb-label">Draw</span>
-    <button class="tool" data-draw="wall" title="Draw Wall — click vertices, Enter/double-click finishes">Wall</button>
-    <button class="tool" data-draw="pipe" title="Draw Pipe — click vertices, Enter/double-click finishes">Pipe</button>
-    <button class="tool" data-draw="head" title="Place Head — click to place">Head</button>
-    <button class="tool" data-draw="fitting" title="Add Fitting — click to place">Drop</button>
-    <button class="tool" data-draw="door" title="Add Door — click to place">Door</button>
-    <span class="tb-sep"></span>
-    <span class="tb-label">Edit</span>
-    <button class="tool" data-act="measure" title="Measure distance + angle between two points">Measure</button>
-    <button class="tool" data-act="trim" title="Trim / Extend — pick a run, then a boundary run">Trim</button>
-    <button class="tool" data-act="offset" title="Offset — parallel copy of the selected run at a typed distance">Offset</button>
-    <button class="tool" data-act="array" title="Array — rectangular grid of copies of the selection">Array</button>
-    <button class="tool" data-act="mirror" title="Mirror selection across a picked 2-point axis">Mirror</button>
-    <span class="tb-sep"></span>
-    <button class="tool toggle on" id="snapToggleBtn" title="Object snap master on/off (endpoint, midpoint, intersection, perpendicular, node, extension, grid)">Snap</button>
-    <button class="tool" id="snapSettingsBtn" title="Object-snap settings — enable / disable each snap type">⚙</button>
-    <button class="tool toggle" id="gridToggleBtn" title="Grid 1ft (display only)">Grid 1ft</button>
-    <button class="tool toggle on" id="orthoToggleBtn" title="Ortho — lock draw to H/V">Ortho</button>
-    <button class="tool toggle" id="polarToggleBtn" title="Polar tracking — snap draw direction to angle increments">Polar 45°</button>
-    <button class="tool" id="polarSettingsBtn" title="Polar angle increment (90/45/30/22.5/15°)">⚙</button>
-    <span class="tb-spacer"></span>
-    <div class="tb-readout"><span><b>X</b> 124.0 ft</span><span><b>Y</b> 86.5 ft</span><span><b>Z</b> 0.0 ft</span><span><b>Scale</b> 1 : 96</span></div>
-  </div>
+  <!-- HF-TOOLBAR: UE5-style mode-aware toolbar shell mounted by src/ui/dock/toolbar.js. -->
+  <div id="toolBar"></div>
 
   <aside class="left">
     <!-- THIS JOB -->
@@ -669,6 +661,7 @@ import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from
 import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
 import { demoTimeline } from '/src/engine/demo-timeline.js';
 import { summarizeExportArtifact, buildExportProofMessage } from '/src/ui/export-proof.js';
+import { renderToolbar } from '/src/ui/dock/toolbar.js';
 // HF-A1-UNDERLAY: built-in plan fixtures (same module the server uses) for the floor-plan ground underlay.
 import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '/src/data/floorplans.js';
 // HF-B1-PDFUNDERLAY (Stream B): REAL plan-sheet PDF underlays + multi-level scaffold.
@@ -6500,7 +6493,7 @@ function setDrawTool(tool) {
     : 'draw tool off';
   window.__hfDrawTool = drawTool;
   document.body.style.cursor = drawTool ? 'crosshair' : '';
-  if (window.__syncToolBar) try { window.__syncToolBar(MULTI_SEG(drawTool) || drawTool === 'head' || drawTool === 'fitting' || drawTool === 'door' ? drawTool : null); } catch (_) {}
+  if (window.__syncToolBar) try { window.__syncToolBar(MULTI_SEG(drawTool) || drawTool === 'head' || drawTool === 'fitting' || drawTool === 'door' || drawTool === 'measure' ? drawTool : null); } catch (_) {}
   try { if (typeof updateCmdPrompt === 'function') updateCmdPrompt(); } catch (_) {}
 }
 function clearDrawPreview() { if (drawPreview) { scene.remove(drawPreview); try { drawPreview.geometry && drawPreview.geometry.dispose(); } catch (_) {} drawPreview = null; } }
@@ -8730,28 +8723,45 @@ window.__hfEditProps = (solidIndex, patch) => {
   return lastPropsEdit;
 };
 window.__hfDraw = { setDrawTool: (t) => setDrawTool(t), commitPipe, commitWall, commitHead }; // headless hooks
-// HF-TOOLBAR: wire the draw/edit toolbar to the real tool functions (no dead stubs).
-(function wireToolBar() {
+// HF-TOOLBAR: mount the mode-aware toolbar and wire it to the real tool functions.
+(function mountToolbar() {
   const tb = document.getElementById('toolBar'); if (!tb) return;
-  const setActive = (btn) => tb.querySelectorAll('.tool').forEach((b) => b.classList.toggle('on', b === btn));
-  const selectBtn = tb.querySelector('[data-act="select"]');
-  tb.addEventListener('click', (e) => {
-    const btn = e.target.closest('.tool'); if (!btn) return;
-    const act = btn.dataset.act;
-    if (btn.dataset.draw) { setDrawTool(btn.dataset.draw); setActive(btn); }
-    else if (act === 'select') { setDrawTool(null); setActive(btn); }
-    else if (act === 'delete') { editDelete(); /* selection-op; tool stays as-is */ }
-    else if (act === 'measure') { startMeasure(); setActive(btn); }
-    else if (act === 'trim') { startTrim(); setActive(btn); }
-    else if (act === 'offset') { startOffset(); }
-    else if (act === 'array') { doArray(); }
-    else if (act === 'mirror') { startMirrorLine(); setActive(btn); }
-    else if (act === 'move') { startCopyMoveBase(false); setActive(btn); }
-    else if (act === 'copy') { startCopyMoveBase(true); setActive(btn); }
+  const utilitiesMarkup = `
+    <button class="tool toggle on" id="snapToggleBtn" title="Object snap master on/off (endpoint, midpoint, intersection, perpendicular, node, extension, grid)">Snap</button>
+    <button class="tool" id="snapSettingsBtn" title="Object-snap settings — enable / disable each snap type">⚙</button>
+    <button class="tool toggle" id="gridToggleBtn" title="Grid 1ft (display only)">Grid 1ft</button>
+    <button class="tool toggle on" id="orthoToggleBtn" title="Ortho — lock draw to H/V">Ortho</button>
+    <button class="tool toggle" id="polarToggleBtn" title="Polar tracking — snap draw direction to angle increments">Polar 45°</button>
+    <button class="tool" id="polarSettingsBtn" title="Polar angle increment (90/45/30/22.5/15°)">⚙</button>
+  `;
+  const readoutMarkup = '<div class="tb-readout"><span><b>X</b> 124.0 ft</span><span><b>Y</b> 86.5 ft</span><span><b>Z</b> 0.0 ft</span><span><b>Scale</b> 1 : 96</span></div>';
+  const toolbar = renderToolbar(tb, {
+    mode: 'SELECT',
+    activeAction: 'select',
+    utilitiesMarkup,
+    readoutMarkup,
+    actions: {
+      select: () => setDrawTool(null),
+      move: () => startCopyMoveBase(false),
+      copy: () => startCopyMoveBase(true),
+      delete: () => editDelete(),
+      wall: () => setDrawTool('wall'),
+      pipe: () => setDrawTool('pipe'),
+      head: () => setDrawTool('head'),
+      drop: () => setDrawTool('fitting'),
+      door: () => setDrawTool('door'),
+      measure: () => startMeasure(),
+      trim: () => startTrim(),
+      offset: () => startOffset(),
+      array: () => doArray(),
+      mirror: () => startMirrorLine(),
+    },
   });
-  // keep the toolbar's active highlight in sync if a draw tool ends (Esc) elsewhere.
-  const _orig = setDrawTool;
-  window.__syncToolBar = (tool) => { const b = tool ? tb.querySelector(`[data-draw="${tool}"]`) : selectBtn; if (b) setActive(b); };
+  window.__syncToolBar = (tool) => {
+    if (tool === 'wall' || tool === 'pipe' || tool === 'head' || tool === 'door' || tool === 'measure') toolbar.setActiveAction(tool);
+    else if (tool === 'fitting') toolbar.setActiveAction('drop');
+    else toolbar.setActiveAction('select');
+  };
 })();
 // HF-INSPTABS: tabbed right Inspector + auto-switch so results never hide in an inactive tab.
 (function wireInspectorTabs() {
