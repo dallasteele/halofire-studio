@@ -258,6 +258,28 @@ Every task ends with an Entry here + a commit.
 | `2709edb` | Phase 1 fork + scaffold @halofire/sprinkler |
 | `72cbe18` | Comprehensive requirements + revised 8-month roadmap |
 | `4b2786a` | Technical plan + M1 infrastructure scaffold |
+
+## 2026-06-17
+
+### Entry 10 — Real-raster floorplan segmentation ensemble gate
+
+- ✅ Added `apps/autosprink/tools/floorplan-seg/segment_ensemble.py`:
+     self-bootstraps the cache under `/opt/hal9000/state/floorplan-seg-cache`,
+     runs two learned floorplan-specialized paths on the real raster
+     `/opt/hal9000/state/sam-1881-p8-008.png`, and writes per-model
+     `*_walls.png` + `*_overlay.png` plus `ensemble_walls.png` +
+     `ensemble_overlay.png`.
+- ✅ `cubicasa_official` uses the published CubiCasa checkpoint and room
+     class `Wall`; `hf_mask2former_lineart` uses the HF floorplan model's
+     `wall` label with a dark-ink gate so it does not mark the whole sheet.
+- ✅ Added exact gate
+     `apps/autosprink/tools/floorplan-seg/test_ensemble_1881.py` to run the
+     tool and assert at least two model masks land in the truthful coverage
+     band `[0.02, 0.55]` on the real 1881 raster.
+- 📝 Attempted the published Raster-to-Vector PyTorch checkpoint as part of
+     scope recovery. It did not produce a usable non-zero wall mask on this
+     raster under the available runtime, so it is not claimed as a working
+     ensemble member.
 | `290cfce` | Wire halofire_validate shell + collisions audits |
 | `61d73a8` | Catalog package + 20 authored components + IFC wire-up |
 | `62ac4cd` | Catalog + Fire Protection sidebar tabs in editor app |
