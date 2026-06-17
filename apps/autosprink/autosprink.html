@@ -741,6 +741,7 @@ import { computeRemoteArea, autoRemoteArea, polygonArea, pointInPolygon, rectRin
 // demand point → the binding (governing) supply + supply-vs-demand graph data.
 // Validated against hand calcs in tests/supplies.test.js.
 import { buildSupply, evaluateSupplies, supplyDemandCurve, defaultCityWaterSpec, SUPPLY_DISCLAIMER } from '/src/engine/supplies.js';
+import { fittingBasis } from '/src/engine/fitting-orient.js';
 
 // HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
 // (leaf + swing arc), recovered partition-inclusive WALLS, and FIXTURES/cores are
@@ -1318,6 +1319,24 @@ function hangerRingGeo(r) { // band-hanger ring around the pipe, axis along run
   g.rotateZ(Math.PI / 2); return g;
 }
 
+function worldAxisFromEngine(axis) {
+  if (!Array.isArray(axis) || axis.length !== 3) return null;
+  return new THREE.Vector3(axis[0], axis[2], axis[1]);
+}
+
+function detailQuaternionFor(item) {
+  const runAxis = item.runAxis || (item.info && item.info.runAxis);
+  const outletAxis = item.outletAxis || (item.info && item.info.outletAxis);
+  if (!Array.isArray(runAxis) || !Array.isArray(outletAxis)) return null;
+  const basis = fittingBasis(runAxis, outletAxis);
+  const xAxis = worldAxisFromEngine(basis.xAxis);
+  const yAxis = worldAxisFromEngine(basis.yAxis);
+  const zAxis = worldAxisFromEngine(basis.zAxis);
+  if (!xAxis || !yAxis || !zAxis) return null;
+  const mat = new THREE.Matrix4().makeBasis(xAxis, yAxis, zAxis);
+  return new THREE.Quaternion().setFromRotationMatrix(mat);
+}
+
 // One InstancedMesh from prebuilt items [{p:[wx,wy,wz], rotY, sy, info}].
 function instancedDetail(geo, color, items, kind, fittingType) {
   const mat = new THREE.MeshStandardMaterial({ color, metalness: 0.55, roughness: 0.45 });
@@ -1325,7 +1344,9 @@ function instancedDetail(geo, color, items, kind, fittingType) {
   const d = new THREE.Object3D();
   items.forEach((it, i) => {
     d.position.set(it.p[0], it.p[1], it.p[2]);
-    d.rotation.set(0, it.rotY || 0, 0);
+    const q = detailQuaternionFor(it);
+    if (q) d.quaternion.copy(q);
+    else d.rotation.set(0, it.rotY || 0, 0);
     d.scale.set(1, it.sy || 1, 1);
     d.updateMatrix(); inst.setMatrixAt(i, d.matrix);
   });
@@ -1514,7 +1535,7 @@ function renderGeometryDetail(cadModel, ceilFt) {
         const back = end === 'to' ? host.u : [-host.u[0], -host.u[1], -host.u[2]];
         const rotY = rotYFor(back[0], back[1]);
         push('elbowDown', hr.toFixed(3), () => elbowGeo(hr, Math.max(0.3, hr * 2.4), stubLen, false), 0xc9a84c, {
-          p: wp, rotY,
+          p: wp, rotY, runAxis: [back[0], back[1], 0], outletAxis: [0, 0, -1],
           info: { p: wp, label: 'End-of-line elbow (turn down to drop)', verify: 'inferred end-of-line turn-down fitting; not mfg-exact', rows: [
             ['Type', '90° elbow, branch end -> drop'], ['Run size', `${host.s.diameterIn}"`], ['Drop size', `${drec.s.diameterIn}"`], ['Plan coords (ft)', fmtP(top)],
           ] },
@@ -1523,7 +1544,7 @@ function renderGeometryDetail(cadModel, ceilFt) {
       } else { // mid-run: reducing tee on the branch, branch port down to the drop
         const rotY = rotYFor(host.u[0], host.u[1]);
         push('teeDown', hr.toFixed(3) + '/' + dropR.toFixed(3), () => teeGeo(hr, dropR, stubLen, false), 0xc9a84c, {
-          p: wp, rotY,
+          p: wp, rotY, runAxis: [host.u[0], host.u[1], 0], outletAxis: [0, 0, -1],
           info: { p: wp, label: 'Branch tee (drop take-off)', verify: 'inferred reducing tee at the branch x drop junction; not mfg-exact', rows: [
             ['Type', 'Tee, branch run x drop outlet'], ['Run size', `${host.s.diameterIn}"`], ['Outlet size', `${drec.s.diameterIn}"`], ['Plan coords (ft)', fmtP(top)],
           ] },
@@ -1563,7 +1584,7 @@ function renderGeometryDetail(cadModel, ceilFt) {
       const mr = renderedPipeR(main.s.diameterIn, false);
       const wp = W(top);
       push('teeDown', mr.toFixed(3) + '/' + tieR.toFixed(3), () => teeGeo(mr, tieR, Math.max(0.18, tieR * 1.2), false), 0xc9a84c, {
-        p: wp, rotY: rotYFor(main.u[0], main.u[1]),
+        p: wp, rotY: rotYFor(main.u[0], main.u[1]), runAxis: [main.u[0], main.u[1], 0], outletAxis: [0, 0, -1],
         info: { p: wp, label: 'Cross-main tee (branch tie)', verify: 'inferred tee at the cross-main x riser-tie junction; not mfg-exact', rows: [
           ['Type', 'Tee, cross-main x riser tie'], ['Run size', `${main.s.diameterIn}"`], ['Outlet size', `${tie.s.diameterIn}"`], ['Plan coords (ft)', fmtP(top)],
         ] },
@@ -1576,7 +1597,7 @@ function renderGeometryDetail(cadModel, ceilFt) {
       const into = end === 'from' ? branch.u : [-branch.u[0], -branch.u[1], -branch.u[2]]; // direction INTO the branch run
       const wp = W(bot);
       push('elbowUp', tieR.toFixed(3), () => elbowGeo(tieR, Math.max(0.3, tieR * 2.4), Math.max(0.18, tieR * 1.2), true), 0xc9a84c, {
-        p: wp, rotY: rotYFor(-into[0], -into[1]), // leg occupies local -X -> point it along the branch
+        p: wp, rotY: rotYFor(-into[0], -into[1]), runAxis: [-into[0], -into[1], 0], outletAxis: [0, 0, 1], // leg occupies local -X -> point it along the branch
         info: { p: wp, label: 'Riser-tie elbow (tie -> branch)', verify: 'inferred vertical-to-horizontal elbow; not mfg-exact', rows: [
           ['Type', '90° elbow, riser tie -> branch line'], ['Size', `${tie.s.diameterIn}" / ${branch.s.diameterIn}"`], ['Plan coords (ft)', fmtP(bot)],
         ] },
