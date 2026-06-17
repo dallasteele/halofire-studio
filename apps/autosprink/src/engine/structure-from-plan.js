@@ -316,6 +316,36 @@ export function detectColumns(grid, segments, members = [], opts = {}) {
   return { columns, note };
 }
 
+export function detectColumnMarkers(candidates, segments, opts = {}) {
+  const markerRadiusFt = Number.isFinite(opts.markerRadiusFt) ? opts.markerRadiusFt : 2.5;
+  const markerMaxLenFt = Number.isFinite(opts.markerMaxLenFt) ? opts.markerMaxLenFt : 3;
+  const minMarkerSegs = Number.isFinite(opts.minMarkerSegs) ? opts.minMarkerSegs : 4;
+  const segs = (Array.isArray(segments) ? segments : []).filter((s) => segLen(s) <= markerMaxLenFt);
+  const markers = [];
+  for (const candidate of (Array.isArray(candidates) ? candidates : [])) {
+    const x = Number(candidate?.x);
+    const y = Number(candidate?.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    let markerSegs = 0;
+    for (const s of segs) {
+      const [mx, my] = segMid(s);
+      if (Math.hypot(mx - x, my - y) <= markerRadiusFt) markerSegs += 1;
+    }
+    if (markerSegs < minMarkerSegs) continue;
+    markers.push({
+      x: round(x),
+      y: round(y),
+      markerSegs,
+      confidence: 'low',
+      evidence: 'dense-short-segment-cluster',
+    });
+  }
+  return {
+    markers,
+    note: 'Column markers validated by nearby short-segment density only; best-effort, deterministic, needs-verification.',
+  };
+}
+
 /**
  * PURE. Detect BEAMS / JOISTS as long axis-aligned member lines, each tagged by the nearest
  * beam member token. Beams span between grid lines; we keep long, near-axis-aligned segments

@@ -1,3 +1,5 @@
+import { validateBuildingModel } from './building-model.js';
+
 /**
  * building-from-plan.js — build TRUE-SCALE per-level 3D from extracted LevelPlans.
  *
@@ -371,6 +373,272 @@ function makeWallsFullLayer(THREE, segs, bounds, elevationFt, heightFt, mergeGeo
   grp.name = 'plan-wallsfull';
   grp.userData = { kind: 'plan-wallsfull', merged: false, segCount: n, needsVerification: true };
   return n ? grp : null;
+}
+
+function shellOutlineFromModel(model) {
+  const outline = model?.shell?.outline;
+  return Array.isArray(outline) ? outline : [];
+}
+
+function roofNeeded(model) {
+  const zones = Array.isArray(model?.zones) ? model.zones : [];
+  if (zones.some((zone) => zone?.covered === true)) return true;
+  if (zones.length === 0) return false;
+  return zones.some((zone) => zone?.kind !== 'parking');
+}
+
+function wallLength2d(wall) {
+  return Math.hypot(Number(wall.b[0]) - Number(wall.a[0]), Number(wall.b[1]) - Number(wall.a[1]));
+}
+
+function wallVector2d(wall) {
+  const len = wallLength2d(wall);
+  if (!(len > 0)) return { ux: 1, uy: 0, len: 0 };
+  return {
+    ux: (Number(wall.b[0]) - Number(wall.a[0])) / len,
+    uy: (Number(wall.b[1]) - Number(wall.a[1])) / len,
+    len,
+  };
+}
+
+function openingCenterPoint(item) {
+  const pos = item?.position || item?.positionFt;
+  if (Array.isArray(pos) && pos.length >= 2) return [Number(pos[0]), Number(pos[1])];
+  if (Number.isFinite(item?.x) && Number.isFinite(item?.y)) return [Number(item.x), Number(item.y)];
+  return null;
+}
+
+function openingWidthFt(item) {
+  const width = Number.isFinite(Number(item?.widthFt)) ? Number(item.widthFt) : Number(item?.width);
+  return width > 0 ? width : 0;
+}
+
+function projectOpeningToWall(wall, item) {
+  const widthFt = openingWidthFt(item);
+  if (!(widthFt > 0)) return null;
+  const { ux, uy, len } = wallVector2d(wall);
+  if (!(len > 0)) return null;
+  let centerOffset = Number(item?.offsetFt);
+  if (!Number.isFinite(centerOffset)) {
+    const pt = openingCenterPoint(item);
+    if (!pt) return null;
+    const dx = pt[0] - Number(wall.a[0]);
+    const dy = pt[1] - Number(wall.a[1]);
+    centerOffset = (dx * ux) + (dy * uy);
+  }
+  const half = widthFt / 2;
+  const startFt = Math.max(0, centerOffset - half);
+  const endFt = Math.min(len, centerOffset + half);
+  if (!(endFt - startFt > 0.05)) return null;
+  const centerFt = (startFt + endFt) / 2;
+  const center = [
+    Number(wall.a[0]) + ux * centerFt,
+    Number(wall.a[1]) + uy * centerFt,
+  ];
+  return {
+    startFt,
+    endFt,
+    centerFt,
+    center,
+    widthFt: endFt - startFt,
+    kind: item?.type || item?.kind || 'opening',
+    source: item?.source || null,
+  };
+}
+
+function collectWallOpenings(model, wall, wallIndex) {
+  const collected = [];
+  const seen = new Set();
+  const pushOpening = (opening) => {
+    const projection = projectOpeningToWall(wall, opening);
+    if (!projection) return;
+    const key = `${Math.round(projection.startFt * 1000)}:${Math.round(projection.endFt * 1000)}:${projection.kind}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    collected.push(projection);
+  };
+
+  for (const opening of (Array.isArray(wall?.openings) ? wall.openings : [])) pushOpening(opening);
+  for (const door of (Array.isArray(model?.doors) ? model.doors : [])) {
+    if (Number(door?.hostWall) === wallIndex) pushOpening({ ...door, type: 'door' });
+  }
+  for (const opening of (Array.isArray(model?.openings) ? model.openings : [])) {
+    if (Number(opening?.hostWall) === wallIndex) pushOpening(opening);
+  }
+  collected.sort((a, b) => a.startFt - b.startFt);
+  return collected;
+}
+
+function cutWallSpans(wall, cutouts) {
+  const len = wallLength2d(wall);
+  if (!(len > 0)) return [];
+  if (!Array.isArray(cutouts) || cutouts.length === 0) return [{ startFt: 0, endFt: len }];
+  const spans = [];
+  let cursor = 0;
+  for (const cutout of cutouts) {
+    const startFt = Math.max(0, Math.min(len, Number(cutout.startFt)));
+    const endFt = Math.max(startFt, Math.min(len, Number(cutout.endFt)));
+    if (startFt > cursor + 0.05) spans.push({ startFt: cursor, endFt: startFt });
+    cursor = Math.max(cursor, endFt);
+  }
+  if (cursor < len - 0.05) spans.push({ startFt: cursor, endFt: len });
+  return spans;
+}
+
+function makeShellMesh(THREE, outline, bounds, heightFt, elevationFt) {
+  if (!THREE.Shape || !THREE.ExtrudeGeometry) {
+    const g = new THREE.Group();
+    g.name = 'building-model-shell';
+    g.userData = { kind: 'building-model-shell', needsVerification: true };
+    return g;
+  }
+  const shape = new THREE.Shape();
+  outline.forEach(([x, y], i) => {
+    const px = x - bounds.cx;
+    const pz = y - bounds.cy;
+    if (i === 0) shape.moveTo(px, pz); else shape.lineTo(px, pz);
+  });
+  shape.closePath();
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: heightFt, bevelEnabled: false });
+  geo.rotateX(-Math.PI / 2);
+  const mat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: WALL_COLOR, transparent: true, opacity: 0.22, metalness: 0, roughness: 0.92 })
+    : new THREE.MeshBasicMaterial({ color: WALL_COLOR, transparent: true, opacity: 0.22 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.y = elevationFt;
+  mesh.name = 'building-model-shell';
+  mesh.userData = { kind: 'building-model-shell', needsVerification: true };
+  return mesh;
+}
+
+function makeWallSpanMesh(THREE, wall, bounds, elevationFt, heightFt, thicknessFt, span, mat) {
+  const { ux, uy } = wallVector2d(wall);
+  const sx = Number(wall.a[0]) + ux * span.startFt;
+  const sy = Number(wall.a[1]) + uy * span.startFt;
+  const ex = Number(wall.a[0]) + ux * span.endFt;
+  const ey = Number(wall.a[1]) + uy * span.endFt;
+  return makeWall(
+    THREE,
+    { a: [sx, sy], b: [ex, ey] },
+    bounds,
+    elevationFt,
+    heightFt,
+    thicknessFt,
+    mat,
+  );
+}
+
+function makeColumnMesh(THREE, column, bounds, elevationFt, heightFt) {
+  if (!THREE.BoxGeometry) return null;
+  const sizeFt = Math.max(0.5, Number(column?.sizeFt) || 1);
+  const geo = new THREE.BoxGeometry(sizeFt, heightFt, sizeFt);
+  const mat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: 0x64748b, transparent: true, opacity: 0.85, metalness: 0.1, roughness: 0.85 })
+    : new THREE.MeshBasicMaterial({ color: 0x64748b, transparent: true, opacity: 0.85 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(Number(column.x) - bounds.cx, elevationFt + heightFt / 2, Number(column.y) - bounds.cy);
+  mesh.name = 'building-model-column';
+  mesh.userData = { kind: 'building-model-column', sizeFt, needsVerification: true };
+  return mesh;
+}
+
+function makeRoofMesh(THREE, outline, bounds, elevationFt, thicknessFt) {
+  const roof = makeFootprintSlab(THREE, outline, bounds, elevationFt, thicknessFt);
+  roof.name = 'building-model-roof';
+  roof.userData = { ...(roof.userData || {}), kind: 'building-model-roof', needsVerification: true };
+  return roof;
+}
+
+/**
+ * Build a THREE group from the canonical BuildingModel emitted by plan-pipeline.js.
+ * This preserves the dependency-injected THREE pattern and keeps the older LevelPlan
+ * renderer available for existing callers during the migration.
+ */
+export function buildBuildingFromPlan(THREE, model, opts = {}) {
+  if (!THREE || !THREE.Group) throw new Error('buildBuildingFromPlan: THREE namespace is required');
+  validateBuildingModel(model);
+
+  const {
+    elevationFt = 0,
+    wallHeightFt = 10,
+    roofThicknessFt = 0.5,
+    floorThicknessFt = 0.75,
+    wallThicknessFt = 0.5,
+  } = opts;
+
+  const outline = shellOutlineFromModel(model);
+  const bounds = planBounds(outline);
+  const root = new THREE.Group();
+  root.name = 'building-from-model';
+  root.userData = { kind: 'building-from-model', needsVerification: true };
+
+  const wallMat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: WALL_COLOR, transparent: true, opacity: 0.7, metalness: 0, roughness: 0.88 })
+    : new THREE.MeshBasicMaterial({ color: WALL_COLOR, transparent: true, opacity: 0.7 });
+
+  root.add(makeShellMesh(THREE, outline, bounds, wallHeightFt, elevationFt));
+
+  const wallGroups = [];
+  (Array.isArray(model.walls) ? model.walls : []).forEach((wall, wallIndex) => {
+    const group = new THREE.Group();
+    group.name = 'building-model-wall';
+    const cutouts = collectWallOpenings(model, wall, wallIndex);
+    const spans = cutWallSpans(wall, cutouts);
+    spans.forEach((span, spanIndex) => {
+      const mesh = makeWallSpanMesh(
+        THREE,
+        wall,
+        bounds,
+        elevationFt,
+        wallHeightFt,
+        Number(wall.thicknessFt) || wallThicknessFt,
+        span,
+        wallMat,
+      );
+      if (!mesh) return;
+      mesh.userData = {
+        ...(mesh.userData || {}),
+        sourceWall: wallIndex,
+        spanIndex,
+        cutStartFt: span.startFt,
+        cutEndFt: span.endFt,
+        needsVerification: true,
+      };
+      group.add(mesh);
+    });
+    group.userData = {
+      kind: 'building-model-wall',
+      sourceWall: wallIndex,
+      cutCount: cutouts.length,
+      cuts: cutouts.map((cutout) => ({ center: cutout.center, widthFt: cutout.widthFt, kind: cutout.kind })),
+      needsVerification: true,
+    };
+    root.add(group);
+    wallGroups.push(group);
+  });
+
+  (Array.isArray(model.columns) ? model.columns : []).forEach((column) => {
+    const mesh = makeColumnMesh(THREE, column, bounds, elevationFt, wallHeightFt);
+    if (mesh) root.add(mesh);
+  });
+
+  const floor = makeFootprintSlab(THREE, outline, bounds, elevationFt, floorThicknessFt);
+  floor.name = 'building-model-floor';
+  floor.userData = { ...(floor.userData || {}), kind: 'building-model-floor', needsVerification: true };
+  root.add(floor);
+
+  if (roofNeeded(model)) {
+    const roof = makeRoofMesh(THREE, outline, bounds, elevationFt + wallHeightFt, roofThicknessFt);
+    root.add(roof);
+  }
+
+  root.userData.summary = {
+    shellMeshes: 1,
+    wallMeshes: wallGroups.length,
+    columnMeshes: (Array.isArray(model.columns) ? model.columns.length : 0),
+    cutWalls: wallGroups.filter((group) => Number(group.userData?.cutCount) > 0).length,
+  };
+  return root;
 }
 
 /**
