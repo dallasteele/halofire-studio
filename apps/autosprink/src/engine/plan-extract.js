@@ -64,6 +64,19 @@ function round(n) {
   return Math.round((Number(n) + Number.EPSILON) * 1e4) / 1e4;
 }
 
+function cloneWallLine(wall) {
+  return {
+    ...wall,
+    a: Array.isArray(wall?.a) ? [...wall.a] : wall?.a,
+    b: Array.isArray(wall?.b) ? [...wall.b] : wall?.b,
+  };
+}
+
+function buildCompatibilityWallsFt(wallRuns, walls) {
+  const source = Array.isArray(wallRuns) && wallRuns.length ? wallRuns : (Array.isArray(walls) ? walls : []);
+  return source.map(cloneWallLine);
+}
+
 function classifyLabel(text) {
   const t = String(text || '');
   for (const { kind, re } of SPACE_KINDS) {
@@ -624,6 +637,7 @@ export function buildLevelPlan(input, opts = {}) {
   const wr = buildWallRuns(walls, opts.wallRunOpts || {});
   const wallRuns = wr.runs;
   const wallRunsMeta = wr.meta;
+  const wallsFt = buildCompatibilityWallsFt(wallRuns, walls);
 
   // RECALL-COMPLETE wall set (W2): the proven single-band `walls` above is the dominant cut-wall
   // lineweight — it keeps footprint/room segmentation stable (it is what the verified W0 footprint
@@ -702,6 +716,7 @@ export function buildLevelPlan(input, opts = {}) {
     },
     wallBboxFt,
     walls,
+    wallsFt,
     wallRuns,
     wallRunsMeta,
     ...(wallsFull ? { wallsFull, wallsFullMeta } : {}),
@@ -1040,6 +1055,7 @@ export function mergeWingPlans(wingA, wingB, reg, meta = {}) {
   // RECORE: wall RUNS computed from the MERGED single-band walls (both wings in the common
   // frame) — the honest primary structure (envelope + partitions), non-wall ink excluded.
   const wrMerged = buildWallRuns(walls, meta.wallRunOpts || {});
+  const wallsFt = buildCompatibilityWallsFt(wrMerged.runs, walls);
 
   // Rooms: A as-is; B translated (poly + any bbox).
   const roomsA = (wingA.rooms || []).map((r) => ({ ...r }));
@@ -1111,6 +1127,7 @@ export function mergeWingPlans(wingA, wingB, reg, meta = {}) {
     footprintAreaReliable: false, // a union of two wing envelopes — bbox only, not an enclosed trace
     footprintBboxFt: { widthFt, heightFt, minX: round(uMinX), minY: round(uMinY), maxX: round(uMaxX), maxY: round(uMaxY) },
     walls,
+    wallsFt,
     wallRuns: wrMerged.runs,
     wallRunsMeta: wrMerged.meta,
     ...(wallsFull ? { wallsFull, wallsFullMeta: { merged: true, count: wallsFull.length, note: 'Partition-inclusive recall-complete wall set, both wings merged (wing B translated). Rendering + recall only; footprint uses single-band walls. needs-verification.' } } : {}),
