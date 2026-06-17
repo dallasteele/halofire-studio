@@ -682,6 +682,7 @@ import { manifestForProject, sheetsForLevel } from '/src/data/plan-manifest.js';
 // HF-C1-PARTMESH (Stream C): true-scale real CAD part meshes (mm->ft, Y-up)
 // with Inspector provenance; primitives stay as flagged fallback.
 import { createPartMeshLoader } from '/src/engine/part-meshes.js';
+import { selectionBracketCornerSegments, selectionBracketWorldSize } from '/src/engine/sel-bracket.js';
 // HF-W1 (Stream W1): the EDIT ENGINE — snapshot command stack + pure cadModel
 // edit ops (ported from apps/cad history.ts + store.ts) and the pure snap
 // engine. All viewer-side preview/raycast/DOM wiring stays inline below.
@@ -980,7 +981,7 @@ async function initStudio() {
   let fpsFrames = 0, fpsLast = performance.now();
   (function loop(now) {
     try { if (typeof faceGripsToCamera === 'function') faceGripsToCamera(); } catch (_) { /* grips optional */ }
-    requestAnimationFrame(loop); stepCamTween(now || performance.now()); controls.update(); renderer.render(scene, camera);
+    requestAnimationFrame(loop); stepCamTween(now || performance.now()); controls.update(); updateSelectionBracket(); renderer.render(scene, camera);
     try { updateViewCube(); } catch (_) { /* cube optional */ }
     try { updateScaleBar(); } catch (_) { /* scale bar optional */ }
     try { if (window.__hfRepositionAnnotations) window.__hfRepositionAnnotations(); } catch (_) { /* annotation overlay optional */ }
@@ -2836,6 +2837,50 @@ let camTween = null; // in-flight frame tween, stepped from the render loop
 const SEL_COLOR = new THREE.Color(0x00e676);
 const selMeshMat = new THREE.MeshStandardMaterial({ color: SEL_COLOR.clone(), emissive: 0x0a3c22, metalness: 0.35, roughness: 0.5 });
 let selHL = null; // { kind:'mesh', mesh, origMat } | { kind:'inst', inst, idx }
+let selBracket = null;
+
+function ensureSelectionBracket() {
+  if (selBracket || !scene) return selBracket;
+  const pts = [];
+  for (const seg of selectionBracketCornerSegments()) {
+    pts.push(new THREE.Vector3(seg[0], seg[1], seg[2]), new THREE.Vector3(seg[3], seg[4], seg[5]));
+  }
+  const geometry = new THREE.BufferGeometry().setFromPoints(pts);
+  const material = new THREE.LineBasicMaterial({
+    color: SEL_COLOR.clone(),
+    transparent: true,
+    opacity: 0.95,
+    depthTest: false,
+  });
+  selBracket = new THREE.LineSegments(geometry, material);
+  selBracket.name = 'hfSelectionBracket';
+  selBracket.renderOrder = 1100;
+  selBracket.visible = false;
+  selBracket.raycast = () => {};
+  scene.add(selBracket);
+  return selBracket;
+}
+
+function hideSelectionBracket() {
+  if (selBracket) selBracket.visible = false;
+}
+
+function updateSelectionBracket() {
+  if (!curSel || !camera || !renderer) { hideSelectionBracket(); return; }
+  const bracket = ensureSelectionBracket();
+  if (!bracket) return;
+  const canvas = renderer.domElement;
+  const rect = canvas && typeof canvas.getBoundingClientRect === 'function' ? canvas.getBoundingClientRect() : null;
+  const viewportHeightPx = Math.max(
+    1,
+    Math.round((rect && rect.height ? rect.height : canvas.clientHeight || canvas.height || 1) * (window.devicePixelRatio || 1)),
+  );
+  const worldSize = selectionBracketWorldSize(camera, curSel.center, viewportHeightPx, { pixelSize: 10 });
+  bracket.position.copy(curSel.center);
+  bracket.quaternion.copy(camera.quaternion);
+  bracket.scale.setScalar(Math.max(0.01, worldSize));
+  bracket.visible = true;
+}
 
 function applyHighlight(found) {
   clearHighlight();
@@ -3003,6 +3048,7 @@ function clearSelection(restoreTarget) {
   try { if (typeof clearSetHighlight === 'function') clearSetHighlight(); } catch (_) {} // HF-W3-SEL: clear multi-select set recolor
   if (typeof hfSelSet !== 'undefined') hfSelSet = []; // HF-W3-SEL: empty the selection set
   const insp = $('inspector'); if (insp) insp.classList.remove('open');
+  hideSelectionBracket();
   curSel = null;
   curSelKey = null;
   curSelSolid = null; // HF-W1-CMD
@@ -3257,6 +3303,7 @@ function handleCanvasClick(e, frameAfter) {
   curSelSolid = sol || (found.part ? found.part.solid : null) || null;
   try { if (typeof refreshGrips === 'function') refreshGrips(); } catch (_) {} // HF-W2: show endpoint grips for the picked run
   window.__lastSelection = window.__lastSelection || null; // (set below)
+  updateSelectionBracket();
   openInspector(info.title, info.rows, info.verify);
   // contract #1: NO controls.target change here — selection is camera-neutral,
   // so contract #2 (click a different part at its unchanged screen position,
