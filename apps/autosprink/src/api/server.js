@@ -625,6 +625,180 @@ function publicLoginUrl(req, params = {}) {
   return url.toString();
 }
 
+const WORKBENCH_REVIEW_ACTION = 'workbench_flag_reviewed';
+
+function reportDestinationForRole(role) {
+  const normalized = normalizeRole(role);
+  if (normalized === 'estimator') {
+    return {
+      view: 'bid-performance',
+      label: 'Open my bid performance',
+      description: 'Estimator bid performance',
+      href: '/reports.html?view=bid-performance',
+    };
+  }
+  if (normalized === 'designer') {
+    return {
+      view: 'design-queue',
+      label: 'Open my design queue',
+      description: 'Designer work queue',
+      href: '/reports.html?view=design-queue',
+    };
+  }
+  return {
+    view: 'company-dashboard',
+    label: 'Open company dashboard',
+    description: 'Company dashboard',
+    href: '/reports.html?view=company-dashboard',
+  };
+}
+
+function parseWorkbenchDate(...values) {
+  for (const value of values) {
+    if (!value) continue;
+    const date = new Date(value);
+    if (!Number.isNaN(date.getTime())) return date;
+  }
+  return null;
+}
+
+function summarizeBidStatus(status) {
+  const normalized = String(status || 'pending').trim().toLowerCase();
+  if (['needs review', 'pending', 'hold', 'at risk'].includes(normalized)) return 'flagged';
+  if (['won', 'awarded', 'complete', 'completed'].includes(normalized)) return 'ok';
+  return 'active';
+}
+
+function buildWorkbenchJobsForUser(user) {
+  const role = normalizeRole(user?.role);
+  const bids = db.prepare('SELECT * FROM bids ORDER BY COALESCE(due_date, date, updated_at, created_at) ASC, created_at DESC').all();
+  const projects = db.prepare('SELECT * FROM projects ORDER BY COALESCE(end_date, start_date, updated_at, created_at) ASC, created_at DESC').all();
+  const bidsWithoutOwner = bids.length > 0 && bids.every((item) => item.created_by == null);
+  const projectsWithoutManager = projects.length > 0 && projects.every((item) => !item.manager);
+  const normalizedUserName = String(user?.name || '').trim().toLowerCase();
+
+  const visibleBids = bids.filter((bid) => {
+    if (['admin', 'ceo'].includes(role)) return true;
+    if (role === 'estimator') return bid.created_by === user.id || bidsWithoutOwner;
+    return bid.created_by === user.id;
+  });
+
+  const visibleProjects = projects.filter((project) => {
+    if (['admin', 'ceo'].includes(role)) return true;
+    if (role === 'designer') {
+      return String(project.phase || '').toLowerCase().includes('design')
+        || String(project.manager || '').trim().toLowerCase() === normalizedUserName
+        || projectsWithoutManager;
+    }
+    return String(project.manager || '').trim().toLowerCase() === normalizedUserName;
+  });
+
+  return [
+    ...visibleBids.map((bid) => {
+      const dueAt = parseWorkbenchDate(bid.due_date, bid.date, bid.updated_at, bid.created_at);
+      return {
+        key: `bid:${bid.id}`,
+        entity_type: 'bid',
+        entity_id: bid.id,
+        title: bid.project || `Bid #${bid.id}`,
+        subtitle: [bid.contractor, bid.system_type].filter(Boolean).join(' · ') || 'Bid request',
+        status: bid.status || 'Pending',
+        status_tone: summarizeBidStatus(bid.status),
+        date_label: dueAt ? dueAt.toISOString() : null,
+        amount: Number(bid.value) || 0,
+        owner: bid.created_by === user.id ? 'You' : null,
+        href: `/crm.html?bid=${bid.id}`,
+        search_text: [bid.project, bid.contractor, bid.contact, bid.notes, bid.status].filter(Boolean).join(' '),
+      };
+    }),
+    ...visibleProjects.map((project) => {
+      const projectDate = parseWorkbenchDate(project.start_date, project.end_date, project.updated_at, project.created_at);
+      return {
+        key: `project:${project.id}`,
+        entity_type: 'project',
+        entity_id: project.id,
+        title: project.name || `Project #${project.id}`,
+        subtitle: [project.phase, project.manager].filter(Boolean).join(' · ') || 'Project',
+        status: project.status || 'On Track',
+        status_tone: /at risk|hold|blocked/i.test(String(project.status || '')) ? 'flagged' : 'active',
+        date_label: projectDate ? projectDate.toISOString() : null,
+        amount: Number(project.budget) || 0,
+        owner: project.manager || null,
+        href: `/autosprink.html?project=${encodeURIComponent(project.name || '')}`,
+        search_text: [project.name, project.phase, project.manager, project.notes, project.status].filter(Boolean).join(' '),
+      };
+    }),
+  ].sort((left, right) => {
+    const leftDate = parseWorkbenchDate(left.date_label)?.getTime() || Number.MAX_SAFE_INTEGER;
+    const rightDate = parseWorkbenchDate(right.date_label)?.getTime() || Number.MAX_SAFE_INTEGER;
+    return leftDate - rightDate;
+  }).slice(0, 50);
+}
+
+function buildWorkbenchReviewMap() {
+  const rows = db.prepare(`
+    SELECT entity_type, entity_id, MAX(created_at) AS reviewed_at
+    FROM activity_log
+    WHERE action = ?
+    GROUP BY entity_type, entity_id
+  `).all(WORKBENCH_REVIEW_ACTION);
+  return new Map(rows.map((row) => [`${row.entity_type}:${row.entity_id}`, row.reviewed_at]));
+}
+
+function buildWorkbenchFlaggedItems(jobs, reviewMap) {
+  return jobs
+    .filter((job) => job.status_tone === 'flagged')
+    .map((job) => {
+      const reviewedAt = reviewMap.get(`${job.entity_type}:${job.entity_id}`) || null;
+      return {
+        ...job,
+        reviewed_at: reviewedAt,
+        reviewed: Boolean(reviewedAt),
+        review_label: reviewedAt ? 'Reviewed' : 'Review',
+        summary: `${job.subtitle || job.entity_type} · ${job.status}`,
+      };
+    });
+}
+
+function buildWorkbenchTasks(jobs, flaggedItems) {
+  const tasks = [];
+  for (const item of flaggedItems.filter((entry) => !entry.reviewed).slice(0, 4)) {
+    tasks.push({
+      key: `task:${item.key}`,
+      title: `Review ${item.title}`,
+      detail: item.summary,
+      href: item.href,
+      kind: 'review',
+    });
+  }
+  for (const job of jobs.slice(0, 6)) {
+    if (!job.date_label) continue;
+    tasks.push({
+      key: `followup:${job.key}`,
+      title: job.entity_type === 'bid' ? 'Check bid deadline' : 'Advance project queue',
+      detail: `${job.title} · ${job.status}`,
+      href: job.href,
+      kind: 'followup',
+    });
+    if (tasks.length >= 6) break;
+  }
+  return tasks.slice(0, 6);
+}
+
+function buildWorkbenchCalendarItems(jobs) {
+  return jobs
+    .filter((job) => job.date_label)
+    .slice(0, 6)
+    .map((job) => ({
+      key: `calendar:${job.key}`,
+      label: job.title,
+      detail: job.subtitle || job.status,
+      starts_at: job.date_label,
+      href: job.href,
+      status: job.status,
+    }));
+}
+
 function buildPasswordResetEmail({ name, resetUrl }) {
   const safeName = escapeHtmlServer(name || 'there');
   const safeUrl = escapeHtmlServer(resetUrl);
@@ -906,6 +1080,74 @@ app.get('/api/analytics/summary', authMiddleware, (req, res) => {
   res.json({
     totalBids, wonBids, totalRevenue, activeProjects, avgDealSize,
     winRate: totalBids > 0 ? Math.round(wonBids / totalBids * 100) : 0,
+  });
+});
+
+app.get('/api/workbench/overview', authMiddleware, (req, res) => {
+  const user = db.prepare('SELECT id, username, name, role, email FROM users WHERE id = ?').get(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const jobs = buildWorkbenchJobsForUser(user);
+  const reviewMap = buildWorkbenchReviewMap();
+  const flaggedItems = buildWorkbenchFlaggedItems(jobs, reviewMap);
+  const tasks = buildWorkbenchTasks(jobs, flaggedItems);
+  const calendar = buildWorkbenchCalendarItems(jobs);
+
+  res.json({
+    user,
+    report: reportDestinationForRole(user.role),
+    metrics: {
+      jobs: jobs.length,
+      flagged: flaggedItems.filter((item) => !item.reviewed).length,
+      tasks: tasks.length,
+      calendar: calendar.length,
+    },
+    jobs,
+    flagged_items: flaggedItems,
+    tasks,
+    calendar,
+  });
+});
+
+app.post('/api/workbench/reviews', authMiddleware, (req, res) => {
+  const entityType = String(req.body?.entity_type || '').trim().toLowerCase();
+  const entityId = Number(req.body?.entity_id || 0);
+  const note = String(req.body?.note || '').trim();
+  if (!['bid', 'project'].includes(entityType) || !entityId) {
+    return res.status(400).json({ error: 'entity_type and entity_id are required' });
+  }
+
+  const row = entityType === 'bid'
+    ? db.prepare('SELECT id, project AS title, status, contractor AS subtitle FROM bids WHERE id = ?').get(entityId)
+    : db.prepare('SELECT id, name AS title, status, phase AS subtitle FROM projects WHERE id = ?').get(entityId);
+  if (!row) return res.status(404).json({ error: 'Workbench item not found' });
+
+  db.prepare(`
+    INSERT INTO activity_log (user_id, action, entity_type, entity_id, details)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(
+    req.user.id,
+    WORKBENCH_REVIEW_ACTION,
+    entityType,
+    entityId,
+    JSON.stringify({
+      note,
+      title: row.title,
+      status: row.status,
+      subtitle: row.subtitle || null,
+      reviewed_by_role: normalizeRole(req.user.role),
+    }),
+  );
+
+  res.json({
+    ok: true,
+    review: {
+      entity_type: entityType,
+      entity_id: entityId,
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: req.user.name || req.user.username,
+      note,
+    },
   });
 });
 

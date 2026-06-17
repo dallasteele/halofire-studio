@@ -30,8 +30,8 @@
 </head>
 <body class="hf" data-hf-page="reports">
   <div class="wrap">
-    <div class="ptitle">Reports</div>
-    <div class="psub">Role-based dashboards · this view defaults to the company (owner/dev) tier.</div>
+    <div class="ptitle" id="reportTitle">Reports</div>
+    <div class="psub" id="reportSubtitle">Role-based dashboards · this view defaults to the company (owner/dev) tier.</div>
 
     <div class="kpis">
       <div class="kpi hf-card"><div class="k">Bids out</div><div class="v" id="kBids">—</div><div class="d" id="kBidsD">loading…</div></div>
@@ -42,9 +42,9 @@
 
     <div class="grid2">
       <section class="hf-panel">
-        <div class="phd"><span class="t">Company dashboard</span><span class="hf-chip info"><span class="gl"></span> owner / dev tier</span></div>
+        <div class="phd"><span class="t" id="reportPanelTitle">Company dashboard</span><span class="hf-chip info"><span class="gl"></span> role-aware landing</span></div>
         <div class="pbd">
-          <div class="empty">
+          <div class="empty" id="reportEmptyState">
             <div class="e-t">Real role dashboards land here</div>
             <div class="note">Estimator · CFO · Designer · PM · Service-ITM · Dispatcher · Tech · Safety · HR — each scoped by access tier, plus the per-position / per-employee drill-down. Powered by the <code>activity_log</code> telemetry spine once the foundation (R0) is wired. Today only bid win-rate / pipeline is computable off real data.</div>
           </div>
@@ -55,6 +55,34 @@
 
   <script src="/public/halofire-shell.js?v=13"></script>
   <script>
+    var reportViews = {
+      'company-dashboard': {
+        title: 'Company dashboard',
+        subtitle: 'Role-based dashboards · company-wide bid and project rollup.',
+        emptyTitle: 'Company dashboard readback',
+        emptyBody: 'This route opens the executive dashboard lens. Real company-level pipeline metrics are live below, while deeper role dashboards still build out on the same telemetry spine.',
+      },
+      'bid-performance': {
+        title: 'Estimator bid performance',
+        subtitle: 'Role-based dashboards · personal bid performance and follow-up funnel.',
+        emptyTitle: 'Estimator dashboard readback',
+        emptyBody: 'This route opens the estimator lens. Current live metrics come from real bid totals and statuses; follow-up and close-rate drill-downs remain on the same reports surface.',
+      },
+      'design-queue': {
+        title: 'Designer work queue',
+        subtitle: 'Role-based dashboards · active design queue and project handoffs.',
+        emptyTitle: 'Design queue readback',
+        emptyBody: 'This route opens the designer queue lens. It shares the same reports surface while the queue-specific workload cards are built out around project phase telemetry.',
+      },
+    };
+    var params = new URLSearchParams(window.location.search);
+    var reportView = params.get('view') || 'company-dashboard';
+    var activeView = reportViews[reportView] || reportViews['company-dashboard'];
+    document.getElementById('reportTitle').textContent = activeView.title;
+    document.getElementById('reportSubtitle').textContent = activeView.subtitle;
+    document.getElementById('reportPanelTitle').textContent = activeView.title;
+    document.getElementById('reportEmptyState').innerHTML = '<div class="e-t">' + activeView.emptyTitle + '</div><div class="note">' + activeView.emptyBody + '</div>';
+
     // real bid KPIs (win-rate/pipeline are the only trustworthy metrics today)
     fetch('/api/bids?limit=3000', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
       if (!d) return; var bids = d.bids || []; var total = d.total || bids.length;
