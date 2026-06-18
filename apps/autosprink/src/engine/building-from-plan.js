@@ -385,6 +385,18 @@ function makeWallsFullLayer(THREE, segs, bounds, elevationFt, heightFt, mergeGeo
  *   bump for stair shafts, default 2), includeRooms (true), includeWalls (true).
  * @returns {{root, levels, setActiveLevel, setLevelVisible, bounds, summary}}
  */
+// PURE. True when a footprint loop is just an axis-aligned bbox RECTANGLE (a fallback outline, not
+// a real building footprint). Used to suppress the meaningless rectangular perimeter slab.
+function isAxisAlignedRect(poly) {
+  if (!Array.isArray(poly)) return false;
+  const closed = poly.length >= 2 && poly[0][0] === poly[poly.length - 1][0] && poly[0][1] === poly[poly.length - 1][1];
+  const pts = closed ? poly.slice(0, -1) : poly;
+  if (pts.length !== 4) return false;
+  const xs = new Set(pts.map((q) => Math.round(q[0] * 100)));
+  const ys = new Set(pts.map((q) => Math.round(q[1] * 100)));
+  return xs.size === 2 && ys.size === 2;
+}
+
 export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
   if (!THREE || !THREE.Group) throw new Error('buildBuildingFromPlans: THREE namespace is required');
   if (!Array.isArray(levelPlans) || levelPlans.length === 0) {
@@ -451,8 +463,10 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
 
     let wallCount = 0, roomCount = 0, stairCount = 0;
 
-    // Footprint slab.
-    if (Array.isArray(plan.footprintFt) && plan.footprintFt.length >= 3) {
+    // Footprint slab — but NOT when footprintFt is just an axis-aligned bbox RECTANGLE: that is a
+    // fallback outline (not a real building footprint), and drawing it places a meaningless
+    // rectangular perimeter the walls don't follow. Skip it; the real walls define the building.
+    if (Array.isArray(plan.footprintFt) && plan.footprintFt.length >= 3 && !isAxisAlignedRect(plan.footprintFt)) {
       const slab = makeFootprintSlab(THREE, plan.footprintFt, bounds, elevationFt, slabThicknessFt);
       group.add(slab);
     }
