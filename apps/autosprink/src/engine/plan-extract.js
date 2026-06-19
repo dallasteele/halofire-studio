@@ -72,6 +72,20 @@ function classifyLabel(text) {
   return null;
 }
 
+function normalizeSegmentsFt(segments) {
+  return (Array.isArray(segments) ? segments : [])
+    .map((s) => {
+      if (s && Number.isFinite(s.x1) && Number.isFinite(s.y1) && Number.isFinite(s.x2) && Number.isFinite(s.y2)) {
+        return { x1: Number(s.x1), y1: Number(s.y1), x2: Number(s.x2), y2: Number(s.y2), lineWidth: s.lineWidth };
+      }
+      if (s && Array.isArray(s.a) && Array.isArray(s.b)) {
+        return { x1: Number(s.a[0]), y1: Number(s.a[1]), x2: Number(s.b[0]), y2: Number(s.b[1]), lineWidth: s.lineWidth };
+      }
+      return null;
+    })
+    .filter(Boolean);
+}
+
 /**
  * Stair DIRECTION tokens. Architects almost never write "STAIR" inside the shaft on an overall
  * plan — they draw the tread hatch and annotate the run direction with "UP" / "DN" / "DOWN"
@@ -261,13 +275,31 @@ export function segmentRooms(wallSegments, textItemsFt = [], opts = {}) {
       wall[idx(toCx(s.x1 + (s.x2 - s.x1) * f), toCy(s.y1 + (s.y2 - s.y1) * f))] = 1;
     }
   }
+  // STAGE 1 (2026-06-19): morphological DILATION to bridge wall fragment/door gaps BEFORE the
+  // exterior flood, so the flood cannot leak through small gaps and the interior segments into
+  // real enclosed rooms instead of one leaked giant pocket. Dilate cells span ~bridgeFt total.
+  const bridgeFt = Number.isFinite(opts.bridgeFt) ? Number(opts.bridgeFt) : 3;
+  const dilCells = Math.max(1, Math.round((bridgeFt / 2) / Math.min(cw, ch)));
+  let wallD = wall;
+  for (let d = 0; d < dilCells; d++) {
+    const next = new Uint8Array(wallD);
+    for (let cy = 0; cy < gridN; cy++) for (let cx = 0; cx < gridN; cx++) {
+      if (!wallD[idx(cx, cy)]) continue;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const nx = cx + dx, ny = cy + dy;
+        if (nx >= 0 && ny >= 0 && nx < gridN && ny < gridN) next[idx(nx, ny)] = 1;
+      }
+    }
+    wallD = next;
+  }
+
   // Flood the exterior from the border.
   const exterior = new Uint8Array(gridN * gridN);
   const stack = [];
   const pushIf = (cx, cy) => {
     if (cx < 0 || cy < 0 || cx >= gridN || cy >= gridN) return;
     const k = idx(cx, cy);
-    if (exterior[k] || wall[k]) return;
+    if (exterior[k] || wallD[k]) return;
     exterior[k] = 1; stack.push(k);
   };
   for (let cx = 0; cx < gridN; cx++) { pushIf(cx, 0); pushIf(cx, gridN - 1); }
@@ -281,7 +313,7 @@ export function segmentRooms(wallSegments, textItemsFt = [], opts = {}) {
   let interiorCells = 0;
   const components = [];
   for (let start = 0; start < gridN * gridN; start++) {
-    if (wall[start] || exterior[start] || comp[start] !== -1) continue;
+    if (wallD[start] || exterior[start] || comp[start] !== -1) continue;
     const id = components.length;
     const cells = [];
     const st = [start]; comp[start] = id;
@@ -291,7 +323,7 @@ export function segmentRooms(wallSegments, textItemsFt = [], opts = {}) {
       const nb = [cx > 0 ? idx(cx - 1, cy) : -1, cx < gridN - 1 ? idx(cx + 1, cy) : -1,
         cy > 0 ? idx(cx, cy - 1) : -1, cy < gridN - 1 ? idx(cx, cy + 1) : -1];
       for (const nk of nb) {
-        if (nk >= 0 && !wall[nk] && !exterior[nk] && comp[nk] === -1) { comp[nk] = id; st.push(nk); }
+        if (nk >= 0 && !wallD[nk] && !exterior[nk] && comp[nk] === -1) { comp[nk] = id; st.push(nk); }
       }
     }
     components.push(cells);
@@ -305,6 +337,7 @@ export function segmentRooms(wallSegments, textItemsFt = [], opts = {}) {
   for (const cells of components) {
     const areaSqft = cells.length * cellArea;
     if (areaSqft < minRoomSqft) continue;
+    if (areaSqft > 0.45 * (w * h)) continue; // STAGE 2: reject leaked >45%-footprint pseudo-room
     let cMinX = Infinity, cMinY = Infinity, cMaxX = -Infinity, cMaxY = -Infinity;
     let sumX = 0, sumY = 0;
     for (const k of cells) {
@@ -506,9 +539,40 @@ export function buildLevelPlan(input, opts = {}) {
   //    drops the hairline fill + thin grid/dimension annotation. The footprint + room segmentation
   //    MUST use the SINGLE dominant cut-wall band (the verified W0 footprint/netalign depends on it),
   //    so partitionInclusive is explicitly stripped here — it only governs the additive wallsFull set.
+  const preselectedWallSegmentsFt = normalizeSegmentsFt(opts.preselectedWallSegmentsFt);
   const { partitionInclusive: _pi, ...singleBandLayerOpts } = (opts.layerOpts || {});
-  const wl = selectWallLayer(segments, singleBandLayerOpts);
+  const wl = preselectedWallSegmentsFt.length
+    ? { wallSegments: preselectedWallSegmentsFt, method: 'caller-preselected-wall-segments' }
+    : selectWallLayer(segments, singleBandLayerOpts);
   const wallSegs = wl.wallSegments.length >= 3 ? wl.wallSegments : segments;
+  const walls = wallSegs.map((s) => ({ a: [round(s.x1), round(s.y1)], b: [round(s.x2), round(s.y2)] }));
+  const wr = buildWallRuns(walls, opts.wallRunOpts || {});
+  const wallRuns = wr.runs;
+  const wallRunsMeta = wr.meta;
+
+  if (opts.wallRunsOnly === true) {
+    return {
+      scaleFtPerUnit: round(scaleFtPerUnit),
+      scaleText: scaleText || `feetPerUnit=${round(scaleFtPerUnit)}`,
+      walls,
+      wallsFt: walls,
+      wallRuns,
+      wallRunsMeta,
+      counts: {
+        segments: segments.length,
+        wallSegments: wallSegs.length,
+        wallRuns: wallRuns.length,
+      },
+      wallLayer: { method: wl.method, chosen: wl.chosen },
+      provenance: PROVENANCE_BASE + ' — wall-runs-only fast path',
+      needsVerification: true,
+      notes: {
+        wallRuns: 'Fast-path extraction for raw wall segments + merged wall runs only. ' +
+          'Uses the real vector wall layer and buildWallRuns, but intentionally skips rooms, ' +
+          'stairs, parking, and footprint inference to keep the real-PDF step-2 gate bounded.',
+      },
+    };
+  }
 
   // 2) FOOTPRINT: enclosed rectilinear outline of the dominant connected wall network.
   const outline = buildingOutlinePolygon(wallSegs, opts.outlineOpts || {});
@@ -612,19 +676,6 @@ export function buildLevelPlan(input, opts = {}) {
     }
   }
 
-  // Walls emitted as {a,b,thickness?} pairs (the wall-layer segments).
-  const walls = wallSegs.map((s) => ({ a: [round(s.x1), round(s.y1)], b: [round(s.x2), round(s.y2)] }));
-
-  // RECORE: collapse the FRAGMENTED single-band cut-wall segments into real wall RUNS, with
-  // non-wall exclusion (diagonals = door-swing arcs/hatch dropped; sub-2ft stubs = dimension
-  // ticks/glyphs dropped). This is the HONEST structure — a plausible count of actual walls
-  // (envelope + partitions), NOT the tens-of-thousands of ink fragments. Rendered as the
-  // primary walls; `wallsFull` (the over-inclusive lineweight union) is retained only as an
-  // OFF-by-default diagnostic overlay. needs-verification.
-  const wr = buildWallRuns(walls, opts.wallRunOpts || {});
-  const wallRuns = wr.runs;
-  const wallRunsMeta = wr.meta;
-
   // RECALL-COMPLETE wall set (W2): the proven single-band `walls` above is the dominant cut-wall
   // lineweight — it keeps footprint/room segmentation stable (it is what the verified W0 footprint
   // and netalign depend on) but UNDER-captures interior partition + core walls (~71% wall recall
@@ -702,6 +753,7 @@ export function buildLevelPlan(input, opts = {}) {
     },
     wallBboxFt,
     walls,
+    wallsFt: walls,
     wallRuns,
     wallRunsMeta,
     ...(wallsFull ? { wallsFull, wallsFullMeta } : {}),
@@ -1111,6 +1163,7 @@ export function mergeWingPlans(wingA, wingB, reg, meta = {}) {
     footprintAreaReliable: false, // a union of two wing envelopes — bbox only, not an enclosed trace
     footprintBboxFt: { widthFt, heightFt, minX: round(uMinX), minY: round(uMinY), maxX: round(uMaxX), maxY: round(uMaxY) },
     walls,
+    wallsFt: walls,
     wallRuns: wrMerged.runs,
     wallRunsMeta: wrMerged.meta,
     ...(wallsFull ? { wallsFull, wallsFullMeta: { merged: true, count: wallsFull.length, note: 'Partition-inclusive recall-complete wall set, both wings merged (wing B translated). Rendering + recall only; footprint uses single-band walls. needs-verification.' } } : {}),
@@ -1198,8 +1251,10 @@ export async function extractLevelPlanFromPdf(page, opts = {}) {
   const scaleFtPerUnit = scaleInfo.feetPerUnit;
 
   // 3) GEOMETRY: CTM-mapped segments in feet.
-  const opList = await page.getOperatorList();
-  const { segments } = extractSegmentsFromOpList(opList, { scale: scaleFtPerUnit });
+  const precomputedSegmentsFt = normalizeSegmentsFt(opts.segmentsFt);
+  const segments = precomputedSegmentsFt.length
+    ? precomputedSegmentsFt
+    : extractSegmentsFromOpList(await page.getOperatorList(), { scale: scaleFtPerUnit }).segments;
   if (!segments.length) {
     throw new Error('extractLevelPlanFromPdf: no vector path geometry on this page (raster/scanned or text-only).');
   }
@@ -1308,7 +1363,24 @@ export async function extractStackedFloorPlanFromPdf(page, opts = {}) {
   wingB.scaleSource = scaleInfo.source;
 
   // 5) REGISTER + MERGE.
-  const reg = computeWingRegistration(wingA, wingB, opts.regOpts || {});
+  // For sheets whose two plates are DIFFERENT grid ranges (a long building split across two rows,
+  // e.g. 1881 cols 1-15 lower / 16-30 upper) there are NO shared columns, so the registration falls
+  // back to aligning bbox edges and OVERLAPS the wings into one band. opts.noWingRegister keeps each
+  // wing at its drawn page-feet sheet position (dx=dy=0) so both plates appear separated, as on the sheet.
+  const reg = opts.noWingRegister ? null : computeWingRegistration(wingA, wingB, opts.regOpts || {});
+  // FAIL-CLOSED (2026-06-19): when wing registration is unreliable (no shared grid columns between the
+  // two plates — exactly the A-101 case), do NOT emit a union-bbox merge (wrong-aspect footprint +
+  // leaked rooms). Honest fallback: extract the whole sheet as a SINGLE plan view; the dilation-closed
+  // segmenter then recovers real rooms across the plate.
+  const regFailed = !reg || reg.method === 'sheet-position-no-register'
+    || (Array.isArray(reg.sharedCols) && reg.sharedCols.length === 0)
+    || (Array.isArray(reg.inlierCols) && reg.inlierCols.length === 0);
+  if (regFailed) {
+    const single = buildLevelPlan({ segments, textItemsFt, scaleFtPerUnit, scaleText: scaleInfo.scaleText }, opts);
+    single.scaleSource = scaleInfo.source;
+    single.stackedSplit = { isStacked: true, fellBackToSingleRegion: true, regMethod: reg ? reg.method : 'noWingRegister', note: 'wing registration unreliable — extracted as single region' };
+    return single;
+  }
   const merged = mergeWingPlans(wingA, wingB, reg, {
     scaleFtPerUnit, scaleText: scaleInfo.scaleText, scaleSource: scaleInfo.source,
   });
