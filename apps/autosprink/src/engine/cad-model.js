@@ -232,7 +232,7 @@ function buildFloorCad(floor, baseElevationFt) {
     const cad = offsetRoomCadZ(buildRoomCad(merged), baseElevationFt);
     return { name: room.name, ...cad };
   });
-  const solids = rooms.flatMap((r) => r.solids);
+  const solids = collapseSystemComponents(rooms.flatMap((r) => r.solids));
   return {
     level: floor.level ?? null,
     baseElevationFt,
@@ -428,6 +428,24 @@ function buildBuildingCad(building) {
  * @returns {{name:string, units:string, rooms:Array, solids:Array, counts:object,
  *   floors?:Array, disclaimer:string}}
  */
+// System singletons (riser assembly, alarm check valve, FDC) belong to the WHOLE
+// model's riser, NOT each room. The per-room builder (buildRoomCad) emits one of
+// each per room, so a 24-room plan yields 24 duplicates slopped across the floor.
+// Collapse them to the FIRST occurrence so the model shows ONE system riser
+// assembly / alarm valve / FDC. Per-branch fittings (tees, elbows, couplings,
+// reducers) are genuinely per-room and are left untouched.
+function collapseSystemComponents(solids) {
+  const SYSTEM_KEYS = new Set(['riser_assembly', 'valve_alarm_check', 'fdc']);
+  const seen = new Set();
+  return solids.filter((sld) => {
+    if (sld && sld.kind === 'component' && SYSTEM_KEYS.has(sld.componentKey)) {
+      if (seen.has(sld.componentKey)) return false;
+      seen.add(sld.componentKey);
+    }
+    return true;
+  });
+}
+
 export function buildCadModel(floorPlan) {
   // Building shape: a normalized building (stories[] with spaces/walls). Detect
   // by the building schema so legacy {rooms}/{floors} plans take the path below.
@@ -452,7 +470,7 @@ export function buildCadModel(floorPlan) {
   if (hasFloors) {
     const floors = floorPlan.floors.map((floor) => buildFloorCad(floor, floor.baseElevationFt || 0));
     const rooms = floors.flatMap((f) => f.rooms);
-    const solids = floors.flatMap((f) => f.solids);
+    const solids = collapseSystemComponents(floors.flatMap((f) => f.solids));
     return {
       ...base,
       floors,
@@ -467,7 +485,7 @@ export function buildCadModel(floorPlan) {
     const cad = buildRoomCad(room);
     return { name: room.name, ...cad };
   });
-  const solids = rooms.flatMap((r) => r.solids);
+  const solids = collapseSystemComponents(rooms.flatMap((r) => r.solids));
   return {
     ...base,
     rooms,
