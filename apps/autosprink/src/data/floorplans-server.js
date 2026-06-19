@@ -91,6 +91,38 @@ export function cooperative1881FloorPlanFromExtractedPlate() {
     ? Math.round((Number(data.estimatedFloorToFloorFt) - 1) * 100) / 100
     : 9;
 
+  // STAGE 4 (2026-06-19): return the REAL segmented rooms (not one footprint room) so the sprinkler
+  // engine grids PER ROOM. Each room carries its own polygon + kind->hazard. Pass walls through.
+  const KIND_HAZARD = { unit: 'light', residential: 'light', apartment: 'light',
+    corridor: 'light', lobby: 'light', office: 'light',
+    parking: 'ordinary', garage: 'ordinary', mechanical: 'ordinary',
+    storage: 'ordinary', unknown: 'ordinary' };
+  const STAIR_KINDS = new Set(['stair', 'stairs', 'elevator', 'shaft', 'core']);
+  const cleanRing = (ring) => {
+    let pts = ring.map((q) => [Number(q[0]), Number(q[1])]);
+    if (pts.length > 3) {
+      const a = pts[0], b = pts[pts.length - 1];
+      if (Math.abs(a[0] - b[0]) < 1e-6 && Math.abs(a[1] - b[1]) < 1e-6) pts = pts.slice(0, -1);
+    }
+    return pts;
+  };
+  const srcRooms = Array.isArray(plan.rooms) ? plan.rooms : [];
+  const realRooms = srcRooms
+    .filter((r) => r && Array.isArray(r.poly) && r.poly.length >= 3
+      && !STAIR_KINDS.has(String(r.kind || '').toLowerCase()))
+    .map((r) => {
+      const polygon = cleanRing(r.poly);
+      const hazard = KIND_HAZARD[String(r.kind || 'unknown').toLowerCase()] || 'ordinary';
+      const lbl = (r.label && !/^#|^\d+(\.\d+)?$/.test(String(r.label)))
+        ? r.label : ((r.kind || 'space') + ' (' + Math.round(r.areaSqft || polyAreaSqft(polygon)) + ' sqft)');
+      return { name: lbl, kind: r.kind || 'unknown', polygon, excludeRects, hazard, ceilingHeightFt, confidence: r.confidence || 'low' };
+    })
+    .filter((r) => { const a = polyAreaSqft(r.polygon); return a >= 20 && a <= 0.45 * plateAreaSqft; });
+  if (realRooms.length === 0) console.warn('[cooperative1881] plan.rooms empty/unusable -> FALLING BACK to single footprint plate');
+  const rooms = realRooms.length > 0 ? realRooms : [{
+    name: 'Floor 1 (FALLBACK plate)', kind: 'plate', polygon: poly, excludeRects, hazard: 'ordinary', ceilingHeightFt,
+  }];
+
   return {
     name: COOPERATIVE_1881_PROJECT_NAME,
     units: 'ft',
@@ -106,14 +138,9 @@ export function cooperative1881FloorPlanFromExtractedPlate() {
       + '~120 sqft/head density — internal-alpha assumption, not an engineering call)',
     extractedPlate: true,
     footprintFt: poly,
-    rooms: [
-      {
-        name: 'Floor 1 — residential + parking plate (extracted)',
-        polygon: poly,
-        excludeRects,
-        hazard: 'ordinary',
-        ceilingHeightFt,
-      },
-    ],
+    wallRuns: Array.isArray(plan.wallRuns) ? plan.wallRuns : [],
+    wallsFull: Array.isArray(plan.wallsFull) ? plan.wallsFull : [],
+    rooms,
+    roomSource: realRooms.length > 0 ? 'extracted-segmented' : 'footprint-fallback',
   };
 }
