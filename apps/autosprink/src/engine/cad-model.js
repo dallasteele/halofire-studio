@@ -345,7 +345,17 @@ function buildStoryCad(story, layoutStory) {
 
     // Per-space component placement markers, derived from this space's network
     // coords (never fabricated). Z-lifted below by offsetSolidZ. Fail-closed.
-    pushComponentMarkers(localSolids, `${space.name}/`, mainX, y0, mainZ, branchZ, mainDia, space.branchLines);
+    pushComponentMarkers(localSolids, `${space.name}/`, mainX, y0, mainZ, branchZ, mainDia, space.branchLines, { systemComponents: false });
+  }
+
+  // Building-level system components belong to the WHOLE story's riser, not each
+  // room. Place riser assembly + alarm valve + FDC + riser-top elbow ONCE at the
+  // primary (min-corner) riser instead of duplicating them per space.
+  const branchedSpaces = layoutStory.spaces.filter((sp) => sp.branchLines && sp.branchLines.length);
+  if (branchedSpaces.length) {
+    const sysMainX = round(Math.min(...branchedSpaces.flatMap((sp) => sp.branchLines.map((b) => b.startX))));
+    const sysY0 = round(Math.min(...branchedSpaces.flatMap((sp) => sp.branchLines.map((b) => b.y))));
+    pushComponentMarkers(localSolids, '', sysMainX, sysY0, mainZ, branchZ, 0, [], { systemComponents: true });
   }
 
   const solids = localSolids.map((s) => offsetSolidZ(s, baseElevationFt));
@@ -485,7 +495,8 @@ export function buildCadModel(floorPlan) {
  * @param {number} mainDia cross-main pipe diameter (in) for reducer step detection
  * @param {Array} branchLines branch lines, each with `.row`/`.y`/`.startX`/`.endX`/`.diameterIn`
  */
-function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchZ, mainDia, branchLines) {
+function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchZ, mainDia, branchLines, opts = {}) {
+  const systemComponents = opts.systemComponents !== false;
   const place = (key, name, position, placement = null) => {
     const def = getComponent(key);
     if (!def) return; // fail-closed: skip unknown registry keys
@@ -495,16 +506,20 @@ function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchZ, mainDia
       ...(placement ? { placement } : {}),
     });
   };
+  // System-level singletons (riser assembly / alarm valve / FDC / riser-top elbow)
+  // route through placeSys so per-space calls can suppress them — they belong to the
+  // whole-building riser, not each room.
+  const placeSys = systemComponents ? place : () => {};
   const mainRunAxis = normalizeRunAxis([0, 1, 0]);
   const branchRunAxis = normalizeRunAxis([1, 0, 0]);
   const downAxis = [0, 0, -1];
 
   // System riser assembly at the riser top (where the riser meets the cross-main).
-  place('riser_assembly', 'riser-assembly', [mainX, y0, mainZ]);
+  placeSys('riser_assembly', 'riser-assembly', [mainX, y0, mainZ]);
   // Alarm check valve on the riser, just below the assembly (deterministic -1 ft).
-  place('valve_alarm_check', 'alarm-check', [mainX, y0, round(mainZ - 1)]);
+  placeSys('valve_alarm_check', 'alarm-check', [mainX, y0, round(mainZ - 1)]);
   // Fire department connection at the riser base, on the floor.
-  place('fdc', 'fdc', [mainX, y0, 0]);
+  placeSys('fdc', 'fdc', [mainX, y0, 0]);
   // A tee at each branch-to-cross-main junction (the riser-tie top points).
   for (const b of branchLines) {
     place(
@@ -517,7 +532,7 @@ function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchZ, mainDia
 
   // 90° elbow at the riser top turn (vertical riser -> horizontal cross-main),
   // co-located with the riser assembly but a distinct fitting marker.
-  place(
+  placeSys(
     'fitting_elbow_90',
     'elbow-riser-top',
     [mainX, y0, mainZ],
