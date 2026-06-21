@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>HaloFire — AutoBid · Intake</title>
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13" />
+<style>
+  .wrap{ max-width:1180px; margin:0 auto; padding:22px 24px 80px; }
+  .crumbs{ font-size:var(--hf-fs-label); color:var(--hf-muted); margin:4px 0 8px; }
+  .crumbs a{ color:var(--hf-color-interactive-text,#9ec3ff); text-decoration:none; }
+  .ptitle{ font-family:var(--hf-display); font-size:var(--hf-fs-title); font-weight:600; margin:2px 0 2px; }
+  .psub{ color:var(--hf-muted); font-size:var(--hf-fs-sm); margin-bottom:18px; max-width:780px; line-height:1.5; }
+  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:16px; }
+  .kpi{ padding:14px 16px; }
+  .kpi .k{ font-size:var(--hf-fs-label); letter-spacing:0.5px; text-transform:uppercase; color:var(--hf-muted); }
+  .kpi .v{ font-size:24px; font-weight:600; margin-top:6px; font-variant-numeric:tabular-nums; }
+  .kpi .d{ font-size:var(--hf-fs-label); color:var(--hf-faint); margin-top:4px; }
+  .phd{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--hf-line); }
+  .phd .t{ font-size:var(--hf-fs-label); letter-spacing:0.9px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; flex:1; }
+  .pbd{ padding:6px 0; }
+  .note{ color:var(--hf-muted); font-size:var(--hf-fs-sm); line-height:1.55; padding:14px; }
+  .conns{ display:flex; flex-wrap:wrap; gap:8px; padding:12px 14px; }
+  .conn{ display:flex; align-items:center; gap:7px; padding:6px 11px; border:1px solid var(--hf-line); border-radius:999px; font-size:var(--hf-fs-label); }
+  .dot{ width:8px; height:8px; border-radius:50%; flex:none; }
+  .dot.on{ background:#4ade80; } .dot.off{ background:#71717a; }
+  table.bb{ width:100%; border-collapse:collapse; }
+  table.bb th{ text-align:left; font-size:var(--hf-fs-label); letter-spacing:0.6px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; padding:9px 14px; border-bottom:1px solid var(--hf-line); }
+  table.bb td{ padding:10px 14px; border-bottom:1px solid var(--hf-line); font-size:var(--hf-fs-sm); color:var(--hf-text); }
+  table.bb tr:last-child td{ border-bottom:0; }
+  table.bb tr:hover td{ background:rgba(255,255,255,0.02); }
+  .jn{ font-weight:600; } .sub{ color:var(--hf-muted); font-size:11px; }
+  .pill{ display:inline-block; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:600; }
+  .pill.take{ background:rgba(74,222,128,0.14); color:#86efac; border:1px solid rgba(74,222,128,0.35); }
+  .pill.maybe{ background:rgba(251,191,36,0.14); color:#fcd34d; border:1px solid rgba(251,191,36,0.35); }
+  .pill.pass{ background:rgba(113,113,122,0.18); color:#a1a1aa; border:1px solid rgba(113,113,122,0.4); }
+  .pill.flag{ background:rgba(252,165,165,0.14); color:#fca5a5; border:1px solid rgba(252,165,165,0.35); }
+  .btn{ font:inherit; cursor:pointer; padding:7px 14px; border-radius:var(--hf-r-ctl,7px); border:1px solid var(--hf-line); background:var(--hf-glass,rgba(255,255,255,0.04)); color:var(--hf-text); font-size:var(--hf-fs-sm); font-weight:600; }
+  @media(max-width:900px){ .grid{ grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body class="hf" data-hf-page="autobid">
+  <div class="wrap">
+    <div class="crumbs"><a href="/autobid-board.html">AutoBid</a> · Intake</div>
+    <div class="ptitle">AutoBid · Intake</div>
+    <div class="psub">One funnel for every incoming bid — the Egnyte bid folder plus external invite sources — auto-triaged against approved builders + corpus fit so nothing gets missed. Qualifying invites flow straight to the <a href="/autobid-board.html" style="color:var(--hf-color-interactive-text,#9ec3ff)">Bid Board</a> as built packages.</div>
+
+    <div class="grid">
+      <div class="kpi hf-card"><div class="k">Detected</div><div class="v" id="kDet">—</div><div class="d">in the bid folder</div></div>
+      <div class="kpi hf-card"><div class="k">Take / Maybe</div><div class="v" id="kTake">—</div><div class="d">triaged worth bidding</div></div>
+      <div class="kpi hf-card"><div class="k">Naming flags</div><div class="v" id="kName">—</div><div class="d">violations to normalize</div></div>
+      <div class="kpi hf-card"><div class="k">NDA</div><div class="v" id="kNda">—</div><div class="d">flagged confidential</div></div>
+    </div>
+
+    <section class="hf-panel">
+      <div class="phd"><span class="t">Intake sources</span><button class="btn" id="scanBtn" style="margin-left:auto">Scan now</button></div>
+      <div class="conns" id="conns"><div class="note">Loading connectors…</div></div>
+    </section>
+
+    <section class="hf-panel" style="margin-top:14px">
+      <div class="phd"><span class="t">Incoming bids</span><a class="btn" href="/autobid-draw.html" style="margin-left:auto;text-decoration:none">✎ Open drawing</a><span class="hf-chip"><span class="gl"></span> <span id="srcChip">live scan</span></span></div>
+      <div class="pbd"><div id="bbWrap"><div class="note">Loading incoming bids…</div></div></div>
+    </section>
+  </div>
+
+  <script src="/public/halofire-shell.js?v=13"></script>
+  <script>
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+    function api(path,opts){ return fetch('/api/autobid'+path, Object.assign({credentials:'include'}, opts||{})); }
+
+    function triagePill(t){
+      var s = String(t||'').toLowerCase();
+      if(s.indexOf('take')>=0||s==='bid') return '<span class="pill take">take</span>';
+      if(s.indexOf('maybe')>=0||s.indexOf('review')>=0) return '<span class="pill maybe">maybe</span>';
+      if(s.indexOf('pass')>=0||s.indexOf('skip')>=0) return '<span class="pill pass">pass</span>';
+      return '<span class="pill maybe">'+esc(t||'—')+'</span>';
+    }
+
+    function loadConns(){
+      api('/intake/connectors').then(function(r){return r.ok?r.json():null;}).then(function(d){
+        var el = document.getElementById('conns');
+        if(!d||!d.connectors){ el.innerHTML='<div class="note">Connectors unavailable.</div>'; return; }
+        el.innerHTML = '<div class="conn"><span class="dot on"></span> Egnyte bid folder · live</div>' +
+          d.connectors.map(function(c){
+            return '<div class="conn" title="'+esc(c.reason||'')+'"><span class="dot '+(c.available?'on':'off')+'"></span> '+esc(c.name)+' · '+(c.available?'connected':'scaffold')+'</div>';
+          }).join('');
+      });
+    }
+
+    function loadBids(){
+      var wrap = document.getElementById('bbWrap');
+      api('/intake/bids').then(function(r){return r.ok?r.json():null;}).then(function(d){
+        if(!d){ wrap.innerHTML='<div class="note">The AutoBid engine is not reachable. Start it: <code>C:/Python312/python.exe engine/api.py</code>.</div>'; document.getElementById('srcChip').textContent='engine offline'; return; }
+        var bids = d.bids||[];
+        document.getElementById('kDet').textContent = d.count!=null?d.count:bids.length;
+        var tk = bids.filter(function(b){ var s=String(b.triage||'').toLowerCase(); return s.indexOf('take')>=0||s.indexOf('maybe')>=0||s.indexOf('bid')>=0||s.indexOf('review')>=0; }).length;
+        document.getElementById('kTake').textContent = tk;
+        document.getElementById('kName').textContent = d.naming_violations!=null?d.naming_violations:'—';
+        document.getElementById('kNda').textContent = d.nda_count!=null?d.nda_count:'—';
+        if(!bids.length){ wrap.innerHTML='<div class="note">No incoming bids detected in the folder yet.</div>'; return; }
+        var rows = bids.slice(0,200).map(function(b){
+          var nameFlag = (b.naming_ok===false)? ' <span class="pill flag">naming</span>':'';
+          var nda = b.nda_flag? ' <span class="pill flag">NDA</span>':'';
+          var s = String(b.triage||'').toLowerCase();
+          var actionable = (s.indexOf('take')>=0||s.indexOf('maybe')>=0||s.indexOf('bid')>=0||s.indexOf('review')>=0);
+          var produced = String(b.status||'').toLowerCase()==='produced';
+          var action;
+          if(produced){
+            action = '<a class="btn" href="/autobid-board.html">On Bid Board →</a>';
+          } else if(actionable){
+            action = '<button class="btn produce" data-id="'+esc(b.id)+'" data-job="'+esc(b.job||b.rel_path||('Bid '+b.id))+'">Produce bid →</button>';
+          } else {
+            action = '<span class="sub">—</span>';
+          }
+          return '<tr data-row="'+esc(b.id)+'">'
+            + '<td><div class="jn">'+esc(b.job||b.rel_path||('Bid '+b.id))+'</div><div class="sub">'+esc(b.builder||'')+' · '+esc(b.source||'egnyte')+' · '+(b.n_files!=null?b.n_files+' files':'')+'</div></td>'
+            + '<td>'+triagePill(b.triage)+(b.triage_score!=null?' <span class="sub">'+Math.round(b.triage_score*100)/100+'</span>':'')+'</td>'
+            + '<td>'+esc(b.status||'new')+nameFlag+nda+'</td>'
+            + '<td><span class="sub">'+esc((b.detected_at||'').slice(0,10))+'</span></td>'
+            + '<td>'+action+'</td>'
+            + '</tr>';
+        }).join('');
+        wrap.innerHTML = '<table class="bb"><thead><tr><th>Bid</th><th>Triage</th><th>Status</th><th>Detected</th><th>Action</th></tr></thead><tbody>'+rows+'</tbody></table>';
+      });
+    }
+
+    // Produce a bid from a triaged intake row -> runs the autonomous pipeline in the
+    // engine, persists a ready_bids row, then takes the user to the Bid Board. The
+    // funnel stays automatic; the ONE human gate is review-and-send (ADR-001).
+    function produceBid(btn){
+      var id = btn.getAttribute('data-id');
+      var job = btn.getAttribute('data-job')||('Bid '+id);
+      btn.disabled=true; var orig=btn.textContent; btn.textContent='Producing…';
+      api('/intake/'+encodeURIComponent(id)+'/produce',{method:'POST'})
+        .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+        .then(function(res){
+          if(!res.ok){
+            btn.disabled=false; btn.textContent=orig;
+            alert('Could not produce "'+job+'": '+((res.j&&res.j.detail)||'engine error'));
+            return;
+          }
+          // Produced — go to the Bid Board where it now appears in ready-to-send.
+          btn.textContent='Done →';
+          window.location.href='/autobid-board.html';
+        })
+        .catch(function(){ btn.disabled=false; btn.textContent=orig; alert('Engine not reachable.'); });
+    }
+
+    document.addEventListener('click', function(e){
+      if(e.target && e.target.id==='scanBtn'){
+        e.target.disabled=true; e.target.textContent='Scanning…';
+        api('/intake/scan',{method:'POST'}).then(function(r){return r.ok?r.json():null;}).then(function(){ loadBids(); }).finally(function(){ e.target.disabled=false; e.target.textContent='Scan now'; });
+        return;
+      }
+      if(e.target && e.target.classList && e.target.classList.contains('produce')){
+        produceBid(e.target);
+      }
+    });
+    loadConns(); loadBids();
+  </script>
+</body>
+</html>

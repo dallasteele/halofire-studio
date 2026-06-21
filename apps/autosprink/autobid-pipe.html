@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>HaloFire — AutoBid · Pipe Network</title>
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13" />
+<style>
+  .wrap{ max-width:1480px; margin:0 auto; padding:18px 22px 60px; }
+  .crumbs{ font-size:var(--hf-fs-label); color:var(--hf-muted); margin:4px 0 8px; }
+  .crumbs a{ color:var(--hf-color-interactive-text,#9ec3ff); text-decoration:none; }
+  .ptitle{ font-family:var(--hf-display); font-size:var(--hf-fs-title); font-weight:600; margin:2px 0 2px; }
+  .psub{ color:var(--hf-muted); font-size:var(--hf-fs-sm); margin-bottom:14px; max-width:980px; line-height:1.5; }
+
+  .ed{ display:grid; grid-template-columns:1fr 360px; gap:14px; align-items:start; }
+  .col{ min-width:0; }
+
+  .docpick{ display:flex; gap:8px; padding:12px 14px; border-bottom:1px solid var(--hf-line); }
+  .docpick input{ flex:1; min-width:0; background:rgba(8,12,20,.5); border:1px solid var(--hf-line); border-radius:7px; padding:7px 10px; color:var(--hf-text); font-size:var(--hf-fs-sm); outline:none; }
+  .docpick button{ font:inherit; cursor:pointer; padding:7px 12px; border-radius:7px; border:none; background:var(--hf-color-accent,#f0a868); color:#1a1208; font-weight:700; font-size:var(--hf-fs-sm); }
+
+  .stage{ position:relative; overflow:hidden; background:#0c1018; height:70vh; border-bottom:1px solid var(--hf-line); }
+  .stage svg{ display:block; width:100%; height:100%; }
+  .stagemsg{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--hf-muted); font-size:var(--hf-fs-sm); text-align:center; padding:24px; pointer-events:none; }
+  .legend{ display:flex; gap:16px; padding:9px 14px; font-size:11.5px; color:var(--hf-muted); flex-wrap:wrap; }
+  .legend .dot{ display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+  .legend .ln{ display:inline-block; width:16px; height:3px; margin-right:5px; vertical-align:middle; }
+
+  .pnl{ padding:12px 14px; border-bottom:1px solid var(--hf-line); }
+  .pnl h3{ font-size:var(--hf-fs-label); letter-spacing:0.6px; text-transform:uppercase; color:var(--hf-muted); margin:0 0 8px; font-weight:600; }
+  .kv{ display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:3px 0; }
+  .kv .k{ color:var(--hf-muted); } .kv .v{ font-variant-numeric:tabular-nums; text-align:right; }
+  .big{ font-size:19px; font-weight:700; color:var(--hf-color-accent,#f0a868); font-variant-numeric:tabular-nums; }
+  .ok{ color:#86efac; font-weight:700; } .bad{ color:#fca5a5; font-weight:700; }
+  .gate{ border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:13px; font-weight:700; }
+  .gate.pass{ background:rgba(74,222,128,0.12); border:1px solid rgba(74,222,128,0.4); color:#86efac; }
+  .gate.fail{ background:rgba(252,165,165,0.10); border:1px solid rgba(252,165,165,0.4); color:#fca5a5; }
+  .cav{ font-size:11px; color:var(--hf-muted); line-height:1.5; }
+  .cav li{ margin-bottom:6px; }
+  .basis{ font-size:11px; color:var(--hf-muted); line-height:1.5; }
+</style>
+</head>
+<body class="hf" data-hf-page="autobid">
+  <div class="wrap">
+    <div class="crumbs"><a href="/autobid-board.html">AutoBid</a> · Pipe Network</div>
+    <div class="ptitle">AutoBid · Routed Pipe Network</div>
+    <div class="psub">The laid-out heads connected into <b>ONE connected pipe network</b> — riser → cross main(s) → branch lines → heads — sized by the NFPA pipe schedule (2.5″/8″ for a 5.6K head, 2.0″/6″ for an 8K head). The <b>cohesion gate</b> proves the graph is exactly one connected component with every head reachable from the riser; a disjoint network is refused, never slopped out. Total pipe footage is rolled up by size for the BOM to verify (the bid is priced per-head; the BOM verifies, it never reprices).</div>
+
+    <div class="docpick" style="max-width:560px;border:none;padding:0 0 12px">
+      <input id="refInput" type="text" value="9" placeholder="bid ref (id or document_id)" />
+      <button id="goBtn">Route network</button>
+    </div>
+
+    <div class="ed">
+      <!-- LEFT: the routed graph (plan view) -->
+      <section class="col hf-panel" style="display:flex;flex-direction:column;min-width:0">
+        <div class="legend">
+          <span><span class="dot" style="background:#f0a868"></span>riser</span>
+          <span><span class="ln" style="background:#fca5a5"></span>cross main</span>
+          <span><span class="ln" style="background:#7dd3fc"></span>branch line</span>
+          <span><span class="dot" style="background:#86efac"></span>head</span>
+          <span id="floorNote" class="hf-muted"></span>
+        </div>
+        <div class="stage" id="stage">
+          <svg id="net" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="stagemsg" id="stageMsg">Enter a bid ref and route the network.</div>
+        </div>
+      </section>
+
+      <!-- RIGHT: cohesion gate + sizing + footage -->
+      <aside class="col hf-panel">
+        <div class="pnl">
+          <h3>Cohesion gate</h3>
+          <div id="gateBox"><span class="hf-muted">—</span></div>
+        </div>
+        <div class="pnl">
+          <h3>Graph</h3>
+          <div class="kv"><span class="k">nodes</span><span class="v" id="nNodes">—</span></div>
+          <div class="kv"><span class="k">edges</span><span class="v" id="nEdges">—</span></div>
+          <div class="kv"><span class="k">heads</span><span class="v" id="nHeads">—</span></div>
+          <div class="kv"><span class="k">branch lines</span><span class="v" id="nBranch">—</span></div>
+          <div class="kv"><span class="k">main taps</span><span class="v" id="nMain">—</span></div>
+          <div class="kv"><span class="k">risers / floors</span><span class="v" id="nRiser">—</span></div>
+        </div>
+        <div class="pnl">
+          <h3>NFPA pipe sizing</h3>
+          <div class="kv"><span class="k">K-factor</span><span class="v" id="kf">—</span></div>
+          <div class="kv"><span class="k">branch line</span><span class="v" id="brIn">—</span></div>
+          <div class="kv"><span class="k">cross main</span><span class="v" id="mnIn">—</span></div>
+          <div class="kv"><span class="k">riser feed</span><span class="v" id="rsIn">—</span></div>
+        </div>
+        <div class="pnl">
+          <h3>Total pipe footage by size</h3>
+          <div class="kv"><span class="k">TOTAL</span><span class="v big" id="totFt">—</span></div>
+          <div id="bySize"></div>
+        </div>
+        <div class="pnl">
+          <h3>Basis</h3>
+          <div class="basis" id="basis">—</div>
+        </div>
+        <div class="pnl">
+          <h3>Honest residual</h3>
+          <ul class="cav" id="caveats"><li class="hf-muted">—</li></ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="/public/halofire-shell.js?v=13"></script>
+  <script>
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const api = (p, opts) => fetch('/api/autobid' + p, Object.assign({ credentials: 'include' }, opts || {}));
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const fmt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 1 });
+
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  async function route(ref) {
+    if (!ref || isNaN(ref)) { $('stageMsg').textContent = 'enter a bid ref'; $('stageMsg').style.display = 'flex'; return; }
+    $('stageMsg').textContent = 'routing connected pipe network…'; $('stageMsg').style.display = 'flex';
+    $('net').innerHTML = '';
+    let d;
+    try {
+      const resp = await api('/pipe-route/' + ref);
+      d = await resp.json();
+      if (!resp.ok) throw new Error(d.detail || resp.status);
+    } catch (e) {
+      $('stageMsg').textContent = 'route failed: ' + (e && e.message ? e.message : e);
+      return;
+    }
+    if (!d.available) {
+      // Honest: the engine refused (no footprint, or the cohesion gate failed).
+      const why = d.cohesion_failed ? 'COHESION GATE REFUSED a disjoint network' : 'no routable network';
+      $('gateBox').innerHTML = '<div class="gate fail">✗ ' + esc(why) + '</div><div class="cav">' + esc(d.reason || '') + '</div>';
+      $('stageMsg').textContent = why + ' — ' + (d.reason || ''); $('stageMsg').style.display = 'flex';
+      return;
+    }
+    renderNet(d);
+  }
+
+  function renderNet(d) {
+    const n = d.network;
+    const checks = d.checks || {};
+
+    // --- cohesion gate (the headline) ---
+    const pass = !!checks.all_pass;
+    $('gateBox').innerHTML =
+      '<div class="gate ' + (pass ? 'pass' : 'fail') + '">' + (pass ? '✓ CONNECTED' : '✗ NOT CONNECTED') +
+      ' — ' + n.component_count + ' component' + (n.component_count === 1 ? '' : 's') + '</div>' +
+      '<div class="kv"><span class="k">single component</span><span class="v ' + (checks.single_component ? 'ok' : 'bad') + '">' + (checks.single_component ? 'PASS' : 'FAIL') + '</span></div>' +
+      '<div class="kv"><span class="k">heads reachable from riser</span><span class="v ' + (checks.all_heads_reachable ? 'ok' : 'bad') + '">' + (checks.all_heads_reachable ? 'PASS' : 'FAIL') + '</span></div>' +
+      '<div class="kv"><span class="k">unreachable heads</span><span class="v">' + n.unreachable_head_count + '</span></div>' +
+      '<div class="kv"><span class="k">every head in graph</span><span class="v ' + (checks.every_head_present ? 'ok' : 'bad') + '">' + (checks.every_head_present ? 'PASS' : 'FAIL') + '</span></div>';
+
+    // --- graph counts ---
+    $('nNodes').textContent = fmt(d.node_count);
+    $('nEdges').textContent = fmt(d.edge_count);
+    $('nHeads').textContent = fmt(n.head_count);
+    $('nBranch').textContent = fmt(n.branch_count);
+    $('nMain').textContent = fmt(n.main_node_count);
+    $('nRiser').textContent = (n.riser_count) + ' / ' + n.floors;
+
+    // --- sizing ---
+    $('kf').textContent = n.k_factor;
+    $('brIn').textContent = n.branch_in + '″';
+    $('mnIn').textContent = n.main_in + '″';
+    $('rsIn').textContent = n.riser_in + '″';
+
+    // --- footage by size ---
+    $('totFt').textContent = fmt(n.total_pipe_ft) + ' ft';
+    const sizes = Object.keys(n.footage_by_size).map(Number).sort((a, b) => b - a);
+    $('bySize').innerHTML = sizes.map((s) =>
+      '<div class="kv"><span class="k">' + s + '″ pipe</span><span class="v">' + fmt(n.footage_by_size[s]) + ' ft</span></div>'
+    ).join('');
+
+    $('basis').textContent = n.basis || '';
+    $('caveats').innerHTML = (n.caveats || []).map((c) => '<li>' + esc(c) + '</li>').join('') || '<li class="hf-muted">—</li>';
+    $('floorNote').textContent = n.floors > 1 ? ('plan view shows floor 0 of ' + n.floors + ' (plates repeat)') : '';
+
+    drawGraph(n);
+  }
+
+  // Draw the floor-0 graph in plan view (x = long axis, y = across axis), auto-fit.
+  function drawGraph(n) {
+    const svg = $('net');
+    svg.innerHTML = '';
+    // floor-0 nodes only (the plate repeats per floor; one plate is the readable view)
+    const nodes = n.nodes.filter((nd) => nd.floor === 0 || nd.kind === 'riser');
+    const ids = new Set(nodes.map((nd) => nd.id));
+    const byId = {}; nodes.forEach((nd) => { byId[nd.id] = nd; });
+    const edges = n.edges.filter((e) => ids.has(e.a) && ids.has(e.b));
+    if (!nodes.length) { $('stageMsg').style.display = 'flex'; $('stageMsg').textContent = 'no plate to draw'; return; }
+
+    const xs = nodes.map((nd) => nd.x), ys = nodes.map((nd) => nd.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const W = 1000, H = 600, pad = 40;
+    const spanX = (maxX - minX) || 1, spanY = (maxY - minY) || 1;
+    const sc = Math.min((W - 2 * pad) / spanX, (H - 2 * pad) / spanY);
+    const ox = (W - spanX * sc) / 2, oy = (H - spanY * sc) / 2;
+    const px = (x) => ox + (x - minX) * sc;
+    const py = (y) => oy + (y - minY) * sc;
+
+    const frag = document.createDocumentFragment();
+    // edges first (under the nodes)
+    edges.forEach((e) => {
+      const a = byId[e.a], b = byId[e.b];
+      if (e.length_ft <= 0 && e.kind !== 'main') return; // skip zero-length tees for clarity
+      const ln = document.createElementNS(SVGNS, 'line');
+      ln.setAttribute('x1', px(a.x)); ln.setAttribute('y1', py(a.y));
+      ln.setAttribute('x2', px(b.x)); ln.setAttribute('y2', py(b.y));
+      let col = '#7dd3fc', w = 1.2;            // branch / drop
+      if (e.kind === 'main') { col = '#fca5a5'; w = 2.6; }
+      else if (e.kind === 'riser') { col = '#f0a868'; w = 3.2; }
+      ln.setAttribute('stroke', col); ln.setAttribute('stroke-width', w); ln.setAttribute('stroke-linecap', 'round');
+      frag.appendChild(ln);
+    });
+    // head dots (sample if huge, to keep the SVG light)
+    const heads = nodes.filter((nd) => nd.kind === 'head');
+    const step = heads.length > 1600 ? Math.ceil(heads.length / 1600) : 1;
+    heads.forEach((nd, i) => {
+      if (i % step !== 0) return;
+      const c = document.createElementNS(SVGNS, 'circle');
+      c.setAttribute('cx', px(nd.x)); c.setAttribute('cy', py(nd.y)); c.setAttribute('r', 1.6);
+      c.setAttribute('fill', '#86efac'); frag.appendChild(c);
+    });
+    // riser markers
+    nodes.filter((nd) => nd.kind === 'riser').forEach((nd) => {
+      const c = document.createElementNS(SVGNS, 'circle');
+      c.setAttribute('cx', px(nd.x)); c.setAttribute('cy', py(nd.y)); c.setAttribute('r', 5);
+      c.setAttribute('fill', '#f0a868'); c.setAttribute('stroke', '#1a1208'); c.setAttribute('stroke-width', 1);
+      frag.appendChild(c);
+    });
+    svg.appendChild(frag);
+    $('stageMsg').style.display = 'none';
+  }
+
+  $('goBtn').addEventListener('click', () => route(parseInt($('refInput').value, 10)));
+  $('refInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') route(parseInt($('refInput').value, 10)); });
+  route(parseInt($('refInput').value, 10) || 9);
+  </script>
+</body>
+</html>

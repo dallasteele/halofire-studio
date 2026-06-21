@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>HaloFire — AutoBid · Drawing</title>
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13" />
+<!-- pdf.js renders the REAL plan PDF (range-streamed through the auth-gated proxy). -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  .wrap{ max-width:1480px; margin:0 auto; padding:18px 22px 60px; }
+  .crumbs{ font-size:var(--hf-fs-label); color:var(--hf-muted); margin:4px 0 8px; }
+  .crumbs a{ color:var(--hf-color-interactive-text,#9ec3ff); text-decoration:none; }
+  .ptitle{ font-family:var(--hf-display); font-size:var(--hf-fs-title); font-weight:600; margin:2px 0 2px; }
+  .psub{ color:var(--hf-muted); font-size:var(--hf-fs-sm); margin-bottom:14px; max-width:880px; line-height:1.5; }
+
+  .ed{ display:grid; grid-template-columns:280px 1fr 320px; gap:14px; align-items:start; }
+  .col{ min-width:0; }
+
+  /* doc + sheet picker */
+  .docpick{ display:flex; gap:8px; padding:12px 14px; border-bottom:1px solid var(--hf-line); }
+  .docpick input{ flex:1; min-width:0; background:rgba(8,12,20,.5); border:1px solid var(--hf-line); border-radius:7px; padding:7px 10px; color:var(--hf-text); font-size:var(--hf-fs-sm); outline:none; }
+  .docpick button{ font:inherit; cursor:pointer; padding:7px 12px; border-radius:7px; border:none; background:var(--hf-color-accent,#f0a868); color:#1a1208; font-weight:700; font-size:var(--hf-fs-sm); }
+  .docmeta{ padding:10px 14px; font-size:var(--hf-fs-label); color:var(--hf-muted); line-height:1.5; border-bottom:1px solid var(--hf-line); word-break:break-word; }
+  .docmeta b{ color:var(--hf-text); }
+  .ok{ color:#86efac; font-weight:700; } .bad{ color:#fca5a5; font-weight:700; }
+  .shdr{ font-size:var(--hf-fs-label); letter-spacing:0.8px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; padding:10px 14px 6px; }
+  .sheets{ max-height:62vh; overflow:auto; }
+  .sheet{ display:flex; align-items:center; gap:8px; padding:8px 14px; cursor:pointer; font-size:var(--hf-fs-sm); border-bottom:1px solid rgba(255,255,255,0.03); }
+  .sheet:hover{ background:rgba(255,255,255,0.03); }
+  .sheet.sel{ background:rgba(240,168,104,0.10); box-shadow:inset 3px 0 0 var(--hf-color-accent,#f0a868); }
+  .sheet .lbl{ font-weight:700; min-width:56px; }
+  .sheet .ty{ color:var(--hf-muted); font-size:11px; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .sheet .fp{ font-size:9px; background:rgba(74,222,128,0.16); color:#86efac; padding:2px 6px; border-radius:10px; font-weight:700; }
+
+  /* toolbar */
+  .tbar{ display:flex; gap:6px; align-items:center; padding:9px 12px; border-bottom:1px solid var(--hf-line); flex-wrap:wrap; }
+  .tbtn{ font:inherit; cursor:pointer; background:rgba(8,12,20,.4); border:1px solid var(--hf-line); color:var(--hf-text); border-radius:7px; padding:6px 10px; font-size:12.5px; }
+  .tbtn:hover{ border-color:var(--hf-color-accent,#f0a868); }
+  .tbtn.on{ background:var(--hf-color-accent,#f0a868); color:#1a1208; border-color:transparent; font-weight:700; }
+  .tbtn:disabled{ opacity:.4; cursor:not-allowed; }
+  .tbar .sep{ width:1px; height:20px; background:var(--hf-line); margin:0 2px; }
+  .tbar .lab{ font-size:11px; color:var(--hf-muted); }
+  .tbar select{ background:rgba(8,12,20,.5); border:1px solid var(--hf-line); color:var(--hf-text); border-radius:6px; padding:5px 7px; font-size:12px; }
+  .hint{ font-size:11px; color:var(--hf-muted); margin-left:auto; }
+
+  /* stage */
+  .stage{ position:relative; overflow:hidden; background:#0c1018; height:74vh; }
+  .scroller{ position:absolute; inset:0; overflow:auto; }
+  .cwrap{ position:relative; line-height:0; margin:18px auto; width:max-content; box-shadow:0 10px 40px rgba(0,0,0,0.5); }
+  #pdfCanvas{ display:block; background:#fff; }
+  #overlay{ position:absolute; left:0; top:0; }
+  .stagemsg{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--hf-muted); font-size:var(--hf-fs-sm); text-align:center; padding:24px; pointer-events:none; }
+
+  /* right rail */
+  .pnl{ padding:12px 14px; border-bottom:1px solid var(--hf-line); }
+  .pnl h3{ font-size:var(--hf-fs-label); letter-spacing:0.6px; text-transform:uppercase; color:var(--hf-muted); margin:0 0 8px; font-weight:600; }
+  .kv{ display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:3px 0; }
+  .kv .k{ color:var(--hf-muted); } .kv .v{ font-variant-numeric:tabular-nums; text-align:right; }
+  .big{ font-size:19px; font-weight:700; color:var(--hf-color-accent,#f0a868); font-variant-numeric:tabular-nums; }
+  .emit{ width:100%; font:inherit; cursor:pointer; background:var(--hf-color-accent,#f0a868); color:#1a1208; border:none; border-radius:8px; padding:11px; font-weight:700; font-size:14px; margin-top:4px; }
+  .emit:disabled{ opacity:.4; cursor:not-allowed; }
+  .res{ margin-top:9px; font-size:12px; }
+  .annlist{ font-size:11.5px; }
+  .annrow{ display:flex; justify-content:space-between; gap:8px; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--hf-muted); }
+  .annrow b{ color:var(--hf-text); }
+  pre.json{ background:rgba(8,12,20,.7); border:1px solid var(--hf-line); border-radius:8px; padding:9px; font-size:10.5px; line-height:1.45; color:#c9d4e2; overflow:auto; max-height:200px; white-space:pre-wrap; word-break:break-word; }
+  .persist{ font-size:11.5px; color:var(--hf-muted); }
+  .persist .row{ display:flex; justify-content:space-between; padding:3px 0; }
+  .persist b{ color:var(--hf-text); }
+</style>
+</head>
+<body class="hf" data-hf-page="autobid">
+  <div class="wrap">
+    <div class="crumbs"><a href="/autobid-board.html">AutoBid</a> · Drawing</div>
+    <div class="ptitle">AutoBid · Drawing</div>
+    <div class="psub">A Bluebeam-style markup surface on the <b>real plan PDF</b>. Open the plan set, render a sheet, then crop the drawing extent, calibrate scale from two known points, and measure / area / note — the dialed-in plan persists straight to the engine so the geometry takeoff consumes a clean, human-confirmed input.</div>
+
+    <div class="ed">
+      <!-- LEFT: plan set + sheet list -->
+      <section class="col hf-panel">
+        <div class="docpick">
+          <input id="docInput" type="text" value="34978" placeholder="document_id" />
+          <button id="openBtn">Open</button>
+        </div>
+        <div class="docmeta" id="docMeta">Default: the Cooperative 1881 bid set (doc 34978).</div>
+        <div class="shdr">Sheets <span id="shCount" class="hf-muted"></span></div>
+        <div class="sheets" id="sheetList"><div class="note" style="padding:14px;color:var(--hf-muted);font-size:12px">Open a plan set…</div></div>
+      </section>
+
+      <!-- CENTER: render + markup -->
+      <section class="col hf-panel" style="display:flex;flex-direction:column;min-width:0">
+        <div class="tbar">
+          <button class="tbtn" id="prevBtn" disabled>‹ Prev</button>
+          <span id="pageLabel" class="lab">—</span>
+          <button class="tbtn" id="nextBtn" disabled>Next ›</button>
+          <span class="sep"></span>
+          <span class="lab">Zoom</span>
+          <button class="tbtn" id="zoutBtn" disabled>−</button>
+          <span id="zoomLabel" class="lab" style="min-width:42px;text-align:center">100%</span>
+          <button class="tbtn" id="zinBtn" disabled>+</button>
+          <button class="tbtn" id="sharpenBtn" disabled title="Render this page with pdf.js vector (downloads the full PDF — slow on large plan sets)">◎ Sharpen (vector)</button>
+          <span class="sep"></span>
+          <button class="tbtn on" id="panBtn" disabled>✋ Pan</button>
+          <button class="tbtn" id="cropBtn" disabled>✂ Crop</button>
+          <button class="tbtn" id="scaleBtn" disabled>📏 Scale</button>
+          <button class="tbtn" id="measBtn" disabled>📐 Measure</button>
+          <button class="tbtn" id="areaBtn" disabled>▭ Area</button>
+          <button class="tbtn" id="noteBtn" disabled>✎ Note</button>
+          <span class="sep"></span>
+          <button class="tbtn" id="clearBtn" disabled>Clear</button>
+          <span class="hint" id="modeHint"></span>
+        </div>
+        <div class="stage" id="stage">
+          <div class="scroller" id="scroller">
+            <div class="cwrap" id="cwrap" style="display:none">
+              <canvas id="pdfCanvas"></canvas>
+              <canvas id="overlay"></canvas>
+            </div>
+          </div>
+          <div class="stagemsg" id="stageMsg">Select a sheet to render the plan.</div>
+        </div>
+      </section>
+
+      <!-- RIGHT: dialed-in plan + annotations -->
+      <aside class="col hf-panel">
+        <div class="pnl">
+          <h3>Crop — real plan extent</h3>
+          <div class="kv"><span class="k">px (x,y,w,h)</span><span class="v" id="cropPx">—</span></div>
+          <div class="kv"><span class="k">feet (w × h)</span><span class="v" id="cropFt">—</span></div>
+        </div>
+        <div class="pnl">
+          <h3>Scale calibration</h3>
+          <div class="kv"><span class="k">two points px</span><span class="v" id="scalePts">—</span></div>
+          <div class="kv"><span class="k">real distance</span><span class="v" id="scaleReal">—</span></div>
+          <div class="kv"><span class="k">ft / base px</span><span class="v big" id="scaleFpu">—</span></div>
+        </div>
+        <div class="pnl">
+          <h3>Markup <span id="annCount" class="hf-muted"></span></h3>
+          <div class="annlist" id="annList"><span class="hf-muted">No measures, areas or notes yet.</span></div>
+        </div>
+        <div class="pnl">
+          <button class="emit" id="emitBtn" disabled>Save dialed-in plan</button>
+          <div class="res" id="emitRes"></div>
+        </div>
+        <div class="pnl">
+          <h3>Dialed-in JSON</h3>
+          <pre class="json" id="planJson">—</pre>
+        </div>
+        <div class="pnl">
+          <h3>Persisted for this doc</h3>
+          <div class="persist" id="persistList"><span class="hf-muted">—</span></div>
+        </div>
+        <div class="pnl">
+          <h3>Design handoff → takeoff</h3>
+          <div class="hf-muted" style="font-size:11px;line-height:1.5;margin-bottom:8px">
+            The dialed-in plan feeds the geometry/AutoSPRINK takeoff. This is the calibrated
+            footprint the design routes on — proving the crop+scale drives the design, not a dead end.
+          </div>
+          <div class="docpick" style="padding:0 0 8px;border:none">
+            <input id="hoRef" placeholder="bid ref (id or document_id)" />
+            <button id="hoBtn">Show takeoff input</button>
+          </div>
+          <div class="docpick" style="padding:0 0 8px;border:none">
+            <input id="hoScale" placeholder="try a new scale (ft/px) — optional" />
+            <button id="hoScaleBtn">Re-scale</button>
+          </div>
+          <div class="res" id="hoRes"><span class="hf-muted">—</span></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="/public/halofire-shell.js?v=13"></script>
+  <script>
+  'use strict';
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+  const $ = (id) => document.getElementById(id);
+  const api = (p, opts) => fetch('/api/autobid' + p, Object.assign({ credentials: 'include' }, opts || {}));
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+  const S = {
+    doc: null, sheets: [], page: null, sheetLabel: null,
+    pdf: null, pdfDoc: null,            // pdf.js document
+    zoom: 1.0, baseScale: 1.0,          // baseScale = pdf.js viewport scale at 100%
+    baseW: 0, baseH: 0,                 // base (100%) render px dims — the persisted coordinate space
+    mode: 'pan',
+    crop: null,                         // {x,y,w,h} in BASE px
+    scalePts: [],                       // [[x,y],[x,y]] in BASE px
+    scaleRealFt: null, scaleFtPerUnit: null,
+    cropFt: null,
+    annotations: [],                    // {type:'measure'|'area'|'note', ...} in BASE px
+  };
+  const canvas = $('pdfCanvas');
+  const overlay = $('overlay');
+  const octx = overlay.getContext('2d');
+
+  // ---- boot ------------------------------------------------------------
+  async function boot() {
+    openDoc(parseInt($('docInput').value, 10) || 34978);
+  }
+
+  async function openDoc(doc) {
+    S.doc = doc; S.pdf = null; S.pdfDoc = null; S.page = null;
+    $('sheetList').innerHTML = '<div class="note" style="padding:14px;color:var(--hf-muted);font-size:12px">loading sheets…</div>';
+    $('docMeta').innerHTML = 'loading…';
+    let d;
+    try { d = await (await api('/sheets?doc=' + doc)).json(); }
+    catch (e) { $('sheetList').innerHTML = '<div class="note" style="padding:14px">failed: ' + esc(e.message) + '</div>'; return; }
+    S.sheets = d.sheets || [];
+    const tag = d.exists ? '<span class="ok">on disk ✓</span>' : '<span class="bad">not on disk ✗</span>';
+    $('docMeta').innerHTML =
+      '<div><b>' + esc(d.filename || ('doc ' + doc)) + '</b></div>' +
+      '<div style="margin-top:4px">' + tag + ' · ' + d.count + ' sheets · ' + d.fp_review_count + ' in FP review set</div>';
+    $('shCount').textContent = '(' + d.count + ')';
+    renderSheetList();
+    loadPersisted(doc);
+  }
+
+  function renderSheetList() {
+    if (!S.sheets.length) { $('sheetList').innerHTML = '<div class="note" style="padding:14px">no sheets indexed</div>'; return; }
+    $('sheetList').innerHTML = S.sheets.map((s) =>
+      '<div class="sheet' + (s.page_index === S.page ? ' sel' : '') + '" data-page="' + s.page_index + '" data-label="' + esc(s.sheet_label || '') + '">' +
+        '<span class="lbl">' + esc(s.sheet_label || ('p' + (s.page_index + 1))) + '</span>' +
+        '<span class="ty">' + esc((s.discipline || '') + ' · ' + (s.sheet_type || '').replace(/_/g, ' ')) + '</span>' +
+        (s.fp_review ? '<span class="fp">FP</span>' : '') +
+      '</div>').join('');
+    [...document.querySelectorAll('.sheet')].forEach((el) =>
+      el.addEventListener('click', () => selectSheet(+el.dataset.page, el.dataset.label)));
+  }
+
+  // ---- load the PDF (once per doc) via pdf.js, kicked off in the background ----
+  // pdf.js gives crisp vector zoom, but the 1881 set is 343MB and the auth-gated
+  // proxy buffers the whole file (Range collapses to 200), so the client download is
+  // slow. We therefore PAINT FAST with the engine's server-side PNG (/pdf/page,
+  // PyMuPDF — one page, ~1MB, a couple seconds) and UPGRADE to the pdf.js vector
+  // render for the same page when it's ready. Same BASE coordinate space either way.
+  function ensurePdf() {
+    if (S.pdfPromise) return S.pdfPromise;
+    const loadingTask = pdfjsLib.getDocument({
+      url: '/api/autobid/pdf?doc=' + S.doc,
+      withCredentials: true,
+      rangeChunkSize: 262144,
+    });
+    S.pdfPromise = loadingTask.promise.then((doc) => { S.pdfDoc = doc; return doc; }).catch(() => null);
+    return S.pdfPromise;
+  }
+
+  async function selectSheet(page, label) {
+    S.page = page; S.sheetLabel = label || null;
+    resetMarkup();
+    [...document.querySelectorAll('.sheet')].forEach((e) => e.classList.toggle('sel', +e.dataset.page === page));
+    const idx = S.sheets.findIndex((s) => s.page_index === page);
+    $('pageLabel').textContent = (label || ('page ' + (page + 1))) + ' (' + (page + 1) + '/' + S.sheets.length + ')';
+    $('prevBtn').disabled = idx <= 0;
+    $('nextBtn').disabled = idx >= S.sheets.length - 1;
+    await renderPage();
+  }
+
+  const BASE_W = 1600;   // base render width in px = the persisted coordinate space
+
+  async function renderPage() {
+    const reqPage = S.page;
+    $('cwrap').style.display = 'none';
+    $('stageMsg').style.display = 'flex';
+    $('stageMsg').textContent = 'rendering sheet (server-side PNG, PyMuPDF)…';
+    try {
+      // ---- FAST PATH: server-side PNG at a DPI that yields ~BASE_W*zoom px wide ----
+      // /pdf/page renders the single page server-side; we pick a DPI so the long edge
+      // is close to BASE_W*zoom. Page is letter/arch in PDF points; PyMuPDF dpi=72 == points.
+      const dpi = Math.round(Math.min(220, Math.max(72, (BASE_W * S.zoom) / 11)));  // ~11in wide plan heuristic
+      const url = '/api/autobid/pdf/page?doc=' + S.doc + '&page=' + reqPage + '&dpi=' + dpi;
+      const resp = await fetch(url, { credentials: 'include' });
+      if (!resp.ok) throw new Error('PNG render ' + resp.status);
+      const blob = await resp.blob();
+      const img = await blobImage(blob);
+      if (reqPage !== S.page) return;   // user moved on
+      // BASE space = this PNG scaled to BASE_W wide at zoom=1.
+      S.baseScale = (BASE_W / img.naturalWidth);            // png px -> base px factor
+      S.baseW = BASE_W;
+      S.baseH = Math.round(img.naturalHeight * S.baseScale);
+      paintImage(img, Math.round(S.baseW * S.zoom), Math.round(S.baseH * S.zoom));
+      revealStage();
+      // pdf.js vector render is an OPT-IN upgrade (the "Sharpen" button) — auto-fetching
+      // a 343MB plan PDF in the background would stall the tab, so we don't.
+    } catch (e) {
+      $('stageMsg').textContent = 'render failed: ' + (e && e.message ? e.message : e);
+    }
+  }
+
+  function blobImage(blob) {
+    return new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => { res(img); };
+      img.onerror = () => rej(new Error('image decode failed'));
+      img.src = URL.createObjectURL(blob);
+    });
+  }
+  function paintImage(img, w, h) {
+    canvas.width = w; canvas.height = h;
+    overlay.width = w; overlay.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    if (img.src.startsWith('blob:')) URL.revokeObjectURL(img.src);
+  }
+  function revealStage() {
+    $('cwrap').style.display = 'block';
+    $('stageMsg').style.display = 'none';
+    ['zinBtn','zoutBtn','panBtn','cropBtn','scaleBtn','measBtn','areaBtn','noteBtn','clearBtn','sharpenBtn'].forEach((b) => $(b).disabled = false);
+    $('zoomLabel').textContent = Math.round(S.zoom * 100) + '%';
+    drawOverlay();
+  }
+
+  // OPT-IN: render the current page with pdf.js vector. Downloads the full PDF (slow on
+  // large plan sets) and repaints the SAME page at the SAME base width — coordinate space
+  // is unchanged, so existing crop/scale/markup stay valid.
+  async function sharpenToVector() {
+    const reqPage = S.page;
+    const btn = $('sharpenBtn');
+    btn.disabled = true; const lbl = btn.textContent; btn.textContent = '◎ downloading PDF…';
+    try {
+      const pdf = await ensurePdf();
+      if (!pdf || reqPage !== S.page) return;
+      const pg = await pdf.getPage(reqPage + 1);   // pdf.js pages are 1-based
+      if (reqPage !== S.page) return;
+      const raw = pg.getViewport({ scale: 1.0 });
+      const scale = (S.baseW * S.zoom) / raw.width;
+      const vp = pg.getViewport({ scale });
+      if (Math.abs(vp.width - canvas.width) > 2) { canvas.width = Math.round(vp.width); overlay.width = canvas.width; }
+      if (Math.abs(vp.height - canvas.height) > 2) { canvas.height = Math.round(vp.height); overlay.height = canvas.height; }
+      await pg.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+      if (reqPage === S.page) { btn.textContent = '◎ vector ✓'; drawOverlay(); }
+    } catch (e) {
+      btn.textContent = '◎ vector failed';
+    } finally {
+      setTimeout(() => { btn.textContent = lbl; btn.disabled = false; }, 2200);
+    }
+  }
+
+  // ---- coordinate transforms: screen <-> BASE px (persisted space) -----
+  // overlay/canvas are rendered at baseScale*zoom; BASE px = the scale-1.0*baseScale space.
+  function viewFactor() { return S.zoom; }                 // base px * zoom = view px
+  function toBase(ev) {
+    const r = overlay.getBoundingClientRect();
+    const sx = overlay.width / r.width, sy = overlay.height / r.height;
+    const vx = (ev.clientX - r.left) * sx, vy = (ev.clientY - r.top) * sy;
+    return [Math.round(vx / viewFactor()), Math.round(vy / viewFactor())];
+  }
+  function vx(bx) { return bx * viewFactor(); }            // base -> view px for drawing
+
+  // ---- markup state ----------------------------------------------------
+  function resetMarkup() {
+    S.crop = null; S.scalePts = []; S.scaleRealFt = null; S.scaleFtPerUnit = null;
+    S.cropFt = null; S.annotations = []; setMode('pan'); refresh();
+  }
+  function setMode(m) {
+    S.mode = m;
+    ['pan','crop','scale','meas','area','note'].forEach((k) => {
+      const map = { pan:'panBtn', crop:'cropBtn', scale:'scaleBtn', meas:'measBtn', area:'areaBtn', note:'noteBtn' };
+      $(map[k]).classList.toggle('on', k === m);
+    });
+    const hints = {
+      pan: 'Drag to pan the plan.',
+      crop: 'Drag a box around the real drawing (excludes title block / notes).',
+      scale: 'Click two points a known distance apart, then enter the feet.',
+      meas: 'Click two points to measure a distance (needs scale).',
+      area: 'Drag a rectangle to measure an area (needs scale).',
+      note: 'Click where the note goes, then type it.',
+    };
+    $('modeHint').textContent = hints[m] || '';
+    overlay.style.cursor = (m === 'pan') ? 'grab' : 'crosshair';
+    $('scroller').style.cursor = (m === 'pan') ? 'grab' : 'default';
+  }
+
+  function ftPerBasePx() { return S.scaleFtPerUnit; }      // feet per BASE px
+  function pxDist(a, b) { return Math.hypot(b[0]-a[0], b[1]-a[1]); }
+  function rectFrom(a, b) {
+    return { x: Math.min(a[0],b[0]), y: Math.min(a[1],b[1]), w: Math.abs(b[0]-a[0]), h: Math.abs(b[1]-a[1]) };
+  }
+
+  // ---- pointer handling ------------------------------------------------
+  let dragStart = null, panStart = null;
+  overlay.addEventListener('mousedown', (ev) => {
+    if (S.mode === 'pan') {
+      const sc = $('scroller');
+      panStart = { x: ev.clientX, y: ev.clientY, l: sc.scrollLeft, t: sc.scrollTop };
+      overlay.style.cursor = 'grabbing';
+      return;
+    }
+    if (S.mode === 'crop' || S.mode === 'area') { dragStart = toBase(ev); }
+  });
+  window.addEventListener('mousemove', (ev) => {
+    if (S.mode === 'pan' && panStart) {
+      const sc = $('scroller');
+      sc.scrollLeft = panStart.l - (ev.clientX - panStart.x);
+      sc.scrollTop = panStart.t - (ev.clientY - panStart.y);
+      return;
+    }
+    if ((S.mode === 'crop' || S.mode === 'area') && dragStart) {
+      const cur = toBase(ev);
+      S._drag = rectFrom(dragStart, cur);
+      drawOverlay();
+    }
+  });
+  window.addEventListener('mouseup', (ev) => {
+    if (S.mode === 'pan' && panStart) { panStart = null; overlay.style.cursor = 'grab'; return; }
+    if ((S.mode === 'crop' || S.mode === 'area') && dragStart && S._drag && S._drag.w > 4 && S._drag.h > 4) {
+      if (S.mode === 'crop') { S.crop = S._drag; recompute(); }
+      else {
+        const r = S._drag;
+        const f = ftPerBasePx();
+        const areaFt = f ? +(r.w * f * r.h * f).toFixed(1) : null;
+        S.annotations.push({ type:'area', rect:r, area_sqft: areaFt });
+        refresh();
+      }
+    }
+    dragStart = null; S._drag = null; drawOverlay();
+  });
+  overlay.addEventListener('click', (ev) => {
+    if (S.mode === 'scale') {
+      const p = toBase(ev);
+      if (S.scalePts.length >= 2) S.scalePts = [];
+      S.scalePts.push(p); drawOverlay();
+      if (S.scalePts.length === 2) {
+        const d = pxDist(S.scalePts[0], S.scalePts[1]);
+        const ans = prompt('Two points are ' + d.toFixed(1) + ' base-px apart.\nEnter the REAL distance in FEET:', '');
+        const ft = parseFloat(ans);
+        if (ft && ft > 0) { S.scaleRealFt = ft; S.scaleFtPerUnit = ft / d; }
+        recompute(); setMode('pan');
+      }
+      return;
+    }
+    if (S.mode === 'meas') {
+      const p = toBase(ev);
+      if (!S._measA) { S._measA = p; drawOverlay(); }
+      else {
+        const a = S._measA, b = p, d = pxDist(a, b);
+        const f = ftPerBasePx();
+        S.annotations.push({ type:'measure', a, b, ft: f ? +(d * f).toFixed(2) : null });
+        S._measA = null; refresh();
+      }
+      return;
+    }
+    if (S.mode === 'note') {
+      const p = toBase(ev);
+      const txt = prompt('Note text:', '');
+      if (txt && txt.trim()) S.annotations.push({ type:'note', at:p, text: txt.trim() });
+      refresh(); setMode('pan');
+      return;
+    }
+  });
+
+  // ---- overlay paint ---------------------------------------------------
+  function drawOverlay() {
+    octx.clearRect(0, 0, overlay.width, overlay.height);
+    const drag = (S.mode === 'crop') ? (S._drag || S.crop) : S.crop;
+    if (drag) {
+      const c = { x:vx(drag.x), y:vx(drag.y), w:vx(drag.w), h:vx(drag.h) };
+      octx.save();
+      octx.fillStyle = 'rgba(0,0,0,.40)';
+      octx.fillRect(0, 0, overlay.width, c.y);
+      octx.fillRect(0, c.y + c.h, overlay.width, overlay.height - (c.y + c.h));
+      octx.fillRect(0, c.y, c.x, c.h);
+      octx.fillRect(c.x + c.w, c.y, overlay.width - (c.x + c.w), c.h);
+      octx.strokeStyle = '#f0a868'; octx.lineWidth = 2;
+      octx.strokeRect(c.x + .5, c.y + .5, c.w, c.h);
+      octx.restore();
+    }
+    // active area drag
+    if (S.mode === 'area' && S._drag) {
+      const r = S._drag;
+      octx.save(); octx.strokeStyle = '#4ade80'; octx.fillStyle = 'rgba(74,222,128,.12)'; octx.lineWidth = 2;
+      octx.fillRect(vx(r.x), vx(r.y), vx(r.w), vx(r.h));
+      octx.strokeRect(vx(r.x)+.5, vx(r.y)+.5, vx(r.w), vx(r.h)); octx.restore();
+    }
+    // scale points + line
+    if (S.scalePts.length) {
+      octx.save(); octx.strokeStyle = '#9ec3ff'; octx.fillStyle = '#9ec3ff'; octx.lineWidth = 2;
+      if (S.scalePts.length === 2) { octx.beginPath(); octx.moveTo(vx(S.scalePts[0][0]), vx(S.scalePts[0][1])); octx.lineTo(vx(S.scalePts[1][0]), vx(S.scalePts[1][1])); octx.stroke(); }
+      S.scalePts.forEach((p) => { octx.beginPath(); octx.arc(vx(p[0]), vx(p[1]), 5, 0, 7); octx.fill(); });
+      octx.restore();
+    }
+    // measure-in-progress first point
+    if (S._measA) { octx.save(); octx.fillStyle = '#7dd3fc'; octx.beginPath(); octx.arc(vx(S._measA[0]), vx(S._measA[1]), 5, 0, 7); octx.fill(); octx.restore(); }
+    // saved annotations
+    S.annotations.forEach((an) => {
+      octx.save();
+      if (an.type === 'measure') {
+        octx.strokeStyle = '#7dd3fc'; octx.fillStyle = '#7dd3fc'; octx.lineWidth = 2;
+        octx.beginPath(); octx.moveTo(vx(an.a[0]), vx(an.a[1])); octx.lineTo(vx(an.b[0]), vx(an.b[1])); octx.stroke();
+        [an.a, an.b].forEach((p) => { octx.beginPath(); octx.arc(vx(p[0]), vx(p[1]), 4, 0, 7); octx.fill(); });
+        if (an.ft != null) label(((an.a[0]+an.b[0])/2), ((an.a[1]+an.b[1])/2), an.ft + ' ft', '#7dd3fc');
+      } else if (an.type === 'area') {
+        octx.strokeStyle = '#4ade80'; octx.fillStyle = 'rgba(74,222,128,.12)'; octx.lineWidth = 2;
+        octx.fillRect(vx(an.rect.x), vx(an.rect.y), vx(an.rect.w), vx(an.rect.h));
+        octx.strokeRect(vx(an.rect.x)+.5, vx(an.rect.y)+.5, vx(an.rect.w), vx(an.rect.h));
+        if (an.area_sqft != null) label(an.rect.x + an.rect.w/2, an.rect.y + an.rect.h/2, an.area_sqft.toLocaleString() + ' sf', '#86efac');
+      } else if (an.type === 'note') {
+        octx.fillStyle = '#fcd34d'; octx.beginPath(); octx.arc(vx(an.at[0]), vx(an.at[1]), 6, 0, 7); octx.fill();
+        label(an.at[0] + 10/viewFactor(), an.at[1], an.text, '#fcd34d', 'left');
+      }
+      octx.restore();
+    });
+  }
+  function label(bx, by, text, color, align) {
+    octx.save();
+    octx.font = '600 13px ui-sans-serif,system-ui,sans-serif';
+    octx.textAlign = align || 'center'; octx.textBaseline = 'middle';
+    const x = vx(bx), y = vx(by);
+    const w = octx.measureText(text).width;
+    const ax = (align === 'left') ? x : x - w/2;
+    octx.fillStyle = 'rgba(8,12,20,.85)';
+    octx.fillRect(ax - 5, y - 10, w + 10, 20);
+    octx.fillStyle = color; octx.fillText(text, (align === 'left') ? x : x, y);
+    octx.restore();
+  }
+
+  // ---- recompute + panel ----------------------------------------------
+  function recompute() {
+    if (S.crop && S.scaleFtPerUnit) {
+      S.cropFt = { w_ft: +(S.crop.w * S.scaleFtPerUnit).toFixed(2), h_ft: +(S.crop.h * S.scaleFtPerUnit).toFixed(2) };
+    } else S.cropFt = null;
+    // re-derive annotation feet if scale changed
+    const f = ftPerBasePx();
+    S.annotations.forEach((an) => {
+      if (an.type === 'measure') an.ft = f ? +(pxDist(an.a, an.b) * f).toFixed(2) : null;
+      if (an.type === 'area') an.area_sqft = f ? +(an.rect.w * f * an.rect.h * f).toFixed(1) : null;
+    });
+    refresh();
+  }
+
+  function buildPlan() {
+    return {
+      documentId: S.doc, pageIndex: S.page, sheetLabel: S.sheetLabel,
+      renderDpi: S.baseW,    // base-px coordinate-space WIDTH (cropRectPx is in this space)
+      cropRectPx: S.crop, cropRectFt: S.cropFt,
+      scalePointsPx: S.scalePts.length === 2 ? S.scalePts : null,
+      scaleRealFt: S.scaleRealFt, scaleFtPerUnit: S.scaleFtPerUnit,
+      annotations: S.annotations,
+      renderer: 'pdfjs',
+    };
+  }
+
+  function refresh() {
+    const c = S.crop;
+    $('cropPx').textContent = c ? (c.x + ',' + c.y + ',' + c.w + ',' + c.h) : '—';
+    $('cropFt').textContent = S.cropFt ? (S.cropFt.w_ft + ' × ' + S.cropFt.h_ft + ' ft') : '—';
+    $('scalePts').textContent = S.scalePts.length === 2 ? S.scalePts.map((p) => '(' + p[0] + ',' + p[1] + ')').join(' → ') : '—';
+    $('scaleReal').textContent = S.scaleRealFt != null ? (S.scaleRealFt + ' ft') : '—';
+    $('scaleFpu').textContent = S.scaleFtPerUnit != null ? S.scaleFtPerUnit.toFixed(5) : '—';
+    // annotations list
+    $('annCount').textContent = S.annotations.length ? ('(' + S.annotations.length + ')') : '';
+    if (!S.annotations.length) $('annList').innerHTML = '<span class="hf-muted">No measures, areas or notes yet.</span>';
+    else $('annList').innerHTML = S.annotations.map((an, i) => {
+      let r = '';
+      if (an.type === 'measure') r = '<b>Measure</b> · ' + (an.ft != null ? an.ft + ' ft' : 'no scale');
+      else if (an.type === 'area') r = '<b>Area</b> · ' + (an.area_sqft != null ? an.area_sqft.toLocaleString() + ' sf' : 'no scale');
+      else r = '<b>Note</b> · ' + esc(an.text);
+      return '<div class="annrow"><span>' + r + '</span><span style="cursor:pointer;color:#fca5a5" data-del="' + i + '">✕</span></div>';
+    }).join('');
+    [...document.querySelectorAll('[data-del]')].forEach((el) =>
+      el.addEventListener('click', () => { S.annotations.splice(+el.dataset.del, 1); recompute(); drawOverlay(); }));
+    const ready = S.page != null && (S.crop || S.scaleFtPerUnit || S.annotations.length);
+    $('emitBtn').disabled = !ready;
+    $('planJson').textContent = S.page != null ? JSON.stringify(buildPlan(), null, 2) : '—';
+    drawOverlay();
+  }
+
+  // ---- persist ---------------------------------------------------------
+  async function emitPlan() {
+    const plan = buildPlan();
+    $('emitRes').innerHTML = '<span class="hf-muted">persisting…</span>';
+    try {
+      const resp = await api('/dialed-in-plan', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(plan) });
+      const d = await resp.json();
+      if (!resp.ok) throw new Error(d.detail || resp.status);
+      const r = d.result || {};
+      $('emitRes').innerHTML = '<span class="ok">✓ ' + esc(r.action) + '</span> · dialed_in_plans row #' + r.id;
+      loadPersisted(S.doc);
+    } catch (e) {
+      $('emitRes').innerHTML = '<span class="bad">persist failed: ' + esc(e.message) + '</span>';
+    }
+  }
+
+  async function loadPersisted(doc) {
+    try {
+      const d = await (await api('/dialed-in-plans?doc=' + doc)).json();
+      if (!d.count) { $('persistList').innerHTML = '<span class="hf-muted">none yet</span>'; return; }
+      $('persistList').innerHTML = d.plans.map((p) => {
+        let nAnn = 0;
+        try { const pj = JSON.parse(p.plan_json || '{}'); nAnn = (pj.annotations || []).length; } catch (e) {}
+        return '<div class="row"><span><b>' + esc(p.sheet_label || ('p' + p.page_index)) + '</b> · row #' + p.id +
+          (nAnn ? ' · ' + nAnn + ' markup' : '') + '</span>' +
+          '<span>' + (p.scale_ft_per_unit ? (Number(p.scale_ft_per_unit).toFixed(4) + ' ft/px') : 'no scale') + '</span></div>';
+      }).join('');
+    } catch (e) { $('persistList').innerHTML = '<span class="hf-muted">' + esc(e.message) + '</span>'; }
+  }
+
+  // ---- design handoff (dialed-in plan -> geometry takeoff input) --------
+  function fpLine(fp) {
+    if (!fp) return '<span class="bad">no routable footprint</span>';
+    return '<b>' + fp.long_ft + ' × ' + fp.short_ft + ' ft</b> · ' +
+      Number(fp.area_sqft).toLocaleString() + ' sf · aspect ' + fp.aspect;
+  }
+  async function loadHandoff(ref, scale) {
+    if (!ref || isNaN(ref)) { $('hoRes').innerHTML = '<span class="bad">enter a bid ref</span>'; return; }
+    $('hoRes').innerHTML = '<span class="hf-muted">resolving takeoff input…</span>';
+    let q = '/dialed-in-plan/takeoff?ref=' + ref;
+    if (scale != null && scale !== '' && !isNaN(scale)) q += '&scale_ft_per_unit=' + scale;
+    try {
+      const resp = await api(q);
+      const d = await resp.json();
+      if (!resp.ok) throw new Error(d.detail || resp.status);
+      const ps = d.plan_scale || {};
+      let html = '<div class="row"><span>sheet</span><span><b>' + esc(d.sheet_label || ('p' + d.page_index)) + '</b></span></div>';
+      html += '<div class="row"><span>plan scale</span><span>' + (ps.scale_ft_per_unit || '?') + ' ft/px</span></div>';
+      html += '<div class="row"><span>takeoff footprint</span><span>' + fpLine(ps.footprint) + '</span></div>';
+      if (ps.routed_preview) {
+        const rp = ps.routed_preview;
+        html += '<div class="row"><span>routed grid</span><span>' + rp.n_branch_lines_per_plate +
+          ' branch lines @ ' + rp.head_spacing_ft + ' ft · ' + Number(rp.total_ft).toLocaleString() + ' ft</span></div>';
+      }
+      if (d.scale_change) {
+        const sc = d.scale_change;
+        html += '<div class="row" style="margin-top:6px"><span><b>scale change</b></span><span>' +
+          sc.from_scale_ft_per_unit + ' → ' + sc.to_scale_ft_per_unit + ' ft/px</span></div>';
+        html += '<div class="row"><span>long ft</span><span>' + sc.footprint_long_ft.before + ' → <b>' + sc.footprint_long_ft.after + '</b></span></div>';
+        html += '<div class="row"><span>short ft</span><span>' + sc.footprint_short_ft.before + ' → <b>' + sc.footprint_short_ft.after + '</b></span></div>';
+        html += '<div class="row"><span>area sf</span><span>' + Number(sc.footprint_area_sqft.before).toLocaleString() + ' → <b>' + Number(sc.footprint_area_sqft.after).toLocaleString() + '</b></span></div>';
+        html += '<div class="row"><span>routed ft</span><span>' + Number(sc.routed_total_ft.before).toLocaleString() + ' → <b>' + Number(sc.routed_total_ft.after).toLocaleString() + '</b></span></div>';
+        html += '<div class="ok" style="font-size:11px;margin-top:6px">✓ the scale change moved the takeoff geometry input</div>';
+      }
+      $('hoRes').innerHTML = html;
+    } catch (e) {
+      $('hoRes').innerHTML = '<span class="bad">' + esc(e.message) + '</span>';
+    }
+  }
+
+  // ---- zoom ------------------------------------------------------------
+  function setZoom(z) {
+    S.zoom = Math.min(3, Math.max(0.4, +z.toFixed(2)));
+    if (S.page != null) renderPage();
+  }
+
+  // ---- wiring ----------------------------------------------------------
+  $('openBtn').addEventListener('click', () => openDoc(parseInt($('docInput').value, 10)));
+  $('docInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') openDoc(parseInt($('docInput').value, 10)); });
+  $('panBtn').addEventListener('click', () => setMode('pan'));
+  $('cropBtn').addEventListener('click', () => setMode(S.mode === 'crop' ? 'pan' : 'crop'));
+  $('scaleBtn').addEventListener('click', () => { S.scalePts = []; setMode(S.mode === 'scale' ? 'pan' : 'scale'); });
+  $('measBtn').addEventListener('click', () => { S._measA = null; setMode(S.mode === 'meas' ? 'pan' : 'meas'); });
+  $('areaBtn').addEventListener('click', () => setMode(S.mode === 'area' ? 'pan' : 'area'));
+  $('noteBtn').addEventListener('click', () => setMode(S.mode === 'note' ? 'pan' : 'note'));
+  $('clearBtn').addEventListener('click', () => { resetMarkup(); });
+  $('zinBtn').addEventListener('click', () => setZoom(S.zoom + 0.25));
+  $('zoutBtn').addEventListener('click', () => setZoom(S.zoom - 0.25));
+  $('sharpenBtn').addEventListener('click', sharpenToVector);
+  $('emitBtn').addEventListener('click', emitPlan);
+  $('hoBtn').addEventListener('click', () => loadHandoff(parseInt($('hoRef').value, 10), null));
+  $('hoScaleBtn').addEventListener('click', () => loadHandoff(parseInt($('hoRef').value, 10), $('hoScale').value));
+  $('hoRef').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadHandoff(parseInt($('hoRef').value, 10), null); });
+  $('prevBtn').addEventListener('click', () => { const i = S.sheets.findIndex((s) => s.page_index === S.page); if (i > 0) selectSheet(S.sheets[i-1].page_index, S.sheets[i-1].sheet_label); });
+  $('nextBtn').addEventListener('click', () => { const i = S.sheets.findIndex((s) => s.page_index === S.page); if (i < S.sheets.length - 1) selectSheet(S.sheets[i+1].page_index, S.sheets[i+1].sheet_label); });
+
+  boot();
+  </script>
+</body>
+</html>

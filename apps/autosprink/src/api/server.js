@@ -804,6 +804,45 @@ app.delete('/api/bids/:id', authMiddleware, requireRole('admin'), (req, res) => 
   res.json({ message: 'Bid deleted' });
 });
 
+// ── AutoBid (ADR-001 single-gate) — proxy to the corpus intelligence engine ──
+// The Python engine (halofire-autobid, FastAPI on :8770) holds the corpus brain:
+// 1,038 priced bids, comparables, Qwen profile extraction, hydraulics, the
+// BuildingModel + the autonomous ReadyBid package + outgoing proposal PDF. The
+// studio owns auth + glass shell + email; it reaches the intelligence through this
+// authenticated proxy. /api/autobid/<X> -> <engine>/<X> (query + body preserved,
+// binary-safe so /proposal PDFs stream through). The single review-and-send gate
+// (ADR-001) supersedes the legacy official-flow gates.
+const AUTOBID_ENGINE_URL = (process.env.AUTOBID_ENGINE_URL || 'http://127.0.0.1:8770').replace(/\/+$/, '');
+app.all('/api/autobid/*', authMiddleware, async (req, res, next) => {
+  const subPath = req.params[0] || '';
+  // Do NOT shadow the legacy studio-Node AutoBid routes that have their own explicit
+  // handlers later in this file (the old CRM intake). Fall through so those still run.
+  const LEGACY_AUTOBID = new Set(['intake/status', 'intake/poll']);
+  if (LEGACY_AUTOBID.has(subPath)) return next();
+  const qIdx = req.originalUrl.indexOf('?');
+  const qs = qIdx >= 0 ? req.originalUrl.slice(qIdx) : '';
+  const target = `${AUTOBID_ENGINE_URL}/${subPath}${qs}`;
+  try {
+    const init = { method: req.method, headers: {} };
+    if (!['GET', 'HEAD'].includes(req.method)) {
+      init.headers['content-type'] = req.get('content-type') || 'application/json';
+      init.body = (req.body && typeof req.body === 'object') ? JSON.stringify(req.body) : (req.body || undefined);
+    }
+    const upstream = await fetch(target, init);
+    res.status(upstream.status);
+    res.set('content-type', upstream.headers.get('content-type') || 'application/octet-stream');
+    res.send(Buffer.from(await upstream.arrayBuffer()));
+  } catch (err) {
+    (log.error || console.error)(`autobid proxy failed: ${target} -> ${err.message}`);
+    res.status(502).json({
+      error: 'autobid_engine_unreachable',
+      detail: err.message,
+      target,
+      hint: 'Start the AutoBid engine: C:/Python312/python.exe engine/api.py (in halofire-autobid)',
+    });
+  }
+});
+
 // ── Projects CRUD ──
 app.get('/api/projects', authMiddleware, (req, res) => {
   const projects = db.prepare('SELECT * FROM projects ORDER BY created_at DESC').all();
@@ -21456,9 +21495,10 @@ app.post('/api/parts/generate', authMiddleware, (req, res) => {
 // HONESTY/fail-closed: generated meshes are best-effort, NOT manufacturer-exact.
 // manufacturerExactCount is 0 for generated/missing parts; it only rises when a
 // user attaches a real catalog model (manufacturer+license) via the R4 override
-// route. EITHER WAY the AUTOSPRINK_PARITY gate stays hardcoded 'blocked' (parity
-// needs manufacturer-exact models for EVERY required part + PE/AHJ review). No STL
-// is ever fabricated for a part without a real mesh.
+// route. The AUTOSPRINK_PARITY gate is ACCURACY-driven (partsParityGateStatus):
+// it clears IFF every REQUIRED part carries a real downloaded/faithful catalog
+// model; generated/cutsheet massing never clears it, so with none attached it
+// stays 'blocked'. No STL is ever fabricated for a part without a real mesh.
 const PARTS_MANIFEST_PATH = path.resolve(__dirname, '../../parts/parts-manifest.json');
 // S5: the autonomous part-sourcing run (scripts/auto-source-run.mjs) writes its
 // observable status here, relative to the repo root (same place the script writes).
@@ -21490,8 +21530,9 @@ const PART_OVERRIDE_FIELDS = new Set(['mode', 'url', 'filename', 'format', 'manu
 // BOTH a manufacturer AND a license were attested; file/present -> set ONLY for a
 // web-renderable mesh format. Every merged entry is re-run through
 // sanitizePartEntry (defense in depth: it re-affirms the source-set guard so a
-// tampered row can never leak a false manufacturer-exact claim). Overrides NEVER
-// touch parityGateStatus — that gate stays hardcoded 'blocked' at the call site.
+// tampered row can never leak a false manufacturer-exact claim). Overrides feed
+// the ACCURACY-driven partsParityGateStatus like any other entry: a single
+// override does NOT clear parity (every REQUIRED part must carry a real model).
 function mergePartOverrides(components) {
   let rows;
   try {
@@ -21526,13 +21567,39 @@ function mergePartOverrides(components) {
 }
 
 // Recompute the honest count fields from a (possibly override-merged) component
-// list. parityGateStatus is intentionally NOT derived here — see call sites.
+// list. parityGateStatus is derived separately by partsParityGateStatus().
 function recountParts(components) {
   return {
     generatedCount: components.filter((c) => c.source === 'generated' && c.present === true).length,
     missingCount: components.filter((c) => c.present !== true).length,
     manufacturerExactCount: components.filter((c) => c.manufacturerExact === true).length,
   };
+}
+
+// ACCURACY-DRIVEN parity gate (replaces the prior hardcoded 'blocked' literal).
+// The honest distinction is ACCURACY/provenance, not permission: a part is
+// parity-grade ONLY when it carries a REAL manufacturer/catalog model
+// (source ∈ {catalog,manufacturer} AND manufacturerExact === true AND present —
+// i.e. an actual downloaded vendor STL/STEP or a faithful catalog model, with a
+// cited source). We feed exactly those parts into the registry's
+// buildParityInventory()/parityGateStatus() so the gate clears IFF every REQUIRED
+// component has such a real model. Generated/cutsheet/spec-nominal massing is NOT
+// parity-grade and is omitted, so it can never clear the gate. This is fail-closed
+// by construction: with zero real catalog parts the inventory is incomplete and
+// the gate stays 'blocked' — but the moment a genuine downloaded vendor model
+// lands for a component, it surfaces honestly instead of being hardcoded out.
+function partsParityGateStatus(components) {
+  const modelStatusByKey = {};
+  for (const c of components || []) {
+    const isRealCatalog =
+      (c.source === 'catalog' || c.source === 'manufacturer') &&
+      c.manufacturerExact === true &&
+      c.present === true;
+    if (isRealCatalog) {
+      modelStatusByKey[c.key] = { source: 'catalog', model: c.file || c.key };
+    }
+  }
+  return parityGateStatus(buildParityInventory(modelStatusByKey));
 }
 
 // W3 parts-pipeline ledger: dimensioned (real spec-accurate true-scale mesh) vs
@@ -21572,7 +21639,9 @@ app.get('/api/parts', authMiddleware, async (req, res) => {
         components,
         ...recountParts(components),
         dimensionLedger: dimensionLedgerFor(components),
-        parityGateStatus: 'blocked', // fail-closed: found/generated/override parts never clear parity
+        // ACCURACY-DRIVEN: clears IFF every required component has a real, cited
+        // manufacturer/catalog model; generated/cutsheet massing never clears it.
+        parityGateStatus: partsParityGateStatus(components),
         disclaimer: raw.disclaimer || PARTS_DISCLAIMER,
       });
     }
@@ -21587,7 +21656,8 @@ app.get('/api/parts', authMiddleware, async (req, res) => {
     components,
     ...recountParts(components),
     dimensionLedger: dimensionLedgerFor(components),
-    parityGateStatus: 'blocked',
+    // ACCURACY-DRIVEN: see partsParityGateStatus(). Empty/all-generated => blocked.
+    parityGateStatus: partsParityGateStatus(components),
     disclaimer: PARTS_DISCLAIMER,
   });
 });
@@ -21598,11 +21668,12 @@ app.get('/api/parts', authMiddleware, async (req, res) => {
 // 'catalog' + manufacturerExact:true (the build pipeline only produces
 // generated/missing and is hardcoded manufacturerExact:false).
 // HONESTY/fail-closed: attaching a part is recorded as PRESENT catalog evidence,
-// but it NEVER clears AUTOSPRINK_PARITY — that gate requires manufacturer-exact
-// models for EVERY required component PLUS licensed PE/AHJ review, none of which
-// a single upload provides. GET /api/parts keeps parityGateStatus hardcoded
-// 'blocked'. A non-mesh format (STEP/DWG) is recorded but is NOT web-renderable
-// (file stays null); we never fabricate a renderable mesh or a license.
+// but it NEVER single-handedly clears AUTOSPRINK_PARITY — that gate is
+// accuracy-driven and requires a real manufacturer/catalog model for EVERY
+// required component (plus licensed PE/AHJ review), which one upload cannot
+// satisfy. GET /api/parts derives parityGateStatus from partsParityGateStatus().
+// A non-mesh format (STEP/DWG) is recorded but is NOT web-renderable (file stays
+// null); we never fabricate a renderable mesh or a license.
 app.post('/api/parts/:key/override', authMiddleware, requireRole('admin'), (req, res) => {
   const rejected = Object.keys(req.body).filter((k) => !PART_OVERRIDE_FIELDS.has(k));
   if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });

@@ -46,6 +46,7 @@
     calendar:     '#c89a3c', // gold
     reports:      '#f7d516', // ember yellow (login bg)
     crm:          '#ffd54f', // halo yellow
+    autobid:      '#ff6a2b', // ember orange (the bid hot path)
     settings:     '#b8b8b2', // login muted
     officialflow: '#e8432d', // fire red
     _default:     '#e8432d'
@@ -56,6 +57,7 @@
     { id: 'studio',    label: 'Studio',    href: 'autosprink.html' },
     { id: 'calendar',  label: 'Calendar',  href: 'calendar.html' },
     { id: 'crm',       label: 'CRM',       href: 'crm.html' },
+    { id: 'autobid',   label: 'AutoBid',   href: 'autobid-board.html' },
     { id: 'reports',   label: 'Reports',   href: 'reports.html' },
     { id: 'vendors',   label: 'Vendors',   href: 'vendors.html' },
     { id: 'settings',  label: 'Settings',  href: 'settings.html' }
@@ -153,6 +155,24 @@
   function applyMode(m) { document.documentElement.setAttribute('data-hf-mode', m === 'light' ? 'light' : 'dark'); }
   function setMode(m) { try { localStorage.setItem('hf-mode', m); } catch (e) {} applyMode(m); }
 
+  // ---- SCROLLBAR style (Settings appearance) — drives the glass scrollbar width.
+  //      Always a GLASS scrollbar (tinted by the selected color); this just picks
+  //      how prominent it is. 'thin' (6px) / 'standard' (10px) / 'overlay' (auto-hide).
+  //      The width is published as --hf-sb-w and the mode as data-hf-scrollbar so
+  //      halofire-glass.css can react — never a raw OS bar. ----
+  var SCROLLBARS = {
+    thin:     { name: 'Thin',     w: '6px'  },
+    standard: { name: 'Standard', w: '10px' },
+    overlay:  { name: 'Overlay',  w: '10px' }   // auto-hide; width applies while scrolling
+  };
+  function savedScrollbar() { try { return localStorage.getItem('hf-scrollbar') || 'standard'; } catch (e) { return 'standard'; } }
+  function applyScrollbar(id) {
+    var s = SCROLLBARS[id] || SCROLLBARS.standard;
+    document.documentElement.style.setProperty('--hf-sb-w', s.w);
+    document.documentElement.setAttribute('data-hf-scrollbar', id);
+  }
+  function setScrollbar(id) { try { localStorage.setItem('hf-scrollbar', id); } catch (e) {} applyScrollbar(id); }
+
   function page() { return (document.body && document.body.getAttribute('data-hf-page')) || '_default'; }
   function applyFire() { document.documentElement.style.setProperty('--hf-fire-color', FIRE[page()] || FIRE._default); }
 
@@ -202,6 +222,7 @@
   function boot() {
     document.body.classList.add('hf');
     applyMode(savedMode());
+    applyScrollbar(savedScrollbar());
     applyTheme(savedTheme());
     applyEmber(savedEmber());
     applyFire();
@@ -210,11 +231,60 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 
+  // ---- single-source NAV/BRAND builders (shared by the auto appbar AND any page,
+  //      e.g. Studio, that mounts the bar inside its own chrome via data-hf-appbar="off").
+  //      A page that opts out of the auto bar calls HFShell.mountAppbarInto(el) so its
+  //      brand + primary nav come from HERE, not a hand-rolled copy. ----
+  function mountAppbarInto(host, opts) {
+    if (!host) return;
+    opts = opts || {};
+    // Detach any page-specific extras (e.g. a #studioNavExtras node holding the Demo
+    // button) BEFORE we rewrite innerHTML, so their existing event handlers survive.
+    var rightNode = opts.rightNode || null;
+    if (rightNode && rightNode.parentNode) rightNode.parentNode.removeChild(rightNode);
+
+    host.classList.add('hf-appbar');                 // inherit the shared appbar glass styling
+    host.innerHTML =
+      brand() + navHtml() +
+      '<div class="hf-right" id="hfRightHost">' +
+        (opts.rightHtml || '') +
+        '<span class="hf-role-chip" id="hfRole"><span class="dot"></span> …</span>' +
+        (opts.signout === false ? '' :
+          '<a class="hf-signout" id="hfSignout" href="#">Sign out</a>') +
+      '</div>';
+
+    // Re-home the preserved extras at the START of the right block (left of role chip).
+    if (rightNode) {
+      var rh = host.querySelector('#hfRightHost');
+      if (rh) rh.insertBefore(rightNode, rh.firstChild);
+    }
+
+    var so = host.querySelector('#hfSignout');
+    if (so) so.onclick = function (e) {
+      e.preventDefault();
+      fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+        .then(function () { location.href = '/index.html'; })
+        .catch(function () { location.href = '/index.html'; });
+    };
+    // fill the role chip from the session, identical to the auto appbar
+    fetch('/api/auth/me', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      var el = host.querySelector('#hfRole'); if (!el) return;
+      var u = (d && (d.user || d)) || {};
+      var name = u.name || u.username || 'User';
+      var role = u.position || u.role || '';
+      el.innerHTML = '<span class="dot"></span> ' + name + (role ? ' · ' + role : '');
+    }).catch(function () {});
+    return host;
+  }
+
   // public API for the Settings appearance controls
   window.HFTheme = {
     themes: THEMES, get: savedTheme, set: setTheme, apply: applyTheme,
     embers: EMBERS, getEmber: savedEmber, setEmber: setEmber, applyEmber: applyEmber,
     getEmberMotion: savedEmberMotion, setEmberMotion: setEmberMotion,
+    scrollbars: SCROLLBARS, getScrollbar: savedScrollbar, setScrollbar: setScrollbar,
     fireMap: FIRE, getMode: savedMode, setMode: setMode
   };
+  // shell composition API: pages that opt out of the auto bar reuse the SAME builders
+  window.HFShell = { brand: brand, navHtml: navHtml, mountAppbarInto: mountAppbarInto };
 })();

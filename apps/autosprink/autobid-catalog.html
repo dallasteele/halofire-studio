@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>HaloFire — AutoBid · CAD Part Catalog</title>
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13" />
+<style>
+  .wrap{ max-width:1180px; margin:0 auto; padding:22px 24px 80px; }
+  .crumbs{ font-size:var(--hf-fs-label); color:var(--hf-muted); margin:4px 0 8px; }
+  .crumbs a{ color:var(--hf-color-interactive-text,#9ec3ff); text-decoration:none; }
+  .ptitle{ font-family:var(--hf-display); font-size:var(--hf-fs-title); font-weight:600; margin:2px 0 2px; }
+  .psub{ color:var(--hf-muted); font-size:var(--hf-fs-sm); margin-bottom:18px; max-width:820px; line-height:1.5; }
+  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:16px; }
+  .kpi{ padding:14px 16px; }
+  .kpi .k{ font-size:var(--hf-fs-label); letter-spacing:0.5px; text-transform:uppercase; color:var(--hf-muted); }
+  .kpi .v{ font-size:24px; font-weight:600; margin-top:6px; font-variant-numeric:tabular-nums; }
+  .kpi .d{ font-size:var(--hf-fs-label); color:var(--hf-faint); margin-top:4px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:7px; padding:12px 14px; }
+  .chip{ cursor:pointer; padding:5px 12px; border:1px solid var(--hf-line); border-radius:999px; font-size:var(--hf-fs-label); color:var(--hf-muted); background:rgba(255,255,255,0.02); }
+  .chip.on{ background:var(--hf-color-accent,#f0a868); color:#1a1208; border-color:transparent; font-weight:600; }
+  .phd{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--hf-line); }
+  .phd .t{ font-size:var(--hf-fs-label); letter-spacing:0.9px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; flex:1; }
+  .pbd{ padding:6px 0; }
+  .note{ color:var(--hf-muted); font-size:var(--hf-fs-sm); line-height:1.55; padding:14px; }
+  table.bb{ width:100%; border-collapse:collapse; }
+  table.bb th{ text-align:left; font-size:var(--hf-fs-label); letter-spacing:0.6px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; padding:9px 14px; border-bottom:1px solid var(--hf-line); }
+  table.bb td{ padding:9px 14px; border-bottom:1px solid var(--hf-line); font-size:var(--hf-fs-sm); color:var(--hf-text); vertical-align:middle; }
+  table.bb tr:last-child td{ border-bottom:0; }
+  table.bb tr:hover td{ background:rgba(255,255,255,0.02); }
+  .fam{ font-weight:600; text-transform:capitalize; }
+  .sub{ color:var(--hf-muted); }
+  .prm{ color:var(--hf-faint); font-size:11px; font-variant-numeric:tabular-nums; }
+  .pill{ display:inline-block; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .pill.real{ background:rgba(74,222,128,0.14); color:#86efac; border:1px solid rgba(74,222,128,0.35); }
+  .pill.await{ background:rgba(251,191,36,0.14); color:#fcd34d; border:1px solid rgba(251,191,36,0.35); }
+  /* FOUND-source pills: cutsheet (real datasheet), web (manufacturer page), estimate (envelope) */
+  .pill.cutsheet{ background:rgba(74,222,128,0.16); color:#86efac; border:1px solid rgba(74,222,128,0.40); }
+  .pill.web{ background:rgba(158,195,255,0.16); color:#bcd4ff; border:1px solid rgba(158,195,255,0.40); }
+  .pill.estimate{ background:rgba(251,191,36,0.13); color:#fcd34d; border:1px solid rgba(251,191,36,0.32); }
+  .conf{ color:var(--hf-faint); font-size:10px; margin-left:5px; font-variant-numeric:tabular-nums; }
+  a.dl{ color:var(--hf-color-interactive-text,#9ec3ff); text-decoration:none; font-weight:600; }
+  a.src{ color:var(--hf-color-interactive-text,#9ec3ff); text-decoration:none; font-weight:600; }
+  a.src:hover{ text-decoration:underline; }
+  .egnyte{ color:#86efac; font-weight:600; font-size:11px; }
+  .egnyte .pathfile{ color:var(--hf-text); }
+  /* found product-image thumbnail */
+  .thumb{ width:40px; height:40px; border-radius:8px; object-fit:cover; border:1px solid var(--hf-line); background:rgba(255,255,255,0.03); vertical-align:middle; cursor:zoom-in; }
+  .thumb.broken{ display:none; }
+  /* key found-dims rendered as small labeled tags */
+  .dims{ display:flex; flex-wrap:wrap; gap:4px; max-width:300px; }
+  .dimtag{ font-size:10px; padding:1px 6px; border-radius:5px; background:rgba(255,255,255,0.045); border:1px solid var(--hf-line); color:var(--hf-text); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .dimtag b{ color:var(--hf-muted); font-weight:600; }
+  .nodim{ color:var(--hf-faint); font-size:11px; }
+  @media(max-width:900px){ .grid{ grid-template-columns:1fr 1fr; } .dims{ max-width:180px; } }
+</style>
+</head>
+<body class="hf" data-hf-page="autobid">
+  <div class="wrap">
+    <div class="crumbs"><a href="/autobid-board.html">AutoBid</a> · CAD Part Catalog</div>
+    <div class="ptitle">AutoBid · CAD Part Catalog</div>
+    <div class="psub">Every fire-sprinkler part family — heads, pipe, fittings, riser, valves, backflow, fire pump, gauges, hangers, escutcheons, FDC — cataloged in the DB. Where a <b>cut sheet or manufacturer page was FOUND</b>, the row shows the source link, a product image, the real dimensions (K/coverage/temp/orientation for heads; size/take-out/NPT for fittings) and a <b>cutsheet</b>/<b>web</b> confidence pill. Parts with no source found keep an honest <b>estimate</b> envelope. The bid layout uses these found dimensions as a close-approximation starting point — accurate dims, not exact vendor geometry.</div>
+
+    <div class="grid">
+      <div class="kpi hf-card"><div class="k">Cataloged parts</div><div class="v" id="kParts">—</div><div class="d">across all families</div></div>
+      <div class="kpi hf-card"><div class="k">Found sources</div><div class="v" id="kFound">—</div><div class="d">cut sheet / web page</div></div>
+      <div class="kpi hf-card"><div class="k">Real dimensions</div><div class="v" id="kDims">—</div><div class="d">cutsheet or web extracted</div></div>
+      <div class="kpi hf-card"><div class="k">Estimate only</div><div class="v" id="kAwait">—</div><div class="d">envelope — no source yet</div></div>
+    </div>
+
+    <section class="hf-panel">
+      <div class="phd"><span class="t">Filter by family</span></div>
+      <div class="chips" id="chips"><div class="note">Loading catalog…</div></div>
+    </section>
+
+    <section class="hf-panel" style="margin-top:14px">
+      <div class="phd"><span class="t">Parts</span><span class="hf-chip"><span class="gl"></span> <span id="srcChip">live catalog</span></span></div>
+      <div class="pbd"><div id="tbl"><div class="note">Loading parts…</div></div></div>
+    </section>
+  </div>
+
+  <script src="/public/halofire-shell.js?v=13"></script>
+  <script>
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+    function api(path){ return fetch('/api/autobid'+path, { credentials:'include' }); }
+    var ALL = [], FAM = null;
+
+    function paramStr(p){ if(!p||typeof p!=='object') return ''; return Object.keys(p).map(function(k){ return k.replace(/_in$/,'').replace(/_/g,' ')+' '+p[k]; }).join(' · '); }
+
+    // Has a real found source (Egnyte cut sheet or manufacturer web page)?
+    function hasFound(p){ var sk=p.source_kind; return sk==='egnyte_cutsheet'||sk==='web_cutsheet'||sk==='image'; }
+
+    // The key found-dims to surface, by family. Heads → K/coverage/temp/orientation/response;
+    // fittings/pipe/valves/etc → size/take-out/NPT/lay-length. Only keys actually present in
+    // dims are rendered (never zero-filled — honest to what the cut sheet stated).
+    var DIM_PRIORITY = {
+      heads: ['k_factor','coverage_sqft','temp_f','orientation','response','height_max_ft','orifice_in','thread_npt_in'],
+      fitting: ['size_in','take_out_in','face_to_face_in','thread_npt_in','length_in','od_in'],
+      pipe: ['diameter_in','od_in','wall_in','length_in'],
+      _default: ['size_in','diameter_in','length_in','face_to_face_in','thread_npt_in','take_out_in','coverage_sqft','temp_f','k_factor','orientation','response','height_max_ft']
+    };
+    var DIM_LABEL = {
+      k_factor:'K', coverage_sqft:'cov', temp_f:'temp', orientation:'orient', response:'resp',
+      height_max_ft:'max h', orifice_in:'orifice', thread_npt_in:'NPT', size_in:'size',
+      take_out_in:'take-out', face_to_face_in:'F-F', length_in:'len', od_in:'OD',
+      wall_in:'wall', diameter_in:'dia', lay_length_in:'lay'
+    };
+    function dimUnit(k,v){
+      if(k==='coverage_sqft') return v+' ft²';
+      if(k==='temp_f') return v+'°F';
+      if(k==='height_max_ft') return v+' ft';
+      if(k==='k_factor') return v+'K';
+      if(k==='orientation'||k==='response') return ''+v;
+      if(/_in$/.test(k)) return v+'″';
+      return ''+v;
+    }
+    function dimsTags(p){
+      var d = p.dims||{};
+      var keys = Object.keys(d);
+      if(!keys.length) return '<span class="nodim">—</span>';
+      var order = (DIM_PRIORITY[p.family]||DIM_PRIORITY._default);
+      var seen={}, ordered=[];
+      order.forEach(function(k){ if(d[k]!=null && d[k]!=='' && !seen[k]){ seen[k]=1; ordered.push(k); } });
+      keys.forEach(function(k){ if(d[k]!=null && d[k]!=='' && !seen[k]){ seen[k]=1; ordered.push(k); } });
+      return '<div class="dims">'+ordered.map(function(k){
+        return '<span class="dimtag"><b>'+esc(DIM_LABEL[k]||k)+'</b> '+esc(dimUnit(k,d[k]))+'</span>';
+      }).join('')+'</div>';
+    }
+
+    // The found source cell: web page → clickable link + thumbnail; Egnyte → Y: locator
+    // (filename bolded, not a clickable http link); else honest dash.
+    function sourceCell(p){
+      var ref=p.source_ref, img=p.image_url, thumb='';
+      if(img){ thumb='<img class="thumb" src="'+esc(img)+'" alt="part image" loading="lazy" onerror="this.classList.add(\'broken\')" onclick="window.open(this.src,\'_blank\')" /> '; }
+      if(p.source_kind==='web_cutsheet' && ref){
+        return thumb+'<a class="src" href="'+esc(ref)+'" target="_blank" rel="noopener">manufacturer page ↗</a>';
+      }
+      if(p.source_kind==='egnyte_cutsheet' && ref){
+        var fn = ref.split(/[\\/]/).pop();
+        return thumb+'<span class="egnyte" title="'+esc(ref)+'">📄 Egnyte: <span class="pathfile">'+esc(fn)+'</span></span>';
+      }
+      if(p.source_kind==='image' && (img||ref)){
+        return thumb+(ref? '<a class="src" href="'+esc(ref)+'" target="_blank" rel="noopener">product image ↗</a>' : '<span class="egnyte">product image</span>');
+      }
+      return '<span class="sub">—</span>';
+    }
+
+    // The provenance pill: REPLACES the blanket "awaiting cut-sheet" for found parts.
+    // cutsheet (real datasheet) / web (manufacturer page) / estimate (envelope, no source).
+    function srcPill(p){
+      var ds=p.dim_source, conf=p.dim_confidence;
+      var confStr = (conf!=null)? '<span class="conf">'+Math.round(conf*100)+'%</span>' : '';
+      if(ds==='cutsheet') return '<span class="pill cutsheet">cut sheet</span>'+confStr;
+      if(ds==='web')      return '<span class="pill web">web</span>'+confStr;
+      // estimate / null → honest envelope flag (no source found yet)
+      return '<span class="pill estimate">estimate</span>'+confStr;
+    }
+
+    function render(){
+      var rows = ALL.filter(function(p){ return !FAM || p.family===FAM; });
+      var tbl = document.getElementById('tbl');
+      if(!rows.length){ tbl.innerHTML='<div class="note">No parts.</div>'; return; }
+      // found rows first (real sources at the top), then by family/subtype
+      rows = rows.slice().sort(function(a,b){
+        var fa=hasFound(a)?0:1, fb=hasFound(b)?0:1;
+        if(fa!==fb) return fa-fb;
+        return (a.family+a.subtype).localeCompare(b.family+b.subtype);
+      });
+      tbl.innerHTML = '<table class="bb"><thead><tr><th>Family</th><th>Subtype</th><th>Found dimensions</th><th>CAD model</th><th>Source</th><th>Confidence</th></tr></thead><tbody>'
+        + rows.map(function(p){
+            var dl = p.model_path ? '<a class="dl" href="/api/autobid/catalog/model?path='+encodeURIComponent(p.model_path)+'" target="_blank" rel="noopener">⤓ STL</a>' : '<span class="sub">—</span>';
+            var dimsCell = hasFound(p) ? dimsTags(p) : '<span class="prm">'+esc(paramStr(p.params))+'</span>';
+            return '<tr>'
+              + '<td><span class="fam">'+esc(p.family)+'</span></td>'
+              + '<td>'+esc(p.subtype||'')+'</td>'
+              + '<td>'+dimsCell+'</td>'
+              + '<td>'+dl+'</td>'
+              + '<td>'+sourceCell(p)+'</td>'
+              + '<td>'+srcPill(p)+'</td>'
+              + '</tr>';
+          }).join('')
+        + '</tbody></table>';
+    }
+
+    function chips(families){
+      var keys = Object.keys(families).sort();
+      var el = document.getElementById('chips');
+      el.innerHTML = '<span class="chip'+(FAM==null?' on':'')+'" data-f="">all ('+ALL.length+')</span>'
+        + keys.map(function(k){ return '<span class="chip" data-f="'+esc(k)+'">'+esc(k)+' ('+families[k]+')</span>'; }).join('');
+      el.querySelectorAll('.chip').forEach(function(c){
+        c.addEventListener('click', function(){
+          FAM = c.getAttribute('data-f') || null;
+          el.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); });
+          c.classList.add('on');
+          render();
+        });
+      });
+    }
+
+    api('/catalog/parts').then(function(r){ return r.ok?r.json():null; }).then(function(d){
+      if(!d){ document.getElementById('tbl').innerHTML='<div class="note">The AutoBid engine is not reachable. Start it: <code>C:/Python312/python.exe engine/api.py</code>.</div>'; document.getElementById('srcChip').textContent='engine offline'; return; }
+      ALL = d.parts || [];
+      var nFound = ALL.filter(hasFound).length;
+      var nDims  = ALL.filter(function(p){ return p.dim_source==='cutsheet'||p.dim_source==='web'; }).length;
+      var nEst   = ALL.filter(function(p){ return !hasFound(p); }).length;
+      document.getElementById('kParts').textContent = d.total_parts!=null?d.total_parts:ALL.length;
+      document.getElementById('kFound').textContent = nFound;
+      document.getElementById('kDims').textContent = nDims;
+      document.getElementById('kAwait').textContent = nEst;
+      document.getElementById('srcChip').textContent = nFound+' found · live catalog';
+      chips(d.families||{});
+      render();
+    });
+  </script>
+</body>
+</html>
