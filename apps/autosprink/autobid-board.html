@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>HaloFire — AutoBid</title>
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13" />
+<style>
+  .wrap{ max-width:1180px; margin:0 auto; padding:22px 24px 80px; }
+  .ptitle{ font-family:var(--hf-display); font-size:var(--hf-fs-title); font-weight:600; margin:6px 0 2px; }
+  .psub{ color:var(--hf-muted); font-size:var(--hf-fs-sm); margin-bottom:20px; max-width:760px; line-height:1.5; }
+  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+  .kpi{ padding:14px 16px; }
+  .kpi .k{ font-size:var(--hf-fs-label); letter-spacing:0.5px; text-transform:uppercase; color:var(--hf-muted); }
+  .kpi .v{ font-size:24px; font-weight:600; margin-top:6px; font-variant-numeric:tabular-nums; }
+  .kpi .d{ font-size:var(--hf-fs-label); color:var(--hf-faint); margin-top:4px; }
+  .phd{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--hf-line); }
+  .phd .t{ font-size:var(--hf-fs-label); letter-spacing:0.9px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; flex:1; }
+  .pbd{ padding:6px 0; }
+  .note{ color:var(--hf-muted); font-size:var(--hf-fs-sm); line-height:1.55; padding:14px; }
+  table.bb{ width:100%; border-collapse:collapse; }
+  table.bb th{ text-align:left; font-size:var(--hf-fs-label); letter-spacing:0.6px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; padding:9px 14px; border-bottom:1px solid var(--hf-line); }
+  table.bb td{ padding:11px 14px; border-bottom:1px solid var(--hf-line); font-size:var(--hf-fs-sm); color:var(--hf-text); vertical-align:middle; }
+  table.bb tr:last-child td{ border-bottom:0; }
+  table.bb tr:hover td{ background:rgba(255,255,255,0.02); }
+  .num{ font-variant-numeric:tabular-nums; text-align:right; }
+  .jn{ font-weight:600; }
+  .loc{ color:var(--hf-muted); font-size:var(--hf-fs-label); }
+  .pill{ display:inline-block; padding:2px 9px; border-radius:var(--hf-r-pill,999px); font-size:11px; font-weight:600; letter-spacing:0.3px; }
+  .pill.ready{ background:rgba(74,222,128,0.14); color:#86efac; border:1px solid rgba(74,222,128,0.35); }
+  .pill.attn{ background:rgba(251,191,36,0.14); color:#fcd34d; border:1px solid rgba(251,191,36,0.35); }
+  .pill.clean{ background:rgba(127,180,255,0.12); color:#9ec3ff; border:1px solid rgba(127,180,255,0.3); }
+  .pill.flag{ background:rgba(252,165,165,0.14); color:#fca5a5; border:1px solid rgba(252,165,165,0.35); }
+  .pill.grade{ background:rgba(74,222,128,0.16); color:#86efac; border:1px solid rgba(74,222,128,0.4); }
+  .pill.approx{ background:rgba(251,191,36,0.16); color:#fcd34d; border:1px solid rgba(251,191,36,0.4); }
+  .btn{ font:inherit; cursor:pointer; padding:7px 14px; border-radius:var(--hf-r-ctl,7px); border:1px solid var(--hf-line); background:var(--hf-glass,rgba(255,255,255,0.04)); color:var(--hf-text); font-size:var(--hf-fs-sm); font-weight:600; }
+  .btn.send{ background:var(--hf-color-accent,#f0a868); color:#1a1208; border-color:transparent; }
+  .btn.send:hover{ filter:brightness(1.06); }
+  @media(max-width:900px){ .grid{ grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body class="hf" data-hf-page="autobid">
+  <div class="wrap">
+    <div class="ptitle">AutoBid · Bid Board</div>
+    <div class="psub">Every incoming bid is auto-built end-to-end from Halo Fire's own bid history — profile, takeoff, pricing, hydraulics, qualifiers — with <b>no intermediate gates</b>. The one human step is the final review-and-send. Bids land here when their package is ready.</div>
+
+    <div class="grid">
+      <div class="kpi hf-card"><div class="k">Ready to send</div><div class="v" id="kReady">—</div><div class="d">packages built, awaiting review</div></div>
+      <div class="kpi hf-card"><div class="k">Pipeline value</div><div class="v" id="kValue">—</div><div class="d">sum of ready bids</div></div>
+      <div class="kpi hf-card"><div class="k">Avg $/head</div><div class="v" id="kPph">—</div><div class="d">vs corpus median</div></div>
+      <div class="kpi hf-card"><div class="k">Corpus</div><div class="v" id="kCorpus">—</div><div class="d">priced historical bids</div></div>
+    </div>
+
+    <section class="hf-panel">
+      <div class="phd"><span class="t">Ready to review &amp; send</span><a class="btn" href="/autobid-catalog.html" style="margin-left:auto;text-decoration:none">⚙ CAD catalog</a><a class="btn" href="/autosprink.html?doc=34978" style="margin-left:8px;text-decoration:none" title="PDF→3D model for the indexed demo doc">⬡ 3D (doc 34978)</a><a class="btn" href="/autobid-draw.html?doc=34978" style="margin-left:8px;text-decoration:none">✎ Open drawing</a><span class="hf-chip" style="margin-left:8px"><span class="gl"></span> <span id="srcChip">live engine</span></span></div>
+      <div class="pbd">
+        <div id="bbWrap"><div class="note">Loading ready bids from the AutoBid engine…</div></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/public/halofire-shell.js?v=13"></script>
+  <script>
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+    function usd(n){ if(n==null||isNaN(n)) return '—'; return '$'+Math.round(n).toLocaleString(); }
+    function api(path){ return fetch('/api/autobid'+path, { credentials:'include' }); }
+
+    function anomalyPill(s){
+      if(s==='clean') return '<span class="pill clean">clean</span>';
+      if(s==='self_corrected') return '<span class="pill attn">self-corrected</span>';
+      return '<span class="pill flag">'+esc(s||'flagged')+'</span>';
+    }
+
+    // Honest per-type confidence flag (engine confidence block). bid-grade only when
+    // positively classified; everything else (and unknown) reads close-approx.
+    function confPill(c){
+      if(!c || !c.level) return '';
+      var grade = (c.level==='bid-grade');
+      var title = (c.residual_note||'') + (c.building_type? ' ['+c.building_type+']':'');
+      return '<span class="pill '+(grade?'grade':'approx')+'" title="'+esc(title)+'">'+(grade?'bid-grade':'close-approx')+'</span>';
+    }
+
+    // Per-bid verified-loop outcome (ensemble cross-checks persisted on the governance
+    // op-log). Honest three-state: converged / residual (did not converge) / unknown
+    // (the package has not run its verification yet — never faked as a pass).
+    function verifyPill(v){
+      if(!v) return '<span class="pill" style="background:rgba(148,163,184,0.12);color:#94a3b8;border:1px solid rgba(148,163,184,0.3)" title="No verification run persisted yet — open Review to run the package verification.">unverified</span>';
+      if(v.converged) return '<span class="pill ready" title="Ensemble verification converged: every present cross-check agrees.">converged</span>';
+      return '<span class="pill flag" title="'+esc(v.residual||'An ensemble cross-check did not agree.')+'">residual</span>';
+    }
+
+    // OpenClaw conductor governance indicator — did this bid's geometry/layout/price ops
+    // run through the governed conductor (durable op-log record)?
+    function govPill(g){
+      if(g && g.governed) return '<span class="pill clean" title="Governed by the OpenClaw conductor — ops logged '+esc(g.ts||'')+(g.level?(', gate level '+g.level):'')+'.">⚙ governed</span>';
+      return '<span class="pill" style="background:rgba(148,163,184,0.12);color:#94a3b8;border:1px solid rgba(148,163,184,0.3)" title="No governance record yet — the package has not run through the conductor.">ungoverned</span>';
+    }
+
+    Promise.all([
+      api('/ready-to-send').then(function(r){ return r.ok?r.json():null; }).catch(function(){return null;}),
+      api('/health').then(function(r){ return r.ok?r.json():null; }).catch(function(){return null;})
+    ]).then(function(res){
+      var rts = res[0], health = res[1];
+      var wrap = document.getElementById('bbWrap');
+      if(!rts){
+        wrap.innerHTML = '<div class="note">The AutoBid engine is not reachable. Start it: <code>C:/Python312/python.exe engine/api.py</code> in halofire-autobid, then reload.</div>';
+        document.getElementById('srcChip').textContent = 'engine offline';
+        return;
+      }
+      var bids = rts.bids || [];
+      // KPIs
+      document.getElementById('kReady').textContent = (rts.ready_count!=null?rts.ready_count:bids.length);
+      var totalVal = bids.reduce(function(a,b){ return a+(b.total||0); },0);
+      document.getElementById('kValue').textContent = usd(totalVal);
+      var pphs = bids.map(function(b){return b.cost_per_head;}).filter(function(x){return x;});
+      var avgPph = pphs.length? pphs.reduce(function(a,x){return a+x;},0)/pphs.length : null;
+      document.getElementById('kPph').textContent = avgPph? ('$'+Math.round(avgPph)) : '—';
+      if(health && health.corpus_bids){ document.getElementById('kCorpus').textContent = Number(health.corpus_bids).toLocaleString(); }
+      else { api('/bids?limit=1').then(function(r){return r.ok?r.json():null;}).then(function(d){ if(d&&d.total) document.getElementById('kCorpus').textContent = Number(d.total).toLocaleString(); }); }
+
+      if(!bids.length){
+        wrap.innerHTML = '<div class="note">No bids are ready to send yet. As intake produces packages they appear here. (Run a bid: <code>engine/run_bid.py --doc &lt;id&gt;</code>.)</div>';
+        return;
+      }
+      var rows = bids.map(function(b){
+        var ref = b.ref!=null?b.ref:b.summary_id;
+        var statusPill = (b.status==='ready_to_send')? '<span class="pill ready">ready</span>' : '<span class="pill attn">'+esc(b.status||'pending')+'</span>';
+        return '<tr>'
+          + '<td><div class="jn">'+esc(b.job_name||('Bid '+ref))+'</div><div class="loc">'+esc(b.location||b.builder||'')+'</div></td>'
+          + '<td class="num">'+(b.head_count!=null?Number(b.head_count).toLocaleString():'—')+'</td>'
+          + '<td class="num">'+usd(b.total)+'</td>'
+          + '<td class="num">'+(b.cost_per_head!=null?('$'+Math.round(b.cost_per_head)):'—')+'</td>'
+          + '<td>'+(b.qualifier_count!=null?b.qualifier_count:'—')+'</td>'
+          + '<td>'+confPill(b.confidence)+'</td>'
+          + '<td>'+verifyPill(b.verification)+' '+govPill(b.governance)+'</td>'
+          + '<td>'+statusPill+' '+anomalyPill(b.anomaly_state)+'</td>'
+          + '<td style="text-align:right;white-space:nowrap">'
+          +   (b.document_id!=null? '<a class="btn" title="PDF→3D model" href="/autosprink.html?doc='+encodeURIComponent(b.document_id)+'" style="text-decoration:none;padding:7px 10px">⬡ 3D</a>'
+          +     ' <a class="btn" title="Bluebeam-clone per-room layout" href="/autobid-draw.html?doc='+encodeURIComponent(b.document_id)+'" style="text-decoration:none;padding:7px 10px">✎ Draw</a> ' : '')
+          +   '<a class="btn send" href="/autobid-send.html?ref='+encodeURIComponent(ref)+'">Review &amp; Send →</a></td>'
+          + '</tr>';
+      }).join('');
+      wrap.innerHTML = '<table class="bb"><thead><tr>'
+        + '<th>Job</th><th class="num">Heads</th><th class="num">Total</th><th class="num">$/head</th><th>Quals</th><th>Confidence</th><th>Verification</th><th>Status</th><th></th>'
+        + '</tr></thead><tbody>'+rows+'</tbody></table>';
+    });
+  </script>
+</body>
+</html>

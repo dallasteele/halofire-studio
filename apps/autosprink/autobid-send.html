@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>HaloFire — AutoBid · Review &amp; Send</title>
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13" />
+<style>
+  .wrap{ max-width:1240px; margin:0 auto; padding:18px 24px 90px; }
+  .crumbs{ font-size:var(--hf-fs-label); color:var(--hf-muted); margin:4px 0 10px; }
+  .crumbs a{ color:var(--hf-color-interactive-text,#9ec3ff); text-decoration:none; }
+  .head{ display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap; margin-bottom:16px; }
+  .head .jn{ font-family:var(--hf-display); font-size:26px; font-weight:600; }
+  .head .loc{ color:var(--hf-muted); font-size:var(--hf-fs-sm); margin-top:2px; }
+  .head .spacer{ flex:1; }
+  .headline{ text-align:right; }
+  .headline .big{ font-size:34px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .headline .band{ font-size:var(--hf-fs-label); color:var(--hf-muted); margin-top:3px; }
+  .cols{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:16px; align-items:start; }
+  .phd{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--hf-line); }
+  .phd .t{ font-size:var(--hf-fs-label); letter-spacing:0.9px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; flex:1; }
+  .pbd{ padding:14px; }
+  .note{ color:var(--hf-muted); font-size:var(--hf-fs-sm); line-height:1.55; }
+  .mt{ margin-top:16px; }
+  .stat{ display:flex; justify-content:space-between; padding:7px 0; border-top:1px solid var(--hf-line); font-size:var(--hf-fs-sm); }
+  .stat:first-child{ border-top:0; }
+  .stat .l{ color:var(--hf-muted); } .stat .v{ font-weight:600; font-variant-numeric:tabular-nums; }
+  .pill{ display:inline-block; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:600; }
+  .pill.ok{ background:rgba(74,222,128,0.14); color:#86efac; border:1px solid rgba(74,222,128,0.35); }
+  .pill.warn{ background:rgba(251,191,36,0.14); color:#fcd34d; border:1px solid rgba(251,191,36,0.35); }
+  /* Honest per-type confidence flag (engine confidence block) */
+  .conf{ display:flex; align-items:flex-start; gap:10px; margin:2px 0 16px; padding:11px 14px; border:1px solid var(--hf-line); border-radius:var(--hf-r-win,12px); background:var(--hf-glass,rgba(255,255,255,0.03)); }
+  .conf .cb{ display:inline-block; padding:3px 11px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.3px; white-space:nowrap; flex:none; }
+  .conf .cb.grade{ background:rgba(74,222,128,0.16); color:#86efac; border:1px solid rgba(74,222,128,0.4); }
+  .conf .cb.approx{ background:rgba(251,191,36,0.16); color:#fcd34d; border:1px solid rgba(251,191,36,0.4); }
+  .conf .cn{ font-size:var(--hf-fs-sm); color:var(--hf-muted); line-height:1.5; }
+  .conf .cn b{ color:var(--hf-text); }
+  .bar{ display:flex; align-items:center; gap:10px; margin:6px 0; font-size:var(--hf-fs-sm); }
+  .bar .lab{ width:120px; color:var(--hf-muted); flex:none; }
+  .bar .track{ flex:1; height:9px; border-radius:6px; background:rgba(255,255,255,0.06); overflow:hidden; }
+  .bar .fill{ height:100%; background:var(--hf-color-accent,#f0a868); border-radius:6px; }
+  .bar .val{ width:84px; text-align:right; font-variant-numeric:tabular-nums; flex:none; }
+  iframe.pdf{ width:100%; height:560px; border:1px solid var(--hf-line); border-radius:var(--hf-r-win,12px); background:#fff; }
+  .ql{ list-style:none; margin:0; padding:0; }
+  .ql li{ display:flex; gap:8px; padding:8px 0; border-top:1px solid var(--hf-line); font-size:var(--hf-fs-sm); }
+  .ql li:first-child{ border-top:0; }
+  .ql textarea{ flex:1; resize:vertical; min-height:34px; font:inherit; font-size:var(--hf-fs-sm); color:var(--hf-text); background:rgba(255,255,255,0.03); border:1px solid var(--hf-line); border-radius:6px; padding:6px 8px; }
+  .ql .src{ flex:none; width:74px; color:var(--hf-faint); font-size:11px; text-transform:uppercase; letter-spacing:0.4px; padding-top:8px; }
+  .massing{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+  /* Sprinkler design — true-scale 2D plan + verdict */
+  .planwrap{ background:#0c1018; border:1px solid var(--hf-line); border-radius:10px; padding:6px; }
+  .planwrap svg{ display:block; width:100%; height:auto; }
+  .leg{ display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; font-size:11px; color:var(--hf-muted); }
+  .leg .sw{ display:inline-block; width:18px; height:0; border-top-width:3px; border-top-style:solid; vertical-align:middle; margin-right:5px; }
+  .leg .dot{ display:inline-block; width:8px; height:8px; border-radius:50%; background:#7dd3fc; vertical-align:middle; margin-right:5px; }
+  .sizerow{ display:flex; justify-content:space-between; padding:5px 0; border-top:1px solid var(--hf-line); font-size:var(--hf-fs-sm); font-variant-numeric:tabular-nums; }
+  .floorpill{ padding:8px 10px; border:1px solid var(--hf-line); border-radius:8px; font-size:var(--hf-fs-label); display:flex; justify-content:space-between; }
+  .floorpill.real{ border-color:rgba(74,222,128,0.4); } .floorpill.placeholder{ border-color:rgba(251,191,36,0.3); color:var(--hf-muted); }
+  .sendbar{ position:sticky; bottom:0; margin-top:18px; padding:14px 16px; display:flex; align-items:center; gap:14px; border-radius:var(--hf-r-win,12px); }
+  .sendbar .summary{ flex:1; font-size:var(--hf-fs-sm); color:var(--hf-muted); }
+  .btn{ font:inherit; cursor:pointer; padding:11px 22px; border-radius:var(--hf-r-ctl,7px); border:1px solid var(--hf-line); background:var(--hf-glass,rgba(255,255,255,0.04)); color:var(--hf-text); font-weight:600; }
+  .btn.send{ background:var(--hf-color-accent,#f0a868); color:#1a1208; border-color:transparent; font-size:15px; padding:12px 26px; }
+  .btn.send:disabled{ opacity:0.5; cursor:default; }
+  .btn.send:hover:not(:disabled){ filter:brightness(1.06); }
+  .bomtbl{ width:100%; border-collapse:collapse; font-size:var(--hf-fs-sm); font-variant-numeric:tabular-nums; }
+  .bomtbl th{ text-align:left; font-weight:600; color:var(--hf-muted); padding:6px 8px; border-bottom:1px solid var(--hf-line); font-size:var(--hf-fs-label); }
+  .bomtbl td{ padding:6px 8px; border-top:1px solid var(--hf-line); vertical-align:top; }
+  @media(max-width:1000px){ .cols{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="hf" data-hf-page="autobid">
+  <div class="wrap">
+    <div class="crumbs"><a href="/autobid-board.html">← Bid Board</a> · Review &amp; Send</div>
+    <div id="root"><div class="note">Loading bid package…</div></div>
+  </div>
+
+  <script src="/public/halofire-shell.js?v=13"></script>
+  <script>
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+    function usd(n){ if(n==null||isNaN(n)) return '—'; return '$'+Math.round(n).toLocaleString(); }
+    function api(path,opts){ return fetch('/api/autobid'+path, Object.assign({credentials:'include'}, opts||{})); }
+    var REF = new URLSearchParams(location.search).get('ref');
+
+    function bars(items, fmt){
+      var max = Math.max.apply(null, items.map(function(i){return Math.abs(i.value)||0;}).concat([1]));
+      return items.map(function(i){
+        var pct = Math.max(2, Math.round(100*(Math.abs(i.value)||0)/max));
+        return '<div class="bar"><div class="lab">'+esc(i.label)+'</div><div class="track"><div class="fill" style="width:'+pct+'%"></div></div><div class="val">'+(fmt?fmt(i.value):i.value)+'</div></div>';
+      }).join('');
+    }
+    // metadata keys that aren't real chart bars
+    var CHART_SKIP = { available:1, type:1, render_hint:1, grouped_bar:1, systems:1, basis:1, label:1, name:1, unit:1, n_bids:1 };
+    function chartItems(cd){
+      // normalize an engine charts_data.* block into [{label,value}] of SCALAR numeric rows only
+      if(!cd) return [];
+      if(Array.isArray(cd)) return cd.map(function(x){
+        return { label:(x.label||x.name||x.k||''), value:(x.value!=null?x.value:x.v) };
+      }).filter(function(i){ return typeof i.value==='number' && isFinite(i.value); });
+      return Object.keys(cd).map(function(k){
+        var v = (cd[k] && typeof cd[k]==='object' && cd[k].value!=null) ? cd[k].value : cd[k];
+        return { label:k.replace(/_/g,' '), value:v, key:k };
+      }).filter(function(i){
+        if(CHART_SKIP[i.key]) return false;
+        if(typeof i.value!=='number' || !isFinite(i.value)) return false;
+        if(/pct|margin/.test(i.key) && i.value===0) return false; // hide empty percent rows
+        return true;
+      });
+    }
+
+    function num(n){ return (n==null||isNaN(n))?'—':Number(n).toLocaleString(); }
+
+    // Pipe size -> stroke style for the true-scale plan (main = thick warm, branch = thin blue).
+    function pipeStyle(sz){
+      var s = Number(sz)||0;
+      if(s>=6) return { color:'#f0a868', w:2.4 };   // cross main (8"/6")
+      if(s>=2.5) return { color:'#6ea8ff', w:1.2 };  // branch (2.5")
+      return { color:'#8aa0c0', w:1.0 };             // branch downsized (2.0") / drop
+    }
+
+    // Render the routed design plan to an SVG at TRUE SCALE: one ft->px factor for BOTH
+    // axes (no exaggeration). Heads are dots; pipe segments are lines colored by size.
+    function planSVG(plan){
+      var b = plan.bounds_ft||{}, W = b.width_ft||0, H = b.height_ft||0;
+      if(!(W>0) || !(H>0) || !(plan.segments||[]).length){ return '<div class="note">No routable plan geometry for this floor.</div>'; }
+      var pad = 14;                              // px margin
+      var maxW = 560;                            // px budget for the panel width
+      var k = maxW / W;                          // ft -> px (SAME factor both axes = true scale)
+      var svgW = Math.round(W*k + pad*2), svgH = Math.round(H*k + pad*2);
+      // map a plan-ft point to svg px (flip y so north is up)
+      function px(x){ return pad + (x - b.min_x)*k; }
+      function py(y){ return pad + (b.max_y - y)*k; }
+      var lines = (plan.segments||[]).map(function(s){
+        var st = pipeStyle(s.size_in);
+        return '<line x1="'+px(s.x1).toFixed(1)+'" y1="'+py(s.y1).toFixed(1)+'" x2="'+px(s.x2).toFixed(1)+'" y2="'+py(s.y2).toFixed(1)+'" stroke="'+st.color+'" stroke-width="'+st.w+'" stroke-linecap="round" />';
+      }).join('');
+      var dots = (plan.heads||[]).map(function(h){
+        return '<circle cx="'+px(h.x).toFixed(1)+'" cy="'+py(h.y).toFixed(1)+'" r="1.7" fill="#7dd3fc" />';
+      }).join('');
+      var riser = plan.riser ? '<rect x="'+(px(plan.riser.x)-3.5).toFixed(1)+'" y="'+(py(plan.riser.y)-3.5).toFixed(1)+'" width="7" height="7" fill="#f87171" />' : '';
+      // a true-scale 20 ft reference bar (bottom-left)
+      var barFt = 20, barPx = barFt*k;
+      var bar = '<line x1="'+pad+'" y1="'+(svgH-8)+'" x2="'+(pad+barPx).toFixed(1)+'" y2="'+(svgH-8)+'" stroke="#cbd5e1" stroke-width="1.5" />'
+              + '<text x="'+(pad+barPx+5).toFixed(1)+'" y="'+(svgH-5)+'" fill="#94a3b8" font-size="9">20 ft</text>';
+      return '<div class="planwrap"><svg viewBox="0 0 '+svgW+' '+svgH+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="True-scale sprinkler plan, floor '+((plan.floor||0)+1)+'">'
+           + lines + dots + riser + bar + '</svg></div>'
+           + '<div class="leg"><span><span class="sw" style="border-top-color:#f0a868"></span>cross main</span>'
+           + '<span><span class="sw" style="border-top-color:#6ea8ff"></span>branch</span>'
+           + '<span><span class="dot"></span>head ×'+num(plan.head_count)+'</span>'
+           + '<span><span style="display:inline-block;width:8px;height:8px;background:#f87171;vertical-align:middle;margin-right:5px"></span>riser</span></div>';
+    }
+
+    // P3 per-room layout: render the richest studio_drawing plate (room rects + heads +
+    // routed pipe), true-scale. This is the faithful PER-ROOM placement (vs the uniform
+    // /design bbox grid). Returns '' if no studio_drawing so we fall back to /design.
+    function studioPlateSVG(p){
+      var b = p.bounds_ft||{}, W=b.width_ft||0, H=b.height_ft||0;
+      if(!(W>0)||!(H>0)) return '';
+      var pad=12, maxW=560, k=maxW/W;
+      var svgW=Math.round(W*k+pad*2), svgH=Math.round(H*k+pad*2);
+      var X=function(x){return (pad+(x-(b.min_x||0))*k).toFixed(1);};
+      var Y=function(y){return (pad+((b.max_y||H)-y)*k).toFixed(1);};
+      var rooms=(p.rooms||[]).map(function(r){
+        return '<rect x="'+X(r.x0_ft)+'" y="'+Y(r.y1_ft)+'" width="'+((r.x1_ft-r.x0_ft)*k).toFixed(1)+'" height="'+((r.y1_ft-r.y0_ft)*k).toFixed(1)+'" fill="rgba(74,222,128,.05)" stroke="rgba(74,222,128,.4)" stroke-width="0.6" />';
+      }).join('');
+      var segs=((p.pipe||{}).segments||[]).map(function(s){
+        if(s.x1===s.x2&&s.y1===s.y2) return '';
+        var st=pipeStyle(s.size_in);
+        return '<line x1="'+X(s.x1)+'" y1="'+Y(s.y1)+'" x2="'+X(s.x2)+'" y2="'+Y(s.y2)+'" stroke="'+st.color+'" stroke-width="'+st.w+'" stroke-linecap="round" />';
+      }).join('');
+      var dots=(p.heads||[]).map(function(h){ return '<circle cx="'+X(h.x)+'" cy="'+Y(h.y)+'" r="1.6" fill="#7dd3fc" />'; }).join('');
+      var riser=(p.pipe&&p.pipe.riser)?'<rect x="'+(X(p.pipe.riser.x)-3.5)+'" y="'+(Y(p.pipe.riser.y)-3.5)+'" width="7" height="7" fill="#f87171" />':'';
+      return '<div class="planwrap"><svg viewBox="0 0 '+svgW+' '+svgH+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Per-room layout '+esc(p.label||'')+'">'+rooms+segs+dots+riser+'</svg></div>';
+    }
+    function renderStudioDrawing(sd){
+      var body=document.getElementById('designBody'), verdict=document.getElementById('designVerdict');
+      if(!body||!sd||sd.available===false||!(sd.plates||[]).length) return false;
+      var p=sd.plates.slice().sort(function(a,b){return (b.head_count||0)-(a.head_count||0);})[0];
+      var svg=studioPlateSVG(p);
+      if(!svg) return false;
+      var coh = sd.cohesion_ok;
+      verdict.innerHTML = (coh? '<span class="pill ok">cohesion: one system</span>':'<span class="pill warn">disjoint network</span>')
+        + ' <span class="pill ok">per-room (P3)</span>';
+      var pipe=p.pipe||{};
+      body.innerHTML = ''
+        + '<div class="stat"><span class="l">Heads (whole building)</span><span class="v">'+num(sd.head_count)+' · '+num(sd.plate_count)+' plates</span></div>'
+        + '<div class="stat"><span class="l">Pipe (riser '+esc(sd.k_factor?('K='+sd.k_factor):'')+')</span><span class="v">'+num(Math.round(sd.total_pipe_ft||0))+' ft · '+num(sd.segment_count)+' segs</span></div>'
+        + '<div style="margin-top:12px"><div class="note" style="margin-bottom:6px">Per-room true-scale plan — plate <b>'+esc(p.label||'')+'</b> ('+num(p.head_count)+' heads · '+num((pipe.segments||[]).length)+' pipe runs · '+num(Math.round((p.bounds_ft||{}).width_ft))+' × '+num(Math.round((p.bounds_ft||{}).height_ft))+' ft). Heads tile each real room — not a uniform blanket.</div>'
+        + svg + '</div>'
+        + '<div class="leg"><span><span class="sw" style="border-top-color:#f0a868"></span>cross main</span>'
+        + '<span><span class="sw" style="border-top-color:#6ea8ff"></span>branch</span>'
+        + '<span><span class="dot"></span>head ×'+num(p.head_count)+'</span>'
+        + '<span><span style="display:inline-block;width:8px;height:8px;background:rgba(74,222,128,.5);vertical-align:middle;margin-right:5px"></span>room</span></div>'
+        + '<div class="note" style="margin-top:10px"><b>Honest residual:</b> per-room NFPA grid on the extracted rooms; pipe is a coarse routed tree (is_estimate). Brady\'s signed AutoSPRINK calc is the binding post-award number.</div>';
+      return true;
+    }
+
+    function loadDesign(){
+      var body = document.getElementById('designBody');
+      var verdict = document.getElementById('designVerdict');
+      if(!body) return;
+      // Prefer the P3 per-room studio_drawing carried on the package (faithful per-room
+      // placement). Only fall back to the /design uniform grid if it's absent.
+      if(window.__SD && renderStudioDrawing(window.__SD)) return;
+      api('/design/'+encodeURIComponent(REF)).then(function(r){ return r.ok?r.json():r.json().then(function(e){throw e;}); }).then(function(d){
+        if(!d || d.available===false){
+          if(d && d.cohesion_failed){ verdict.innerHTML='<span class="pill warn">cohesion failed</span>'; }
+          body.innerHTML='<div class="note">No routed design available'+(d&&d.reason?': '+esc(d.reason):'')+'. The design needs an extracted ML footprint to lay heads on.</div>';
+          return;
+        }
+        var s = d.summary||{}, plan = d.plan||{};
+        var cohesion = s.cohesion_ok ? '<span class="pill ok">cohesion: one system</span>' : '<span class="pill warn">disjoint network</span>';
+        var supplyPill = (s.hydraulics_available===false) ? '' : (s.supply_adequate ? ' <span class="pill ok">supply adequate</span>' : ' <span class="pill warn">supply short</span>');
+        verdict.innerHTML = cohesion + supplyPill;
+        var sizes = s.footage_by_size || {};
+        var sizeRows = Object.keys(sizes).sort(function(a,bb){return Number(bb)-Number(a);}).map(function(sz){
+          return '<div class="sizerow"><span>'+esc(sz)+'" pipe</span><span>'+num(Math.round(sizes[sz]))+' ft</span></div>';
+        }).join('');
+        var html = ''
+          + '<div class="stat"><span class="l">Heads (whole building)</span><span class="v">'+num(s.head_count)+' · '+num(s.floors)+' floors</span></div>'
+          + '<div class="stat"><span class="l">Pipe (riser '+esc(s.riser_in)+'" · K='+esc(s.k_factor)+')</span><span class="v">'+num(Math.round(s.total_pipe_ft))+' ft</span></div>'
+          + sizeRows
+          + (s.hydraulics_available!==false
+              ? '<div class="stat"><span class="l">Remote-area demand</span><span class="v">'+num(s.demand_gpm)+' gpm @ '+num(s.demand_psi)+' psi</span></div>'
+              + '<div class="stat"><span class="l">Supply'+(s.supply_assumed?' (assumed)':'')+' vs demand</span><span class="v">'+num(s.supply_residual_psi)+' psi · margin '+(s.margin_psi>=0?'+':'')+num(s.margin_psi)+' psi</span></div>'
+              : '<div class="stat"><span class="l">Remote-area demand</span><span class="v">—</span></div>')
+          + '<div class="stat"><span class="l">Cohesion (connected)</span><span class="v">'+s.component_count+' component · '+(s.all_heads_reachable?'all heads reachable':(s.unreachable_head_count+' unreachable'))+'</span></div>'
+          + '<div style="margin-top:12px"><div class="note" style="margin-bottom:6px">True-scale plan — floor '+((plan.floor||0)+1)+' ('+num(plan.head_count)+' heads · '+num(plan.segment_count)+' pipe runs · '+num(Math.round((plan.bounds_ft||{}).width_ft))+' × '+num(Math.round((plan.bounds_ft||{}).height_ft))+' ft). No exaggerated scale.</div>'
+          + planSVG(plan) + '</div>'
+          + '<div class="note" style="margin-top:10px"><b>Honest residual:</b> screening design — uniform NFPA grid + coarse tree route + Hazen-Williams remote-area calc ('+(s.is_estimate?'is_estimate':'binding')+'). The BOM verifies this footage (never reprices; the bid is priced per-head). Brady\'s signed AutoSPRINK calc is the binding post-award number.</div>';
+        body.innerHTML = html;
+      }).catch(function(err){
+        body.innerHTML='<div class="note">Could not load the design'+(err&&(err.detail||err.error)?': '+esc(err.detail||err.error):'')+'.</div>';
+      });
+    }
+
+    // BOM cross-check panel — each BOM line resolved to a DB-cataloged part with a
+    // 3D/SCAD model link + cut-sheet (P5). LOOKUP only: the bid is priced per-head;
+    // this BOM verifies the parts + links models, it never reprices.
+    function loadBomParts(){
+      var body = document.getElementById('bomPartsBody');
+      var verdict = document.getElementById('bomPartsVerdict');
+      if(!body) return;
+      api('/bom/'+encodeURIComponent(REF)+'/parts').then(function(r){ return r.ok?r.json():r.json().then(function(e){throw e;}); }).then(function(d){
+        var pr = d.parts_resolution||{};
+        verdict.innerHTML = pr.all_resolved
+          ? '<span class="pill ok">'+num(pr.resolved_count)+'/'+num(pr.total_count)+' parts cataloged</span>'
+          : '<span class="pill warn">'+num(pr.resolved_count)+'/'+num(pr.total_count)+' resolved</span>';
+        var rows = (d.lines||[]).map(function(l){
+          var c = l.catalog||{};
+          var qty = (l.qty!=null? Number(l.qty).toLocaleString():'—')+' '+esc(l.unit||'');
+          var awaitTag = c.await_cut_sheet ? ' <span class="pill warn" style="font-size:10px;padding:1px 6px">awaiting cut-sheet</span>' : '';
+          var link;
+          if(c.cut_sheet_url){
+            link = '<a href="'+esc(c.cut_sheet_url)+'" target="_blank" rel="noopener" style="color:var(--hf-color-interactive-text,#9ec3ff)">cut-sheet ↗</a>';
+          } else if(c.model_path){
+            link = '<span title="'+esc(c.model_path)+'" style="color:#9ec3ff">3D model</span>';
+          } else {
+            link = '<span class="note" style="opacity:.6">no model yet</span>';
+          }
+          var part = c.family ? esc(c.family)+' / '+esc(c.subtype) : '<span class="pill warn">no catalog part</span>';
+          return '<tr>'
+            + '<td>'+esc(l.item||'')+'</td>'
+            + '<td style="text-align:right;white-space:nowrap">'+qty+'</td>'
+            + '<td>'+part+awaitTag+'</td>'
+            + '<td style="text-align:right;white-space:nowrap">'+link+'</td>'
+            + '</tr>';
+        }).join('');
+        body.innerHTML = '<table class="bomtbl"><thead><tr><th>BOM line</th><th style="text-align:right">Qty</th><th>Catalog part</th><th style="text-align:right">Model</th></tr></thead><tbody>'+rows+'</tbody></table>'
+          + '<div class="note" style="margin-top:10px"><b>Honest residual:</b> each line resolves to a DB-cataloged part family/subtype with a parametric 3D model; <b>awaiting cut-sheet</b> = the model is a dimensioned envelope until the manufacturer datasheet lands. The catalog VERIFIES the BOM and links the parts — it never reprices (the bid is priced per-head).</div>';
+      }).catch(function(err){
+        body.innerHTML='<div class="note">Could not load the cataloged BOM'+(err&&(err.detail||err.error)?': '+esc(err.detail||err.error):'')+'.</div>';
+      });
+    }
+
+    if(!REF){ document.getElementById('root').innerHTML='<div class="note">No bid ref given. Open one from the <a href="/autobid-board.html">Bid Board</a>.</div>'; }
+    else api('/package/'+encodeURIComponent(REF)).then(function(r){ return r.ok?r.json():r.json().then(function(e){throw e;}); }).then(function(p){
+      render(p);
+    }).catch(function(err){
+      document.getElementById('root').innerHTML='<div class="note">Could not load the package for ref '+esc(REF)+'. '+esc((err&&(err.detail||err.error))||'')+'<br>If the engine is offline: <code>C:/Python312/python.exe engine/api.py</code>.</div>';
+    });
+
+    // Honest per-type confidence flag — reads the engine's confidence block
+    // (bid-grade vs close-approx + the residual note). Never overstates: anything
+    // that is not positively bid-grade renders as close-approx.
+    function confidenceBadge(c){
+      if(!c || !c.level) return '';
+      var grade = (c.level==='bid-grade');
+      var label = grade ? 'BID-GRADE' : 'CLOSE-APPROX';
+      var bt = c.building_type ? esc(c.building_type) : '';
+      var note = esc(c.residual_note||'');
+      return '<div class="conf">'
+        + '<span class="cb '+(grade?'grade':'approx')+'" title="'+(grade?'Recreated end-to-end from the plans':'Honest starting point - confirm scope post-award')+'">'+label+'</span>'
+        + '<div class="cn"><b>'+(grade?'Bid-grade':'Close-approx')+'</b>'+(bt?' &middot; '+bt:'')+' &mdash; '+note+'</div>'
+        + '</div>';
+    }
+
+    // ---- Ops-center review aggregation (P1) — geometry / layout / reconcile /
+    // verification / governance blocks the engine /package already carries. All
+    // honest three-state renders: available / pending / unknown, never faked. ----
+
+    // Governance line — proof the geometry/layout/price ops ran through the OpenClaw
+    // conductor (durable op-log) + the frozen gate's recorded verdict.
+    function governanceLine(g){
+      if(!g) return '';
+      if(g.governed){
+        var vc = (g.verification_converged===true)? ' · verification converged'
+               : (g.verification_converged===false)? ' · verification residual' : '';
+        return '<div class="note" style="margin:-8px 0 14px;padding:8px 14px;border:1px solid rgba(127,180,255,0.25);border-radius:10px;background:rgba(127,180,255,0.05)">'
+          + '⚙ <b>Governed</b> — geometry / layout / price ran through the OpenClaw conductor ('
+          + esc((g.ops||[]).join(' · ')) + '), op-log recorded ' + esc(g.ts||'') + ', gate level <b>' + esc(g.level||'—') + '</b>' + vc + '.</div>';
+      }
+      return '<div class="note" style="margin:-8px 0 14px;padding:8px 14px;border:1px solid var(--hf-line);border-radius:10px">Ungoverned — no conductor record for this package ('+esc(g.error||'')+').</div>';
+    }
+
+    // Plan geometry + per-room layout summary panel (sqft / rooms / doors / plates).
+    function geometryPanel(p){
+      var g = p.geometry||{}, rl = p.room_layout||{}, rb = p.readyBid||{};
+      var ok = g.available===true;
+      var head = ok? '<span class="pill ok">geometry resolved</span>' : '<span class="pill warn">geometry pending</span>';
+      var body;
+      if(!ok){
+        body = '<div class="note">No resolved plan-set geometry'+(g.reason?': '+esc(g.reason):'')+'. The bid stays priced on the authoritative sqft; the earned badge needs resolved geometry.</div>';
+      } else {
+        var plates = g.plates||[], p0 = plates[0]||{};
+        var rooms = (g.rooms||{}).total_rooms, doors = (g.doors||{}).total_doors;
+        var scale = (g.scale||{});
+        body = ''
+          + '<div class="stat"><span class="l">Authoritative sqft (priced)</span><span class="v">'+(rb.authoritative_sqft?num(Math.round(rb.authoritative_sqft))+' sq ft':'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Extracted footprint (plate 1)</span><span class="v">'+(p0.long_ft?num(Math.round(p0.long_ft))+' × '+num(Math.round(p0.short_ft))+' ft · '+num(Math.round(p0.area_sqft||0))+' sq ft':'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Plates / floors</span><span class="v">'+num(plates.length)+' plate(s) · '+(g.n_floors!=null?num(g.n_floors)+' floor(s)':'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Rooms segmented</span><span class="v">'+(rooms!=null?num(rooms):'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Doors detected</span><span class="v">'+(doors!=null?num(doors):'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Auto-read scale</span><span class="v">'+esc(scale.scale_text||'—')+(scale.basis?' ('+esc(scale.basis)+')':'')+'</span></div>'
+          + (rl.available? ('<div class="stat"><span class="l">Per-room layout</span><span class="v">'+num(rl.head_count)+' heads · '+num(rl.n_rooms)+' rooms'+(rl.n_open_plates?(' · '+num(rl.n_open_plates)+' open plate(s)'):'')+'</span></div>') : '<div class="stat"><span class="l">Per-room layout</span><span class="v">pending</span></div>')
+          + '<div class="note" style="margin-top:10px">Extracted from the plan set (auto-scale + segmentation) — a screening read (is_estimate), not a signed survey.</div>';
+      }
+      return '<section class="hf-panel mt"><div class="phd"><span class="t">Plan geometry · per-room layout</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
+    }
+
+    // Head reconcile disclosure — priced whole-building count vs geometry-grounded count.
+    function reconcilePanel(hr){
+      if(!hr) return '';
+      var agree = (hr.delta===0);
+      return '<section class="hf-panel mt"><div class="phd"><span class="t">Head reconcile</span>'
+        + (agree?'<span class="pill ok">counts agree</span>':'<span class="pill warn">Δ '+num(hr.delta)+' heads</span>')+'</div><div class="pbd">'
+        + '<div class="stat"><span class="l">Priced head count</span><span class="v">'+num(hr.head_count_priced)+'</span></div>'
+        + '<div class="stat"><span class="l">Geometry-grounded count</span><span class="v">'+num(hr.head_count_geometry)+(hr.geometry_count_source?' <span class="note" style="font-size:11px">('+esc(hr.geometry_count_source.replace(/_/g,' '))+')</span>':'')+'</span></div>'
+        + '<div class="stat"><span class="l">Delta</span><span class="v">'+(hr.delta>0?'+':'')+num(hr.delta)+'</span></div>'
+        + '<div class="note" style="margin-top:10px">'+esc(hr.reconcile_note||'')+'</div>'
+        + '</div></section>';
+    }
+
+    // Per-bid verified loop — every ensemble check with its pass/fail/unknown status.
+    function verificationPanel(v){
+      var head, body;
+      if(!v){
+        head = '<span class="pill warn">not run</span>';
+        body = '<div class="note">The per-bid verification loop did not run for this package (engine build without verification, or the verifier errored). The frozen confidence gate above still applies.</div>';
+      } else {
+        head = v.converged? '<span class="pill ok">converged</span>' : '<span class="pill warn">did not converge</span>';
+        var rows = (v.checks||[]).map(function(c){
+          var st = c.status==='pass'? '<span class="pill ok">pass</span>'
+                 : c.status==='fail'? '<span class="pill warn" style="background:rgba(252,165,165,0.14);color:#fca5a5;border-color:rgba(252,165,165,0.35)">fail</span>'
+                 : '<span class="pill" style="background:rgba(148,163,184,0.12);color:#94a3b8;border:1px solid rgba(148,163,184,0.3)">unknown</span>';
+          return '<div class="stat" title="'+esc(c.detail||'')+'"><span class="l">'+esc((c.id||'').replace(/_/g,' '))+'</span><span class="v">'+st+'</span></div>';
+        }).join('');
+        body = rows
+          + (v.residual? '<div class="note" style="margin-top:10px"><b>Residual:</b> '+esc(v.residual)+'</div>'
+                       : '<div class="note" style="margin-top:10px">Every present cross-check agrees — the ensemble converged. An <i>unknown</i> leg has absent inputs (e.g. no FP drawing to overlay) and is disclosed, never assumed.</div>');
+      }
+      return '<section class="hf-panel mt"><div class="phd"><span class="t">Verification — ensemble cross-checks</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
+    }
+
+    function render(p){
+      var rb = p.readyBid||{}, cd = p.charts_data||{}, m3 = p.model3d||{};
+      var quals = p.qualifiers||[];
+      var conf = p.confidence||null;
+      // P3 per-room layout carried on the package (preferred plan source for loadDesign).
+      window.__SD = p.studio_drawing || null;
+      // doc id for the 3D viewer + Bluebeam draw links (package ref is the doc when ?by=doc).
+      var docId = (p.meta&&p.meta.document_id) || rb.document_id || ((p.studio_drawing||{}).plates? p.ref : null);
+      var navLinks = docId
+        ? '<a class="btn" href="/autosprink.html?doc='+encodeURIComponent(docId)+'" style="text-decoration:none;margin-left:8px">⬡ Open 3D model</a>'
+          + '<a class="btn" href="/autobid-draw.html?doc='+encodeURIComponent(docId)+'" style="text-decoration:none;margin-left:8px">✎ Open drawing</a>'
+        : '';
+      var sent = p.sent_status && (p.sent_status.sent || p.sent_status.status==='sent');
+      var heads = rb.head_count, bomHeads = rb.bom_head_count;
+      var agree = rb.heads_agree!==false && rb.cross_check_pass!==false;
+
+      var costItems = chartItems(cd.cost_breakdown);
+      var covItems = chartItems(cd.coverage);
+      var pphItems = chartItems(cd.dollars_per_head);
+
+      // massing / floors honesty
+      var floors = m3.floors||rb.floors||null;
+      var prov = m3.floor_provenance||{};
+      var floorPills = '';
+      if(floors){
+        for(var f=1; f<=floors; f++){
+          var real = (prov[f]==='ml'||prov[f]==='real'||prov[f]==='extracted'|| (f===1 && m3.geometry_grounded));
+          floorPills += '<div class="floorpill '+(real?'real':'placeholder')+'"><span>Floor '+f+'</span><span>'+(real?'real geometry':'massing')+'</span></div>';
+        }
+      }
+
+      var html = ''
+      + '<div class="head">'
+      +   '<div><div class="jn">'+esc(rb.job_name||('Bid '+REF))+'</div><div class="loc">'+esc(rb.location||rb.builder||'')+' · '+(rb.authoritative_sqft?Number(rb.authoritative_sqft).toLocaleString()+' sq ft':'')+'</div></div>'
+      +   '<div class="spacer"></div>'
+      +   '<div class="headline"><div class="big">'+usd(rb.total)+'</div><div class="band">'+ (rb.in_band===false?'<span class="pill warn">outside corpus band</span>':'<span class="pill ok">in corpus band</span>') +' · $'+Math.round(rb.cost_per_head||0)+'/head</div>'
+      +     '<div style="margin-top:8px">'+navLinks+'</div></div>'
+      + '</div>'
+
+      + confidenceBadge(conf)
+      + governanceLine(p.governance)
+
+      + '<div class="cols">'
+      // LEFT: numbers + charts + massing
+      +   '<div>'
+      +     '<section class="hf-panel"><div class="phd"><span class="t">Cross-check</span>'+(agree?'<span class="pill ok">heads agree</span>':'<span class="pill warn">review heads</span>')+'</div><div class="pbd">'
+      +       '<div class="stat"><span class="l">Head count (takeoff)</span><span class="v">'+(heads!=null?Number(heads).toLocaleString():'—')+'</span></div>'
+      +       '<div class="stat"><span class="l">Head count (BOM)</span><span class="v">'+(bomHeads!=null?Number(bomHeads).toLocaleString():'—')+'</span></div>'
+      +       '<div class="stat"><span class="l">Riser / backflow</span><span class="v">'+(rb.riser_size_in||'—')+'" / '+(rb.backflow_size_in||'—')+'"</span></div>'
+      +       '<div class="stat"><span class="l">Anomaly</span><span class="v">'+esc(rb.anomaly_state||'—')+(rb.self_corrected?' (self-corrected)':'')+'</span></div>'
+      +     '</div></section>'
+
+      // P1 ops-center review aggregation — geometry / reconcile / verification blocks
+      // straight off the /package manifest (all honest three-state, never faked).
+      +     geometryPanel(p)
+      +     reconcilePanel(p.head_reconcile)
+      +     verificationPanel(p.verification)
+
+      +     (costItems.length? '<section class="hf-panel mt"><div class="phd"><span class="t">Cost breakdown</span></div><div class="pbd">'+bars(costItems, usd)+'</div></section>':'')
+      +     (covItems.length? '<section class="hf-panel mt"><div class="phd"><span class="t">Coverage</span></div><div class="pbd">'+bars(covItems)+'</div></section>':'')
+      +     (pphItems.length? '<section class="hf-panel mt"><div class="phd"><span class="t">$/head vs history</span></div><div class="pbd">'+bars(pphItems, function(v){return '$'+Math.round(v);})+'</div></section>':'')
+
+      +     '<section class="hf-panel mt"><div class="phd"><span class="t">3D massing</span>'+(m3.geometry_grounded?'<span class="pill ok">floor 1 real</span>':'')+'</div><div class="pbd">'
+      +       (floorPills? '<div class="massing">'+floorPills+'</div><div class="note" style="margin-top:10px">Footprint '+(m3.footprint_bbox_ft?esc(m3.footprint_bbox_ft.join? m3.footprint_bbox_ft.join(' × ') : JSON.stringify(m3.footprint_bbox_ft))+' ft':'—')+'. <b>Honest residual:</b> floor 1 is real extracted geometry; floors 2+ repeat as massing until per-floor extraction lands.</div>' : '<div class="note">Massing summary unavailable.</div>')
+      +     '</div></section>'
+
+      // Sprinkler design — the code-correct layout + pipe + calc, true-scale plan view.
+      // Populated async by loadDesign() so the package render is never blocked on it.
+      +     '<section class="hf-panel mt" id="designPanel"><div class="phd"><span class="t">Sprinkler design</span><span id="designVerdict"></span></div><div class="pbd" id="designBody"><div class="note">Loading the routed design…</div></div></section>'
+
+      // BOM cross-check — every BOM line resolved to a DB-cataloged part + 3D model
+      // (P5). Populated async by loadBomParts(); the bid stays priced per-head.
+      +     '<section class="hf-panel mt" id="bomPartsPanel"><div class="phd"><span class="t">BOM cross-check — cataloged parts</span><span id="bomPartsVerdict"></span></div><div class="pbd" id="bomPartsBody"><div class="note">Resolving BOM lines to catalog parts…</div></div></section>'
+      +   '</div>'
+
+      // RIGHT: the outgoing proposal + qualifiers
+      +   '<div>'
+      +     '<section class="hf-panel"><div class="phd"><span class="t">Outgoing proposal (draft)</span><span class="hf-chip"><span class="gl"></span> corpus format</span></div><div class="pbd">'
+      +       '<iframe class="pdf" src="/api/autobid/proposal/'+encodeURIComponent(REF)+'" title="proposal"></iframe>'
+      +       '<div class="note" style="padding:8px 0 0"><a href="/api/autobid/proposal/'+encodeURIComponent(REF)+'" target="_blank" rel="noopener" style="color:var(--hf-color-interactive-text,#9ec3ff)">Open proposal PDF ↗</a> — the outgoing cover sheet in Halo Fire\'s corpus format.</div>'
+      +     '</div></section>'
+      +     '<section class="hf-panel mt"><div class="phd"><span class="t">Qualifiers / assumptions ('+quals.length+')</span></div><div class="pbd">'
+      +       '<div class="note" style="margin-bottom:8px">Auto-applied from the corpus + rules. Edit any line before sending; these ride the bid as exclusions/assumptions.</div>'
+      +       '<ul class="ql" id="qlist">'+ quals.map(function(q,i){
+                var text = (typeof q==='string')? q : (q.text||q.qualifier||q.note||JSON.stringify(q));
+                var src = (q&&q.source)? q.source : '';
+                return '<li><span class="src">'+esc(src)+'</span><textarea data-i="'+i+'">'+esc(text)+'</textarea></li>';
+              }).join('') +'</ul>'
+      +     '</div></section>'
+      +   '</div>'
+      + '</div>'
+
+      + '<div class="sendbar hf-card">'
+      +   '<div class="summary">'+(sent? 'This bid was already sent ('+esc((p.sent_status&&p.sent_status.sent_at)||'')+').' : 'Reviewing-and-sending is the one human gate. Send exports the package for confirmed transmission — it does not auto-email the client.')+'</div>'
+      +   '<button class="btn" onclick="window.location=\'/autobid-board.html\'">Back to board</button>'
+      +   '<button class="btn send" id="sendBtn"'+(sent?' disabled':'')+'>'+(sent?'Sent ✓':'Send bid package →')+'</button>'
+      + '</div>';
+
+      document.getElementById('root').innerHTML = html;
+
+      // Fetch + render the unified sprinkler design (heads + routed pipe + hydraulics)
+      // into its panel — TRUE-SCALE 2D plan, no exaggeration. Non-blocking.
+      loadDesign();
+
+      // Resolve every BOM line to a DB-cataloged part with a 3D model link. Non-blocking.
+      loadBomParts();
+
+      var btn = document.getElementById('sendBtn');
+      if(btn && !sent){
+        btn.addEventListener('click', function(){
+          btn.disabled = true; btn.textContent = 'Sending…';
+          var edited = Array.prototype.map.call(document.querySelectorAll('#qlist textarea'), function(t){ return t.value; });
+          api('/package/'+encodeURIComponent(REF)+'/send', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ qualifiers: edited }) })
+            .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok, j:j}; }); })
+            .then(function(res){
+              if(res.ok){
+                btn.textContent = 'Sent ✓';
+                var ss = (res.j && res.j.sent_status) || {};
+                var b = ss.bundle || {};
+                var dr = b.draft || {};
+                var files = [];
+                if(ss.proposal_pdf || b.proposal_pdf) files.push('proposal PDF');
+                if(ss.cover_sheet || b.cover_sheet_xlsx) files.push('Excel cover sheet');
+                var where = ss.export_path || b.dir || 'out/sent/'+REF;
+                var draftMsg = (dr && dr.transmitted === false)
+                  ? ' An email draft is STAGED (to ' + esc((dr.to && (dr.to.name||dr.to.company)) || 'the GC')
+                      + (dr.needs_recipient_email ? ', recipient email needed' : '')
+                      + ', ' + (dr.attachment_count||files.length) + ' attachments) — not sent. Live email needs SMTP credentials.'
+                  : ' An email draft is staged — not sent.';
+                document.querySelector('.sendbar .summary').textContent =
+                  'Package exported to ' + esc(where) + (files.length? ' ('+files.join(' + ')+').' : '.') + draftMsg;
+              }
+              else { btn.disabled=false; btn.textContent='Send bid package →'; document.querySelector('.sendbar .summary').textContent='Send failed: '+esc((res.j&&(res.j.detail||res.j.error))||'unknown'); }
+            })
+            .catch(function(e){ btn.disabled=false; btn.textContent='Send bid package →'; document.querySelector('.sendbar .summary').textContent='Send failed: '+esc(e.message); });
+        });
+      }
+    }
+  </script>
+</body>
+</html>
