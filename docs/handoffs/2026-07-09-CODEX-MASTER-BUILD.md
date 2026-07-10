@@ -420,3 +420,19 @@ The continuation work remains deliberately below the completion bar:
   semantic review or production gate was changed.
 - Expanded focused verification is green: **71 engine tests** and **13 Studio
   tests**. This verifies isolation and review visibility, not N5/N6 acceptance.
+
+## 17. CODEX CONTINUATION EVIDENCE — 2026-07-10 (POST-CHANGE REGRESSION)
+
+- The post-change root engine run passes **755 tests**, skips **10**, and emits
+  **4 warnings**. Compileall, rule verification, and loop-contract validation
+  remain green.
+- The focused AutoBid browser/proxy loop passes **14/14** (spatial review,
+  FP overlay, FP semantic-review proxy, and send-panel checks). The broad Studio
+  run reached **1,540 passed / 24 failed** across 152 files; all 24 failures
+  are existing Workbench/shell browser or static-surface failures in the
+  unrelated dirty Studio UI (`#projectTarget`/resolver selectors and a glass
+  style assertion), not the AutoBid review lane. They remain visible blockers
+  for a clean whole-Studio claim and were not altered in this slice.
+- No deployment was performed. The master objective remains open: canonical
+  human review rows, N5/N6 acceptance, clean whole-Studio runtime, formal proof,
+  and authorized deployment are still required.
