@@ -461,3 +461,20 @@ The continuation work remains deliberately below the completion bar:
   `autosprink.html`, `index.html`, styles, and `server.js` are explicitly out
   of scope for this continuation. The exact clean-runtime mismatch is recorded
   rather than hidden by weakening or retargeting tests.
+
+## 20. CODEX CONTINUATION EVIDENCE — 2026-07-10 (N6 FAMILY EYE-GATE SURFACE)
+
+- Root `38049a4e7` adds a separate strict family-review contract/store and
+  `POST /package/{ref}/fp-vector-family-review`. It binds artifact, document,
+  page/physical-page, bundle/overlay hashes, family ID, and verified estimator/
+  admin identity. It has no `head_count` field and emits
+  `semantic_classification=not_attempted`, `gate_status=not_scored`, and
+  `production_gate_effect=none`.
+- The restarted engine exposes **4** truth-free candidate families for Walmart
+  artifact `8ad8…`, with **0** family decisions and density review still
+  `missing`. Studio `2bb101c` displays family IDs, anchor/support IDs,
+  occurrence counts, co-location support, and eye-gate status beside the
+  source/hash context; its focused browser/static checks pass **9** tests.
+- Full engine regression after the slice: **763 passed, 10 skipped, 4 warnings**.
+  This prepares the human semantic decision but does not score N6 or clear any
+  production gate.
