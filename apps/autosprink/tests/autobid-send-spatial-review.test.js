@@ -43,6 +43,12 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('not attempted · not scored');
     expect(html).toContain('never clear the spatial or bid-grade gates');
     expect(html).toContain('Truth-free bundle');
+    expect(html).toContain('Candidate family groups');
+    expect(html).toContain('anchor_family_id');
+    expect(html).toContain('support_family_ids');
+    expect(html).toContain('candidate occurrences');
+    expect(html).toContain('support_co_location_fraction');
+    expect(html).toContain('candidate_requires_overlay_eye_gate');
     expect(html).toContain('Reviewed sprinkler-head count');
     expect(html).toContain('data-decision="accepted"');
     expect(html).toContain('Accept semantic count');

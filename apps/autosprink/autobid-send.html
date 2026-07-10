@@ -522,10 +522,19 @@
         var page=artifact.page||{};
         var review=artifact.review||{};
         var decision=review.decision||'pending';
+        var familyGroups=Array.isArray(artifact.family_groups)?artifact.family_groups:[];
+        var familyRows=familyGroups.map(function(group){
+          var support=Array.isArray(group.support_family_ids)?group.support_family_ids:[];
+          var supportText=support.length?support.join(', '):'none';
+          var fraction=group.support_co_location_fraction==null?'—':num(group.support_co_location_fraction*100)+'%';
+          return '<div class="stat"><span class="l">Family candidate '+esc(group.group_id||'-')+'</span><span class="v"><code>'+esc(group.anchor_family_id||'-')+'</code> · '+num(group.occurrence_count)+' candidate occurrences</span></div>'
+            + '<div class="note">Support families: <code>'+esc(supportText)+'</code> · co-location '+esc(fraction)+' · '+esc(group.status||'candidate_requires_overlay_eye_gate')+'</div>';
+        }).join('');
         return '<div class="spatial-plate" data-fp-vector-artifact="'+esc(artifact.artifact_id||'')+'">'
           + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+num(page.physical_page_number)+'</span></div>'
           + '<div class="stat"><span class="l">Semantic status</span><span class="v">not attempted · not scored</span></div>'
           + '<div class="stat"><span class="l">Human semantic review</span><span class="v">'+esc(decision.replace(/_/g,' '))+(review.head_count!=null?' · '+num(review.head_count)+' heads':'')+'</span></div>'
+          + (familyRows?'<div class="note"><b>Candidate family groups ('+num(familyGroups.length)+'):</b> '+familyRows+'</div>':'<div class="note">No candidate family groups are present in the verified bundle.</div>')
           + (artifact.overlay_url?'<img class="spatial-overlay fp-vector-overlay" data-fp-vector-overlay-index="'+index+'" src="'+esc(artifact.overlay_url)+'" alt="FP vector-symbol candidate overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Candidate overlay URL missing.</div>')
           + '<div class="spatial-digests"><div><span class="note">Source PDF SHA-256</span><br><code title="'+esc(artifact.source_pdf_sha256||'')+'">'+esc(digest(artifact.source_pdf_sha256))+'</code></div>'
           + (artifact.bundle_url?'<div><span class="note">Truth-free bundle</span><br><a href="'+esc(artifact.bundle_url)+'">Open bundle JSON</a></div>':'')
