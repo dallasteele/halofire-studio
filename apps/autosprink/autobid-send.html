@@ -427,7 +427,7 @@
           + '<div class="stat"><span class="l">Automated overlay gate</span><span class="v">'+(autoPassed?'<span class="pill ok">pass</span>':'<span class="pill warn">fail</span>')+'</span></div>'
           + '<div class="stat"><span class="l">Human review</span><span class="v">'+esc(decision.replace(/_/g,' '))+'</span></div>'
           + (gateReasons?'<div class="note"><b>Automated residual:</b> '+gateReasons+'</div>':'')
-          + (urls.overlay_png?'<img class="spatial-overlay" src="'+esc(urls.overlay_png)+'" alt="Spatial wall and room overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Overlay image URL missing; acceptance is unavailable.</div>')
+          + (urls.overlay_png?'<img class="spatial-overlay" data-spatial-overlay-index="'+index+'" src="'+esc(urls.overlay_png)+'" alt="Spatial wall and room overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Overlay image URL missing; acceptance is unavailable.</div>')
           + metricRows
           + '<div class="spatial-digests">'
           + '<div><span class="note">PNG SHA-256</span><br><code title="'+esc(integrity.png_sha256||'')+'">'+esc(digest(integrity.png_sha256))+'</code></div>'
@@ -439,7 +439,7 @@
           + '<label class="spatial-review-metric">Reviewed wall recall (0.90-1.00)<input id="spatialRecall'+index+'" type="number" min="0.90" max="1" step="0.01" value="'+esc(review.reviewed_structural_wall_recall==null?'':review.reviewed_structural_wall_recall)+'" /></label>'
           + '<label class="spatial-review-metric">Phantom room count<input id="spatialPhantoms'+index+'" type="number" min="0" step="1" value="'+esc(review.phantom_room_count==null?'':review.phantom_room_count)+'" /></label>'
           + '<textarea id="spatialNote'+index+'" aria-label="Spatial review note for '+esc(page.sheet_label||('plate '+(index+1)))+'" placeholder="Review note">'+esc(review.note||'')+'</textarea>'
-          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="accepted"'+((!autoPassed||!urls.overlay_png)?' disabled title="Automated overlay gate must pass and an overlay must be visible before acceptance"':'')+'>Accept overlay</button>'
+          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="accepted" disabled title="The automated gate must pass and this stored overlay must finish loading before acceptance">Accept overlay</button>'
           + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="rejected">Reject overlay</button>'
           + '<div class="note spatial-result" id="spatialResult'+index+'"></div>'
           + '</div></div>';
@@ -452,12 +452,35 @@
 
     function bindSpatialReview(sv){
       var plates=(sv&&sv.plates)||[];
+      plates.forEach(function(plate,index){
+        var gate=plate.automated_gate||{};
+        var image=document.querySelector('[data-spatial-overlay-index="'+index+'"]');
+        var accept=document.querySelector('.spatialDecision[data-plate-index="'+index+'"][data-decision="accepted"]');
+        var result=document.getElementById('spatialResult'+index);
+        if(!image || !accept) return;
+        function markVisible(){
+          if(image.naturalWidth<=0 || image.naturalHeight<=0) return markBroken();
+          accept.setAttribute('data-overlay-visible','true');
+          accept.disabled=gate.passed!==true;
+          accept.title=gate.passed===true?'Stored overlay loaded and automated gate passed':'Automated overlay gate must pass before acceptance';
+          if(result) result.textContent='Stored overlay loaded. Review the pixels before recording a decision.';
+        }
+        function markBroken(){
+          accept.removeAttribute('data-overlay-visible');
+          accept.disabled=true;
+          accept.title='Stored overlay could not be displayed; acceptance is unavailable';
+          if(result) result.textContent='Stored overlay failed to load or decode. Acceptance remains disabled.';
+        }
+        image.addEventListener('load',markVisible);
+        image.addEventListener('error',markBroken);
+        if(image.complete) (image.naturalWidth>0?markVisible:markBroken)();
+      });
       Array.prototype.forEach.call(document.querySelectorAll('.spatialDecision'),function(button){
         button.addEventListener('click',function(){
           var index=Number(button.getAttribute('data-plate-index'));
           var decision=button.getAttribute('data-decision');
           var plate=plates[index]||{}, gate=plate.automated_gate||{}, integrity=plate.integrity||{};
-          if(decision==='accepted' && gate.passed!==true) return;
+          if(decision==='accepted' && (gate.passed!==true || button.getAttribute('data-overlay-visible')!=='true')) return;
           var note=document.getElementById('spatialNote'+index);
           var recallInput=document.getElementById('spatialRecall'+index);
           var phantomInput=document.getElementById('spatialPhantoms'+index);
@@ -489,7 +512,8 @@
             .catch(function(error){
               if(result) result.textContent='Spatial review failed: '+error.message;
               Array.prototype.forEach.call(siblings,function(item){
-                item.disabled=(item.getAttribute('data-decision')==='accepted' && gate.passed!==true);
+                item.disabled=(item.getAttribute('data-decision')==='accepted'
+                  && (gate.passed!==true || item.getAttribute('data-overlay-visible')!=='true'));
               });
             });
         });

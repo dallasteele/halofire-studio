@@ -28,11 +28,17 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).not.toContain('Object.keys(plate.metrics');
   });
 
-  it('requires an automated pass for acceptance but always offers rejection', () => {
-    expect(html).toContain("(!autoPassed||!urls.overlay_png)?' disabled");
+  it('requires a decoded stored overlay and an automated pass for acceptance', () => {
+    expect(html).toContain('data-spatial-overlay-index=');
+    expect(html).toContain('data-overlay-visible');
+    expect(html).toContain("image.addEventListener('load',markVisible)");
+    expect(html).toContain("image.addEventListener('error',markBroken)");
+    expect(html).toContain("if(image.complete) (image.naturalWidth>0?markVisible:markBroken)();");
+    expect(html).toContain('Stored overlay failed to load or decode. Acceptance remains disabled.');
+    expect(html).toContain('data-decision="accepted" disabled');
     expect(html).toContain('>Accept overlay</button>');
     expect(html).toContain('data-decision="rejected">Reject overlay</button>');
-    expect(html).toContain("if(decision==='accepted' && gate.passed!==true) return;");
+    expect(html).toContain("gate.passed!==true || button.getAttribute('data-overlay-visible')!=='true'");
     expect(html).toContain('Reviewed wall recall (0.90-1.00)');
     expect(html).toContain('Phantom room count');
     expect(html).toContain("recall<0.90 || recall>1 || phantoms!==0");
