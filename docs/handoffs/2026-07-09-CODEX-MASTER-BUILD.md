@@ -436,3 +436,16 @@ The continuation work remains deliberately below the completion bar:
 - No deployment was performed. The master objective remains open: canonical
   human review rows, N5/N6 acceptance, clean whole-Studio runtime, formal proof,
   and authorized deployment are still required.
+
+## 18. CODEX CONTINUATION EVIDENCE — 2026-07-10 (CANONICAL ACCEPTANCE AUDIT)
+
+- Live package ref `234` remains correctly fail-closed: workbook document
+  `108566`, geometry document `108569`, one immutable FP artifact, zero FP
+  semantic-review rows, zero spatial-review rows, and no accepted geometry
+  level mapping. `model3d.geometry_grounded=false` with
+  `accepted_level_mapping_missing`.
+- Direct engine review writes reject missing identity with **401** and an
+  untrusted role with **403**. The exact next manual gate is an estimator/admin
+  visual review of the stored Walmart FP-2.1 overlay, followed by the Studio
+  proxy POST with verified identity, hash echoes, and a human-confirmed positive
+  head count. No count was injected or trusted.
