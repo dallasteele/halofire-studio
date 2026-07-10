@@ -541,6 +541,9 @@ function normalizeRole(role) {
   return String(role || 'user').trim().toLowerCase();
 }
 
+const INVITABLE_ROLES = new Set(['admin', 'estimator', 'user']);
+const SPATIAL_REVIEW_ROLES = new Set(['admin', 'estimator']);
+
 function requireRole(role) {
   return (req, res, next) => {
     if (normalizeRole(req.user?.role) !== role) {
@@ -680,7 +683,8 @@ app.post('/api/auth/login', (req, res) => {
 app.post('/api/auth/invite', authMiddleware, requireRole('admin'), (req, res) => {
   const email = canonicalEmail(req.body?.email);
   const name = String(req.body?.name || email).trim();
-  const role = normalizeRole(req.body?.role || 'user') === 'admin' ? 'admin' : 'user';
+  const requestedRole = normalizeRole(req.body?.role || 'user');
+  const role = INVITABLE_ROLES.has(requestedRole) ? requestedRole : 'user';
   if (!isValidEmail(email)) return res.status(400).json({ error: 'Valid employee email is required' });
 
   let user = db.prepare('SELECT * FROM users WHERE username = ?').get(email);
@@ -824,11 +828,12 @@ app.all('/api/autobid/*', authMiddleware, async (req, res, next) => {
   const target = `${AUTOBID_ENGINE_URL}/${subPath}${qs}`;
   const isSpatialReviewWrite = req.method === 'POST'
     && /^package\/[^/]+\/spatial-review$/.test(subPath);
-  // Until estimator/reviewer roles exist in the Studio identity model, only an
-  // administrator may change the governed spatial-review state. Reads remain
-  // available to every authenticated Studio user.
-  if (isSpatialReviewWrite && normalizeRole(req.user?.role) !== 'admin') {
-    return res.status(403).json({ error: 'Admin role required for spatial review' });
+  // Spatial review is a narrow write capability. Estimators may record the
+  // hash-bound overlay decision, while ordinary users remain read-only and all
+  // other administrator-only routes keep their existing role checks.
+  if (isSpatialReviewWrite
+      && !SPATIAL_REVIEW_ROLES.has(normalizeRole(req.user?.role))) {
+    return res.status(403).json({ error: 'Estimator or admin role required for spatial review' });
   }
   try {
     // Reviewer identity is derived exclusively from the verified Studio JWT.

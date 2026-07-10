@@ -37,6 +37,7 @@ describe('AutoBid authenticated proxy boundary', () => {
   let tempDir;
   let base;
   let adminToken;
+  let estimatorToken;
   let userToken;
   const received = [];
 
@@ -87,7 +88,7 @@ describe('AutoBid authenticated proxy boundary', () => {
     const invite = await fetch(`${base}/api/auth/invite`, {
       method: 'POST',
       headers: { authorization: `Bearer ${adminToken}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ email: 'reviewer@example.test', name: 'Real Reviewer', role: 'user' }),
+      body: JSON.stringify({ email: 'estimator@example.test', name: 'Real Estimator', role: 'estimator' }),
     });
     expect(invite.status).toBe(201);
     const setupToken = (await invite.json()).setup_token;
@@ -97,7 +98,22 @@ describe('AutoBid authenticated proxy boundary', () => {
       body: JSON.stringify({ token: setupToken, password: 'reviewer-password-2026' }),
     });
     expect(setup.status).toBe(200);
-    userToken = await login(base, 'reviewer@example.test', 'reviewer-password-2026');
+    estimatorToken = await login(base, 'estimator@example.test', 'reviewer-password-2026');
+
+    const userInvite = await fetch(`${base}/api/auth/invite`, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${adminToken}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'viewer@example.test', name: 'Read Only User', role: 'user' }),
+    });
+    expect(userInvite.status).toBe(201);
+    const userSetupToken = (await userInvite.json()).setup_token;
+    const userSetup = await fetch(`${base}/api/auth/setup-password`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ token: userSetupToken, password: 'viewer-password-2026' }),
+    });
+    expect(userSetup.status).toBe(200);
+    userToken = await login(base, 'viewer@example.test', 'viewer-password-2026');
   }, 15000);
 
   afterAll(async () => {
@@ -137,12 +153,12 @@ describe('AutoBid authenticated proxy boundary', () => {
     expect(response.headers.get('content-disposition')).toBe('attachment; filename="review.json"');
   });
 
-  it('preserves an authorized review body and denies non-admin writes before upstream', async () => {
+  it('allows estimator review writes and denies ordinary users before upstream', async () => {
     const payload = { decision: 'accepted', overlay_artifact_id: 'sha256:abc' };
     const accepted = await fetch(`${base}/api/autobid/package/4/spatial-review`, {
       method: 'POST',
       headers: {
-        authorization: `Bearer ${adminToken}`,
+        authorization: `Bearer ${estimatorToken}`,
         'content-type': 'application/json',
         'x-halofire-reviewer-name': 'Forged Name',
       },
@@ -151,7 +167,8 @@ describe('AutoBid authenticated proxy boundary', () => {
     expect(accepted.status).toBe(200);
     const forwarded = received.at(-1);
     expect(JSON.parse(forwarded.body)).toEqual(payload);
-    expect(forwarded.headers['x-halofire-reviewer-name']).toBe('HaloFire Admin');
+    expect(forwarded.headers['x-halofire-reviewer-name']).toBe('Real Estimator');
+    expect(forwarded.headers['x-halofire-reviewer-role']).toBe('estimator');
 
     const count = received.length;
     const denied = await fetch(`${base}/api/autobid/package/4/spatial-review`, {
@@ -160,7 +177,7 @@ describe('AutoBid authenticated proxy boundary', () => {
       body: JSON.stringify(payload),
     });
     expect(denied.status).toBe(403);
-    expect(await denied.json()).toEqual({ error: 'Admin role required for spatial review' });
+    expect(await denied.json()).toEqual({ error: 'Estimator or admin role required for spatial review' });
     expect(received).toHaveLength(count);
   });
 });
