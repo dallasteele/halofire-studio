@@ -12,6 +12,8 @@ describe('AutoBid final spatial review panel', () => {
     const model3d = html.indexOf('<span class="t">3D massing</span>');
     const design = html.indexOf('<span class="t">Sprinkler design</span>');
     expect(geometry).toBeGreaterThan(0);
+    const density = html.indexOf('+     densityResolutionPanel(p)');
+    expect(density).toBeGreaterThan(geometry);
     expect(spatial).toBeGreaterThan(geometry);
     const fpVector = html.indexOf('+     fpVectorReviewPanel(p.fp_vector_review)');
     expect(fpVector).toBeGreaterThan(spatial);
@@ -47,6 +49,14 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain("'/fp-vector-review'");
     expect(html).toContain('expected_bundle_sha256');
     expect(html).toContain('expected_overlay_sha256');
+  });
+
+  it('surfaces density provenance as diagnostic-only evidence', () => {
+    expect(html).toContain('function densityResolutionPanel(p)');
+    expect(html).toContain('id="densityResolutionPanel"');
+    expect(html).toContain('Density source');
+    expect(html).toContain('diagnostic-only; it does not alter NFPA spacing');
+    expect(html).toContain('observed');
   });
 
   it('requires a decoded stored overlay and an automated pass for acceptance', () => {

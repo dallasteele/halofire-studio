@@ -386,6 +386,21 @@
       return '<section class="hf-panel mt"><div class="phd"><span class="t">Plan geometry · per-room layout</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
     }
 
+    function densityResolutionPanel(p){
+      var d=p.density_resolution||{};
+      var resolution=d.resolution||{}, layout=resolution.layout||{}, review=d.review||{};
+      var source=(layout.source||'unresolved').replace(/_/g,' ');
+      var status=d.available===true?'available':(review.status||'missing');
+      var head=d.available===true?'<span class="pill warn">diagnostic</span>':'<span class="pill warn">'+esc(status.replace(/_/g,' '))+'</span>';
+      var observed=(layout.provenance&&layout.provenance.observed_head_count!=null)
+        ? ' · observed '+num(layout.provenance.observed_head_count)+' heads' : '';
+      var body='<div class="stat"><span class="l">Density source</span><span class="v">'+esc(source)+observed+'</span></div>'
+        + '<div class="stat"><span class="l">Layout density</span><span class="v">'+(layout.sqft_per_head!=null?num(layout.sqft_per_head)+' sqft/head':'—')+'</span></div>'
+        + '<div class="note">This provenance sidecar is diagnostic-only; it does not alter NFPA spacing, pricing, spatial acceptance, model3d grounding, or bid-grade.</div>';
+      if(d.reason) body+='<div class="note"><b>Residual:</b> '+esc(d.reason.replace(/_/g,' '))+'</div>';
+      return '<section class="hf-panel mt" id="densityResolutionPanel"><div class="phd"><span class="t">Density provenance</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
+    }
+
     // Head reconcile disclosure — priced whole-building count vs geometry-grounded count.
     function reconcilePanel(hr){
       if(!hr) return '';
@@ -709,6 +724,7 @@
       // P1 ops-center review aggregation — geometry / reconcile / verification blocks
       // straight off the /package manifest (all honest three-state, never faked).
       +     geometryPanel(p)
+      +     densityResolutionPanel(p)
       +     spatialVerificationPanel(p.spatial_verification)
       +     fpVectorReviewPanel(p.fp_vector_review)
       +     reconcilePanel(p.head_reconcile)
