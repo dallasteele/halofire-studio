@@ -614,3 +614,15 @@ The continuation work remains deliberately below the completion bar:
   records engine healthy, Studio/prover unavailable, source identity verified,
   authorization absent, and `deployment_performed=false`. The master-build
   remains open at those external gates and at trusted human FP/spatial review.
+
+## 29. CODEX CONTINUATION EVIDENCE — 2026-07-10 (CURRENT-HEAD PROOF REFRESH)
+
+- After the evidence commits advanced the checkout, the runtime proof was
+  regenerated against the actual current HEAD `07915f8228b0177f0313dd417bda8d1f35886b3e`.
+  Artifact `runtime-deployment-proof-20260710T1300Z-v5.json` has proof ID
+  `fa6aa56ef63cf4f61a211a1a022b2aa565a8b505bd346f3969afd760801e16fd` and
+  `source_head_verified=true`.
+- Current observations remain fail-closed: AutoBid `8770` passes; Studio
+  `3210` and formal prover `8810` refuse connections; authorization is absent;
+  deployment remains false. This refresh prevents stale-HEAD evidence from
+  being mistaken for current deployment proof.
