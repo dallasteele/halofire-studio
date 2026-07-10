@@ -523,6 +523,7 @@
         var review=artifact.review||{};
         var decision=review.decision||'pending';
         var familyGroups=Array.isArray(artifact.family_groups)?artifact.family_groups:[];
+        var familyReviews=Array.isArray(artifact.family_reviews)?artifact.family_reviews:[];
         var familyRows=familyGroups.map(function(group){
           var support=Array.isArray(group.support_family_ids)?group.support_family_ids:[];
           var supportText=support.length?support.join(', '):'none';
@@ -530,11 +531,23 @@
           return '<div class="stat"><span class="l">Family candidate '+esc(group.group_id||'-')+'</span><span class="v"><code>'+esc(group.anchor_family_id||'-')+'</code> · '+num(group.occurrence_count)+' candidate occurrences</span></div>'
             + '<div class="note">Support families: <code>'+esc(supportText)+'</code> · co-location '+esc(fraction)+' · '+esc(group.status||'candidate_requires_overlay_eye_gate')+'</div>';
         }).join('');
+        var familyControlRows=familyGroups.map(function(group){
+          var familyReview=familyReviews.filter(function(item){return item.family_id===group.group_id;}).slice(-1)[0]||{};
+          var familyDecision=familyReview.decision||'pending';
+          var familyReviewer=familyReview.reviewer_name
+            ? ' · '+esc(familyReview.reviewer_name)+' ('+esc(familyReview.reviewer_role||'reviewer')+')' : '';
+          return '<div class="note"><b>Family review:</b> '+esc(familyDecision)+familyReviewer+'</div>'
+            + '<div class="family-review-actions" data-family-group="'+esc(group.group_id||'')+'">'
+            + '<textarea class="fpVectorFamilyNote" aria-label="Family review note for '+esc(group.group_id||'candidate')+'" placeholder="Family review note">'+esc(familyReview.note||'')+'</textarea>'
+            + '<button class="btn fpVectorFamilyDecision" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'" data-decision="accepted"'+(familyDecision==='accepted'?' disabled':'')+'>Accept family</button>'
+            + '<button class="btn fpVectorFamilyDecision" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'" data-decision="rejected">Reject family</button>'
+            + '<div class="note fpVectorFamilyResult"></div></div>';
+        }).join('');
         return '<div class="spatial-plate" data-fp-vector-artifact="'+esc(artifact.artifact_id||'')+'">'
           + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+num(page.physical_page_number)+'</span></div>'
           + '<div class="stat"><span class="l">Semantic status</span><span class="v">not attempted · not scored</span></div>'
           + '<div class="stat"><span class="l">Human semantic review</span><span class="v">'+esc(decision.replace(/_/g,' '))+(review.head_count!=null?' · '+num(review.head_count)+' heads':'')+'</span></div>'
-          + (familyRows?'<div class="note"><b>Candidate family groups ('+num(familyGroups.length)+'):</b> '+familyRows+'</div>':'<div class="note">No candidate family groups are present in the verified bundle.</div>')
+          + (familyRows?'<div class="note"><b>Candidate family groups ('+num(familyGroups.length)+'):</b> '+familyRows+familyControlRows+'</div>':'<div class="note">No candidate family groups are present in the verified bundle.</div>')
           + (artifact.overlay_url?'<img class="spatial-overlay fp-vector-overlay" data-fp-vector-overlay-index="'+index+'" src="'+esc(artifact.overlay_url)+'" alt="FP vector-symbol candidate overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Candidate overlay URL missing.</div>')
           + '<div class="spatial-digests"><div><span class="note">Source PDF SHA-256</span><br><code title="'+esc(artifact.source_pdf_sha256||'')+'">'+esc(digest(artifact.source_pdf_sha256))+'</code></div>'
           + (artifact.bundle_url?'<div><span class="note">Truth-free bundle</span><br><a href="'+esc(artifact.bundle_url)+'">Open bundle JSON</a></div>':'')
@@ -603,6 +616,39 @@
             .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
             .then(function(response){if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'review failed'); location.reload();})
             .catch(function(error){if(result) result.textContent='FP semantic review failed: '+error.message;});
+        });
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('.fpVectorFamilyDecision'),function(button){
+        button.addEventListener('click',function(){
+          var index=Number(button.getAttribute('data-fp-vector-index'));
+          var artifact=artifacts[index]||{};
+          var familyId=button.getAttribute('data-family-id')||'';
+          var decision=button.getAttribute('data-decision');
+          var image=document.querySelector('[data-fp-vector-overlay-index="'+index+'"]');
+          var actions=button.parentNode;
+          var result=actions.querySelector('.fpVectorFamilyResult');
+          var note=actions.querySelector('.fpVectorFamilyNote');
+          var page=artifact.page||{};
+          if(!image || image.getAttribute('data-overlay-visible')!=='true'){
+            if(result) result.textContent='Review only after the stored candidate overlay decodes in the browser.';
+            return;
+          }
+          Array.prototype.forEach.call(actions.querySelectorAll('.fpVectorFamilyDecision'),function(item){item.disabled=true;});
+          if(result) result.textContent='Saving '+decision+' family review...';
+          api('/package/'+encodeURIComponent(REF)+'/fp-vector-family-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+            artifact_id:artifact.artifact_id,
+            page_index:page.page_index,
+            physical_page_number:page.physical_page_number,
+            family_id:familyId,
+            decision:decision,
+            bundle_sha256:(artifact.integrity||{}).bundle_sha256,
+            overlay_sha256:(artifact.integrity||{}).overlay_sha256,
+            note:note?note.value:'',
+            by:'doc'
+          })})
+            .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+            .then(function(response){if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'family review failed'); location.reload();})
+            .catch(function(error){if(result) result.textContent='FP family review failed: '+error.message; Array.prototype.forEach.call(actions.querySelectorAll('.fpVectorFamilyDecision'),function(item){item.disabled=false;});});
         });
       });
     }
