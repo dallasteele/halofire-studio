@@ -528,3 +528,33 @@ The continuation work remains deliberately below the completion bar:
 - N5 remains open until trusted source-bound held-out evidence is actually
   available and meets the frozen 12% accuracy gate. No database rows,
   reviewer decisions, or production gates were fabricated or changed.
+
+## 24. CODEX CONTINUATION EVIDENCE — 2026-07-10 (SOURCE PROBE, IDENTITY, A-101 REVIEW)
+
+- Root `c0b92f6fd` adds a read-only source-bound density probe. It hashes every
+  scanned PDF, binds page/physical-page findings and snippets, supports common
+  PDF unit spellings, and emits no head truth, answer-key fields, DB writes, or
+  production eligibility. The real held-out report
+  `source-bound-density-heldout.v1.json` scanned 18 documents and produced 21
+  findings with **0 numeric density candidates** and 18 explicit blockers:
+  AZAZ, Circle K, Kozo, and Walmart source documents do not expose a trusted
+  numeric Division-21 density in their text layers. This is an evidence-bound
+  absence, not a fallback answer.
+- Root `d01a5d681` hardens the spatial review boundary. Accepted overlay rows
+  require estimator/admin identity at the store layer, and legacy accepted rows
+  with missing/invalid identity are projected as untrusted and cannot clear the
+  spatial gate. Focused store/service/API coverage is **39 passed**; no
+  production review rows were fabricated.
+- Root `a709cd311` recovers legacy Cooperative composite viewport provenance
+  deterministically from registered block IDs and source-Y order. The real
+  A-101 artifact is page index **43** / physical PDF page **44**, with upper
+  `network-0` source bbox `[288,178,1464,704]` and lower `network-1` source bbox
+  `[494,932,2250,1458]`; registration residual is **0.000425 ft**.
+- Studio `5e756fb` exposes that zero-based/physical mapping, viewport bounds,
+  and a zoomable stored source-PDF/derived-geometry review frame. Static and
+  browser coverage is **8 + 1 passed**, with the rendered frame at
+  `out/agent-loops/halofire-master-build-20260710/evidence/a101-overlay-review-frame.png`.
+- The running `8770` process is stale relative to `a709cd311`; it must be
+  restarted before treating the recovered projection as live. N5/N6 and
+  production acceptance remain open: no trusted human FP-family/spatial review,
+  held-out density score, or formal prover/deployment proof exists.
