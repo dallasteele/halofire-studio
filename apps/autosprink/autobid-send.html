@@ -57,6 +57,15 @@
   .sizerow{ display:flex; justify-content:space-between; padding:5px 0; border-top:1px solid var(--hf-line); font-size:var(--hf-fs-sm); font-variant-numeric:tabular-nums; }
   .floorpill{ padding:8px 10px; border:1px solid var(--hf-line); border-radius:8px; font-size:var(--hf-fs-label); display:flex; justify-content:space-between; }
   .floorpill.real{ border-color:rgba(74,222,128,0.4); } .floorpill.placeholder{ border-color:rgba(251,191,36,0.3); color:var(--hf-muted); }
+  .spatial-plate{ border-top:1px solid var(--hf-line); padding-top:14px; margin-top:14px; }
+  .spatial-plate:first-child{ border-top:0; padding-top:0; margin-top:0; }
+  .spatial-overlay{ display:block; width:100%; height:auto; margin:10px 0; border:1px solid var(--hf-line); border-radius:8px; background:#fff; }
+  .spatial-digests{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px 14px; margin-top:9px; }
+  .spatial-digests code{ color:var(--hf-muted); font-size:10px; overflow-wrap:anywhere; }
+  .spatial-actions{ display:flex; align-items:flex-start; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .spatial-actions textarea{ flex:1 1 280px; min-height:54px; resize:vertical; font:inherit; font-size:var(--hf-fs-sm); color:var(--hf-text); background:rgba(255,255,255,0.03); border:1px solid var(--hf-line); border-radius:6px; padding:7px 9px; }
+  .spatial-actions .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .spatial-result{ width:100%; }
   .sendbar{ position:sticky; bottom:0; margin-top:18px; padding:14px 16px; display:flex; align-items:center; gap:14px; border-radius:var(--hf-r-win,12px); }
   .sendbar .summary{ flex:1; font-size:var(--hf-fs-sm); color:var(--hf-muted); }
   .btn{ font:inherit; cursor:pointer; padding:11px 22px; border-radius:var(--hf-r-ctl,7px); border:1px solid var(--hf-line); background:var(--hf-glass,rgba(255,255,255,0.04)); color:var(--hf-text); font-weight:600; }
@@ -372,6 +381,107 @@
       return '<section class="hf-panel mt"><div class="phd"><span class="t">Verification — ensemble cross-checks</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
     }
 
+    // Final spatial evidence review. Only these explicitly allowlisted metrics and
+    // digests render; filesystem paths and arbitrary gate JSON never enter the DOM.
+    var SPATIAL_METRICS = [
+      ['reviewed_structural_wall_recall','Reviewed wall recall','pct'],
+      ['classified_wall_ink_coverage','Classified wall ink coverage','pct'],
+      ['paired_candidate_ink_coverage','Paired candidate ink coverage','pct'],
+      ['phantom_room_count','Phantom rooms','num'],
+      ['footprint_dimension_error','Footprint dimension error','pct'],
+      ['n_rooms','Closed rooms','num'],
+      ['retained_wall_count','Retained walls','num'],
+      ['classified_structural_evidence_count','Structural evidence','num']
+    ];
+    function spatialValue(value, format){
+      if(value==null || typeof value!=='number' || !isFinite(value)) return '&mdash;';
+      return format==='pct' ? (value*100).toFixed(1)+'%' : num(value);
+    }
+    function digest(value){
+      var s=String(value||'');
+      if(!s) return '&mdash;';
+      return s.length>24 ? s.slice(0,12)+'...'+s.slice(-8) : s;
+    }
+    function spatialVerificationPanel(sv){
+      if(!sv){
+        return '<section class="hf-panel mt" id="spatialVerificationPanel"><div class="phd"><span class="t">Final spatial verification</span><span class="pill warn">unavailable</span></div><div class="pbd"><div class="note">No durable spatial overlay artifact is attached. The spatial badge remains unearned; honest package export is still available.</div></div></section>';
+      }
+      var status=sv.status||'pending_review';
+      var passed=sv.passed===true;
+      var head=passed?'<span class="pill ok">accepted</span>':'<span class="pill warn">'+esc(status.replace(/_/g,' '))+'</span>';
+      var plates=(sv.plates||[]).map(function(plate,index){
+        var page=plate.page||{}, gate=plate.automated_gate||{}, review=plate.review||{};
+        var integrity=plate.integrity||{}, source=plate.source||{}, urls=plate.urls||{};
+        var autoPassed=gate.passed===true;
+        var metricRows=SPATIAL_METRICS.map(function(spec){
+          var value=(plate.metrics||{})[spec[0]];
+          if(value==null) return '';
+          return '<div class="stat"><span class="l">'+esc(spec[1])+'</span><span class="v">'+spatialValue(value,spec[2])+'</span></div>';
+        }).join('');
+        var gateReasons=(gate.reasons||[]).map(function(reason){return esc(reason);}).join(' &middot; ');
+        var decision=review.current===false?'stale':(review.decision||'pending');
+        return '<div class="spatial-plate" data-spatial-artifact="'+esc(plate.artifact_id||'')+'">'
+          + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+num(page.physical_page_number)+'</span></div>'
+          + '<div class="stat"><span class="l">Automated overlay gate</span><span class="v">'+(autoPassed?'<span class="pill ok">pass</span>':'<span class="pill warn">fail</span>')+'</span></div>'
+          + '<div class="stat"><span class="l">Human review</span><span class="v">'+esc(decision.replace(/_/g,' '))+'</span></div>'
+          + (gateReasons?'<div class="note"><b>Automated residual:</b> '+gateReasons+'</div>':'')
+          + (urls.overlay_png?'<img class="spatial-overlay" src="'+esc(urls.overlay_png)+'" alt="Spatial wall and room overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Overlay image URL missing; acceptance is unavailable.</div>')
+          + metricRows
+          + '<div class="spatial-digests">'
+          + '<div><span class="note">PNG SHA-256</span><br><code title="'+esc(integrity.png_sha256||'')+'">'+esc(digest(integrity.png_sha256))+'</code></div>'
+          + '<div><span class="note">Manifest SHA-256</span><br><code title="'+esc(integrity.manifest_sha256||'')+'">'+esc(digest(integrity.manifest_sha256))+'</code></div>'
+          + '<div><span class="note">Source PDF SHA-256</span><br><code title="'+esc(source.pdf_sha256||'')+'">'+esc(digest(source.pdf_sha256))+'</code></div>'
+          + '<div><span class="note">Input fingerprint</span><br><code title="'+esc(source.input_fingerprint||'')+'">'+esc(digest(source.input_fingerprint))+'</code></div>'
+          + '</div>'
+          + '<div class="spatial-actions">'
+          + '<textarea id="spatialNote'+index+'" aria-label="Spatial review note for '+esc(page.sheet_label||('plate '+(index+1)))+'" placeholder="Review note">'+esc(review.note||'')+'</textarea>'
+          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="accepted"'+((!autoPassed||!urls.overlay_png)?' disabled title="Automated overlay gate must pass and an overlay must be visible before acceptance"':'')+'>Accept overlay</button>'
+          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="rejected">Reject overlay</button>'
+          + '<div class="note spatial-result" id="spatialResult'+index+'"></div>'
+          + '</div></div>';
+      }).join('');
+      if(!plates) plates='<div class="note">No current overlay artifacts are available. The spatial badge remains unearned.</div>';
+      return '<section class="hf-panel mt" id="spatialVerificationPanel"><div class="phd"><span class="t">Final spatial verification</span>'+head+'</div><div class="pbd">'
+        + '<div class="note" style="margin-bottom:12px">Review the stored overlay against the named physical sheet before accepting. This controls only the spatial-verification badge; it never auto-accepts and never blocks honest package export.</div>'
+        + plates+'</div></section>';
+    }
+
+    function bindSpatialReview(sv){
+      var plates=(sv&&sv.plates)||[];
+      Array.prototype.forEach.call(document.querySelectorAll('.spatialDecision'),function(button){
+        button.addEventListener('click',function(){
+          var index=Number(button.getAttribute('data-plate-index'));
+          var decision=button.getAttribute('data-decision');
+          var plate=plates[index]||{}, gate=plate.automated_gate||{}, integrity=plate.integrity||{};
+          if(decision==='accepted' && gate.passed!==true) return;
+          var note=document.getElementById('spatialNote'+index);
+          var result=document.getElementById('spatialResult'+index);
+          var siblings=button.parentNode.querySelectorAll('.spatialDecision');
+          Array.prototype.forEach.call(siblings,function(item){item.disabled=true;});
+          if(result) result.textContent='Saving '+decision+' review...';
+          var payload={
+            artifact_id:plate.artifact_id,
+            decision:decision,
+            note:note?note.value:'',
+            expected_png_sha256:integrity.png_sha256,
+            expected_manifest_sha256:integrity.manifest_sha256
+          };
+          api('/package/'+encodeURIComponent(REF)+'/spatial-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+            .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+            .then(function(response){
+              if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'review failed');
+              location.reload();
+            })
+            .catch(function(error){
+              if(result) result.textContent='Spatial review failed: '+error.message;
+              Array.prototype.forEach.call(siblings,function(item){
+                item.disabled=(item.getAttribute('data-decision')==='accepted' && gate.passed!==true);
+              });
+            });
+        });
+      });
+    }
+
     function render(p){
       var rb = p.readyBid||{}, cd = p.charts_data||{}, m3 = p.model3d||{};
       var quals = p.qualifiers||[];
@@ -427,6 +537,7 @@
       // P1 ops-center review aggregation — geometry / reconcile / verification blocks
       // straight off the /package manifest (all honest three-state, never faked).
       +     geometryPanel(p)
+      +     spatialVerificationPanel(p.spatial_verification)
       +     reconcilePanel(p.head_reconcile)
       +     verificationPanel(p.verification)
 
@@ -479,12 +590,15 @@
       // Resolve every BOM line to a DB-cataloged part with a 3D model link. Non-blocking.
       loadBomParts();
 
+      // The overlay review controls only the spatial badge. Export remains independent.
+      bindSpatialReview(p.spatial_verification);
+
       var btn = document.getElementById('sendBtn');
       if(btn && !sent){
         btn.addEventListener('click', function(){
           btn.disabled = true; btn.textContent = 'Sending…';
           var edited = Array.prototype.map.call(document.querySelectorAll('#qlist textarea'), function(t){ return t.value; });
-          api('/package/'+encodeURIComponent(REF)+'/send', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ qualifiers: edited }) })
+          api('/package/'+encodeURIComponent(REF)+'/send', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ edited_qualifiers: edited }) })
             .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok, j:j}; }); })
             .then(function(res){
               if(res.ok){
