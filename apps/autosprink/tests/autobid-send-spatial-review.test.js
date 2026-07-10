@@ -25,6 +25,9 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('PNG SHA-256');
     expect(html).toContain('Manifest SHA-256');
     expect(html).toContain('Source PDF SHA-256');
+    expect(html).toContain('plate.viewport_provenance');
+    expect(html).toContain('Registered source viewports:');
+    expect(html).toContain('data-viewport-role=');
     expect(html).not.toContain('Object.keys(plate.metrics');
   });
 

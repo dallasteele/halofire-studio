@@ -459,10 +459,19 @@
         }).join('');
         var gateReasons=(gate.reasons||[]).map(function(reason){return esc(reason);}).join(' &middot; ');
         var decision=review.current===false?'stale':(review.decision||'pending');
+        var viewportRows=(plate.viewport_provenance||[]).map(function(viewport){
+          var dims=(viewport.printed_long_ft!=null&&viewport.printed_short_ft!=null)
+            ? (' / '+num(viewport.printed_long_ft)+' x '+num(viewport.printed_short_ft)+' ft') : '';
+          var transform=Array.isArray(viewport.transform_ft)&&viewport.transform_ft.length===2
+            ? (' / transform '+num(viewport.transform_ft[0])+' x '+num(viewport.transform_ft[1])+' ft') : '';
+          return '<span class="spatial-viewport" data-viewport-role="'+esc(viewport.role||'')+'">'
+            + esc(viewport.role||'viewport')+' ('+esc(viewport.block_id||'')+')'+dims+transform+'</span>';
+        }).join(' &middot; ');
         return '<div class="spatial-plate" data-spatial-artifact="'+esc(plate.artifact_id||'')+'">'
           + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+num(page.physical_page_number)+'</span></div>'
           + '<div class="stat"><span class="l">Automated overlay gate</span><span class="v">'+(autoPassed?'<span class="pill ok">pass</span>':'<span class="pill warn">fail</span>')+'</span></div>'
           + '<div class="stat"><span class="l">Human review</span><span class="v">'+esc(decision.replace(/_/g,' '))+'</span></div>'
+          + (viewportRows?'<div class="note"><b>Registered source viewports:</b> '+viewportRows+'</div>':'')
           + (gateReasons?'<div class="note"><b>Automated residual:</b> '+gateReasons+'</div>':'')
           + (urls.overlay_png?'<img class="spatial-overlay" data-spatial-overlay-index="'+index+'" src="'+esc(urls.overlay_png)+'" alt="Spatial wall and room overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Overlay image URL missing; acceptance is unavailable.</div>')
           + metricRows
