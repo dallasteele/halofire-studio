@@ -15,6 +15,7 @@ const SOURCE_ARTIFACTS = path.join(WORKSPACE_ROOT, 'halofire-autobid', 'out', 's
 const PYTHON = 'C:/Python312/python.exe';
 const ADMIN_PASSWORD = 'review-browser-admin-password';
 const ESTIMATOR_PASSWORD = 'review-browser-estimator-password';
+const VIEWER_PASSWORD = 'review-browser-viewer-password';
 
 let tempDir;
 let copiedDb;
@@ -155,6 +156,24 @@ describe('AutoBid spatial review live browser boundary', () => {
     expect(setup.user.role).toBe('estimator');
     expect((await api('/api/autobid/health', setup.token)).service).toBe('halofire-autobid-api');
 
+    // Exercise the actual Studio -> AutoBid boundary with a read-only identity.
+    // The proxy must reject the write before the engine sees it; this keeps the
+    // copied review database untouched and proves the browser-visible role gate
+    // is not only covered by the fake-engine unit test.
+    const viewerInvite = await api('/api/auth/invite', admin.token, {
+      method: 'POST',
+      body: JSON.stringify({
+        email: 'spatial.viewer@example.test',
+        name: 'Spatial Read Only Viewer',
+        role: 'user',
+      }),
+    });
+    const viewer = await api('/api/auth/setup-password', null, {
+      method: 'POST',
+      body: JSON.stringify({ token: viewerInvite.setup_token, password: VIEWER_PASSWORD }),
+    });
+    expect(viewer.user.role).toBe('user');
+
     const page = await browser.newPage();
     page.setDefaultTimeout(20_000);
     await page.context().addCookies([{ name: 'halofire_session', value: setup.token, url: base }]);
@@ -188,6 +207,32 @@ describe('AutoBid spatial review live browser boundary', () => {
       for (const physicalPage of [44, 47, 50, 53, 56, 59, 62, 65]) {
         expect(panelText).toContain(`/ ${physicalPage}`);
       }
+
+      const beforeReview = await api('/api/autobid/package/9', setup.token);
+      const firstPlate = beforeReview.spatial_verification.plates[0];
+      const denied = await fetch(`${base}/api/autobid/package/9/spatial-review`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${viewer.token}`,
+        },
+        body: JSON.stringify({
+          artifact_id: firstPlate.artifact_id,
+          decision: 'accepted',
+          reviewed_structural_wall_recall: 0.95,
+          phantom_room_count: 0,
+          expected_png_sha256: firstPlate.integrity.png_sha256,
+          expected_manifest_sha256: firstPlate.integrity.manifest_sha256,
+        }),
+      });
+      expect(denied.status).toBe(403);
+      expect(await denied.json()).toEqual({
+        error: 'Estimator or admin role required for spatial review',
+      });
+      const copiedBeforeEstimatorReview = new Database(copiedDb, { readonly: true });
+      expect(copiedBeforeEstimatorReview
+        .prepare('SELECT COUNT(*) AS n FROM spatial_overlay_reviews').get().n).toBe(0);
+      copiedBeforeEstimatorReview.close();
 
       const accepts = page.locator('.spatialDecision[data-decision="accepted"]');
       expect(await accepts.count()).toBe(8);
