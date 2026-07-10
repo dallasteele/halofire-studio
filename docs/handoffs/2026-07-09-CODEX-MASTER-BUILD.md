@@ -360,6 +360,9 @@ The continuation work remains deliberately below the completion bar:
   end-to-end evidence now shows all 8 levels model3d-grounded, accepted layout
   passed, accepted drawing available on all 8 plates, and outside-head count 0;
   per-level head counts were 226, 211, 241, 266, 237, 328, 266, and 269.
+- Root `21b5040f7` adds an explicit repaired-room-to-accepted-layout regression;
+  the schema/layout focus now passes **18** tests. Studio `371beef` surfaces the
+  density sidecar in the estimator panel with its diagnostic-only semantics.
 - Focused repair tests pass **56**; production-wiring tests pass **2** plus the
   relevant regression suite (**162**). The live canonical package remains
   correctly fail-closed because no trusted Cooperative review rows exist.
