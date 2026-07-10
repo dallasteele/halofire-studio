@@ -52,6 +52,15 @@ describe('AutoBid authenticated proxy boundary', () => {
           headers: request.headers,
           body: Buffer.concat(chunks).toString('utf8'),
         });
+        // The real engine owns the FP semantic-review role boundary. Keep the
+        // fake upstream honest so this test proves the Studio proxy forwards
+        // the verified JWT identity and cannot turn a viewer into a reviewer.
+        const isFpSemanticReview = /^\/package\/4\/fp-vector-review(?:\?|$)/.test(request.url || '');
+        if (isFpSemanticReview && !['admin', 'estimator'].includes(request.headers['x-halofire-reviewer-role'])) {
+          response.writeHead(403, { 'content-type': 'application/json' });
+          response.end(JSON.stringify({ detail: 'trusted estimator or admin reviewer role is required' }));
+          return;
+        }
         response.writeHead(200, {
           'content-type': 'application/json',
           etag: '"spatial-v2"',
@@ -179,5 +188,50 @@ describe('AutoBid authenticated proxy boundary', () => {
     expect(denied.status).toBe(403);
     expect(await denied.json()).toEqual({ error: 'Estimator or admin role required for spatial review' });
     expect(received).toHaveLength(count);
+  });
+
+  it('forwards FP semantic-review identity from JWT and keeps viewer reviews fail-closed', async () => {
+    const payload = {
+      artifact_id: 'a'.repeat(64),
+      decision: 'accepted',
+      head_count: 123,
+      expected_bundle_sha256: 'b'.repeat(64),
+      expected_overlay_sha256: 'c'.repeat(64),
+    };
+    const accepted = await fetch(`${base}/api/autobid/package/4/fp-vector-review`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${estimatorToken}`,
+        'content-type': 'application/json',
+        'x-halofire-reviewer-id': 'forged-id',
+        'x-halofire-reviewer-name': 'Forged Name',
+        'x-halofire-reviewer-role': 'admin',
+      },
+      body: JSON.stringify(payload),
+    });
+    expect(accepted.status).toBe(200);
+    const forwardedEstimator = received.at(-1);
+    expect(forwardedEstimator.url).toBe('/package/4/fp-vector-review');
+    expect(forwardedEstimator.headers['x-halofire-reviewer-id']).not.toBe('forged-id');
+    expect(forwardedEstimator.headers['x-halofire-reviewer-name']).toBe('Real Estimator');
+    expect(forwardedEstimator.headers['x-halofire-reviewer-role']).toBe('estimator');
+    expect(JSON.parse(forwardedEstimator.body)).toEqual(payload);
+
+    const denied = await fetch(`${base}/api/autobid/package/4/fp-vector-review`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${userToken}`,
+        'content-type': 'application/json',
+        'x-halofire-reviewer-id': 'forged-admin-id',
+        'x-halofire-reviewer-name': 'Forged Admin',
+        'x-halofire-reviewer-role': 'admin',
+      },
+      body: JSON.stringify(payload),
+    });
+    expect(denied.status).toBe(403);
+    const forwardedViewer = received.at(-1);
+    expect(forwardedViewer.headers['x-halofire-reviewer-id']).not.toBe('forged-admin-id');
+    expect(forwardedViewer.headers['x-halofire-reviewer-name']).toBe('Read Only User');
+    expect(forwardedViewer.headers['x-halofire-reviewer-role']).toBe('user');
   });
 });
