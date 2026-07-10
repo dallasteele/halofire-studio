@@ -828,12 +828,26 @@ app.all('/api/autobid/*', authMiddleware, async (req, res, next) => {
   const target = `${AUTOBID_ENGINE_URL}/${subPath}${qs}`;
   const isSpatialReviewWrite = req.method === 'POST'
     && /^package\/[^/]+\/spatial-review$/.test(subPath);
+  const isFpReviewWrite = req.method === 'POST'
+    && /^package\/[^/]+\/fp-vector-(?:review|family-review)$/.test(subPath);
   // Spatial review is a narrow write capability. Estimators may record the
   // hash-bound overlay decision, while ordinary users remain read-only and all
   // other administrator-only routes keep their existing role checks.
   if (isSpatialReviewWrite
       && !SPATIAL_REVIEW_ROLES.has(normalizeRole(req.user?.role))) {
     return res.status(403).json({ error: 'Estimator or admin role required for spatial review' });
+  }
+  // FP semantic counts and vector-family eye-gates are also human review writes.
+  // Reject ordinary users before contacting the engine so a viewer cannot turn
+  // a downstream 403 into a side effect, timing oracle, or identity confusion.
+  if (isFpReviewWrite
+      && !SPATIAL_REVIEW_ROLES.has(normalizeRole(req.user?.role))) {
+    return res.status(403).json({ error: 'Estimator or admin role required for FP review' });
+  }
+  if ((isSpatialReviewWrite || isFpReviewWrite)
+      && (!String(req.user?.id || '').trim()
+        || !String(req.user?.name || req.user?.username || '').trim())) {
+    return res.status(401).json({ error: 'Trusted reviewer identity is unavailable' });
   }
   try {
     // Reviewer identity is derived exclusively from the verified Studio JWT.
