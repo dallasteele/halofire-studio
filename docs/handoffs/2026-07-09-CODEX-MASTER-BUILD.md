@@ -587,3 +587,17 @@ The continuation work remains deliberately below the completion bar:
   artifact records AutoBid `8770` healthy, Studio `3210` refused, formal prover
   `8810` refused, verified source HEAD, no deployment authorization, and
   `deployment_performed=false`; focused proof coverage passes **4 tests**.
+
+## 27. CODEX CONTINUATION EVIDENCE — 2026-07-10 (RUNTIME PROOF HARDENING)
+
+- Runtime proof follow-ups `579e011f3` and `a2119e69e` preserve the canonical
+  Studio `/api/health` contract (which has no `service` field), treat HTTP
+  404/5xx as a typed health-contract failure distinct from connection refusal,
+  and reject malformed source identities without raising. Focused proof
+  coverage is **6 passed** and the full engine suite is **788 passed, 10
+  skipped, 4 warnings**.
+- The v3 live artifact records AutoBid `8770` HTTP 200, local Studio `3210`
+  refused, formal prover `8810` refused, remote prover endpoint HTTP 404 (not
+  the required contract), public Studio health reachable but not a local
+  deployment proof, missing authorization, and hard-coded
+  `deployment_performed=false`. Overall status remains **blocked**.
