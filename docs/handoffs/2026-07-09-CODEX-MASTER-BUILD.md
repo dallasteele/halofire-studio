@@ -403,3 +403,18 @@ The continuation work remains deliberately below the completion bar:
   not itself create a human review. Canonical FP semantic and Cooperative
   spatial reviews remain absent; N6 strict vector-symbol scoring, the GX10
   formal proof lane, and deployment acceptance remain unearned.
+
+## 16. CODEX CONTINUATION EVIDENCE — 2026-07-10 (N6 VECTOR PROBE)
+
+- The truth-free held-out vector scan covers six FP artifacts. Repeated-glyph
+  fingerprints nominate review candidates, but every artifact remains
+  `semantic_classification=not_attempted` / `gate_status=not_scored`.
+  The persisted blockers are explicit: no held-out truth-point binding, no
+  strict-posgate wiring to vector candidates, and family-budget truncation.
+- A fresh bounded Winco scan retained 512 families with truncation warnings;
+  top consensus groups varied from 236/230/211/58 markers. Walmart's top
+  family had 364 markers and Circle K's candidate support was only 0.8077.
+  These are candidate markers, not head counts. N6 remains unearned and no
+  semantic review or production gate was changed.
+- Expanded focused verification is green: **71 engine tests** and **13 Studio
+  tests**. This verifies isolation and review visibility, not N5/N6 acceptance.
