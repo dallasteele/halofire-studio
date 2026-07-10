@@ -449,3 +449,15 @@ The continuation work remains deliberately below the completion bar:
   visual review of the stored Walmart FP-2.1 overlay, followed by the Studio
   proxy POST with verified identity, hash echoes, and a human-confirmed positive
   head count. No count was injected or trusted.
+
+## 19. CODEX CONTINUATION EVIDENCE — 2026-07-10 (WORKBENCH MISMATCH ROOT CAUSE)
+
+- The 24 broad Studio failures are a proven route/test mismatch, not an
+  AutoBid regression: live `/workbench.html` is the intentionally swapped
+  `HaloFire · Today` dashboard from `af2c13d` and lacks `#projectTarget`,
+  `#resolverQueue`, and legacy official-flow sections. `/official-flow.html`
+  contains those selectors. Redirecting or duplicating that workflow in
+  `workbench.html` would be a broad semantic change, and the current dirty
+  `autosprink.html`, `index.html`, styles, and `server.js` are explicitly out
+  of scope for this continuation. The exact clean-runtime mismatch is recorded
+  rather than hidden by weakening or retargeting tests.
