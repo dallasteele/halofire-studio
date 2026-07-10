@@ -64,6 +64,8 @@
   .spatial-digests code{ color:var(--hf-muted); font-size:10px; overflow-wrap:anywhere; }
   .spatial-actions{ display:flex; align-items:flex-start; gap:8px; margin-top:10px; flex-wrap:wrap; }
   .spatial-actions textarea{ flex:1 1 280px; min-height:54px; resize:vertical; font:inherit; font-size:var(--hf-fs-sm); color:var(--hf-text); background:rgba(255,255,255,0.03); border:1px solid var(--hf-line); border-radius:6px; padding:7px 9px; }
+  .spatial-review-metric{ display:flex; flex-direction:column; gap:4px; min-width:150px; color:var(--hf-muted); font-size:var(--hf-fs-sm); }
+  .spatial-review-metric input{ width:100%; color:var(--hf-text); background:rgba(255,255,255,0.03); border:1px solid var(--hf-line); border-radius:6px; padding:7px 9px; font:inherit; }
   .spatial-actions .btn:disabled{ opacity:.45; cursor:not-allowed; }
   .spatial-result{ width:100%; }
   .sendbar{ position:sticky; bottom:0; margin-top:18px; padding:14px 16px; display:flex; align-items:center; gap:14px; border-radius:var(--hf-r-win,12px); }
@@ -434,6 +436,8 @@
           + '<div><span class="note">Input fingerprint</span><br><code title="'+esc(source.input_fingerprint||'')+'">'+esc(digest(source.input_fingerprint))+'</code></div>'
           + '</div>'
           + '<div class="spatial-actions">'
+          + '<label class="spatial-review-metric">Reviewed wall recall (0.90-1.00)<input id="spatialRecall'+index+'" type="number" min="0.90" max="1" step="0.01" value="'+esc(review.reviewed_structural_wall_recall==null?'':review.reviewed_structural_wall_recall)+'" /></label>'
+          + '<label class="spatial-review-metric">Phantom room count<input id="spatialPhantoms'+index+'" type="number" min="0" step="1" value="'+esc(review.phantom_room_count==null?'':review.phantom_room_count)+'" /></label>'
           + '<textarea id="spatialNote'+index+'" aria-label="Spatial review note for '+esc(page.sheet_label||('plate '+(index+1)))+'" placeholder="Review note">'+esc(review.note||'')+'</textarea>'
           + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="accepted"'+((!autoPassed||!urls.overlay_png)?' disabled title="Automated overlay gate must pass and an overlay must be visible before acceptance"':'')+'>Accept overlay</button>'
           + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="rejected">Reject overlay</button>'
@@ -455,7 +459,15 @@
           var plate=plates[index]||{}, gate=plate.automated_gate||{}, integrity=plate.integrity||{};
           if(decision==='accepted' && gate.passed!==true) return;
           var note=document.getElementById('spatialNote'+index);
+          var recallInput=document.getElementById('spatialRecall'+index);
+          var phantomInput=document.getElementById('spatialPhantoms'+index);
           var result=document.getElementById('spatialResult'+index);
+          var recall=recallInput&&recallInput.value!==''?Number(recallInput.value):null;
+          var phantoms=phantomInput&&phantomInput.value!==''?Number(phantomInput.value):null;
+          if(decision==='accepted' && (recall==null || !isFinite(recall) || recall<0.90 || recall>1 || phantoms!==0)){
+            if(result) result.textContent='Acceptance requires reviewed wall recall from 0.90 to 1.00 and exactly zero phantom rooms.';
+            return;
+          }
           var siblings=button.parentNode.querySelectorAll('.spatialDecision');
           Array.prototype.forEach.call(siblings,function(item){item.disabled=true;});
           if(result) result.textContent='Saving '+decision+' review...';
@@ -463,6 +475,8 @@
             artifact_id:plate.artifact_id,
             decision:decision,
             note:note?note.value:'',
+            reviewed_structural_wall_recall:decision==='accepted'?recall:null,
+            phantom_room_count:decision==='accepted'?phantoms:null,
             expected_png_sha256:integrity.png_sha256,
             expected_manifest_sha256:integrity.manifest_sha256
           };
