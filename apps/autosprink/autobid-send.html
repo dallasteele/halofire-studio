@@ -643,8 +643,7 @@
             decision:decision,
             bundle_sha256:(artifact.integrity||{}).bundle_sha256,
             overlay_sha256:(artifact.integrity||{}).overlay_sha256,
-            note:note?note.value:'',
-            by:'doc'
+            note:note?note.value:''
           })})
             .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
             .then(function(response){if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'family review failed'); location.reload();})
