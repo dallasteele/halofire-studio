@@ -505,3 +505,26 @@ The continuation work remains deliberately below the completion bar:
   **5 tests** (combined FP family/vector focus: **35 passed**). N6 remains
   unearned until real held-out truth-point bindings and an accepted family
   review exist.
+
+## 23. CODEX CONTINUATION EVIDENCE — 2026-07-10 (N5 SOURCE-BOUND EVIDENCE)
+
+- Root `074bdb854` adds a strict, frozen external Division-21 evidence contract
+  and a truth-free density audit. Evidence is bound to document ID, physical
+  page, source SHA, source path/snippet, reviewer identity/role, hazard class,
+  hydraulic density, and remote area. Hydraulic gpm/sqft and remote-area
+  values are never converted into layout sqft/head without explicit reviewed
+  layout evidence; all absent or ambiguous evidence remains
+  `production_eligible=false`.
+- The canonical audit confirms **0 trusted numeric `spec_hazard` rows** for all
+  four held-out targets: AZAZ job 4, Circle K job 1999, Kozo job 1143, and
+  Walmart job 622. The audit persists this absence and fails closed rather
+  than manufacturing a density answer. Focused adversarial coverage passes
+  **5 tests**.
+- Studio `b304caa` now exposes hydraulic spec status/source/document/page/path
+  and every density qualifier in the estimator panel, including the missing
+  same-job Division-21 qualifier. The panel remains explicitly
+  diagnostic-only: it cannot alter spacing, pricing, spatial/model3d
+  acceptance, or bid-grade. Focused static coverage remains **8 passed**.
+- N5 remains open until trusted source-bound held-out evidence is actually
+  available and meets the frozen 12% accuracy gate. No database rows,
+  reviewer decisions, or production gates were fabricated or changed.
