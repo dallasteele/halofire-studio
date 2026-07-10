@@ -755,6 +755,7 @@ import { buildBuildingLevels } from '/src/engine/building-levels.js';
 // HF-E1-PLANBUILD (Stream D/E): build REAL per-level 3D from the extracted plan
 // (building-from-plan.js), with the sheet registered UNDER it at the drawing-derived
 // true scale. Replaces the margin-box for Cooperative 1881.
+import { acceptedModel3dToLevels } from '/src/engine/accepted-model3d.js';
 import { buildBuildingFromPlans, computePlanUnderlayTransform, unionFootprintCenter, planBounds } from '/src/engine/building-from-plan.js';
 import { manifestForProject, sheetsForLevel } from '/src/data/plan-manifest.js';
 // HF-C1-PARTMESH (Stream C): true-scale real CAD part meshes (mm->ft, Y-up)
@@ -2613,6 +2614,7 @@ const W2_HEATMAP_URL = '/public/halofire-W2b/recall-definitive.png'; // HF-W2b: 
 const PLAN_BUILD_LEVEL_PAGES = { 1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 23, 7: 26, 8: 29 };
 let planBuildState = null; // { project, data, levelPlans, api, center, activeLevel, loadedSheets:Set, failures }
 let planLevelsJsonPromise = null;
+let acceptedModel3dState = null;
 
 function getPlanLevelsJson() {
   if (!planLevelsJsonPromise) {
@@ -2621,6 +2623,33 @@ function getPlanLevelsJson() {
       .catch((e) => { planLevelsJsonPromise = null; throw e; });
   }
   return planLevelsJsonPromise;
+}
+
+// Optional package handoff: the autobid-send review route links here with the
+// document id. Use the package's real per-floor model only after the same
+// hash-bound overlay gate has passed for every level; otherwise keep the static
+// extracted-plan viewer and surface the reason in __underlayMode. This fetch is
+// deliberately best-effort so a cold/unavailable AutoBid process cannot blank
+// the CAD surface or turn massing into a reviewed model.
+async function getAcceptedModel3dLevels() {
+  let doc;
+  try { doc = new URLSearchParams(location.search).get('doc'); } catch (_) { doc = null; }
+  if (!doc || !/^\d+$/.test(String(doc))) {
+    acceptedModel3dState = { source: 'static-extracted', reason: 'no_document_id' };
+    return { levels: null, reason: 'no_document_id' };
+  }
+  try {
+    const payload = await api('/autobid/package/' + encodeURIComponent(doc) + '?by=doc');
+    const checked = acceptedModel3dToLevels(payload);
+    acceptedModel3dState = checked.levels
+      ? { source: 'accepted-vector-overlay', documentId: checked.sourceDocumentId, levelCount: checked.levels.length }
+      : { source: 'static-extracted', documentId: Number(doc), reason: checked.reason };
+    return checked;
+  } catch (error) {
+    const reason = 'accepted_model3d_fetch_failed:' + String(error && error.message || error);
+    acceptedModel3dState = { source: 'static-extracted', documentId: Number(doc), reason };
+    return { levels: null, reason };
+  }
 }
 
 // HF-BAKED-UNDERLAY: PREFER a small pre-baked, registered underlay PNG over the
@@ -2698,14 +2727,24 @@ function registerPlanBuildUnderlay(entry, levelN, page, source, pageWidthPt, pag
 async function ensurePlanBuildSheet(levelN) {
   const st = planBuildState;
   if (!st || levelN === 'all') return;
-  const page = PLAN_BUILD_LEVEL_PAGES[Number(levelN)];
   const entry = st.api.levels.find((l) => l.level === Number(levelN));
-  if (!page || !entry) return;
+  if (!entry) return;
+  // The level's own derived scale (from its sheet) — never a hardcoded fallback.
+  const lvlSrc = (st.data.levels || []).find((l) => l.level === Number(levelN));
+  const evidence = lvlSrc && lvlSrc.plan && lvlSrc.plan.acceptanceEvidence;
+  // Accepted package plans carry the exact one-based physical page. The static
+  // extracted fixture retains its historical page map as a fallback; accepted
+  // geometry never silently falls back to a guessed page.
+  const page = evidence && Number.isInteger(Number(evidence.physicalPageNumber))
+    ? Number(evidence.physicalPageNumber)
+    : PLAN_BUILD_LEVEL_PAGES[Number(levelN)];
+  if (!(page > 0) || (st.data.source === 'accepted-vector-overlay' && !evidence)) {
+    st.failures.push({ level: levelN, error: 'accepted geometry has no exact physical PDF page mapping - sheet not registered' });
+    return;
+  }
   const key = `arch:p${page}`;
   if (st.loadedSheets.has(key)) return;
   st.loadedSheets.add(key);
-  // The level's own derived scale (from its sheet) — never a hardcoded fallback.
-  const lvlSrc = (st.data.levels || []).find((l) => l.level === Number(levelN));
   const s = lvlSrc && lvlSrc.plan && Number(lvlSrc.plan.scaleFtPerUnit);
   if (!(s > 0)) { st.loadedSheets.delete(key); st.failures.push({ level: levelN, error: 'no derived scaleFtPerUnit for level — sheet not registered (no fabricated scale)' }); return; }
   const scaleText = (lvlSrc && lvlSrc.plan && lvlSrc.plan.scaleText) || `${s} ft/pt`;
@@ -2838,7 +2877,15 @@ function buildPlanBuildPanel() {
 // false (caller falls back to the manifest scaffold) only if the plan JSON is unusable.
 async function renderPlanComprehensionBuild(name) {
   let data;
-  try { data = await getPlanLevelsJson(); }
+  try {
+    // Prefer a complete accepted package model for this document. Pending or
+    // partial review intentionally falls back to the extracted-plan artifact;
+    // it can still be inspected, but it cannot masquerade as accepted 3D.
+    const accepted = await getAcceptedModel3dLevels();
+    data = accepted.levels
+      ? { levels: accepted.levels, source: 'accepted-vector-overlay', sourceDocumentId: accepted.sourceDocumentId }
+      : await getPlanLevelsJson();
+  }
   catch (e) { window.__planBuildError = String(e.message || e); return false; }
   const levels = (data && Array.isArray(data.levels)) ? data.levels : [];
   const levelPlans = levels
@@ -2876,6 +2923,10 @@ async function renderPlanComprehensionBuild(name) {
   window.__underlayMode = {
     mode: 'plan-comprehension-build', project: name,
     summary: api.summary, center, activeLevel: 1,
+    source: data.source || 'static-extracted',
+    sourceDocumentId: data.sourceDocumentId || null,
+    acceptedModel3d: data.source === 'accepted-vector-overlay',
+    pendingReason: data.source === 'accepted-vector-overlay' ? null : (acceptedModel3dState && acceptedModel3dState.reason) || null,
     note: 'building geometry EXTRACTED from vector PDF; sheet registered UNDER it at sheet-derived true scale — needs-verification',
     failures: planBuildState.failures, needsVerification: true,
   };
@@ -2886,6 +2937,39 @@ async function renderPlanComprehensionBuild(name) {
     setLayerVisible: planBuildState.api.setLayerVisible,
     activeLevel: planBuildState.activeLevel,
   } : null);
+
+  // ASSEMBLE-BUILDING verification hook. Proves the REAL extracted geometry (walls + openings +
+  // columns + rooms + fixtures, scale-calibrated) is ASSEMBLED into the renderable Building model
+  // the head-placer + router run on — i.e. the building-from-plan root is in the scene with actual
+  // mesh geometry, not just a counts object. Returns mesh/vertex tallies traversed from the live
+  // root, the root kind/needsVerification flag, and the assembled bbox in feet. Camera-neutral
+  // (read-only). Used by the live end-to-end probe; never mutates the scene or camera.
+  window.__hfAssembly = () => {
+    if (!planBuildState || !planBuildState.api || !planBuildState.api.root) return { built: false, reason: 'no plan build — load/import a plan first' };
+    const root = planBuildState.api.root;
+    let meshCount = 0, vertexCount = 0; const groupNames = new Set();
+    root.traverse((o) => {
+      if (o.isMesh && o.geometry) {
+        meshCount++;
+        const pos = o.geometry.attributes && o.geometry.attributes.position;
+        if (pos) vertexCount += pos.count;
+      }
+      if (o.isGroup && o.name) groupNames.add(o.name);
+    });
+    const b = planBuildState.api.bounds || {};
+    const inScene = !!(planGroup && root.parent === planGroup);
+    return {
+      built: meshCount > 0,
+      inScene,
+      planGroupVisible: !!(planGroup && planGroup.visible),
+      kind: root.userData && root.userData.kind,
+      needsVerification: !!(root.userData && root.userData.needsVerification),
+      meshCount, vertexCount,
+      levelCount: Array.isArray(planBuildState.api.levels) ? planBuildState.api.levels.length : 0,
+      groupNames: [...groupNames].slice(0, 24),
+      bboxFt: Number.isFinite(b.widthFt) ? { widthFt: Math.round(b.widthFt), depthFt: Math.round(b.depthFt) } : null,
+    };
+  };
 
   // PHASE 4 — INTAKE hook. Exposes the reconstructed building model (the head-placer + router
   // run on this): aggregated wall RUNS, openings (cased openings + door positions), and COLUMNS
@@ -2916,7 +3000,9 @@ async function renderPlanComprehensionBuild(name) {
     const insp = $('inspector'), it = $('inspTitle'), ib = $('inspBody');
     return { open: insp && insp.classList.contains('open'), title: it ? it.textContent : '', bodyText: ib ? ib.textContent : '', userData: door.userData };
   };
-  $('status').textContent = `built ${api.summary.levelCount} levels from the extracted plan (floor 1: parking plate + stair cores + rooms) — needs-verification`;
+  $('status').textContent = data.source === 'accepted-vector-overlay'
+    ? `built ${api.summary.levelCount} levels from accepted vector overlays (physical-page bound; needs-verification)`
+    : `built ${api.summary.levelCount} levels from the extracted plan (floor 1: parking plate + stair cores + rooms) — needs-verification`;
   return true;
 }
 
