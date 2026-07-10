@@ -487,5 +487,6 @@ The continuation work remains deliberately below the completion bar:
   family ID, bundle hash, overlay hash, note, and `by=doc`.
 - The UI still labels the family lane `not_attempted` / `not_scored`; it never
   accepts a head count or clears spatial/model3d/bid-grade gates. Focused static
-  coverage remains **8 passed**. A real trusted human decision is still required
-  before N6 scoring can begin.
+  coverage remains **8 passed**, and the live browser smoke now verifies the
+  family controls and candidate context (**1/1**). A real trusted human decision
+  is still required before N6 scoring can begin.
