@@ -478,3 +478,14 @@ The continuation work remains deliberately below the completion bar:
 - Full engine regression after the slice: **763 passed, 10 skipped, 4 warnings**.
   This prepares the human semantic decision but does not score N6 or clear any
   production gate.
+
+## 21. CODEX CONTINUATION EVIDENCE — 2026-07-10 (ESTIMATOR FAMILY DECISION CONTROL)
+
+- Studio `808cec7` completes the estimator action surface. Each verified family
+  group now has Accept/Reject controls, persisted reviewer/role/decision state,
+  overlay-decode gating, and a POST carrying artifact ID, page/physical-page,
+  family ID, bundle hash, overlay hash, note, and `by=doc`.
+- The UI still labels the family lane `not_attempted` / `not_scored`; it never
+  accepts a head count or clears spatial/model3d/bid-grade gates. Focused static
+  coverage remains **8 passed**. A real trusted human decision is still required
+  before N6 scoring can begin.
