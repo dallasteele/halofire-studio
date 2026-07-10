@@ -389,6 +389,14 @@
     function densityResolutionPanel(p){
       var d=p.density_resolution||{};
       var resolution=d.resolution||{}, layout=resolution.layout||{}, review=d.review||{};
+      var provenance=resolution.density_provenance||{};
+      var hydraulic=provenance.hydraulic||resolution.hydraulic||{};
+      var hydraulicStatus=(hydraulic.status||'missing').replace(/_/g,' ');
+      var hydraulicSource=hydraulic.source||'spec_hazard (CSI Division-21 spec text)';
+      var hydraulicDocument=hydraulic.document_id!=null?num(hydraulic.document_id):'-';
+      var hydraulicPage=hydraulic.source_page!=null?num(hydraulic.source_page):'-';
+      var hydraulicPath=hydraulic.rel_path||'-';
+      var qualifiers=Array.isArray(resolution.qualifiers)?resolution.qualifiers.filter(Boolean):[];
       var source=(layout.source||'unresolved').replace(/_/g,' ');
       var status=d.available===true?'available':(review.status||'missing');
       var head=d.available===true?'<span class="pill warn">diagnostic</span>':'<span class="pill warn">'+esc(status.replace(/_/g,' '))+'</span>';
@@ -396,7 +404,11 @@
         ? ' · observed '+num(layout.provenance.observed_head_count)+' heads' : '';
       var body='<div class="stat"><span class="l">Density source</span><span class="v">'+esc(source)+observed+'</span></div>'
         + '<div class="stat"><span class="l">Layout density</span><span class="v">'+(layout.sqft_per_head!=null?num(layout.sqft_per_head)+' sqft/head':'—')+'</span></div>'
+        + '<div class="stat"><span class="l">Hydraulic spec evidence</span><span class="v">'+esc(hydraulicStatus)+' / '+esc(hydraulicSource)+'</span></div>'
+        + '<div class="note"><b>Spec source:</b> document '+esc(hydraulicDocument)+' / page '+esc(hydraulicPage)+' / '+esc(hydraulicPath)+'</div>'
         + '<div class="note">This provenance sidecar is diagnostic-only; it does not alter NFPA spacing, pricing, spatial acceptance, model3d grounding, or bid-grade.</div>';
+      if(qualifiers.length) body+='<div class="note"><b>Required Division-21 evidence:</b><br>'+qualifiers.map(function(item){return esc(item);}).join('<br>')+'</div>';
+      else if(hydraulic.qualifier) body+='<div class="note"><b>Required Division-21 evidence:</b><br>'+esc(hydraulic.qualifier)+'</div>';
       if(d.reason) body+='<div class="note"><b>Residual:</b> '+esc(d.reason.replace(/_/g,' '))+'</div>';
       return '<section class="hf-panel mt" id="densityResolutionPanel"><div class="phd"><span class="t">Density provenance</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
     }

@@ -76,6 +76,12 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('Density source');
     expect(html).toContain('diagnostic-only; it does not alter NFPA spacing');
     expect(html).toContain('observed');
+    expect(html).toContain('Hydraulic spec evidence');
+    expect(html).toContain('density_provenance');
+    expect(html).toContain('source_page');
+    expect(html).toContain('rel_path');
+    expect(html).toContain('Required Division-21 evidence');
+    expect(html).toContain('resolution.qualifiers');
   });
 
   it('requires a decoded stored overlay and an automated pass for acceptance', () => {
