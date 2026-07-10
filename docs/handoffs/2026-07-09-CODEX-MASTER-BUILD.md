@@ -570,3 +570,20 @@ The continuation work remains deliberately below the completion bar:
   18 blockers / 0 numeric hydraulic candidates / 0 explicit layout candidates**
   across AZAZ, Circle K, Kozo, and Walmart. Focused probe coverage is **6
   passed**; all density-focused tests remain **38 passed**.
+
+## 26. CODEX CONTINUATION EVIDENCE — 2026-07-10 (MODEL3D, ROUTE, DEPLOYMENT PROOF)
+
+- Root `e7338c0fb` makes accepted-vector geometry consumable by downstream 3D/CAD
+  clients through validated per-floor `plan.walls` and `plan.rooms` aliases,
+  while `7ac0cb218` proves machine-passed but human-pending overlays remain
+  ungrounded with empty generic geometry. The focused model3d/spatial boundary
+  passes **33 tests**; canonical Cooperative geometry remains correctly
+  `geometry_grounded=false` until human review.
+- Studio `0df4df0` makes the dashboard-to-estimator route contract explicit:
+  `/workbench.html` visibly hands off to `/official-flow.html` while preserving
+  project/hash context. A browser smoke proves the handoff and required review
+  selectors (**1 passed**) without hiding the known route mismatch.
+- Root `ee58af269` adds a typed fail-closed runtime/deployment proof. The live
+  artifact records AutoBid `8770` healthy, Studio `3210` refused, formal prover
+  `8810` refused, verified source HEAD, no deployment authorization, and
+  `deployment_performed=false`; focused proof coverage passes **4 tests**.
