@@ -491,3 +491,17 @@ The continuation work remains deliberately below the completion bar:
   coverage remains **8 passed**, and the live browser smoke now verifies the
   family controls and candidate context (**1/1**). A real trusted human decision
   is still required before N6 scoring can begin.
+
+## 22. CODEX CONTINUATION EVIDENCE — 2026-07-10 (N6 SCORING-ONLY BRIDGE)
+
+- Root `825352f77` adds a scoring-only bridge from an accepted family review to
+  `score_candidate_family`. It persists a truth-free candidate artifact with a
+  content identity, frozen centers, source/page/hash/reviewer binding, then
+  accepts authoritative held-out truth points only in the explicit scoring
+  function. Missing/rejected/ambiguous family reviews, tampering, and absent
+  truth fail closed.
+- The bridge cannot be called by production package/layout/model3d paths and
+  does not mutate N6 or bid-grade state. Its adversarial scoring focus passes
+  **4 tests** (combined FP family/vector focus: **35 passed**). N6 remains
+  unearned until real held-out truth-point bindings and an accepted family
+  review exist.
