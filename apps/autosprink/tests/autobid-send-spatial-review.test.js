@@ -41,6 +41,12 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('not attempted · not scored');
     expect(html).toContain('never clear the spatial or bid-grade gates');
     expect(html).toContain('Truth-free bundle');
+    expect(html).toContain('Reviewed sprinkler-head count');
+    expect(html).toContain('data-decision="accepted"');
+    expect(html).toContain('Accept semantic count');
+    expect(html).toContain("'/fp-vector-review'");
+    expect(html).toContain('expected_bundle_sha256');
+    expect(html).toContain('expected_overlay_sha256');
   });
 
   it('requires a decoded stored overlay and an automated pass for acceptance', () => {

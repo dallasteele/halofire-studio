@@ -505,18 +505,82 @@
       var head=status==='available'?'<span class="pill warn">review only</span>':'<span class="pill warn">'+esc(status.replace(/_/g,' '))+'</span>';
       var rows=artifacts.map(function(artifact,index){
         var page=artifact.page||{};
+        var review=artifact.review||{};
+        var decision=review.decision||'pending';
         return '<div class="spatial-plate" data-fp-vector-artifact="'+esc(artifact.artifact_id||'')+'">'
           + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+num(page.physical_page_number)+'</span></div>'
           + '<div class="stat"><span class="l">Semantic status</span><span class="v">not attempted · not scored</span></div>'
+          + '<div class="stat"><span class="l">Human semantic review</span><span class="v">'+esc(decision.replace(/_/g,' '))+(review.head_count!=null?' · '+num(review.head_count)+' heads':'')+'</span></div>'
           + (artifact.overlay_url?'<img class="spatial-overlay fp-vector-overlay" data-fp-vector-overlay-index="'+index+'" src="'+esc(artifact.overlay_url)+'" alt="FP vector-symbol candidate overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Candidate overlay URL missing.</div>')
           + '<div class="spatial-digests"><div><span class="note">Source PDF SHA-256</span><br><code title="'+esc(artifact.source_pdf_sha256||'')+'">'+esc(digest(artifact.source_pdf_sha256))+'</code></div>'
           + (artifact.bundle_url?'<div><span class="note">Truth-free bundle</span><br><a href="'+esc(artifact.bundle_url)+'">Open bundle JSON</a></div>':'')
+          + '</div>'
+          + '<div class="spatial-actions fp-vector-actions">'
+          + '<label class="spatial-review-metric">Reviewed sprinkler-head count<input id="fpVectorHeadCount'+index+'" type="number" min="1" step="1" value="'+esc(review.head_count==null?'':review.head_count)+'" /></label>'
+          + '<textarea id="fpVectorNote'+index+'" aria-label="FP vector review note for '+esc(page.sheet_label||('candidate '+(index+1)))+'" placeholder="Review note">'+esc(review.note||'')+'</textarea>'
+          + '<button class="btn fpVectorDecision" data-fp-vector-index="'+index+'" data-decision="accepted"'+(decision==='accepted'?' disabled':'')+'>Accept semantic count</button>'
+          + '<button class="btn fpVectorDecision" data-fp-vector-index="'+index+'" data-decision="rejected">Reject candidate</button>'
+          + '<div class="note spatial-result" id="fpVectorResult'+index+'"></div>'
           + '</div></div>';
       }).join('');
       if(!rows) rows='<div class="note">No document-bound FP vector candidate overlay is available.</div>';
       return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span>'+head+'</div><div class="pbd">'
         + '<div class="note" style="margin-bottom:12px">These repeated-vector candidates are estimator-visible review evidence only. They are not sprinkler counts, do not carry answer-key truth, and never clear the spatial or bid-grade gates.</div>'
         + rows+'</div></section>';
+    }
+
+    function bindFpVectorReview(fp){
+      var artifacts=(fp&&fp.artifacts)||[];
+      artifacts.forEach(function(artifact,index){
+        var image=document.querySelector('[data-fp-vector-overlay-index="'+index+'"]');
+        var result=document.getElementById('fpVectorResult'+index);
+        if(image){
+          image.addEventListener('load',function(){
+            if(image.naturalWidth>0 && image.naturalHeight>0){
+              image.setAttribute('data-overlay-visible','true');
+              if(result) result.textContent='Candidate overlay loaded. Count only symbols you can verify against the source sheet.';
+            }
+          });
+          image.addEventListener('error',function(){
+            image.removeAttribute('data-overlay-visible');
+            if(result) result.textContent='Candidate overlay failed to load; semantic review is unavailable.';
+          });
+          if(image.complete && image.naturalWidth>0) image.setAttribute('data-overlay-visible','true');
+        }
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('.fpVectorDecision'),function(button){
+        button.addEventListener('click',function(){
+          var index=Number(button.getAttribute('data-fp-vector-index'));
+          var decision=button.getAttribute('data-decision');
+          var artifact=artifacts[index]||{};
+          var result=document.getElementById('fpVectorResult'+index);
+          var image=document.querySelector('[data-fp-vector-overlay-index="'+index+'"]');
+          var countInput=document.getElementById('fpVectorHeadCount'+index);
+          var note=document.getElementById('fpVectorNote'+index);
+          var count=countInput&&countInput.value!==''?Number(countInput.value):null;
+          if(decision==='accepted' && (!image || image.getAttribute('data-overlay-visible')!=='true')){
+            if(result) result.textContent='Accept only after the stored candidate overlay decodes in the browser.';
+            return;
+          }
+          if(decision==='accepted' && (!Number.isInteger(count) || count<=0)){
+            if(result) result.textContent='Acceptance requires a positive integer count verified by the estimator.';
+            return;
+          }
+          Array.prototype.forEach.call(button.parentNode.querySelectorAll('.fpVectorDecision'),function(item){item.disabled=true;});
+          if(result) result.textContent='Saving '+decision+' semantic review...';
+          api('/package/'+encodeURIComponent(REF)+'/fp-vector-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+            artifact_id:artifact.artifact_id,
+            decision:decision,
+            head_count:decision==='accepted'?count:null,
+            note:note?note.value:'',
+            expected_bundle_sha256:(artifact.integrity||{}).bundle_sha256,
+            expected_overlay_sha256:(artifact.integrity||{}).overlay_sha256
+          })})
+            .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+            .then(function(response){if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'review failed'); location.reload();})
+            .catch(function(error){if(result) result.textContent='FP semantic review failed: '+error.message;});
+        });
+      });
     }
 
     function bindSpatialReview(sv){
@@ -701,6 +765,7 @@
 
       // The overlay review controls only the spatial badge. Export remains independent.
       bindSpatialReview(p.spatial_verification);
+      bindFpVectorReview(p.fp_vector_review);
 
       var btn = document.getElementById('sendBtn');
       if(btn && !sent){
