@@ -601,3 +601,16 @@ The continuation work remains deliberately below the completion bar:
   the required contract), public Studio health reachable but not a local
   deployment proof, missing authorization, and hard-coded
   `deployment_performed=false`. Overall status remains **blocked**.
+
+## 28. CODEX CONTINUATION EVIDENCE — 2026-07-10 (FINAL RUNTIME BINDING)
+
+- Root `fedc7c712` completes the runtime proof boundary: the source commit is
+  accepted only when the supplied identity exactly matches `git rev-parse
+  HEAD`; malformed or mismatched identities are typed blockers, and the CLI
+  cannot enable deployment authorization. Focused runtime coverage is **7
+  passed**; the full engine suite is **790 passed, 10 skipped, 4 warnings**.
+- Final proof artifact `runtime-deployment-proof-20260710T1200Z-v4.json`
+  (`proof_id=4594c07157585a7f412dc8ec46d7b480b7823145f951e76ad24934259e16690d`)
+  records engine healthy, Studio/prover unavailable, source identity verified,
+  authorization absent, and `deployment_performed=false`. The master-build
+  remains open at those external gates and at trusted human FP/spatial review.
