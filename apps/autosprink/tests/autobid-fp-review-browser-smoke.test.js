@@ -177,6 +177,30 @@ describe('AutoBid FP vector semantic review browser boundary', () => {
       expect(await familyButtons.filter({ hasText: 'Reject family' }).first().isEnabled()).toBe(true);
       expect(await page.locator('.family-review-actions input, .family-review-actions [data-head-count]').count()).toBe(0);
       expect(await page.locator('[id^="fpVectorHeadCount"]').first().inputValue()).toBe('');
+
+      // A family eye-gate is the only FP acceptance this truth-free fixture may
+      // exercise: it records provenance without inventing a semantic head count.
+      const familyResponse = page.waitForResponse(
+        (response) => response.url().includes('/fp-vector-family-review'),
+      );
+      await familyButtons.filter({ hasText: 'Accept family' }).first().click();
+      expect((await familyResponse).status()).toBe(200);
+      await page.waitForLoadState('load');
+      await page.locator('#fpVectorReviewPanel').waitFor();
+      const acceptedText = await page.locator('#fpVectorReviewPanel').innerText();
+      expect(acceptedText).toContain('Family review: accepted');
+      expect(acceptedText).toContain('not attempted · not scored');
+      const reviewDb = new Database(path.join(tempDir, 'autobid.db'), { readonly: true });
+      try {
+        const row = reviewDb.prepare(
+          'SELECT decision, reviewer_role, family_id FROM fp_vector_family_reviews ORDER BY id DESC LIMIT 1',
+        ).get();
+        expect(row).toEqual({
+          decision: 'accepted', reviewer_role: 'estimator', family_id: expect.any(String),
+        });
+      } finally {
+        reviewDb.close();
+      }
     } finally {
       await page.close();
     }
