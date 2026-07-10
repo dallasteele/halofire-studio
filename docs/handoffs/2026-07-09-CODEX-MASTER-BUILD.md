@@ -558,3 +558,15 @@ The continuation work remains deliberately below the completion bar:
   restarted before treating the recovered projection as live. N5/N6 and
   production acceptance remain open: no trusted human FP-family/spatial review,
   held-out density score, or formal prover/deployment proof exists.
+
+## 25. CODEX CONTINUATION EVIDENCE — 2026-07-10 (EXPLICIT LAYOUT PROBE)
+
+- Root `79b5b9766` extends the read-only density probe to recognize explicit
+  source statements such as `sq ft per sprinkler/head` separately from
+  hydraulic gpm/sqft. It still emits only source-bound candidates and never
+  promotes a value to the layout prior or production gate.
+- The real-source v2 report
+  `source-bound-density-heldout.v2.json` remains **18 documents / 21 findings /
+  18 blockers / 0 numeric hydraulic candidates / 0 explicit layout candidates**
+  across AZAZ, Circle K, Kozo, and Walmart. Focused probe coverage is **6
+  passed**; all density-focused tests remain **38 passed**.
