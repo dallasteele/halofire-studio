@@ -162,8 +162,21 @@ describe('AutoBid FP vector semantic review browser boundary', () => {
       expect(panelText).toContain('FP-2.1 / 1');
       expect(panelText).toContain('not attempted · not scored');
       expect(panelText).toContain('review evidence only');
+      expect(panelText).toMatch(/Candidate family groups \(\d+\)/);
+      expect(panelText).toContain('Family review: pending');
       expect(await page.locator('.fpVectorDecision[data-decision="accepted"]').isEnabled()).toBe(true);
       expect(await page.locator('.fpVectorDecision[data-decision="rejected"]').isEnabled()).toBe(true);
+      expect(panelText).toContain('Candidate family groups');
+      expect(panelText).toContain('family-group-');
+      expect(await page.locator('.fpVectorFamilyDecision[data-decision="accepted"]').count()).toBeGreaterThan(0);
+      expect(await page.locator('.fpVectorFamilyDecision[data-decision="rejected"]').count()).toBeGreaterThan(0);
+      expect(panelText).toContain('not scored');
+      const familyButtons = page.locator('.fpVectorFamilyDecision');
+      expect(await familyButtons.count()).toBeGreaterThan(0);
+      expect(await familyButtons.filter({ hasText: 'Accept family' }).first().isEnabled()).toBe(true);
+      expect(await familyButtons.filter({ hasText: 'Reject family' }).first().isEnabled()).toBe(true);
+      expect(await page.locator('.family-review-actions input, .family-review-actions [data-head-count]').count()).toBe(0);
+      expect(await page.locator('[id^="fpVectorHeadCount"]').first().inputValue()).toBe('');
     } finally {
       await page.close();
     }
