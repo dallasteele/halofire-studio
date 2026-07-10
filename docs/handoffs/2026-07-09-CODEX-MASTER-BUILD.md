@@ -297,3 +297,26 @@ The continuation work remains deliberately below the completion bar:
   Cooperative overlays have no trusted human review rows, real held-out density
   accuracy is not met, N6 semantic scoring remains unearned, and the VPS
   engine/Studio are stale. No production mutation was authorized or performed.
+
+## 11. CODEX CONTINUATION EVIDENCE — 2026-07-10 (FP REVIEW SURFACE)
+
+- Root `251542e58` now has a separate `fp_vector_review_store.py` contract. A
+  producer must bind a truth-free bundle to `document_id`, `page_index`, the
+  exact physical page, sheet label, and source PDF SHA-256 before it is visible
+  to an estimator. Bundle and PNG bytes are content-addressed and integrity
+  checked; a replacement supersedes the old page artifact.
+- The engine exposes immutable `/fp-vector-artifacts/{id}/overlay.png` and
+  `/bundle.json` routes and adds a package-level `fp_vector_review` projection.
+  It is explicitly `review_only=true`, `semantic_classification=not_attempted`,
+  and `gate_status=not_scored`; it is not read by `spatial_verification`,
+  confidence, model3d grounding, or accepted-layout code.
+- Studio `autobid-send.html` now renders document-bound FP candidate overlays
+  with physical-page identity, source digest, and a truth-free bundle link. The
+  panel has no accept control and states that it cannot clear spatial or
+  bid-grade gates. The unrelated local `apps/autosprink/src/api/server.js`
+  modification remains untouched.
+- New engine/API tests plus the existing spatial/vector suite pass **66 tests**;
+  Studio static checks pass **29 tests**. This proves visibility and isolation,
+  not semantic head-count accuracy. No production FP artifact has been bound
+  to the canonical corpus yet, no reviewer row was fabricated, and no deploy
+  was performed.

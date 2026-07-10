@@ -496,6 +496,29 @@
         + plates+'</div></section>';
     }
 
+    function fpVectorReviewPanel(fp){
+      if(!fp){
+        return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span><span class="pill warn">unavailable</span></div><div class="pbd"><div class="note">No bound FP vector candidate overlay is attached. This review aid never clears spatial verification or bid-grade.</div></div></section>';
+      }
+      var status=fp.status||'missing';
+      var artifacts=fp.artifacts||[];
+      var head=status==='available'?'<span class="pill warn">review only</span>':'<span class="pill warn">'+esc(status.replace(/_/g,' '))+'</span>';
+      var rows=artifacts.map(function(artifact,index){
+        var page=artifact.page||{};
+        return '<div class="spatial-plate" data-fp-vector-artifact="'+esc(artifact.artifact_id||'')+'">'
+          + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+num(page.physical_page_number)+'</span></div>'
+          + '<div class="stat"><span class="l">Semantic status</span><span class="v">not attempted · not scored</span></div>'
+          + (artifact.overlay_url?'<img class="spatial-overlay fp-vector-overlay" data-fp-vector-overlay-index="'+index+'" src="'+esc(artifact.overlay_url)+'" alt="FP vector-symbol candidate overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Candidate overlay URL missing.</div>')
+          + '<div class="spatial-digests"><div><span class="note">Source PDF SHA-256</span><br><code title="'+esc(artifact.source_pdf_sha256||'')+'">'+esc(digest(artifact.source_pdf_sha256))+'</code></div>'
+          + (artifact.bundle_url?'<div><span class="note">Truth-free bundle</span><br><a href="'+esc(artifact.bundle_url)+'">Open bundle JSON</a></div>':'')
+          + '</div></div>';
+      }).join('');
+      if(!rows) rows='<div class="note">No document-bound FP vector candidate overlay is available.</div>';
+      return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span>'+head+'</div><div class="pbd">'
+        + '<div class="note" style="margin-bottom:12px">These repeated-vector candidates are estimator-visible review evidence only. They are not sprinkler counts, do not carry answer-key truth, and never clear the spatial or bid-grade gates.</div>'
+        + rows+'</div></section>';
+    }
+
     function bindSpatialReview(sv){
       var plates=(sv&&sv.plates)||[];
       plates.forEach(function(plate,index){
@@ -623,6 +646,7 @@
       // straight off the /package manifest (all honest three-state, never faked).
       +     geometryPanel(p)
       +     spatialVerificationPanel(p.spatial_verification)
+      +     fpVectorReviewPanel(p.fp_vector_review)
       +     reconcilePanel(p.head_reconcile)
       +     verificationPanel(p.verification)
 

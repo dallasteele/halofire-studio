@@ -13,6 +13,8 @@ describe('AutoBid final spatial review panel', () => {
     const design = html.indexOf('<span class="t">Sprinkler design</span>');
     expect(geometry).toBeGreaterThan(0);
     expect(spatial).toBeGreaterThan(geometry);
+    const fpVector = html.indexOf('+     fpVectorReviewPanel(p.fp_vector_review)');
+    expect(fpVector).toBeGreaterThan(spatial);
     expect(model3d).toBeGreaterThan(spatial);
     expect(design).toBeGreaterThan(model3d);
   });
@@ -29,6 +31,16 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('Registered source viewports:');
     expect(html).toContain('data-viewport-role=');
     expect(html).not.toContain('Object.keys(plate.metrics');
+  });
+
+  it('renders FP vector candidates as estimator-visible, non-gating review evidence', () => {
+    expect(html).toContain('function fpVectorReviewPanel(fp)');
+    expect(html).toContain('id="fpVectorReviewPanel"');
+    expect(html).toContain('data-fp-vector-artifact=');
+    expect(html).toContain('fp-vector-overlay');
+    expect(html).toContain('not attempted · not scored');
+    expect(html).toContain('never clear the spatial or bid-grade gates');
+    expect(html).toContain('Truth-free bundle');
   });
 
   it('requires a decoded stored overlay and an automated pass for acceptance', () => {
