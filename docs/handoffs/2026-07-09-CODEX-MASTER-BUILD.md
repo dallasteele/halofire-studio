@@ -626,3 +626,33 @@ The continuation work remains deliberately below the completion bar:
   `3210` and formal prover `8810` refuse connections; authorization is absent;
   deployment remains false. This refresh prevents stale-HEAD evidence from
   being mistaken for current deployment proof.
+
+## 30. CODEX CONTINUATION EVIDENCE - 2026-07-10 (REVIEW, DENSITY, MODEL3D)
+
+- Root `158ca4a68` adds a read-only source-bound spec inventory. The real report
+  `source-bound-spec-inventory.v1.json` covers eight held-out target plan
+  documents and eight source-bound Division-21 criteria candidates. It records
+  source document/page/snippet hashes and explicit blockers; it contains no
+  answer-key, workbook-summary, or head-count fields. Home Depot job 610 has
+  three trusted-looking spec rows plus five `needs_review` rows, but the
+  inventory remains diagnostic and `production_eligible=false`.
+- Root `d2fccfe93` and Studio `87ebcfe`/`6749940` make the accepted-vector
+  model3d handoff typed and physical-page-bound. Pending or partial geometry is
+  rejected before rendering. The live extracted fallback assembly is real and
+  renderable: eight levels, 2,380 meshes, 668,560 vertices, 822 wall meshes,
+  192 room meshes, and no page errors; it remains `needsVerification=true`.
+- Studio `d425ab0` gates FP semantic/family writes at the authenticated proxy,
+  replacing forged headers with verified JWT identity and rejecting viewers
+  before upstream contact. Studio `0b7c891` proves estimator-visible family
+  acceptance in an isolated test database. Canonical production rows remain
+  zero; no semantic head count or production gate was fabricated.
+- Current verification is green on the scoped lanes: full engine **809 passed,
+  10 skipped, 4 warnings**; source-density inventory/probe focus **31 passed**;
+  accepted model3d focus **20 Python + 13 Studio**; review/proxy/browser focus
+  includes **13 proxy/static + 2 browser**. The current-head runtime proof must
+  be regenerated after this handoff commit.
+- The master objective remains open. Required external gates are still an
+  actual trusted FP semantic review, trusted Cooperative spatial review rows,
+  held-out density at the frozen 12% threshold, strict N6 scoring, a clean
+  whole-Studio regression, and authorized deployment. No deployment was
+  performed.
