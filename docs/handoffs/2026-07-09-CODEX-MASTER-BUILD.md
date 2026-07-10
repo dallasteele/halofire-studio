@@ -366,3 +366,22 @@ The continuation work remains deliberately below the completion bar:
 - Focused repair tests pass **56**; production-wiring tests pass **2** plus the
   relevant regression suite (**162**). The live canonical package remains
   correctly fail-closed because no trusted Cooperative review rows exist.
+
+## 14. CODEX CONTINUATION EVIDENCE — 2026-07-10 (BROAD VERIFICATION)
+
+- Root `4543d9ec7` records the accepted copied-DB geometry evidence without
+  changing the canonical database. The full root engine suite now passes
+  **751 tests**, with **10 skipped** and **4 warnings** under the canonical
+  `C:/Python312/python.exe` runtime. Studio `371beef`/`f9bba98` is green at
+  **10 tests** across the spatial/FP browser/static loop.
+- `verify_agentic_rules.py`, `agent_loop_guard.py validate`, and compileall
+  pass. The local engine health endpoint reports the expected Python 3.12
+  runtime and the live Walmart package still exposes an available,
+  immutable FP artifact while its semantic review is explicitly `missing` and
+  density remains diagnostic-only.
+- Copied-DB Cooperative evidence remains simulation-only: all eight levels
+  are grounded and layout/drawing gates pass with outside-head count zero.
+  The canonical DB still has no trusted semantic FP or Cooperative spatial
+  review rows. Held-out density remains **4/8 within 12%**; GX10 formal prover
+  health is unavailable; VPS deployment is stale and unauthorized. The master
+  goal therefore remains open and no production bid-grade claim is made.
