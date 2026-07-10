@@ -385,3 +385,21 @@ The continuation work remains deliberately below the completion bar:
   review rows. Held-out density remains **4/8 within 12%**; GX10 formal prover
   health is unavailable; VPS deployment is stale and unauthorized. The master
   goal therefore remains open and no production bid-grade claim is made.
+
+## 15. CODEX CONTINUATION EVIDENCE — 2026-07-10 (REVIEWER PROXY + DENSITY CANDIDATE)
+
+- Studio `4bda968` adds an authenticated FP semantic-review proxy smoke. The
+  upstream receives the verified JWT identity (`Real Estimator`, `estimator`),
+  client-forged reviewer headers are replaced, and a read-only user remains
+  fail-closed even when forging admin headers. The focused proxy test passes
+  **4/4**; the engine FP review/API/store focus passes **13/13**. No source
+  server file or canonical review row was changed.
+- A truth-free log-space MAD outlier-rejection candidate was evaluated without
+  modifying the production resolver: held-out density moves from **4/8** and
+  18.9933% MAE to **5/8** and approximately **17.9458% MAE**. AZAZ, Circle K,
+  and Kozo remain materially out of band, so the candidate is not promoted and
+  N5 remains open.
+- The proxy evidence strengthens the trusted-reviewer boundary, but it does
+  not itself create a human review. Canonical FP semantic and Cooperative
+  spatial reviews remain absent; N6 strict vector-symbol scoring, the GX10
+  formal proof lane, and deployment acceptance remain unearned.
