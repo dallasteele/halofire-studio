@@ -475,7 +475,7 @@ The continuation work remains deliberately below the completion bar:
   `missing`. Studio `2bb101c` displays family IDs, anchor/support IDs,
   occurrence counts, co-location support, and eye-gate status beside the
   source/hash context; its focused browser/static checks pass **9** tests.
-- Full engine regression after the slice: **763 passed, 10 skipped, 4 warnings**.
+- Full engine regression after the slice: **768 passed, 10 skipped, 4 warnings**.
   This prepares the human semantic decision but does not score N6 or clear any
   production gate.
 
@@ -502,6 +502,6 @@ The continuation work remains deliberately below the completion bar:
   truth fail closed.
 - The bridge cannot be called by production package/layout/model3d paths and
   does not mutate N6 or bid-grade state. Its adversarial scoring focus passes
-  **4 tests** (combined FP family/vector focus: **35 passed**). N6 remains
+  **5 tests** (combined FP family/vector focus: **35 passed**). N6 remains
   unearned until real held-out truth-point bindings and an accepted family
   review exist.
