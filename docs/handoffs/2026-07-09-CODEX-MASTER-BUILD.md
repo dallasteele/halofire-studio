@@ -320,3 +320,30 @@ The continuation work remains deliberately below the completion bar:
   not semantic head-count accuracy. No production FP artifact has been bound
   to the canonical corpus yet, no reviewer row was fabricated, and no deploy
   was performed.
+
+## 12. CODEX CONTINUATION EVIDENCE — 2026-07-10 (TRUSTED FP REVIEW LOOP)
+
+- Root `ea821d393` corrected the FP review store root. The default API now points
+  at `out/`, matching stored `fp-vector-review/<artifact>/...` relpaths; the
+  real Walmart FP-2.1 bundle is served locally with immutable 200 responses for
+  both bundle JSON (46,419 bytes) and overlay PNG (726,401 bytes).
+- Root `494dedefb` normalizes Cooperative A-101 registered viewport transforms
+  into the composite frame while preserving raw registration transforms and the
+  composite origin. Real physical page 44 extraction now reports two localized
+  views, a registered 340.1 x 60.0 ft composite, and 0.000425 ft registration
+  residual; the inspected overlay visibly covers both upper and lower views.
+- Root `a23472d46` and `2edc4a2ca` add the strict, source-bound reviewed-FP head
+  evidence contract. Root `526cda756` persists trusted estimator/admin semantic
+  reviews with artifact/page/hash binding and exposes them at the separate
+  `/package/{ref}/fp-vector-review` route. Accepted reviews can emit
+  `project_overlay_evidence`; they never mutate `spatial_verification`, model3d,
+  or bid-grade automatically. No count was entered for the Walmart artifact.
+- Studio `1c6d257` adds the estimator browser flow. An authenticated browser
+  smoke against package ref 234 (Walmart workbook doc 108566 -> FP sibling doc
+  108569) rendered and decoded the real FP-2.1 overlay, showed physical page 1,
+  and exposed semantic review controls. Viewer role denial and estimator
+  missing-count fail-closed checks returned 403 and 422 respectively.
+- Full engine suite: **748 passed, 10 skipped**. Focused review/evidence tests:
+  **25 passed**. Studio spatial/FP browser/static loop: **9 passed**. Rule
+  verifier and compileall pass. The FP semantic count remains unaccepted and
+  N6 held-out scoring remains unearned; no deploy was performed.
