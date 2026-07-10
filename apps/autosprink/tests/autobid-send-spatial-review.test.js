@@ -56,4 +56,15 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).not.toContain('JSON.stringify({ qualifiers: edited })');
     expect(html).not.toMatch(/sendBtn[^\n]+spatial_verification/);
   });
+
+  it('withholds provisional studio drawing until accepted vector geometry is present', () => {
+    expect(html).toContain('window.__AGD = p.accepted_geometry_drawing || null;');
+    expect(html).toContain('window.__AGD && (window.__AGD.available!==true || window.__AGD.accepted_geometry!==true)');
+    expect(html).toContain('sd.accepted_geometry!==true');
+    expect(html).toContain('Per-room drawing withheld pending human overlay review.');
+    expect(html).toContain('provisional raster/rectangle drawing is not rendered');
+    expect(html).toContain('var poly=r.polygon_ft||r.poly;');
+    expect(html).toContain('p.wallRuns||[]');
+    expect(html).toContain('walls+rooms+segs+dots+riser');
+  });
 });

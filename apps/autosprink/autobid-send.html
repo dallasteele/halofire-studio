@@ -164,16 +164,38 @@
     // P3 per-room layout: render the richest studio_drawing plate (room rects + heads +
     // routed pipe), true-scale. This is the faithful PER-ROOM placement (vs the uniform
     // /design bbox grid). Returns '' if no studio_drawing so we fall back to /design.
-    function studioPlateSVG(p){
+    function studioPlateSVG(p, acceptedGeometry){
       var b = p.bounds_ft||{}, W=b.width_ft||0, H=b.height_ft||0;
       if(!(W>0)||!(H>0)) return '';
       var pad=12, maxW=560, k=maxW/W;
       var svgW=Math.round(W*k+pad*2), svgH=Math.round(H*k+pad*2);
       var X=function(x){return (pad+(x-(b.min_x||0))*k).toFixed(1);};
       var Y=function(y){return (pad+((b.max_y||H)-y)*k).toFixed(1);};
+      function point(value){
+        if(Array.isArray(value)&&value.length>=2) return [Number(value[0]),Number(value[1])];
+        if(value&&Number.isFinite(Number(value.x))&&Number.isFinite(Number(value.y))) return [Number(value.x),Number(value.y)];
+        return null;
+      }
+      function polygonPath(r){
+        var poly=r.polygon_ft||r.poly;
+        if(!Array.isArray(poly)||poly.length<3) return '';
+        var points=poly.map(point);
+        if(points.some(function(v){return !v||!Number.isFinite(v[0])||!Number.isFinite(v[1]);})) return '';
+        return '<path d="M '+points.map(function(v){return X(v[0])+' '+Y(v[1]);}).join(' L ')+' Z" fill="rgba(74,222,128,.05)" stroke="rgba(74,222,128,.4)" stroke-width="0.6" />';
+      }
       var rooms=(p.rooms||[]).map(function(r){
+        if(acceptedGeometry){
+          var polygon=polygonPath(r);
+          if(polygon) return polygon;
+        }
         return '<rect x="'+X(r.x0_ft)+'" y="'+Y(r.y1_ft)+'" width="'+((r.x1_ft-r.x0_ft)*k).toFixed(1)+'" height="'+((r.y1_ft-r.y0_ft)*k).toFixed(1)+'" fill="rgba(74,222,128,.05)" stroke="rgba(74,222,128,.4)" stroke-width="0.6" />';
       }).join('');
+      var walls=acceptedGeometry?(p.wallRuns||[]).map(function(w){
+        var a=point(w.a||w.start||w.p0||{x:w.x0,y:w.y0});
+        var z=point(w.b||w.end||w.p1||{x:w.x1,y:w.y1});
+        if(!a||!z) return '';
+        return '<line x1="'+X(a[0])+'" y1="'+Y(a[1])+'" x2="'+X(z[0])+'" y2="'+Y(z[1])+'" stroke="rgba(248,113,113,.75)" stroke-width="1" stroke-linecap="round" />';
+      }).join(''):'';
       var segs=((p.pipe||{}).segments||[]).map(function(s){
         if(s.x1===s.x2&&s.y1===s.y2) return '';
         var st=pipeStyle(s.size_in);
@@ -181,13 +203,24 @@
       }).join('');
       var dots=(p.heads||[]).map(function(h){ return '<circle cx="'+X(h.x)+'" cy="'+Y(h.y)+'" r="1.6" fill="#7dd3fc" />'; }).join('');
       var riser=(p.pipe&&p.pipe.riser)?'<rect x="'+(X(p.pipe.riser.x)-3.5)+'" y="'+(Y(p.pipe.riser.y)-3.5)+'" width="7" height="7" fill="#f87171" />':'';
-      return '<div class="planwrap"><svg viewBox="0 0 '+svgW+' '+svgH+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Per-room layout '+esc(p.label||'')+'">'+rooms+segs+dots+riser+'</svg></div>';
+      return '<div class="planwrap"><svg viewBox="0 0 '+svgW+' '+svgH+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Per-room layout '+esc(p.label||'')+'">'+walls+rooms+segs+dots+riser+'</svg></div>';
     }
-    function renderStudioDrawing(sd){
+    function renderPendingStudioDrawing(sd, accepted){
+      var body=document.getElementById('designBody'), verdict=document.getElementById('designVerdict');
+      if(!body) return false;
+      var reason=(accepted&&accepted.reason)|| (sd&&sd.accepted_geometry_reason) || 'accepted vector geometry is not available';
+      verdict.innerHTML='<span class="pill warn">geometry review pending</span>';
+      body.innerHTML='<div class="note"><b>Per-room drawing withheld pending human overlay review.</b> The provisional raster/rectangle drawing is not rendered. '+esc(reason)+'. Accept a stored vector overlay before this drawing can be used.</div>';
+      return true;
+    }
+    function renderStudioDrawing(sd, accepted){
       var body=document.getElementById('designBody'), verdict=document.getElementById('designVerdict');
       if(!body||!sd||sd.available===false||!(sd.plates||[]).length) return false;
+      if(!accepted||accepted.available!==true||accepted.accepted_geometry!==true||sd.accepted_geometry!==true){
+        return renderPendingStudioDrawing(sd, accepted);
+      }
       var p=sd.plates.slice().sort(function(a,b){return (b.head_count||0)-(a.head_count||0);})[0];
-      var svg=studioPlateSVG(p);
+      var svg=studioPlateSVG(p, true);
       if(!svg) return false;
       var coh = sd.cohesion_ok;
       verdict.innerHTML = (coh? '<span class="pill ok">cohesion: one system</span>':'<span class="pill warn">disjoint network</span>')
@@ -210,9 +243,13 @@
       var body = document.getElementById('designBody');
       var verdict = document.getElementById('designVerdict');
       if(!body) return;
-      // Prefer the P3 per-room studio_drawing carried on the package (faithful per-room
-      // placement). Only fall back to the /design uniform grid if it's absent.
-      if(window.__SD && renderStudioDrawing(window.__SD)) return;
+      // Prefer the N3 accepted vector drawing carried on the package. A legacy
+      // raster/rectangle studio_drawing is deliberately withheld until its paired
+      // accepted_geometry_drawing has passed the overlay gate.
+      if(window.__AGD && (window.__AGD.available!==true || window.__AGD.accepted_geometry!==true)){
+        renderPendingStudioDrawing(window.__SD, window.__AGD); return;
+      }
+      if(window.__SD && renderStudioDrawing(window.__SD, window.__AGD)) return;
       api('/design/'+encodeURIComponent(REF)).then(function(r){ return r.ok?r.json():r.json().then(function(e){throw e;}); }).then(function(d){
         if(!d || d.available===false){
           if(d && d.cohesion_failed){ verdict.innerHTML='<span class="pill warn">cohesion failed</span>'; }
@@ -526,6 +563,7 @@
       var conf = p.confidence||null;
       // P3 per-room layout carried on the package (preferred plan source for loadDesign).
       window.__SD = p.studio_drawing || null;
+      window.__AGD = p.accepted_geometry_drawing || null;
       // doc id for the 3D viewer + Bluebeam draw links (package ref is the doc when ?by=doc).
       var docId = (p.meta&&p.meta.document_id) || rb.document_id || ((p.studio_drawing||{}).plates? p.ref : null);
       var navLinks = docId
