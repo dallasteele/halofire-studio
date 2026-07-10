@@ -394,11 +394,11 @@ The continuation work remains deliberately below the completion bar:
   fail-closed even when forging admin headers. The focused proxy test passes
   **4/4**; the engine FP review/API/store focus passes **13/13**. No source
   server file or canonical review row was changed.
-- A truth-free log-space MAD outlier-rejection candidate was evaluated without
-  modifying the production resolver: held-out density moves from **4/8** and
-  18.9933% MAE to **5/8** and approximately **17.9458% MAE**. AZAZ, Circle K,
-  and Kozo remain materially out of band, so the candidate is not promoted and
-  N5 remains open.
+- Root `1b6070257` persists that truth-free log-space MAD outlier-rejection
+  candidate in an isolated, non-production audit module. Held-out density moves
+  from **4/8** and 18.9933% MAE to **5/8** and **17.9458% MAE**. The persisted
+  artifact contains no answer-key fields; AZAZ, Circle K, and Kozo remain
+  materially out of band, so the candidate is not promoted and N5 remains open.
 - The proxy evidence strengthens the trusted-reviewer boundary, but it does
   not itself create a human review. Canonical FP semantic and Cooperative
   spatial reviews remain absent; N6 strict vector-symbol scoring, the GX10
