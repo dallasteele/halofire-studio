@@ -317,9 +317,9 @@ The continuation work remains deliberately below the completion bar:
   modification remains untouched.
 - New engine/API tests plus the existing spatial/vector suite pass **66 tests**;
   Studio static checks pass **29 tests**. This proves visibility and isolation,
-  not semantic head-count accuracy. No production FP artifact has been bound
-  to the canonical corpus yet, no reviewer row was fabricated, and no deploy
-  was performed.
+  not semantic head-count accuracy. At that checkpoint no canonical FP artifact
+  was bound and no reviewer row was fabricated; the later local Walmart binding
+  and review-loop evidence are recorded below. No deploy was performed.
 
 ## 12. CODEX CONTINUATION EVIDENCE — 2026-07-10 (TRUSTED FP REVIEW LOOP)
 
