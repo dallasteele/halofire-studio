@@ -286,7 +286,14 @@ The continuation work remains deliberately below the completion bar:
   source viewport provenance (upper/lower roles, dimensions, transforms) beside
   the stored overlay. `df2079dff` rejects non-estimator/admin spatial-review
   roles at the engine boundary.
+- `251542e58` adds a truth-free FP review bundle: co-located vector paint variants
+  are grouped, disjoint families remain separate, and a hash-bound multi-color
+  overlay is rendered for eye review. A real Walmart FP2.1 probe produced four
+  review groups (364, 364, 159, and 119 centers; 1,006 markers) that visibly land
+  on repeated plan symbols. Semantic head classification and strict held-out
+  scoring remain **not attempted**; the bundle is not a count and cannot clear a
+  gate.
 - Focused evidence is green, but the requirement audit is still open: canonical
   Cooperative overlays have no trusted human review rows, real held-out density
-  accuracy is not met, N6 FP held-out scoring remains not attempted, and the VPS
+  accuracy is not met, N6 semantic scoring remains unearned, and the VPS
   engine/Studio are stale. No production mutation was authorized or performed.
