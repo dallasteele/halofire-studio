@@ -312,9 +312,9 @@ The continuation work remains deliberately below the completion bar:
   confidence, model3d grounding, or accepted-layout code.
 - Studio `autobid-send.html` now renders document-bound FP candidate overlays
   with physical-page identity, source digest, and a truth-free bundle link. The
-  panel has no accept control and states that it cannot clear spatial or
-  bid-grade gates. The unrelated local `apps/autosprink/src/api/server.js`
-  modification remains untouched.
+  panel exposes a separate trusted semantic-review control and states that it
+  cannot clear spatial or bid-grade gates. The unrelated local
+  `apps/autosprink/src/api/server.js` modification remains untouched.
 - New engine/API tests plus the existing spatial/vector suite pass **66 tests**;
   Studio static checks pass **29 tests**. This proves visibility and isolation,
   not semantic head-count accuracy. At that checkpoint no canonical FP artifact
