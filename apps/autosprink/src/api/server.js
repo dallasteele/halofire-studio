@@ -804,6 +804,73 @@ app.delete('/api/bids/:id', authMiddleware, requireRole('admin'), (req, res) => 
   res.json({ message: 'Bid deleted' });
 });
 
+// ── AutoBid (ADR-001 single-gate) — proxy to the corpus intelligence engine ──
+// The Python engine (halofire-autobid, FastAPI on :8770) holds the corpus brain:
+// 1,046 priced bids, comparables, Qwen profile extraction, hydraulics, the
+// BuildingModel + the autonomous ReadyBid package + outgoing proposal PDF. The
+// studio owns auth + glass shell + email; it reaches the intelligence through this
+// authenticated proxy. /api/autobid/<X> -> <engine>/<X> (query + body preserved,
+// binary-safe so /proposal PDFs stream through). The single review-and-send gate
+// (ADR-001) supersedes the legacy official-flow gates.
+const AUTOBID_ENGINE_URL = (process.env.AUTOBID_ENGINE_URL || 'http://127.0.0.1:8770').replace(/\/+$/, '');
+app.all('/api/autobid/*', authMiddleware, async (req, res, next) => {
+  const subPath = req.params[0] || '';
+  // Do NOT shadow the legacy studio-Node AutoBid routes that have their own explicit
+  // handlers later in this file (the old CRM intake). Fall through so those still run.
+  const LEGACY_AUTOBID = new Set(['intake/status', 'intake/poll']);
+  if (LEGACY_AUTOBID.has(subPath)) return next();
+  const qIdx = req.originalUrl.indexOf('?');
+  const qs = qIdx >= 0 ? req.originalUrl.slice(qIdx) : '';
+  const target = `${AUTOBID_ENGINE_URL}/${subPath}${qs}`;
+  const isSpatialReviewWrite = req.method === 'POST'
+    && /^package\/[^/]+\/spatial-review$/.test(subPath);
+  // Until estimator/reviewer roles exist in the Studio identity model, only an
+  // administrator may change the governed spatial-review state. Reads remain
+  // available to every authenticated Studio user.
+  if (isSpatialReviewWrite && normalizeRole(req.user?.role) !== 'admin') {
+    return res.status(403).json({ error: 'Admin role required for spatial review' });
+  }
+  try {
+    // Reviewer identity is derived exclusively from the verified Studio JWT.
+    // Never forward client-supplied x-halofire-reviewer-* headers.
+    const init = {
+      method: req.method,
+      headers: {
+        'x-halofire-reviewer-id': String(req.user.id),
+        'x-halofire-reviewer-name': String(req.user.name || req.user.username),
+        'x-halofire-reviewer-role': normalizeRole(req.user.role),
+      },
+    };
+    if (!['GET', 'HEAD'].includes(req.method)) {
+      init.headers['content-type'] = req.get('content-type') || 'application/json';
+      init.body = (req.body && typeof req.body === 'object') ? JSON.stringify(req.body) : (req.body || undefined);
+    }
+    const upstream = await fetch(target, init);
+    res.status(upstream.status);
+    const responseHeaders = [
+      'content-type',
+      'etag',
+      'cache-control',
+      'x-content-type-options',
+      'content-disposition',
+    ];
+    for (const header of responseHeaders) {
+      const value = upstream.headers.get(header);
+      if (value) res.set(header, value);
+    }
+    if (!upstream.headers.get('content-type')) res.set('content-type', 'application/octet-stream');
+    res.send(Buffer.from(await upstream.arrayBuffer()));
+  } catch (err) {
+    (log.error || console.error)(`autobid proxy failed: ${target} -> ${err.message}`);
+    res.status(502).json({
+      error: 'autobid_engine_unreachable',
+      detail: err.message,
+      target,
+      hint: 'Start the AutoBid engine: C:/Python312/python.exe engine/api.py (in halofire-autobid)',
+    });
+  }
+});
+
 // ── Projects CRUD ──
 app.get('/api/projects', authMiddleware, (req, res) => {
   const projects = db.prepare('SELECT * FROM projects ORDER BY created_at DESC').all();
