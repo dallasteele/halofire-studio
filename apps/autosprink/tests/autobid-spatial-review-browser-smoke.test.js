@@ -182,6 +182,8 @@ describe('AutoBid spatial review live browser boundary', () => {
       await page.locator('#spatialVerificationPanel').waitFor();
       const images = page.locator('.spatial-overlay');
       expect(await images.count()).toBe(8);
+      expect(await page.locator('.spatial-review-frame').count()).toBe(8);
+      expect(await page.locator('[data-spatial-zoom]').count()).toBe(8);
       // The product uses lazy loading. Visit every plate just as an estimator
       // must, then require a real browser decode before any acceptance assertion.
       for (let index = 0; index < 8; index += 1) {
@@ -203,7 +205,15 @@ describe('AutoBid spatial review live browser boundary', () => {
         fs.mkdirSync(path.dirname(screenshotPath), { recursive: true });
         await page.screenshot({ path: screenshotPath, fullPage: true });
       }
+      if (process.env.AUTOBID_REVIEW_A101_SCREENSHOT_PATH) {
+        const screenshotPath = path.resolve(process.env.AUTOBID_REVIEW_A101_SCREENSHOT_PATH);
+        fs.mkdirSync(path.dirname(screenshotPath), { recursive: true });
+        await page.locator('.spatial-review-frame').first().screenshot({ path: screenshotPath });
+      }
       const panelText = await page.locator('#spatialVerificationPanel').innerText();
+      expect(panelText).toContain('Indexed source page (zero-based)');
+      expect(panelText).toContain('upper (network-0)');
+      expect(panelText).toContain('lower (network-1)');
       for (const physicalPage of [44, 47, 50, 53, 56, 59, 62, 65]) {
         expect(panelText).toContain(`/ ${physicalPage}`);
       }

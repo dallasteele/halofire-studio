@@ -24,6 +24,7 @@ describe('AutoBid final spatial review panel', () => {
   it('shows the stored overlay, physical sheet/page, allowlisted metrics, and digests', () => {
     expect(html).toContain('urls.overlay_png');
     expect(html).toContain('Sheet / physical page');
+    expect(html).toContain('Indexed source page (zero-based)');
     expect(html).toContain('var SPATIAL_METRICS = [');
     expect(html).toContain("['classified_wall_ink_coverage','Classified wall ink coverage','pct']");
     expect(html).toContain('PNG SHA-256');
@@ -32,6 +33,11 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('plate.viewport_provenance');
     expect(html).toContain('Registered source viewports:');
     expect(html).toContain('data-viewport-role=');
+    expect(html).toContain('spatial-review-frame');
+    expect(html).toContain('Stored source-PDF pixels + derived walls/rooms composite.');
+    expect(html).toContain('data-spatial-zoom=');
+    expect(html).toContain('source bbox');
+    expect(html).toContain('geometry bbox');
     expect(html).not.toContain('Object.keys(plate.metrics');
   });
 

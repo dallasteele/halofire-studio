@@ -59,7 +59,17 @@
   .floorpill.real{ border-color:rgba(74,222,128,0.4); } .floorpill.placeholder{ border-color:rgba(251,191,36,0.3); color:var(--hf-muted); }
   .spatial-plate{ border-top:1px solid var(--hf-line); padding-top:14px; margin-top:14px; }
   .spatial-plate:first-child{ border-top:0; padding-top:0; margin-top:0; }
-  .spatial-overlay{ display:block; width:100%; height:auto; margin:10px 0; border:1px solid var(--hf-line); border-radius:8px; background:#fff; }
+  /* Bluebeam-like review frame: the stored image is a source-PDF + derived
+     geometry composite.  Keep it bounded and zoomable so an estimator can
+     inspect the actual pixels before recording a decision. */
+  .spatial-review-frame{ margin:10px 0; border:1px solid var(--hf-line); border-radius:8px; background:#0b1018; overflow:auto; }
+  .spatial-review-frame figcaption{ padding:7px 9px; border-bottom:1px solid var(--hf-line); color:var(--hf-muted); font-size:11px; line-height:1.4; }
+  .spatial-review-toolbar{ display:flex; align-items:center; gap:8px; padding:7px 9px; border-bottom:1px solid var(--hf-line); color:var(--hf-muted); font-size:11px; }
+  .spatial-review-toolbar input[type=range]{ flex:1; min-width:120px; accent-color:var(--hf-color-accent,#f0a868); }
+  .spatial-review-toolbar output{ min-width:42px; text-align:right; color:var(--hf-text); font-variant-numeric:tabular-nums; }
+  .spatial-review-frame .spatial-overlay{ display:block; width:100%; min-width:100%; height:auto; margin:0; border:0; border-radius:0; background:#fff; transform-origin:top left; }
+  .spatial-review-frame .spatial-overlay[data-overlay-visible="false"]{ opacity:.65; }
+  .spatial-viewport{ display:inline-block; }
   .spatial-digests{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px 14px; margin-top:9px; }
   .spatial-digests code{ color:var(--hf-muted); font-size:10px; overflow-wrap:anywhere; }
   .spatial-actions{ display:flex; align-items:flex-start; gap:8px; margin-top:10px; flex-wrap:wrap; }
@@ -468,6 +478,10 @@
       if(!s) return '&mdash;';
       return s.length>24 ? s.slice(0,12)+'...'+s.slice(-8) : s;
     }
+    function viewportBox(value){
+      if(!Array.isArray(value) || value.length!==4 || value.some(function(item){return typeof item!=='number'||!isFinite(item);})) return '';
+      return value.map(function(item){return Number(item).toFixed(1);}).join(', ');
+    }
     function spatialVerificationPanel(sv){
       if(!sv){
         return '<section class="hf-panel mt" id="spatialVerificationPanel"><div class="phd"><span class="t">Final spatial verification</span><span class="pill warn">unavailable</span></div><div class="pbd"><div class="note">No durable spatial overlay artifact is attached. The spatial badge remains unearned; honest package export is still available.</div></div></section>';
@@ -491,16 +505,30 @@
             ? (' / '+num(viewport.printed_long_ft)+' x '+num(viewport.printed_short_ft)+' ft') : '';
           var transform=Array.isArray(viewport.transform_ft)&&viewport.transform_ft.length===2
             ? (' / transform '+num(viewport.transform_ft[0])+' x '+num(viewport.transform_ft[1])+' ft') : '';
+          var sourceBox=viewportBox(viewport.source_bbox_pt);
+          var geometryBox=viewportBox(viewport.geometry_bbox_pt);
+          var boxes=(sourceBox||geometryBox)
+            ? (' / source bbox ['+esc(sourceBox||'&mdash;')+']'+(geometryBox?' / geometry bbox ['+esc(geometryBox)+']':'')) : '';
           return '<span class="spatial-viewport" data-viewport-role="'+esc(viewport.role||'')+'">'
-            + esc(viewport.role||'viewport')+' ('+esc(viewport.block_id||'')+')'+dims+transform+'</span>';
+            + esc(viewport.role||'viewport')+' ('+esc(viewport.block_id||'')+')'+dims+transform+boxes+'</span>';
         }).join(' &middot; ');
+        var physicalPage=page.physical_page_number==null?'&mdash;':num(page.physical_page_number);
+        var pageIndex=page.page_index==null?'&mdash;':num(page.page_index);
+        var overlayFrame=urls.overlay_png
+          ? '<figure class="spatial-review-frame" data-spatial-review-frame="'+index+'">'
+            + '<figcaption>Stored source-PDF pixels + derived walls/rooms composite. Inspect both localized views; red outlines identify source viewports and blue lines are extracted wall centerlines.</figcaption>'
+            + '<div class="spatial-review-toolbar"><label for="spatialZoom'+index+'">Zoom</label><input id="spatialZoom'+index+'" data-spatial-zoom="'+index+'" type="range" min="100" max="300" step="10" value="100" /><output id="spatialZoomValue'+index+'" for="spatialZoom'+index+'">100%</output></div>'
+            + '<img class="spatial-overlay" data-spatial-overlay-index="'+index+'" src="'+esc(urls.overlay_png)+'" alt="Stored source-PDF and derived wall/room overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(physicalPage)+'" loading="lazy" />'
+            + '</figure>'
+          : '<div class="note">Overlay image URL missing; acceptance is unavailable.</div>';
         return '<div class="spatial-plate" data-spatial-artifact="'+esc(plate.artifact_id||'')+'">'
-          + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+num(page.physical_page_number)+'</span></div>'
+          + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+physicalPage+'</span></div>'
+          + '<div class="stat"><span class="l">Indexed source page (zero-based)</span><span class="v">'+pageIndex+'</span></div>'
           + '<div class="stat"><span class="l">Automated overlay gate</span><span class="v">'+(autoPassed?'<span class="pill ok">pass</span>':'<span class="pill warn">fail</span>')+'</span></div>'
           + '<div class="stat"><span class="l">Human review</span><span class="v">'+esc(decision.replace(/_/g,' '))+'</span></div>'
           + (viewportRows?'<div class="note"><b>Registered source viewports:</b> '+viewportRows+'</div>':'')
           + (gateReasons?'<div class="note"><b>Automated residual:</b> '+gateReasons+'</div>':'')
-          + (urls.overlay_png?'<img class="spatial-overlay" data-spatial-overlay-index="'+index+'" src="'+esc(urls.overlay_png)+'" alt="Spatial wall and room overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Overlay image URL missing; acceptance is unavailable.</div>')
+          + overlayFrame
           + metricRows
           + '<div class="spatial-digests">'
           + '<div><span class="note">PNG SHA-256</span><br><code title="'+esc(integrity.png_sha256||'')+'">'+esc(digest(integrity.png_sha256))+'</code></div>'
@@ -664,7 +692,7 @@
       });
     }
 
-    function bindSpatialReview(sv){
+      function bindSpatialReview(sv){
       var plates=(sv&&sv.plates)||[];
       plates.forEach(function(plate,index){
         var gate=plate.automated_gate||{};
@@ -766,6 +794,24 @@
         }
       }
 
+      function bindSpatialReviewFrames(){
+        Array.prototype.forEach.call(document.querySelectorAll('[data-spatial-zoom]'),function(slider){
+          var index=slider.getAttribute('data-spatial-zoom');
+          var frame=document.querySelector('[data-spatial-review-frame="'+index+'"]');
+          var image=frame&&frame.querySelector('.spatial-overlay');
+          var output=document.getElementById('spatialZoomValue'+index);
+          if(!frame||!image) return;
+          var update=function(){
+            var percent=Math.max(100,Math.min(300,Number(slider.value)||100));
+            image.style.width=percent+'%';
+            if(output) output.value=percent+'%';
+            if(output) output.textContent=percent+'%';
+          };
+          slider.addEventListener('input',update);
+          update();
+        });
+      }
+
       var html = ''
       + '<div class="head">'
       +   '<div><div class="jn">'+esc(rb.job_name||('Bid '+REF))+'</div><div class="loc">'+esc(rb.location||rb.builder||'')+' · '+(rb.authoritative_sqft?Number(rb.authoritative_sqft).toLocaleString()+' sq ft':'')+'</div></div>'
@@ -847,6 +893,7 @@
 
       // The overlay review controls only the spatial badge. Export remains independent.
       bindSpatialReview(p.spatial_verification);
+      bindSpatialReviewFrames();
       bindFpVectorReview(p.fp_vector_review);
 
       var btn = document.getElementById('sendBtn');
