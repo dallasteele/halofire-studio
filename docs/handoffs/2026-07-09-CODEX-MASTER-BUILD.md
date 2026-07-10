@@ -406,7 +406,9 @@ The continuation work remains deliberately below the completion bar:
 
 ## 16. CODEX CONTINUATION EVIDENCE — 2026-07-10 (N6 VECTOR PROBE)
 
-- The truth-free held-out vector scan covers six FP artifacts. Repeated-glyph
+- Root `37ae8aefa` persists the reusable probe artifact
+  `out/corpus_backtest/fp-vector-repeat-fingerprint-probe.v1.json`. The
+  truth-free held-out vector scan covers six FP artifacts. Repeated-glyph
   fingerprints nominate review candidates, but every artifact remains
   `semantic_classification=not_attempted` / `gate_status=not_scored`.
   The persisted blockers are explicit: no held-out truth-point binding, no
