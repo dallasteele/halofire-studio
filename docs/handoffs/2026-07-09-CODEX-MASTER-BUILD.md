@@ -347,3 +347,19 @@ The continuation work remains deliberately below the completion bar:
   **25 passed**. Studio spatial/FP browser/static loop: **9 passed**. Rule
   verifier and compileall pass. The FP semantic count remains unaccepted and
   N6 held-out scoring remains unearned; no deploy was performed.
+
+## 13. CODEX CONTINUATION EVIDENCE — 2026-07-10 (PRODUCTION SIDECAR + 8-FLOOR REPAIR)
+
+- Root `8cb1a782b` wires one-and-only-one current accepted FP review into a
+  `density_resolution` sidecar on `/layout` and `/package`. Multiple accepted
+  pages, missing review, or integrity failure remain explicit residuals. The
+  sidecar is `diagnostic_only_code_spacing_unchanged`: it does not re-price,
+  alter NFPA spacing, clear spatial/model3d gates, or promote bid-grade.
+- Root `89d01ec13` applies deterministic Shapely `make_valid` splitting to
+  ordinary accepted plates, not only disjoint bundles. Copied-DB Cooperative
+  end-to-end evidence now shows all 8 levels model3d-grounded, accepted layout
+  passed, accepted drawing available on all 8 plates, and outside-head count 0;
+  per-level head counts were 226, 211, 241, 266, 237, 328, 266, and 269.
+- Focused repair tests pass **56**; production-wiring tests pass **2** plus the
+  relevant regression suite (**162**). The live canonical package remains
+  correctly fail-closed because no trusted Cooperative review rows exist.
