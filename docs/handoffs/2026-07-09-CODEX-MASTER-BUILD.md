@@ -773,3 +773,25 @@ The continuation work remains deliberately below the completion bar:
   vector-grounded 3D/drawing, density at the frozen threshold, production N6, and
   formal deployment authorization still require real external evidence. No answer
   key, human decision, transmission, or authorization was fabricated.
+
+## 35. CODEX CONTINUATION EVIDENCE - 2026-07-11 (LIVE 3D SOURCE IDENTITY AND MODULE RUNTIME)
+
+- Studio `7fa910c` fixes a live identity defect in the PDF-to-3D route. A request
+  such as `/autosprink.html?doc=34978` now resolves the canonical AutoBid package
+  before initialization, selects the Cooperative project, and renders the visible
+  source card as `The Cooperative 1881 Apartments phase 1`, `doc 34978`,
+  `Review pending`, and `needs-verification`. It no longer inherits the Home Depot
+  fixture identity or its unrelated metadata.
+- The live module probe found five missing runtime module responses that had been
+  served as HTML (`accepted-model3d.js`, `ceiling-grid.js`, `section-cut.js`,
+  `submittal-sheets.js`, and `cut-sheets.js`). Those tracked modules were deployed
+  to the VPS and the probe now reports zero non-JavaScript script responses.
+- The live Studio screenshot
+  `out/agent-loops/halofire-master-build-20260711/live-ops/autosprink-34978-source-bound-final.png`
+  was inspected: the 3D viewport shows the extracted Cooperative plan geometry and
+  registered plan underlay, the job card is source-bound, the viewer is console-clean,
+  and the status remains an honest review-pending state. Focused Studio coverage is
+  **18 passed**.
+- This is a real source-identity/runtime correction, not an accepted-geometry claim.
+  The model remains needs-verification until the source PDF is available for exact
+  rendered-page binding and a trusted human accepts the required spatial/FP rows.
