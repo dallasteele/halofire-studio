@@ -1083,16 +1083,29 @@ async function bindSourceDocumentIdentity() {
   window.__sourceDocIdentity = { state: 'resolving', docId };
   let packagePayload = null;
   let identityRow = null;
+  // The document-bound bid route is the fast identity surface (~2s versus the
+  // all-bids ready-to-send aggregate). Resolve the source title/location from
+  // it first so the 3D shell never waits on unrelated bids. Package details
+  // remain optional and do not alter any acceptance gate.
   try {
-    const ready = await api('/autobid/ready-to-send');
-    const rows = Array.isArray(ready && ready.bids) ? ready.bids : [];
-    const row = rows.find((item) => Number(item.geometry_document_id) === docId);
-    if (row) {
-      identityRow = row;
-      if (row.ref != null) packagePayload = await api('/autobid/package/' + encodeURIComponent(row.ref));
+    const direct = await api('/autobid/bid/' + encodeURIComponent(docId) + '?by=doc');
+    const directMeta = direct && direct.meta ? direct.meta : {};
+    identityRow = { ...directMeta, ref: direct && direct.ref, document_id: directMeta.document_id || docId };
+  } catch (_) {
+    identityRow = null;
+  }
+  try {
+    if (!identityRow) {
+      const ready = await api('/autobid/ready-to-send');
+      const rows = Array.isArray(ready && ready.bids) ? ready.bids : [];
+      const row = rows.find((item) => Number(item.geometry_document_id) === docId);
+      if (row) {
+        identityRow = row;
+        if (row.ref != null) packagePayload = await api('/autobid/package/' + encodeURIComponent(row.ref));
+      }
     }
   } catch (_) {
-    // The direct document lookup below remains the honest identity fallback.
+    // The direct document lookup above remains the honest identity fallback.
   }
   // A ready-to-send row is already a canonical source identity. Do not make the
   // page wait on the much slower document lookup after a package-by-ref succeeds
