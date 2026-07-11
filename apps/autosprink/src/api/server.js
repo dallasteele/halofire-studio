@@ -541,6 +541,8 @@ function normalizeRole(role) {
   return String(role || 'user').trim().toLowerCase();
 }
 
+const SPATIAL_REVIEW_ROLES = new Set(['admin', 'estimator']);
+
 function requireRole(role) {
   return (req, res, next) => {
     if (normalizeRole(req.user?.role) !== role) {
@@ -822,15 +824,41 @@ app.all('/api/autobid/*', authMiddleware, async (req, res, next) => {
   const qIdx = req.originalUrl.indexOf('?');
   const qs = qIdx >= 0 ? req.originalUrl.slice(qIdx) : '';
   const target = `${AUTOBID_ENGINE_URL}/${subPath}${qs}`;
+  const isSpatialReviewWrite = req.method === 'POST'
+    && /^package\/[^/]+\/spatial-review$/.test(subPath);
+  const isFpReviewWrite = req.method === 'POST'
+    && /^package\/[^/]+\/fp-vector-(?:review|family-review)$/.test(subPath);
+  if ((isSpatialReviewWrite || isFpReviewWrite)
+      && !SPATIAL_REVIEW_ROLES.has(normalizeRole(req.user?.role))) {
+    return res.status(403).json({ error: 'Estimator or admin role required for review' });
+  }
+  if ((isSpatialReviewWrite || isFpReviewWrite)
+      && (!String(req.user?.id || '').trim()
+        || !String(req.user?.name || req.user?.username || '').trim())) {
+    return res.status(401).json({ error: 'Trusted reviewer identity is unavailable' });
+  }
   try {
-    const init = { method: req.method, headers: {} };
+    // Reviewer identity is derived only from the verified Studio JWT; client
+    // supplied x-halofire-reviewer-* headers are never forwarded.
+    const init = {
+      method: req.method,
+      headers: {
+        'x-halofire-reviewer-id': String(req.user.id),
+        'x-halofire-reviewer-name': String(req.user.name || req.user.username),
+        'x-halofire-reviewer-role': normalizeRole(req.user.role),
+      },
+    };
     if (!['GET', 'HEAD'].includes(req.method)) {
       init.headers['content-type'] = req.get('content-type') || 'application/json';
       init.body = (req.body && typeof req.body === 'object') ? JSON.stringify(req.body) : (req.body || undefined);
     }
     const upstream = await fetch(target, init);
     res.status(upstream.status);
-    res.set('content-type', upstream.headers.get('content-type') || 'application/octet-stream');
+    for (const header of ['content-type', 'etag', 'cache-control', 'x-content-type-options', 'content-disposition']) {
+      const value = upstream.headers.get(header);
+      if (value) res.set(header, value);
+    }
+    if (!upstream.headers.get('content-type')) res.set('content-type', 'application/octet-stream');
     res.send(Buffer.from(await upstream.arrayBuffer()));
   } catch (err) {
     (log.error || console.error)(`autobid proxy failed: ${target} -> ${err.message}`);

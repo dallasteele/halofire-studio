@@ -198,6 +198,19 @@ body{
 .greet h1{font-size:22px; font-weight:680; letter-spacing:-0.2px;}
 .greet h1 .accent{color:var(--gold);}
 .greet .sub{font-size:12.5px; color:var(--muted); margin-top:2px;}
+.review-route{
+  display:flex; align-items:center; gap:var(--s3); flex-wrap:wrap;
+  margin-left:auto; padding:var(--s3) var(--s4);
+  border:1px solid rgba(217,164,65,0.28); border-radius:var(--r-control);
+  background:rgba(217,164,65,0.07); color:var(--muted);
+  box-shadow:var(--shadow-recess);
+}
+.review-route .kicker{
+  font-size:10px; text-transform:uppercase; letter-spacing:.65px; color:var(--faint);
+}
+.review-route strong{font-size:12px; color:var(--text); font-weight:650;}
+.review-route .state{font-size:10.5px; color:var(--warn);}
+.review-route a{white-space:nowrap; text-decoration:none;}
 .kpi-strip{display:flex; gap:var(--s4); margin-left:auto;}
 .kpi{
   min-width:118px;
@@ -402,7 +415,7 @@ svg{display:block;}
 </style>
 <script src="/public/halofire-auth.js"></script>
 </head>
-<body class="hf" data-hf-page="workbench">
+<body class="hf" data-hf-page="workbench" data-hf-route-contract="dashboard-handoff" data-hf-review-route="/official-flow.html">
 <div class="frame">
 
   <!-- Top chrome + left workspace nav removed: the shared HaloFire app bar
@@ -424,6 +437,12 @@ svg{display:block;}
           <div class="o">Default</div>
         </div>
         <button class="btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Customize dock</button>
+      </div>
+      <div id="estimatorReviewRoute" class="review-route" data-route-surface="dashboard" data-route-state="explicit-handoff" data-review-target="/official-flow.html">
+        <span class="kicker">Estimator review route</span>
+        <strong>Official Flow</strong>
+        <span class="state" data-route-state-label>separate evidence surface</span>
+        <a id="estimatorReviewRouteLink" class="btn gold sm" href="/official-flow.html#officialFlowAttachmentIntake" data-route-handoff="official-flow">Open review lane →</a>
       </div>
     </div>
 
@@ -561,7 +580,7 @@ svg{display:block;}
               <div class="s">From: rfq@pvmall-gc.com · 14,200 sq ft · NFPA 13 · drafted 9:04 AM</div>
               <div style="margin-top:8px; display:flex; gap:6px; align-items:center;">
                 <button class="btn gold sm">Approve &amp; send</button>
-                <button class="btn ghost sm">Review</button>
+                <button class="btn ghost sm" data-autobid-review="1" type="button">Review</button>
                 <span class="chip warn" style="margin-left:auto;">⚠ Sqft check</span>
               </div>
             </div>
@@ -639,8 +658,8 @@ svg{display:block;}
           </div>
           <div class="legend"><span><i style="background:#5aa9e6"></i>Bids sent</span><span><i style="background:#d9a441"></i>Won</span></div>
           <div style="margin-top:auto; padding-top:10px; display:flex; gap:8px;">
-            <button class="btn sm">View pipeline</button>
-            <button class="btn gold sm" style="margin-left:auto;">New bid</button>
+            <a class="btn sm" href="/autobid-board.html?hf=r2" data-autobid-route="board">View pipeline</a>
+            <a class="btn gold sm" href="/autobid-intake.html?hf=r2" data-autobid-route="intake" style="margin-left:auto;">New bid</a>
           </div>
         </div>
       </div>
@@ -698,6 +717,22 @@ svg{display:block;}
 })();
 </script>
 <script>
+// The Today dashboard is intentionally distinct from the estimator evidence
+// surface. Keep the handoff explicit and preserve a selected project in the
+// URL so a reviewer cannot mistake this route for the review console.
+(function () {
+  var link = document.getElementById('estimatorReviewRouteLink');
+  var route = document.getElementById('estimatorReviewRoute');
+  if (!link || !route) return;
+  var project = new URLSearchParams(window.location.search).get('project');
+  var href = '/official-flow.html';
+  if (project) href += '?project=' + encodeURIComponent(project);
+  href += '#officialFlowAttachmentIntake';
+  link.href = href;
+  route.dataset.reviewHref = href;
+})();
+</script>
+<script>
 // Workbench data wiring: real /api/bids -> approval lane, KPI strip, pipeline.
 // Honest placeholders where no API exists (schedule, inspections, activity).
 (function () {
@@ -745,7 +780,7 @@ svg{display:block;}
         return '<div style="padding:10px 0;border-top:1px solid var(--line)">' +
           '<div style="color:var(--text);font-weight:600">' + esc(b.project || ('Bid #' + b.id)) + '</div>' +
           '<div style="color:var(--muted);font-size:11px;margin-top:3px">' + esc(b.contractor || '—') + ' · ' + money(b.value) + ' · <span style="color:var(--gold)">' + esc(statusLabel(b.status)) + '</span></div>' +
-          '<div style="margin-top:8px;display:flex;gap:6px;align-items:center"><button disabled style="all:unset;display:inline-flex;align-items:center;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;color:#8b95a6;background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:not-allowed" title="Approval send-flow not built yet (CAL-1)">Approve &amp; send</button><button style="all:unset;display:inline-flex;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;color:var(--gold);background:rgba(217,164,65,.12);border:1px solid rgba(217,164,65,.35);cursor:pointer">Review</button></div>' +
+          '<div style="margin-top:8px;display:flex;gap:6px;align-items:center"><button disabled style="all:unset;display:inline-flex;align-items:center;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;color:#8b95a6;background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:not-allowed" title="Approval send-flow not built yet (CAL-1)">Approve &amp; send</button><button type="button" data-autobid-review="1" style="all:unset;display:inline-flex;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;color:var(--gold);background:rgba(217,164,65,.12);border:1px solid rgba(217,164,65,.35);cursor:pointer">Review</button></div>' +
           '</div>';
       }).join('') : '<div style="color:var(--muted);padding:14px 0">Nothing awaiting approval.</div>';
     }
@@ -757,7 +792,13 @@ svg{display:block;}
       var rows = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).slice(0, 7).map(function (k) {
         return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--muted)">' + esc(k) + '</span><span style="color:var(--text);font-weight:600">' + counts[k] + '</span></div>';
       }).join('');
-      pl.querySelector('.card-bd').innerHTML = '<div style="padding:2px">' + (rows || '<span style="color:var(--muted)">No bids yet.</span>') + '</div>';
+      // Re-rendered API data must retain the same real intake/board handoffs
+      // as the static shell; otherwise the pipeline controls disappear once
+      // the dashboard receives its first live response.
+      var pipelineActions = '<div style="margin-top:10px;padding-top:10px;display:flex;gap:8px;border-top:1px solid var(--line)">' +
+        '<a class="btn sm" href="/autobid-board.html?hf=r2" data-autobid-route="board">View pipeline</a>' +
+        '<a class="btn gold sm" href="/autobid-intake.html?hf=r2" data-autobid-route="intake" style="margin-left:auto;">New bid</a></div>';
+      pl.querySelector('.card-bd').innerHTML = '<div style="padding:2px">' + (rows || '<span style="color:var(--muted)">No bids yet.</span>') + '</div>' + pipelineActions;
     }
 
     // No-API panels — honest placeholders (do NOT fake real-looking jobs).
@@ -806,8 +847,9 @@ svg{display:block;}
     });
     inp.addEventListener('keydown',function(e){ if(e.key==='Enter'&&inp.value.trim()) location.href='crm.html?hf=r2&q='+encodeURIComponent(inp.value.trim()); });
   }
-  // REVIEW buttons in the approval lane -> open the CRM bids board.
-  document.addEventListener('click',function(e){ var b=e.target.closest('button'); if(b&&(b.textContent||'').trim()==='Review'){ e.preventDefault(); location.href='crm.html?hf=r2'; } });
+  // REVIEW controls in the approval lane -> the canonical AutoBid board,
+  // where package review, 3D/layout, and send remain source-bound.
+  document.addEventListener('click',function(e){ var b=e.target.closest('[data-autobid-review]'); if(b){ e.preventDefault(); location.href='/autobid-board.html?hf=r2'; } });
 })();
 </script>
 <!-- Shared HaloFire shell: injects the top app bar, applies the saved glass

@@ -29,6 +29,13 @@
   .pill{ display:inline-block; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:600; }
   .pill.ok{ background:rgba(74,222,128,0.14); color:#86efac; border:1px solid rgba(74,222,128,0.35); }
   .pill.warn{ background:rgba(251,191,36,0.14); color:#fcd34d; border:1px solid rgba(251,191,36,0.35); }
+  /* Honest per-type confidence flag (engine confidence block) */
+  .conf{ display:flex; align-items:flex-start; gap:10px; margin:2px 0 16px; padding:11px 14px; border:1px solid var(--hf-line); border-radius:var(--hf-r-win,12px); background:var(--hf-glass,rgba(255,255,255,0.03)); }
+  .conf .cb{ display:inline-block; padding:3px 11px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.3px; white-space:nowrap; flex:none; }
+  .conf .cb.grade{ background:rgba(74,222,128,0.16); color:#86efac; border:1px solid rgba(74,222,128,0.4); }
+  .conf .cb.approx{ background:rgba(251,191,36,0.16); color:#fcd34d; border:1px solid rgba(251,191,36,0.4); }
+  .conf .cn{ font-size:var(--hf-fs-sm); color:var(--hf-muted); line-height:1.5; }
+  .conf .cn b{ color:var(--hf-text); }
   .bar{ display:flex; align-items:center; gap:10px; margin:6px 0; font-size:var(--hf-fs-sm); }
   .bar .lab{ width:120px; color:var(--hf-muted); flex:none; }
   .bar .track{ flex:1; height:9px; border-radius:6px; background:rgba(255,255,255,0.06); overflow:hidden; }
@@ -50,6 +57,105 @@
   .sizerow{ display:flex; justify-content:space-between; padding:5px 0; border-top:1px solid var(--hf-line); font-size:var(--hf-fs-sm); font-variant-numeric:tabular-nums; }
   .floorpill{ padding:8px 10px; border:1px solid var(--hf-line); border-radius:8px; font-size:var(--hf-fs-label); display:flex; justify-content:space-between; }
   .floorpill.real{ border-color:rgba(74,222,128,0.4); } .floorpill.placeholder{ border-color:rgba(251,191,36,0.3); color:var(--hf-muted); }
+  .spatial-plate{ border-top:1px solid var(--hf-line); padding-top:14px; margin-top:14px; }
+  .spatial-plate:first-child{ border-top:0; padding-top:0; margin-top:0; }
+  /* Bluebeam-like review frame: the stored image is a source-PDF + derived
+     geometry composite.  Keep it bounded and zoomable so an estimator can
+     inspect the actual pixels before recording a decision. */
+  .spatial-review-frame{ margin:10px 0; border:1px solid var(--hf-line); border-radius:8px; background:#0b1018; overflow:auto; }
+  .spatial-review-frame figcaption{ padding:7px 9px; border-bottom:1px solid var(--hf-line); color:var(--hf-muted); font-size:11px; line-height:1.4; }
+  .spatial-review-toolbar{ display:flex; align-items:center; gap:8px; padding:7px 9px; border-bottom:1px solid var(--hf-line); color:var(--hf-muted); font-size:11px; }
+  .spatial-review-toolbar input[type=range]{ flex:1; min-width:120px; accent-color:var(--hf-color-accent,#f0a868); }
+  .spatial-review-toolbar output{ min-width:42px; text-align:right; color:var(--hf-text); font-variant-numeric:tabular-nums; }
+  .spatial-review-frame .spatial-overlay{ display:block; width:100%; min-width:100%; height:auto; margin:0; border:0; border-radius:0; background:#fff; transform-origin:top left; }
+  .spatial-review-frame .spatial-overlay[data-overlay-visible="false"]{ opacity:.65; }
+  .viewport-scope{ margin:10px 0 12px; padding:10px 12px; border:1px solid rgba(240,168,104,.28); border-radius:10px; background:linear-gradient(110deg,rgba(240,168,104,.10),rgba(255,255,255,.025)); color:var(--hf-text); }
+  .viewport-scope strong{ display:block; font-size:var(--hf-fs-sm); letter-spacing:.15px; }
+  .viewport-scope small{ display:block; margin-top:3px; color:var(--hf-muted); line-height:1.45; }
+  .viewport-review-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:8px 0 4px; }
+  .viewport-review-card{ display:flex; align-items:flex-start; gap:8px; min-width:0; padding:9px 10px; border:1px solid var(--hf-line); border-radius:9px; background:rgba(255,255,255,.025); color:var(--hf-text); cursor:pointer; transition:border-color .16s ease,background .16s ease,box-shadow .16s ease; }
+  .viewport-review-card:hover{ border-color:rgba(240,168,104,.5); background:rgba(240,168,104,.06); }
+  .viewport-review-card:focus-within{ outline:2px solid rgba(158,195,255,.8); outline-offset:2px; }
+  .viewport-review-card:has(input:checked){ border-color:rgba(74,222,128,.48); background:rgba(74,222,128,.07); box-shadow:0 0 0 1px rgba(74,222,128,.12) inset; }
+  .viewport-review-card input{ flex:none; margin-top:3px; accent-color:#86efac; }
+  .viewport-review-card .viewport-card-body{ min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .viewport-review-card .viewport-card-title{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:var(--hf-fs-sm); font-weight:650; }
+  .viewport-review-card .viewport-role{ color:var(--hf-text); text-transform:capitalize; }
+  .viewport-review-card .viewport-status{ color:#fcd34d; font-size:10px; letter-spacing:.35px; text-transform:uppercase; }
+  .viewport-review-card:has(input:checked) .viewport-status{ color:#86efac; }
+  .viewport-review-card .viewport-card-detail{ color:var(--hf-muted); font-size:11px; line-height:1.45; overflow-wrap:anywhere; }
+  .viewport-review-card .viewport-card-detail code{ color:var(--hf-muted); font-size:10px; }
+  @media(max-width:700px){ .viewport-review-grid{ grid-template-columns:1fr; } }
+  .fp-point-review{ margin-top:10px; padding:10px; border:1px solid var(--hf-line); border-radius:8px; background:rgba(0,0,0,.18); }
+  .fp-point-review-stage{ position:relative; overflow:auto; max-height:520px; background:#fff; }
+  .fp-point-review-stage img{ display:block; width:100%; height:auto; }
+  .fp-point-review-stage canvas{ position:absolute; inset:0; width:100%; height:100%; cursor:crosshair; }
+  .fp-point-review-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+  .spatial-viewport{ display:inline-block; }
+  .spatial-digests{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px 14px; margin-top:9px; }
+  .spatial-digests code{ color:var(--hf-muted); font-size:10px; overflow-wrap:anywhere; }
+  .spatial-actions{ display:flex; align-items:flex-start; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .spatial-actions textarea{ flex:1 1 280px; min-height:54px; resize:vertical; font:inherit; font-size:var(--hf-fs-sm); color:var(--hf-text); background:rgba(255,255,255,0.03); border:1px solid var(--hf-line); border-radius:6px; padding:7px 9px; }
+  .spatial-review-metric{ display:flex; flex-direction:column; gap:4px; min-width:150px; color:var(--hf-muted); font-size:var(--hf-fs-sm); }
+  .spatial-review-metric input{ width:100%; color:var(--hf-text); background:rgba(255,255,255,0.03); border:1px solid var(--hf-line); border-radius:6px; padding:7px 9px; font:inherit; }
+  .spatial-actions .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .spatial-result{ width:100%; }
+  /* Held-out density review: source-bound, diagnostic-only reviewer worklist. */
+  .density-heldout-card{ border-top:1px solid var(--hf-line); padding-top:14px; margin-top:14px; }
+  .density-heldout-card:first-child{ border-top:0; padding-top:0; margin-top:0; }
+  .density-heldout-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 14px; margin:10px 0; }
+  .density-heldout-grid .stat{ min-width:0; }
+  .density-heldout-page{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:8px 0; }
+  .density-heldout-page select{ min-width:190px; color:var(--hf-text); background:rgba(255,255,255,.04); border:1px solid var(--hf-line); border-radius:6px; padding:7px 9px; font:inherit; }
+  .density-heldout-source{ color:var(--hf-color-interactive-text,#9ec3ff); text-decoration:none; }
+  .density-heldout-source:hover{ text-decoration:underline; }
+  .density-heldout-form{ display:grid; grid-template-columns:minmax(140px,180px) minmax(200px,1fr) auto; gap:8px; align-items:end; margin-top:10px; }
+  .density-heldout-field{ display:flex; flex-direction:column; gap:4px; color:var(--hf-muted); font-size:11px; }
+  .density-heldout-field input{ width:100%; box-sizing:border-box; color:var(--hf-text); background:rgba(255,255,255,.04); border:1px solid var(--hf-line); border-radius:6px; padding:8px 9px; font:inherit; }
+  .density-heldout-field input:focus{ outline:2px solid rgba(158,195,255,.75); outline-offset:1px; }
+  .density-heldout-field input[aria-invalid="true"]{ border-color:#fca5a5; }
+  .density-heldout-actions{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .density-heldout-actions .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .density-heldout-result{ flex:1 1 260px; min-width:0; }
+  .density-heldout-result.ok{ color:#86efac; }
+  .density-heldout-result.warn{ color:#fcd34d; }
+  .density-heldout-unresolved{ margin-top:10px; padding:8px 10px; border:1px solid rgba(251,191,36,.28); border-radius:8px; color:#fcd34d; font-size:var(--hf-fs-sm); }
+  @media(max-width:760px){ .density-heldout-grid,.density-heldout-form{ grid-template-columns:1fr; } }
+  /* One truthful operator worklist for the receipts that still need a human or
+     independently-owned report.  This is a navigation aid only: it never
+     changes a gate and deliberately carries no expected totals. */
+  .review-action-manifest{ border:1px solid rgba(158,195,255,.28); background:linear-gradient(125deg,rgba(158,195,255,.08),rgba(255,255,255,.025)); }
+  .review-action-intro{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+  .review-action-intro .signal{ width:9px; height:9px; margin-top:5px; border-radius:50%; background:#fcd34d; box-shadow:0 0 0 4px rgba(252,211,77,.12); flex:none; }
+  .review-action-intro .signal.ok{ background:#86efac; box-shadow:0 0 0 4px rgba(134,239,172,.12); }
+  .review-action-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .review-action{ display:flex; flex-direction:column; gap:5px; min-width:0; padding:10px 11px; border:1px solid var(--hf-line); border-radius:9px; background:rgba(0,0,0,.12); }
+  .review-action-head{ display:flex; align-items:center; gap:7px; }
+  .review-action-head strong{ flex:1; font-size:var(--hf-fs-sm); }
+  .review-action-status{ font-size:10px; letter-spacing:.45px; text-transform:uppercase; color:#fcd34d; }
+  .review-action-status.ok{ color:#86efac; }
+  .review-action-detail{ color:var(--hf-muted); font-size:11px; line-height:1.45; }
+  .review-action-link{ align-self:flex-start; color:var(--hf-color-interactive-text,#9ec3ff); font-size:11px; text-decoration:none; }
+  .review-action-link:hover{ text-decoration:underline; }
+  .review-action-count{ color:var(--hf-text); font-variant-numeric:tabular-nums; }
+  .ops-flow-rail{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:0 0 18px; padding:12px; border:1px solid rgba(158,195,255,.24); border-radius:12px; background:linear-gradient(120deg,rgba(158,195,255,.08),rgba(255,255,255,.025)); }
+  .ops-flow-step{ position:relative; min-width:0; padding:10px 10px 9px; border:1px solid var(--hf-line); border-radius:9px; background:rgba(0,0,0,.12); }
+  .ops-flow-step:not(:last-child)::after{ content:'>'; position:absolute; right:-8px; top:50%; transform:translateY(-50%); color:#f0a868; font-size:13px; font-weight:700; z-index:1; }
+  .ops-flow-step .flow-k{ display:block; color:var(--hf-muted); font-size:10px; letter-spacing:.7px; text-transform:uppercase; }
+  .ops-flow-step .flow-v{ display:block; margin-top:4px; color:var(--hf-text); font-size:var(--hf-fs-sm); font-weight:650; }
+  .ops-flow-step .flow-note{ display:block; margin-top:4px; color:var(--hf-faint); font-size:11px; line-height:1.35; }
+  .ops-flow-step.current{ border-color:rgba(240,168,104,.55); background:rgba(240,168,104,.09); }
+  .ops-flow-step.complete .flow-v{ color:#86efac; }
+  @supports (animation-timeline: view()){
+    @media (prefers-reduced-motion: no-preference){
+      .ops-flow-rail{ animation:hf-ops-rail-reveal linear both; animation-duration:1s; animation-timeline:view(); animation-range:entry 0% cover 24%; }
+      @keyframes hf-ops-rail-reveal{ from{ opacity:.72; transform:translateY(16px); } to{ opacity:1; transform:none; } }
+    }
+  }
+  @media (prefers-reduced-motion: reduce){ .ops-flow-rail{ opacity:1; transform:none; animation:none; } }
+  @media(max-width:760px){ .review-action-grid{ grid-template-columns:1fr; } }
+  @media(max-width:760px){ .ops-flow-rail{ grid-template-columns:1fr 1fr; } .ops-flow-step:nth-child(2)::after{ display:none; } .ops-flow-step:nth-child(4)::after{ display:none; } }
+  @media(max-width:480px){ .ops-flow-rail{ grid-template-columns:1fr; } .ops-flow-step::after{ display:none !important; } }
   .sendbar{ position:sticky; bottom:0; margin-top:18px; padding:14px 16px; display:flex; align-items:center; gap:14px; border-radius:var(--hf-r-win,12px); }
   .sendbar .summary{ flex:1; font-size:var(--hf-fs-sm); color:var(--hf-muted); }
   .btn{ font:inherit; cursor:pointer; padding:11px 22px; border-radius:var(--hf-r-ctl,7px); border:1px solid var(--hf-line); background:var(--hf-glass,rgba(255,255,255,0.04)); color:var(--hf-text); font-weight:600; }
@@ -143,10 +249,95 @@
            + '<span><span style="display:inline-block;width:8px;height:8px;background:#f87171;vertical-align:middle;margin-right:5px"></span>riser</span></div>';
     }
 
+    // P3 per-room layout: render the richest studio_drawing plate (room rects + heads +
+    // routed pipe), true-scale. This is the faithful PER-ROOM placement (vs the uniform
+    // /design bbox grid). Returns '' if no studio_drawing so we fall back to /design.
+    function studioPlateSVG(p, acceptedGeometry){
+      var b = p.bounds_ft||{}, W=b.width_ft||0, H=b.height_ft||0;
+      if(!(W>0)||!(H>0)) return '';
+      var pad=12, maxW=560, k=maxW/W;
+      var svgW=Math.round(W*k+pad*2), svgH=Math.round(H*k+pad*2);
+      var X=function(x){return (pad+(x-(b.min_x||0))*k).toFixed(1);};
+      var Y=function(y){return (pad+((b.max_y||H)-y)*k).toFixed(1);};
+      function point(value){
+        if(Array.isArray(value)&&value.length>=2) return [Number(value[0]),Number(value[1])];
+        if(value&&Number.isFinite(Number(value.x))&&Number.isFinite(Number(value.y))) return [Number(value.x),Number(value.y)];
+        return null;
+      }
+      function polygonPath(r){
+        var poly=r.polygon_ft||r.poly;
+        if(!Array.isArray(poly)||poly.length<3) return '';
+        var points=poly.map(point);
+        if(points.some(function(v){return !v||!Number.isFinite(v[0])||!Number.isFinite(v[1]);})) return '';
+        return '<path d="M '+points.map(function(v){return X(v[0])+' '+Y(v[1]);}).join(' L ')+' Z" fill="rgba(74,222,128,.05)" stroke="rgba(74,222,128,.4)" stroke-width="0.6" />';
+      }
+      var rooms=(p.rooms||[]).map(function(r){
+        if(acceptedGeometry){
+          var polygon=polygonPath(r);
+          if(polygon) return polygon;
+        }
+        return '<rect x="'+X(r.x0_ft)+'" y="'+Y(r.y1_ft)+'" width="'+((r.x1_ft-r.x0_ft)*k).toFixed(1)+'" height="'+((r.y1_ft-r.y0_ft)*k).toFixed(1)+'" fill="rgba(74,222,128,.05)" stroke="rgba(74,222,128,.4)" stroke-width="0.6" />';
+      }).join('');
+      var walls=acceptedGeometry?(p.wallRuns||[]).map(function(w){
+        var a=point(w.a||w.start||w.p0||{x:w.x0,y:w.y0});
+        var z=point(w.b||w.end||w.p1||{x:w.x1,y:w.y1});
+        if(!a||!z) return '';
+        return '<line x1="'+X(a[0])+'" y1="'+Y(a[1])+'" x2="'+X(z[0])+'" y2="'+Y(z[1])+'" stroke="rgba(248,113,113,.75)" stroke-width="1" stroke-linecap="round" />';
+      }).join(''):'';
+      var segs=((p.pipe||{}).segments||[]).map(function(s){
+        if(s.x1===s.x2&&s.y1===s.y2) return '';
+        var st=pipeStyle(s.size_in);
+        return '<line x1="'+X(s.x1)+'" y1="'+Y(s.y1)+'" x2="'+X(s.x2)+'" y2="'+Y(s.y2)+'" stroke="'+st.color+'" stroke-width="'+st.w+'" stroke-linecap="round" />';
+      }).join('');
+      var dots=(p.heads||[]).map(function(h){ return '<circle cx="'+X(h.x)+'" cy="'+Y(h.y)+'" r="1.6" fill="#7dd3fc" />'; }).join('');
+      var riser=(p.pipe&&p.pipe.riser)?'<rect x="'+(X(p.pipe.riser.x)-3.5)+'" y="'+(Y(p.pipe.riser.y)-3.5)+'" width="7" height="7" fill="#f87171" />':'';
+      return '<div class="planwrap"><svg viewBox="0 0 '+svgW+' '+svgH+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Per-room layout '+esc(p.label||'')+'">'+walls+rooms+segs+dots+riser+'</svg></div>';
+    }
+    function renderPendingStudioDrawing(sd, accepted){
+      var body=document.getElementById('designBody'), verdict=document.getElementById('designVerdict');
+      if(!body) return false;
+      var reason=(accepted&&accepted.reason)|| (sd&&sd.accepted_geometry_reason) || 'accepted vector geometry is not available';
+      verdict.innerHTML='<span class="pill warn">geometry review pending</span>';
+      body.innerHTML='<div class="note"><b>Per-room drawing withheld pending human overlay review.</b> The provisional raster/rectangle drawing is not rendered. '+esc(reason)+'. Accept a stored vector overlay before this drawing can be used.</div>';
+      return true;
+    }
+    function renderStudioDrawing(sd, accepted){
+      var body=document.getElementById('designBody'), verdict=document.getElementById('designVerdict');
+      if(!body||!sd||sd.available===false||!(sd.plates||[]).length) return false;
+      if(!accepted||accepted.available!==true||accepted.accepted_geometry!==true||sd.accepted_geometry!==true){
+        return renderPendingStudioDrawing(sd, accepted);
+      }
+      var p=sd.plates.slice().sort(function(a,b){return (b.head_count||0)-(a.head_count||0);})[0];
+      var svg=studioPlateSVG(p, true);
+      if(!svg) return false;
+      var coh = sd.cohesion_ok;
+      verdict.innerHTML = (coh? '<span class="pill ok">cohesion: one system</span>':'<span class="pill warn">disjoint network</span>')
+        + ' <span class="pill ok">per-room (P3)</span>';
+      var pipe=p.pipe||{};
+      body.innerHTML = ''
+        + '<div class="stat"><span class="l">Heads (whole building)</span><span class="v">'+num(sd.head_count)+' · '+num(sd.plate_count)+' plates</span></div>'
+        + '<div class="stat"><span class="l">Pipe (riser '+esc(sd.k_factor?('K='+sd.k_factor):'')+')</span><span class="v">'+num(Math.round(sd.total_pipe_ft||0))+' ft · '+num(sd.segment_count)+' segs</span></div>'
+        + '<div style="margin-top:12px"><div class="note" style="margin-bottom:6px">Per-room true-scale plan — plate <b>'+esc(p.label||'')+'</b> ('+num(p.head_count)+' heads · '+num((pipe.segments||[]).length)+' pipe runs · '+num(Math.round((p.bounds_ft||{}).width_ft))+' × '+num(Math.round((p.bounds_ft||{}).height_ft))+' ft). Heads tile each real room — not a uniform blanket.</div>'
+        + svg + '</div>'
+        + '<div class="leg"><span><span class="sw" style="border-top-color:#f0a868"></span>cross main</span>'
+        + '<span><span class="sw" style="border-top-color:#6ea8ff"></span>branch</span>'
+        + '<span><span class="dot"></span>head ×'+num(p.head_count)+'</span>'
+        + '<span><span style="display:inline-block;width:8px;height:8px;background:rgba(74,222,128,.5);vertical-align:middle;margin-right:5px"></span>room</span></div>'
+        + '<div class="note" style="margin-top:10px"><b>Honest residual:</b> per-room NFPA grid on the extracted rooms; pipe is a coarse routed tree (is_estimate). Brady\'s signed AutoSPRINK calc is the binding post-award number.</div>';
+      return true;
+    }
+
     function loadDesign(){
       var body = document.getElementById('designBody');
       var verdict = document.getElementById('designVerdict');
       if(!body) return;
+      // Prefer the N3 accepted vector drawing carried on the package. A legacy
+      // raster/rectangle studio_drawing is deliberately withheld until its paired
+      // accepted_geometry_drawing has passed the overlay gate.
+      if(window.__AGD && (window.__AGD.available!==true || window.__AGD.accepted_geometry!==true)){
+        renderPendingStudioDrawing(window.__SD, window.__AGD); return;
+      }
+      if(window.__SD && renderStudioDrawing(window.__SD, window.__AGD)) return;
       api('/design/'+encodeURIComponent(REF)).then(function(r){ return r.ok?r.json():r.json().then(function(e){throw e;}); }).then(function(d){
         if(!d || d.available===false){
           if(d && d.cohesion_failed){ verdict.innerHTML='<span class="pill warn">cohesion failed</span>'; }
@@ -219,16 +410,949 @@
     }
 
     if(!REF){ document.getElementById('root').innerHTML='<div class="note">No bid ref given. Open one from the <a href="/autobid-board.html">Bid Board</a>.</div>'; }
-    else api('/package/'+encodeURIComponent(REF)).then(function(r){ return r.ok?r.json():r.json().then(function(e){throw e;}); }).then(function(p){
+    else api('/package/'+encodeURIComponent(REF)).then(function(r){ return r.json().catch(function(){return {};}).then(function(e){ if(!r.ok){ e.__status=r.status; throw e; } return e; }); }).then(function(p){
       render(p);
     }).catch(function(err){
-      document.getElementById('root').innerHTML='<div class="note">Could not load the package for ref '+esc(REF)+'. '+esc((err&&(err.detail||err.error))||'')+'<br>If the engine is offline: <code>C:/Python312/python.exe engine/api.py</code>.</div>';
+      var root=document.getElementById('root');
+      var status=err&&Number(err.__status||err.status||0);
+      if(status===401){
+        root.innerHTML='<section class="hf-panel" data-auth-required="true"><div class="phd"><span class="t">Review &amp; Send</span><span class="pill warn">sign in required</span></div><div class="pbd"><div class="note"><b>Sign in to review this bid package.</b> Your reviewer identity is required before source-bound packets or acceptance receipts can be opened. No package data was loaded.</div><a class="btn" href="/login.html?next='+encodeURIComponent(location.pathname+location.search)+'" style="display:inline-block;margin-top:12px;text-decoration:none">Sign in to continue</a></div></section>';
+      } else if(status===403){
+        root.innerHTML='<section class="hf-panel" data-auth-forbidden="true"><div class="phd"><span class="t">Review &amp; Send</span><span class="pill warn">access denied</span></div><div class="pbd"><div class="note"><b>This bid is not available to your reviewer role.</b> Ask an estimator, admin, or release authorizer to open the appropriate review lane.</div></div></section>';
+      } else {
+        root.innerHTML='<div class="note">Could not load the package for ref '+esc(REF)+'. '+esc((err&&(err.detail||err.error))||'')+'<br>If the engine is offline: <code>C:/Python312/python.exe engine/api.py</code>.</div>';
+      }
     });
+
+    // Honest per-type confidence flag — reads the engine's confidence block
+    // (bid-grade vs close-approx + the residual note). Never overstates: anything
+    // that is not positively bid-grade renders as close-approx.
+    function confidenceBadge(c){
+      if(!c || !c.level) return '';
+      var grade = (c.level==='bid-grade');
+      var label = grade ? 'BID-GRADE' : 'CLOSE-APPROX';
+      var bt = c.building_type ? esc(c.building_type) : '';
+      var note = esc(c.residual_note||'');
+      return '<div class="conf">'
+        + '<span class="cb '+(grade?'grade':'approx')+'" title="'+(grade?'Recreated end-to-end from the plans':'Honest starting point - confirm scope post-award')+'">'+label+'</span>'
+        + '<div class="cn"><b>'+(grade?'Bid-grade':'Close-approx')+'</b>'+(bt?' &middot; '+bt:'')+' &mdash; '+note+'</div>'
+        + '</div>';
+    }
+
+    // ---- Ops-center review aggregation (P1) — geometry / layout / reconcile /
+    // verification / governance blocks the engine /package already carries. All
+    // honest three-state renders: available / pending / unknown, never faked. ----
+
+    // Governance line — proof the geometry/layout/price ops ran through the OpenClaw
+    // conductor (durable op-log) + the frozen gate's recorded verdict.
+    function governanceLine(g){
+      if(!g) return '';
+      if(g.governed){
+        var vc = (g.verification_converged===true)? ' · verification converged'
+               : (g.verification_converged===false)? ' · verification residual' : '';
+        return '<div class="note" style="margin:-8px 0 14px;padding:8px 14px;border:1px solid rgba(127,180,255,0.25);border-radius:10px;background:rgba(127,180,255,0.05)">'
+          + '⚙ <b>Governed</b> — geometry / layout / price ran through the OpenClaw conductor ('
+          + esc((g.ops||[]).join(' · ')) + '), op-log recorded ' + esc(g.ts||'') + ', gate level <b>' + esc(g.level||'—') + '</b>' + vc + '.</div>';
+      }
+      return '<div class="note" style="margin:-8px 0 14px;padding:8px 14px;border:1px solid var(--hf-line);border-radius:10px">Ungoverned — no conductor record for this package ('+esc(g.error||'')+').</div>';
+    }
+
+    // Plan geometry + per-room layout summary panel (sqft / rooms / doors / plates).
+    function geometryPanel(p){
+      var g = p.geometry||{}, rl = p.room_layout||{}, rb = p.readyBid||{};
+      var ok = g.available===true;
+      var head = ok? '<span class="pill ok">geometry resolved</span>' : '<span class="pill warn">geometry pending</span>';
+      var body;
+      if(!ok){
+        body = '<div class="note">No resolved plan-set geometry'+(g.reason?': '+esc(g.reason):'')+'. The bid stays priced on the authoritative sqft; the earned badge needs resolved geometry.</div>';
+      } else {
+        var plates = g.plates||[], p0 = plates[0]||{};
+        var rooms = (g.rooms||{}).total_rooms, doors = (g.doors||{}).total_doors;
+        var scale = (g.scale||{});
+        body = ''
+          + '<div class="stat"><span class="l">Authoritative sqft (priced)</span><span class="v">'+(rb.authoritative_sqft?num(Math.round(rb.authoritative_sqft))+' sq ft':'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Extracted footprint (plate 1)</span><span class="v">'+(p0.long_ft?num(Math.round(p0.long_ft))+' × '+num(Math.round(p0.short_ft))+' ft · '+num(Math.round(p0.area_sqft||0))+' sq ft':'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Plates / floors</span><span class="v">'+num(plates.length)+' plate(s) · '+(g.n_floors!=null?num(g.n_floors)+' floor(s)':'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Rooms segmented</span><span class="v">'+(rooms!=null?num(rooms):'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Doors detected</span><span class="v">'+(doors!=null?num(doors):'—')+'</span></div>'
+          + '<div class="stat"><span class="l">Auto-read scale</span><span class="v">'+esc(scale.scale_text||'—')+(scale.basis?' ('+esc(scale.basis)+')':'')+'</span></div>'
+          + (rl.available? ('<div class="stat"><span class="l">Per-room layout</span><span class="v">'+num(rl.head_count)+' heads · '+num(rl.n_rooms)+' rooms'+(rl.n_open_plates?(' · '+num(rl.n_open_plates)+' open plate(s)'):'')+'</span></div>') : '<div class="stat"><span class="l">Per-room layout</span><span class="v">pending</span></div>')
+          + '<div class="note" style="margin-top:10px">Extracted from the plan set (auto-scale + segmentation) — a screening read (is_estimate), not a signed survey.</div>';
+      }
+      return '<section class="hf-panel mt"><div class="phd"><span class="t">Plan geometry · per-room layout</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
+    }
+
+    function densityResolutionPanel(p){
+      var d=p.density_resolution||{};
+      var resolution=d.resolution||{}, layout=resolution.layout||{}, review=d.review||{};
+      var provenance=resolution.density_provenance||{};
+      var hydraulic=provenance.hydraulic||resolution.hydraulic||{};
+      var hydraulicStatus=(hydraulic.status||'missing').replace(/_/g,' ');
+      var hydraulicSource=hydraulic.source||'spec_hazard (CSI Division-21 spec text)';
+      var hydraulicDocument=hydraulic.document_id!=null?num(hydraulic.document_id):'-';
+      var hydraulicPage=hydraulic.source_page!=null?num(hydraulic.source_page):'-';
+      var hydraulicPath=hydraulic.rel_path||'-';
+      var qualifiers=Array.isArray(resolution.qualifiers)?resolution.qualifiers.filter(Boolean):[];
+      var source=(layout.source||'unresolved').replace(/_/g,' ');
+      var status=d.available===true?'available':(review.status||'missing');
+      var head=d.available===true?'<span class="pill warn">diagnostic</span>':'<span class="pill warn">'+esc(status.replace(/_/g,' '))+'</span>';
+      var observed=(layout.provenance&&layout.provenance.observed_head_count!=null)
+        ? ' · observed '+num(layout.provenance.observed_head_count)+' heads' : '';
+      var body='<div class="stat"><span class="l">Density source</span><span class="v">'+esc(source)+observed+'</span></div>'
+        + '<div class="stat"><span class="l">Layout density</span><span class="v">'+(layout.sqft_per_head!=null?num(layout.sqft_per_head)+' sqft/head':'—')+'</span></div>'
+        + '<div class="stat"><span class="l">Hydraulic spec evidence</span><span class="v">'+esc(hydraulicStatus)+' / '+esc(hydraulicSource)+'</span></div>'
+        + '<div class="note"><b>Spec source:</b> document '+esc(hydraulicDocument)+' / page '+esc(hydraulicPage)+' / '+esc(hydraulicPath)+'</div>'
+        + '<div class="note">This provenance sidecar is diagnostic-only; it does not alter NFPA spacing, pricing, spatial acceptance, model3d grounding, or bid-grade.</div>';
+      if(qualifiers.length) body+='<div class="note"><b>Required Division-21 evidence:</b><br>'+qualifiers.map(function(item){return esc(item);}).join('<br>')+'</div>';
+      else if(hydraulic.qualifier) body+='<div class="note"><b>Required Division-21 evidence:</b><br>'+esc(hydraulic.qualifier)+'</div>';
+      if(d.reason) body+='<div class="note"><b>Residual:</b> '+esc(d.reason.replace(/_/g,' '))+'</div>';
+      return '<section class="hf-panel mt" id="densityResolutionPanel"><div class="phd"><span class="t">Density provenance</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
+    }
+
+    // Held-out density review worklist. The manifest is truth-free and the
+    // receipt endpoint returns only a redacted decision; no answer key or gate
+    // promotion is rendered here. Counts are accepted only in a verified
+    // estimator/admin session and remain a diagnostic observation.
+    var DENSITY_REVIEW_HASH=/^[0-9a-f]{64}$/i;
+    function densityHeldoutReviewPanel(){
+      return '<section class="hf-panel mt" id="densityHeldoutReviewPanel">'
+        + '<div class="phd"><span class="t">Held-out density review</span><span class="pill warn" id="densityHeldoutStatus">verifying reviewer…</span></div>'
+        + '<div class="pbd"><div class="note">Source-bound blind worklist for independent density measurement. It shows only the exact FP page and hashes; expected totals are intentionally withheld. A submitted receipt is diagnostic-only and cannot change pricing, geometry, or acceptance.</div>'
+        + '<div id="densityHeldoutBody"><div class="note" style="margin-top:10px">Loading truth-free review manifest…</div></div></div></section>';
+    }
+
+    // Read-only action manifest: a compact map from each remaining acceptance
+    // gate to the exact panel or independent owner that can satisfy it.  The
+    // endpoint is canonical, but the projection intentionally omits candidate
+    // counts, answer keys, and any write capability.
+    function acceptanceActionManifest(){
+      return '<section class="hf-panel mt review-action-manifest" id="acceptanceActionManifest">'
+        + '<div class="phd"><span class="t">Acceptance worklist</span><span class="pill warn" id="acceptanceActionStatus">checking gates…</span></div>'
+        + '<div class="pbd"><div class="review-action-intro"><span class="signal" id="acceptanceActionSignal"></span><div class="note"><b>What still needs an independent receipt.</b> Open a source-bound review panel below, or route the external report to its owning verifier. This list is read-only and never promotes production.</div></div>'
+        + '<div class="review-action-grid" id="acceptanceActionGrid"><div class="note">Loading canonical acceptance audit…</div></div>'
+        + '<div class="note" id="acceptanceActionFoot" style="margin-top:10px"></div></div></section>';
+    }
+    function bindAcceptanceActionManifest(){
+      var panel=document.getElementById('acceptanceActionManifest');
+      var status=document.getElementById('acceptanceActionStatus');
+      var signal=document.getElementById('acceptanceActionSignal');
+      var grid=document.getElementById('acceptanceActionGrid');
+      var foot=document.getElementById('acceptanceActionFoot');
+      if(!panel||!status||!grid) return;
+      var gates=[
+        {key:'fp_semantic_review',label:'FP semantic review',anchor:'#fpVectorReviewPanel',detail:'Trusted estimator/admin semantic review of the source-bound FP candidate; record the observed count only after the stored overlay is visible.'},
+        {key:'spatial_review',label:'Spatial overlays',anchor:'#spatialVerificationPanel',detail:'Inspect and attest every registered physical-page viewport, including both A-101 upper and lower views, then record each overlay decision.'},
+        {key:'density_holdout',label:'Held-out density',anchor:'#densityHeldoutReviewPanel',detail:'Independent estimator/admin measurement from the truth-free source page; submit only the redacted receipt. The frozen threshold is evaluated by the owning verifier.'},
+        {key:'n6_scoring',label:'N6 scorecard',anchor:'/api/autobid/package/'+encodeURIComponent(REF)+'/review-packet',external:true,detail:'A distinct independent scorer must supply the strict vector-symbol scorecard; the truth-free packet is the source-bound input, while candidate scans and the estimator receipt are not sufficient.'},
+        {key:'release_authorization',label:'Release authorization',anchor:'/api/autobid/package/'+encodeURIComponent(REF)+'/acceptance-audit',external:true,detail:'A separate release_authorizer must sign the immutable release-artifact and acceptance-audit hashes. Reviewer roles cannot authorize deployment.'}
+      ];
+      function escStatus(value){ return String(value||'pending').replace(/_/g,' '); }
+      function gateFor(audit,key){ return audit&&audit[key] ? audit[key] : null; }
+      function render(audit){
+        var rows=[];
+        gates.forEach(function(item){
+          var gate=gateFor(audit,item.key);
+          var isRelease=item.key==='release_authorization';
+          var passed=!isRelease && gate && gate.status==='passed';
+          var gateStatus=isRelease?'pending':(gate&&gate.status||'pending');
+          var count=gate&&!isRelease ? '<span class="review-action-count">'+num(gate.accepted_count)+' / '+num(gate.required_count)+'</span>' : '';
+          var action=!isRelease && gate&&gate.next_action ? gate.next_action : item.detail;
+          rows.push('<article class="review-action" data-acceptance-action="'+item.key+'">'
+            + '<div class="review-action-head"><strong>'+esc(item.label)+'</strong><span class="review-action-status '+(passed?'ok':'')+'">'+escStatus(gateStatus)+'</span></div>'
+            + '<div class="review-action-detail">'+(count?count+' · ':'')+esc(action)+'</div>'
+            + '<a class="review-action-link" href="'+esc(item.anchor)+'"'+(item.external?' target="_blank" rel="noopener"':'')+'>'+(passed?'Review receipt ↗':(item.external?'Open source packet ↗':'Open action ↗'))+'</a>'
+            + '</article>');
+        });
+        grid.innerHTML=rows.join('');
+        var production=audit&&audit.production_gate;
+        status.className='pill '+(production==='eligible'?'ok':'warn');
+        status.textContent=production==='eligible'?'eligible':'production blocked';
+        if(signal) signal.className='signal '+(production==='eligible'?'ok':'');
+        if(foot){
+          var hash=audit&&audit.packet_sha256 ? digest(audit.packet_sha256) : '—';
+          foot.textContent='Canonical audit packet '+hash+' · production gate effect: none. Release authorization is intentionally shown as a separate owner action; no browser control can authorize it.';
+        }
+      }
+      api('/package/'+encodeURIComponent(REF)+'/acceptance-audit').then(function(response){
+        return response.json().catch(function(){return {};}).then(function(body){ if(!response.ok){ body.__status=response.status; throw body; } return body; });
+      }).then(render).catch(function(err){
+        status.className='pill warn'; status.textContent=Number(err&&err.__status)===401?'sign in required':'audit unavailable';
+        if(signal) signal.className='signal';
+        grid.innerHTML='<div class="note">Canonical acceptance audit unavailable; no action state was inferred. '+esc((err&&(err.detail||err.error))||'')+'</div>';
+        if(foot) foot.textContent='No gate was changed.';
+      });
+    }
+    function bindDensityHeldoutReview(){
+      var panel=document.getElementById('densityHeldoutReviewPanel');
+      var status=document.getElementById('densityHeldoutStatus');
+      var body=document.getElementById('densityHeldoutBody');
+      if(!panel||!status||!body) return;
+      var reviewer=null;
+      function setStatus(text,ok){
+        status.className='pill '+(ok?'ok':'warn');
+        status.textContent=text;
+      }
+      function pageUrl(binding,page){
+        return '/api/autobid/pdf/page?doc='+encodeURIComponent(binding.fp_document_id)+'&page='+encodeURIComponent(page.page_index);
+      }
+      function renderBindings(manifest){
+        var bindings=Array.isArray(manifest.bindings)?manifest.bindings:[];
+        var unresolved=Array.isArray(manifest.unresolved_folds)?manifest.unresolved_folds:[];
+        if(!bindings.length){
+          body.innerHTML='<div class="density-heldout-unresolved">No source-bound held-out density rows are currently available. No review can be recorded.</div>';
+          return;
+        }
+        var rows=bindings.map(function(binding,index){
+          var pages=Array.isArray(binding.pages)?binding.pages:[];
+          var first=pages[0]||{};
+          var options=pages.map(function(page,pageIndex){
+            return '<option value="'+pageIndex+'">Physical page '+esc(page.physical_page_number)+' · indexed '+esc(page.page_index)+'</option>';
+          }).join('');
+          var source=first.page_index!=null?pageUrl(binding,first):'#';
+          return '<article class="density-heldout-card" data-density-fold-index="'+index+'">'
+            + '<div class="phd" style="padding:0 0 8px;border-bottom:0"><span class="t" style="font-size:12px;color:var(--hf-text)">'+esc(binding.project_group||binding.fold_id)+'</span><span class="pill warn">review only</span></div>'
+            + '<div class="density-heldout-grid">'
+            + '<div class="stat"><span class="l">Fold</span><span class="v">'+esc(binding.fold_id)+'</span></div>'
+            + '<div class="stat"><span class="l">FP sheet</span><span class="v">'+esc(binding.sheet_label||'—')+'</span></div>'
+            + '<div class="stat"><span class="l">FP document</span><span class="v">'+num(binding.fp_document_id)+'</span></div>'
+            + '<div class="stat"><span class="l">Available pages</span><span class="v">'+num(pages.length)+'</span></div>'
+            + '</div>'
+            + '<div class="density-heldout-page"><label class="density-heldout-field" style="flex:1 1 220px"><span>Source page to inspect</span><select class="densityHeldoutPage">'+options+'</select></label>'
+            + '<a class="density-heldout-source" data-density-source href="'+esc(source)+'" target="_blank" rel="noopener">Open canonical source page ↗</a></div>'
+            + '<div class="density-heldout-grid" data-density-page-meta>'
+            + '<div class="stat"><span class="l">Physical page</span><span class="v" data-density-physical>'+esc(first.physical_page_number==null?'—':first.physical_page_number)+'</span></div>'
+            + '<div class="stat"><span class="l">Rendered page SHA-256</span><span class="v"><code data-density-rendered title="'+esc(first.rendered_page_sha256||'')+'">'+esc(digest(first.rendered_page_sha256))+'</code></span></div>'
+            + '<div class="stat"><span class="l">Source PDF SHA-256</span><span class="v"><code title="'+esc(binding.source_pdf_sha256||'')+'">'+esc(digest(binding.source_pdf_sha256))+'</code></span></div>'
+            + '<div class="stat"><span class="l">Source status</span><span class="v">'+esc(binding.source_status||'unknown')+'</span></div>'
+            + '</div>'
+            + '<div class="density-heldout-form">'
+            + '<label class="density-heldout-field">Observed heads<input class="densityHeldoutCount" type="number" min="1" max="10000000" step="1" inputmode="numeric" aria-label="Observed sprinkler head count for '+esc(binding.fold_id)+'" placeholder="Count visible heads" /></label>'
+            + '<label class="density-heldout-field">Marked overlay SHA-256<input class="densityHeldoutOverlay" type="text" inputmode="text" autocomplete="off" spellcheck="false" pattern="[0-9a-fA-F]{64}" aria-label="Marked overlay SHA-256 for '+esc(binding.fold_id)+'" placeholder="64-character hash of your marked review overlay" /></label>'
+            + '<div class="density-heldout-actions"><button class="btn densityHeldoutSubmit" type="button" disabled>Submit observation</button></div>'
+            + '</div>'
+            + '<div class="density-heldout-actions"><span class="note density-heldout-result" role="status">No observation submitted.</span><span class="pill warn">gate effect: none</span></div>'
+            + '</article>';
+        }).join('');
+        if(unresolved.length) rows+='<div class="density-heldout-unresolved">Unresolved folds remain review-blocked: '+unresolved.map(function(item){return esc(item);}).join(', ')+'</div>';
+        body.innerHTML=rows;
+        Array.prototype.forEach.call(document.querySelectorAll('[data-density-fold-index]'),function(card){
+          var index=Number(card.getAttribute('data-density-fold-index'));
+          var binding=bindings[index]||{};
+          var pages=Array.isArray(binding.pages)?binding.pages:[];
+          var select=card.querySelector('.densityHeldoutPage');
+          var source=card.querySelector('[data-density-source]');
+          var physical=card.querySelector('[data-density-physical]');
+          var rendered=card.querySelector('[data-density-rendered]');
+          var count=card.querySelector('.densityHeldoutCount');
+          var overlay=card.querySelector('.densityHeldoutOverlay');
+          var submit=card.querySelector('.densityHeldoutSubmit');
+          var result=card.querySelector('.density-heldout-result');
+          function selectedPage(){return pages[Number(select&&select.value)||0]||{};}
+          function updatePage(){
+            var page=selectedPage();
+            if(source) source.href=page.page_index==null?'#':pageUrl(binding,page);
+            if(physical) physical.textContent=page.physical_page_number==null?'—':String(page.physical_page_number);
+            if(rendered){rendered.textContent=digest(page.rendered_page_sha256); rendered.title=page.rendered_page_sha256||'';}
+            updateReady();
+          }
+          function updateReady(){
+            var validCount=!!count && Number.isInteger(Number(count.value)) && Number(count.value)>0 && Number(count.value)<=10000000;
+            var validOverlay=!!overlay && DENSITY_REVIEW_HASH.test(String(overlay.value||'').trim());
+            var page=selectedPage();
+            var validPage=!!page && page.page_index!=null && DENSITY_REVIEW_HASH.test(String(page.rendered_page_sha256||''));
+            if(count) count.setAttribute('aria-invalid',validCount?'false':'true');
+            if(overlay) overlay.setAttribute('aria-invalid',validOverlay?'false':'true');
+            if(submit) submit.disabled=!(window.__densityReviewerAuthorized===true && validCount && validOverlay && validPage && binding.source_status==='available');
+          }
+          if(select) select.addEventListener('change',updatePage);
+          if(count) count.addEventListener('input',updateReady);
+          if(overlay) overlay.addEventListener('input',updateReady);
+          if(submit) submit.addEventListener('click',function(){
+            var page=selectedPage();
+            var observed=Number(count&&count.value);
+            var overlayHash=String(overlay&&overlay.value||'').trim().toLowerCase();
+            if(window.__densityReviewerAuthorized!==true){result.textContent='Verified estimator/admin reviewer session required; no receipt was recorded.'; result.className='note density-heldout-result warn'; return;}
+            if(!Number.isInteger(observed)||observed<=0||observed>10000000){result.textContent='Enter a positive integer count visible on the selected source page.'; result.className='note density-heldout-result warn'; updateReady(); return;}
+            if(!DENSITY_REVIEW_HASH.test(overlayHash)){result.textContent='Enter the 64-character SHA-256 of the marked review overlay; the source-page hash is not an overlay receipt.'; result.className='note density-heldout-result warn'; updateReady(); return;}
+            submit.disabled=true; result.textContent='Submitting source-bound observation…'; result.className='note density-heldout-result';
+            api('/heldout-density/review-evidence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+              manifest_sha256:manifest.manifest_sha256,
+              binding_id:manifest.binding_id,
+              fold_id:binding.fold_id,
+              decision:'accepted',
+              page_index:page.page_index,
+              source_pdf_sha256:binding.source_pdf_sha256,
+              rendered_page_sha256:page.rendered_page_sha256,
+              overlay_sha256:overlayHash,
+              observed_head_count:observed
+            })}).then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+              .then(function(response){
+                if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'review receipt rejected');
+                var receipt=response.json&&response.json.receipt||{};
+                if(receipt.observed_head_count!=null||receipt.actual_heads!=null||receipt.answer_key!=null) throw new Error('server returned forbidden truth fields');
+                result.textContent='Receipt stored '+digest(receipt.decision_id)+'… · diagnostic-only · gate effect: none';
+                result.className='note density-heldout-result ok';
+              }).catch(function(error){result.textContent='Density review failed: '+error.message; result.className='note density-heldout-result warn'; updateReady();});
+          });
+          updatePage();
+        });
+      }
+      window.__densityReviewerAuthorized=false;
+      fetch('/api/auth/me',{credentials:'include'}).then(function(response){return response.ok?response.json():null;}).then(function(user){
+        reviewer=user||null;
+        var role=String((user&&user.role)||'').toLowerCase();
+        var allowed=role==='estimator'||role==='admin';
+        window.__densityReviewerAuthorized=allowed;
+        if(!allowed){setStatus('reviewer not authorized',false); body.innerHTML='<div class="density-heldout-unresolved">A verified estimator/admin session is required to view or submit held-out observations. No review controls are enabled.</div>'; return null;}
+        setStatus('reviewer: '+String((user&&(user.name||user.username))||'User')+' · '+role+' · verified',true);
+        return api('/heldout-density/review-manifest').then(function(response){return response.ok?response.json():response.json().then(function(error){throw error;});});
+      }).then(function(payload){
+        if(payload) renderBindings(payload.review_manifest||{});
+      }).catch(function(error){
+        setStatus('manifest unavailable',false);
+        body.innerHTML='<div class="density-heldout-unresolved">Held-out density review is unavailable: '+esc((error&& (error.detail||error.error||error.message))||'unknown error')+'. No observation was recorded.</div>';
+      });
+    }
+
+    // Head reconcile disclosure — priced whole-building count vs geometry-grounded count.
+    function reconcilePanel(hr){
+      if(!hr) return '';
+      var agree = (hr.delta===0);
+      return '<section class="hf-panel mt"><div class="phd"><span class="t">Head reconcile</span>'
+        + (agree?'<span class="pill ok">counts agree</span>':'<span class="pill warn">Δ '+num(hr.delta)+' heads</span>')+'</div><div class="pbd">'
+        + '<div class="stat"><span class="l">Priced head count</span><span class="v">'+num(hr.head_count_priced)+'</span></div>'
+        + '<div class="stat"><span class="l">Geometry-grounded count</span><span class="v">'+num(hr.head_count_geometry)+(hr.geometry_count_source?' <span class="note" style="font-size:11px">('+esc(hr.geometry_count_source.replace(/_/g,' '))+')</span>':'')+'</span></div>'
+        + '<div class="stat"><span class="l">Delta</span><span class="v">'+(hr.delta>0?'+':'')+num(hr.delta)+'</span></div>'
+        + '<div class="note" style="margin-top:10px">'+esc(hr.reconcile_note||'')+'</div>'
+        + '</div></section>';
+    }
+
+    // Per-bid verified loop — every ensemble check with its pass/fail/unknown status.
+    function verificationPanel(v){
+      var head, body;
+      if(!v){
+        head = '<span class="pill warn">not run</span>';
+        body = '<div class="note">The per-bid verification loop did not run for this package (engine build without verification, or the verifier errored). The frozen confidence gate above still applies.</div>';
+      } else {
+        head = v.converged? '<span class="pill ok">converged</span>' : '<span class="pill warn">did not converge</span>';
+        var rows = (v.checks||[]).map(function(c){
+          var st = c.status==='pass'? '<span class="pill ok">pass</span>'
+                 : c.status==='fail'? '<span class="pill warn" style="background:rgba(252,165,165,0.14);color:#fca5a5;border-color:rgba(252,165,165,0.35)">fail</span>'
+                 : '<span class="pill" style="background:rgba(148,163,184,0.12);color:#94a3b8;border:1px solid rgba(148,163,184,0.3)">unknown</span>';
+          return '<div class="stat" title="'+esc(c.detail||'')+'"><span class="l">'+esc((c.id||'').replace(/_/g,' '))+'</span><span class="v">'+st+'</span></div>';
+        }).join('');
+        body = rows
+          + (v.residual? '<div class="note" style="margin-top:10px"><b>Residual:</b> '+esc(v.residual)+'</div>'
+                       : '<div class="note" style="margin-top:10px">Every present cross-check agrees — the ensemble converged. An <i>unknown</i> leg has absent inputs (e.g. no FP drawing to overlay) and is disclosed, never assumed.</div>');
+      }
+      return '<section class="hf-panel mt"><div class="phd"><span class="t">Verification — ensemble cross-checks</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
+    }
+
+    // Final spatial evidence review. Only these explicitly allowlisted metrics and
+    // digests render; filesystem paths and arbitrary gate JSON never enter the DOM.
+    var SPATIAL_METRICS = [
+      ['reviewed_structural_wall_recall','Reviewed wall recall','pct'],
+      ['classified_wall_ink_coverage','Classified wall ink coverage','pct'],
+      ['paired_candidate_ink_coverage','Paired candidate ink coverage','pct'],
+      ['phantom_room_count','Phantom rooms','num'],
+      ['footprint_dimension_error','Footprint dimension error','pct'],
+      ['n_rooms','Closed rooms','num'],
+      ['retained_wall_count','Retained walls','num'],
+      ['classified_structural_evidence_count','Structural evidence','num']
+    ];
+    function spatialValue(value, format){
+      if(value==null || typeof value!=='number' || !isFinite(value)) return '&mdash;';
+      return format==='pct' ? (value*100).toFixed(1)+'%' : num(value);
+    }
+    function digest(value){
+      var s=String(value||'');
+      if(!s) return '&mdash;';
+      return s.length>24 ? s.slice(0,12)+'...'+s.slice(-8) : s;
+    }
+    function viewportBox(value){
+      if(!Array.isArray(value) || value.length!==4 || value.some(function(item){return typeof item!=='number'||!isFinite(item);})) return '';
+      return value.map(function(item){return Number(item).toFixed(1);}).join(', ');
+    }
+    function spatialVerificationPanel(sv){
+      if(!sv){
+        return '<section class="hf-panel mt" id="spatialVerificationPanel"><div class="phd"><span class="t">Final spatial verification</span><span class="pill warn">unavailable</span></div><div class="pbd"><div class="note">No durable spatial overlay artifact is attached. The spatial badge remains unearned; honest package export is still available.</div></div></section>';
+      }
+      var status=sv.status||'pending_review';
+      var passed=sv.passed===true;
+      var head=passed?'<span class="pill ok">accepted</span>':'<span class="pill warn">'+esc(status.replace(/_/g,' '))+'</span>';
+      var plates=(sv.plates||[]).map(function(plate,index){
+        var page=plate.page||{}, gate=plate.automated_gate||{}, review=plate.review||{};
+        var integrity=plate.integrity||{}, source=plate.source||{}, urls=plate.urls||{};
+        var renderedHash=String(integrity.rendered_page_sha256||'').trim();
+        var priorViewportAttestations=Array.isArray(review.viewport_attestations)?review.viewport_attestations:[];
+        var autoPassed=gate.passed===true;
+        var metricRows=SPATIAL_METRICS.map(function(spec){
+          var value=(plate.metrics||{})[spec[0]];
+          if(value==null) return '';
+          return '<div class="stat"><span class="l">'+esc(spec[1])+'</span><span class="v">'+spatialValue(value,spec[2])+'</span></div>';
+        }).join('');
+        var gateReasons=(gate.reasons||[]).map(function(reason){return esc(reason);}).join(' &middot; ');
+        var decision=review.current===false?'stale':(review.decision||'pending');
+        var viewportProvenance=Array.isArray(plate.viewport_provenance)?plate.viewport_provenance:[];
+        var viewportRows=viewportProvenance.map(function(viewport){
+          var dims=(viewport.printed_long_ft!=null&&viewport.printed_short_ft!=null)
+            ? (' / '+num(viewport.printed_long_ft)+' x '+num(viewport.printed_short_ft)+' ft') : '';
+          var transform=Array.isArray(viewport.transform_ft)&&viewport.transform_ft.length===2
+            ? (' / transform '+num(viewport.transform_ft[0])+' x '+num(viewport.transform_ft[1])+' ft') : '';
+          var sourceBox=viewportBox(viewport.source_bbox_pt);
+          var geometryBox=viewportBox(viewport.geometry_bbox_pt);
+          var attested=priorViewportAttestations.some(function(item){return item&&item.block_id===viewport.block_id&&item.role===viewport.role;});
+          var role=String(viewport.role||'viewport');
+          var roleLabel=role==='upper'?'Upper viewport':(role==='lower'?'Lower viewport':role);
+          var status=attested?'attested':'needs check';
+          var boxes=(sourceBox||geometryBox)
+            ? ('source bbox ['+esc(sourceBox||'—')+']'+(geometryBox?' · geometry bbox ['+esc(geometryBox)+']':'')) : 'No registered bbox';
+          return '<label class="viewport-review-card spatial-viewport" data-viewport-role="'+esc(role)+'">'
+            + (viewportProvenance.length>1?'<input type="checkbox" class="viewport-attestation" data-viewport-block="'+esc(viewport.block_id||'')+'" aria-label="Attest '+esc(role)+' viewport '+esc(viewport.block_id||'')+'"'+(attested?' checked':'')+' />':'')
+            + '<span class="viewport-card-body"><span class="viewport-card-title"><span class="viewport-role">'+esc(roleLabel)+'</span> <span class="viewport-id">'+esc(role)+' ('+esc(viewport.block_id||'')+')</span><span class="viewport-status">'+status+'</span></span>'
+            + '<span class="viewport-card-detail">'+esc((dims+transform).replace(/^\s*\/\s*/,'')||'Registered composite view')+'<br><code>'+boxes+'</code></span></span></label>';
+        }).join('');
+        var viewportScope=viewportProvenance.length>1
+          ? '<div class="viewport-scope"><strong>Composite scope · '+num(viewportProvenance.length)+' registered views</strong><small><b>Registered source viewports:</b> compare every outlined source view before accepting this plate. A-101 requires both upper and lower attestations; the badge remains pending until each checked box is recorded.</small><div class="viewport-review-grid">'+viewportRows+'</div></div>'
+          : (viewportRows?'<div class="viewport-scope"><strong>Single registered view</strong><small>Confirm the source outline and geometry before recording a decision.</small><div class="viewport-review-grid">'+viewportRows+'</div></div>':'');
+        var physicalPage=page.physical_page_number==null?'&mdash;':num(page.physical_page_number);
+        var pageIndex=page.page_index==null?'&mdash;':num(page.page_index);
+        var overlayFrame=urls.overlay_png
+          ? '<figure class="spatial-review-frame" data-spatial-review-frame="'+index+'">'
+            + '<figcaption>Stored source-PDF pixels + derived walls/rooms composite. Inspect both localized views; red outlines identify source viewports and blue lines are extracted wall centerlines.</figcaption>'
+            + '<div class="spatial-review-toolbar"><label for="spatialZoom'+index+'">Zoom</label><input id="spatialZoom'+index+'" data-spatial-zoom="'+index+'" type="range" min="100" max="300" step="10" value="100" /><output id="spatialZoomValue'+index+'" for="spatialZoom'+index+'">100%</output></div>'
+            + '<img class="spatial-overlay" data-spatial-overlay-index="'+index+'" src="'+esc(urls.overlay_png)+'" alt="Stored source-PDF and derived wall/room overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(physicalPage)+'" loading="lazy" />'
+            + '</figure>'
+          : '<div class="note">Overlay image URL missing; acceptance is unavailable.</div>';
+        return '<div class="spatial-plate" data-spatial-artifact="'+esc(plate.artifact_id||'')+'">'
+          + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+physicalPage+'</span></div>'
+          + '<div class="stat"><span class="l">Indexed source page (zero-based)</span><span class="v">'+pageIndex+'</span></div>'
+          + '<div class="stat"><span class="l">Automated overlay gate</span><span class="v">'+(autoPassed?'<span class="pill ok">pass</span>':'<span class="pill warn">fail</span>')+'</span></div>'
+          + '<div class="stat"><span class="l">Human review</span><span class="v">'+esc(decision.replace(/_/g,' '))+'</span></div>'
+          + (viewportScope||'')
+          + (gateReasons?'<div class="note"><b>Automated residual:</b> '+gateReasons+'</div>':'')
+          + overlayFrame
+          + metricRows
+          + '<div class="spatial-digests">'
+          + '<div><span class="note">PNG SHA-256</span><br><code title="'+esc(integrity.png_sha256||'')+'">'+esc(digest(integrity.png_sha256))+'</code></div>'
+          + '<div><span class="note">Manifest SHA-256</span><br><code title="'+esc(integrity.manifest_sha256||'')+'">'+esc(digest(integrity.manifest_sha256))+'</code></div>'
+          + '<div><span class="note">Rendered page SHA-256</span><br><code title="'+esc(renderedHash)+'">'+esc(digest(renderedHash))+'</code></div>'
+          + '<div><span class="note">Source PDF SHA-256</span><br><code title="'+esc(source.pdf_sha256||'')+'">'+esc(digest(source.pdf_sha256))+'</code></div>'
+          + '<div><span class="note">Input fingerprint</span><br><code title="'+esc(source.input_fingerprint||'')+'">'+esc(digest(source.input_fingerprint))+'</code></div>'
+          + '</div>'
+          + '<div class="spatial-actions">'
+          + '<label class="spatial-review-metric">Reviewed wall recall (0.90-1.00)<input id="spatialRecall'+index+'" type="number" min="0.90" max="1" step="0.01" value="'+esc(review.reviewed_structural_wall_recall==null?'':review.reviewed_structural_wall_recall)+'" /></label>'
+          + '<label class="spatial-review-metric">Phantom room count<input id="spatialPhantoms'+index+'" type="number" min="0" step="1" value="'+esc(review.phantom_room_count==null?'':review.phantom_room_count)+'" /></label>'
+          + '<textarea id="spatialNote'+index+'" aria-label="Spatial review note for '+esc(page.sheet_label||('plate '+(index+1)))+'" placeholder="Review note">'+esc(review.note||'')+'</textarea>'
+          + (!renderedHash?'<div class="note spatial-source-binding-warning">Source raster unavailable on the canonical runtime; no spatial decision can be recorded until the rendered source-page hash is bound.</div>':'')
+          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="accepted" disabled title="The automated gate must pass, the rendered source-page hash must be bound, and this stored overlay must finish loading before acceptance">Accept overlay</button>'
+          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="rejected" disabled title="Verified estimator/admin reviewer session required before recording a decision">Reject overlay</button>'
+          + '<div class="note spatial-result" id="spatialResult'+index+'"></div>'
+          + '</div></div>';
+      }).join('');
+      if(!plates) plates='<div class="note">No current overlay artifacts are available. The spatial badge remains unearned.</div>';
+      var packetUrl='/api/autobid/package/'+encodeURIComponent(REF)+'/review-packet';
+      return '<section class="hf-panel mt" id="spatialVerificationPanel"><div class="phd"><span class="t">Final spatial verification</span>'+head+'<span class="pill warn" id="spatialReviewerContext">reviewer session: verifying…</span></div><div class="pbd">'
+        + '<div class="note" style="margin-bottom:12px">Review the stored overlay against the named physical sheet before accepting. This controls only the spatial-verification badge; it never auto-accepts and never blocks honest package export. <a class="btn" href="'+packetUrl+'" target="_blank" rel="noopener" style="margin-left:8px;text-decoration:none">Open canonical review packet ↗</a><br><small>Packet is source-bound to the resolved plan-set document, physical pages, and rendered-page hashes; it contains no answer key.</small></div>'
+        + plates+'</div></section>';
+    }
+
+    function fpVectorMaterializationPanel(docId){
+      if(!docId) return '<div class="note">No canonical geometry document is resolved; FP materialization is unavailable.</div>';
+      return '<div class="fp-materialize-panel" id="fpVectorMaterializePanel">'
+        + '<div class="note"><b>Generate a source-bound candidate.</b> Select an indexed fire-protection sheet to scan its vector layer. This creates a truth-free overlay only; it never records a count, clears a gate, or replaces human review.</div>'
+        + '<div id="fpVectorMaterializeBody"><div class="note">Loading indexed FP sheets…</div></div>'
+        + '</div>';
+    }
+
+    function fpVectorReviewPanel(fp, docId){
+      if(!fp){
+        return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span><span class="pill warn">unavailable</span><span class="pill warn" id="qwenFloorplanStatus">vision assist: checking</span></div><div class="pbd"><div class="note">No bound FP vector candidate overlay is attached. This review aid never clears spatial verification or bid-grade.</div>'+fpVectorMaterializationPanel(docId)+'</div></section>';
+      }
+      var status=fp.status||'missing';
+      var artifacts=fp.artifacts||[];
+      var head=status==='available'?'<span class="pill warn">review only</span>':'<span class="pill warn">'+esc(status.replace(/_/g,' '))+'</span>';
+      var rows=artifacts.map(function(artifact,index){
+        var page=artifact.page||{};
+        var review=artifact.review||{};
+        var decision=review.decision||'pending';
+        var pointReview=artifact.point_review||null;
+        var pointAccepted=!!(pointReview&&pointReview.decision==='accepted');
+        var familyGroups=Array.isArray(artifact.family_groups)?artifact.family_groups:[];
+        var familyReviews=Array.isArray(artifact.family_reviews)?artifact.family_reviews:[];
+        var familyRows=familyGroups.map(function(group){
+          var support=Array.isArray(group.support_family_ids)?group.support_family_ids:[];
+          var supportText=support.length?support.join(', '):'none';
+          var fraction=group.support_co_location_fraction==null?'—':num(group.support_co_location_fraction*100)+'%';
+          return '<div class="stat"><span class="l">Family candidate '+esc(group.group_id||'-')+'</span><span class="v"><code>'+esc(group.anchor_family_id||'-')+'</code> · '+num(group.occurrence_count)+' candidate occurrences</span></div>'
+            + '<div class="note">Support families: <code>'+esc(supportText)+'</code> · co-location '+esc(fraction)+' · '+esc(group.status||'candidate_requires_overlay_eye_gate')+'</div>';
+        }).join('');
+        var familyControlRows=familyGroups.map(function(group){
+          var familyReview=familyReviews.filter(function(item){return item.family_id===group.group_id;}).slice(-1)[0]||{};
+          var familyDecision=familyReview.decision||'pending';
+          var familyReviewer=familyReview.reviewer_name
+            ? ' · '+esc(familyReview.reviewer_name)+' ('+esc(familyReview.reviewer_role||'reviewer')+')' : '';
+          var pointStatus=pointReview ? (pointReview.decision||'accepted')+' · '+esc(pointReview.reviewer_name||pointReview.reviewer_id||'trusted reviewer')+' · '+esc(pointReview.reviewed_at||'') : 'pending';
+          return '<div class="note"><b>Family review:</b> '+esc(familyDecision)+familyReviewer+'</div>'
+            + '<div class="note"><b>Blind point receipt:</b> '+esc(pointStatus)+(pointReview?'<br><small>packet '+esc(digest(pointReview.packet_hash))+' · overlay '+esc(digest(pointReview.point_overlay_sha256))+' · <a href="'+esc(pointReview.point_review_url||'#')+'" target="_blank" rel="noreferrer">receipt</a> · <a href="'+esc(pointReview.point_overlay_url||'#')+'" target="_blank" rel="noreferrer">marked source page</a></small>':'')+'</div>'
+            + '<div class="family-review-actions" data-family-group="'+esc(group.group_id||'')+'">'
+            + '<textarea class="fpVectorFamilyNote" aria-label="Family review note for '+esc(group.group_id||'candidate')+'" placeholder="Family review note">'+esc(familyReview.note||'')+'</textarea>'
+            + '<button class="btn fpVectorFamilyDecision" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'" data-decision="accepted"'+(familyDecision==='accepted'?' disabled':'')+'>Accept family</button>'
+            + '<button class="btn fpVectorFamilyDecision" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'" data-decision="rejected">Reject family</button>'
+            + '<button class="btn fpPointPacket" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'">Open blind point review</button>'
+            + '<div class="fpPointReviewMount"></div>'
+            + '<div class="note fpVectorFamilyResult"></div></div>';
+        }).join('');
+        return '<div class="spatial-plate" data-fp-vector-artifact="'+esc(artifact.artifact_id||'')+'">'
+          + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+num(page.physical_page_number)+'</span></div>'
+          + '<div class="stat"><span class="l">Semantic status</span><span class="v">not attempted · not scored</span></div>'
+          + '<div class="stat"><span class="l">Human semantic review</span><span class="v">'+esc(decision.replace(/_/g,' '))+(decision==='accepted'?' · bound to independent point receipt':(pointAccepted?' · point receipt ready':' · requires accepted independent point receipt'))+'</span></div>'
+          + (familyRows?'<div class="note"><b>Candidate family groups ('+num(familyGroups.length)+'):</b> '+familyRows+familyControlRows+'</div>':'<div class="note">No candidate family groups are present in the verified bundle.</div>')
+          + (artifact.overlay_url?'<img class="spatial-overlay fp-vector-overlay" data-fp-vector-overlay-index="'+index+'" src="'+esc(artifact.overlay_url)+'" alt="FP vector-symbol candidate overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Candidate overlay URL missing.</div>')
+          + '<div class="spatial-digests"><div><span class="note">Source PDF SHA-256</span><br><code title="'+esc(artifact.source_pdf_sha256||'')+'">'+esc(digest(artifact.source_pdf_sha256))+'</code></div>'
+          + (artifact.bundle_url?'<div><span class="note">Truth-free bundle</span><br><a href="'+esc(artifact.bundle_url)+'">Open bundle JSON</a></div>':'')
+          + '</div>'
+          + '<div class="spatial-actions fp-vector-actions">'
+          + '<div class="note">Semantic acceptance is blind: the server derives the observed count from an accepted independent point receipt. No answer-key count is entered here.</div>'
+          + '<textarea id="fpVectorNote'+index+'" aria-label="FP vector review note for '+esc(page.sheet_label||('candidate '+(index+1)))+'" placeholder="Review note">'+esc(review.note||'')+'</textarea>'
+          + '<button class="btn fpVectorDecision" data-fp-vector-index="'+index+'" data-decision="accepted"'+(decision==='accepted'||!pointAccepted?' disabled':'')+'>Accept semantic review</button>'
+          + '<div class="note spatial-result" id="fpVectorResult'+index+'"></div>'
+          + '</div></div>';
+      }).join('');
+      if(!rows) rows='<div class="note">No document-bound FP vector candidate overlay is available.</div>';
+      return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span>'+head+'<span class="pill warn" id="qwenFloorplanStatus">vision assist: checking</span></div><div class="pbd">'
+        + '<div class="note" style="margin-bottom:12px">These repeated-vector candidates are estimator-visible review evidence only. They are not sprinkler counts, do not carry answer-key truth, and never clear the spatial or bid-grade gates.</div>'
+        + fpVectorMaterializationPanel(docId)+rows+'</div></section>';
+    }
+
+    function bindFpMaterialization(docId){
+      var body=document.getElementById('fpVectorMaterializeBody');
+      if(!body || !docId) return;
+      api('/sheets?doc='+encodeURIComponent(docId)).then(function(response){
+        return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json,status:response.status};});
+      }).then(function(result){
+        if(!result.ok) throw new Error((result.json&&(result.json.detail||result.json.error))||('HTTP '+result.status));
+        var sheets=Array.isArray(result.json.sheets)?result.json.sheets.filter(function(sheet){
+          return sheet && sheet.fp_review===true;
+        }):[];
+        if(!sheets.length){
+          body.innerHTML='<div class="note">No indexed fire-protection sheet is available for this document. No candidate was generated.</div>';
+          return;
+        }
+        body.innerHTML='<div class="fp-materialize-grid">'+sheets.map(function(sheet,index){
+          var page=Number(sheet.page_index), physical=Number(sheet.physical_page_number);
+          var source=String(sheet.source_pdf_sha256||'').toLowerCase();
+          var valid=Number.isInteger(page)&&page>=0&&Number.isInteger(physical)&&physical===page+1&&/^[0-9a-f]{64}$/.test(source);
+          return '<article class="review-action fp-materialize-card" data-fp-materialize-index="'+index+'">'
+            + '<div class="review-action-head"><strong>'+esc(sheet.sheet_label||('FP page '+physical))+'</strong><span class="review-action-status">physical '+esc(physical)+'</span></div>'
+            + '<div class="review-action-detail">Indexed source page '+esc(page)+' · PDF '+esc(digest(source))+' · candidate scan only.</div>'
+            + '<button class="btn fpMaterializeButton" data-fp-materialize-index="'+index+'" '+(valid?'':'disabled')+'>Materialize candidate →</button>'
+            + '<div class="note fpMaterializeResult" role="status"></div></article>';
+        }).join('')+'</div>';
+        Array.prototype.forEach.call(document.querySelectorAll('.fpMaterializeButton'),function(button){
+          button.addEventListener('click',function(){
+            var index=Number(button.getAttribute('data-fp-materialize-index'));
+            var sheet=sheets[index]||{};
+            var resultNode=button.parentNode.querySelector('.fpMaterializeResult');
+            button.disabled=true;
+            if(resultNode) resultNode.textContent='Materializing the immutable source-bound overlay…';
+            api('/fp-vector-artifacts/materialize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+              document_id:Number(docId), page_index:Number(sheet.page_index),
+              physical_page_number:Number(sheet.physical_page_number),
+              sheet_label:String(sheet.sheet_label||''),
+              source_pdf_sha256:String(sheet.source_pdf_sha256||'').toLowerCase()
+            })}).then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json,status:response.status};});})
+              .then(function(response){
+                if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||('materialization blocked (HTTP '+response.status+')'));
+                if(resultNode) resultNode.textContent='Candidate stored. Reloading the source-bound review panel…';
+                location.reload();
+              }).catch(function(error){
+                if(resultNode) resultNode.textContent='Candidate not generated: '+error.message+' No gate changed.';
+                button.disabled=false;
+              });
+          });
+        });
+      }).catch(function(error){
+        body.innerHTML='<div class="note">Indexed FP sheets unavailable: '+esc(error.message)+'. No candidate was generated.</div>';
+      });
+    }
+
+    function bindFpVectorReview(fp, docId){
+      var artifacts=(fp&&fp.artifacts)||[];
+      var visionStatus=document.getElementById('qwenFloorplanStatus');
+      if(visionStatus){
+        api('/vision/qwen-floorplan/status')
+          .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+          .then(function(result){
+            if(result.ok && result.json.available===true){
+              visionStatus.className='pill ok';
+              visionStatus.textContent='vision assist: '+(result.json.device==='cuda'?'local GPU':'local CPU');
+              visionStatus.title='Qwen candidate generation is available. It remains review-only.';
+            }else{
+              visionStatus.className='pill warn';
+              visionStatus.textContent='vision assist: unavailable here';
+              visionStatus.title='Candidate generation is unavailable on this host; deterministic and human review remain active.';
+            }
+          })
+          .catch(function(){
+            visionStatus.className='pill warn';
+            visionStatus.textContent='vision assist: status unknown';
+          });
+      }
+      bindFpMaterialization(docId);
+      artifacts.forEach(function(artifact,index){
+        var image=document.querySelector('[data-fp-vector-overlay-index="'+index+'"]');
+        var result=document.getElementById('fpVectorResult'+index);
+        if(image){
+          image.addEventListener('load',function(){
+            if(image.naturalWidth>0 && image.naturalHeight>0){
+              image.setAttribute('data-overlay-visible','true');
+              if(result) result.textContent='Candidate overlay loaded. Count only symbols you can verify against the source sheet.';
+            }
+          });
+          image.addEventListener('error',function(){
+            image.removeAttribute('data-overlay-visible');
+            if(result) result.textContent='Candidate overlay failed to load; semantic review is unavailable.';
+          });
+          if(image.complete && image.naturalWidth>0) image.setAttribute('data-overlay-visible','true');
+        }
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('.fpVectorDecision'),function(button){
+        button.addEventListener('click',function(){
+          var index=Number(button.getAttribute('data-fp-vector-index'));
+          var decision=button.getAttribute('data-decision');
+          var artifact=artifacts[index]||{};
+          var result=document.getElementById('fpVectorResult'+index);
+          var image=document.querySelector('[data-fp-vector-overlay-index="'+index+'"]');
+          var note=document.getElementById('fpVectorNote'+index);
+          if(decision==='accepted' && (!image || image.getAttribute('data-overlay-visible')!=='true')){
+            if(result) result.textContent='Accept only after the stored candidate overlay decodes in the browser.';
+            return;
+          }
+          var pointReview=artifact.point_review||null;
+          if(decision==='accepted' && (!pointReview || pointReview.decision!=='accepted')){
+            if(result) result.textContent='Accept only after an independent blind point receipt is accepted.';
+            return;
+          }
+          Array.prototype.forEach.call(button.parentNode.querySelectorAll('.fpVectorDecision'),function(item){item.disabled=true;});
+          if(result) result.textContent='Saving '+decision+' semantic review...';
+          api('/fp-vector-artifacts/'+encodeURIComponent(artifact.artifact_id)+'/semantic-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+            artifact_id:artifact.artifact_id,
+            candidate_id:pointReview?pointReview.candidate_id:'',
+            packet_hash:pointReview?pointReview.packet_hash:'',
+            point_review_decision_id:pointReview?pointReview.decision_id:'',
+            note:note?note.value:'',
+            expected_bundle_sha256:(artifact.integrity||{}).bundle_sha256,
+            expected_overlay_sha256:(artifact.integrity||{}).overlay_sha256
+          })})
+            .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+            .then(function(response){if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'review failed'); location.reload();})
+            .catch(function(error){if(result) result.textContent='FP semantic review failed: '+error.message;});
+        });
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('.fpVectorFamilyDecision'),function(button){
+        button.addEventListener('click',function(){
+          var index=Number(button.getAttribute('data-fp-vector-index'));
+          var artifact=artifacts[index]||{};
+          var familyId=button.getAttribute('data-family-id')||'';
+          var decision=button.getAttribute('data-decision');
+          var image=document.querySelector('[data-fp-vector-overlay-index="'+index+'"]');
+          var actions=button.parentNode;
+          var result=actions.querySelector('.fpVectorFamilyResult');
+          var note=actions.querySelector('.fpVectorFamilyNote');
+          var page=artifact.page||{};
+          if(!image || image.getAttribute('data-overlay-visible')!=='true'){
+            if(result) result.textContent='Review only after the stored candidate overlay decodes in the browser.';
+            return;
+          }
+          Array.prototype.forEach.call(actions.querySelectorAll('.fpVectorFamilyDecision'),function(item){item.disabled=true;});
+          if(result) result.textContent='Saving '+decision+' family review...';
+          api('/package/'+encodeURIComponent(REF)+'/fp-vector-family-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+            artifact_id:artifact.artifact_id,
+            page_index:page.page_index,
+            physical_page_number:page.physical_page_number,
+            family_id:familyId,
+            decision:decision,
+            bundle_sha256:(artifact.integrity||{}).bundle_sha256,
+            overlay_sha256:(artifact.integrity||{}).overlay_sha256,
+            note:note?note.value:''
+          })})
+            .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+            .then(function(response){if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'family review failed'); location.reload();})
+            .catch(function(error){if(result) result.textContent='FP family review failed: '+error.message; Array.prototype.forEach.call(actions.querySelectorAll('.fpVectorFamilyDecision'),function(item){item.disabled=false;});});
+        });
+      });
+      function proxyAutobidUrl(url){
+        return String(url||'').indexOf('/api/autobid')===0?String(url):'/api/autobid'+String(url||'');
+      }
+      function pointDigest(points){
+        var ordered=points.slice().sort(function(a,b){return a.x-b.x||a.y-b.y;});
+        return crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify({points:ordered}))).then(function(buffer){
+          return Array.prototype.map.call(new Uint8Array(buffer),function(byte){return byte.toString(16).padStart(2,'0');}).join('');
+        });
+      }
+      Array.prototype.forEach.call(document.querySelectorAll('.fpPointPacket'),function(button){
+        button.addEventListener('click',function(){
+          var index=Number(button.getAttribute('data-fp-vector-index'));
+          var familyId=button.getAttribute('data-family-id')||'';
+          var artifact=artifacts[index]||{};
+          var actions=button.parentNode;
+          var mount=actions.querySelector('.fpPointReviewMount');
+          var result=actions.querySelector('.fpVectorFamilyResult');
+          var template=artifact.point_review_packet_url_template||'';
+          if(!template){if(result) result.textContent='Blind point packet is not available for this artifact.'; return;}
+          var packetUrl=template.replace('{artifact_id}',encodeURIComponent(artifact.artifact_id||'')).replace('{family_id}',encodeURIComponent(familyId));
+          button.disabled=true;
+          if(result) result.textContent='Loading the source-bound blind page...';
+          api(packetUrl.replace(/^\/api\/autobid/,'')).then(function(response){
+            return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});
+          }).then(function(response){
+            if(!response.ok) throw new Error((response.json&&response.json.detail)||'point packet unavailable; accept the family first');
+            var packet=response.json;
+            mount.innerHTML='<div class="fp-point-review"><div class="note">Blind review: source PDF hash <code>'+esc(digest(packet.source_pdf_sha256))+'</code> · physical page '+esc(packet.physical_page_number)+' · no expected count is supplied.</div>'
+              +'<div class="note fpPointSourceStatus" role="status">Verifying the fetched source raster against rendered-page hash…</div>'
+              +'<div class="fp-point-review-stage"><img class="fpPointPage" alt="Source PDF page for blind sprinkler-head point review" /><canvas class="fpPointCanvas"></canvas></div>'
+              +'<div class="fp-point-review-actions"><button class="btn fpPointDecision" data-decision="accepted" disabled>Accept reviewed points</button><button class="btn fpPointDecision" data-decision="rejected" disabled>Reject page</button><span class="note fpPointCount">0 points marked</span></div></div>';
+            var stage=mount.querySelector('.fp-point-review-stage');
+            var image=mount.querySelector('.fpPointPage');
+            var canvas=mount.querySelector('.fpPointCanvas');
+            var count=mount.querySelector('.fpPointCount');
+            var sourceStatus=mount.querySelector('.fpPointSourceStatus');
+            var decisionButtons=mount.querySelectorAll('.fpPointDecision');
+            var points=[];
+            var sourceVerified=false;
+            var sourceUrl=proxyAutobidUrl(packet.source_pdf_page_url);
+            var sourceBlobUrl=null;
+            var hexDigest=function(buffer){
+              return Array.prototype.map.call(new Uint8Array(buffer),function(byte){return byte.toString(16).padStart(2,'0');}).join('');
+            };
+            var redraw=function(){
+              if(!image.naturalWidth) return;
+              canvas.width=image.naturalWidth; canvas.height=image.naturalHeight;
+              var ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);
+              ctx.fillStyle='#f0a868'; ctx.strokeStyle='#24170b'; ctx.lineWidth=Math.max(2,canvas.width/700);
+              points.forEach(function(point){
+                var px=point.x/packet.page_width_pt*canvas.width;
+                var py=point.y/packet.page_height_pt*canvas.height;
+                ctx.beginPath(); ctx.arc(px,py,Math.max(5,canvas.width/180),0,Math.PI*2); ctx.fill(); ctx.stroke();
+              });
+              if(count) count.textContent=points.length+' point'+(points.length===1?'':'s')+' marked';
+            };
+            image.addEventListener('load',redraw);
+            fetch(sourceUrl,{credentials:'include',cache:'no-store'}).then(function(response){
+              if(!response.ok) throw new Error('source raster fetch returned HTTP '+response.status);
+              return response.arrayBuffer();
+            }).then(function(buffer){
+              if(!window.crypto || !window.crypto.subtle) throw new Error('browser SHA-256 support is unavailable');
+              return window.crypto.subtle.digest('SHA-256',buffer).then(function(digestBuffer){
+                var actual=hexDigest(digestBuffer);
+                if(actual!==String(packet.rendered_page_sha256||'').toLowerCase()) throw new Error('rendered source-page SHA-256 mismatch');
+                sourceVerified=true;
+                Array.prototype.forEach.call(decisionButtons,function(item){item.disabled=false;});
+                if(sourceStatus){sourceStatus.className='note fpPointSourceStatus ok'; sourceStatus.textContent='Source raster verified · rendered-page SHA-256 '+digest(actual)+'…';}
+                // Display the exact bytes that were hashed; do not fetch a second
+                // mutable copy between verification and point placement.
+                sourceBlobUrl=URL.createObjectURL(new Blob([buffer],{type:'image/png'}));
+                image.src=sourceBlobUrl;
+              });
+            }).catch(function(error){
+              sourceVerified=false;
+              if(sourceStatus){sourceStatus.className='note fpPointSourceStatus warn'; sourceStatus.textContent='Blind review unavailable: '+error.message+'. Decision controls remain disabled.';}
+            });
+            canvas.addEventListener('click',function(event){
+              if(!sourceVerified || !image.naturalWidth || !image.naturalHeight) return;
+              var rect=canvas.getBoundingClientRect();
+              points.push({x:(event.clientX-rect.left)/rect.width*packet.page_width_pt,y:(event.clientY-rect.top)/rect.height*packet.page_height_pt});
+              redraw();
+            });
+            Array.prototype.forEach.call(mount.querySelectorAll('.fpPointDecision'),function(decisionButton){
+              decisionButton.addEventListener('click',function(){
+                var decision=decisionButton.getAttribute('data-decision');
+                if(!sourceVerified){if(result) result.textContent='Verify the canonical rendered source page before submitting a decision.'; return;}
+                if(decision==='accepted' && !points.length){if(result) result.textContent='Mark at least one clearly visible sprinkler head before accepting.'; return;}
+                Array.prototype.forEach.call(mount.querySelectorAll('.fpPointDecision'),function(item){item.disabled=true;});
+                var selected=decision==='accepted'?points:[];
+                Promise.resolve().then(function(){
+                  return api('/fp-vector-artifacts/'+encodeURIComponent(artifact.artifact_id)+'/point-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+                    packet_hash:packet.packet_hash, artifact_id:artifact.artifact_id, candidate_id:packet.candidate_id,
+                    family_id:familyId, points:selected, decision:decision,
+                    note:'Estimator point review from source-bound blind page'
+                  })});
+                }).then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+                  .then(function(response){if(!response.ok) throw new Error((response.json&&response.json.detail)||'point review failed'); if(result) result.textContent='Canonical point receipt stored: '+response.json.decision_id.slice(0,12)+'…';})
+                  .catch(function(error){if(result) result.textContent='Point review failed: '+error.message; Array.prototype.forEach.call(mount.querySelectorAll('.fpPointDecision'),function(item){item.disabled=false;});});
+              });
+            });
+            if(result) result.textContent='Source-bound blind page ready. Mark only symbols you can verify.';
+          }).catch(function(error){if(result) result.textContent='Blind point packet failed: '+error.message; button.disabled=false;});
+        });
+      });
+    }
+
+      function bindSpatialReviewerContext(){
+      var chip=document.getElementById('spatialReviewerContext');
+      window.__spatialReviewerAuthorized=false;
+      if(!chip) return;
+      fetch('/api/auth/me',{credentials:'include'})
+        .then(function(response){return response.ok?response.json():null;})
+        .then(function(user){
+          var role=String((user&&user.role)||'').toLowerCase();
+          var allowed=role==='estimator'||role==='admin';
+          window.__spatialReviewerAuthorized=allowed;
+          chip.className='pill '+(allowed?'ok':'warn');
+          chip.textContent=allowed
+            ? 'reviewer: '+String((user&&(user.name||user.username))||'User')+' · '+role+' · verified'
+            : 'reviewer session not authorized';
+          if(window.__spatialReviewRefresh) window.__spatialReviewRefresh();
+        })
+        .catch(function(){
+          window.__spatialReviewerAuthorized=false;
+          chip.className='pill warn';
+          chip.textContent='reviewer session unavailable';
+          if(window.__spatialReviewRefresh) window.__spatialReviewRefresh();
+        });
+      }
+
+      function bindSpatialReview(sv){
+      var plates=(sv&&sv.plates)||[];
+      var refreshers=[];
+      window.__spatialReviewerAuthorized=false;
+      plates.forEach(function(plate,index){
+        var gate=plate.automated_gate||{};
+        var image=document.querySelector('[data-spatial-overlay-index="'+index+'"]');
+        var accept=document.querySelector('.spatialDecision[data-plate-index="'+index+'"][data-decision="accepted"]');
+        var reject=document.querySelector('.spatialDecision[data-plate-index="'+index+'"][data-decision="rejected"]');
+        var result=document.getElementById('spatialResult'+index);
+        if(!image || !accept) return;
+        function markVisible(){
+          if(image.naturalWidth<=0 || image.naturalHeight<=0) return markBroken();
+          accept.setAttribute('data-overlay-visible','true');
+          var renderedHash=String((plate.integrity||{}).rendered_page_sha256||'').trim();
+          var viewportReady=Array.prototype.every.call(
+            document.querySelectorAll('[data-spatial-artifact="'+plate.artifact_id+'"] .viewport-attestation'),
+            function(item){return item.checked;});
+          var reviewerReady=window.__spatialReviewerAuthorized===true;
+          accept.disabled=gate.passed!==true || !viewportReady || renderedHash.length!==64 || !reviewerReady;
+          if(reject) reject.disabled=renderedHash.length!==64 || !reviewerReady;
+          accept.title=!reviewerReady?'Verified estimator/admin reviewer session required before recording a decision':(gate.passed!==true?'Automated overlay gate must pass before acceptance':(renderedHash.length!==64?'Canonical rendered source-page hash is unavailable; acceptance is blocked':(viewportReady?'Stored overlay loaded and all source viewports attested':'Inspect and check every registered source viewport before acceptance')));
+          if(result) result.textContent='Stored overlay loaded. Review the pixels before recording a decision.';
+        }
+        function markBroken(){
+          accept.removeAttribute('data-overlay-visible');
+          accept.disabled=true;
+          if(reject) reject.disabled=true;
+          accept.title='Stored overlay could not be displayed; acceptance is unavailable';
+          if(result) result.textContent='Stored overlay failed to load or decode. Acceptance remains disabled.';
+        }
+        image.addEventListener('load',markVisible);
+        image.addEventListener('error',markBroken);
+        Array.prototype.forEach.call(document.querySelectorAll('[data-spatial-artifact="'+plate.artifact_id+'"] .viewport-attestation'),function(item){
+          item.addEventListener('change',markVisible);
+        });
+        if(image.complete) (image.naturalWidth>0?markVisible:markBroken)();
+        refreshers.push(markVisible);
+      });
+      window.__spatialReviewRefresh=function(){refreshers.forEach(function(refresh){refresh();});};
+      Array.prototype.forEach.call(document.querySelectorAll('.spatialDecision'),function(button){
+        button.addEventListener('click',function(){
+          var index=Number(button.getAttribute('data-plate-index'));
+          var decision=button.getAttribute('data-decision');
+          var plate=plates[index]||{}, gate=plate.automated_gate||{}, integrity=plate.integrity||{};
+          var renderedHash=String(integrity.rendered_page_sha256||'').trim();
+          if(window.__spatialReviewerAuthorized!==true){
+            var unauthorizedResult=document.getElementById('spatialResult'+index);
+            if(unauthorizedResult) unauthorizedResult.textContent='Verified estimator/admin reviewer session required; no decision was recorded.';
+            return;
+          }
+          if(renderedHash.length!==64){
+            var unavailableResult=document.getElementById('spatialResult'+index);
+            if(unavailableResult) unavailableResult.textContent='Canonical rendered source-page hash is unavailable; no spatial decision can be recorded.';
+            return;
+          }
+          if(decision==='accepted' && (gate.passed!==true || button.getAttribute('data-overlay-visible')!=='true')) return;
+          var note=document.getElementById('spatialNote'+index);
+          var recallInput=document.getElementById('spatialRecall'+index);
+          var phantomInput=document.getElementById('spatialPhantoms'+index);
+          var result=document.getElementById('spatialResult'+index);
+          var recall=recallInput&&recallInput.value!==''?Number(recallInput.value):null;
+          var phantoms=phantomInput&&phantomInput.value!==''?Number(phantomInput.value):null;
+          var viewportInputs=document.querySelectorAll('[data-spatial-artifact="'+plate.artifact_id+'"] .viewport-attestation');
+          var viewportReady=Array.prototype.every.call(viewportInputs,function(item){return item.checked;});
+          if(decision==='accepted' && viewportInputs.length && !viewportReady){
+            if(result) result.textContent='Acceptance requires an independent visual check of every registered source viewport.';
+            return;
+          }
+          if(decision==='accepted' && (recall==null || !isFinite(recall) || recall<0.90 || recall>1 || phantoms!==0)){
+            if(result) result.textContent='Acceptance requires reviewed wall recall from 0.90 to 1.00 and exactly zero phantom rooms.';
+            return;
+          }
+          var siblings=button.parentNode.querySelectorAll('.spatialDecision');
+          Array.prototype.forEach.call(siblings,function(item){item.disabled=true;});
+          if(result) result.textContent='Saving '+decision+' review...';
+          var payload={
+            artifact_id:plate.artifact_id,
+            decision:decision,
+            note:note?note.value:'',
+            reviewed_structural_wall_recall:decision==='accepted'?recall:null,
+            phantom_room_count:decision==='accepted'?phantoms:null,
+            viewport_attestations:decision==='accepted'?Array.prototype.map.call(plate.viewport_provenance||[],function(viewport){return {
+              block_id:viewport.block_id, role:viewport.role, source_bbox_pt:viewport.source_bbox_pt
+            };}):null,
+            expected_png_sha256:integrity.png_sha256,
+            expected_manifest_sha256:integrity.manifest_sha256,
+            expected_rendered_page_sha256:integrity.rendered_page_sha256
+          };
+          api('/package/'+encodeURIComponent(REF)+'/spatial-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+            .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+            .then(function(response){
+              if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'review failed');
+              location.reload();
+            })
+            .catch(function(error){
+              if(result) result.textContent='Spatial review failed: '+error.message;
+              Array.prototype.forEach.call(siblings,function(item){
+                item.disabled=item.getAttribute('data-decision')==='rejected'
+                  ? renderedHash.length!==64 || window.__spatialReviewerAuthorized!==true
+                  : (gate.passed!==true || item.getAttribute('data-overlay-visible')!=='true' || renderedHash.length!==64 || window.__spatialReviewerAuthorized!==true);
+              });
+            });
+        });
+      });
+    }
+
+    function operationsFlowRail(p){
+      var ready=(p&&p.readyBid)||{};
+      var verification=(p&&p.verification)||{};
+      var sent=(p&&p.sent_status)||{};
+      var intakeState=ready.job_name||ready.head_count!=null?'complete':'pending';
+      var verificationState=verification.converged===true?'complete':'current';
+      var exportState=sent.transmission_confirmed===true?'complete':'pending';
+      return '<section class="ops-flow-rail" aria-label="HaloFire operations flow" data-active="review">'
+        + '<article class="ops-flow-step '+(intakeState==='complete'?'complete':'')+'"><span class="flow-k">01 · Intake</span><span class="flow-v">'+(intakeState==='complete'?'Package built':'Package pending')+'</span><span class="flow-note">Source, scope, and pricing inputs are bound.</span></article>'
+        + '<article class="ops-flow-step current"><span class="flow-k">02 · Review</span><span class="flow-v">Human review</span><span class="flow-note">Inspect source-bound overlays, counts, and qualifiers.</span></article>'
+        + '<article class="ops-flow-step '+(verificationState==='complete'?'complete':'current')+'"><span class="flow-k">03 · Verify</span><span class="flow-v">'+(verificationState==='complete'?'Checks converged':'Receipts required')+'</span><span class="flow-note">Independent evidence stays separate from candidate tooling.</span></article>'
+        + '<article class="ops-flow-step '+(exportState==='complete'?'complete':'')+'"><span class="flow-k">04 · Export</span><span class="flow-v">'+(exportState==='complete'?'Transmission confirmed':'Manual export')+'</span><span class="flow-note">Export stages the package; sending remains explicit.</span></article>'
+        + '</section>';
+    }
 
     function render(p){
       var rb = p.readyBid||{}, cd = p.charts_data||{}, m3 = p.model3d||{};
       var quals = p.qualifiers||[];
-      var sent = p.sent_status && (p.sent_status.sent || p.sent_status.status==='sent');
+      var conf = p.confidence||null;
+      // P3 per-room layout carried on the package (preferred plan source for loadDesign).
+      window.__SD = p.studio_drawing || null;
+      window.__AGD = p.accepted_geometry_drawing || null;
+      // doc id for the 3D viewer + Bluebeam draw links (package ref is the doc when ?by=doc).
+      // Use only the canonical resolved plan-set source for drawing/3D. A priced
+      // workbook or package ref is not a drawable PDF and must never be a fallback.
+      var docId = p.geometry_document_id || (p.meta&&p.meta.geometry_document_id) || null;
+      var navLinks = docId
+        ? '<a class="btn" href="/autosprink.html?doc='+encodeURIComponent(docId)+'" style="text-decoration:none;margin-left:8px">⬡ Open 3D model</a>'
+          + '<a class="btn" href="/autobid-draw.html?doc='+encodeURIComponent(docId)+'" style="text-decoration:none;margin-left:8px">✎ Open drawing</a>'
+        : '';
+      var sentStatus = p.sent_status || {};
+      var sent = sentStatus.transmission_confirmed === true;
+      var exportedPending = sentStatus.transmission_status === 'exported_manual_transmission_pending';
       var heads = rb.head_count, bomHeads = rb.bom_head_count;
       var agree = rb.heads_agree!==false && rb.cross_check_pass!==false;
 
@@ -247,13 +1371,36 @@
         }
       }
 
+      function bindSpatialReviewFrames(){
+        Array.prototype.forEach.call(document.querySelectorAll('[data-spatial-zoom]'),function(slider){
+          var index=slider.getAttribute('data-spatial-zoom');
+          var frame=document.querySelector('[data-spatial-review-frame="'+index+'"]');
+          var image=frame&&frame.querySelector('.spatial-overlay');
+          var output=document.getElementById('spatialZoomValue'+index);
+          if(!frame||!image) return;
+          var update=function(){
+            var percent=Math.max(100,Math.min(300,Number(slider.value)||100));
+            image.style.width=percent+'%';
+            if(output) output.value=percent+'%';
+            if(output) output.textContent=percent+'%';
+          };
+          slider.addEventListener('input',update);
+          update();
+        });
+      }
+
       var html = ''
       + '<div class="head">'
       +   '<div><div class="jn">'+esc(rb.job_name||('Bid '+REF))+'</div><div class="loc">'+esc(rb.location||rb.builder||'')+' · '+(rb.authoritative_sqft?Number(rb.authoritative_sqft).toLocaleString()+' sq ft':'')+'</div></div>'
       +   '<div class="spacer"></div>'
-      +   '<div class="headline"><div class="big">'+usd(rb.total)+'</div><div class="band">'+ (rb.in_band===false?'<span class="pill warn">outside corpus band</span>':'<span class="pill ok">in corpus band</span>') +' · $'+Math.round(rb.cost_per_head||0)+'/head</div></div>'
+      +   '<div class="headline"><div class="big">'+usd(rb.total)+'</div><div class="band">'+ (rb.in_band===false?'<span class="pill warn">outside corpus band</span>':'<span class="pill ok">in corpus band</span>') +' · $'+Math.round(rb.cost_per_head||0)+'/head</div>'
+      +     '<div style="margin-top:8px">'+navLinks+'</div></div>'
       + '</div>'
 
+      + confidenceBadge(conf)
+      + governanceLine(p.governance)
+
+      + operationsFlowRail(p)
       + '<div class="cols">'
       // LEFT: numbers + charts + massing
       +   '<div>'
@@ -263,6 +1410,17 @@
       +       '<div class="stat"><span class="l">Riser / backflow</span><span class="v">'+(rb.riser_size_in||'—')+'" / '+(rb.backflow_size_in||'—')+'"</span></div>'
       +       '<div class="stat"><span class="l">Anomaly</span><span class="v">'+esc(rb.anomaly_state||'—')+(rb.self_corrected?' (self-corrected)':'')+'</span></div>'
       +     '</div></section>'
+
+      // P1 ops-center review aggregation — geometry / reconcile / verification blocks
+      // straight off the /package manifest (all honest three-state, never faked).
+      +     geometryPanel(p)
+      +     densityResolutionPanel(p)
+      +     densityHeldoutReviewPanel()
+      +     acceptanceActionManifest()
+      +     spatialVerificationPanel(p.spatial_verification)
+      +     fpVectorReviewPanel(p.fp_vector_review, docId)
+      +     reconcilePanel(p.head_reconcile)
+      +     verificationPanel(p.verification)
 
       +     (costItems.length? '<section class="hf-panel mt"><div class="phd"><span class="t">Cost breakdown</span></div><div class="pbd">'+bars(costItems, usd)+'</div></section>':'')
       +     (covItems.length? '<section class="hf-panel mt"><div class="phd"><span class="t">Coverage</span></div><div class="pbd">'+bars(covItems)+'</div></section>':'')
@@ -299,9 +1457,9 @@
       + '</div>'
 
       + '<div class="sendbar hf-card">'
-      +   '<div class="summary">'+(sent? 'This bid was already sent ('+esc((p.sent_status&&p.sent_status.sent_at)||'')+').' : 'Reviewing-and-sending is the one human gate. Send exports the package for confirmed transmission — it does not auto-email the client.')+'</div>'
+      +   '<div class="summary">'+(sent? 'Transmission confirmed ('+esc((p.sent_status&&p.sent_status.sent_at)||'')+').' : (exportedPending ? 'Package exported — manual transmission still pending; files or external delivery are not confirmed.' : 'Reviewing-and-sending is the one human gate. Export stages the package for confirmed transmission — it does not auto-email the client.'))+'</div>'
       +   '<button class="btn" onclick="window.location=\'/autobid-board.html\'">Back to board</button>'
-      +   '<button class="btn send" id="sendBtn"'+(sent?' disabled':'')+'>'+(sent?'Sent ✓':'Send bid package →')+'</button>'
+      +   '<button class="btn send" id="sendBtn"'+(sent?' disabled':'')+'>'+(sent?'Transmission confirmed ✓':(exportedPending?'Re-export package →':'Export bid package →'))+'</button>'
       + '</div>';
 
       document.getElementById('root').innerHTML = html;
@@ -313,12 +1471,20 @@
       // Resolve every BOM line to a DB-cataloged part with a 3D model link. Non-blocking.
       loadBomParts();
 
+      // The overlay review controls only the spatial badge. Export remains independent.
+      bindSpatialReview(p.spatial_verification);
+      bindSpatialReviewerContext();
+      bindSpatialReviewFrames();
+      bindFpVectorReview(p.fp_vector_review, docId);
+      bindDensityHeldoutReview();
+      bindAcceptanceActionManifest();
+
       var btn = document.getElementById('sendBtn');
       if(btn && !sent){
         btn.addEventListener('click', function(){
           btn.disabled = true; btn.textContent = 'Sending…';
           var edited = Array.prototype.map.call(document.querySelectorAll('#qlist textarea'), function(t){ return t.value; });
-          api('/package/'+encodeURIComponent(REF)+'/send', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ qualifiers: edited }) })
+          api('/package/'+encodeURIComponent(REF)+'/send', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ edited_qualifiers: edited }) })
             .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok, j:j}; }); })
             .then(function(res){
               if(res.ok){

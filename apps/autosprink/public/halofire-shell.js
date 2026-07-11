@@ -190,6 +190,59 @@
     return '<nav class="hf-nav">' + links + '</nav>';
   }
 
+  // Keep the app bar's identity state truthful. A 401 means the operator needs
+  // to sign in; a network/5xx response is a runtime/session-health problem and
+  // must not be presented as either an authenticated user or a sign-in prompt.
+  function applyAuthSurface(root, response, payload) {
+    var query = root && root.querySelector
+      ? function (selector) { return root.querySelector(selector); }
+      : function (selector) { return document.querySelector(selector); };
+    var role = query('#hfRole');
+    var signout = query('#hfSignout');
+    if (!role) return;
+    if (response && response.status === 401) {
+      role.innerHTML = '<span class="dot"></span> Sign in required';
+      role.setAttribute('aria-label', 'Sign in required');
+      if (signout) {
+        signout.textContent = 'Sign in';
+        signout.href = '/';
+        signout.removeAttribute('aria-hidden');
+        signout.onclick = null;
+      }
+      return;
+    }
+    if (!response || !response.ok || !payload) {
+      role.innerHTML = '<span class="dot"></span> Session unavailable';
+      role.setAttribute('aria-label', 'Session unavailable');
+      if (signout) {
+        signout.hidden = true;
+        signout.setAttribute('aria-hidden', 'true');
+      }
+      return;
+    }
+    var u = payload.user || payload;
+    var name = u.name || u.username || 'User';
+    var jobRole = u.position || u.role || '';
+    role.innerHTML = '<span class="dot"></span> ' + name + (jobRole ? ' · ' + jobRole : '');
+    role.removeAttribute('aria-label');
+  }
+
+  function hydrateAuthSurface(root) {
+    return fetch('/api/auth/me', { credentials: 'include' }).then(function (response) {
+      if (!response.ok) {
+        applyAuthSurface(root, response, null);
+        return null;
+      }
+      return response.json().then(function (payload) {
+        applyAuthSurface(root, response, payload);
+        return payload;
+      });
+    }).catch(function () {
+      applyAuthSurface(root, null, null);
+      return null;
+    });
+  }
+
   function injectAppbar() {
     if (document.body.getAttribute('data-hf-appbar') === 'off') return;
     if (document.querySelector('.hf-appbar')) return;
@@ -209,14 +262,9 @@
         .then(function () { location.href = '/index.html'; })
         .catch(function () { location.href = '/index.html'; });
     };
-    // fill the role chip from the session if available
-    fetch('/api/auth/me', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-      var el = document.getElementById('hfRole'); if (!el) return;
-      var u = d && (d.user || d) || {};
-      var name = u.name || u.username || 'User';
-      var role = u.position || u.role || '';
-      el.innerHTML = '<span class="dot"></span> ' + name + (role ? ' · ' + role : '');
-    }).catch(function () {});
+    // Fill the identity surface from the cookie session, preserving 401 versus
+    // runtime/network failure semantics in the visible app bar.
+    hydrateAuthSurface(document);
   }
 
   function boot() {
@@ -266,14 +314,9 @@
         .then(function () { location.href = '/index.html'; })
         .catch(function () { location.href = '/index.html'; });
     };
-    // fill the role chip from the session, identical to the auto appbar
-    fetch('/api/auth/me', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
-      var el = host.querySelector('#hfRole'); if (!el) return;
-      var u = (d && (d.user || d)) || {};
-      var name = u.name || u.username || 'User';
-      var role = u.position || u.role || '';
-      el.innerHTML = '<span class="dot"></span> ' + name + (role ? ' · ' + role : '');
-    }).catch(function () {});
+    // Fill the identity surface from the cookie session, preserving 401 versus
+    // runtime/network failure semantics in the visible app bar.
+    hydrateAuthSurface(host);
     return host;
   }
 
