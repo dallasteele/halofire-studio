@@ -1077,8 +1077,10 @@ function api(path, options = {}) {
 async function bindSourceDocumentIdentity() {
   let doc = null;
   try { doc = new URLSearchParams(location.search).get('doc'); } catch (_) {}
-  if (!doc || !/^\d+$/.test(String(doc))) return null;
+  window.__sourceDocIdentity = { state: 'parsed', search: location.search, doc: String(doc || '') };
+  if (!doc || !/^[0-9]+$/.test(String(doc))) return null;
   const docId = Number(doc);
+  window.__sourceDocIdentity = { state: 'resolving', docId };
   let packagePayload = null;
   try {
     const ready = await api('/autobid/ready-to-send');
@@ -1094,8 +1096,8 @@ async function bindSourceDocumentIdentity() {
   }
   const meta = packagePayload && packagePayload.meta ? packagePayload.meta : {};
   const name = String(meta.job_name || '').trim();
-  const location = String(meta.location || '').trim();
-  const isCooperative = /cooperative\s*1881/i.test(name);
+  const jobLocation = String(meta.location || '').trim();
+  const isCooperative = /cooperative[ ]*1881/i.test(name);
   if (isCooperative && $('projectTarget')) {
     $('projectTarget').value = COOPERATIVE_1881_PROJECT_NAME;
   }
@@ -1103,7 +1105,7 @@ async function bindSourceDocumentIdentity() {
   const title = $('jobTitle');
   const subtitle = $('jobSub');
   if (title) title.textContent = name || ('Source document ' + docId);
-  if (subtitle) subtitle.textContent = location || 'Canonical plan-set source bound to document ' + docId;
+  if (subtitle) subtitle.textContent = jobLocation || 'Canonical plan-set source bound to document ' + docId;
   const well = $('jobWell');
   if (well) {
     const total = packagePayload && packagePayload.readyBid && packagePayload.readyBid.total;
@@ -1118,8 +1120,11 @@ async function bindSourceDocumentIdentity() {
   }
   document.body.dataset.sourceDocumentId = String(docId);
   document.body.dataset.sourceDocumentName = name || 'unknown';
-  return { docId, name, location, isCooperative, packagePayload };
+  const result = { docId, name, location: jobLocation, isCooperative, packagePayload: !!packagePayload };
+  window.__sourceDocIdentity = { state: 'bound', ...result };
+  return result;
 }
+window.__bindSourceDocumentIdentity = bindSourceDocumentIdentity;
 
 // ── OpenGeometry / Three scene ──
 const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30, COMPONENTS: 0xfbbf24, HANGERS: 0xb6bcc6, CEILING: 0xd8d2c2 }; // HF-G4-HANGER + HF-G5-CEILGRID layers
@@ -11106,7 +11111,12 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
 (async () => {
   await initStudio();
   try { initEditEngine(); } catch (e) { window.__hfEditEngineError = String(e && e.message || e); } // HF-W1: attach viewport edit/draw listeners
-  await bindSourceDocumentIdentity(); // AutoBid doc links must never inherit the default fixture identity
+  try { await bindSourceDocumentIdentity(); }
+  catch (e) {
+    window.__sourceDocIdentity = { state: 'error', reason: String(e && e.message || e) };
+    const status = document.getElementById('status');
+    if (status) status.textContent = 'source identity resolution failed — geometry remains unbound';
+  }
   await loadProjectTargets();   // HF-A1-SRCLOCK: bid projects -> email-PDF source, locked
   await autoLoadOrUnderlay();   // HF-A1-AUTOLOAD: saved layout or plan underlay, no Generate click
 })();
