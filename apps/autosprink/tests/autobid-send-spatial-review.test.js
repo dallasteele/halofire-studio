@@ -127,6 +127,58 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('resolution.qualifiers');
   });
 
+  it('renders the truth-free held-out density review worklist and keeps receipts non-gating', () => {
+    expect(html).toContain('function densityHeldoutReviewPanel()');
+    expect(html).toContain('id="densityHeldoutReviewPanel"');
+    expect(html).toContain("api('/heldout-density/review-manifest')");
+    expect(html).toContain("api('/heldout-density/review-evidence'");
+    expect(html).toContain('densityHeldoutPage');
+    expect(html).toContain('Open canonical source page');
+    expect(html).toContain('Physical page');
+    expect(html).toContain('Rendered page SHA-256');
+    expect(html).toContain('Source PDF SHA-256');
+    expect(html).toContain('Marked overlay SHA-256');
+    expect(html).toContain('window.__densityReviewerAuthorized');
+    expect(html).toContain("role==='estimator'||role==='admin'");
+    expect(html).toContain('observed_head_count:observed');
+    expect(html).toContain("decision:'accepted'");
+    expect(html).toContain('gate effect: none');
+    expect(html).toContain('diagnostic-only');
+    expect(html).toContain('server returned forbidden truth fields');
+    expect(html).toContain('No observation was recorded');
+    expect(html).not.toContain('densityHeldoutExpected');
+  });
+
+  it('renders a canonical action manifest for every remaining external receipt', () => {
+    expect(html).toContain('function acceptanceActionManifest()');
+    expect(html).toContain('function bindAcceptanceActionManifest()');
+    expect(html).toContain('id="acceptanceActionManifest"');
+    expect(html).toContain("api('/package/'+encodeURIComponent(REF)+'/acceptance-audit')");
+    expect(html).toContain("key:'fp_semantic_review'");
+    expect(html).toContain("key:'spatial_review'");
+    expect(html).toContain("key:'density_holdout'");
+    expect(html).toContain("key:'n6_scoring'");
+    expect(html).toContain("key:'release_authorization'");
+    expect(html).toContain('#fpVectorReviewPanel');
+    expect(html).toContain('#spatialVerificationPanel');
+    expect(html).toContain('#densityHeldoutReviewPanel');
+    expect(html).toContain('distinct independent scorer');
+    expect(html).toContain('separate release_authorizer');
+    expect(html).toContain('production gate effect: none');
+    const actionSection = html.slice(html.indexOf('function acceptanceActionManifest()'), html.indexOf('function bindAcceptanceActionManifest()'));
+    expect(actionSection).not.toContain('expected_count');
+    expect(actionSection).not.toContain('answer_key');
+  });
+
+  it('separates sign-in and role denial from engine outage on package load', () => {
+    expect(html).toContain('data-auth-required="true"');
+    expect(html).toContain('data-auth-forbidden="true"');
+    expect(html).toContain('Sign in to review this bid package');
+    expect(html).toContain('This bid is not available to your reviewer role');
+    expect(html).toContain('If the engine is offline:');
+    expect(html).toContain('e.__status=r.status');
+  });
+
   it('requires a decoded stored overlay and an automated pass for acceptance', () => {
     expect(html).toContain('data-spatial-overlay-index=');
     expect(html).toContain('data-overlay-visible');

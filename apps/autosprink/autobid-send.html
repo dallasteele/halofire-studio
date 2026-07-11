@@ -121,6 +121,24 @@
   .density-heldout-result.warn{ color:#fcd34d; }
   .density-heldout-unresolved{ margin-top:10px; padding:8px 10px; border:1px solid rgba(251,191,36,.28); border-radius:8px; color:#fcd34d; font-size:var(--hf-fs-sm); }
   @media(max-width:760px){ .density-heldout-grid,.density-heldout-form{ grid-template-columns:1fr; } }
+  /* One truthful operator worklist for the receipts that still need a human or
+     independently-owned report.  This is a navigation aid only: it never
+     changes a gate and deliberately carries no expected totals. */
+  .review-action-manifest{ border:1px solid rgba(158,195,255,.28); background:linear-gradient(125deg,rgba(158,195,255,.08),rgba(255,255,255,.025)); }
+  .review-action-intro{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+  .review-action-intro .signal{ width:9px; height:9px; margin-top:5px; border-radius:50%; background:#fcd34d; box-shadow:0 0 0 4px rgba(252,211,77,.12); flex:none; }
+  .review-action-intro .signal.ok{ background:#86efac; box-shadow:0 0 0 4px rgba(134,239,172,.12); }
+  .review-action-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .review-action{ display:flex; flex-direction:column; gap:5px; min-width:0; padding:10px 11px; border:1px solid var(--hf-line); border-radius:9px; background:rgba(0,0,0,.12); }
+  .review-action-head{ display:flex; align-items:center; gap:7px; }
+  .review-action-head strong{ flex:1; font-size:var(--hf-fs-sm); }
+  .review-action-status{ font-size:10px; letter-spacing:.45px; text-transform:uppercase; color:#fcd34d; }
+  .review-action-status.ok{ color:#86efac; }
+  .review-action-detail{ color:var(--hf-muted); font-size:11px; line-height:1.45; }
+  .review-action-link{ align-self:flex-start; color:var(--hf-color-interactive-text,#9ec3ff); font-size:11px; text-decoration:none; }
+  .review-action-link:hover{ text-decoration:underline; }
+  .review-action-count{ color:var(--hf-text); font-variant-numeric:tabular-nums; }
+  @media(max-width:760px){ .review-action-grid{ grid-template-columns:1fr; } }
   .sendbar{ position:sticky; bottom:0; margin-top:18px; padding:14px 16px; display:flex; align-items:center; gap:14px; border-radius:var(--hf-r-win,12px); }
   .sendbar .summary{ flex:1; font-size:var(--hf-fs-sm); color:var(--hf-muted); }
   .btn{ font:inherit; cursor:pointer; padding:11px 22px; border-radius:var(--hf-r-ctl,7px); border:1px solid var(--hf-line); background:var(--hf-glass,rgba(255,255,255,0.04)); color:var(--hf-text); font-weight:600; }
@@ -375,10 +393,18 @@
     }
 
     if(!REF){ document.getElementById('root').innerHTML='<div class="note">No bid ref given. Open one from the <a href="/autobid-board.html">Bid Board</a>.</div>'; }
-    else api('/package/'+encodeURIComponent(REF)).then(function(r){ return r.ok?r.json():r.json().then(function(e){throw e;}); }).then(function(p){
+    else api('/package/'+encodeURIComponent(REF)).then(function(r){ return r.json().catch(function(){return {};}).then(function(e){ if(!r.ok){ e.__status=r.status; throw e; } return e; }); }).then(function(p){
       render(p);
     }).catch(function(err){
-      document.getElementById('root').innerHTML='<div class="note">Could not load the package for ref '+esc(REF)+'. '+esc((err&&(err.detail||err.error))||'')+'<br>If the engine is offline: <code>C:/Python312/python.exe engine/api.py</code>.</div>';
+      var root=document.getElementById('root');
+      var status=err&&Number(err.__status||err.status||0);
+      if(status===401){
+        root.innerHTML='<section class="hf-panel" data-auth-required="true"><div class="phd"><span class="t">Review &amp; Send</span><span class="pill warn">sign in required</span></div><div class="pbd"><div class="note"><b>Sign in to review this bid package.</b> Your reviewer identity is required before source-bound packets or acceptance receipts can be opened. No package data was loaded.</div><a class="btn" href="/login.html?next='+encodeURIComponent(location.pathname+location.search)+'" style="display:inline-block;margin-top:12px;text-decoration:none">Sign in to continue</a></div></section>';
+      } else if(status===403){
+        root.innerHTML='<section class="hf-panel" data-auth-forbidden="true"><div class="phd"><span class="t">Review &amp; Send</span><span class="pill warn">access denied</span></div><div class="pbd"><div class="note"><b>This bid is not available to your reviewer role.</b> Ask an estimator, admin, or release authorizer to open the appropriate review lane.</div></div></section>';
+      } else {
+        root.innerHTML='<div class="note">Could not load the package for ref '+esc(REF)+'. '+esc((err&&(err.detail||err.error))||'')+'<br>If the engine is offline: <code>C:/Python312/python.exe engine/api.py</code>.</div>';
+      }
     });
 
     // Honest per-type confidence flag — reads the engine's confidence block
@@ -476,6 +502,68 @@
         + '<div class="phd"><span class="t">Held-out density review</span><span class="pill warn" id="densityHeldoutStatus">verifying reviewer…</span></div>'
         + '<div class="pbd"><div class="note">Source-bound blind worklist for independent density measurement. It shows only the exact FP page and hashes; expected totals are intentionally withheld. A submitted receipt is diagnostic-only and cannot change pricing, geometry, or acceptance.</div>'
         + '<div id="densityHeldoutBody"><div class="note" style="margin-top:10px">Loading truth-free review manifest…</div></div></div></section>';
+    }
+
+    // Read-only action manifest: a compact map from each remaining acceptance
+    // gate to the exact panel or independent owner that can satisfy it.  The
+    // endpoint is canonical, but the projection intentionally omits candidate
+    // counts, answer keys, and any write capability.
+    function acceptanceActionManifest(){
+      return '<section class="hf-panel mt review-action-manifest" id="acceptanceActionManifest">'
+        + '<div class="phd"><span class="t">Acceptance worklist</span><span class="pill warn" id="acceptanceActionStatus">checking gates…</span></div>'
+        + '<div class="pbd"><div class="review-action-intro"><span class="signal" id="acceptanceActionSignal"></span><div class="note"><b>What still needs an independent receipt.</b> Open a source-bound review panel below, or route the external report to its owning verifier. This list is read-only and never promotes production.</div></div>'
+        + '<div class="review-action-grid" id="acceptanceActionGrid"><div class="note">Loading canonical acceptance audit…</div></div>'
+        + '<div class="note" id="acceptanceActionFoot" style="margin-top:10px"></div></div></section>';
+    }
+    function bindAcceptanceActionManifest(){
+      var panel=document.getElementById('acceptanceActionManifest');
+      var status=document.getElementById('acceptanceActionStatus');
+      var signal=document.getElementById('acceptanceActionSignal');
+      var grid=document.getElementById('acceptanceActionGrid');
+      var foot=document.getElementById('acceptanceActionFoot');
+      if(!panel||!status||!grid) return;
+      var gates=[
+        {key:'fp_semantic_review',label:'FP semantic review',anchor:'#fpVectorReviewPanel',detail:'Trusted estimator/admin semantic review of the source-bound FP candidate; record the observed count only after the stored overlay is visible.'},
+        {key:'spatial_review',label:'Spatial overlays',anchor:'#spatialVerificationPanel',detail:'Inspect and attest every registered physical-page viewport, including both A-101 upper and lower views, then record each overlay decision.'},
+        {key:'density_holdout',label:'Held-out density',anchor:'#densityHeldoutReviewPanel',detail:'Independent estimator/admin measurement from the truth-free source page; submit only the redacted receipt. The frozen threshold is evaluated by the owning verifier.'},
+        {key:'n6_scoring',label:'N6 scorecard',anchor:'/api/autobid/package/'+encodeURIComponent(REF)+'/review-packet',external:true,detail:'A distinct independent scorer must supply the strict vector-symbol scorecard; the truth-free packet is the source-bound input, while candidate scans and the estimator receipt are not sufficient.'},
+        {key:'release_authorization',label:'Release authorization',anchor:'/api/autobid/package/'+encodeURIComponent(REF)+'/acceptance-audit',external:true,detail:'A separate release_authorizer must sign the immutable release-artifact and acceptance-audit hashes. Reviewer roles cannot authorize deployment.'}
+      ];
+      function escStatus(value){ return String(value||'pending').replace(/_/g,' '); }
+      function gateFor(audit,key){ return audit&&audit[key] ? audit[key] : null; }
+      function render(audit){
+        var rows=[];
+        gates.forEach(function(item){
+          var gate=gateFor(audit,item.key);
+          var isRelease=item.key==='release_authorization';
+          var passed=!isRelease && gate && gate.status==='passed';
+          var gateStatus=isRelease?'pending':(gate&&gate.status||'pending');
+          var count=gate&&!isRelease ? '<span class="review-action-count">'+num(gate.accepted_count)+' / '+num(gate.required_count)+'</span>' : '';
+          var action=!isRelease && gate&&gate.next_action ? gate.next_action : item.detail;
+          rows.push('<article class="review-action" data-acceptance-action="'+item.key+'">'
+            + '<div class="review-action-head"><strong>'+esc(item.label)+'</strong><span class="review-action-status '+(passed?'ok':'')+'">'+escStatus(gateStatus)+'</span></div>'
+            + '<div class="review-action-detail">'+(count?count+' · ':'')+esc(action)+'</div>'
+            + '<a class="review-action-link" href="'+esc(item.anchor)+'"'+(item.external?' target="_blank" rel="noopener"':'')+'>'+(passed?'Review receipt ↗':(item.external?'Open source packet ↗':'Open action ↗'))+'</a>'
+            + '</article>');
+        });
+        grid.innerHTML=rows.join('');
+        var production=audit&&audit.production_gate;
+        status.className='pill '+(production==='eligible'?'ok':'warn');
+        status.textContent=production==='eligible'?'eligible':'production blocked';
+        if(signal) signal.className='signal '+(production==='eligible'?'ok':'');
+        if(foot){
+          var hash=audit&&audit.packet_sha256 ? digest(audit.packet_sha256) : '—';
+          foot.textContent='Canonical audit packet '+hash+' · production gate effect: none. Release authorization is intentionally shown as a separate owner action; no browser control can authorize it.';
+        }
+      }
+      api('/package/'+encodeURIComponent(REF)+'/acceptance-audit').then(function(response){
+        return response.json().catch(function(){return {};}).then(function(body){ if(!response.ok){ body.__status=response.status; throw body; } return body; });
+      }).then(render).catch(function(err){
+        status.className='pill warn'; status.textContent=Number(err&&err.__status)===401?'sign in required':'audit unavailable';
+        if(signal) signal.className='signal';
+        grid.innerHTML='<div class="note">Canonical acceptance audit unavailable; no action state was inferred. '+esc((err&&(err.detail||err.error))||'')+'</div>';
+        if(foot) foot.textContent='No gate was changed.';
+      });
     }
     function bindDensityHeldoutReview(){
       var panel=document.getElementById('densityHeldoutReviewPanel');
@@ -1234,6 +1322,7 @@
       +     geometryPanel(p)
       +     densityResolutionPanel(p)
       +     densityHeldoutReviewPanel()
+      +     acceptanceActionManifest()
       +     spatialVerificationPanel(p.spatial_verification)
       +     fpVectorReviewPanel(p.fp_vector_review)
       +     reconcilePanel(p.head_reconcile)
@@ -1294,6 +1383,7 @@
       bindSpatialReviewFrames();
       bindFpVectorReview(p.fp_vector_review);
       bindDensityHeldoutReview();
+      bindAcceptanceActionManifest();
 
       var btn = document.getElementById('sendBtn');
       if(btn && !sent){
