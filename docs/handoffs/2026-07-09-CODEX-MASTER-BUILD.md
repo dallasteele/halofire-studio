@@ -898,3 +898,34 @@ The continuation work remains deliberately below the completion bar:
   and remaining spatial attestations, an independently measured held-out density
   report at the frozen threshold, strict N6 scoring from accepted receipts, and a
   separate deployment-authorization receipt.
+
+## 40. CODEX CONTINUATION EVIDENCE - 2026-07-11 (BLIND REVIEW READBACK, DENSITY MANIFEST, AND VPS PROXY SYNC)
+
+- Root `355b87a2c` adds the authenticated held-out-density review-manifest bridge.
+  The public payload is truth-free: eight source bindings, zero unresolved items,
+  no expected totals, no answer-key fields, and `production_gate_effect: none`.
+  The live Studio proxy returns **401** without verified reviewer identity,
+  **403** for a non-estimator/non-admin role, and **200** for a verified reviewer.
+- Root `6e6e4a7a8` adds immutable FP point-review readback.  Each receipt is bound
+  to the packet hash, source PDF hash, physical page, rendered-page hash, reviewer
+  identity/role, timestamp, and decision hash.  The marked source PNG is served
+  with its immutable ETag/hash; receipt and overlay URLs are projected into the
+  estimator packet.  No point coordinates, answer key, or acceptance gate is
+  exposed in the blind readback payload.
+- Studio `afa9104`, `744014c`, and `7e0d51a` make the canonical packet, receipt,
+  marked source page, verified reviewer chip, and fast source-identity lookup
+  visible in the live estimator flow.  The remote Studio proxy received a scoped
+  header-forwarding patch (backup: `server.js.bak-proxy-20260711`) and was
+  restarted; the source page and Send flow were re-verified after deployment.
+- Current focused backend coverage is **47 passed** (density manifest/queue/
+  scoring plus FP point-review/binding/family scoring).  The full engine baseline
+  remains **876 passed, 10 skipped, 21 warnings**.  Rulebook verification and
+  Python compilation pass.
+- This is an operational unblock for independent review, not an acceptance claim.
+  The live audit remains FP semantic **0/1**, spatial **0/8**, held-out density
+  pending, N6 pending, and production blocked until external receipts exist.  The
+  local Qwen/Hugging Face accelerator is exposed as review-only candidate tooling;
+  the VPS correctly reports no CUDA device and no cached model snapshot, so it
+  cannot silently become a production scorer.  NeMo is not installed and is not
+  used as a truth source; any future curator job must produce only a blinded,
+  source-hashed candidate dataset for the same human gates.
