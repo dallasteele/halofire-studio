@@ -90,6 +90,19 @@ describe('Workbench route contract', () => {
       expect(reviewUrl.searchParams.get('project')).toBe(PROJECT);
       expect(reviewUrl.hash).toBe('#officialFlowAttachmentIntake');
 
+      // The dashboard's bid pipeline controls are real handoffs, not decorative
+      // buttons: intake starts a new bid and board owns package review/3D/send.
+      expect(await page.locator('[data-autobid-route="intake"]').getAttribute('href')).toBe('/autobid-intake.html?hf=r2');
+      expect(await page.locator('[data-autobid-route="board"]').getAttribute('href')).toBe('/autobid-board.html?hf=r2');
+      await page.locator('[data-autobid-route="intake"]').click();
+      await page.waitForURL('**/autobid-intake.html?hf=r2');
+      expect(new URL(page.url()).pathname).toBe('/autobid-intake.html');
+      await page.goBack({ waitUntil: 'domcontentloaded' });
+      await page.locator('[data-autobid-route="board"]').click();
+      await page.waitForURL('**/autobid-board.html?hf=r2');
+      expect(new URL(page.url()).pathname).toBe('/autobid-board.html');
+      await page.goBack({ waitUntil: 'domcontentloaded' });
+
       await page.goto(reviewUrl.toString(), { waitUntil: 'domcontentloaded' });
       expect(await page.locator('body').getAttribute('data-hf-route-contract')).toBe('estimator-review');
       expect(await page.locator('body').getAttribute('data-hf-route-owner')).toBe('estimator');
