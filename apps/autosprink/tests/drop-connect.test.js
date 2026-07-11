@@ -104,10 +104,12 @@ describe('drop-connect — build (synthesize missing connections)', () => {
     expect(arm.to[1]).toBeCloseTo(5, 3);
     expect(arm.from[2]).toBeCloseTo(Z, 3);
     expect(arm.to[2]).toBeCloseTo(Z, 3);
-    // the nipple drops from the turn (y=5, z=Z) to the head (y=5, z=HZ)
+    // The nipple stops at the reducer's pipe port; the reducer then reaches the head.
     const nip = r.added.find((s) => s.connKind === 'drop');
+    const reducer = r.added.find((s) => s.componentKey === 'fitting_reducer');
     expect(nip.from[2]).toBeCloseTo(Z, 3);
-    expect(nip.to[2]).toBeCloseTo(HZ, 3);
+    expect(nip.to).toEqual(reducer.pipePort);
+    expect(reducer.headPort[2]).toBeCloseTo(HZ, 3);
     // fitting markers present
     expect(r.added.some((s) => s.componentKey === 'fitting_elbow_90')).toBe(true);
     expect(r.added.some((s) => s.componentKey === 'fitting_reducer')).toBe(true);
@@ -123,8 +125,10 @@ describe('drop-connect — build (synthesize missing connections)', () => {
     expect(r.armOversAdded).toBe(0);
     expect(r.dropsAdded).toBe(1);
     const nip = r.added.find((s) => s.connKind === 'drop');
+    const reducer = r.added.find((s) => s.componentKey === 'fitting_reducer');
     expect(nip.from).toEqual([20, 0, Z]);
-    expect(nip.to).toEqual([20, 0, HZ]);
+    expect(nip.to).toEqual(reducer.pipePort);
+    expect(reducer.headPort).toEqual([20, 0, HZ]);
     expect(r.analysisAfter.headsConnected).toBe(1);
   });
 
@@ -134,7 +138,9 @@ describe('drop-connect — build (synthesize missing connections)', () => {
     expect(r.sprigsAdded).toBe(1);
     expect(r.dropsAdded).toBe(0);
     const nip = r.added.find((s) => s.connKind === 'sprig');
-    expect(nip.to[2]).toBeCloseTo(UZ, 3);
+    const reducer = r.added.find((s) => s.componentKey === 'fitting_reducer');
+    expect(nip.to).toEqual(reducer.pipePort);
+    expect(reducer.headPort[2]).toBeCloseTo(UZ, 3);
     expect(r.analysisAfter.sprigs).toBe(1);
   });
 
@@ -144,8 +150,10 @@ describe('drop-connect — build (synthesize missing connections)', () => {
     expect(r.armOversAdded).toBe(1);
     expect(r.sprigsAdded).toBe(1);
     const nip = r.added.find((s) => s.connKind === 'sprig');
+    const reducer = r.added.find((s) => s.componentKey === 'fitting_reducer');
     expect(nip.from[2]).toBeCloseTo(Z, 3);
-    expect(nip.to[2]).toBeCloseTo(UZ, 3);
+    expect(nip.to).toEqual(reducer.pipePort);
+    expect(reducer.headPort[2]).toBeCloseTo(UZ, 3);
   });
 
   it('is idempotent: a head that already has a connection gets nothing added', () => {
