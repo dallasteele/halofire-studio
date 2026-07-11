@@ -497,6 +497,7 @@
       var plates=(sv.plates||[]).map(function(plate,index){
         var page=plate.page||{}, gate=plate.automated_gate||{}, review=plate.review||{};
         var integrity=plate.integrity||{}, source=plate.source||{}, urls=plate.urls||{};
+        var priorViewportAttestations=Array.isArray(review.viewport_attestations)?review.viewport_attestations:[];
         var autoPassed=gate.passed===true;
         var metricRows=SPATIAL_METRICS.map(function(spec){
           var value=(plate.metrics||{})[spec[0]];
@@ -516,7 +517,7 @@
           var boxes=(sourceBox||geometryBox)
             ? (' / source bbox ['+esc(sourceBox||'&mdash;')+']'+(geometryBox?' / geometry bbox ['+esc(geometryBox)+']':'')) : '';
           return '<label class="spatial-viewport" data-viewport-role="'+esc(viewport.role||'')+'">'
-            + (viewportProvenance.length>1?'<input type="checkbox" class="viewport-attestation" data-viewport-block="'+esc(viewport.block_id||'')+'" /> ':'')
+            + (viewportProvenance.length>1?'<input type="checkbox" class="viewport-attestation" data-viewport-block="'+esc(viewport.block_id||'')+'"'+(priorViewportAttestations.some(function(item){return item&&item.block_id===viewport.block_id&&item.role===viewport.role;})?' checked':'')+' /> ':'')
             + esc(viewport.role||'viewport')+' ('+esc(viewport.block_id||'')+')'+dims+transform+boxes+'</label>';
         }).join(' &middot; ');
         var physicalPage=page.physical_page_number==null?'&mdash;':num(page.physical_page_number);
