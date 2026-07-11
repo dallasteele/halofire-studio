@@ -1042,3 +1042,16 @@ The continuation work remains deliberately below the completion bar:
   matching evidence hashes are insufficient without the signed v2 receipt and
   dedicated `release_authorizer` identity. The production acceptance audit is
   unchanged and remains fail-closed.
+
+## 46. CODEX CONTINUATION EVIDENCE - 2026-07-11 (SHARED SHELL IDENTITY PARITY)
+
+- Studio `554ce6cd` makes the shared app bar match the Board's auth truth. A 401
+  from `/api/auth/me` now renders `Sign in required` with a sign-in link; runtime,
+  5xx, or network failure renders `Session unavailable` and hides sign-out. The
+  fallback `User / Sign out` state is no longer presented for an unauthenticated
+  session.
+- Focused shell and Board coverage is **6 passed**. The deployed shell hash is
+  `6e59f9612364595f63b33959c30c1705c72afda4bdb5e919123168661e3e9ca1`, matching
+  the local artifact; the VPS Studio service remains active.
+- This is a presentation/auth-boundary correction only. It does not infer bid
+  state, write review rows, or alter FP/spatial/density/N6/deployment gates.
