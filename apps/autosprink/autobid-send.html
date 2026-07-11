@@ -601,13 +601,33 @@
           + '</div></div>';
       }).join('');
       if(!rows) rows='<div class="note">No document-bound FP vector candidate overlay is available.</div>';
-      return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span>'+head+'</div><div class="pbd">'
+      return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span>'+head+'<span class="pill warn" id="qwenFloorplanStatus">vision assist: checking</span></div><div class="pbd">'
         + '<div class="note" style="margin-bottom:12px">These repeated-vector candidates are estimator-visible review evidence only. They are not sprinkler counts, do not carry answer-key truth, and never clear the spatial or bid-grade gates.</div>'
         + rows+'</div></section>';
     }
 
     function bindFpVectorReview(fp){
       var artifacts=(fp&&fp.artifacts)||[];
+      var visionStatus=document.getElementById('qwenFloorplanStatus');
+      if(visionStatus){
+        api('/vision/qwen-floorplan/status')
+          .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+          .then(function(result){
+            if(result.ok && result.json.available===true){
+              visionStatus.className='pill ok';
+              visionStatus.textContent='vision assist: '+(result.json.device==='cuda'?'local GPU':'local CPU');
+              visionStatus.title='Qwen candidate generation is available. It remains review-only.';
+            }else{
+              visionStatus.className='pill warn';
+              visionStatus.textContent='vision assist: unavailable here';
+              visionStatus.title='Candidate generation is unavailable on this host; deterministic and human review remain active.';
+            }
+          })
+          .catch(function(){
+            visionStatus.className='pill warn';
+            visionStatus.textContent='vision assist: status unknown';
+          });
+      }
       artifacts.forEach(function(artifact,index){
         var image=document.querySelector('[data-fp-vector-overlay-index="'+index+'"]');
         var result=document.getElementById('fpVectorResult'+index);
