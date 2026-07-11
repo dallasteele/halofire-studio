@@ -1076,3 +1076,36 @@ The continuation work remains deliberately below the completion bar:
   set is **107 passed**. Live acceptance remains FP 0/1, spatial 0/8, density
   pending, N6 pending, and production blocked. No reviewer rows, answer keys,
   scorecards, or release authorization were manufactured.
+
+## 48. CODEX CONTINUATION EVIDENCE - 2026-07-11 (FIT-QUALITY FILTER AND REVIEW ACTION MANIFEST)
+
+- Root `56d776178` adds a truth-free arithmetic-coherence fence to density
+  comparable fitting: a `bid_summary` row is excluded when its stored
+  `sqft_per_head` disagrees by more than 50% with `sqft / head_count`. The
+  filter reads fit-side fields only and never reads the held-out manifest,
+  observed counts, or answer-key data. Focused density coverage is **31
+  passed**. The canonical `density_heldout_eval` result is now **6/8 inside
+  the frozen 12% tolerance**, MAE **0.094359** (previously 0.114919); AZAZ is
+  still 87 versus 134 (35.07%) and Kozo 2466 versus 2134 (15.56%), so the
+  density gate remains unearned. The separate experimental MAD audit's 5/8 is
+  noncanonical and is not used for acceptance.
+- The filtered resolver is deployed to `/opt/openclaw/halofire-autobid` with
+  backup `design_density_resolver.py.bak-56d776178`; local and VPS SHA-256 are
+  both `e0207e2a1706278ad93b9ea2622be64ee29c0c8a95c9f3c4f202e794e0f45e3c`.
+  `halofire-autobid.service` is active and `/health` on `127.0.0.1:8770`
+  returns 200.
+- Studio `de815f7f` makes Review & Send's acceptance worklist operational but
+  read-only. It maps FP semantic, A-101 upper/lower spatial overlays,
+  held-out density, N6 scorecard, and a separate release-authorization action
+  to source-bound canonical packets/audits. 401/403/auth/runtime failures are
+  distinct and do not infer package state; N6 and release links open truth-free
+  source-bound JSON for the independently authorized owner. Local and live
+  page SHA-256 is `99f710f9af9f53ff9f58aea0e7b75bfaea21fc9a071c09b69fa5d60e100da8b3`.
+  Focused Studio coverage is **22 passed**; the live unauthenticated smoke is
+  HTTP 200 with an auth-required card and zero page errors, while the
+  authenticated fixture renders all five action cards with production still
+  blocked.
+- The full objective remains active. Live acceptance is still FP semantic
+  **0/1**, spatial **0/8**, density pending, N6 pending, and production
+  blocked. No human review row, scorecard, held-out receipt, or signed release
+  authorization was fabricated.
