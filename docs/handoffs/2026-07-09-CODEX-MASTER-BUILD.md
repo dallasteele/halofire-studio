@@ -998,3 +998,30 @@ The continuation work remains deliberately below the completion bar:
   `3eef6a011a86bdc61cf1b06fce1acbf5af60481cfad08853ef1bce4d93dac601`; live
   Studio health is 200. The page contains the density review manifest route and
   panel markers; no production gate or human acceptance row was created.
+
+## 44. CODEX CONTINUATION EVIDENCE - 2026-07-11 (N6 READBACK, RELEASE AUTHORIZATION, AND AUTHENTICATED BOARD UX)
+
+- Root `585065cbe` hardens the strict N6 scorecard boundary. Persisted scorecards
+  now re-check candidate/artifact/packet/decision/source/render/page identities,
+  count consistency, diagnostic-only status, forbidden truth fields, and scorer
+  independence from both family and point reviewers. The authenticated
+  content-addressed readback route returns a coordinate-free, answer-key-free
+  projection and rejects malformed IDs, tampered files, and unauthorized access.
+  The new focused N6 suite is **24 passed**; no scorecard was created.
+- Root `a6f6b65a1` separates deployment authorization from runtime health and
+  estimator/admin review. Release authorization v2 requires a full source HEAD,
+  immutable release-artifact SHA-256, acceptance-audit SHA-256, HMAC binding,
+  and the dedicated `release_authorizer` role. Missing or mismatched hashes emit
+  typed blockers even when both VPS services are healthy. Full engine regression
+  after this change is **905 passed, 10 skipped, 24 warnings**.
+- Studio `ceb9798` makes the unauthenticated Bid Board truthful: a 401 now shows
+  a glass “Sign in to view the bid board” state, while runtime/network failures
+  show a distinct retryable runtime-unavailable state. The misleading local
+  engine-start command is gone. Focused Board/auth coverage is **7 passed**;
+  the live inspected artifact is
+  `out/agent-loops/halofire-master-build-20260711/ops-audit/04-board-auth-runtime.png`.
+- Live N6 readback route is deployed and returns a typed 404 for an unknown
+  artifact without changing the canonical audit. Both services remain healthy;
+  acceptance is still FP 0/1, spatial 0/8, density pending, N6 pending, and
+  production blocked. No acceptance row, scorecard, or deployment authorization
+  was fabricated.
