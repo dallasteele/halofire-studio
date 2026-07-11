@@ -1109,3 +1109,66 @@ The continuation work remains deliberately below the completion bar:
   **0/1**, spatial **0/8**, density pending, N6 pending, and production
   blocked. No human review row, scorecard, held-out receipt, or signed release
   authorization was fabricated.
+
+## 49. CODEX CONTINUATION EVIDENCE - 2026-07-11 (SOURCE-BOUND FP CANDIDATE MATERIALIZATION)
+
+- Root `b8474f7b` plus `a5f683a6a` make the vector-symbol candidate path
+  reachable and source-bound. `POST /fp-vector-artifacts/materialize` accepts
+  only indexed document/page/hash bindings, resolves the indexed PDF mirror,
+  rejects changed sources before scan/write, and returns a review-only receipt;
+  `GET /sheets?doc=` now exposes the physical page and source PDF digest needed
+  by the Studio action. Focused FP materialization/review coverage is **11
+  passed** and the broader FP/vector/point/canonical/spatial set is **142
+  passed**.
+- The API/materializer are deployed with matching hashes and backups on the
+  VPS; `halofire-autobid.service` is active and `/health` is 200. The Studio
+  materialization action is estimator-visible but never infers a count or
+  changes a gate. No live FP artifact was fabricated for an acceptance bid.
+
+## 50. CODEX CONTINUATION EVIDENCE - 2026-07-11 (OPERATIONS MOTION RAIL)
+
+- Studio `03ceda0f` adds the transcript-accurate Review & Send rail:
+  `Intake → Review → Verify → Export`. It uses CSS-only transform/opacity
+  reveal at motion intensity 3, no scroll-jacking or scroll scenes, and an
+  explicit reduced-motion fallback. The scoped spatial-review test is **14/14**
+  and the exact two-file diff is clean.
+- Visual QA inspected the real page at
+  `E:/ClaudeBot/halofire-studio/.playwright-cli/page-2026-07-11T13-20-32-265Z.png`
+  and the reduced-motion render at
+  `E:/ClaudeBot/halofire-studio/out/agent-loops/halofire-master-build-20260711/ops-audit/motion-ops-rail-reduced.png`.
+  Computed proof was `animationName:none`, `transform:none`, `opacity:1`,
+  `htmlOverflowY:visible`, `bodyOverflowY:visible`; native scroll moved and no
+  scroll-jack signals were present.
+
+## 51. CODEX CONTINUATION EVIDENCE - 2026-07-11 (BLIND INDEPENDENT FP SEMANTIC RECEIPT)
+
+- Root `054d55eb2` hardens the semantic boundary. The legacy scalar
+  `/package/{ref}/fp-vector-review` route now fails closed with
+  `semantic_review_requires_blind_point_receipt`; the new
+  `POST /fp-vector-artifacts/{artifact_id}/semantic-review` accepts only
+  `artifact_id`, candidate identity, packet hash, and point-decision identity.
+  The browser cannot submit an expected total or point list. The server derives
+  the observed count from the accepted blind point decision and persists the
+  source PDF hash, physical page, rendered-page hash, bundle/overlay hashes,
+  point digest/type, packet/decision IDs, reviewer identity/role, coordinates
+  (private), and timestamp.
+- Semantic submission rejects missing/changed packets, source/page/artifact or
+  rendered-page hash mismatches, unauthorized roles, and self-review where the
+  semantic reviewer matches the point reviewer. Canonical acceptance now
+  refuses semantic rows that do not contain the complete blind-point binding;
+  N6 remains independently scored and cannot be entered before an accepted
+  point receipt. New adversarial/API coverage plus existing FP suites is **35
+  passed**; the combined canonical/FP/point/procedural package is **59 passed**
+  (14 warnings from existing Pydantic serializer diagnostics). Studio remains
+  green at **14/14** after replacing the scalar count control with the blind
+  semantic-review action.
+- Formal proof lane: GX10 Lean verified
+  `semantic_acceptance_requires_distinct_reviewers`; rulebook verifier,
+  compile, and scoped diff checks pass. VPS route verification shows
+  `semantic-review` in OpenAPI, direct malformed requests fail with typed 422,
+  public unauthenticated proxy requests return 401, and both AutoBid/Studio
+  services are active with matching deployed hashes.
+- This slice creates no reviewer rows and no acceptance promotion. Live gates
+  remain FP semantic **0/1**, spatial **0/8**, density pending, N6 pending,
+  separate release authorization absent, and production blocked until a real
+  independently reviewed FP receipt and the other frozen gates exist.
