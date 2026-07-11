@@ -591,7 +591,7 @@
             ? ' · '+esc(familyReview.reviewer_name)+' ('+esc(familyReview.reviewer_role||'reviewer')+')' : '';
           var pointStatus=pointReview ? (pointReview.decision||'accepted')+' · '+esc(pointReview.reviewer_name||pointReview.reviewer_id||'trusted reviewer')+' · '+esc(pointReview.reviewed_at||'') : 'pending';
           return '<div class="note"><b>Family review:</b> '+esc(familyDecision)+familyReviewer+'</div>'
-            + '<div class="note"><b>Blind point receipt:</b> '+esc(pointStatus)+(pointReview?'<br><small>packet '+esc(digest(pointReview.packet_hash))+' · overlay '+esc(digest(pointReview.point_overlay_sha256))+'</small>':'')+'</div>'
+            + '<div class="note"><b>Blind point receipt:</b> '+esc(pointStatus)+(pointReview?'<br><small>packet '+esc(digest(pointReview.packet_hash))+' · overlay '+esc(digest(pointReview.point_overlay_sha256))+' · <a href="'+esc(pointReview.point_review_url||'#')+'" target="_blank" rel="noreferrer">receipt</a> · <a href="'+esc(pointReview.point_overlay_url||'#')+'" target="_blank" rel="noreferrer">marked source page</a></small>':'')+'</div>'
             + '<div class="family-review-actions" data-family-group="'+esc(group.group_id||'')+'">'
             + '<textarea class="fpVectorFamilyNote" aria-label="Family review note for '+esc(group.group_id||'candidate')+'" placeholder="Family review note">'+esc(familyReview.note||'')+'</textarea>'
             + '<button class="btn fpVectorFamilyDecision" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'" data-decision="accepted"'+(familyDecision==='accepted'?' disabled':'')+'>Accept family</button>'

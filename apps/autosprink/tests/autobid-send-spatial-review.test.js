@@ -81,6 +81,8 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('artifact.point_review');
     expect(html).toContain('Blind point receipt:');
     expect(html).toContain('point_overlay_sha256');
+    expect(html).toContain('pointReview.point_review_url');
+    expect(html).toContain('pointReview.point_overlay_url');
   });
 
   it('uses canonical geometry source IDs and does not treat export history as transmission', () => {
