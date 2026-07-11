@@ -981,3 +981,20 @@ The continuation work remains deliberately below the completion bar:
 - The VPS Studio service is active and the combined Send page hash matches the
   deployed file exactly. The A-101 upper/lower review cards remain unchecked by
   design; they expose the next human action rather than promoting geometry.
+
+## 43. CODEX CONTINUATION EVIDENCE - 2026-07-11 (ESTIMATOR DENSITY REVIEW PANEL)
+
+- Studio `a479a21` completes the estimator-visible held-out density panel. It
+  fetches the authenticated truth-free manifest, shows fold/source/page/rendered
+  hashes, opens the canonical physical page, requires a positive observed count
+  and a 64-character marked-overlay hash, and posts only to the source-bound
+  receipt route. The panel explicitly rejects forbidden truth fields in the
+  response and labels every receipt `diagnostic-only / gate effect: none`.
+- The panel fails closed when `/api/auth/me` is not a verified estimator/admin:
+  no count controls or submission buttons are enabled. Browser coverage is **13
+  passed** for density and spatial review boundaries, including redacted receipt
+  submission and unauthorized-state checks.
+- Final deployed Send page SHA-256 is
+  `3eef6a011a86bdc61cf1b06fce1acbf5af60481cfad08853ef1bce4d93dac601`; live
+  Studio health is 200. The page contains the density review manifest route and
+  panel markers; no production gate or human acceptance row was created.
