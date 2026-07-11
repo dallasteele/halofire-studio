@@ -552,12 +552,12 @@
           + '<textarea id="spatialNote'+index+'" aria-label="Spatial review note for '+esc(page.sheet_label||('plate '+(index+1)))+'" placeholder="Review note">'+esc(review.note||'')+'</textarea>'
           + (!renderedHash?'<div class="note spatial-source-binding-warning">Source raster unavailable on the canonical runtime; no spatial decision can be recorded until the rendered source-page hash is bound.</div>':'')
           + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="accepted" disabled title="The automated gate must pass, the rendered source-page hash must be bound, and this stored overlay must finish loading before acceptance">Accept overlay</button>'
-          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="rejected"'+(!renderedHash?' disabled title="Canonical rendered source-page hash is unavailable; rejection is also blocked to preserve source binding"':'')+'>Reject overlay</button>'
+          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="rejected" disabled title="Verified estimator/admin reviewer session required before recording a decision">Reject overlay</button>'
           + '<div class="note spatial-result" id="spatialResult'+index+'"></div>'
           + '</div></div>';
       }).join('');
       if(!plates) plates='<div class="note">No current overlay artifacts are available. The spatial badge remains unearned.</div>';
-      return '<section class="hf-panel mt" id="spatialVerificationPanel"><div class="phd"><span class="t">Final spatial verification</span>'+head+'</div><div class="pbd">'
+      return '<section class="hf-panel mt" id="spatialVerificationPanel"><div class="phd"><span class="t">Final spatial verification</span>'+head+'<span class="pill warn" id="spatialReviewerContext">reviewer session: verifying…</span></div><div class="pbd">'
         + '<div class="note" style="margin-bottom:12px">Review the stored overlay against the named physical sheet before accepting. This controls only the spatial-verification badge; it never auto-accepts and never blocks honest package export.</div>'
         + plates+'</div></section>';
     }
@@ -802,8 +802,34 @@
       });
     }
 
+      function bindSpatialReviewerContext(){
+      var chip=document.getElementById('spatialReviewerContext');
+      window.__spatialReviewerAuthorized=false;
+      if(!chip) return;
+      fetch('/api/auth/me',{credentials:'include'})
+        .then(function(response){return response.ok?response.json():null;})
+        .then(function(user){
+          var role=String((user&&user.role)||'').toLowerCase();
+          var allowed=role==='estimator'||role==='admin';
+          window.__spatialReviewerAuthorized=allowed;
+          chip.className='pill '+(allowed?'ok':'warn');
+          chip.textContent=allowed
+            ? 'reviewer: '+String((user&&(user.name||user.username))||'User')+' · '+role+' · verified'
+            : 'reviewer session not authorized';
+          if(window.__spatialReviewRefresh) window.__spatialReviewRefresh();
+        })
+        .catch(function(){
+          window.__spatialReviewerAuthorized=false;
+          chip.className='pill warn';
+          chip.textContent='reviewer session unavailable';
+          if(window.__spatialReviewRefresh) window.__spatialReviewRefresh();
+        });
+      }
+
       function bindSpatialReview(sv){
       var plates=(sv&&sv.plates)||[];
+      var refreshers=[];
+      window.__spatialReviewerAuthorized=false;
       plates.forEach(function(plate,index){
         var gate=plate.automated_gate||{};
         var image=document.querySelector('[data-spatial-overlay-index="'+index+'"]');
@@ -818,9 +844,10 @@
           var viewportReady=Array.prototype.every.call(
             document.querySelectorAll('[data-spatial-artifact="'+plate.artifact_id+'"] .viewport-attestation'),
             function(item){return item.checked;});
-          accept.disabled=gate.passed!==true || !viewportReady || renderedHash.length!==64;
-          if(reject) reject.disabled=renderedHash.length!==64;
-          accept.title=gate.passed!==true?'Automated overlay gate must pass before acceptance':(renderedHash.length!==64?'Canonical rendered source-page hash is unavailable; acceptance is blocked':(viewportReady?'Stored overlay loaded and all source viewports attested':'Inspect and check every registered source viewport before acceptance'));
+          var reviewerReady=window.__spatialReviewerAuthorized===true;
+          accept.disabled=gate.passed!==true || !viewportReady || renderedHash.length!==64 || !reviewerReady;
+          if(reject) reject.disabled=renderedHash.length!==64 || !reviewerReady;
+          accept.title=!reviewerReady?'Verified estimator/admin reviewer session required before recording a decision':(gate.passed!==true?'Automated overlay gate must pass before acceptance':(renderedHash.length!==64?'Canonical rendered source-page hash is unavailable; acceptance is blocked':(viewportReady?'Stored overlay loaded and all source viewports attested':'Inspect and check every registered source viewport before acceptance')));
           if(result) result.textContent='Stored overlay loaded. Review the pixels before recording a decision.';
         }
         function markBroken(){
@@ -836,13 +863,20 @@
           item.addEventListener('change',markVisible);
         });
         if(image.complete) (image.naturalWidth>0?markVisible:markBroken)();
+        refreshers.push(markVisible);
       });
+      window.__spatialReviewRefresh=function(){refreshers.forEach(function(refresh){refresh();});};
       Array.prototype.forEach.call(document.querySelectorAll('.spatialDecision'),function(button){
         button.addEventListener('click',function(){
           var index=Number(button.getAttribute('data-plate-index'));
           var decision=button.getAttribute('data-decision');
           var plate=plates[index]||{}, gate=plate.automated_gate||{}, integrity=plate.integrity||{};
           var renderedHash=String(integrity.rendered_page_sha256||'').trim();
+          if(window.__spatialReviewerAuthorized!==true){
+            var unauthorizedResult=document.getElementById('spatialResult'+index);
+            if(unauthorizedResult) unauthorizedResult.textContent='Verified estimator/admin reviewer session required; no decision was recorded.';
+            return;
+          }
           if(renderedHash.length!==64){
             var unavailableResult=document.getElementById('spatialResult'+index);
             if(unavailableResult) unavailableResult.textContent='Canonical rendered source-page hash is unavailable; no spatial decision can be recorded.';
@@ -890,8 +924,9 @@
             .catch(function(error){
               if(result) result.textContent='Spatial review failed: '+error.message;
               Array.prototype.forEach.call(siblings,function(item){
-                item.disabled=(item.getAttribute('data-decision')==='accepted'
-                  && (gate.passed!==true || item.getAttribute('data-overlay-visible')!=='true'));
+                item.disabled=item.getAttribute('data-decision')==='rejected'
+                  ? renderedHash.length!==64 || window.__spatialReviewerAuthorized!==true
+                  : (gate.passed!==true || item.getAttribute('data-overlay-visible')!=='true' || renderedHash.length!==64 || window.__spatialReviewerAuthorized!==true);
               });
             });
         });
@@ -1033,6 +1068,7 @@
 
       // The overlay review controls only the spatial badge. Export remains independent.
       bindSpatialReview(p.spatial_verification);
+      bindSpatialReviewerContext();
       bindSpatialReviewFrames();
       bindFpVectorReview(p.fp_vector_review);
 

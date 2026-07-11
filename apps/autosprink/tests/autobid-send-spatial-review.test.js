@@ -29,6 +29,7 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain("['classified_wall_ink_coverage','Classified wall ink coverage','pct']");
     expect(html).toContain('PNG SHA-256');
     expect(html).toContain('Manifest SHA-256');
+    expect(html).toContain('Rendered page SHA-256');
     expect(html).toContain('Source PDF SHA-256');
     expect(html).toContain('plate.viewport_provenance');
     expect(html).toContain('Registered source viewports:');
@@ -115,6 +116,11 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('Source raster unavailable on the canonical runtime');
     expect(html).toContain('Canonical rendered source-page hash is unavailable; no spatial decision can be recorded.');
     expect(html).toContain('renderedHash.length!==64');
+    expect(html).toContain('id="spatialReviewerContext"');
+    expect(html).toContain("fetch('/api/auth/me',{credentials:'include'})");
+    expect(html).toContain('__spatialReviewerAuthorized');
+    expect(html).toContain('reviewer session unavailable');
+    expect(html).toContain('Verified estimator/admin reviewer session required; no decision was recorded.');
     expect(html).toContain("gate.passed!==true || button.getAttribute('data-overlay-visible')!=='true'");
     expect(html).toContain('Reviewed wall recall (0.90-1.00)');
     expect(html).toContain('Phantom room count');
