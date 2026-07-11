@@ -16,9 +16,10 @@
  *  - Mappings marked verified:'text-heuristic' come from scanning page text
  *    for sheet-code tokens; they are best-effort INFERENCE and individually
  *    flagged needsVerification:true.
- *  - Elevations are ESTIMATED (uniform floor-to-floor); no structural datum was
- *    machine-verified. elevationSource says exactly that. NEVER present these
- *    as AHJ/PE/manufacturer-exact or AutoSprink-parity data.
+ *  - Level elevations are source-bound to the A-201 architectural elevation
+ *    page and immutable PDF/render hashes. Roof planes and code compliance are
+ *    separate fail-closed gates. NEVER present these as AHJ/PE/manufacturer-
+ *    exact or AutoSprink-parity data.
  *
  * Home Depot — Rexburg ID: NO plan PDFs exist anywhere in the workspace (only
  * the proposal workbook), so it has no manifest here; helpers return null and
@@ -29,9 +30,18 @@ export const PLAN_DISCIPLINES = Object.freeze([
   'arch', 'rcp', 'struct', 'mech', 'elec', 'plumb',
 ]);
 
-// Estimated uniform floor-to-floor. NOT machine-verified against the building
-// sections; operators must confirm against A-301..A-307 / S-sheets.
-export const ESTIMATED_FLOOR_TO_FLOOR_FT = 10.5;
+// Source-bound architectural level elevations from A-201. The evidence packet
+// carries the source PDF, physical-page, rendered-page, and packet hashes.
+export const SOURCE_BOUND_LEVEL_ELEVATIONS_FT = Object.freeze([null, 0, 10, 20, 31, 41, 51, 61, 71]);
+export const ELEVATION_EVIDENCE = Object.freeze({
+  artifact: 'src/data/elevation-datums.cooperative-1881.json',
+  sourcePdfSha256: 'bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f',
+  physicalPageNumber: 58,
+  pageIndex: 57,
+  renderedPageSha256: '40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c',
+  sheetId: 'A-201',
+  receiptSha256: 'fd36d747d77d256c3b76f145acadc1386e3d5262eb90855d8f72853717a06734',
+});
 
 const PLAN_ROOT = '/plans/cooperative-1881';
 
@@ -83,8 +93,9 @@ function cooperative1881Levels() {
     levels.push(Object.freeze({
       level: n,
       name: `Level ${n}`,
-      elevationFt: Math.round((n - 1) * ESTIMATED_FLOOR_TO_FLOOR_FT * 100) / 100,
-      elevationSource: 'ESTIMATED_FLOOR_TO_FLOOR_NOT_VERIFIED',
+      elevationFt: SOURCE_BOUND_LEVEL_ELEVATIONS_FT[n],
+      elevationSource: 'SOURCE_BOUND_ARCHITECTURAL_ELEVATION_A-201',
+      elevationEvidence: ELEVATION_EVIDENCE,
       sheets: Object.freeze(sheets),
     }));
   }
@@ -105,7 +116,10 @@ export function cooperative1881PlanManifest() {
     }),
     // Known project footprint from the existing bid fixtures (best-effort).
     footprint: Object.freeze({ widthFt: 413, depthFt: 413.2, source: 'cooperative1881FloorPlan() fixture — needs verification' }),
-    estimatedFloorToFloorFt: ESTIMATED_FLOOR_TO_FLOOR_FT,
+    estimatedFloorToFloorFt: null,
+    verticalDatumsVerified: true,
+    roofGeometryVerified: false,
+    elevationEvidence: ELEVATION_EVIDENCE,
     levels: cooperative1881Levels(),
     // Whole-document inventory (real page counts), incl. sets not mapped to
     // levels. Mechanical pages 5..24 appear to be M101..M120 sequential but a

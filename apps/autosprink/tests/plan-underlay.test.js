@@ -10,7 +10,7 @@ import {
   manifestForProject,
   sheetsForLevel,
   PLAN_DISCIPLINES,
-  ESTIMATED_FLOOR_TO_FLOOR_FT,
+  SOURCE_BOUND_LEVEL_ELEVATIONS_FT,
 } from '../src/data/plan-manifest.js';
 
 describe('computeUnderlayTransform', () => {
@@ -106,13 +106,14 @@ describe('slabOutlinePoints', () => {
 describe('cooperative1881PlanManifest', () => {
   const m = cooperative1881PlanManifest();
 
-  it('has 8 levels with estimated elevations flagged, every sheet needs verification', () => {
+  it('has 8 source-bound level elevations while every plan-sheet mapping remains flagged', () => {
     expect(m.levels).toHaveLength(8);
     expect(m.needsVerification).toBe(true);
     for (const [i, lvl] of m.levels.entries()) {
       expect(lvl.level).toBe(i + 1);
-      expect(lvl.elevationFt).toBeCloseTo(i * ESTIMATED_FLOOR_TO_FLOOR_FT, 6);
-      expect(lvl.elevationSource).toMatch(/NOT_VERIFIED/);
+      expect(lvl.elevationFt).toBe(SOURCE_BOUND_LEVEL_ELEVATIONS_FT[i + 1]);
+      expect(lvl.elevationSource).toBe('SOURCE_BOUND_ARCHITECTURAL_ELEVATION_A-201');
+      expect(lvl.elevationEvidence.receiptSha256).toMatch(/^[0-9a-f]{64}$/);
       for (const s of lvl.sheets) {
         expect(s.needsVerification).toBe(true);
         expect(s.url.startsWith('/plans/cooperative-1881/')).toBe(true);

@@ -1,0 +1,25 @@
+{
+  "artifactType": "halofire.elevation-datum-packet.v1",
+  "sourceDocumentId": "cooperative-1881-architecturals",
+  "sourceBinding": {
+    "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+    "physicalPageNumber": 58,
+    "pageIndex": 57,
+    "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c",
+    "sheetId": "A-201",
+    "coordinateSpace": "pdf-points"
+  },
+  "observations": [
+    { "id": "floor-1", "kind": "floor", "label": "FIRST FLOOR", "elevationText": "+0'-0\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } },
+    { "id": "floor-2", "kind": "floor", "label": "SECOND FLOOR", "elevationText": "+10'-0\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } },
+    { "id": "floor-3", "kind": "floor", "label": "THIRD FLOOR", "elevationText": "+20'-0\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } },
+    { "id": "floor-4", "kind": "floor", "label": "FOURTH FLOOR", "elevationText": "+31'-0\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } },
+    { "id": "floor-5", "kind": "floor", "label": "FIFTH FLOOR", "elevationText": "+41'-0\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } },
+    { "id": "floor-6", "kind": "floor", "label": "SIXTH FLOOR", "elevationText": "+51'-0\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } },
+    { "id": "floor-7", "kind": "floor", "label": "SEVENTH FLOOR", "elevationText": "+61'-0\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } },
+    { "id": "floor-8", "kind": "floor", "label": "EIGHTH FLOOR", "elevationText": "+71'-0\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } },
+    { "id": "roof-eave", "kind": "eave", "label": "ROOF EAVE", "elevationText": "+81'-0\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } },
+    { "id": "roof-ridge", "kind": "ridge", "label": "T.O. ROOF RIDGE", "elevationText": "+89'-6 3/4\"", "sourceBinding": { "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f", "physicalPageNumber": 58, "pageIndex": 57, "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c", "sheetId": "A-201", "coordinateSpace": "pdf-points" } }
+  ],
+  "receiptSha256": "fd36d747d77d256c3b76f145acadc1386e3d5262eb90855d8f72853717a06734"
+}
