@@ -1055,3 +1055,24 @@ The continuation work remains deliberately below the completion bar:
   the local artifact; the VPS Studio service remains active.
 - This is a presentation/auth-boundary correction only. It does not infer bid
   state, write review rows, or alter FP/spatial/density/N6/deployment gates.
+
+## 47. CODEX CONTINUATION EVIDENCE - 2026-07-11 (DENSITY ACCURACY AND PER-FLOOR GEOMETRY)
+
+- Root `0145ca00e` plus tidy `0f4cc3709` improve the corpus-only density prior:
+  rare project-token matching, exact-name/size-nearest selection for sparse
+  families, size-local selection for medium bands, and log-MAD filtering for
+  large bands. The evaluator reads only fit-side `bid_summary` fields; no answer
+  key or truth field enters production resolution. Diagnostic held-out results
+  improve from **4/8 to 6/8 within 12%**, MAE **0.189933 to 0.114919**. AZAZ and
+  Kozo remain out-of-band; the frozen gate remains unearned.
+- Root `762f0d6b3` carries accepted per-floor `scaleFtPerUnit`, scale source,
+  acceptance evidence, and registered upper/lower viewport provenance through
+  vector schema, acceptance loading, and the transactional 3D adapter. Root
+  `25055bd5e` preserves the same evidence on each drawing plate. Focused geometry
+  and drawing coverage is **43 passed** plus **3 Studio strict-validator tests**.
+  Both slices are deployed with matching module hashes and no gate mutation.
+- Whole current AutoBid regression after these changes is **908 passed, 10
+  skipped, 24 warnings**; the combined density/geometry/N6/deployment-focused
+  set is **107 passed**. Live acceptance remains FP 0/1, spatial 0/8, density
+  pending, N6 pending, and production blocked. No reviewer rows, answer keys,
+  scorecards, or release authorization were manufactured.
