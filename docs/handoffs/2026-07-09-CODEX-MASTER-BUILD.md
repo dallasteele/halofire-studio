@@ -711,3 +711,36 @@ The continuation work remains deliberately below the completion bar:
 - The master objective remains open: this fixes public badge honesty but does not
   fabricate trusted FP/Cooperative review rows, improve the held-out density score,
   satisfy strict N6, or create the missing deployment authorization.
+
+## 33. CODEX CONTINUATION EVIDENCE - 2026-07-11 (BLIND FP RECEIPT, SOURCE BINDING, TRANSMISSION TRUTH)
+
+- Root `a179713fd` adds the production ingestion path for blind FP point review:
+  rendered-page-bound point overlays are stored as immutable PNG bytes with their
+  source PDF hash, physical page, rendered-page hash, packet hash, point digest,
+  reviewer identity/role, timestamp, and decision id. Public projections omit point
+  coordinates and answer-key fields. Tamper, page/hash mismatch, reviewer role, and
+  strict scorer-before-acceptance cases are covered by focused tests.
+- The strict N6 scorer endpoint now binds only to an accepted, independent point
+  receipt and persists a content-addressed scorecard. It is explicitly
+  `diagnostic_only` with `production_gate_effect=none`; no answer key or expected
+  total is returned to the reviewer or public projection. Same-person family/point
+  review is rejected fail-closed.
+- Root `a179713fd` also separates package export history from external transmission:
+  an exported package with missing runtime files is now
+  `exported_manual_transmission_pending`, `transmission_confirmed=false`, and never
+  renders as Sent. Explicit transmission confirmation remains a separate state.
+- Studio `e850ddb` binds board and Review & Send 3D/drawing links to the canonical
+  `geometry_document_id`, not the priced workbook document. Cooperative ref 9 live
+  package data now carries pricing document `34975` and geometry document `34978`.
+  The live rendered board and send page are console-clean; the send page visibly
+  reports manual transmission pending.
+- Focused root coverage is **38 passed**; focused Studio source/spatial coverage is
+  **17 passed**. Full root regression before the final UI-only patch was **864 passed,
+  10 skipped, 18 warnings**. `verify_agentic_rules.py`, `py_compile`, and
+  `git diff --check` pass. VPS `srv1509989` (`187.124.234.28`) API and Studio
+  services are active and healthy after deployment.
+- The master objective remains open. No trusted FP semantic/head-count receipt,
+  Cooperative spatial review rows, held-out density improvement to the frozen 12%
+  gate, production N6 score, or deployment-authorization receipt has been fabricated.
+  Accepted geometry is still absent for Cooperative, so its 3D/drawing state remains
+  correctly fail-closed.
