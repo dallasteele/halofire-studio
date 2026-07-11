@@ -744,3 +744,32 @@ The continuation work remains deliberately below the completion bar:
   gate, production N6 score, or deployment-authorization receipt has been fabricated.
   Accepted geometry is still absent for Cooperative, so its 3D/drawing state remains
   correctly fail-closed.
+
+## 34. CODEX CONTINUATION EVIDENCE - 2026-07-11 (SOURCE-RASTER-BOUND SPATIAL REVIEW)
+
+- Root `4e0ad0e76` hardens held-out density scoring. A future density observation
+  must carry an independently accepted FP artifact/review, explicit FP document,
+  physical page, source/render/overlay hashes, trusted reviewer identity/role, and
+  observed-count binding. Density-only evidence and tampered corpus/summary data
+  are rejected. Focused held-out coverage is **26 passed**; the frozen baseline
+  remains **4/8 within 12% (18.9933%)**.
+- Root `e3ab8fcf9` binds spatial review records to the exact rendered source-page
+  SHA-256 in addition to source PDF, physical page, overlay, gate-manifest,
+  reviewer identity/role, timestamp, and viewport attestations. Missing or changed
+  rendered-page hashes reject acceptance with a typed 409. Root `14fd55ad0` and
+  `f1bd715fc` preserve a visible review worklist when the source PDF is offline,
+  while keeping the write path fail-closed.
+- Combined focused backend coverage is **120 passed**; the full engine suite is
+  **869 passed, 10 skipped, 18 warnings**. Studio source/spatial/geometry coverage
+  is **17 passed**. Rulebook, compile, and diff checks pass.
+- VPS `187.124.234.28` is active and healthy. Live `/package/9/review-packet`
+  returns the eight Cooperative targets with physical pages 44/47/50/53/56/59/62/65,
+  source PDF and immutable overlay/gate hashes, and no answer-key fields. Because the
+  source PDF is not mounted on the VPS, rendered-page hashes are explicitly null and
+  acceptance remains unavailable. The live Send page renders all eight overlays and
+  review controls with no browser console errors.
+- The master objective remains open: source-PDF availability for trusted rows,
+  actual independent FP semantic and Cooperative spatial decisions, accepted
+  vector-grounded 3D/drawing, density at the frozen threshold, production N6, and
+  formal deployment authorization still require real external evidence. No answer
+  key, human decision, transmission, or authorization was fabricated.
