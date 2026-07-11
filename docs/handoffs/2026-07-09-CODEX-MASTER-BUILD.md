@@ -659,3 +659,33 @@ The continuation work remains deliberately below the completion bar:
   held-out density at the frozen 12% threshold, strict N6 scoring, a clean
   whole-Studio regression, and authorized deployment. No deployment was
   performed.
+
+## 31. CODEX CONTINUATION EVIDENCE - 2026-07-11 (MATERIALIZATION, ATTESTATION, OPS FLOW)
+
+- Root `5db6d3481`/`4e4750697` adds the source-bound FP vector materializer and
+  typed HMAC deployment authorization. Root `8fc250851` adds legacy composite
+  viewport migration; root `a484707e5` adds the blind held-out density review
+  queue. The density queue contains **8 candidates / 0 unresolved**, exact
+  source PDF/page/render hashes, and no `head_count`, `actual_heads`,
+  `answer_key`, or scoring truth fields (`expected_count_supplied=false`).
+- Root `31017753d` requires exact per-viewport attestations for every registered
+  composite viewport before spatial acceptance. Fresh Cooperative A-101 replay
+  binds physical page 44, upper/lower source bboxes, 418 wall runs, and 12
+  rooms; the bid-grade and spatial review remain correctly pending. Focused
+  engine spatial coverage is **61 passed**; full engine is **857 passed, 10
+  skipped, 19 warnings**.
+- Studio `72d301c`/`5df270c` adds the estimator viewport-attestation checklist;
+  `7fe0dc2` wires Workbench `New bid`, `View pipeline`, and approval `Review` to
+  the canonical AutoBid intake/board routes, preserving those controls after
+  live API re-render. Focused Studio review/ops coverage is **22 passed**.
+- VPS `srv1509989` now serves the eight Cooperative spatial artifacts with
+  integrity-checked overlays and physical-page provenance; package ref 9 is
+  still `pending_review` with **0 spatial review rows**. Engine and Studio
+  health are HTTP 200. Qwen remains honestly review-only and unavailable on the
+  CPU VPS because its model snapshot is absent; local RTX 4090 inference remains
+  available and cannot clear a production gate.
+- The master objective remains open: trusted human FP semantic and Cooperative
+  spatial rows, held-out density at the frozen 12% threshold (current production
+  score remains **4/8**, truth-free MAD diagnostic **5/8**), strict N6 scoring,
+  clean whole-Studio regression, and a provisioned deployment authorization
+  receipt. No acceptance row or deployment authorization was fabricated.
