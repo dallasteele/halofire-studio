@@ -190,6 +190,15 @@ describe('AutoBid FP vector semantic review browser boundary', () => {
       const acceptedText = await page.locator('#fpVectorReviewPanel').innerText();
       expect(acceptedText).toContain('Family review: accepted');
       expect(acceptedText).toContain('not attempted · not scored');
+      const pointPacketButton = page.locator('.fpPointPacket').first();
+      expect(await pointPacketButton.count()).toBe(1);
+      await pointPacketButton.click();
+      await page.locator('.fp-point-review').waitFor();
+      const pointReviewText = await page.locator('.fp-point-review').innerText();
+      expect(pointReviewText).toContain('Blind review');
+      expect(pointReviewText).toContain('no expected count is supplied');
+      expect(await page.locator('.fpPointPage').count()).toBe(1);
+      expect(await page.locator('.fpPointDecision[data-decision="accepted"]').isEnabled()).toBe(true);
       const reviewDb = new Database(path.join(tempDir, 'autobid.db'), { readonly: true });
       try {
         const row = reviewDb.prepare(
