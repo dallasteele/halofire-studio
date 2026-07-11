@@ -689,3 +689,25 @@ The continuation work remains deliberately below the completion bar:
   score remains **4/8**, truth-free MAD diagnostic **5/8**), strict N6 scoring,
   clean whole-Studio regression, and a provisioned deployment authorization
   receipt. No acceptance row or deployment authorization was fabricated.
+
+## 32. CODEX CONTINUATION EVIDENCE - 2026-07-11 (READY-LIST TRUTH-IN-LABELING)
+
+- Root `2f021a920` closes a live honesty bug in `/ready-to-send`: a durable geometry
+  cache hit no longer projects `bid-grade` while the current source-bound spatial
+  overlay is pending. The projection resolves the same geometry document used by
+  `/package`, reads the stored spatial manifest, and applies the existing confidence
+  helper followed by the downgrade-only spatial gate. Pending manifests now expose
+  `spatial_verification_unaccepted=true` and a physical-page residual; accepted
+  manifests can still earn `bid-grade`.
+- Focused badge/spatial coverage is **32 passed**; the full engine suite is **859
+  passed, 10 skipped, 17 warnings**. `verify_agentic_rules.py`, `py_compile`, and
+  `git diff --check` pass.
+- The deployed VPS API (`srv1509989`, `8770`) was restarted from the scoped file.
+  Live `/ready-to-send` reports AZAZ `close-approx`, `spatial_verification_unaccepted=true`,
+  and `no_current_overlay_artifacts; missing_page_index:1`; it does not claim
+  estimator-grade geometry. The rendered live board shows the same close-approx badge
+  with no console errors at
+  `out/agent-loops/halofire-master-build-20260711/live-ops/board-fail-closed.png`.
+- The master objective remains open: this fixes public badge honesty but does not
+  fabricate trusted FP/Cooperative review rows, improve the held-out density score,
+  satisfy strict N6, or create the missing deployment authorization.
