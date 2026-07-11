@@ -89,7 +89,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.locator('#projectTarget').selectOption(PROJECT_NAME);
       await page.locator('#supplied-document-bid-truth').waitFor();
       await page.getByText('supplied_document_bid_truth - EMPLOYEE_REVIEW_NEEDED').waitFor();
@@ -228,7 +228,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.locator('#projectTarget').selectOption(PROJECT_NAME);
       await page.locator('#genBtn').click();
       await page.locator('#bidTruthDefaultsCard').waitFor();
@@ -419,7 +419,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         construction_days: 41,
         source_status: 'employee_replacement_recorded',
       }));
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.locator('#projectTarget').selectOption(PROJECT_NAME);
       await page.locator(`#evidence-${savedLayoutReplacementReadback.evidence_id}`).waitFor({ state: 'attached' });
       const savedLayoutReplacementReadbackText = await page.locator(`#evidence-${savedLayoutReplacementReadback.evidence_id}`).innerText();
@@ -894,7 +894,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.locator('#projectTarget').selectOption(PROJECT_NAME);
       await page.locator('#genBtn').click();
       await page.locator('#bidTruthDefaultsCard').waitFor();

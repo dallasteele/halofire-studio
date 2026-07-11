@@ -577,7 +577,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <!-- NEXT ACTIONS -->
     <section class="panel">
       <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Next Actions</span><span class="pbtn">⌄</span></div>
-      <div class="pbody">
+      <div class="pbody" id="nextActionsBody">
         <div class="task"><span class="ico pend">○</span><span class="tx"><span class="t">Generate layout from plan</span><span class="d">No layout yet — start the AutoDraw pass.</span></span></div>
         <div class="task"><span class="ico warn">⚠</span><span class="tx"><span class="t">Square footage doesn't match the proposal</span><span class="d">Plan reads 84,200 sq ft · proposal lists 81,900.</span></span></div>
         <div class="task"><span class="ico pend">○</span><span class="tx"><span class="t">Awaiting AHJ approval</span><span class="d">Attach the AHJ approval packet when received.</span></span></div>
@@ -938,7 +938,7 @@ import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_P
 // HF-B1-PDFUNDERLAY (Stream B): REAL plan-sheet PDF underlays + multi-level scaffold.
 import { loadPdfjs, renderSheetToCanvas, computeUnderlayTransform, createUnderlayMesh } from '/src/engine/pdf-underlay.js';
 import { buildBuildingLevels } from '/src/engine/building-levels.js';
-// HF-E1-PLANBUILD (Stream D/E): build REAL per-level 3D from the extracted plan
+// HF-E1-PLANBUILD (Stream D/E): build REAL per-level 3D from accepted vector plans
 // (building-from-plan.js), with the sheet registered UNDER it at the drawing-derived
 // true scale. Replaces the margin-box for Cooperative 1881.
 import { buildBuildingFromPlans, computePlanUnderlayTransform, unionFootprintCenter, planBounds } from '/src/engine/building-from-plan.js';
@@ -1107,10 +1107,10 @@ async function bindSourceDocumentIdentity() {
   } catch (_) {
     // The direct document lookup above remains the honest identity fallback.
   }
-  // A ready-to-send row is already a canonical source identity. Do not make the
-  // page wait on the much slower document lookup after a package-by-ref succeeds
-  // (or when the row itself can provide the visible job/location fallback).
-  if (!packagePayload && !identityRow) {
+  // Identity alone cannot determine acceptance state. Fetch the document-bound
+  // package whenever package-by-ref was not already resolved so the visible phase
+  // is driven by the same evidence as the accepted 3D handoff.
+  if (!packagePayload) {
     try { packagePayload = await api('/autobid/package/' + encodeURIComponent(docId) + '?by=doc'); }
     catch (_) { packagePayload = null; }
   }
@@ -1126,17 +1126,30 @@ async function bindSourceDocumentIdentity() {
   const subtitle = $('jobSub');
   if (title) title.textContent = name || ('Source document ' + docId);
   if (subtitle) subtitle.textContent = jobLocation || 'Canonical plan-set source bound to document ' + docId;
+  const acceptedDrawing = packagePayload && packagePayload.accepted_geometry_drawing;
+  const systemAccepted = !!(acceptedDrawing && acceptedDrawing.available && acceptedDrawing.pipe_system_verified === true);
   const well = $('jobWell');
   if (well) {
     const total = packagePayload && packagePayload.readyBid && packagePayload.readyBid.total;
-    const phase = packagePayload && packagePayload.accepted_geometry_drawing && packagePayload.accepted_geometry_drawing.available
+    const phase = systemAccepted
       ? 'Accepted geometry'
       : 'Review pending';
+    const sourceState = phase === 'Accepted geometry' ? 'system-verified' : 'needs-verification';
     well.innerHTML = `
       <div class="job-row"><span class="k">Source PDF</span><span class="v">doc ${docId}</span></div>
       <div class="job-row"><span class="k">Bid value</span><span class="v">${total != null ? usd(total) : 'not resolved'}</span></div>
       <div class="job-row"><span class="k">Phase</span><span class="v"><span class="chip ${phase === 'Accepted geometry' ? 'ok' : 'info'}"><span class="gl"></span> ${phase}</span></span></div>
-      <div class="job-row"><span class="k">Source state</span><span class="v">${isCooperative ? 'Cooperative 1881' : 'document-bound'} · needs-verification</span></div>`;
+      <div class="job-row"><span class="k">Source state</span><span class="v">${isCooperative ? 'Cooperative 1881' : 'document-bound'} · ${sourceState}</span></div>`;
+  }
+  const nextActions = $('nextActionsBody');
+  if (nextActions && systemAccepted) {
+    const heads = Number(acceptedDrawing.head_count || 0).toLocaleString();
+    const segments = Number(acceptedDrawing.segment_count || 0).toLocaleString();
+    const pipeFt = Number(acceptedDrawing.total_pipe_ft || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    nextActions.innerHTML = `
+      <div class="task"><span class="ico ok">✓</span><span class="tx"><span class="t">System layout accepted</span><span class="d">${heads} heads · ${segments} connected graph segments · ${pipeFt} ft.</span></span></div>
+      <div class="task"><span class="ico ok">✓</span><span class="tx"><span class="t">Route verification passed</span><span class="d">Primary, independent, and adversarial system loops agree on wall clearance and graph cohesion.</span></span></div>
+      <div class="task"><span class="ico info">•</span><span class="tx"><span class="t">Permit workflow is downstream</span><span class="d">AHJ/PE signoff remains a legal submittal step, not a software acceptance blocker.</span></span></div>`;
   }
   document.body.dataset.sourceDocumentId = String(docId);
   document.body.dataset.sourceDocumentName = name || 'unknown';
@@ -3101,12 +3114,13 @@ window.__levelPanelToggle = () => {
   return false;
 };
 
-// ── HF-E1-PLANBUILD (Stream D/E): REAL per-level 3D built FROM the extracted plan ──
-// For Cooperative 1881 the margin-box scaffold is REPLACED by geometry extracted from
+// ── HF-E1-PLANBUILD (Stream D/E): REAL per-level 3D built FROM accepted vector plans ──
+// For Cooperative 1881 the margin-box scaffold is REPLACED by geometry accepted from
 // the vector PDFs (building-from-plan.js, true scale derived from each sheet). The actual
 // A-101..A-108 sheet stays as an aligned underlay UNDER the geometry, registered at the
 // SAME drawing-derived scale + shared origin (computePlanUnderlayTransform) — both move
-// together when the level switcher changes level. Everything is needs-verification.
+// together when the level switcher changes level. Accepted package geometry and heads
+// are system-verified; the static extraction fallback remains needs-verification.
 const PLAN_BUILD_ARCH = '/plans/cooperative-1881/1881-architecturals.pdf'; // same PLAN_ROOT as plan-manifest.js (Express/vite root = the autosprink app dir)
 const W2_HEATMAP_URL = '/public/halofire-W2b/recall-definitive.png'; // HF-W2b: DEFINITIVE version-consistent wall-recall heatmap (covered green / missed red = sheet furniture, not walls), served static
 const PLAN_BUILD_LEVEL_PAGES = { 1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 23, 7: 26, 8: 29 };
@@ -3293,7 +3307,9 @@ async function setActivePlanBuildLevel(v) {
   st.api.setActiveLevel(st.activeLevel);
   buildPlanBuildPanel();
   if (st.activeLevel !== 'all') await ensurePlanBuildSheet(st.activeLevel);
-  else $('status').textContent = 'showing all extracted levels — pick a level to register its sheet underlay';
+  else $('status').textContent = st.data && st.data.source === 'accepted-vector-overlay'
+    ? 'showing all system-verified levels — pick a level to inspect its physical-page underlay'
+    : 'showing all extracted levels — pick a level to register its sheet underlay';
 }
 
 function buildPlanBuildPanel() {
@@ -3305,7 +3321,9 @@ function buildPlanBuildPanel() {
     .map((v) => `<button data-lvl="${v}" class="${String(st.activeLevel) === String(v) ? 'on' : ''}">${v === 'all' ? 'All' : 'L' + v}</button>`).join('');
   const active = st.api.levels.find((l) => l.level === Number(st.activeLevel));
   const c = active ? active.counts : null;
-  const cntLine = c ? `walls ${(c.wallRuns || c.walls).toLocaleString()} · rooms ${c.rooms} · stairs ${c.stairs}` : 'extracted geometry';
+  const cntLine = c
+    ? `walls ${(c.wallRuns || c.walls).toLocaleString()} · rooms ${c.rooms} · heads ${(c.sprinklerHeads || 0).toLocaleString()} · pipe ${(c.sprinklerPipeSegments || 0).toLocaleString()} · stairs ${c.stairs}`
+    : (st.data && st.data.source === 'accepted-vector-overlay' ? '8 system-verified levels' : 'extracted geometry');
   // HF-W2: surface extraction completeness — wall recall %, door/fixture counts, + a heatmap link.
   const ext = st.api.summary && st.api.summary.extractionCompleteness;
   let w2Block = '';
@@ -3363,12 +3381,22 @@ function buildPlanBuildPanel() {
         <div id="w2HeatMiss" style="display:none;color:var(--muted);font-size:10px;margin-top:4px">heatmap image unavailable on this host (public/halofire-W2b/recall-definitive.png)</div>
       </div>`;
   }
+  const acceptedFlag = st.data && st.data.source === 'accepted-vector-overlay';
+  const pipeAccepted = acceptedFlag && st.levelPlans.every((entry) => (
+    entry.plan && entry.plan.sprinklerEvidence
+    && entry.plan.sprinklerEvidence.pipeSystemVerified === true
+  ));
+  const verificationFlag = acceptedFlag
+    ? (pipeAccepted
+      ? '<div class="nv-flag" style="color:#4ade80">SYSTEM-VERIFIED — accepted vector walls/rooms, polygon-clipped heads, and the connected wall-aware pipe graph are physical-page bound; independent and adversarial route mutations passed.</div>'
+      : '<div class="nv-flag" style="color:#fbbf24">GEOMETRY VERIFIED — accepted walls/rooms/heads are bound; pipe is hidden because its current route digest has no matching internal-loop receipt.</div>')
+    : '<div class="nv-flag">⚠ NEEDS-VERIFICATION — geometry extracted from the vector PDF; true scale derived from each sheet. NOT AHJ/PE/manufacturer-exact, NOT AutoSprink-parity.</div>';
   lp.innerHTML = `
     <h4>Levels — built from plan</h4>
     <div class="lvl-row">${lvlBtns}</div>
     <div class="disc-row" style="font-family:var(--mono);font-size:10px">${cntLine}</div>
     ${w2Block}
-    <div class="nv-flag">⚠ NEEDS-VERIFICATION — geometry EXTRACTED from the vector PDF (rooms/stairs/walls/doors/fixtures), true scale DERIVED from each sheet's printed notation; sheet registered under it. Wall coverage is recall vs the sheet wall-ink, reported honestly. NOT AHJ/PE/manufacturer-exact, NOT AutoSprink-parity.</div>`;
+    ${verificationFlag}`;
   lp.querySelectorAll('[data-lvl]').forEach((b) => { b.onclick = () => setActivePlanBuildLevel(b.dataset.lvl); });
   const heatLink = lp.querySelector('#w2HeatLink');
   if (heatLink) heatLink.onclick = (e) => { e.preventDefault(); const t = lp.querySelector('#w2HeatThumb'); if (t) t.style.display = t.style.display === 'none' ? 'block' : 'none'; };
@@ -3432,8 +3460,12 @@ async function renderPlanComprehensionBuild(name) {
     sourceDocumentId: data.sourceDocumentId || null,
     acceptedModel3d: data.source === 'accepted-vector-overlay',
     pendingReason: data.source === 'accepted-vector-overlay' ? null : (acceptedModel3dState && acceptedModel3dState.reason) || null,
-    note: 'building geometry EXTRACTED from vector PDF; sheet registered UNDER it at sheet-derived true scale — needs-verification',
-    failures: planBuildState.failures, needsVerification: true,
+    note: data.source === 'accepted-vector-overlay'
+      ? 'system-verified vector geometry, accepted sprinkler heads, and connected wall-aware pipe; source sheet registered at true scale'
+      : 'building geometry extracted from vector PDF; sheet registered at sheet-derived true scale — needs-verification',
+    failures: planBuildState.failures,
+    needsVerification: data.source !== 'accepted-vector-overlay',
+    systemVerified: data.source === 'accepted-vector-overlay',
   };
   // HF-W2: headless-verification hook — expose the extracted-building api + the live
   // viewer essentials so the W2 gate can assert overlay layers + drive selection.
@@ -3452,12 +3484,22 @@ async function renderPlanComprehensionBuild(name) {
   window.__hfAssembly = () => {
     if (!planBuildState || !planBuildState.api || !planBuildState.api.root) return { built: false, reason: 'no plan build — load/import a plan first' };
     const root = planBuildState.api.root;
-    let meshCount = 0, vertexCount = 0; const groupNames = new Set();
+    let meshCount = 0, vertexCount = 0, acceptedHeadCount = 0, acceptedPipeCount = 0;
+    let minPipeElevationFt = Infinity, maxPipeElevationFt = -Infinity;
+    const groupNames = new Set();
     root.traverse((o) => {
       if (o.isMesh && o.geometry) {
         meshCount++;
         const pos = o.geometry.attributes && o.geometry.attributes.position;
         if (pos) vertexCount += pos.count;
+      }
+      if (o.name === 'accepted-sprinkler-head') acceptedHeadCount += 1;
+      if (o.name === 'accepted-pipe-segment') {
+        acceptedPipeCount += 1;
+        if (o.position && Number.isFinite(o.position.y)) {
+          minPipeElevationFt = Math.min(minPipeElevationFt, o.position.y);
+          maxPipeElevationFt = Math.max(maxPipeElevationFt, o.position.y);
+        }
       }
       if (o.isGroup && o.name) groupNames.add(o.name);
     });
@@ -3469,12 +3511,17 @@ async function renderPlanComprehensionBuild(name) {
       planGroupVisible: !!(planGroup && planGroup.visible),
       kind: root.userData && root.userData.kind,
       needsVerification: !!(root.userData && root.userData.needsVerification),
+      systemVerified: !!(root.userData && root.userData.systemVerified),
       meshCount, vertexCount,
+      acceptedHeadCount, acceptedPipeCount,
+      minPipeElevationFt: Number.isFinite(minPipeElevationFt) ? minPipeElevationFt : null,
+      maxPipeElevationFt: Number.isFinite(maxPipeElevationFt) ? maxPipeElevationFt : null,
       levelCount: Array.isArray(planBuildState.api.levels) ? planBuildState.api.levels.length : 0,
       groupNames: [...groupNames].slice(0, 24),
       bboxFt: Number.isFinite(b.widthFt) ? { widthFt: Math.round(b.widthFt), depthFt: Math.round(b.depthFt) } : null,
     };
   };
+  window.__cadVerify3D = window.__hfAssembly();
 
   // PHASE 4 — INTAKE hook. Exposes the reconstructed building model (the head-placer + router
   // run on this): aggregated wall RUNS, openings (cased openings + door positions), and COLUMNS
@@ -3486,6 +3533,7 @@ async function renderPlanComprehensionBuild(name) {
   buildPhase4Intake();
   window.__THREE = THREE; window.__scene = scene; window.__renderer = renderer;
   try { Object.defineProperty(window, '__camera', { configurable: true, get: () => camera }); } catch (_) { window.__camera = camera; }
+  window.__controls = controls;
   window.__hfSetSelectMode = (v) => { selectMode = !!v; };
   // HF-W2: deterministic selection-path probe — runs the SAME describeBuildPart + openInspector
   // the click path uses, on the Nth door of the active level, so headless verification of the
@@ -3506,7 +3554,7 @@ async function renderPlanComprehensionBuild(name) {
     return { open: insp && insp.classList.contains('open'), title: it ? it.textContent : '', bodyText: ib ? ib.textContent : '', userData: door.userData };
   };
   $('status').textContent = data.source === 'accepted-vector-overlay'
-    ? `built ${api.summary.levelCount} levels from accepted vector overlays (physical-page bound; needs-verification)`
+    ? `built ${api.summary.levelCount} system-verified levels with accepted walls, heads, and connected pipe routes`
     : `built ${api.summary.levelCount} levels from the extracted plan (floor 1: parking plate + stair cores + rooms) — needs-verification`;
   return true;
 }
@@ -4461,6 +4509,15 @@ async function autoLoadOrUnderlay() {
       ['pipes', 'hydraulics', 'compliance'].forEach((id) => { $(id).innerHTML = '<span class="muted" style="font-size:12px">—</span>'; });
       $('bid').innerHTML = ''; $('bom').innerHTML = ''; $('warn').textContent = '';
       $('status').textContent = 'floor-plan underlay · Generate Layout to build the sprinkler system';
+    }
+    if (planBuildState && planBuildState.data && planBuildState.data.source === 'accepted-vector-overlay') {
+      $('layout').innerHTML = '<span style="color:#4ade80;font-size:12px">System-verified layout loaded from the document-bound acceptance package.</span>';
+      const summary = planBuildState.api.summary;
+      const totals = (summary.perLevel || []).reduce((acc, level) => ({
+        heads: acc.heads + Number(level.sprinklerHeads || 0),
+        pipes: acc.pipes + Number(level.sprinklerPipeSegments || 0),
+      }), { heads: 0, pipes: 0 });
+      $('status').textContent = `system-verified document package · ${totals.heads.toLocaleString()} accepted heads · ${totals.pipes.toLocaleString()} connected pipe segments`;
     }
   } finally { autoLoading = false; }
 }

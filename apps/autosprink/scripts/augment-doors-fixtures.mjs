@@ -20,7 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
-import { extractArcsFromOpList, detectDoors, detectOpenings, detectFixtures } from '../src/engine/plan-doors.js';
+import { extractArcsFromOpList, detectDoors, detectWindows, detectOpenings, detectFixtures } from '../src/engine/plan-doors.js';
 
 const ARCH = path.resolve(process.cwd(), 'plans/cooperative-1881/1881-architecturals.pdf');
 const DATA = path.resolve(process.cwd(), 'src/data/plan-levels.cooperative-1881.json');
@@ -60,6 +60,10 @@ const splitYFt = plan.stackedSplit && Number.isFinite(plan.stackedSplit.splitYFt
   // host-wall set: prefer the recall-complete wallsFull (captures partition walls doors host on).
   const walls = (plan.wallsFull && plan.wallsFull.length ? plan.wallsFull : plan.walls) || [];
   const { doors, note: doorNote, confidentCount, suspectCount } = detectDoors(placed, walls, {});
+  // WINDOWS: detect mullion bundles (parallel short sill/glazing lines in a wall-thickness band, no
+  // swing arc) in the partition-inclusive wall band (where the glazing lines live). Excludes any
+  // bundle a detected door sits on. Conservative + flagged needs-verification.
+  const { windows, note: winNote, confidentCount: winConfident, suspectCount: winSuspect } = detectWindows(walls, doors, {});
   // Openings: detect on the SINGLE-BAND major walls only (perimeter + primary partitions). The
   // dense partition-inclusive set produces O(n^2) spurious collinear "gaps"; major walls give the
   // honest cased-opening signal. Still conservative + flagged.
@@ -81,11 +85,13 @@ const splitYFt = plan.stackedSplit && Number.isFinite(plan.stackedSplit.splitYFt
   }
 
   plan.doors = doors;
+  plan.windows = windows;
   plan.openings = openings;
   plan.fixtures = fixtures;
   plan.fixtureCounts = fixtureCounts;
   plan.doorExtraction = {
     method: 'swing-arc-circle-fit', arcsTotal: arcs.length, doorsFound: doors.length,
+    windowsFound: windows.length, windowsConfident: winConfident, windowsSuspect: winSuspect,
     // HONEST SPLIT (W2b): confidentDoors = on-wall fits with a real architectural leaf width
     // (~2.3-4.0 ft). suspectDoors = down-ranked fits (off-wall OR sub/over-door width) kept for
     // completeness but flagged — do NOT count these as confident doors. The bulk of suspects are
@@ -93,10 +99,10 @@ const splitYFt = plan.stackedSplit && Number.isFinite(plan.stackedSplit.splitYFt
     confidentDoors: confidentCount, suspectDoors: suspectCount,
     openingsFound: openings.length, fixturesFound: fixtures.length,
     samUsed, samReason, registrationApplied: { dx: reg.dx, dy: reg.dy, splitYFt },
-    notes: { doors: doorNote, openings: openNote, fixtures: fixNote },
+    notes: { doors: doorNote, windows: winNote, openings: openNote, fixtures: fixNote },
     needsVerification: true,
   };
-  plan.counts = { ...(plan.counts || {}), doors: doors.length, openings: openings.length, fixtures: fixtures.length };
+  plan.counts = { ...(plan.counts || {}), doors: doors.length, windows: windows.length, openings: openings.length, fixtures: fixtures.length };
 
   // HONEST RECALL: the wall-coverage % surfaced in the Studio is MEASURED by the standalone
   // scripts/measure-wall-recall.mjs (rasterizes the committed wallsFull vs the A-101 sheet ink;
@@ -113,6 +119,8 @@ const splitYFt = plan.stackedSplit && Number.isFinite(plan.stackedSplit.splitYFt
   const onWall = doors.filter((d) => d.onWall).length;
   console.log(JSON.stringify({
     arcsTotal: arcs.length, doorsFound: doors.length, doorsOnWall: onWall,
+    doorsConfident: confidentCount, doorsSuspect: suspectCount,
+    windowsFound: windows.length, windowsConfident: winConfident, windowsSuspect: winSuspect,
     openingsFound: openings.length, fixturesFound: fixtures.length, fixtureCounts,
     samUsed, samReason, wrote: DATA,
   }, null, 2));

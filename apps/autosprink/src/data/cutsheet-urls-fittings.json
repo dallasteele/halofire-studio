@@ -160,5 +160,41 @@
     "url": "https://www.zurn.com/media-library/web_documents/pdfs/specsheets/bf-350-pdf",
     "confidence": "verified",
     "note": "Zurn Wilkins Model 350 double check valve assembly specification sheet BF-350. URL checked HTTP 200 on 2026-06-12. Covers the double_check type; the RPZ type (e.g. Zurn 375/975XL or Watts 957) has separate sheets — the Watts 957 spec PDF returned HTTP 403 to automated checks, so only its product page (watts.com .../957) verified."
+  },
+  {
+    "key": "head_pendent",
+    "name": "Pendent sprinkler head",
+    "category": "heads",
+    "manufacturer": "Tyco Fire Products (Johnson Controls)",
+    "url": "https://www.tyco-fire.com/TD_TFP/TFP/TFP171_09_2021.pdf",
+    "confidence": "probable",
+    "note": "Tyco TFP171 — Series TY-B 5.6K standard-response pendent/upright technical data sheet (well-known public TFP designation). URL returns HTTP 200 but is served behind Incapsula bot-protection, so the PDF body could not be auto-fetch-verified on 2026-06-15 — confidence kept 'probable'. Engineer of record must confirm the specified product/K-factor before submittal."
+  },
+  {
+    "key": "head_upright",
+    "name": "Upright sprinkler head",
+    "category": "heads",
+    "manufacturer": "Tyco Fire Products (Johnson Controls)",
+    "url": "https://www.tyco-fire.com/TD_TFP/TFP/TFP171_09_2021.pdf",
+    "confidence": "probable",
+    "note": "Tyco TFP171 — Series TY-B 5.6K standard-response sheet also covers the upright orientation (public TFP designation). HTTP 200 behind Incapsula; PDF body not auto-fetch-verified on 2026-06-15. Representative reference — confirm the specified product before submittal."
+  },
+  {
+    "key": "head_sidewall",
+    "name": "Sidewall sprinkler head",
+    "category": "heads",
+    "manufacturer": "Tyco Fire Products (Johnson Controls)",
+    "url": "https://www.tyco-fire.com/TD_TFP/TFP/TFP172_09_2021.pdf",
+    "confidence": "probable",
+    "note": "Tyco TFP172 — Series TY-B 5.6K horizontal sidewall technical data sheet (public TFP designation). HTTP 200 behind Incapsula; PDF body not auto-fetch-verified on 2026-06-15. Representative reference — confirm the specified product before submittal."
+  },
+  {
+    "key": "head_esfr",
+    "name": "ESFR storage sprinkler head",
+    "category": "heads",
+    "manufacturer": "Tyco Fire Products (Johnson Controls)",
+    "url": "https://www.tyco-fire.com/TD_TFP/TFP/TFP312_09_2021.pdf",
+    "confidence": "probable",
+    "note": "Tyco TFP312 — TY7126 ESFR K14.0 pendent technical data sheet (public TFP designation; the K25.2 TY9226 model is TFP315). HTTP 200 behind Incapsula; PDF body not auto-fetch-verified on 2026-06-15. Representative ESFR/storage reference — confirm the specified product/K-factor before submittal."
   }
 ]

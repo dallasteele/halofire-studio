@@ -1,0 +1,252 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
+
+const pagePath = fileURLToPath(new URL('../autobid-send.html', import.meta.url));
+const html = readFileSync(pagePath, 'utf8');
+
+describe('AutoBid final spatial review panel', () => {
+  it('renders spatial verification between plan geometry and 3D/design', () => {
+    const geometry = html.indexOf('+     geometryPanel(p)');
+    const spatial = html.indexOf('+     spatialVerificationPanel(p.spatial_verification)');
+    const model3d = html.indexOf('<span class="t">3D massing</span>');
+    const design = html.indexOf('<span class="t">Sprinkler design</span>');
+    expect(geometry).toBeGreaterThan(0);
+    const density = html.indexOf('+     densityResolutionPanel(p)');
+    expect(density).toBeGreaterThan(geometry);
+    expect(spatial).toBeGreaterThan(geometry);
+    const fpVector = html.indexOf('+     fpVectorReviewPanel(p.fp_vector_review, docId)');
+    expect(fpVector).toBeGreaterThan(spatial);
+    expect(model3d).toBeGreaterThan(spatial);
+    expect(design).toBeGreaterThan(model3d);
+  });
+
+  it('shows the stored overlay, physical sheet/page, allowlisted metrics, and digests', () => {
+    expect(html).toContain('urls.overlay_png');
+    expect(html).toContain('Sheet / physical page');
+    expect(html).toContain('Indexed source page (zero-based)');
+    expect(html).toContain('var SPATIAL_METRICS = [');
+    expect(html).toContain("['classified_wall_ink_coverage','Classified wall ink coverage','pct']");
+    expect(html).toContain('PNG SHA-256');
+    expect(html).toContain('Manifest SHA-256');
+    expect(html).toContain('Rendered page SHA-256');
+    expect(html).toContain("'/api/autobid/package/'+encodeURIComponent(REF)+'/review-packet'");
+    expect(html).toContain('Open canonical review packet');
+    expect(html).toContain('contains no answer key');
+    expect(html).toContain('Source PDF SHA-256');
+    expect(html).toContain('plate.viewport_provenance');
+    expect(html).toContain('Registered source viewports:');
+    expect(html).toContain('data-viewport-role=');
+    expect(html).toContain('viewport-scope');
+    expect(html).toContain('Composite scope');
+    expect(html).toContain('viewport-review-grid');
+    expect(html).toContain('viewport-review-card');
+    expect(html).toContain('aria-label="Attest ');
+    expect(html).toContain('A-101 requires both upper and lower attestations');
+    expect(html).toContain('spatial-review-frame');
+    expect(html).toContain('Stored source-PDF pixels + derived walls/rooms composite.');
+    expect(html).toContain('data-spatial-zoom=');
+    expect(html).toContain('source bbox');
+    expect(html).toContain('geometry bbox');
+    expect(html).not.toContain('Object.keys(plate.metrics');
+  });
+
+  it('renders FP vector candidates as estimator-visible, non-gating review evidence', () => {
+    expect(html).toContain('function fpVectorReviewPanel(fp, docId)');
+    expect(html).toContain('function fpVectorMaterializationPanel(docId)');
+    expect(html).toContain('function bindFpMaterialization(docId)');
+    expect(html).toContain("api('/sheets?doc='+encodeURIComponent(docId))");
+    expect(html).toContain("api('/fp-vector-artifacts/materialize'");
+    expect(html).toContain('source_pdf_sha256:String(sheet.source_pdf_sha256||\'\').toLowerCase()');
+    expect(html).toContain('No candidate was generated');
+    expect(html).toContain('candidate scan only');
+    expect(html).toContain('id="fpVectorReviewPanel"');
+    expect(html).toContain('data-fp-vector-artifact=');
+    expect(html).toContain('fp-vector-overlay');
+    expect(html).toContain('not attempted · not scored');
+    expect(html).toContain('never clear the spatial or bid-grade gates');
+    expect(html).toContain('Truth-free bundle');
+    expect(html).toContain('Candidate family groups');
+    expect(html).toContain('anchor_family_id');
+    expect(html).toContain('support_family_ids');
+    expect(html).toContain('candidate occurrences');
+    expect(html).toContain('support_co_location_fraction');
+    expect(html).toContain('candidate_requires_overlay_eye_gate');
+    expect(html).toContain('family_reviews');
+    expect(html).toContain('Family review:');
+    expect(html).toContain('reviewer_name');
+    expect(html).toContain('reviewer_role');
+    expect(html).toContain('fpVectorFamilyDecision');
+    expect(html).toContain('Accept family');
+    expect(html).toContain('Reject family');
+    expect(html).toContain("'/fp-vector-family-review'");
+    expect(html).toContain('page_index:page.page_index');
+    expect(html).toContain('physical_page_number:page.physical_page_number');
+    expect(html).toContain('family_id:familyId');
+    expect(html).toContain('bundle_sha256:(artifact.integrity||{}).bundle_sha256');
+    expect(html).toContain('overlay_sha256:(artifact.integrity||{}).overlay_sha256');
+    expect(html).toContain('Semantic acceptance is blind');
+    expect(html).toContain('data-decision="accepted"');
+    expect(html).toContain('Accept semantic review');
+    expect(html).toContain("'/semantic-review'");
+    expect(html).toContain('point_review_decision_id');
+    expect(html).toContain('pointReview.candidate_id');
+    expect(html).toContain('expected_bundle_sha256');
+    expect(html).toContain('expected_overlay_sha256');
+    expect(html).toContain('artifact.point_review');
+    expect(html).toContain('Blind point receipt:');
+    expect(html).toContain('point_overlay_sha256');
+    expect(html).toContain('pointReview.point_review_url');
+    expect(html).toContain('pointReview.point_overlay_url');
+  });
+
+  it('verifies blind point source bytes before enabling any decision', () => {
+    expect(html).toContain('fpPointSourceStatus');
+    expect(html).toContain('rendered-page SHA-256');
+    expect(html).toContain("fetch(sourceUrl,{credentials:'include',cache:'no-store'})");
+    expect(html).toContain("window.crypto.subtle.digest('SHA-256',buffer)");
+    expect(html).toContain('new Blob([buffer],{type:\'image/png\'})');
+    expect(html).toContain('Display the exact bytes that were hashed');
+    expect(html).toContain('rendered source-page SHA-256 mismatch');
+    expect(html).toContain('Decision controls remain disabled.');
+    expect(html).toContain('if(!sourceVerified || !image.naturalWidth || !image.naturalHeight) return;');
+    expect(html).toContain('if(!sourceVerified){if(result) result.textContent=');
+  });
+
+  it('uses canonical geometry source IDs and does not treat export history as transmission', () => {
+    expect(html).toContain('p.geometry_document_id');
+    expect(html).toContain('p.meta&&p.meta.geometry_document_id');
+    expect(html).toContain("transmission_confirmed === true");
+    expect(html).toContain('exported_manual_transmission_pending');
+    expect(html).toContain('manual transmission still pending');
+    expect(html).not.toContain("p.meta&&p.meta.document_id) || rb.document_id");
+  });
+
+  it('surfaces density provenance as diagnostic-only evidence', () => {
+    expect(html).toContain('function densityResolutionPanel(p)');
+    expect(html).toContain('id="densityResolutionPanel"');
+    expect(html).toContain('Density source');
+    expect(html).toContain('diagnostic-only; it does not alter NFPA spacing');
+    expect(html).toContain('observed');
+    expect(html).toContain('Hydraulic spec evidence');
+    expect(html).toContain('density_provenance');
+    expect(html).toContain('source_page');
+    expect(html).toContain('rel_path');
+    expect(html).toContain('Required Division-21 evidence');
+    expect(html).toContain('resolution.qualifiers');
+  });
+
+  it('renders the truth-free held-out density review worklist and keeps receipts non-gating', () => {
+    expect(html).toContain('function densityHeldoutReviewPanel()');
+    expect(html).toContain('id="densityHeldoutReviewPanel"');
+    expect(html).toContain("api('/heldout-density/review-manifest')");
+    expect(html).toContain("api('/heldout-density/review-evidence'");
+    expect(html).toContain('densityHeldoutPage');
+    expect(html).toContain('Open canonical source page');
+    expect(html).toContain('Physical page');
+    expect(html).toContain('Rendered page SHA-256');
+    expect(html).toContain('Source PDF SHA-256');
+    expect(html).toContain('Marked overlay SHA-256');
+    expect(html).toContain('window.__densityReviewerAuthorized');
+    expect(html).toContain("role==='estimator'||role==='admin'");
+    expect(html).toContain('observed_head_count:observed');
+    expect(html).toContain("decision:'accepted'");
+    expect(html).toContain('gate effect: none');
+    expect(html).toContain('diagnostic-only');
+    expect(html).toContain('server returned forbidden truth fields');
+    expect(html).toContain('No observation was recorded');
+    expect(html).not.toContain('densityHeldoutExpected');
+  });
+
+  it('renders a canonical action manifest for every remaining external receipt', () => {
+    expect(html).toContain('function acceptanceActionManifest()');
+    expect(html).toContain('function bindAcceptanceActionManifest()');
+    expect(html).toContain('id="acceptanceActionManifest"');
+    expect(html).toContain("api('/package/'+encodeURIComponent(REF)+'/acceptance-audit')");
+    expect(html).toContain("key:'fp_semantic_review'");
+    expect(html).toContain("key:'spatial_review'");
+    expect(html).toContain("key:'density_holdout'");
+    expect(html).toContain("key:'n6_scoring'");
+    expect(html).toContain("key:'release_authorization'");
+    expect(html).toContain('#fpVectorReviewPanel');
+    expect(html).toContain('#spatialVerificationPanel');
+    expect(html).toContain('#densityHeldoutReviewPanel');
+    expect(html).toContain('distinct independent scorer');
+    expect(html).toContain('separate release_authorizer');
+    expect(html).toContain('production gate effect: none');
+    const actionSection = html.slice(html.indexOf('function acceptanceActionManifest()'), html.indexOf('function bindAcceptanceActionManifest()'));
+    expect(actionSection).not.toContain('expected_count');
+    expect(actionSection).not.toContain('answer_key');
+  });
+
+  it('makes the transcript operations flow visible with restrained reduced-motion-safe motion', () => {
+    expect(html).toContain('function operationsFlowRail(p)');
+    expect(html).toContain('aria-label="HaloFire operations flow"');
+    expect(html).toContain('01 · Intake');
+    expect(html).toContain('02 · Review');
+    expect(html).toContain('03 · Verify');
+    expect(html).toContain('04 · Export');
+    expect(html).toContain('animation-timeline:view()');
+    expect(html).toContain('animation-range:entry 0% cover 24%');
+    expect(html).toContain('transform:translateY(16px)');
+    expect(html).toContain('prefers-reduced-motion: reduce');
+    expect(html).not.toContain('animation: hf-ops-rail-reveal infinite');
+  });
+
+  it('separates sign-in and role denial from engine outage on package load', () => {
+    expect(html).toContain('data-auth-required="true"');
+    expect(html).toContain('data-auth-forbidden="true"');
+    expect(html).toContain('Sign in to review this bid package');
+    expect(html).toContain('This bid is not available to your reviewer role');
+    expect(html).toContain('If the engine is offline:');
+    expect(html).toContain('e.__status=r.status');
+  });
+
+  it('requires a decoded stored overlay and an automated pass for acceptance', () => {
+    expect(html).toContain('data-spatial-overlay-index=');
+    expect(html).toContain('data-overlay-visible');
+    expect(html).toContain("image.addEventListener('load',markVisible)");
+    expect(html).toContain("image.addEventListener('error',markBroken)");
+    expect(html).toContain("if(image.complete) (image.naturalWidth>0?markVisible:markBroken)();");
+    expect(html).toContain('Stored overlay failed to load or decode. Acceptance remains disabled.');
+    expect(html).toContain('data-decision="accepted" disabled');
+    expect(html).toContain('>Accept overlay</button>');
+    expect(html).toContain('data-decision="rejected"');
+    expect(html).toContain('Source raster unavailable on the canonical runtime');
+    expect(html).toContain('Canonical rendered source-page hash is unavailable; no spatial decision can be recorded.');
+    expect(html).toContain('renderedHash.length!==64');
+    expect(html).toContain('id="spatialReviewerContext"');
+    expect(html).toContain("fetch('/api/auth/me',{credentials:'include'})");
+    expect(html).toContain('__spatialReviewerAuthorized');
+    expect(html).toContain('reviewer session unavailable');
+    expect(html).toContain('Verified estimator/admin reviewer session required; no decision was recorded.');
+    expect(html).toContain("gate.passed!==true || button.getAttribute('data-overlay-visible')!=='true'");
+    expect(html).toContain('Reviewed wall recall (0.90-1.00)');
+    expect(html).toContain('Phantom room count');
+    expect(html).toContain("recall<0.90 || recall>1 || phantoms!==0");
+  });
+
+  it('posts the concurrency-bound review command and reloads current state', () => {
+    expect(html).toContain("'/spatial-review'");
+    expect(html).toMatch(/artifact_id:plate\.artifact_id,[\s\S]*decision:decision,[\s\S]*note:note\?note\.value:'',[\s\S]*reviewed_structural_wall_recall:decision==='accepted'\?recall:null,[\s\S]*phantom_room_count:decision==='accepted'\?phantoms:null,[\s\S]*expected_png_sha256:integrity\.png_sha256,[\s\S]*expected_manifest_sha256:integrity\.manifest_sha256,[\s\S]*expected_rendered_page_sha256:integrity\.rendered_page_sha256/);
+    expect(html).toContain('location.reload();');
+  });
+
+  it('keeps honest export independent and sends the corrected qualifier key', () => {
+    expect(html).toContain('never blocks honest package export');
+    expect(html).toContain('JSON.stringify({ edited_qualifiers: edited })');
+    expect(html).not.toContain('JSON.stringify({ qualifiers: edited })');
+    expect(html).not.toMatch(/sendBtn[^\n]+spatial_verification/);
+  });
+
+  it('withholds provisional studio drawing until accepted vector geometry is present', () => {
+    expect(html).toContain('window.__AGD = p.accepted_geometry_drawing || null;');
+    expect(html).toContain('window.__AGD && (window.__AGD.available!==true || window.__AGD.accepted_geometry!==true)');
+    expect(html).toContain('sd.accepted_geometry!==true');
+    expect(html).toContain('Per-room drawing withheld pending human overlay review.');
+    expect(html).toContain('provisional raster/rectangle drawing is not rendered');
+    expect(html).toContain('var poly=r.polygon_ft||r.poly;');
+    expect(html).toContain('p.wallRuns||[]');
+    expect(html).toContain('walls+rooms+segs+dots+riser');
+  });
+});

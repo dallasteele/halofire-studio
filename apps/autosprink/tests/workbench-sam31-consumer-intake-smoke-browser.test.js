@@ -7,7 +7,9 @@ import Database from 'better-sqlite3';
 import { chromium } from 'playwright';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const PORT = 3231;
+// Keep this browser server isolated from the room-boundary smoke (which owns
+// 3231) when Vitest is run with overlapping workers or a slow teardown.
+const PORT = 3237;
 const BASE = `http://127.0.0.1:${PORT}`;
 const PASSWORD = 'sam31-smoke-browser-pw';
 const PROJECT_NAME = 'The Cooperative 1881 - Salt Lake City UT';
@@ -213,7 +215,7 @@ describe('Workbench SAM31 saved consumer intake smoke browser controls', () => {
     page.setDefaultTimeout(10_000);
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.selectOption('#projectTarget', PROJECT_NAME);
       await page.locator(`#evidence-${smoke.evidence_id}`).waitFor();
 
@@ -267,7 +269,7 @@ describe('Workbench SAM31 saved consumer intake smoke browser controls', () => {
     page.setDefaultTimeout(10_000);
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.selectOption('#projectTarget', PROJECT_NAME);
       await page.locator(`#evidence-${smoke.evidence_id}`).waitFor();
 
