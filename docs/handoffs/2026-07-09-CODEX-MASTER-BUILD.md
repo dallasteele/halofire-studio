@@ -875,3 +875,26 @@ The continuation work remains deliberately below the completion bar:
   FP semantic decision, spatial acceptance, density score, N6 production score, or
   deployment authorization was created. The full objective remains open pending
   trusted external review receipts and the frozen acceptance gates.
+
+## 39. CODEX CONTINUATION EVIDENCE - 2026-07-11 (FULL REGRESSION AND OPERATIONS AUDIT)
+
+- Independent final verification after the N6 and Studio slices: **876 engine tests
+  passed, 10 skipped, 21 warnings**; **59 focused backend acceptance tests passed**;
+  **24 focused Studio tests passed**; rulebook, compile, and scoped diff checks all
+  pass.
+- Current live acceptance audit remains fail-closed and unchanged in substance:
+  FP semantic **0/1**, spatial **0/8**, density holdout pending, N6 scorecard
+  pending, production gate blocked. The exact source mirror and rendered hashes are
+  available, but no trusted reviewer has submitted the required independent rows.
+- Product-design audit captures from the current live flow are saved under
+  `out/agent-loops/halofire-master-build-20260711/ops-audit/`: the loaded Bid Board,
+  the source-bound Review & Send packet, and the source-bound 3D viewport. The flow
+  is visually coherent and exposes honest status/residuals; the 3D capture visibly
+  contains extracted Cooperative walls/rooms with source doc 34978 and
+  `needs-verification`, not a massing acceptance claim. Screenshot evidence alone
+  does not establish accessibility compliance or human acceptance.
+- The master-build goal remains active. The next required external actions are a
+  distinct trusted reviewer for FP semantic points, independent upper/lower A-101
+  and remaining spatial attestations, an independently measured held-out density
+  report at the frozen threshold, strict N6 scoring from accepted receipts, and a
+  separate deployment-authorization receipt.
