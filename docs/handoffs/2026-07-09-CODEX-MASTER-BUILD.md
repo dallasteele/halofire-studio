@@ -649,8 +649,11 @@ The continuation work remains deliberately below the completion bar:
 - Current verification is green on the scoped lanes: full engine **809 passed,
   10 skipped, 4 warnings**; source-density inventory/probe focus **31 passed**;
   accepted model3d focus **20 Python + 13 Studio**; review/proxy/browser focus
-  includes **13 proxy/static + 2 browser**. The current-head runtime proof must
-  be regenerated after this handoff commit.
+  includes **13 proxy/static + 2 browser**. Current proof artifact
+  `runtime-deployment-proof-formal-gateway-20260710T2055Z.json` has
+  `proof_id=96e94c6894f5064926c05811b7742c8fedece6a36b33a3cd76387db97db8328c`,
+  verifies root `856b23b99`, and passes engine, Studio, formal-prover, and
+  source gates; deployment authorization remains blocked.
 - The master objective remains open. Required external gates are still an
   actual trusted FP semantic review, trusted Cooperative spatial review rows,
   held-out density at the frozen 12% threshold, strict N6 scoring, a clean
