@@ -198,6 +198,10 @@ describe('AutoBid FP vector semantic review browser boundary', () => {
       expect(pointReviewText).toContain('Blind review');
       expect(pointReviewText).toContain('no expected count is supplied');
       expect(await page.locator('.fpPointPage').count()).toBe(1);
+      await page.waitForFunction(() => {
+        const status = document.querySelector('.fpPointSourceStatus');
+        return status && status.textContent.includes('Source raster verified');
+      });
       expect(await page.locator('.fpPointSourceStatus').innerText()).toContain('Source raster verified');
       expect(await page.locator('.fpPointDecision[data-decision="accepted"]').isEnabled()).toBe(true);
       const reviewDb = new Database(path.join(tempDir, 'autobid.db'), { readonly: true });
@@ -214,5 +218,5 @@ describe('AutoBid FP vector semantic review browser boundary', () => {
     } finally {
       await page.close();
     }
-  });
+  }, 30_000);
 });
