@@ -37,6 +37,12 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('plate.viewport_provenance');
     expect(html).toContain('Registered source viewports:');
     expect(html).toContain('data-viewport-role=');
+    expect(html).toContain('viewport-scope');
+    expect(html).toContain('Composite scope');
+    expect(html).toContain('viewport-review-grid');
+    expect(html).toContain('viewport-review-card');
+    expect(html).toContain('aria-label="Attest ');
+    expect(html).toContain('A-101 requires both upper and lower attestations');
     expect(html).toContain('spatial-review-frame');
     expect(html).toContain('Stored source-PDF pixels + derived walls/rooms composite.');
     expect(html).toContain('data-spatial-zoom=');

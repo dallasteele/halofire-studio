@@ -69,6 +69,23 @@
   .spatial-review-toolbar output{ min-width:42px; text-align:right; color:var(--hf-text); font-variant-numeric:tabular-nums; }
   .spatial-review-frame .spatial-overlay{ display:block; width:100%; min-width:100%; height:auto; margin:0; border:0; border-radius:0; background:#fff; transform-origin:top left; }
   .spatial-review-frame .spatial-overlay[data-overlay-visible="false"]{ opacity:.65; }
+  .viewport-scope{ margin:10px 0 12px; padding:10px 12px; border:1px solid rgba(240,168,104,.28); border-radius:10px; background:linear-gradient(110deg,rgba(240,168,104,.10),rgba(255,255,255,.025)); color:var(--hf-text); }
+  .viewport-scope strong{ display:block; font-size:var(--hf-fs-sm); letter-spacing:.15px; }
+  .viewport-scope small{ display:block; margin-top:3px; color:var(--hf-muted); line-height:1.45; }
+  .viewport-review-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:8px 0 4px; }
+  .viewport-review-card{ display:flex; align-items:flex-start; gap:8px; min-width:0; padding:9px 10px; border:1px solid var(--hf-line); border-radius:9px; background:rgba(255,255,255,.025); color:var(--hf-text); cursor:pointer; transition:border-color .16s ease,background .16s ease,box-shadow .16s ease; }
+  .viewport-review-card:hover{ border-color:rgba(240,168,104,.5); background:rgba(240,168,104,.06); }
+  .viewport-review-card:focus-within{ outline:2px solid rgba(158,195,255,.8); outline-offset:2px; }
+  .viewport-review-card:has(input:checked){ border-color:rgba(74,222,128,.48); background:rgba(74,222,128,.07); box-shadow:0 0 0 1px rgba(74,222,128,.12) inset; }
+  .viewport-review-card input{ flex:none; margin-top:3px; accent-color:#86efac; }
+  .viewport-review-card .viewport-card-body{ min-width:0; display:flex; flex-direction:column; gap:3px; }
+  .viewport-review-card .viewport-card-title{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:var(--hf-fs-sm); font-weight:650; }
+  .viewport-review-card .viewport-role{ color:var(--hf-text); text-transform:capitalize; }
+  .viewport-review-card .viewport-status{ color:#fcd34d; font-size:10px; letter-spacing:.35px; text-transform:uppercase; }
+  .viewport-review-card:has(input:checked) .viewport-status{ color:#86efac; }
+  .viewport-review-card .viewport-card-detail{ color:var(--hf-muted); font-size:11px; line-height:1.45; overflow-wrap:anywhere; }
+  .viewport-review-card .viewport-card-detail code{ color:var(--hf-muted); font-size:10px; }
+  @media(max-width:700px){ .viewport-review-grid{ grid-template-columns:1fr; } }
   .fp-point-review{ margin-top:10px; padding:10px; border:1px solid var(--hf-line); border-radius:8px; background:rgba(0,0,0,.18); }
   .fp-point-review-stage{ position:relative; overflow:auto; max-height:520px; background:#fff; }
   .fp-point-review-stage img{ display:block; width:100%; height:auto; }
@@ -515,12 +532,20 @@
             ? (' / transform '+num(viewport.transform_ft[0])+' x '+num(viewport.transform_ft[1])+' ft') : '';
           var sourceBox=viewportBox(viewport.source_bbox_pt);
           var geometryBox=viewportBox(viewport.geometry_bbox_pt);
+          var attested=priorViewportAttestations.some(function(item){return item&&item.block_id===viewport.block_id&&item.role===viewport.role;});
+          var role=String(viewport.role||'viewport');
+          var roleLabel=role==='upper'?'Upper viewport':(role==='lower'?'Lower viewport':role);
+          var status=attested?'attested':'needs check';
           var boxes=(sourceBox||geometryBox)
-            ? (' / source bbox ['+esc(sourceBox||'&mdash;')+']'+(geometryBox?' / geometry bbox ['+esc(geometryBox)+']':'')) : '';
-          return '<label class="spatial-viewport" data-viewport-role="'+esc(viewport.role||'')+'">'
-            + (viewportProvenance.length>1?'<input type="checkbox" class="viewport-attestation" data-viewport-block="'+esc(viewport.block_id||'')+'"'+(priorViewportAttestations.some(function(item){return item&&item.block_id===viewport.block_id&&item.role===viewport.role;})?' checked':'')+' /> ':'')
-            + esc(viewport.role||'viewport')+' ('+esc(viewport.block_id||'')+')'+dims+transform+boxes+'</label>';
-        }).join(' &middot; ');
+            ? ('source bbox ['+esc(sourceBox||'—')+']'+(geometryBox?' · geometry bbox ['+esc(geometryBox)+']':'')) : 'No registered bbox';
+          return '<label class="viewport-review-card spatial-viewport" data-viewport-role="'+esc(role)+'">'
+            + (viewportProvenance.length>1?'<input type="checkbox" class="viewport-attestation" data-viewport-block="'+esc(viewport.block_id||'')+'" aria-label="Attest '+esc(role)+' viewport '+esc(viewport.block_id||'')+'"'+(attested?' checked':'')+' />':'')
+            + '<span class="viewport-card-body"><span class="viewport-card-title"><span class="viewport-role">'+esc(roleLabel)+'</span> <span class="viewport-id">'+esc(role)+' ('+esc(viewport.block_id||'')+')</span><span class="viewport-status">'+status+'</span></span>'
+            + '<span class="viewport-card-detail">'+esc((dims+transform).replace(/^\s*\/\s*/,'')||'Registered composite view')+'<br><code>'+boxes+'</code></span></span></label>';
+        }).join('');
+        var viewportScope=viewportProvenance.length>1
+          ? '<div class="viewport-scope"><strong>Composite scope · '+num(viewportProvenance.length)+' registered views</strong><small><b>Registered source viewports:</b> compare every outlined source view before accepting this plate. A-101 requires both upper and lower attestations; the badge remains pending until each checked box is recorded.</small><div class="viewport-review-grid">'+viewportRows+'</div></div>'
+          : (viewportRows?'<div class="viewport-scope"><strong>Single registered view</strong><small>Confirm the source outline and geometry before recording a decision.</small><div class="viewport-review-grid">'+viewportRows+'</div></div>':'');
         var physicalPage=page.physical_page_number==null?'&mdash;':num(page.physical_page_number);
         var pageIndex=page.page_index==null?'&mdash;':num(page.page_index);
         var overlayFrame=urls.overlay_png

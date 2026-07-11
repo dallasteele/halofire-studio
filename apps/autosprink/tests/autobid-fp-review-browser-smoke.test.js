@@ -198,6 +198,7 @@ describe('AutoBid FP vector semantic review browser boundary', () => {
       expect(pointReviewText).toContain('Blind review');
       expect(pointReviewText).toContain('no expected count is supplied');
       expect(await page.locator('.fpPointPage').count()).toBe(1);
+      expect(await page.locator('.fpPointSourceStatus').innerText()).toContain('Source raster verified');
       expect(await page.locator('.fpPointDecision[data-decision="accepted"]').isEnabled()).toBe(true);
       const reviewDb = new Database(path.join(tempDir, 'autobid.db'), { readonly: true });
       try {
