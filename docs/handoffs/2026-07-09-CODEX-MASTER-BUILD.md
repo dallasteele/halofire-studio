@@ -795,3 +795,27 @@ The continuation work remains deliberately below the completion bar:
 - This is a real source-identity/runtime correction, not an accepted-geometry claim.
   The model remains needs-verification until the source PDF is available for exact
   rendered-page binding and a trusted human accepts the required spatial/FP rows.
+
+## 36. CODEX CONTINUATION EVIDENCE - 2026-07-11 (SOURCE-RASTER UI FAIL-CLOSED DEPLOYMENT)
+
+- Studio `b1534bc` makes the source-raster binding a visible, functional review
+  prerequisite. Each plate now displays the rendered source-page SHA-256 (or an
+  explicit unavailable state), disables both Accept and Reject when that hash is
+  absent, and refuses decision events before an exact 64-character hash is present.
+  Decision payloads carry `expected_rendered_page_sha256` alongside the PNG and
+  manifest hashes; this preserves the backend's typed 409 fail-closed behavior
+  instead of presenting a misleading actionable review control.
+- The focused Studio source/spatial/geometry/workbench suite is **18 passed**.
+  The scoped UI was deployed to VPS `187.124.234.28`; `halofire.service` is active.
+  A fresh authenticated browser run of `/autobid-send.html?ref=9` renders all **8**
+  Cooperative plates, shows physical pages 44/47/50/53/56/59/62/65, and reports
+  all **16** spatial decision buttons disabled with the visible reason
+  `Source raster unavailable on the canonical runtime`. The rendered evidence is
+  `out/agent-loops/halofire-master-build-20260711/live-ops/send-source-raster-gate.png`;
+  the only browser console item is the expected HTTP-origin COOP warning.
+- This closes a UI honesty/deployment slice, not the acceptance goal. The VPS still
+  lacks the canonical source PDF mount, so rendered-page hashes remain null and no
+  spatial/FP/density/N6 acceptance row or bid-grade geometry claim is created. The
+  remaining unblock is to provision the trusted source-PDF mount and authorized
+  reviewer/identity path, then collect independent receipts without answer-key
+  leakage and re-run the frozen gates.
