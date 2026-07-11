@@ -191,10 +191,10 @@ describe('buildCadModel (building) — per-space component markers', () => {
     expect(components.some((c) => c.componentKey === 'fitting_tee')).toBe(true);
   });
 
-  it('emits at least one riser_assembly per space that has a network', () => {
+  it('emits one shared riser assembly for a multi-space system', () => {
     const risers = components.filter((c) => c.componentKey === 'riser_assembly');
-    // both A and B get sprinkler networks -> at least 2 risers
-    expect(risers.length).toBeGreaterThanOrEqual(2);
+    // A and B share one building system; duplicating the riser per room is invalid.
+    expect(risers).toHaveLength(1);
   });
 
   it('lifts component markers on an upper story (Z offset by baseElevationFt)', () => {

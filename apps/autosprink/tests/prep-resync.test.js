@@ -8,7 +8,7 @@ const adapterTsPath = path.join(ROOT, 'src/engine/adapter.ts');
 const adapterJsPath = path.join(ROOT, 'src/engine/adapter.js');
 const autosprinkHtmlPath = path.join(ROOT, 'autosprink.html');
 
-test('prep resync keeps adapter.js and fail-fast module load guards in place', () => {
+test('prep resync keeps current engine imports and fail-fast module load guards in place', () => {
   assert.equal(fs.existsSync(adapterTsPath), false, 'src/engine/adapter.ts should not exist');
   assert.equal(fs.existsSync(adapterJsPath), true, 'src/engine/adapter.js should exist');
 
@@ -16,13 +16,13 @@ test('prep resync keeps adapter.js and fail-fast module load guards in place', (
 
   assert.match(
     html,
-    /import\s*\{\s*getBom,\s*getNfpaReport\s*\}\s*from\s*'\/src\/engine\/adapter\.js';/,
-    'autosprink.html should import getBom/getNfpaReport from /src/engine/adapter.js',
+    /import\s*\{\s*buildHydraulicReport,\s*renderReportHtml\s*\}\s*from\s*'\/src\/engine\/nfpa-report\.js';/,
+    'autosprink.html should import the current hydraulic report adapter',
   );
-  assert.doesNotMatch(
+  assert.match(
     html,
-    /import\s*\{\s*getBom,\s*getNfpaReport\s*\}\s*from\s*'\/src\/engine\/ui-panels\.js';/,
-    'autosprink.html should not import getBom/getNfpaReport from /src/engine/ui-panels.js',
+    /import\s*\{\s*acceptedModel3dToLevels\s*\}\s*from\s*'\/src\/engine\/accepted-model3d\.js';/,
+    'autosprink.html should import the accepted model handoff adapter',
   );
 
   const errorTrapIndex = html.indexOf('window.__hfErrs = window.__hfErrs || [];');

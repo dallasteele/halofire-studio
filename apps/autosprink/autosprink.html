@@ -20,7 +20,7 @@
     --shadow-overlay:0 1px 0 var(--line) inset, 0 16px 48px rgba(0,0,0,0.50);
     --shadow-recess:0 1px 0 rgba(0,0,0,0.40) inset, 0 -1px 0 rgba(255,255,255,0.03) inset;
   }
-  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:12px;-webkit-font-smoothing:antialiased}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:400 var(--type-md) var(--font);-webkit-font-smoothing:antialiased}
   body{background:
     radial-gradient(1200px 700px at 70% -10%, rgba(217,164,65,0.06), transparent 60%),
     radial-gradient(900px 600px at 15% 110%, rgba(90,169,230,0.05), transparent 55%),
@@ -452,8 +452,8 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       radial-gradient(150% 120% at 18% 0%, rgba(var(--hf-ember-rgb,232,67,45),0.12), transparent 58%),
       rgba(var(--hf-glass-tint),0.82);
     border-color:rgba(255,255,255,0.14);
-    backdrop-filter:blur(28px) saturate(1.4);
-    -webkit-backdrop-filter:blur(28px) saturate(1.4);
+    backdrop-filter:blur(28px) saturate(1.35);
+    -webkit-backdrop-filter:blur(28px) saturate(1.35);
   }
   /* the dockable glass panels INSIDE the asides get the same selected-color wash so
      This Job / Layers / Inspector / Properties all visibly carry the theme tint. */
@@ -915,6 +915,15 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 </div>
 
 <script src="/public/halofire-menubar.js"></script>
+<script>
+window.__hfErrs = window.__hfErrs || [];
+window.addEventListener('error', (event) => {
+  window.__hfErrs.push({ type: 'error', message: String(event.message || 'module load error') });
+});
+window.addEventListener('unhandledrejection', (event) => {
+  window.__hfErrs.push({ type: 'unhandledrejection', message: String(event.reason || 'unhandled rejection') });
+});
+</script>
 <script type="importmap">
 {
   "imports": {

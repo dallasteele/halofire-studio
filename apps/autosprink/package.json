@@ -16,6 +16,7 @@
     "smoke:public-readonly-evidence": "node scripts/smoke-public-readonly-evidence.mjs",
     "start": "node src/api/server.js",
     "cron": "node src/cron/scheduler.js",
+    "test:node": "node --test tests/fitting-orient.test.js tests/prep-resync.test.js tests/real-sprinkler-head.test.js tests/reducer-position.test.js tests/scale-audit.test.js tests/sel-bracket.test.js tests/threaded-nipple.test.js tests/toolbar-modal.test.js tests/typography-shell.test.js",
     "skill:list": "node src/core/skill-runner.js --list",
     "skill:run": "node src/core/skill-runner.js --run",
     "db:migrate": "node src/db/migrate.js",

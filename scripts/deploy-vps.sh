@@ -29,6 +29,8 @@ say() { printf '\n=== %s ===\n' "$1"; }
 say "LOCAL GATES (autosprink — unit/integration, excl. flaky browser-smoke)"
 ( cd "$REPO_ROOT/apps/autosprink" && npx vitest run --exclude '**/*browser*smoke*.test.js' --exclude '**/*smoke*browser*.test.js' >/tmp/hf-deploy-asprink.log 2>&1 ) \
   || { echo "autosprink tests FAILED — aborting deploy"; tail -25 /tmp/hf-deploy-asprink.log; exit 1; }
+( cd "$REPO_ROOT/apps/autosprink" && npm run test:node >>/tmp/hf-deploy-asprink.log 2>&1 ) \
+  || { echo "autosprink standalone node tests FAILED; aborting deploy"; tail -25 /tmp/hf-deploy-asprink.log; exit 1; }
 echo "autosprink: green"
 
 if [ "${1:-}" != "--skip-cad" ]; then

@@ -226,7 +226,7 @@
 
   async function openDoc(doc) {
     S.doc = doc; S.pdf = null; S.pdfDoc = null; S.page = null;
-    LAY.doc = null; LAY.plates = null;   // invalidate cached per-room layout for the old doc
+    LAY.doc = null; LAY.plates = null; LAY.accepted = false; LAY.pendingReason = null; // invalidate cached per-room layout for the old doc
     $('sheetList').innerHTML = '<div class="note" style="padding:14px;color:var(--hf-muted);font-size:12px">loading sheets…</div>';
     $('docMeta').innerHTML = 'loading…';
     let d;
@@ -666,7 +666,7 @@
   // the open sheet. True-scale schematic in the footprint-ft frame (room rects +
   // color-coded heads + routed pipe) — registration-safe (no raster overlay), the
   // faithful per-room placement, not the uniform bbox blanket.
-  const LAY = { doc: null, plates: null, loading: false };
+  const LAY = { doc: null, plates: null, loading: false, accepted: false, pendingReason: null };
   function pipeStyleLay(sz) {
     const s = Number(sz) || 0;
     if (s >= 6) return { color: '#f0a868', w: 2.2 };   // cross main (8"/6")
@@ -691,9 +691,30 @@
     const svgW = Math.round(W * k + pad * 2), svgH = Math.round(H * k + pad * 2);
     const X = (x) => (pad + (x - (b.min_x || 0)) * k).toFixed(1);
     const Y = (y) => (pad + ((b.max_y || H) - y) * k).toFixed(1);   // flip y so north up
-    const rooms = (p.rooms || []).map((r) =>
-      '<rect x="' + X(r.x0_ft) + '" y="' + Y(r.y1_ft) + '" width="' + ((r.x1_ft - r.x0_ft) * k).toFixed(1) +
-      '" height="' + ((r.y1_ft - r.y0_ft) * k).toFixed(1) + '" fill="rgba(74,222,128,.06)" stroke="rgba(74,222,128,.45)" stroke-width="0.6" />').join('');
+    const point = (value) => {
+      if (Array.isArray(value) && value.length >= 2) return [Number(value[0]), Number(value[1])];
+      if (value && Number.isFinite(Number(value.x)) && Number.isFinite(Number(value.y))) return [Number(value.x), Number(value.y)];
+      return null;
+    };
+    const rooms = (p.rooms || []).map((r) => {
+      const poly = r.polygon_ft || r.poly;
+      if (Array.isArray(poly) && poly.length >= 3) {
+        const points = poly.map(point);
+        if (points.every((v) => v && Number.isFinite(v[0]) && Number.isFinite(v[1]))) {
+          const d = 'M ' + points.map((v) => X(v[0]) + ' ' + Y(v[1])).join(' L ') + ' Z';
+          return '<path d="' + d + '" fill="rgba(74,222,128,.06)" stroke="rgba(74,222,128,.45)" stroke-width="0.6" />';
+        }
+      }
+      return '<rect x="' + X(r.x0_ft) + '" y="' + Y(r.y1_ft) + '" width="' + ((r.x1_ft - r.x0_ft) * k).toFixed(1) +
+        '" height="' + ((r.y1_ft - r.y0_ft) * k).toFixed(1) + '" fill="rgba(74,222,128,.06)" stroke="rgba(74,222,128,.45)" stroke-width="0.6" />';
+    }).join('');
+    const walls = (p.wallRuns || []).map((w) => {
+      const a = point(w.a || w.start || w.p0 || { x: w.x0, y: w.y0 });
+      const z = point(w.b || w.end || w.p1 || { x: w.x1, y: w.y1 });
+      if (!a || !z) return '';
+      return '<line x1="' + X(a[0]) + '" y1="' + Y(a[1]) + '" x2="' + X(z[0]) + '" y2="' + Y(z[1]) +
+        '" stroke="rgba(248,113,113,.78)" stroke-width="1" stroke-linecap="round" />';
+    }).join('');
     const segs = ((p.pipe || {}).segments || []).map((s) => {
       if (s.x1 === s.x2 && s.y1 === s.y2) return '';      // skip zero-length riser stub
       const st = pipeStyleLay(s.size_in);
@@ -706,24 +727,32 @@
       ? '<rect x="' + (X(p.pipe.riser.x) - 3) + '" y="' + (Y(p.pipe.riser.y) - 3) + '" width="6" height="6" fill="#f87171" />' : '';
     return '<div class="planwrap" style="background:#0c1018;border:1px solid var(--hf-line);border-radius:8px;padding:5px">' +
       '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;height:auto" role="img" aria-label="Per-room sprinkler layout ' + esc(p.label || '') + '">' +
-      rooms + segs + heads + riser + '</svg></div>';
+      walls + rooms + segs + heads + riser + '</svg></div>';
   }
   async function ensureLayoutData() {
     if (!S.doc) return null;
     if (LAY.doc === S.doc && LAY.plates) return LAY.plates;
     if (LAY.loading) return null;
     LAY.loading = true;
-    $('layNote').textContent = 'loading per-room layout from the engine (one extraction, ~cached)…';
+    $('layNote').textContent = 'loading accepted vector drawing from the package…';
     try {
-      const resp = await api('/layout/' + S.doc + '?by=doc');
+      // The legacy /layout route is allowed to return a raster/rectangle candidate.
+      // Read the package acceptance surface instead so this page cannot present that
+      // provisional candidate as a reviewable drawing.
+      const resp = await api('/package/' + S.doc + '?by=doc');
       const d = await resp.json();
       const sd = d.studio_drawing || {};
-      if (!resp.ok || sd.available === false || !(sd.plates || []).length) {
-        $('layNote').innerHTML = '<span class="bad">no per-room layout for this doc</span>' +
-          (sd.reason ? ' — ' + esc(sd.reason) : ' (doc has no indexed floor-plan sheets).');
-        LAY.doc = S.doc; LAY.plates = null; return null;
+      const accepted = d.accepted_geometry_drawing || {};
+      if (!resp.ok || accepted.available !== true || accepted.accepted_geometry !== true || sd.accepted_geometry !== true || !(sd.plates || []).length) {
+        const reason = accepted.reason || sd.accepted_geometry_reason || 'accepted vector geometry is not available';
+        $('layNote').innerHTML = '<span class="bad">geometry review pending</span> — ' +
+          'the provisional raster/rectangle drawing is withheld until a stored vector overlay is accepted (' + esc(reason) + ').';
+        $('layVerdict').innerHTML = '<span class="bad">pending human overlay review</span>';
+        $('laySvg').innerHTML = '';
+        $('layLeg').style.display = 'none';
+        LAY.doc = S.doc; LAY.plates = null; LAY.accepted = false; LAY.pendingReason = reason; return null;
       }
-      LAY.doc = S.doc; LAY.plates = sd.plates;
+      LAY.doc = S.doc; LAY.plates = sd.plates; LAY.accepted = true; LAY.pendingReason = null;
       LAY._summary = { plate_count: sd.plate_count, head_count: sd.head_count, total_pipe_ft: sd.total_pipe_ft, cohesion_ok: sd.cohesion_ok };
       return LAY.plates;
     } catch (e) {
@@ -750,9 +779,9 @@
         : '<span class="bad">disjoint network</span>';
       $('laySvg').innerHTML = platePlanSVG(p);
       $('layLeg').style.display = 'flex';
-      $('layNote').innerHTML = 'Per-room NFPA grid on the real ' + esc(p.label || '') + ' rooms (' +
+      $('layNote').innerHTML = 'Accepted vector walls + polygon rooms with per-room NFPA heads on ' + esc(p.label || '') + ' (' +
         (LAY._summary ? LAY._summary.plate_count + ' plates / ' + Number(LAY._summary.head_count).toLocaleString() + ' heads whole-building' : '') +
-        '). <b>Honest residual:</b> pipe is a coarse routed tree (is_estimate), heads are the faithful per-room placement.';
+        '). <b>Honest residual:</b> pipe is a coarse routed tree (is_estimate), heads are clipped to accepted room polygons.';
     } finally { btn.textContent = lbl; if (S.doc) btn.disabled = false; }
   }
   // enable the layout button once a sheet is open; auto-refresh the panel header on sheet change
