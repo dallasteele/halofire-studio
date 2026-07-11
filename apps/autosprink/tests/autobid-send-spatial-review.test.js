@@ -15,7 +15,7 @@ describe('AutoBid final spatial review panel', () => {
     const density = html.indexOf('+     densityResolutionPanel(p)');
     expect(density).toBeGreaterThan(geometry);
     expect(spatial).toBeGreaterThan(geometry);
-    const fpVector = html.indexOf('+     fpVectorReviewPanel(p.fp_vector_review)');
+    const fpVector = html.indexOf('+     fpVectorReviewPanel(p.fp_vector_review, docId)');
     expect(fpVector).toBeGreaterThan(spatial);
     expect(model3d).toBeGreaterThan(spatial);
     expect(design).toBeGreaterThan(model3d);
@@ -52,7 +52,14 @@ describe('AutoBid final spatial review panel', () => {
   });
 
   it('renders FP vector candidates as estimator-visible, non-gating review evidence', () => {
-    expect(html).toContain('function fpVectorReviewPanel(fp)');
+    expect(html).toContain('function fpVectorReviewPanel(fp, docId)');
+    expect(html).toContain('function fpVectorMaterializationPanel(docId)');
+    expect(html).toContain('function bindFpMaterialization(docId)');
+    expect(html).toContain("api('/sheets?doc='+encodeURIComponent(docId))");
+    expect(html).toContain("api('/fp-vector-artifacts/materialize'");
+    expect(html).toContain('source_pdf_sha256:String(sheet.source_pdf_sha256||\'\').toLowerCase()');
+    expect(html).toContain('No candidate was generated');
+    expect(html).toContain('candidate scan only');
     expect(html).toContain('id="fpVectorReviewPanel"');
     expect(html).toContain('data-fp-vector-artifact=');
     expect(html).toContain('fp-vector-overlay');

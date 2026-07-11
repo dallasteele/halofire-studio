@@ -840,9 +840,17 @@
         + plates+'</div></section>';
     }
 
-    function fpVectorReviewPanel(fp){
+    function fpVectorMaterializationPanel(docId){
+      if(!docId) return '<div class="note">No canonical geometry document is resolved; FP materialization is unavailable.</div>';
+      return '<div class="fp-materialize-panel" id="fpVectorMaterializePanel">'
+        + '<div class="note"><b>Generate a source-bound candidate.</b> Select an indexed fire-protection sheet to scan its vector layer. This creates a truth-free overlay only; it never records a count, clears a gate, or replaces human review.</div>'
+        + '<div id="fpVectorMaterializeBody"><div class="note">Loading indexed FP sheets…</div></div>'
+        + '</div>';
+    }
+
+    function fpVectorReviewPanel(fp, docId){
       if(!fp){
-        return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span><span class="pill warn">unavailable</span></div><div class="pbd"><div class="note">No bound FP vector candidate overlay is attached. This review aid never clears spatial verification or bid-grade.</div></div></section>';
+        return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span><span class="pill warn">unavailable</span><span class="pill warn" id="qwenFloorplanStatus">vision assist: checking</span></div><div class="pbd"><div class="note">No bound FP vector candidate overlay is attached. This review aid never clears spatial verification or bid-grade.</div>'+fpVectorMaterializationPanel(docId)+'</div></section>';
       }
       var status=fp.status||'missing';
       var artifacts=fp.artifacts||[];
@@ -897,10 +905,62 @@
       if(!rows) rows='<div class="note">No document-bound FP vector candidate overlay is available.</div>';
       return '<section class="hf-panel mt" id="fpVectorReviewPanel"><div class="phd"><span class="t">FP vector-symbol review</span>'+head+'<span class="pill warn" id="qwenFloorplanStatus">vision assist: checking</span></div><div class="pbd">'
         + '<div class="note" style="margin-bottom:12px">These repeated-vector candidates are estimator-visible review evidence only. They are not sprinkler counts, do not carry answer-key truth, and never clear the spatial or bid-grade gates.</div>'
-        + rows+'</div></section>';
+        + fpVectorMaterializationPanel(docId)+rows+'</div></section>';
     }
 
-    function bindFpVectorReview(fp){
+    function bindFpMaterialization(docId){
+      var body=document.getElementById('fpVectorMaterializeBody');
+      if(!body || !docId) return;
+      api('/sheets?doc='+encodeURIComponent(docId)).then(function(response){
+        return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json,status:response.status};});
+      }).then(function(result){
+        if(!result.ok) throw new Error((result.json&&(result.json.detail||result.json.error))||('HTTP '+result.status));
+        var sheets=Array.isArray(result.json.sheets)?result.json.sheets.filter(function(sheet){
+          return sheet && sheet.fp_review===true;
+        }):[];
+        if(!sheets.length){
+          body.innerHTML='<div class="note">No indexed fire-protection sheet is available for this document. No candidate was generated.</div>';
+          return;
+        }
+        body.innerHTML='<div class="fp-materialize-grid">'+sheets.map(function(sheet,index){
+          var page=Number(sheet.page_index), physical=Number(sheet.physical_page_number);
+          var source=String(sheet.source_pdf_sha256||'').toLowerCase();
+          var valid=Number.isInteger(page)&&page>=0&&Number.isInteger(physical)&&physical===page+1&&/^[0-9a-f]{64}$/.test(source);
+          return '<article class="review-action fp-materialize-card" data-fp-materialize-index="'+index+'">'
+            + '<div class="review-action-head"><strong>'+esc(sheet.sheet_label||('FP page '+physical))+'</strong><span class="review-action-status">physical '+esc(physical)+'</span></div>'
+            + '<div class="review-action-detail">Indexed source page '+esc(page)+' · PDF '+esc(digest(source))+' · candidate scan only.</div>'
+            + '<button class="btn fpMaterializeButton" data-fp-materialize-index="'+index+'" '+(valid?'':'disabled')+'>Materialize candidate →</button>'
+            + '<div class="note fpMaterializeResult" role="status"></div></article>';
+        }).join('')+'</div>';
+        Array.prototype.forEach.call(document.querySelectorAll('.fpMaterializeButton'),function(button){
+          button.addEventListener('click',function(){
+            var index=Number(button.getAttribute('data-fp-materialize-index'));
+            var sheet=sheets[index]||{};
+            var resultNode=button.parentNode.querySelector('.fpMaterializeResult');
+            button.disabled=true;
+            if(resultNode) resultNode.textContent='Materializing the immutable source-bound overlay…';
+            api('/fp-vector-artifacts/materialize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+              document_id:Number(docId), page_index:Number(sheet.page_index),
+              physical_page_number:Number(sheet.physical_page_number),
+              sheet_label:String(sheet.sheet_label||''),
+              source_pdf_sha256:String(sheet.source_pdf_sha256||'').toLowerCase()
+            })}).then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json,status:response.status};});})
+              .then(function(response){
+                if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||('materialization blocked (HTTP '+response.status+')'));
+                if(resultNode) resultNode.textContent='Candidate stored. Reloading the source-bound review panel…';
+                location.reload();
+              }).catch(function(error){
+                if(resultNode) resultNode.textContent='Candidate not generated: '+error.message+' No gate changed.';
+                button.disabled=false;
+              });
+          });
+        });
+      }).catch(function(error){
+        body.innerHTML='<div class="note">Indexed FP sheets unavailable: '+esc(error.message)+'. No candidate was generated.</div>';
+      });
+    }
+
+    function bindFpVectorReview(fp, docId){
       var artifacts=(fp&&fp.artifacts)||[];
       var visionStatus=document.getElementById('qwenFloorplanStatus');
       if(visionStatus){
@@ -922,6 +982,7 @@
             visionStatus.textContent='vision assist: status unknown';
           });
       }
+      bindFpMaterialization(docId);
       artifacts.forEach(function(artifact,index){
         var image=document.querySelector('[data-fp-vector-overlay-index="'+index+'"]');
         var result=document.getElementById('fpVectorResult'+index);
@@ -1324,7 +1385,7 @@
       +     densityHeldoutReviewPanel()
       +     acceptanceActionManifest()
       +     spatialVerificationPanel(p.spatial_verification)
-      +     fpVectorReviewPanel(p.fp_vector_review)
+      +     fpVectorReviewPanel(p.fp_vector_review, docId)
       +     reconcilePanel(p.head_reconcile)
       +     verificationPanel(p.verification)
 
@@ -1381,7 +1442,7 @@
       bindSpatialReview(p.spatial_verification);
       bindSpatialReviewerContext();
       bindSpatialReviewFrames();
-      bindFpVectorReview(p.fp_vector_review);
+      bindFpVectorReview(p.fp_vector_review, docId);
       bindDensityHeldoutReview();
       bindAcceptanceActionManifest();
 
