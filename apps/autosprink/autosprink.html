@@ -26,14 +26,15 @@
     radial-gradient(900px 600px at 15% 110%, rgba(90,169,230,0.05), transparent 55%),
     var(--bg);}
   /* ====== APPLE-GLASS APP FRAME (chrome / menubar / toolbar / body / statusbar) ====== */
-  #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:42px 34px 40px 1fr 30px;height:100vh;width:100vw}
+  #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:48px 34px 40px 1fr 30px;height:100vh;width:100vw}
 
-  /* ---- TOP CHROME (header) ---- */
-  header{grid-column:1/-1;grid-row:1;z-index:100;display:flex;align-items:center;gap:16px;padding:0 16px;
-    background:linear-gradient(180deg, rgba(28,33,40,0.85), rgba(16,19,24,0.92));
-    -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
-    border-bottom:1px solid var(--line);
-    box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 10px rgba(0,0,0,0.4)}
+  /* ---- TOP CHROME (header) ----
+     The Studio header IS the shared shell appbar (.hf-appbar) mounted inside the
+     #app grid (grid-row:1). All glass/background/border styling is inherited from
+     public/styles/halofire-glass.css .hf-appbar so it matches every other page;
+     we only pin its grid placement here. position:static keeps it in the grid cell
+     (the shared rule's sticky is meaningless inside a fixed-height grid row). */
+  header#studioAppbar{grid-column:1/-1;grid-row:1;z-index:100;position:static}
   .brand{display:flex;align-items:baseline;gap:8px;font-weight:700;font-style:italic;font-size:15px;color:var(--bright);letter-spacing:0.2px}
   .brand span{color:var(--hf-fire-color, var(--gold))}
   .brand small{font-style:normal;font-weight:600;font-size:10px;color:var(--muted);letter-spacing:1.4px;text-transform:uppercase;margin-left:6px}
@@ -42,7 +43,7 @@
   .badge{font-family:var(--font);font-size:9.5px;letter-spacing:0.6px;text-transform:uppercase;color:var(--gold);
     border:1px solid rgba(217,164,65,0.35);background:var(--gold-dim);border-radius:99px;padding:3px 10px}
   .role-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;color:var(--text);
-    background:rgba(14,17,21,0.85);border:1px solid var(--line);box-shadow:var(--shadow-recess);font-size:11px}
+    background:rgba(var(--hf-glass-tint,14,17,21),0.85);border:1px solid var(--line);box-shadow:var(--shadow-recess);font-size:11px}
   .role-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
   /* consistent app nav in the Studio chrome (matches the shared app bar on other pages) */
   header .studio-nav{display:flex;align-items:center;gap:2px}
@@ -55,13 +56,13 @@
   /* ---- TOP MENU BAR (single row, full width) ---- */
   #menuChrome{grid-column:1/-1;grid-row:2;position:relative;z-index:110;display:flex;align-items:stretch;min-height:0;overflow:visible;
     padding:0 10px;
-    background:linear-gradient(180deg, rgba(24,28,34,0.78), rgba(15,18,23,0.85));
+    background:linear-gradient(180deg, rgba(var(--hf-glass-tint),0.82), rgba(var(--hf-glass-tint),0.88));
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
     border-bottom:1px solid var(--line)}
   /* ---- TOOLBAR (draw / edit / snap / readout) ---- */
   #toolBar{grid-column:1/-1;grid-row:3;position:relative;z-index:90;display:flex;align-items:center;gap:6px;
     padding:0 10px;
-    background:linear-gradient(180deg, rgba(20,24,30,0.7), rgba(13,16,20,0.82));
+    background:linear-gradient(180deg, rgba(var(--hf-glass-tint),0.72), rgba(var(--hf-glass-tint),0.84));
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
     border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:visible;white-space:nowrap}
   #toolBar .tb-label{font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin:0 2px 0 6px}
@@ -83,11 +84,20 @@
   .seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
   .seg button{background:var(--panel2);color:var(--muted);border:none;padding:5px 11px;font-size:12px;cursor:pointer}
   .seg button.on{background:var(--gold-dim);color:var(--gold-bright)}
-  aside{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0) 40%), rgba(22,26,32,0.72);
+  aside{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0) 40%), rgba(var(--hf-glass-tint,22,26,32),0.72);
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);overflow-y:auto;padding:12px;
     display:flex;flex-direction:column;gap:10px}
-  aside::-webkit-scrollbar{width:8px}
-  aside::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:6px}
+  /* HF-THEME-SURFACES: GLASS scrollbars tinted by the SELECTED glass color — no raw OS bar.
+     Applies to the asides and every scrollable .pbody/inspector/level panel. */
+  aside::-webkit-scrollbar, .pbody::-webkit-scrollbar, #inspector::-webkit-scrollbar, #levelPanel::-webkit-scrollbar{width:10px;height:10px}
+  aside::-webkit-scrollbar-track, .pbody::-webkit-scrollbar-track, #inspector::-webkit-scrollbar-track, #levelPanel::-webkit-scrollbar-track{background:transparent}
+  aside::-webkit-scrollbar-thumb, .pbody::-webkit-scrollbar-thumb, #inspector::-webkit-scrollbar-thumb, #levelPanel::-webkit-scrollbar-thumb{
+    background:linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.04)), rgba(var(--hf-glass-tint,22,26,32),0.92);
+    border:2px solid transparent;background-clip:padding-box;border-radius:9px}
+  aside::-webkit-scrollbar-thumb:hover, .pbody::-webkit-scrollbar-thumb:hover, #inspector::-webkit-scrollbar-thumb:hover, #levelPanel::-webkit-scrollbar-thumb:hover{
+    background:linear-gradient(180deg, rgba(var(--hf-accent-rgb,217,164,65),0.55), rgba(var(--hf-accent-rgb,217,164,65),0.28)), rgba(var(--hf-glass-tint,22,26,32),0.95);
+    background-clip:padding-box}
+  aside,.pbody,#inspector,#levelPanel{scrollbar-width:thin;scrollbar-color:rgba(var(--hf-glass-tint,22,26,32),0.95) transparent}
   /* ---- STATUS BAR (bottom command line) ---- */
   #statusBar{grid-column:1/-1;grid-row:5;z-index:10;display:flex;align-items:center;gap:12px;padding:0 12px;
     background:linear-gradient(180deg, rgba(18,22,28,0.82), rgba(11,14,18,0.9));
@@ -105,17 +115,152 @@
   #statusBar .pip .gl{width:6px;height:6px;border-radius:50%;background:var(--ok)}
   #statusBar .seg-s{padding:0 4px}
   #statusBar a{color:var(--muted);text-decoration:none}
-  /* dockable glass panel inside the asides (This Job / Next Actions / Layers / Tools·Design / Properties) */
-  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0) 40%), rgba(22,26,32,0.72);
+  /* HF-TOOLWINDOW (user /design-critique 2026-06-15): the canonical UE-style tool window.
+     ONE shared component = glass FRAME + pinned HEADER (collapse toggle) + SCROLLABLE
+     body (glass scrollbar) + drag-RESIZE edge. Every Studio dock panel (This Job /
+     Next Actions / Tools·Design / Layers / Properties) is a .panel, so they all inherit
+     the same window behavior. Sizes + collapse state persist per-user (localStorage),
+     keyed by panel title.
+     HF-THEME-SURFACES: surface tints from the SELECTED glass color (--hf-glass-tint),
+     never a hardcoded slab — so the Settings theme picker recolors every tool window. */
+  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0) 40%), rgba(var(--hf-glass-tint,22,26,32),0.72);
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
-    border:1px solid var(--line);border-radius:var(--r-panel);box-shadow:var(--shadow-panel);position:relative;overflow:hidden}
-  .phead{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);user-select:none}
+    border:1px solid var(--line);border-radius:var(--r-panel);box-shadow:var(--shadow-panel);position:relative;overflow:hidden;
+    display:flex;flex-direction:column;min-height:0;flex:0 0 auto}
+  .phead{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);user-select:none;flex:0 0 auto;cursor:default}
   .phead .grip{display:flex;flex-direction:column;gap:2px}
   .phead .grip i{width:11px;height:1.5px;background:var(--faint);border-radius:2px;display:block}
   .phead .ptitle{font-size:10.5px;letter-spacing:0.9px;text-transform:uppercase;color:var(--muted);font-weight:600;flex:1}
-  .phead .pbtn{color:var(--faint)}
-  .pbody{padding:10px}
-  .well{background:rgba(14,17,21,0.85);border-radius:var(--r-control);box-shadow:var(--shadow-recess);padding:9px 10px}
+  /* collapse chevron is now an interactive control */
+  .phead .pbtn{color:var(--faint);cursor:pointer;font-size:12px;line-height:1;padding:2px 4px;border-radius:5px;
+    transition:transform .16s ease,color .12s,background .12s;transform-origin:50% 45%}
+  .phead .pbtn:hover{color:var(--bright);background:rgba(255,255,255,0.07)}
+  .panel.tw-collapsed .pbtn{transform:rotate(-90deg)}
+  /* HF-TOOLWINDOW: body SCROLLS (glass scrollbar) when content exceeds the window's
+     height cap, so long panels never clip at the window edge. The cap is per-panel
+     (--pbody-max) and is what the resize handle drags. */
+  .pbody{padding:10px;overflow-y:auto;overflow-x:hidden;min-height:0;max-height:var(--pbody-max,60vh);overscroll-behavior:contain}
+  .panel.tw-collapsed .pbody,.panel.tw-collapsed .tw-resize{display:none}
+  /* HF-TOOLWINDOW: drag-RESIZE edge — a thin glass grip pinned at the window bottom.
+     Dragging it grows/shrinks the scrollable body; the handle is a flex sibling so it
+     stays visible (never clipped) and the body scrolls within the chosen height. */
+  .tw-resize{flex:0 0 auto;height:9px;cursor:ns-resize;position:relative;user-select:none;touch-action:none;
+    border-top:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(var(--hf-glass-tint,22,26,32),0.0), rgba(0,0,0,0.18));
+    transition:background .12s}
+  .tw-resize::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:26px;height:3px;border-radius:3px;
+    background:linear-gradient(90deg, rgba(255,255,255,0.05), rgba(var(--hf-accent-rgb,217,164,65),0.45), rgba(255,255,255,0.05))}
+  .tw-resize:hover{background:linear-gradient(180deg, rgba(var(--hf-accent-rgb,217,164,65),0.10), rgba(0,0,0,0.22))}
+  .panel.tw-resizing{box-shadow:0 0 0 1px rgba(var(--hf-accent-rgb,217,164,65),0.40), var(--shadow-panel)}
+  body.tw-dragging{cursor:ns-resize!important}body.tw-dragging *{cursor:ns-resize!important}
+  /* ===================================================================
+     HF-DOCKABLE (user /design-critique 2026-06-15): TRUE UE-style dockable
+     windows. Any .panel can be TORN OFF its dock into a FREE-FLOATING glass
+     window (absolute, titlebar-dragged, 8-way resizable, on-top, viewport-
+     clamped, glass-themed, scrollable body) and DOCKED back by snapping near a
+     dock edge (a dock-zone overlay highlights) or via the re-dock button /
+     titlebar dbl-click. Floating geometry + dock membership persist per-user.
+     Camera-neutral by construction: only DOM/CSS of dock panels, never the 3D
+     controls/target. Surfaces tint from --hf-glass-tint / --hf-ember-rgb so the
+     Settings theme picker recolors every floating window too. */
+  /* --- the floating window shell --- */
+  .panel.tw-float{position:fixed;z-index:600;margin:0;flex:0 0 auto;
+    width:var(--twf-w,300px);height:var(--twf-h,360px);left:var(--twf-x,80px);top:var(--twf-y,90px);
+    box-shadow:0 26px 70px rgba(0,0,0,0.62),0 0 0 1px rgba(var(--hf-accent-rgb,217,164,65),0.22),var(--shadow-panel);
+    border-radius:var(--r-panel)}
+  .panel.tw-float.tw-floatfocus{z-index:640;box-shadow:0 30px 80px rgba(0,0,0,0.70),0 0 0 1px rgba(var(--hf-accent-rgb,217,164,65),0.50),var(--shadow-panel)}
+  /* a floating window's body fills the shell and scrolls; its resize-edge cap no longer applies */
+  .panel.tw-float .pbody{max-height:none!important;flex:1 1 auto}
+  .panel.tw-float .tw-resize{display:none}
+  /* the floating titlebar — DRAG to move, dbl-click to re-dock --- */
+  .panel .tw-titlebar{display:none}
+  .panel.tw-float .tw-titlebar{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 10px;flex:0 0 auto;
+    cursor:grab;user-select:none;touch-action:none;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(var(--hf-glass-tint,22,26,32),0.92), rgba(var(--hf-glass-tint,22,26,32),0.74))}
+  .panel.tw-float.tw-floatdrag .tw-titlebar{cursor:grabbing}
+  .tw-titlebar .tw-tt{font-size:10.5px;letter-spacing:0.9px;text-transform:uppercase;color:var(--bright);font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tw-titlebar .tw-dot{width:7px;height:7px;border-radius:50%;background:rgba(var(--hf-accent-rgb,217,164,65),0.85);box-shadow:0 0 6px rgba(var(--hf-accent-rgb,217,164,65),0.55);flex:0 0 auto}
+  .tw-titlebar .tw-redock{flex:0 0 auto;color:var(--faint);cursor:pointer;font-size:13px;line-height:1;padding:2px 6px;border-radius:6px;border:1px solid transparent;
+    transition:color .12s,background .12s,border-color .12s}
+  .tw-titlebar .tw-redock:hover{color:var(--bright);background:rgba(255,255,255,0.08);border-color:var(--line)}
+  /* a docked panel hides its titlebar; when floating, the phead becomes the body-top */
+  .panel.tw-float .phead{cursor:default}
+  /* --- 8-way resize handles on a floating window --- */
+  .panel .tw-rh{display:none}
+  .panel.tw-float .tw-rh{display:block;position:absolute;z-index:5;background:transparent}
+  .panel.tw-float .tw-rh-n{top:-3px;left:8px;right:8px;height:8px;cursor:ns-resize}
+  .panel.tw-float .tw-rh-s{bottom:-3px;left:8px;right:8px;height:8px;cursor:ns-resize}
+  .panel.tw-float .tw-rh-e{right:-3px;top:8px;bottom:8px;width:8px;cursor:ew-resize}
+  .panel.tw-float .tw-rh-w{left:-3px;top:8px;bottom:8px;width:8px;cursor:ew-resize}
+  .panel.tw-float .tw-rh-ne{top:-3px;right:-3px;width:14px;height:14px;cursor:nesw-resize}
+  .panel.tw-float .tw-rh-nw{top:-3px;left:-3px;width:14px;height:14px;cursor:nwse-resize}
+  .panel.tw-float .tw-rh-se{bottom:-3px;right:-3px;width:14px;height:14px;cursor:nwse-resize}
+  .panel.tw-float .tw-rh-sw{bottom:-3px;left:-3px;width:14px;height:14px;cursor:nesw-resize}
+  .panel.tw-float .tw-rh-se::after{content:"";position:absolute;right:3px;bottom:3px;width:7px;height:7px;
+    border-right:2px solid rgba(var(--hf-accent-rgb,217,164,65),0.55);border-bottom:2px solid rgba(var(--hf-accent-rgb,217,164,65),0.55);border-bottom-right-radius:3px}
+  body.tw-floatdragging{cursor:grabbing!important}body.tw-floatdragging *{cursor:grabbing!important}
+  body.tw-floatresizing{user-select:none!important}
+  /* --- DOCK-ZONE overlay: highlights the home dock rail when a floating window
+     is dragged near its edge; drop snaps it back into the rail. --- */
+  .tw-dockzone{position:fixed;z-index:590;pointer-events:none;display:none;border-radius:14px;
+    border:2px dashed rgba(var(--hf-accent-rgb,217,164,65),0.65);
+    background:linear-gradient(180deg, rgba(var(--hf-accent-rgb,217,164,65),0.16), rgba(var(--hf-glass-tint,22,26,32),0.30));
+    box-shadow:inset 0 0 40px rgba(var(--hf-accent-rgb,217,164,65),0.20),0 0 0 1px rgba(var(--hf-accent-rgb,217,164,65),0.30);
+    transition:opacity .10s}
+  .tw-dockzone.on{display:block}
+  .tw-dockzone .tw-dzlabel{position:absolute;left:50%;top:14px;transform:translateX(-50%);
+    font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--bright);font-weight:700;
+    background:rgba(var(--hf-glass-tint,22,26,32),0.85);border:1px solid rgba(var(--hf-accent-rgb,217,164,65),0.45);
+    padding:4px 12px;border-radius:999px;white-space:nowrap}
+  /* HF-DOCKZONES (CHUNK: dock zones + snap + persistence): MULTIPLE edge dock-zone
+     overlays are shown while a floating window is dragged (left rail / right rail /
+     center-tab). Each zone is faint by default; the one the cursor hovers gets the
+     bright .hot highlight + "DOCK HERE" pill, and dropping snaps the panel into it. */
+  .tw-dz{position:fixed;z-index:588;pointer-events:none;display:none;border-radius:14px;
+    border:2px dashed rgba(var(--hf-accent-rgb,217,164,65),0.32);
+    background:linear-gradient(180deg, rgba(var(--hf-accent-rgb,217,164,65),0.07), rgba(var(--hf-glass-tint,22,26,32),0.14));
+    transition:border-color .1s,background .1s,box-shadow .1s}
+  .tw-dz.show{display:block}
+  .tw-dz.hot{border-color:rgba(var(--hf-accent-rgb,217,164,65),0.85);border-style:solid;
+    background:linear-gradient(180deg, rgba(var(--hf-accent-rgb,217,164,65),0.20), rgba(var(--hf-glass-tint,22,26,32),0.34));
+    box-shadow:inset 0 0 46px rgba(var(--hf-accent-rgb,217,164,65),0.26),0 0 0 1px rgba(var(--hf-accent-rgb,217,164,65),0.45)}
+  .tw-dz .tw-dzpill{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;opacity:.55;
+    background:rgba(var(--hf-glass-tint,22,26,32),0.80);border:1px solid var(--line);
+    padding:4px 11px;border-radius:999px;white-space:nowrap;transition:color .1s,opacity .1s,border-color .1s}
+  .tw-dz.hot .tw-dzpill{color:var(--bright);opacity:1;border-color:rgba(var(--hf-accent-rgb,217,164,65),0.55)}
+  .tw-dz .tw-dzpill::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;
+    vertical-align:middle;background:rgba(var(--hf-accent-rgb,217,164,65),0.7)}
+  /* HF-DOCKZONES: the RIGHT dock rail — a glass column pinned over the right edge of
+     the viewport; only present (in the DOM) when at least one panel is docked there.
+     Mirrors aside.left's scrollable glass + tinted scrollbars. */
+  #twDockRight{position:fixed;z-index:60;top:var(--twdr-top,150px);right:0;
+    width:var(--twdr-w,288px);max-height:var(--twdr-h,70vh);display:flex;flex-direction:column;gap:8px;
+    padding:8px 8px 12px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+    border-left:1px solid var(--line);border-top-left-radius:14px;border-bottom-left-radius:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0) 40%), rgba(var(--hf-glass-tint,22,26,32),0.82);
+    -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
+    box-shadow:-18px 0 50px rgba(0,0,0,0.40)}
+  #twDockRight:empty{display:none}
+  #twDockRight::-webkit-scrollbar{width:10px}
+  #twDockRight::-webkit-scrollbar-track{background:transparent}
+  #twDockRight::-webkit-scrollbar-thumb{background:rgba(var(--hf-glass-tint,22,26,32),0.95);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+  #twDockRight{scrollbar-width:thin;scrollbar-color:rgba(var(--hf-glass-tint,22,26,32),0.95) transparent}
+  #twDockRight .twdr-cap{font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--faint);
+    font-weight:700;padding:1px 4px 2px;opacity:.8}
+  /* a "Float" tear-off affordance shown on docked panel headers */
+  .phead .tw-detach{flex:0 0 auto;color:var(--faint);cursor:pointer;font-size:12px;line-height:1;padding:2px 5px;border-radius:5px;
+    transition:color .12s,background .12s}
+  .phead .tw-detach:hover{color:var(--hf-accent,var(--gold-bright));background:rgba(255,255,255,0.07)}
+  .panel.tw-float .phead .tw-detach{display:none}
+  /* Reset Layout control (lives in the left dock header strip) */
+  #twResetLayout{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:10px;letter-spacing:0.6px;
+    text-transform:uppercase;color:var(--muted);background:rgba(var(--hf-glass-tint,22,26,32),0.55);
+    border:1px solid var(--line);border-radius:7px;padding:4px 9px;margin:0 0 4px;width:100%;justify-content:center;
+    transition:color .12s,background .12s,border-color .12s}
+  #twResetLayout:hover{color:var(--bright);border-color:rgba(var(--hf-accent-rgb,217,164,65),0.45);background:rgba(var(--hf-accent-rgb,217,164,65),0.10)}
+  .well{background:rgba(var(--hf-glass-tint,14,17,21),0.55);border-radius:var(--r-control);box-shadow:var(--shadow-recess);padding:9px 10px}
   .job-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0}
   .job-row + .job-row{border-top:1px solid var(--line)}
   .job-row .k{color:var(--muted)}
@@ -215,7 +360,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   #scaleBarLabel{font-size:10px;line-height:1;color:var(--bright);letter-spacing:.3px}
   /* HF-D1-INSPDOCK (PRIORITIES 3c): the Inspector lives IN the right results
      panel — never floating over the viewport. */
-  #inspector{display:none;flex-direction:column;overflow:hidden;width:100%;max-height:46vh;margin:0 0 14px;background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(0,0,0,0.5)),rgba(13,12,10,0.82);border:1px solid rgba(255,255,255,0.15);border-radius:14px;box-shadow:0 18px 48px rgba(0,0,0,0.5)}
+  #inspector{display:none;flex-direction:column;overflow:hidden;width:100%;max-height:46vh;margin:0 0 14px;background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(0,0,0,0.5)),rgba(var(--hf-glass-tint),0.82);border:1px solid rgba(255,255,255,0.15);border-radius:14px;box-shadow:0 18px 48px rgba(0,0,0,0.5)}
   #inspector.open{display:flex}
   #inspHeader{padding:10px 12px 8px;border-bottom:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:space-between}
   #inspTitle{font-size:12px;font-weight:700;color:var(--bright)}
@@ -230,7 +375,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
      absolute apple-glass viewport overlay to a static in-panel section. */
   /* HF-UXCLEAN §1: clip the docked level panel so its stat rows wrap WITHIN the
      left aside and never paint past its right edge onto the canvas. */
-  #levelPanel{display:none;flex-direction:column;gap:6px;width:100%;max-width:100%;margin:0 0 6px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.32)),rgba(13,12,10,0.55);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px}
+  #levelPanel{display:none;flex-direction:column;gap:6px;width:100%;max-width:100%;margin:0 0 6px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.32)),rgba(var(--hf-glass-tint),0.55);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px}
   #levelPanel.open{display:flex}
   #levelPanel *{min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
   #levelPanel h4{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin:2px 0 0}
@@ -267,8 +412,11 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 </style>
 <style id="employee-studio-glass-overrides">
   body.hf-studio-glass{
-    --panel:rgba(13,12,10,0.76);
-    --panel2:rgba(0,0,0,0.46);
+    /* HF-SHARED-NAV: panel surfaces derive from the shell glass tint so the
+       Settings theme picker (azure/emerald/etc.) recolors the tool windows too,
+       not just the nav. Falls back to the warm dark if the shell hasn't set it. */
+    --panel:rgba(var(--hf-glass-tint),0.80);
+    --panel2:rgba(var(--hf-glass-tint),0.55);
     --line:rgba(255,255,255,0.14);
     --fire:#e8432d;
     --gold:#ffd54f;
@@ -277,18 +425,50 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     --text:#f2ece0;
     --muted:rgba(242,236,224,0.62);
     --bright:#fff8e8;
+    /* HF-THEME-SURFACES: the Studio body background is driven by the SELECTED
+       ember color (--hf-ember-rgb, control 2) and glass tint (--hf-glass-tint,
+       control 1) — NOT hardcoded slabs. Changing the theme color in Settings
+       now retints the whole canvas backdrop, exactly like every other page
+       (mirrors public/styles/halofire-glass.css body.hf). Fallbacks keep the
+       warm dark if the shell hasn't booted yet. */
+    background-color:#070605;
     background:
-      radial-gradient(circle at 30% 42%,rgba(255,213,79,0.14),transparent 24%),
-      radial-gradient(circle at 74% 37%,rgba(232,67,45,0.14),transparent 31%),
-      linear-gradient(125deg,#050505 0%,#11100e 45%,#090302 100%);
+      radial-gradient(circle at 30% 42%, rgba(var(--hf-ember-rgb,255,213,79),0.22), transparent 30%),
+      radial-gradient(circle at 74% 37%, rgba(var(--hf-ember-rgb,232,67,45),0.18), transparent 34%),
+      radial-gradient(135% 110% at 50% 86%, rgba(var(--hf-ember-rgb,216,160,70),0.38), transparent 62%),
+      linear-gradient(125deg, rgba(var(--hf-glass-tint,16,16,18),0.70) 0%, rgba(var(--hf-glass-tint,16,16,18),0.42) 45%, rgba(0,0,0,0.60) 100%),
+      #070605;
+    background-attachment:fixed;
   }
-  body.hf-studio-glass header,
+  /* HF-THEME-SURFACES: glass panels + asides tint from the shell theme tokens
+     (control 1 = --hf-glass-tint, control 2 = --hf-ember-rgb). A SELECTED-COLOR
+     wash (ember glow at low alpha) is layered over the glass so the chosen theme
+     reads clearly on every tool window — not a near-black slab. header is excluded
+     (it IS the shared .hf-appbar). */
   body.hf-studio-glass aside,
   body.hf-studio-glass #legend{
-    background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.42)),rgba(13,12,10,0.72);
+    background:
+      linear-gradient(180deg,rgba(255,255,255,0.07),rgba(0,0,0,0.26) 70%),
+      radial-gradient(150% 120% at 18% 0%, rgba(var(--hf-ember-rgb,232,67,45),0.12), transparent 58%),
+      rgba(var(--hf-glass-tint),0.82);
     border-color:rgba(255,255,255,0.14);
-    backdrop-filter:blur(28px) saturate(1.35);
-    -webkit-backdrop-filter:blur(28px) saturate(1.35);
+    backdrop-filter:blur(28px) saturate(1.4);
+    -webkit-backdrop-filter:blur(28px) saturate(1.4);
+  }
+  /* the dockable glass panels INSIDE the asides get the same selected-color wash so
+     This Job / Layers / Inspector / Properties all visibly carry the theme tint. */
+  body.hf-studio-glass .panel,
+  body.hf-studio-glass #inspector,
+  body.hf-studio-glass #levelPanel{
+    background:
+      linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0) 42%),
+      radial-gradient(130% 120% at 12% -10%, rgba(var(--hf-ember-rgb,232,67,45),0.10), transparent 55%),
+      rgba(var(--hf-glass-tint),0.80)!important;
+  }
+  body.hf-studio-glass .well{
+    background:
+      radial-gradient(120% 140% at 0% 0%, rgba(var(--hf-ember-rgb,232,67,45),0.08), transparent 60%),
+      rgba(var(--hf-glass-tint),0.62)!important;
   }
   body.hf-studio-glass #canvasWrap{
     background:
@@ -330,25 +510,18 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 </head>
 <body class="hf-shell hf-studio-glass" data-hf-page="studio" data-hf-appbar="off">
 <div id="app">
-  <header>
-    <div class="brand">Halo<span>Fire</span> Studio <small>Sprinkler CAD · OpenGeometry</small></div>
-    <div class="chrome-spacer"></div>
-    <span class="badge">Internal Alpha · NOT AHJ/PE/AutoSprink parity</span>
-    <div class="chrome-spacer"></div>
-    <div class="right">
+  <!-- HF-SHARED-NAV: brand + primary nav are injected from the shared shell
+       (public/halofire-shell.js -> HFShell.mountAppbarInto) so the Studio top bar
+       is identical in structure/links/style to the Workbench and every other page.
+       Studio-specific controls live in #studioNavExtras and are re-homed into the
+       shell-built .hf-right block (so #demoBtn / #autoLoadBadge keep their handlers);
+       the role chip + Sign out then come from the shell, same as every other page. -->
+  <header id="studioAppbar">
+    <span id="studioNavExtras" style="display:flex;align-items:center;gap:12px">
+      <span class="badge">Internal Alpha · NOT AHJ/PE/AutoSprink parity</span>
       <span id="autoLoadBadge">● auto-loaded</span>
       <button id="demoBtn" title="Animate the structure + sprinkler system rising out of the plan">▶ Demo</button>
-      <nav class="studio-nav">
-        <a href="/workbench.html?hf=r2">Workbench</a>
-        <a class="active" href="/autosprink.html?hf=r2">Studio</a>
-        <a href="/calendar.html?hf=r2">Calendar</a>
-        <a href="/crm.html?hf=r2">CRM</a>
-        <a href="/reports.html?hf=r2">Reports</a>
-        <a href="/vendors.html?hf=r2">Vendors</a>
-        <a href="/settings.html?hf=r2">Settings</a>
-      </nav>
-      <span class="role-chip"><span class="dot"></span> D. Steele · estimator</span>
-    </div>
+    </span>
   </header>
 
   <!-- HF-UXCLEAN §1: app menu bar docks in this chrome strip ABOVE the canvas
@@ -390,9 +563,9 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <section class="panel">
       <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">This Job</span><span class="pbtn">⌄</span></div>
       <div class="pbody">
-        <div class="job-title">Home Depot — Rexburg</div>
-        <div class="job-sub">Distribution Center · Rexburg, ID</div>
-        <div class="well">
+        <div class="job-title" id="jobTitle">Loading source-bound job…</div>
+        <div class="job-sub" id="jobSub">Resolving the requested AutoBid document</div>
+        <div class="well" id="jobWell">
           <div class="job-row"><span class="k">State</span><span class="v">ID · 21 ft pipe stock</span></div>
           <div class="job-row"><span class="k">Bid value</span><span class="v">$842,500</span></div>
           <div class="job-row"><span class="k">Phase</span><span class="v"><span class="chip info"><span class="gl"></span> Takeoff</span></span></div>
@@ -420,6 +593,19 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <option value="Home Depot - Rexburg ID">Home Depot - Rexburg ID</option>
       <option value="The Cooperative 1881 - Salt Lake City UT">The Cooperative 1881 - Salt Lake City UT</option>
     </select>
+
+    <!-- AutoBid engine 3D: load the PDF->3D building model the engine extracted from the
+         real plan set (vector-first geo_kernel -> OpenSCAD CSG wall solids + door cuts -> STL).
+         Engine: GET /geometry/model?doc=&plate= (JSON) + .../model/file?fmt=stl. True scale (feet),
+         loaded via the page's STLLoader into its own group; additive (never touches modelGroup). -->
+    <h3>AutoBid 3D (PDF → model)</h3>
+    <div style="display:flex;gap:4px">
+      <input id="abDoc" type="text" value="34978" placeholder="document_id" style="flex:1;font-size:11px;padding:6px;background:var(--panel,#0d1118);color:inherit;border:1px solid #2b3543;border-radius:5px">
+      <input id="abPlate" type="text" value="A-104" placeholder="plate (e.g. A-104)" style="width:96px;font-size:11px;padding:6px;background:var(--panel,#0d1118);color:inherit;border:1px solid #2b3543;border-radius:5px">
+    </div>
+    <button class="act ghost" id="abLoadBtn" type="button" style="font-size:11px;padding:7px;margin-top:4px;width:100%">⬡ Load engine 3D from PDF</button>
+    <button class="act ghost" id="abClearBtn" type="button" style="font-size:11px;padding:7px;margin-top:4px;width:100%;display:none">Clear engine 3D</button>
+    <div id="abStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">Loads the PDF→3D model the engine extracted for the chosen plate (true scale, feet).</div>
     <h3>Design</h3>
     <label>Source</label>
     <select id="planSource">
@@ -755,8 +941,8 @@ import { buildBuildingLevels } from '/src/engine/building-levels.js';
 // HF-E1-PLANBUILD (Stream D/E): build REAL per-level 3D from the extracted plan
 // (building-from-plan.js), with the sheet registered UNDER it at the drawing-derived
 // true scale. Replaces the margin-box for Cooperative 1881.
-import { acceptedModel3dToLevels } from '/src/engine/accepted-model3d.js';
 import { buildBuildingFromPlans, computePlanUnderlayTransform, unionFootprintCenter, planBounds } from '/src/engine/building-from-plan.js';
+import { acceptedModel3dToLevels } from '/src/engine/accepted-model3d.js';
 import { manifestForProject, sheetsForLevel } from '/src/data/plan-manifest.js';
 // HF-C1-PARTMESH (Stream C): true-scale real CAD part meshes (mm->ft, Y-up)
 // with Inspector provenance; primitives stay as flagged fallback.
@@ -885,6 +1071,56 @@ function api(path, options = {}) {
   });
 }
 
+// AutoBid links arrive with a canonical geometry document id.  Resolve that
+// identity before the Studio's built-in project loader runs; otherwise the
+// default Home Depot fixture can appear while a different PDF is requested.
+async function bindSourceDocumentIdentity() {
+  let doc = null;
+  try { doc = new URLSearchParams(location.search).get('doc'); } catch (_) {}
+  if (!doc || !/^\d+$/.test(String(doc))) return null;
+  const docId = Number(doc);
+  let packagePayload = null;
+  try {
+    const ready = await api('/autobid/ready-to-send');
+    const rows = Array.isArray(ready && ready.bids) ? ready.bids : [];
+    const row = rows.find((item) => Number(item.geometry_document_id) === docId);
+    if (row && row.ref != null) packagePayload = await api('/autobid/package/' + encodeURIComponent(row.ref));
+  } catch (_) {
+    // The direct document lookup below remains the honest identity fallback.
+  }
+  if (!packagePayload) {
+    try { packagePayload = await api('/autobid/package/' + encodeURIComponent(docId) + '?by=doc'); }
+    catch (_) { packagePayload = null; }
+  }
+  const meta = packagePayload && packagePayload.meta ? packagePayload.meta : {};
+  const name = String(meta.job_name || '').trim();
+  const location = String(meta.location || '').trim();
+  const isCooperative = /cooperative\s*1881/i.test(name);
+  if (isCooperative && $('projectTarget')) {
+    $('projectTarget').value = COOPERATIVE_1881_PROJECT_NAME;
+  }
+  if ($('abDoc')) $('abDoc').value = String(docId);
+  const title = $('jobTitle');
+  const subtitle = $('jobSub');
+  if (title) title.textContent = name || ('Source document ' + docId);
+  if (subtitle) subtitle.textContent = location || 'Canonical plan-set source bound to document ' + docId;
+  const well = $('jobWell');
+  if (well) {
+    const total = packagePayload && packagePayload.readyBid && packagePayload.readyBid.total;
+    const phase = packagePayload && packagePayload.accepted_geometry_drawing && packagePayload.accepted_geometry_drawing.available
+      ? 'Accepted geometry'
+      : 'Review pending';
+    well.innerHTML = `
+      <div class="job-row"><span class="k">Source PDF</span><span class="v">doc ${docId}</span></div>
+      <div class="job-row"><span class="k">Bid value</span><span class="v">${total != null ? usd(total) : 'not resolved'}</span></div>
+      <div class="job-row"><span class="k">Phase</span><span class="v"><span class="chip ${phase === 'Accepted geometry' ? 'ok' : 'info'}"><span class="gl"></span> ${phase}</span></span></div>
+      <div class="job-row"><span class="k">Source state</span><span class="v">${isCooperative ? 'Cooperative 1881' : 'document-bound'} · needs-verification</span></div>`;
+  }
+  document.body.dataset.sourceDocumentId = String(docId);
+  document.body.dataset.sourceDocumentName = name || 'unknown';
+  return { docId, name, location, isCooperative, packagePayload };
+}
+
 // ── OpenGeometry / Three scene ──
 const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30, COMPONENTS: 0xfbbf24, HANGERS: 0xb6bcc6, CEILING: 0xd8d2c2 }; // HF-G4-HANGER + HF-G5-CEILGRID layers
 // HF-PHASE2-SMARTPIPE: per-topology-role pipe colors for the Smart Pipe legend.
@@ -943,6 +1179,80 @@ function normalizePartGeo(geo, targetFt) {
   const maxDim = Math.max(size.x, size.y, size.z) || 1;
   const sc = targetFt / maxDim; geo.scale(sc, sc, sc); geo.computeVertexNormals();
   return geo;
+}
+
+// ── AutoBid engine 3D (PDF -> model) ─────────────────────────────────────────
+// Load the building model the engine extracted from the real plan set (geo_kernel
+// OpenSCAD CSG -> STL, true scale in feet, OpenSCAD Z-up). Added as its OWN group
+// (engineModelGroup) so it never disturbs the live design (modelGroup/planGroup).
+let engineModelGroup = null;
+function abSetStatus(msg, bad) {
+  const el = $('abStatus'); if (!el) return;
+  el.innerHTML = bad ? '<span style="color:#fca5a5">' + msg + '</span>' : msg;
+}
+async function loadEngineModel() {
+  const doc = ($('abDoc') && $('abDoc').value || '').trim();
+  const plate = ($('abPlate') && $('abPlate').value || '').trim();
+  if (!doc) { abSetStatus('enter a document_id', true); return; }
+  const btn = $('abLoadBtn'); if (btn) { btn.disabled = true; btn.textContent = '… extracting (engine, ~80s first time)'; }
+  abSetStatus('asking the engine for the PDF→3D model…');
+  try {
+    // 1) metadata (gives stl_url + bbox + face/room counts + honest residual)
+    // api() prefixes '/api' and returns parsed JSON; the engine proxy is '/api/autobid/*'.
+    const q = '/autobid/geometry/model?doc=' + encodeURIComponent(doc) + (plate ? '&plate=' + encodeURIComponent(plate) : '');
+    const meta = await api(q);
+    if (!meta || meta.available === false) {
+      abSetStatus('no model for this doc/plate' + (meta && meta.reason ? ' — ' + meta.reason : '') + '.', true);
+      return;
+    }
+    // 2) STL bytes (proxied through /api/autobid). The engine memoizes, so this is fast on repeats.
+    abSetStatus('loading STL (' + (meta.stl_facets || '?') + ' facets)…');
+    const stlUrl = '/api/autobid' + (meta.stl_url || ('/geometry/model/file?doc=' + doc + '&plate=' + plate + '&fmt=stl'));
+    const resp = await fetch(stlUrl, { credentials: 'include' });
+    if (!resp.ok) throw new Error('STL ' + resp.status);
+    const buf = await resp.arrayBuffer();
+    const geo = new STLLoader().parse(buf);   // STL is in feet
+    geo.computeBoundingBox();
+    const bb = geo.boundingBox, ctr = new THREE.Vector3(); bb.getCenter(ctr);
+    // OpenSCAD Z-up -> three Y-up; center on the floor (so it sits on the grid).
+    geo.translate(-ctr.x, -ctr.y, -bb.min.z);
+    geo.rotateX(-Math.PI / 2);                 // Z-up -> Y-up (true scale, no rescale)
+    geo.computeVertexNormals();
+    // remove any prior engine model
+    if (engineModelGroup) { scene.remove(engineModelGroup); engineModelGroup.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); }
+    engineModelGroup = new THREE.Group(); engineModelGroup.name = 'engineModelPDF';
+    const mat = new THREE.MeshLambertMaterial({ color: 0xc9d4e2, transparent: true, opacity: 0.62, side: THREE.DoubleSide });
+    const mesh = new THREE.Mesh(geo, mat); mesh.name = 'engineModel:' + (meta.plate || plate || 'auto');
+    engineModelGroup.add(mesh);
+    // crisp wall edges so the unit partitions read in 3D
+    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), new THREE.LineBasicMaterial({ color: 0x6ea8ff }));
+    engineModelGroup.add(edges);
+    scene.add(engineModelGroup);
+    try { window.__engineModelGroup = engineModelGroup; } catch (_) {}   // verification hook
+    // frame the camera on the loaded model
+    const g = new THREE.Box3().setFromObject(engineModelGroup);
+    const size = new THREE.Vector3(); g.getSize(size); const gc = new THREE.Vector3(); g.getCenter(gc);
+    const dist = Math.max(size.x, size.y, size.z) * 1.4 + 10;
+    if (camera && controls) {
+      if (camera.isOrthographicCamera && perspCam) { camera = perspCam; }
+      camera.position.set(gc.x + dist * 0.7, gc.y + dist * 0.6, gc.z + dist * 0.7);
+      controls.target.set(gc.x, gc.y, gc.z); camera.lookAt(gc.x, gc.y, gc.z); controls.update();
+    }
+    const bx = meta.bbox_ft || [size.x, size.z, size.y];
+    abSetStatus('<b style="color:#86efac">' + (meta.plate || plate) + '</b> · ' + (meta.n_rooms || '?') + ' rooms · ' +
+      (meta.n_doors || '?') + ' doors · ' + (meta.stl_facets || '?') + ' facets · ' +
+      bx.map((n) => Math.round(n)).join('×') + ' ft. <span style="opacity:.7">PDF→3D via OpenSCAD CSG (is_estimate).</span>');
+    if ($('abClearBtn')) $('abClearBtn').style.display = 'block';
+  } catch (e) {
+    abSetStatus('load failed: ' + (e && e.message ? e.message : e), true);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '⬡ Load engine 3D from PDF'; }
+  }
+}
+function clearEngineModel() {
+  if (engineModelGroup) { scene.remove(engineModelGroup); engineModelGroup.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); engineModelGroup = null; }
+  if ($('abClearBtn')) $('abClearBtn').style.display = 'none';
+  abSetStatus('cleared. Loads the PDF→3D model the engine extracted for the chosen plate (true scale, feet).');
 }
 
 // Load + cache the part mesh for a registry component key (best-effort, fail-soft).
@@ -1183,6 +1493,92 @@ async function initStudio() {
   // the orbit pivot + x-ray dim ratio so the headless gate can verify isolation
   // and exact pivot-restore. No effect on rendering or interaction.
   window.__dbgTarget = () => controls ? [controls.target.x, controls.target.y, controls.target.z] : null;
+  // Headless verification only: pose the persp camera for a FRONT elevation of a target
+  // box (slab->ceiling visible). Sets controls.target so the render loop's controls.update()
+  // keeps the pose. No effect on interactive use (never called in the live UI).
+  window.__hfPoseFront = (cx, cy, cz, dist, lift) => {
+    if (!controls || !camera || camera.isOrthographicCamera) return false;
+    camera.up.set(0, 1, 0);
+    camera.position.set(cx, cy + (lift || 0), cz + dist);
+    controls.target.set(cx, cy, cz);
+    camera.lookAt(cx, cy, cz);
+    controls.update();
+    return true;
+  };
+  // Headless verification only: pose the persp camera looking at an arbitrary
+  // world target from a unit direction at a given distance (used to zoom on a
+  // pipe-run/drop-assembly detail from iso/front/side). No interactive effect.
+  window.__hfPoseAt = (tx, ty, tz, dx, dy, dz, dist) => {
+    if (!controls || !camera || camera.isOrthographicCamera) return false;
+    const L = Math.hypot(dx, dy, dz) || 1; dx /= L; dy /= L; dz /= L;
+    camera.up.set(0, 1, 0);
+    camera.position.set(tx + dx * dist, ty + dy * dist, tz + dz * dist);
+    controls.target.set(tx, ty, tz);
+    camera.lookAt(tx, ty, tz);
+    controls.update();
+    return true;
+  };
+  // Headless verification only: dump the ACTUAL rendered head/pipe world bboxes +
+  // the active project + cad-model head plan bbox, so the coverage check reads the
+  // live scene (module-scoped layerGroups/modelGroup/currentCadModel) directly.
+  window.__hfCoverageScan = () => {
+    const out = { project: null, headsPlan: null, headsWorld: null, pipesWorld: null, modelGroupPos: null };
+    try { out.project = typeof currentProjectName === 'function' ? currentProjectName() : null; } catch (_) {}
+    try { out.modelGroupPos = modelGroup ? [+modelGroup.position.x.toFixed(2), +modelGroup.position.y.toFixed(2), +modelGroup.position.z.toFixed(2)] : null; } catch (_) {}
+    const bb = (pts) => {
+      if (!pts.length) return null;
+      let a = [1e9, 1e9, 1e9], b = [-1e9, -1e9, -1e9];
+      for (const p of pts) for (let i = 0; i < 3; i++) { a[i] = Math.min(a[i], p[i]); b[i] = Math.max(b[i], p[i]); }
+      return { count: pts.length, min: a.map((n) => +n.toFixed(2)), max: b.map((n) => +n.toFixed(2)), span: [b[0]-a[0], b[1]-a[1], b[2]-a[2]].map((n) => +n.toFixed(2)) };
+    };
+    try {
+      const m = currentCadModel;
+      if (m && m.solids) {
+        const hs = m.solids.filter((s) => s.kind === 'head');
+        out.headsPlan = bb(hs.map((h) => h.position));
+      }
+    } catch (e) { out.headsPlanErr = String(e); }
+    try {
+      const collect = (group) => {
+        const pts = [];
+        if (!group) return pts;
+        group.traverse((o) => {
+          if (o.isInstancedMesh) {
+            const v = new THREE.Vector3(), mat = new THREE.Matrix4();
+            for (let i = 0; i < o.count; i++) { o.getMatrixAt(i, mat); v.setFromMatrixPosition(mat); const w = o.localToWorld(v.clone()); pts.push([w.x, w.y, w.z]); }
+          } else if (o.isMesh) { const w = o.getWorldPosition(new THREE.Vector3()); pts.push([w.x, w.y, w.z]); }
+        });
+        return pts;
+      };
+      out.headsWorld = bb(collect(layerGroups && layerGroups.HEADS));
+      const pipePts = [].concat(collect(layerGroups && layerGroups.BRANCH), collect(layerGroups && layerGroups.MAIN), collect(layerGroups && layerGroups.DROPS));
+      out.pipesWorld = bb(pipePts);
+    } catch (e) { out.headsWorldErr = String(e); }
+    return out;
+  };
+  // Headless verification only: underlay world bbox + show/hide network vs underlay
+  // for split-registration capture (module-scoped planGroup/modelGroup/layerGroups).
+  window.__hfRegSplit = (mode) => {
+    const r = { mode };
+    try {
+      let umin = [1e9,1e9,1e9], umax = [-1e9,-1e9,-1e9], n = 0;
+      if (planGroup) planGroup.traverse((o) => {
+        if (o.isMesh && o.name && /plan-underlay/.test(o.name)) {
+          const box = new THREE.Box3().setFromObject(o);
+          for (let i=0;i<3;i++){ umin[i]=Math.min(umin[i],box.min.getComponent(i)); umax[i]=Math.max(umax[i],box.max.getComponent(i)); }
+          n++;
+        }
+      });
+      r.underlayWorldBbox = n ? { min: umin.map((v)=>+v.toFixed(2)), max: umax.map((v)=>+v.toFixed(2)), span:[umax[0]-umin[0],umax[1]-umin[1],umax[2]-umin[2]].map((v)=>+v.toFixed(2)) } : 'none';
+    } catch (e) { r.err = String(e); }
+    const setLayers = (keys, vis) => { for (const k of keys) { const g = layerGroups && layerGroups[k]; if (g) g.visible = vis; } };
+    const NET = ['HEADS','BRANCH','MAIN','DROPS','COMPONENTS','HANGERS'];
+    const BLD = ['WALLS','WALLS_INT','COLUMN','FLOOR','CEILING'];
+    if (mode === 'network') { if (planGroup) planGroup.visible = false; setLayers(NET, true); setLayers(BLD, false); }
+    else if (mode === 'underlay') { if (planGroup) planGroup.visible = true; setLayers(NET, false); setLayers(BLD, false); }
+    else if (mode === 'both') { if (planGroup) planGroup.visible = true; setLayers(NET, true); setLayers(BLD, true); }
+    return r;
+  };
   window.__dbgDim = () => {
     let dimmed = 0, total = 0;
     for (const g of [modelGroup, planGroup].filter(Boolean)) g.traverse((o) => {
@@ -1270,28 +1666,77 @@ function addPipe(s) {
 
 // Instanced heads (one draw call for all sprinkler heads). Uses the real CAD
 // part mesh (headPartGeo) when the parts library has one; else a primitive.
+// HF-G6-HEADORIENT: the head mesh has a natural axis (inlet/thread end vs the
+// deflector/business end). Determine which Y-half holds the DEFLECTOR (the wide
+// frame end) by comparing the max radial spread of the top vs bottom half. A
+// pendent head's inlet threads onto the drop ABOVE and the deflector hangs
+// BELOW; an upright is the mirror; a sidewall lies horizontal. We orient + seat
+// each head from its `orientation` field so they point the right way at true scale.
+function headDeflectorAxis(geo) {
+  // returns +1 if the deflector (wider end) is at +Y in the mesh, -1 if at -Y.
+  geo.computeBoundingBox();
+  const pos = geo.attributes && geo.attributes.position;
+  if (!pos) return -1;
+  const bb = geo.boundingBox; const midY = (bb.min.y + bb.max.y) / 2;
+  let topR = 0, botR = 0;
+  for (let i = 0; i < pos.count; i += 1) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    const r = Math.hypot(x, z);
+    if (y >= midY) { if (r > topR) topR = r; } else if (r > botR) botR = r;
+  }
+  return topR >= botR ? 1 : -1; // deflector side in mesh-local Y
+}
 function addInstancedHeads(worldPts, headSolids) {
   if (!worldPts.length) return;
   const geo = headPartGeo || new THREE.SphereGeometry(0.6, 16, 12);
-  // Gate 5b (interpenetration): the part geo is normalized about its center but
-  // a pendent head HANGS BELOW the drop end — its top thread meets the drop
-  // bottom. Offset each instance down by half the part height so the head
-  // never swallows the reducer / pierces the tee+coupling at the branch above.
   geo.computeBoundingBox();
-  const headHalfH = geo.boundingBox ? (geo.boundingBox.max.y - geo.boundingBox.min.y) / 2 : 0;
+  const bb = geo.boundingBox;
+  const headH = bb ? (bb.max.y - bb.min.y) : 0;
+  const headHalfH = headH / 2;
+  // deflector side in mesh-local Y (+1 deflector at +Y, -1 at -Y). For a pendent
+  // we want the deflector DOWN, so if it's currently UP we flip the mesh.
+  const deflSide = headPartGeo ? headDeflectorAxis(geo) : -1;
   const mat = new THREE.MeshStandardMaterial({
     color: COLORS.HEADS, emissive: 0x330000,
     metalness: headPartGeo ? 0.55 : 0, roughness: headPartGeo ? 0.45 : 1,
   });
   const inst = new THREE.InstancedMesh(geo, mat, worldPts.length);
   const d = new THREE.Object3D();
-  worldPts.forEach((p, i) => { d.position.set(p[0], p[1] - headHalfH, p[2]); d.rotation.set(0,0,0); d.scale.set(1,1,1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
+  const HALF_PI = Math.PI / 2;
+  const counts = { pendent: 0, upright: 0, sidewall: 0 };
+  worldPts.forEach((p, i) => {
+    const s = headSolids && headSolids[i] ? headSolids[i] : null;
+    const orient = s && typeof s.orientation === 'string' ? s.orientation.toLowerCase() : 'pendent';
+    d.position.set(p[0], p[1], p[2]);
+    d.scale.set(1, 1, 1);
+    d.rotation.set(0, 0, 0);
+    if (orient.startsWith('up')) { // UPRIGHT — deflector UP, inlet at the branch below
+      counts.upright += 1;
+      // mesh deflector must end up at +Y. If it's at -Y, flip 180° about X.
+      if (deflSide < 0) d.rotation.set(Math.PI, 0, 0);
+      d.position.y = p[1] + headHalfH; // seat ABOVE the branch/sprig top
+    } else if (orient.startsWith('side')) { // SIDEWALL — deflector points HORIZONTALLY
+      counts.sidewall += 1;
+      // bring the mesh +Y axis to +X (toward the room); seat the inlet at the wall pipe.
+      const dir = s && Array.isArray(s.direction) ? s.direction : [1, 0]; // plan dir into room
+      const yaw = Math.atan2(-(dir[1] || 0), (dir[0] || 1)); // plan (x,y)->world yaw about Y
+      // rotate deflector (+Y) toward +X: -90° about Z; if mesh deflector is -Y, +90°
+      d.rotation.set(0, yaw, deflSide >= 0 ? -HALF_PI : HALF_PI);
+      d.position.set(p[0], p[1], p[2]);
+    } else { // PENDENT (default) — deflector DOWN, inlet threads onto the drop above
+      counts.pendent += 1;
+      if (deflSide > 0) d.rotation.set(Math.PI, 0, 0); // flip so deflector faces -Y
+      d.position.y = p[1] - headHalfH; // hang BELOW the drop bottom point
+    }
+    d.updateMatrix(); inst.setMatrixAt(i, d.matrix);
+  });
   inst.instanceMatrix.needsUpdate = true;
   inst.userData.hfInstanced = { kind: 'head', solids: headSolids || [] }; // HF-A1-SELECT
   layerGroups.HEADS.add(inst);
   window.__headDebug = { usingPartMesh: !!headPartGeo, source: partsSource, vertsPerHead: geo.attributes.position.count, instances: worldPts.length,
-    headHalfH, sampleWorld: worldPts.length ? worldPts[0] : null, samplePlaced: worldPts.length ? [worldPts[0][0], worldPts[0][1]-headHalfH, worldPts[0][2]] : null,
-    bbox: geo.boundingBox ? { min: [geo.boundingBox.min.x, geo.boundingBox.min.y, geo.boundingBox.min.z], max: [geo.boundingBox.max.x, geo.boundingBox.max.y, geo.boundingBox.max.z] } : null };
+    headHalfH, headH, deflSide, orientCounts: counts,
+    sampleWorld: worldPts.length ? worldPts[0] : null, samplePlaced: worldPts.length ? [worldPts[0][0], worldPts[0][1]-headHalfH, worldPts[0][2]] : null,
+    bbox: bb ? { min: [bb.min.x, bb.min.y, bb.min.z], max: [bb.max.x, bb.max.y, bb.max.z] } : null };
 }
 
 // Instanced drops (vertical pipe stubs; cylinder default axis is world Y).
@@ -1783,8 +2228,9 @@ function cutWall(wallCuboid, s) {
 // true scale. Only applies when BOTH (a) the server used the extracted plate
 // (floorPlan.extractedPlate) AND (b) the plan-comprehension build is live with
 // a center; otherwise the network stays at the origin (unchanged behaviour).
-function alignNetworkToExtractedPlate(floorPlan) {
+function alignNetworkToExtractedPlate(floorPlan, opts) {
   if (!modelGroup) return;
+  const keepView = !!(opts && opts.keepView);
   const usingPlate = !!(floorPlan && floorPlan.extractedPlate);
   const c = (usingPlate && planBuildState && planBuildState.center) ? planBuildState.center : null;
   if (c && Number.isFinite(c.cx) && Number.isFinite(c.cy)) {
@@ -1798,7 +2244,17 @@ function alignNetworkToExtractedPlate(floorPlan) {
       const nb = new THREE.Box3().setFromObject(modelGroup);
       if (Number.isFinite(nb.min.x) && nb.min.x <= nb.max.x) {
         rec.networkWorldBbox = { minX: nb.min.x, maxX: nb.max.x, minY: nb.min.y, maxY: nb.max.y, minZ: nb.min.z, maxZ: nb.max.z };
-        frameCamera(nb.min.x, nb.max.x, nb.min.z, nb.max.z, nb.max.y);
+        // GUARD#1 (camera-neutral): when a building was already framed and the user is looking at it,
+        // update the FRAME bbox (so Fit / plan-view still bound the network) WITHOUT moving the camera
+        // target — Generate must not reframe off the building the user is already viewing. A cold
+        // standalone Generate (no kept view) reframes onto the network as before.
+        if (keepView && window._frame) {
+          const _cx = (nb.min.x + nb.max.x) / 2, _cz = (nb.min.z + nb.max.z) / 2;
+          const _span = Math.max(nb.max.x - nb.min.x, nb.max.z - nb.min.z, 40);
+          window._frame = { cx: _cx, cz: _cz, span: _span, ceil: nb.max.y, bbox: { minX: nb.min.x, maxX: nb.max.x, minY: nb.min.z, maxY: nb.max.z } };
+        } else {
+          frameCamera(nb.min.x, nb.max.x, nb.min.z, nb.max.z, nb.max.y);
+        }
       }
       if (planBuildState && planBuildState.api && planBuildState.api.root) {
         const gb = new THREE.Box3().setFromObject(planBuildState.api.root);
@@ -2710,14 +3166,17 @@ function registerPlanBuildUnderlay(entry, levelN, page, source, pageWidthPt, pag
     // createUnderlayMesh) resolves the remaining near-coplanar depth ties.
     elevationFt: entry.elevationFt, liftFt: 0.5,
   });
+  const dbgRot = (window.__dbgUnderlayRotX !== undefined) ? Number(window.__dbgUnderlayRotX) : t.rotation.x;
   const mesh = createUnderlayMesh(THREE, {
     canvas: source,
-    transform: { widthFt: t.widthFt, depthFt: t.depthFt, position: t.position, rotation: t.rotation, scaleSource: t.scaleSource, needsVerification: true },
+    transform: { widthFt: t.widthFt, depthFt: t.depthFt, position: t.position, rotation: { x: dbgRot, y: t.rotation.y, z: t.rotation.z }, scaleSource: t.scaleSource, needsVerification: true },
     opacity: 0.92, name: `plan-underlay:A-10${levelN}:p${page}`,
-    // ORIENTATION CONTRACT: -PI/2 (textured face up = readable from the top-down plan camera),
-    // NO texture flip — the verified default reads sheet text FORWARD at BOTH top and iso
-    // (empirically re-verified via the 4-way U/V flip sweep; see pdf-underlay.js header).
-    flipTextureV: t.flipTextureV === true,
+    // ORIENTATION CONTRACT: -PI/2 (textured face up = readable from the top-down plan camera).
+    // REGISTRATION: the texture V axis must run the SAME direction as the geometry's
+    // plan-Y -> world-Z map (computePlanUnderlayTransform returns flipTextureV for this).
+    // __dbgUnderlayFlipV (live-QA override) lets the registration sweep force a value.
+    flipTextureV: (window.__dbgUnderlayFlipV !== undefined) ? !!window.__dbgUnderlayFlipV : (t.flipTextureV === true),
+    flipTextureU: (window.__dbgUnderlayFlipU !== undefined) ? !!window.__dbgUnderlayFlipU : false,
     sheetMeta: { sheet: `A-10${levelN}`, page, discipline: 'arch', verified: 'registered-true-scale', underlaySource: sourceLabel },
   });
   entry.group.add(mesh);
@@ -2853,7 +3312,8 @@ function buildPlanBuildPanel() {
         <div>whole-sheet wall-ink coverage (diagnostic): <b style="color:#fbbf24">${recall}</b> floor (denominator incl. border/grid/dim ink) (L${ext.level})</div>
         <div>${doorLine}${windowLine ? ' · ' + windowLine : ''} · openings ${ext.openings || 0} · lineweight-union overlay ${ext.recoveredWalls ? ext.recoveredWalls.toLocaleString() : 0} segs (off by default)</div>
         ${columnLine ? `<div>${columnLine}</div>` : ''}
-        ${ext.fixtures ? `<div>fixtures/cores: ${ext.fixtures}${fxLine ? ' (' + fxLine + ')' : ''}</div>` : ''}
+        ${(ext.rooms != null && ext.rooms > 0) ? `<div>rooms <b style="color:#4ade80">${ext.rooms}</b>${ext.roomAreaSqft ? ` · <b>${ext.roomAreaSqft.toLocaleString()} sq ft</b>` : ''}${ext.roomMeanCoverage != null ? ` · <span style="color:var(--muted)">${Math.round(ext.roomMeanCoverage * 100)}% boundary-on-wall</span>` : ''} <span style="color:var(--muted)">[${ext.roomSource || 'trace'}]</span></div>` : ''}
+        ${ext.fixtures ? `<div>fixtures/cores: ${ext.fixtures}${(ext.fixtureSymbols != null) ? ` (<b style="color:#fbbf24">${ext.fixtureSymbols} geom symbols</b>${ext.fixturePlumbing ? ` · ${ext.fixturePlumbing} plumbing` : ' · 0 plumbing'})` : (fxLine ? ' (' + fxLine + ')' : '')}</div>` : ''}
         <div style="margin-top:4px"><a href="#" id="w2HeatLink" style="color:#7dd3fc;text-decoration:underline">view recall heatmap ▸</a></div>
         <img id="w2HeatThumb" src="${W2_HEATMAP_URL}" alt="wall recall heatmap (covered green / missed red)"
              style="display:none;width:100%;margin-top:6px;border:1px solid var(--line,#283042);border-radius:4px"
@@ -2902,7 +3362,10 @@ async function renderPlanComprehensionBuild(name) {
     api = buildBuildingFromPlans(THREE, levelPlans, {
       mergeGeometries,            // HF-G1-COUPLE merger — collapse thousands of walls to 1 mesh/level
       wallMergeThreshold: 600,
-      wallHeightFt: 9, wallThicknessFt: 0.5, slabThicknessFt: 0.75,
+      // TRUE-SCALE ceiling: the 1881 first floor is a ~14ft slab-to-ceiling parking/retail level
+      // (estimatedFloorToFloorFt ~10.5 is the residential floors above). Walls + perimeter shell +
+      // columns all stand slab(z=0)->14ft so the building reads at true height, not 9ft squat.
+      wallHeightFt: 14, wallThicknessFt: 0.5, slabThicknessFt: 0.75,
     });
   } catch (e) { window.__planBuildError = 'buildBuildingFromPlans: ' + String(e.message || e); return false; }
 
@@ -3758,7 +4221,13 @@ async function applyGenerated(data) {
   const COMP_TARGET_FT = { riser_assembly: 3.0, valve_alarm_check: 1.2, fdc: 1.5, fitting_tee: 0.8, fitting_elbow_90: 0.55, fitting_coupling: 0.45, fitting_reducer: 0.4 };
   await Promise.all(compKeys.map((k) => loadPartGeo(k, COMP_TARGET_FT[k] || 1.5)));
   await preloadDetailMeshes(); // HF-C1-PARTMESH: real coupling/hanger/tee/elbow meshes for the detail pass
-  renderModel(cadModel);
+  // GUARD#1 (camera-neutral): when a building/plan is ALREADY loaded and framed (the user is looking
+  // at the imported model), Generate places the sprinkler network onto the SAME building frame
+  // (network + building share one origin + true scale — see alignNetworkToExtractedPlate below), so
+  // KEEP the user's current view instead of reframing off the building. Only a cold standalone
+  // Generate with no prior frame fits to the new layout.
+  const _keepView = !!(window._frame && planBuildState);
+  renderModel(cadModel, _keepView ? { preserveView: true } : undefined);
   await renderRealOrFixtureUnderlay(floorPlan); // HF-B1-PDFUNDERLAY: REAL sheets when the project has them
   // HF-E2-NETALIGN: register the sprinkler network onto the EXTRACTED plate frame.
   // For Cooperative 1881 the server now lays the network against the REAL extracted
@@ -3770,7 +4239,7 @@ async function applyGenerated(data) {
   // the whole modelGroup by (-cx, 0, -cy) — the SAME union-footprint center the building
   // uses. Result: network + building share one origin + one true scale (1 unit = 1 ft).
   // Non-1881 projects (and the placeholder fallback) keep modelGroup at the origin.
-  alignNetworkToExtractedPlate(floorPlan);
+  alignNetworkToExtractedPlate(floorPlan, { keepView: _keepView });
   lastFloorPlan = floorPlan || null; // HF-W1: remembered so post-edit re-renders re-align to the same plate frame
     const r = bid.rooms[0];
     $('layout').innerHTML = `
@@ -3997,6 +4466,12 @@ $('planSource').onchange = (e) => {
   autoLoadOrUnderlay(); // HF-A1-AUTOLOAD: source change re-checks the saved layout
 };
 $('projectTarget').onchange = () => { applySourcePolicy(); autoLoadOrUnderlay(); };
+// AutoBid engine 3D (PDF -> model) loader wiring
+try { const _ud = new URLSearchParams(location.search).get('doc'); if (_ud && $('abDoc')) $('abDoc').value = _ud; } catch (_) {}
+if ($('abLoadBtn')) $('abLoadBtn').onclick = loadEngineModel;
+if ($('abClearBtn')) $('abClearBtn').onclick = clearEngineModel;
+if ($('abPlate')) $('abPlate').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadEngineModel(); });
+if ($('abDoc')) $('abDoc').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadEngineModel(); });
 if ($('pdfFile')) $('pdfFile').onchange = async (e) => {
   const f = e.target.files && e.target.files[0];
   if (!f) { pdfBase64 = ''; return; }
@@ -4337,6 +4812,8 @@ window.__HFEdit = HFEdit; // headless-verification hook
 window.__hfEditState = { label: '', depth: 0, canUndo: false, canRedo: false };
 // Headless-verification accessors (module-scoped state isn't on window).
 window.__hfModel = () => currentCadModel;
+// Headless verification only: force a re-render of the current model (camera held).
+window.__hfRerender = () => { if (currentCadModel) { renderModel(currentCadModel, { preserveView: true }); return true; } return false; };
 window.__hfReady = () => ogReady === true;
 window.__hfSolidCount = (kind) => (currentCadModel && Array.isArray(currentCadModel.solids))
   ? (kind ? currentCadModel.solids.filter((s) => s.kind === kind).length : currentCadModel.solids.length) : null;
@@ -6210,9 +6687,10 @@ function stretchSelectBox(a, b) {
       const sy = rect.top + (-v.y * 0.5 + 0.5) * rect.height;
       if (sx >= x0 && sx <= x1 && sy >= y0 && sy <= y1) {
         stretchPicked.push({ solidIndex: i, grip: e.grip, plan: [e.plan[0], e.plan[1]], elev });
-        const geo = new THREE.PlaneGeometry(0.85, 0.85);
+        const geo = new THREE.PlaneGeometry(1, 1); // unit square; scaled screen-constant per frame
         const mat = new THREE.MeshBasicMaterial({ color: 0x00e676, depthTest: false, transparent: true, opacity: 0.95, side: THREE.DoubleSide });
         const mk = new THREE.Mesh(geo, mat); mk.position.copy(planToWorldVec(e.plan, elev || drawElev));
+        mk.userData.hfGripPx = GRIP_PX;
         mk.renderOrder = 1320; try { mk.quaternion.copy(camera.quaternion); } catch (_) {}
         scene.add(mk); stretchMarks.push(mk);
       }
@@ -6418,7 +6896,7 @@ function buildPhase4Intake() {
     if (!st || !st.api) return { available: false, reason: 'no plan build — import a PDF/DXF plan first', walls: [], openings: [], columns: [], levels: [], scaleFtPerPx: null, source: 'none' };
     const lps = Array.isArray(st.levelPlans) ? st.levelPlans : [];
     const apiLevels = (st.api && Array.isArray(st.api.levels)) ? st.api.levels : [];
-    const walls = [], openings = [], columns = [], levels = [];
+    const walls = [], openings = [], columns = [], rooms = [], fixtures = [], levels = [];
     let scaleFtPerUnit = null;
     for (const lp of lps) {
       const p = lp.plan || {};
@@ -6437,6 +6915,14 @@ function buildPhase4Intake() {
       for (const o of (p.openings || [])) if (o && Array.isArray(o.position)) openings.push({ level: lp.level, kind: 'opening', position: o.position, width: o.width, confidence: o.confidence });
       for (const d of (p.doors || [])) if (d && Array.isArray(d.position)) openings.push({ level: lp.level, kind: 'door', position: d.position, width: d.width, confidence: d.confidence, suspect: d.suspect });
       for (const w of (p.windows || [])) if (w && Array.isArray(w.position)) openings.push({ level: lp.level, kind: 'window', position: w.position, width: w.width, confidence: w.confidence, mullionLines: w.mullionLines });
+      // ROOMS: prefer the TRUE traced room boundaries (marching-squares polygons + shoelace area +
+      // independent wall-coverage closure metric) over the legacy bbox-rectangle flood-fill rooms.
+      const rsrc = (Array.isArray(p.roomBoundaries) && p.roomBoundaries.length) ? p.roomBoundaries : (p.rooms || []);
+      for (const r of rsrc) if (r && Array.isArray(r.poly) && r.poly.length >= 3) rooms.push({ level: lp.level, poly: r.poly, areaSqft: r.areaSqft, kind: r.kind, label: r.label, hazardHint: r.hazardHint, wallCoverage: r.wallCoverage, confidence: r.confidence, suspect: r.suspect });
+      // FIXTURES: geometric fixture/equipment SYMBOLS (compact symbol clusters) plus the legacy
+      // label/room-kind cores; both carry fixtureKind + confidence so a consumer can split them.
+      for (const f of (p.fixtureSymbols || [])) if (f && Array.isArray(f.position)) fixtures.push({ level: lp.level, fixtureKind: f.fixtureKind, position: f.position, widthFt: f.widthFt, heightFt: f.heightFt, source: f.source, confidence: f.confidence, suspect: f.suspect });
+      for (const f of (p.fixtures || [])) if (f && Array.isArray(f.position)) fixtures.push({ level: lp.level, fixtureKind: f.fixtureKind, position: f.position, source: f.source, confidence: f.confidence });
       levels.push({ level: lp.level, name: lp.name, elevationFt: lp.elevationFt, scaleFtPerUnit: p.scaleFtPerUnit, scaleText: p.scaleText });
     }
     // COLUMNS: from the resolved api levels (extracted or grid-synthesized in building-from-plan).
@@ -6465,15 +6951,47 @@ function buildPhase4Intake() {
       scaleSource: cal ? ('operator-calibration(' + cal.method + ')') : (sheetFtPerPx != null ? 'sheet-printed-scale' : 'unknown'),
       calibrated: !!cal,
       sheetFtPerPx,
-      walls, openings, columns, levels,
-      counts: { walls: walls.length, openings: openings.length, columns: columns.length, levels: levels.length },
+      walls, openings, columns, rooms, fixtures, levels,
+      counts: { walls: walls.length, openings: openings.length, columns: columns.length, rooms: rooms.length, fixtures: fixtures.length, levels: levels.length },
+      // ROOMS — true traced polygons + areas (hazard/occupancy + coverage input). wallCoverage is
+      // the closure signal (fraction of each boundary on extracted wall ink). HONEST SPLIT: only
+      // the levels with a real floor-plan extraction (L1 = A-101) carry traced boundaries with a
+      // measured wallCoverage; other levels fall back to the legacy bbox-rectangle flood-fill rooms
+      // (no coverage). meanWallCoverage is computed over the TRACED rooms only so it is not diluted
+      // by the legacy set — never label a flood-fill bbox as a measured-closure room.
+      roomCounts: (() => {
+        const traced = rooms.filter((r) => Number.isFinite(r.wallCoverage));
+        const legacy = rooms.length - traced.length;
+        return {
+          total: rooms.length,
+          traced: traced.length,
+          legacyBbox: legacy,
+          confident: rooms.filter((r) => !r.suspect && r.confidence !== 'low').length,
+          suspect: rooms.filter((r) => r.suspect || r.confidence === 'low').length,
+          totalAreaSqft: Math.round(rooms.reduce((a, r) => a + (Number(r.areaSqft) || 0), 0)),
+          tracedAreaSqft: Math.round(traced.reduce((a, r) => a + (Number(r.areaSqft) || 0), 0)),
+          meanWallCoverage: traced.length ? Math.round((traced.reduce((a, r) => a + r.wallCoverage, 0) / traced.length) * 1e4) / 1e4 : null,
+          roomSource: traced.length && legacy ? 'mixed(boundary-trace L1 + bbox-floodfill L2+)' : traced.length ? 'boundary-trace' : 'bbox-floodfill',
+          kinds: rooms.reduce((acc, r) => { acc[r.kind || 'unknown'] = (acc[r.kind || 'unknown'] || 0) + 1; return acc; }, {}),
+        };
+      })(),
+      // FIXTURES — geometric symbols (plumbing typed only inside a restroom w/ a footprint match;
+      // else 'equipment' at low confidence) + label/room-kind cores. Honest: an overall plan carries
+      // workstation/casework glyphs, NOT cleanly-labeled plumbing, so most are 'equipment'.
+      fixtureCounts: {
+        total: fixtures.length,
+        plumbing: fixtures.filter((f) => f.fixtureKind && !['equipment', 'mech', 'elec', 'stair', 'elevator', 'trash'].includes(f.fixtureKind)).length,
+        equipment: fixtures.filter((f) => f.fixtureKind === 'equipment').length,
+        cores: fixtures.filter((f) => ['mech', 'elec', 'stair', 'elevator', 'trash'].includes(f.fixtureKind)).length,
+        kinds: fixtures.reduce((acc, f) => { acc[f.fixtureKind || 'unknown'] = (acc[f.fixtureKind || 'unknown'] || 0) + 1; return acc; }, {}),
+      },
       columnSource,
       columnCounts: {
         total: columns.length,
         confident: columns.filter((c) => c.confidence === 'medium' || c.confidence === 'high').length,
         suspect: columns.filter((c) => c.confidence === 'low' || c.confidence === 'suspect').length,
       },
-      provenance: 'Engineering aid — building model reconstructed from the imported plan. Walls = high-recall collinear-merged runs from the partition-inclusive wall-ink band, dashed grid datums excluded (>=90% ink recall, ~99% precision measured on A-101 p8); openings = swing-arc doors + mullion-bundle windows + collinear-gap cased openings (best-effort); columns = ' + (columnSource || 'none') + '. NOT AHJ/PE-stamped — needs-verification.',
+      provenance: 'Engineering aid — building model reconstructed from the imported plan. Walls = high-recall collinear-merged runs from the partition-inclusive wall-ink band, dashed grid datums excluded (>=90% ink recall, ~99% precision measured on A-101 p8); openings = swing-arc doors + mullion-bundle windows + collinear-gap cased openings (best-effort); columns = ' + (columnSource || 'none') + '; rooms = enclosed wall-network voids traced to true polygons + shoelace areas (~99% boundary-on-wall coverage measured); fixtures = compact fixture-scale symbol clusters (typed plumbing only inside a restroom w/ a footprint match, else equipment — an overall plan carries workstation/casework glyphs, NOT labeled plumbing). NOT AHJ/PE-stamped — needs-verification.',
       needsVerification: true,
     };
   };
@@ -7139,7 +7657,7 @@ const snapState = defaultSnapState();
 // Full AutoSPRINK O-snap suite — every geometric + tracking snap type the engine
 // (snaps.js) supports. The toolbar master toggle + settings popover both drive these.
 const SNAP_ALL_KEYS = ['endpoint', 'midpoint', 'intersection', 'perpendicular', 'node', 'extension', 'grid'];
-const SNAP_LABELS = { endpoint: 'Endpoint', midpoint: 'Midpoint', intersection: 'Intersection', perpendicular: 'Perpendicular', node: 'Node / Center', extension: 'Extension', grid: 'Grid' };
+const SNAP_LABELS = { endpoint: 'Endpoint', midpoint: 'Midpoint', intersection: 'Intersection', perpendicular: 'Perpendicular', node: 'Node / Center', extension: 'Extension', grid: 'Grid', nearest: 'Nearest' };
 function toggleSnap(type) {
   if (!(type in snapState)) return;
   snapState[type] = !snapState[type];
@@ -7156,8 +7674,30 @@ window.__hfSnapState = { ...snapState };
 // cursor (segmentsFromModel = pipe/wall runs; nodesFromModel = head/fitting centers).
 function hfSnapAt(point) {
   const segs = segmentsFromModel(currentCadModel);
-  const nodes = nodesFromModel(currentCadModel);
-  return snapPoint(point, segs, snapState, nodes);
+  let nodes = nodesFromModel(currentCadModel);
+  // Snap-into-Symbols OFF removes component/symbol centers from the NODE set.
+  if (!snapState.symbols) nodes = nodes.filter((n) => n.label === 'head');
+  // Special-Element ON keeps only head + fitting centers (drops walls-as-nodes etc.).
+  if (snapState.special) nodes = nodes.filter((n) => n.label === 'head' || n.label === 'fitting' || n.label === 'component');
+  const base = snapPoint(point, segs, snapState, nodes);
+  // Near (Nearest) snap — nearest point ON any run, computed here so the engine
+  // file stays untouched. Only wins when it is the closest snap within tolerance.
+  if (snapState.nearest && segs.length) {
+    const tol = (snapState.tolFt > 0 ? snapState.tolFt : 1.5);
+    let bp = null, bd = Infinity;
+    for (const s of segs) {
+      const abx = s.b[0] - s.a[0], aby = s.b[1] - s.a[1];
+      const L2 = abx * abx + aby * aby; if (L2 < 1e-9) continue;
+      let t = ((point[0] - s.a[0]) * abx + (point[1] - s.a[1]) * aby) / L2; t = Math.max(0, Math.min(1, t));
+      const fp = [s.a[0] + t * abx, s.a[1] + t * aby];
+      const d = Math.hypot(point[0] - fp[0], point[1] - fp[1]);
+      if (d < bd) { bd = d; bp = fp; }
+    }
+    if (bp && bd <= tol && (!base.snapped || bd < base.dist)) {
+      return { p: bp, type: 'nearest', snapped: true, dist: bd, from: null, label: 'Nearest' };
+    }
+  }
+  return base;
 }
 
 // HF-PHASE1-POLAR: apply the active angular constraint to a draft vector from
@@ -7464,6 +8004,192 @@ function snapVisibleGrid() {
   $('status').textContent = `visible grid ${gridHelper.visible ? 'ON' : 'off'}`;
 }
 window.__hfGridVisible = () => !!(gridHelper && gridHelper.visible);
+
+// ── HF-W-TOOLSWIRE (2026-06-15): make the remaining AutoSPRINK Snaps / Benchmark /
+// UCS menu items REAL state changes (or honestly stub the ones that need geometry
+// this client doesn't model). Every wired item below flips an observable flag or
+// places a real marker — none is a dead NEEDS-VERIFICATION stub.
+//
+// Extra snap-state flags live alongside the engine's per-type flags. The engine's
+// snap() never reads them; they are consumed in autosprink.html (hfSnapAt below +
+// the head-placement / draw-elevation paths), so src/engine/snaps.js is untouched.
+snapState.nearest = false;       // Near snap: nearest point ON a run (not just named points)
+snapState.special = false;       // Special Element: restrict NODE snap to heads/fittings only
+snapState.symbols = true;        // Snap into Symbols: include component insertion points in NODE snap
+snapState.ceilingSnap = false;   // Sprinkler Ceiling Snap: placed heads pull to the ceiling plane
+snapState.zLock = false;         // Z-Lock / Elevation Lock: keep drawElev fixed (don't inherit run Z)
+
+// UCS (user coordinate system) / benchmark reference — a real origin+rotation+elev
+// datum that the draw path actually uses (see hfUcsApply). Persisted so it survives
+// reload, matching AutoSPRINK's per-drawing benchmark.
+const hfUcs = (function () {
+  let saved = {}; try { saved = JSON.parse(localStorage.getItem('hfUcs.v1') || '{}') || {}; } catch (_) {}
+  return {
+    originX: +saved.originX || 0, originY: +saved.originY || 0, elevFt: +saved.elevFt || 0,
+    rotDeg: +saved.rotDeg || 0, autoRotation: !!saved.autoRotation, autoOrtho: !!saved.autoOrtho,
+    orthoInput: saved.orthoInput !== false, visible: !!saved.visible,
+  };
+})();
+function hfUcsSave() { try { localStorage.setItem('hfUcs.v1', JSON.stringify(hfUcs)); } catch (_) {} window.__hfUcs = { ...hfUcs }; }
+window.__hfUcs = { ...hfUcs };
+let benchmarkMarker = null;
+function hfBenchmarkMesh() {
+  if (benchmarkMarker) return benchmarkMarker;
+  const g = new THREE.Group();
+  const ringGeo = new THREE.RingGeometry(0.9, 1.1, 32);
+  const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xffd54f, side: THREE.DoubleSide, transparent: true, opacity: 0.95, depthTest: false }));
+  ring.rotation.x = -Math.PI / 2; g.add(ring);
+  const armMat = new THREE.LineBasicMaterial({ color: 0xffd54f, depthTest: false });
+  const armGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-2, 0, 0), new THREE.Vector3(2, 0, 0),
+    new THREE.Vector3(0, 0, -2), new THREE.Vector3(0, 0, 2),
+  ]);
+  g.add(new THREE.LineSegments(armGeo, armMat));
+  g.renderOrder = 4000;
+  benchmarkMarker = g; scene.add(g);
+  return g;
+}
+function hfBenchmarkSync() {
+  const m = hfBenchmarkMesh();
+  const off = modelGroup ? modelGroup.position : { x: 0, z: 0 };
+  m.position.set(off.x + hfUcs.originX, hfUcs.elevFt + 0.05, off.z + hfUcs.originY);
+  m.rotation.y = -hfUcs.rotDeg * Math.PI / 180;
+  m.visible = !!hfUcs.visible;
+}
+
+// Z-Lock / Elevation Lock — both pin the working elevation so every new run/head
+// keeps drawElev instead of inheriting a clicked run's Z. Real, observable.
+function snapZLock() {
+  snapState.zLock = !snapState.zLock;
+  window.__hfSnapState = { ...snapState };
+  $('status').textContent = `Z-Lock ${snapState.zLock ? 'ON — runs stay at ' + drawElev + ' ft' : 'off — runs inherit clicked elevation'}`;
+}
+function snapElevationLock() {
+  snapState.zLock = !snapState.zLock; // elevation lock shares the working-elevation pin
+  window.__hfSnapState = { ...snapState };
+  $('status').textContent = `Elevation Lock ${snapState.zLock ? 'ON — drawElev pinned at ' + drawElev + ' ft' : 'off'}`;
+}
+// Near (Nearest) — snap to the nearest point lying ON a run. Real new snap type
+// (computed in hfSnapAt; the glyph reuses the perpendicular look).
+function snapNear() {
+  snapState.nearest = !snapState.nearest;
+  window.__hfSnapState = { ...snapState };
+  $('status').textContent = `Near (nearest-on-run) snap ${snapState.nearest ? 'ON' : 'off'}`;
+}
+// Special Element — restrict NODE/center snapping to special elements (heads +
+// fittings). Real flag consumed when building node candidates in hfSnapAt.
+function snapSpecialElement() {
+  snapState.special = !snapState.special;
+  if (snapState.special) snapState.node = true; // special snap implies node snapping is on
+  window.__hfSnapState = { ...snapState };
+  $('status').textContent = `Special-Element snap ${snapState.special ? 'ON — center-snap heads/fittings only' : 'off — all node centers'}`;
+}
+// Snap into Symbols — include / exclude component (symbol) insertion centers in the
+// NODE snap set. Real flag.
+function snapIntoSymbols() {
+  snapState.symbols = !snapState.symbols;
+  window.__hfSnapState = { ...snapState };
+  $('status').textContent = `Snap-into-Symbols ${snapState.symbols ? 'ON — symbol centers snap' : 'off'}`;
+}
+// Pipe-to-Sprinkler Snap Options — opens the live object-snap options popover (the
+// same per-type panel the toolbar gear opens). Real UI surface.
+function snapPipeToSprinklerOptions() {
+  if (typeof openSnapPopover === 'function') {
+    try { openSnapPopover(); } catch (_) { try { toggleSnapPopover(); } catch (__) {} }
+    $('status').textContent = 'Pipe→Sprinkler snap options — toggle the per-type object snaps';
+  } else { $('status').textContent = 'snap options popover unavailable'; }
+}
+// Sprinkler Ceiling Snap — when ON, a placed head pulls its elevation to the
+// ceiling plane (from the live ceiling grid if built, else the working elev).
+// Real flag consumed in the head-placement path.
+function snapSprinklerCeiling() {
+  snapState.ceilingSnap = !snapState.ceilingSnap;
+  window.__hfSnapState = { ...snapState };
+  const cc = (typeof ceilingContract === 'function') ? ceilingContract() : null;
+  const at = cc && cc.available ? '' : ' (no ceiling grid yet — falls back to working elevation; run Generate Layout for a ceiling plane)';
+  $('status').textContent = `Sprinkler Ceiling Snap ${snapState.ceilingSnap ? 'ON — heads pull to ceiling' + at : 'off'}`;
+}
+// Return the ceiling-plane elevation (ft) for ceiling-snap, or null if unknown.
+function hfCeilingZ() {
+  try {
+    const cc = ceilingContract();
+    if (cc && cc.available && Number.isFinite(cc.origin && cc.origin.z)) return cc.origin.z;
+  } catch (_) {}
+  return null;
+}
+
+// ── UCS / Benchmark — real coordinate-datum state ──
+// Auto Benchmark — set the benchmark origin to the centroid of the current model
+// (or 0,0 when empty) and show the marker. Real placement.
+function benchmarkAuto() {
+  let cx = 0, cy = 0, n = 0;
+  const sols = currentCadModel && Array.isArray(currentCadModel.solids) ? currentCadModel.solids : [];
+  for (const s of sols) {
+    let p = null;
+    if (Array.isArray(s.position)) p = s.position; else if (Array.isArray(s.from)) p = s.from; else if (Array.isArray(s.a)) p = s.a;
+    if (p) { cx += p[0]; cy += p[1]; n += 1; }
+  }
+  if (n) { hfUcs.originX = +(cx / n).toFixed(2); hfUcs.originY = +(cy / n).toFixed(2); }
+  hfUcs.visible = true; hfUcsSave(); hfBenchmarkSync();
+  $('status').textContent = `Auto Benchmark set at (${hfUcs.originX}, ${hfUcs.originY}) ft — origin datum + marker shown`;
+}
+// Visible Benchmark — toggle the benchmark marker mesh. Real overlay.
+function benchmarkVisible() {
+  hfUcs.visible = !hfUcs.visible; hfUcsSave(); hfBenchmarkSync();
+  $('status').textContent = `Benchmark marker ${hfUcs.visible ? 'shown' : 'hidden'}`;
+}
+// Alter Benchmark Elevation/Rotation — prompt for the datum elevation + rotation
+// and apply them. Real, persisted, and consumed by the draw path (hfUcsApply).
+function benchmarkAlter() {
+  const e = window.prompt('Benchmark elevation (ft):', String(hfUcs.elevFt)); if (e == null) return;
+  const r = window.prompt('Benchmark rotation (deg, CCW):', String(hfUcs.rotDeg)); if (r == null) return;
+  hfUcs.elevFt = Number(e) || 0; hfUcs.rotDeg = Number(r) || 0; hfUcs.visible = true;
+  hfUcsSave(); hfBenchmarkSync();
+  $('status').textContent = `Benchmark datum: elev ${hfUcs.elevFt} ft, rotation ${hfUcs.rotDeg}°`;
+}
+// Move Benchmark — prompt for a new origin (or use the last clicked plan point).
+function benchmarkMove() {
+  const x = window.prompt('Benchmark origin X (ft):', String(hfUcs.originX)); if (x == null) return;
+  const y = window.prompt('Benchmark origin Y (ft):', String(hfUcs.originY)); if (y == null) return;
+  hfUcs.originX = Number(x) || 0; hfUcs.originY = Number(y) || 0; hfUcs.visible = true;
+  hfUcsSave(); hfBenchmarkSync();
+  $('status').textContent = `Benchmark moved to (${hfUcs.originX}, ${hfUcs.originY}) ft`;
+}
+// UCS toggles — real persisted booleans that change draw behavior.
+function ucsAutoBenchmarkRotation() {
+  hfUcs.autoRotation = !hfUcs.autoRotation; hfUcsSave();
+  $('status').textContent = `UCS auto benchmark-rotation ${hfUcs.autoRotation ? 'ON — draw aligns to benchmark rotation' : 'off'}`;
+}
+function ucsAutoOrthoSnaps() {
+  hfUcs.autoOrtho = !hfUcs.autoOrtho; hfUcsSave();
+  // auto-ortho engages the persistent ortho lock too, so the effect is visible while drawing
+  orthoLock = hfUcs.autoOrtho; const ob = $('orthoToggleBtn'); if (ob) ob.classList.toggle('on', orthoLock); window.__hfOrtho = orthoLock;
+  $('status').textContent = `UCS auto ortho-snaps ${hfUcs.autoOrtho ? 'ON — ortho lock engaged' : 'off'}`;
+}
+function ucsOrthoInput() {
+  hfUcs.orthoInput = !hfUcs.orthoInput; hfUcsSave();
+  $('status').textContent = `UCS ortho input ${hfUcs.orthoInput ? 'ON — typed lengths follow ortho axis' : 'off'}`;
+}
+// Expose the UCS/benchmark drivers for the headless harness (no DOM prompts).
+window.__hfBenchmark = {
+  state: () => ({ ...hfUcs, markerVisible: !!(benchmarkMarker && benchmarkMarker.visible) }),
+  auto: () => { benchmarkAuto(); return window.__hfBenchmark.state(); },
+  visible: () => { benchmarkVisible(); return window.__hfBenchmark.state(); },
+  setOrigin: (x, y) => { hfUcs.originX = +x || 0; hfUcs.originY = +y || 0; hfUcs.visible = true; hfUcsSave(); hfBenchmarkSync(); return window.__hfBenchmark.state(); },
+  setDatum: (elev, rot) => { hfUcs.elevFt = +elev || 0; hfUcs.rotDeg = +rot || 0; hfUcs.visible = true; hfUcsSave(); hfBenchmarkSync(); return window.__hfBenchmark.state(); },
+  autoRotation: () => { ucsAutoBenchmarkRotation(); return window.__hfBenchmark.state(); },
+  autoOrtho: () => { ucsAutoOrthoSnaps(); return window.__hfBenchmark.state(); },
+  orthoInput: () => { ucsOrthoInput(); return window.__hfBenchmark.state(); },
+};
+window.__hfSnapExtra = {
+  zLock: () => { snapZLock(); return snapState.zLock; },
+  elevLock: () => { snapElevationLock(); return snapState.zLock; },
+  near: () => { snapNear(); return snapState.nearest; },
+  special: () => { snapSpecialElement(); return snapState.special; },
+  symbols: () => { snapIntoSymbols(); return snapState.symbols; },
+  ceiling: () => { snapSprinklerCeiling(); return snapState.ceilingSnap; },
+};
+
 function planToWorldVec(plan, elev) {
   const off = modelGroup ? modelGroup.position : { x: 0, z: 0 };
   return new THREE.Vector3(off.x + plan[0], elev || 9, off.z + plan[1]);
@@ -8160,11 +8886,33 @@ function clearMeasureLabel() { if (measureLabel) { measureLabel.remove(); measur
 // of both ends = a clean segment translate). Hovering a grip highlights it. Built
 // WITH the existing snapState/hfSnapAt + HFEdit stack — no camera reframe, ever.
 const GRIP_BLUE = 0x2f6bff, GRIP_HOT = 0x00e676, GRIP_MID = 0x9aa7b8;
-const GRIP_SIZE = 0.85;          // world ft — square half handled below
+// CONSTANT-SCREEN-SIZE grips (AutoSPRINK / Unreal manipulator look): the plane
+// geometry is a UNIT square (1 world ft) and every frame we rescale each handle
+// so it spans a fixed pixel target on screen regardless of zoom or camera type.
+// This kills the old "giant world-space square swallows the pipe when you zoom"
+// bug — GRIP_SIZE used to be 0.85 world ft, which ballooned on zoom-in.
+const GRIP_PX = 8;               // target on-screen size of an endpoint grip (px)
+const GRIP_HOVER_MULT = 1.5;     // hover/active handles grow 1.5× (still constant-screen)
+const GRIP_MIN_FT = 0.04, GRIP_MAX_FT = 400; // clamp so a degenerate zoom never explodes
 let gripMeshes = [], gripDrag = null, gripHover = null;
+// world ft that one screen pixel spans AT a given world position (camera-aware,
+// per-grip so perspective foreshortening is handled point-by-point). Mirrors the
+// scale-bar math in feetPerPixelAtTarget() but evaluated at the grip, not target.
+function ftPerPixelAt(worldPos) {
+  const cnv = $('canvas'); const h = (cnv && cnv.clientHeight) || (renderer && renderer.domElement.clientHeight) || 1;
+  if (!camera) return 1 / h;
+  if (camera.isOrthographicCamera) {
+    const worldH = (camera.top - camera.bottom) / (camera.zoom || 1);
+    return worldH / h;
+  }
+  const dist = camera.position.distanceTo(worldPos);
+  const worldH = 2 * dist * Math.tan((camera.fov * Math.PI / 180) / 2);
+  return worldH / h;
+}
 // A small camera-facing square (AutoSPRINK grip look) at a plan point.
+// Geometry is a 1ft unit square; faceGripsToCamera() rescales it to GRIP_PX px.
 function makeGripMesh(name, plan, elev, color) {
-  const geo = new THREE.PlaneGeometry(GRIP_SIZE, GRIP_SIZE);
+  const geo = new THREE.PlaneGeometry(1, 1);
   const mat = new THREE.MeshBasicMaterial({ color, depthTest: false, transparent: true, opacity: 0.96, side: THREE.DoubleSide });
   const m = new THREE.Mesh(geo, mat);
   m.position.copy(planToWorldVec(plan, elev));
@@ -8172,6 +8920,9 @@ function makeGripMesh(name, plan, elev, color) {
   m.userData.hfGrip = name;          // 'from'|'to'|'a'|'b' = endpoint; 'mid' = segment-move
   m.userData.hfGripBase = color;
   m.userData.hfGripPlan = [plan[0], plan[1]];
+  m.userData.hfGripPx = (name === 'mid') ? GRIP_PX + 1 : GRIP_PX; // mid grip a hair larger
+  m.userData.hfGripHovered = false;
+  m.scale.set(GRIP_PX * 0.05, GRIP_PX * 0.05, 1); // seed; corrected next frame
   gripMeshes.push(m); scene.add(m);
   return m;
 }
@@ -8197,10 +8948,62 @@ function refreshGrips() {
 // handles in 3D + 2D. Called from refreshGrips and the render loop hook.
 function faceGripsToCamera() {
   if (!camera) return;
-  for (const g of gripMeshes) { try { g.quaternion.copy(camera.quaternion); } catch (_) {} }
-  if (typeof stretchMarks !== 'undefined') for (const m of stretchMarks) { try { m.quaternion.copy(camera.quaternion); } catch (_) {} }
+  for (const g of gripMeshes) {
+    try {
+      g.quaternion.copy(camera.quaternion);
+      if (window.__hfGripLegacy) { g.scale.set(0.85, 0.85, 1); continue; } // BEFORE-capture only
+      // CONSTANT-SCREEN-SIZE: scale the unit-square so it spans hfGripPx pixels
+      // at THIS grip's distance/zoom. Never grows huge on zoom-in, never vanishes
+      // on zoom-out — a true CAD manipulator handle.
+      const px = (g.userData.hfGripPx || GRIP_PX) * (g.userData.hfGripHovered ? GRIP_HOVER_MULT : 1);
+      let ft = ftPerPixelAt(g.position) * px;
+      if (!isFinite(ft) || ft <= 0) ft = GRIP_MIN_FT;
+      ft = Math.max(GRIP_MIN_FT, Math.min(GRIP_MAX_FT, ft));
+      g.scale.set(ft, ft, 1);
+    } catch (_) {}
+  }
+  if (typeof stretchMarks !== 'undefined') for (const m of stretchMarks) {
+    try {
+      m.quaternion.copy(camera.quaternion);
+      let ft = ftPerPixelAt(m.position) * (m.userData.hfGripPx || GRIP_PX);
+      if (!isFinite(ft) || ft <= 0) ft = GRIP_MIN_FT;
+      ft = Math.max(GRIP_MIN_FT, Math.min(GRIP_MAX_FT, ft));
+      m.scale.set(ft, ft, 1);
+    } catch (_) {}
+  }
 }
 window.__hfFaceGrips = faceGripsToCamera;
+// ── Test/verification hooks for the live grip harness (read-only introspection) ──
+window.__hfGripDebug = {
+  meshes: () => gripMeshes,
+  setView: (v) => { try { setView(v); } catch (_) {} },
+  // on-screen pixel footprint of a named endpoint/mid grip (proves constant-screen)
+  screenPx: (name) => {
+    const g = gripMeshes.find((x) => x.userData.hfGrip === name);
+    const cnv = $('canvas'); if (!g || !cnv || !camera) return null;
+    g.updateMatrixWorld(true);
+    const w = cnv.clientWidth, h = cnv.clientHeight;
+    const xs = [], ys = [];
+    for (const [cx, cy] of [[-0.5,-0.5],[0.5,-0.5],[0.5,0.5],[-0.5,0.5]]) {
+      const v = new THREE.Vector3(cx, cy, 0).applyMatrix4(g.matrixWorld).project(camera);
+      xs.push((v.x*0.5+0.5)*w); ys.push((-v.y*0.5+0.5)*h);
+    }
+    return { px: Math.max(...xs)-Math.min(...xs), py: Math.max(...ys)-Math.min(...ys) };
+  },
+  // force the OLD broken behavior (fixed 0.85ft world square) for BEFORE capture
+  forceLegacy: (on) => { window.__hfGripLegacy = !!on; },
+  // multiply ortho zoom (test-only) to prove constant-screen across ortho zoom
+  orthoZoom: (mult) => { if (camera && camera.isOrthographicCamera) { camera.zoom *= mult; camera.updateProjectionMatrix(); controls.update(); return camera.zoom; } return null; },
+  // set ortho zoom so one screen pixel spans `ftpp` feet (test-only, precise demo)
+  setOrthoFtPerPx: (ftpp) => { const cnv = $('canvas'); const h = (cnv && cnv.clientHeight) || 1; if (camera && camera.isOrthographicCamera) { const worldH = (camera.top - camera.bottom); camera.zoom = worldH / (ftpp * h); camera.updateProjectionMatrix(); controls.update(); return camera.zoom; } return null; },
+  isOrtho: () => !!(camera && camera.isOrthographicCamera),
+  diag: (name) => {
+    const g = gripMeshes.find((x) => x.userData.hfGrip === name); if (!g || !camera) return null;
+    const dist = camera.position.distanceTo(g.position);
+    return { dist, ftPerPx: ftPerPixelAt(g.position), scale: g.scale.x, fov: camera.fov, isOrtho: !!camera.isOrthographicCamera,
+      camPos: [camera.position.x, camera.position.y, camera.position.z], near: camera.near };
+  }
+};
 // Hover highlight: enlarge + recolor the grip under the cursor (when idle).
 function gripHoverTest(clientX, clientY) {
   if (!gripMeshes.length || gripDrag) return;
@@ -8210,10 +9013,10 @@ function gripHoverTest(clientX, clientY) {
   const hits = raycaster.intersectObjects(gripMeshes, false);
   const hit = hits.length ? hits[0].object : null;
   if (hit === gripHover) return;
-  if (gripHover) { gripHover.material.color.setHex(gripHover.userData.hfGripBase); gripHover.scale.set(1, 1, 1); }
+  if (gripHover) { gripHover.material.color.setHex(gripHover.userData.hfGripBase); gripHover.userData.hfGripHovered = false; }
   gripHover = hit;
   if (gripHover) {
-    gripHover.material.color.setHex(GRIP_HOT); gripHover.scale.set(1.5, 1.5, 1.5);
+    gripHover.material.color.setHex(GRIP_HOT); gripHover.userData.hfGripHovered = true;
     renderer.domElement.style.cursor = 'pointer';
   } else if (!hfDrag && !moveDrag) { renderer.domElement.style.cursor = ''; }
   window.__hfGripHover = gripHover ? gripHover.userData.hfGrip : null;
@@ -8354,8 +9157,12 @@ function commitWall(a, b) {
   if (HFEdit.apply('draw-wall', (m) => addSolid(m, makeWallSolid(a, b)))) $('status').textContent = `drew interior wall ${len.toFixed(1)}ft (needs-verification) · Ctrl+Z to undo`;
 }
 function commitHead(p) {
-  const solid = { kind: 'head', position: [p[0], p[1], drawElev - 1] };
-  if (HFEdit.apply('place-head', (m) => addSolid(m, solid))) $('status').textContent = 'placed sprinkler head (needs-verification) · Ctrl+Z to undo';
+  // Sprinkler Ceiling Snap: when ON, pull the deflector to the ceiling plane (live
+  // ceiling grid Z if available, else 1 ft below the working elevation as before).
+  let headZ = drawElev - 1;
+  if (snapState.ceilingSnap) { const cz = (typeof hfCeilingZ === 'function') ? hfCeilingZ() : null; if (Number.isFinite(cz)) headZ = cz - 0.1; }
+  const solid = { kind: 'head', position: [p[0], p[1], headZ] };
+  if (HFEdit.apply('place-head', (m) => addSolid(m, solid))) $('status').textContent = `placed sprinkler head${snapState.ceilingSnap ? ' (ceiling-snapped to ' + headZ.toFixed(1) + ' ft)' : ''} (needs-verification) · Ctrl+Z to undo`;
 }
 function commitFitting(p) {
   const solid = { kind: 'component', componentKey: 'fitting_tee', position: [p[0], p[1], drawElev], label: 'Tee fitting (drawn)', verify: 'manually placed fitting — needs-verification' };
@@ -9895,11 +10702,15 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     { id: 'view.layers', name: 'Layers panel', desc: sdesc },
     { id: 'view.levels', name: 'Levels / sheets panel', desc: sdesc },
     { id: 'view.coverage', name: 'Coverage & spacing overlay (toggle)', desc: sdesc },
+    { id: 'view.reset-layout', name: 'Reset Window Layout', desc: sdesc },
   ]);
   addItems('auto-draw', [{ id: 'auto-draw.generate-layout', name: 'Generate Layout', desc: sdesc }]);
   addItems('actions', [{ id: 'actions.generate-layout', name: 'Generate Layout', desc: sdesc }]);
   addItems('select', [{ id: 'select.mode-toggle', name: 'Select Mode (toggle)', desc: sdesc }]);
-  addItems('window', [{ id: 'window.inspector', name: 'Inspector (toggle)', desc: sdesc }]);
+  addItems('window', [
+    { id: 'window.inspector', name: 'Inspector (toggle)', desc: sdesc },
+    { id: 'window.reset-layout', name: 'Reset Window Layout', desc: sdesc },
+  ]);
   // HF-W1: Studio-added draw tools (the AutoSprink scrape has no leading short
   // labels for these; expose explicit, wired entries at the top of each menu).
   addItems('tools', [
@@ -10053,6 +10864,25 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'snaps.orthographic': () => snapOrtho(),
     'snaps.enable-element-snaps': () => snapMasterEnable(),
     'snaps.visible-grid': () => snapVisibleGrid(),
+    // ── HF-W-TOOLSWIRE (2026-06-15): the remaining Snaps menu items as REAL state ──
+    'snaps.z-lock': () => snapZLock(),
+    'snaps.elevation-lock': () => snapElevationLock(),
+    'snaps.near': () => snapNear(),
+    'snaps.special-element': () => snapSpecialElement(),
+    'snaps.snap-into-symbols': () => snapIntoSymbols(),
+    'snaps.pipe-to-sprinkler-snap-options': () => snapPipeToSprinklerOptions(),
+    'snaps.sprinkler-ceiling-snap': () => snapSprinklerCeiling(),
+    // Tangent needs arc/circle primitives — this client models pipes/walls as
+    // straight segments only, so there is no curve to be tangent to. Honest stub.
+    'snaps.tangent': hfHonestStub('Tangent snap needs arc/circle geometry — this Studio models pipes/walls as straight segments only (no curved primitives to be tangent to).'),
+    // ── UCS / Benchmark — real coordinate-datum state (origin/elev/rotation) ──
+    'snaps.auto-benchmark': () => benchmarkAuto(),
+    'snaps.visible-benchmark': () => benchmarkVisible(),
+    'snaps.alter-benchmark-elevation-rotation': () => benchmarkAlter(),
+    'tools.move-benchmark': () => benchmarkMove(),
+    'snaps.ucs-auto-benchmark-rotation': () => ucsAutoBenchmarkRotation(),
+    'snaps.ucs-auto-ortho-snaps': () => ucsAutoOrthoSnaps(),
+    'snaps.ucs-ortho-input': () => ucsOrthoInput(),
     // ── HF-SPK: Hydraulics menu — real flow formulas + pipe volume + analysis ──
     'hydraulics.flow-calculator': () => hydraulicsFlowCalculator(),
     'hydraulics.hydrant-flow-calculator': () => hydraulicsHydrantCalculator(),
@@ -10198,6 +11028,9 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'view.abbreviate-views-and-pictures': hfHonestStub('view abbreviation is a paper-space sheet feature — model-space Studio has no sheet views.'),
     'view.control-area-navigator': hfHonestStub('control-area navigator needs defined control areas — not yet built.'),
     'view.text-box-clipping-indicator': hfHonestStub('text-box clipping indicators belong to a paper-space text layout — not in model-space Studio.'),
+    // ── HF-DOCKZONES: Reset Window Layout — dock every tool window back to defaults ──
+    'view.reset-layout': () => { if (window.__twReset) { window.__twReset(); $('status').textContent = 'window layout reset to default (all panels docked left)'; } },
+    'window.reset-layout': () => { if (window.__twReset) { window.__twReset(); $('status').textContent = 'window layout reset to default (all panels docked left)'; } },
     // ── HF-AV: WINDOW — real panel show/hide (no MDI child windows in a web Studio) ──
     'window.inspector': () => { const i = $('inspector'); if (i) i.classList.toggle('open'); },
     'window.open-drawings': () => windowOpenDrawings(),
@@ -10273,6 +11106,7 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
 (async () => {
   await initStudio();
   try { initEditEngine(); } catch (e) { window.__hfEditEngineError = String(e && e.message || e); } // HF-W1: attach viewport edit/draw listeners
+  await bindSourceDocumentIdentity(); // AutoBid doc links must never inherit the default fixture identity
   await loadProjectTargets();   // HF-A1-SRCLOCK: bid projects -> email-PDF source, locked
   await autoLoadOrUnderlay();   // HF-A1-AUTOLOAD: saved layout or plan underlay, no Generate click
 })();
@@ -10280,5 +11114,667 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
 <!-- Shared shell: applies the glass-color theme + light/dark mode + the studio
      Fire color. App bar suppressed (the Studio keeps its own CAD chrome). -->
 <script src="/public/halofire-shell.js?v=13"></script>
+<script>
+  // HF-SHARED-NAV: build the Studio top bar from the SAME shell builders the other
+  // pages use (brand + primary nav), re-homing the Studio-only controls into the
+  // shell-built right block. Result: structurally/visually identical chrome.
+  (function () {
+    var host = document.getElementById('studioAppbar');
+    var extras = document.getElementById('studioNavExtras');
+    if (host && window.HFShell && window.HFShell.mountAppbarInto) {
+      window.HFShell.mountAppbarInto(host, { rightNode: extras });
+    }
+  })();
+</script>
+<script>
+  // ===================================================================
+  // HF-TOOLWINDOW (user /design-critique 2026-06-15)
+  // Upgrade every Studio dock .panel into the ONE shared UE-style tool window:
+  //   - pinned header with a working COLLAPSE chevron (.pbtn)
+  //   - SCROLLABLE body (glass scrollbar) that never clips long content
+  //   - drag-RESIZE bottom edge that sets the body's height cap (--pbody-max)
+  //   - per-USER persistence (localStorage) of height + collapsed state, keyed by title
+  // Camera-neutral by construction: only touches DOM/CSS of the dock panels, never the
+  // 3D controls/target.
+  // ===================================================================
+  (function () {
+    // HF-DOCKZONES (CHUNK): full layout state is one VERSIONED localStorage key. v2
+    // adds per-panel dock MEMBERSHIP (which rail: 'left'|'right') + order, on top of
+    // the v1 float geometry / size / collapse. A version bump migrates v1 forward.
+    var LSKEY = 'hf-studio-layout-v2';
+    var LSKEY_V1 = 'hf-studio-toolwindows-v1';
+    var LAYOUT_VERSION = 2;
+    function loadState() {
+      try {
+        var raw = localStorage.getItem(LSKEY);
+        if (raw) { var s = JSON.parse(raw) || {}; return (s && s.panels) ? s : { version: LAYOUT_VERSION, panels: (s.panels || s) }; }
+        // migrate v1 (flat key->{h,collapsed,float}) forward into v2.panels
+        var v1 = localStorage.getItem(LSKEY_V1);
+        if (v1) { var p = JSON.parse(v1) || {}; return { version: LAYOUT_VERSION, panels: p }; }
+      } catch (e) {}
+      return { version: LAYOUT_VERSION, panels: {} };
+    }
+    var _layout = loadState();
+    // `state` is the per-panel map (back-compat with all existing code paths).
+    var state = _layout.panels = _layout.panels || {};
+    function saveState() {
+      try { localStorage.setItem(LSKEY, JSON.stringify({ version: LAYOUT_VERSION, panels: state })); } catch (e) {}
+    }
+
+    // ---- HF-DOCKABLE: registry of panels keyed by their stable title-key so we can
+    //      tear a panel off into a floating window and dock it into ANY rail.
+    var REG = {};            // key -> { panel, home, placeholder, body, key }
+    var MOVED = {};          // key -> true once a panel has been moved off its home slot (runtime only)
+    var DOCK_SNAP = 70;      // px proximity to a dock edge that arms a zone
+    var dockRightEl = null;  // the right dock rail (created lazily)
+
+    function leftRail() { return document.querySelector('aside.left'); }
+    function ensureDockRight() {
+      if (dockRightEl && dockRightEl.isConnected) return dockRightEl;
+      dockRightEl = document.getElementById('twDockRight');
+      if (!dockRightEl) {
+        dockRightEl = document.createElement('div');
+        dockRightEl.id = 'twDockRight';
+        dockRightEl.setAttribute('role', 'region');
+        dockRightEl.setAttribute('aria-label', 'Right dock rail');
+        var cap = document.createElement('div'); cap.className = 'twdr-cap'; cap.textContent = 'Docked';
+        dockRightEl.appendChild(cap);
+        document.body.appendChild(dockRightEl);
+      }
+      positionDockRight();
+      return dockRightEl;
+    }
+    // hide the right rail entirely when no panel is docked there (caption alone ≠ content)
+    function syncDockRight() {
+      if (!dockRightEl) return;
+      var has = dockRightEl.querySelector('.panel');
+      dockRightEl.style.display = has ? 'flex' : 'none';
+    }
+    function positionDockRight() {
+      if (!dockRightEl) return;
+      // align the right rail's top to the canvas top so it never covers the toolbar
+      var cw = document.getElementById('canvasWrap');
+      var t = cw ? cw.getBoundingClientRect().top : 150;
+      dockRightEl.style.setProperty('--twdr-top', Math.max(60, Math.round(t)) + 'px');
+      var h = cw ? cw.getBoundingClientRect().height : (window.innerHeight - t - 40);
+      dockRightEl.style.setProperty('--twdr-h', Math.max(220, Math.round(h - 16)) + 'px');
+    }
+    // a rail object for a given dock id, or null
+    function railEl(dock) {
+      if (dock === 'right') return ensureDockRight();
+      return leftRail();
+    }
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    function keyFor(panel) {
+      var t = panel.querySelector('.ptitle');
+      var raw = (t && t.textContent || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      return raw || ('panel-' + Math.random().toString(36).slice(2, 8));
+    }
+
+    function applyHeight(body, px) {
+      if (px && px > 0) body.style.setProperty('--pbody-max', px + 'px');
+      else body.style.removeProperty('--pbody-max');
+    }
+
+    function setCollapsed(panel, key, collapsed) {
+      panel.classList.toggle('tw-collapsed', collapsed);
+      var btn = panel.querySelector('.pbtn');
+      if (btn) btn.setAttribute('aria-expanded', String(!collapsed));
+      state[key] = state[key] || {};
+      state[key].collapsed = collapsed;
+      saveState(state);
+    }
+
+    function upgrade(panel) {
+      if (panel.__twUpgraded) return;
+      panel.__twUpgraded = true;
+      var head = panel.querySelector('.phead');
+      var body = panel.querySelector('.pbody');
+      if (!head || !body) return;
+      var key = keyFor(panel);
+      panel.dataset.twKey = key;
+      var saved = state[key] || {};
+
+      // ---- restore saved height + collapse ----
+      if (saved.h) applyHeight(body, saved.h);
+      if (saved.collapsed) panel.classList.add('tw-collapsed');
+
+      // ---- COLLAPSE via the chevron (and header dbl-click) ----
+      var btn = panel.querySelector('.pbtn');
+      function toggle() { setCollapsed(panel, key, !panel.classList.contains('tw-collapsed')); }
+      if (btn) {
+        btn.setAttribute('role', 'button');
+        btn.setAttribute('tabindex', '0');
+        btn.setAttribute('aria-label', 'Collapse panel');
+        btn.setAttribute('aria-expanded', String(!panel.classList.contains('tw-collapsed')));
+        btn.title = 'Collapse / expand';
+        btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); toggle(); });
+        btn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+      }
+      head.addEventListener('dblclick', function (e) {
+        // ignore dbl-clicks on interactive controls inside the head
+        if (e.target.closest('button,a,input,select,.pbtn')) return;
+        toggle();
+      });
+
+      // ---- RESIZE edge ----
+      var handle = document.createElement('div');
+      handle.className = 'tw-resize';
+      handle.setAttribute('role', 'separator');
+      handle.setAttribute('aria-orientation', 'horizontal');
+      handle.setAttribute('aria-label', 'Resize panel');
+      handle.title = 'Drag to resize';
+      panel.appendChild(handle);
+
+      var drag = null;
+      function px(el) { return el.getBoundingClientRect().height; }
+      function onMove(e) {
+        if (!drag) return;
+        var h = Math.max(56, Math.min(1400, drag.startH + (e.clientY - drag.startY)));
+        applyHeight(body, h);
+      }
+      function endDrag() {
+        if (!drag) return;
+        var finalH = Math.round(px(body));
+        applyHeight(body, finalH);
+        state[key] = state[key] || {};
+        state[key].h = finalH;
+        saveState(state);
+        drag = null;
+        panel.classList.remove('tw-resizing');
+        document.body.classList.remove('tw-dragging');
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', endDrag);
+        window.removeEventListener('pointercancel', endDrag);
+      }
+      handle.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        // current rendered body height becomes the drag baseline; pin it explicitly so
+        // max-height changes translate to real growth even if flex was sizing the body.
+        drag = { startY: e.clientY, startH: Math.round(px(body)) };
+        applyHeight(body, drag.startH);
+        panel.classList.add('tw-resizing');
+        document.body.classList.add('tw-dragging');
+        // listen on window so the drag continues even when the pointer leaves the thin handle
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', endDrag);
+        window.addEventListener('pointercancel', endDrag);
+      });
+      // double-click the handle resets to the auto cap
+      handle.addEventListener('dblclick', function () {
+        applyHeight(body, 0);
+        if (state[key]) { delete state[key].h; saveState(state); }
+      });
+
+      // ================= HF-DOCKABLE wiring =================
+      // home anchor: a placeholder marks the panel's DEFAULT slot in the LEFT rail so
+      // Reset Layout (and re-dock when no target rail is given) returns it to the same
+      // position even after sibling order / rail changes. `home` is always the left rail.
+      var home = leftRail();
+      var placeholder = document.createComment('twhome:' + key);
+      panel.parentNode.insertBefore(placeholder, panel);
+      // default dock order = DOM order within the left rail at upgrade time
+      var defOrder = Array.prototype.indexOf.call(home ? home.querySelectorAll('.panel') : [], panel);
+      REG[key] = { panel: panel, home: home, placeholder: placeholder, body: body, key: key,
+                   dock: 'left', defOrder: defOrder < 0 ? 999 : defOrder };
+
+      // a "Float" tear-off button on the docked header
+      var detach = document.createElement('span');
+      detach.className = 'tw-detach';
+      detach.textContent = '⧉';
+      detach.title = 'Detach into a floating window (or drag the header out)';
+      detach.setAttribute('role', 'button');
+      detach.setAttribute('tabindex', '0');
+      detach.setAttribute('aria-label', 'Detach panel');
+      var titleSpan = head.querySelector('.ptitle');
+      if (titleSpan && titleSpan.nextSibling) head.insertBefore(detach, titleSpan.nextSibling);
+      else head.appendChild(detach);
+      function detachAt(r) {
+        floatPanel(key, { x: clamp(r.left + 28, 8, window.innerWidth - 220),
+                          y: clamp(r.top + 18, 56, window.innerHeight - 160),
+                          w: Math.max(260, Math.round(r.width)), h: Math.max(220, Math.round(r.height) || 360) });
+      }
+      detach.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        detachAt(panel.getBoundingClientRect());
+      });
+      detach.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); detach.click(); } });
+
+      // ---- UE-TRUE: drag a DOCKED panel's header OUT to tear it off into a float ----
+      // A small drag threshold on the header (not on the collapse/detach controls)
+      // floats the panel, then immediately hands the gesture to the float-drag logic
+      // so the window follows the cursor and arms dock zones in one continuous motion.
+      head.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0) return;
+        if (panel.classList.contains('tw-float')) return; // floats use the titlebar
+        if (e.target.closest('button,a,input,select,.pbtn,.tw-detach')) return;
+        var sx = e.clientX, sy = e.clientY;
+        var r0 = panel.getBoundingClientRect();
+        var grabDX = e.clientX - r0.left, grabDY = e.clientY - r0.top;
+        function watch(ev) {
+          if (Math.abs(ev.clientX - sx) < 6 && Math.abs(ev.clientY - sy) < 6) return;
+          window.removeEventListener('pointermove', watch);
+          window.removeEventListener('pointerup', drop);
+          detachAt(r0);
+          // place the freshly-floated window under the cursor at the same grab offset
+          var p = REG[key].panel;
+          var nx = clamp(ev.clientX - grabDX, 8, window.innerWidth - p.offsetWidth - 8);
+          var ny = clamp(ev.clientY - 14, 56, window.innerHeight - p.offsetHeight - 8);
+          p.style.setProperty('--twf-x', nx + 'px');
+          p.style.setProperty('--twf-y', ny + 'px');
+          beginFloatDragFrom(key, ev.clientX, ev.clientY);
+        }
+        function drop() {
+          window.removeEventListener('pointermove', watch);
+          window.removeEventListener('pointerup', drop);
+        }
+        window.addEventListener('pointermove', watch);
+        window.addEventListener('pointerup', drop);
+      });
+
+      // ---- floating titlebar (drag to move, dbl-click to re-dock, ⤓ button to re-dock) ----
+      var tbar = document.createElement('div');
+      tbar.className = 'tw-titlebar';
+      var dot = document.createElement('span'); dot.className = 'tw-dot';
+      var tt = document.createElement('span'); tt.className = 'tw-tt';
+      tt.textContent = (titleSpan && titleSpan.textContent || 'Panel').trim();
+      var redock = document.createElement('span'); redock.className = 'tw-redock'; redock.textContent = '⤓';
+      redock.title = 'Dock back to its home rail'; redock.setAttribute('role', 'button'); redock.setAttribute('tabindex', '0');
+      redock.setAttribute('aria-label', 'Re-dock panel');
+      tbar.appendChild(dot); tbar.appendChild(tt); tbar.appendChild(redock);
+      panel.insertBefore(tbar, panel.firstChild);
+      redock.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); dockPanel(key); });
+      redock.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dockPanel(key); } });
+      tbar.addEventListener('dblclick', function (e) {
+        if (e.target.closest('.tw-redock')) return;
+        dockPanel(key);
+      });
+
+      // ---- 8-way resize handles (only active while floating) ----
+      ['n','s','e','w','ne','nw','se','sw'].forEach(function (dir) {
+        var rh = document.createElement('div');
+        rh.className = 'tw-rh tw-rh-' + dir;
+        rh.dataset.dir = dir;
+        panel.appendChild(rh);
+        rh.addEventListener('pointerdown', function (e) { startFloatResize(e, key, dir); });
+      });
+
+      // ---- drag the titlebar to move the floating window ----
+      tbar.addEventListener('pointerdown', function (e) { startFloatDrag(e, key); });
+      // focus-to-top on any pointerdown inside a floating window
+      panel.addEventListener('pointerdown', function () {
+        if (panel.classList.contains('tw-float')) focusFloat(key);
+      }, true);
+
+      // ---- restore persisted layout: float geometry takes priority, else dock rail ----
+      if (saved.float && saved.float.on) {
+        floatPanel(key, saved.float, true);
+      } else if (saved.dock === 'right') {
+        MOVED[key] = true;
+        dockPanel(key, 'right', true);
+      }
+    }
+
+    // ===================== HF-DOCKABLE: float / dock =====================
+    function focusFloat(key) {
+      Object.keys(REG).forEach(function (k) {
+        var p = REG[k].panel;
+        if (p.classList.contains('tw-float')) p.classList.toggle('tw-floatfocus', k === key);
+      });
+    }
+    function clampFloatIntoView(panel) {
+      var w = panel.offsetWidth || 300, h = panel.offsetHeight || 360;
+      var maxX = Math.max(8, window.innerWidth - w - 8);
+      var maxY = Math.max(56, window.innerHeight - h - 8);
+      var x = parseFloat(panel.style.getPropertyValue('--twf-x')) || 80;
+      var y = parseFloat(panel.style.getPropertyValue('--twf-y')) || 90;
+      panel.style.setProperty('--twf-x', clamp(x, 8, maxX) + 'px');
+      panel.style.setProperty('--twf-y', clamp(y, 56, maxY) + 'px');
+    }
+    function persistFloat(key) {
+      var reg = REG[key]; if (!reg) return;
+      var p = reg.panel;
+      state[key] = state[key] || {};
+      if (p.classList.contains('tw-float')) {
+        state[key].float = {
+          on: true,
+          x: Math.round(parseFloat(p.style.getPropertyValue('--twf-x')) || 80),
+          y: Math.round(parseFloat(p.style.getPropertyValue('--twf-y')) || 90),
+          w: Math.round(parseFloat(p.style.getPropertyValue('--twf-w')) || p.offsetWidth || 300),
+          h: Math.round(parseFloat(p.style.getPropertyValue('--twf-h')) || p.offsetHeight || 360)
+        };
+        state[key].dock = null; // floating panels have no rail membership
+      } else {
+        if (state[key].float) state[key].float = { on: false };
+        state[key].dock = reg.dock || 'left';
+      }
+      saveState();
+    }
+    // persist the dock membership + order index for every CURRENTLY-docked panel in a rail
+    function persistDockOrder(dock) {
+      var rail = railEl(dock); if (!rail) return;
+      var panels = rail.querySelectorAll('.panel');
+      for (var i = 0; i < panels.length; i++) {
+        var k = panels[i].dataset.twKey; if (!k) continue;
+        state[k] = state[k] || {};
+        state[k].dock = dock; state[k].order = i;
+        if (state[k].float) state[k].float = { on: false };
+      }
+      saveState();
+    }
+    function floatPanel(key, geo, isRestore) {
+      var reg = REG[key]; if (!reg) return;
+      var p = reg.panel;
+      if (p.classList.contains('tw-float')) return;
+      geo = geo || {};
+      var w = clamp(geo.w || 300, 220, Math.min(640, window.innerWidth - 16));
+      var h = clamp(geo.h || 360, 160, Math.min(window.innerHeight - 70, 900));
+      var x = clamp(geo.x != null ? geo.x : 90, 8, Math.max(8, window.innerWidth - w - 8));
+      var y = clamp(geo.y != null ? geo.y : 96, 56, Math.max(56, window.innerHeight - h - 8));
+      // expanding a collapsed panel makes the float usable
+      p.classList.remove('tw-collapsed');
+      p.style.setProperty('--twf-w', w + 'px');
+      p.style.setProperty('--twf-h', h + 'px');
+      p.style.setProperty('--twf-x', x + 'px');
+      p.style.setProperty('--twf-y', y + 'px');
+      // move it to <body> so it floats above the grid / asides and is viewport-positioned
+      document.body.appendChild(p);
+      p.classList.add('tw-float');
+      reg.dock = null;
+      focusFloat(key);
+      clampFloatIntoView(p);
+      syncDockRight();
+      if (!isRestore) persistFloat(key);
+    }
+    // Dock a panel into a rail. `dock` = 'left'|'right' (default: its remembered rail,
+    // else 'left'). For the LEFT rail with no explicit order we re-insert at the home
+    // placeholder so the default layout is exactly preserved.
+    function dockPanel(key, dock, isRestore) {
+      var reg = REG[key]; if (!reg) return;
+      var p = reg.panel;
+      dock = dock || reg.dock || 'left';
+      p.classList.remove('tw-float', 'tw-floatfocus', 'tw-floatdrag');
+      p.style.removeProperty('--twf-x'); p.style.removeProperty('--twf-y');
+      p.style.removeProperty('--twf-w'); p.style.removeProperty('--twf-h');
+      reg.dock = dock;
+      var rail = railEl(dock);
+      if (dock === 'left' && reg.placeholder && reg.placeholder.parentNode && !MOVED[key]) {
+        // back to the EXACT home slot (default layout fidelity)
+        reg.placeholder.parentNode.insertBefore(p, reg.placeholder.nextSibling);
+      } else if (rail) {
+        // honor a persisted order index within the target rail, else append
+        var ord = (state[key] && typeof state[key].order === 'number') ? state[key].order : null;
+        if (ord != null) {
+          var sibs = Array.prototype.slice.call(rail.querySelectorAll('.panel'));
+          if (ord >= sibs.length) rail.appendChild(p);
+          else rail.insertBefore(p, sibs[ord]);
+        } else {
+          rail.appendChild(p);
+        }
+      }
+      if (dock === 'right') ensureDockRight();
+      if (!isRestore) {
+        state[key] = state[key] || {};
+        state[key].float = { on: false };
+        state[key].dock = dock;
+        persistDockOrder(dock);
+      }
+      syncDockRight();
+      clearDockZones();
+    }
+
+    // ---- MULTI dock-zone overlays: built once, shown together during a float drag ----
+    var ZONES = {}; // id -> el
+    function ensureZones() {
+      if (ZONES.left) return ZONES;
+      [['left','Dock left'],['right','Dock right'],['center','Float center']].forEach(function (z) {
+        var el = document.createElement('div');
+        el.className = 'tw-dz tw-dz-' + z[0];
+        el.dataset.zone = z[0];
+        var pill = document.createElement('div'); pill.className = 'tw-dzpill'; pill.textContent = z[1];
+        el.appendChild(pill);
+        document.body.appendChild(el);
+        ZONES[z[0]] = el;
+      });
+      return ZONES;
+    }
+    // geometry for each zone, computed at drag start (so it reflects current layout)
+    function zoneRects() {
+      var lr = leftRail();
+      var lrR = lr ? lr.getBoundingClientRect() : { left: 0, top: 90, width: 240, height: 600 };
+      var cw = document.getElementById('canvasWrap');
+      var cwR = cw ? cw.getBoundingClientRect() : { left: 260, top: 90, width: 900, height: 600, right: 1160 };
+      var rW = 288;
+      return {
+        left: { left: lrR.left, top: lrR.top, width: Math.max(180, lrR.width), height: lrR.height },
+        right: { left: window.innerWidth - rW, top: cwR.top, width: rW, height: cwR.height },
+        center: { left: cwR.left + cwR.width * 0.18, top: cwR.top + cwR.height * 0.18,
+                  width: cwR.width * 0.64, height: cwR.height * 0.64 }
+      };
+    }
+    var _zoneGeo = null;
+    function showZones() {
+      ensureZones();
+      _zoneGeo = zoneRects();
+      ['left','right','center'].forEach(function (id) {
+        var el = ZONES[id], r = _zoneGeo[id];
+        el.style.left = Math.round(r.left) + 'px'; el.style.top = Math.round(r.top) + 'px';
+        el.style.width = Math.round(r.width) + 'px'; el.style.height = Math.round(r.height) + 'px';
+        el.classList.add('show'); el.classList.remove('hot');
+      });
+    }
+    function clearDockZones() {
+      ['left','right','center'].forEach(function (id) { if (ZONES[id]) { ZONES[id].classList.remove('show','hot'); } });
+    }
+    // which zone is the cursor over? returns 'left'|'right'|'center'|null and lights it
+    function hitZone(clientX, clientY) {
+      if (!_zoneGeo) return null;
+      // priority: explicit rails (left/right) before the broad center float zone
+      var order = ['left', 'right', 'center'];
+      var hit = null;
+      for (var i = 0; i < order.length; i++) {
+        var id = order[i], r = _zoneGeo[id];
+        // rails: extend the active band by DOCK_SNAP toward the viewport interior
+        var pad = (id === 'center') ? 0 : DOCK_SNAP;
+        var inX = clientX >= r.left - pad && clientX <= r.left + r.width + pad;
+        var inY = clientY >= r.top - pad && clientY <= r.top + r.height + pad;
+        if (inX && inY) { hit = id; break; }
+      }
+      order.forEach(function (id) { if (ZONES[id]) ZONES[id].classList.toggle('hot', id === hit); });
+      return hit;
+    }
+
+    // ---- titlebar drag (move) with MULTI dock-zone snapping ----
+    function startFloatDrag(e, key) {
+      if (e.button !== 0) return;
+      if (e.target.closest('.tw-redock')) return;
+      if (!REG[key] || !REG[key].panel.classList.contains('tw-float')) return;
+      e.preventDefault(); e.stopPropagation();
+      beginFloatDragFrom(key, e.clientX, e.clientY);
+    }
+    // shared drag loop, also entered directly when tearing a docked panel out by header
+    function beginFloatDragFrom(key, startX, startY) {
+      var reg = REG[key]; if (!reg) return;
+      var p = reg.panel;
+      if (!p.classList.contains('tw-float')) return;
+      focusFloat(key);
+      var ox = parseFloat(p.style.getPropertyValue('--twf-x')) || 0;
+      var oy = parseFloat(p.style.getPropertyValue('--twf-y')) || 0;
+      var hot = null;
+      p.classList.add('tw-floatdrag');
+      document.body.classList.add('tw-floatdragging');
+      showZones();
+      function mv(ev) {
+        var w = p.offsetWidth, h = p.offsetHeight;
+        var nx = clamp(ox + (ev.clientX - startX), 8, Math.max(8, window.innerWidth - w - 8));
+        var ny = clamp(oy + (ev.clientY - startY), 56, Math.max(56, window.innerHeight - h - 8));
+        p.style.setProperty('--twf-x', nx + 'px');
+        p.style.setProperty('--twf-y', ny + 'px');
+        hot = hitZone(ev.clientX, ev.clientY);
+      }
+      function up() {
+        window.removeEventListener('pointermove', mv);
+        window.removeEventListener('pointerup', up);
+        p.classList.remove('tw-floatdrag');
+        document.body.classList.remove('tw-floatdragging');
+        if (hot === 'left' || hot === 'right') {
+          if (hot !== 'left') MOVED[key] = true; // moving to the right rail abandons the home slot
+          dockPanel(key, hot);
+        } else {
+          clampFloatIntoView(p); persistFloat(key);
+        }
+        clearDockZones();
+      }
+      window.addEventListener('pointermove', mv);
+      window.addEventListener('pointerup', up);
+    }
+
+    // ---- 8-way resize of a floating window ----
+    function startFloatResize(e, key, dir) {
+      if (e.button !== 0) return;
+      var reg = REG[key]; if (!reg) return;
+      var p = reg.panel;
+      if (!p.classList.contains('tw-float')) return;
+      e.preventDefault(); e.stopPropagation();
+      focusFloat(key);
+      var startX = e.clientX, startY = e.clientY;
+      var x0 = parseFloat(p.style.getPropertyValue('--twf-x')) || 0;
+      var y0 = parseFloat(p.style.getPropertyValue('--twf-y')) || 0;
+      var w0 = p.offsetWidth, h0 = p.offsetHeight;
+      var minW = 220, minH = 150;
+      document.body.classList.add('tw-floatresizing');
+      function mv(ev) {
+        var dx = ev.clientX - startX, dy = ev.clientY - startY;
+        var nx = x0, ny = y0, nw = w0, nh = h0;
+        if (dir.indexOf('e') >= 0) nw = clamp(w0 + dx, minW, window.innerWidth - x0 - 8);
+        if (dir.indexOf('s') >= 0) nh = clamp(h0 + dy, minH, window.innerHeight - y0 - 8);
+        if (dir.indexOf('w') >= 0) { nw = clamp(w0 - dx, minW, x0 + w0 - 8); nx = x0 + (w0 - nw); }
+        if (dir.indexOf('n') >= 0) { nh = clamp(h0 - dy, minH, y0 + h0 - 50); ny = y0 + (h0 - nh); }
+        p.style.setProperty('--twf-w', nw + 'px');
+        p.style.setProperty('--twf-h', nh + 'px');
+        p.style.setProperty('--twf-x', nx + 'px');
+        p.style.setProperty('--twf-y', ny + 'px');
+      }
+      function up() {
+        window.removeEventListener('pointermove', mv);
+        window.removeEventListener('pointerup', up);
+        document.body.classList.remove('tw-floatresizing');
+        clampFloatIntoView(p);
+        persistFloat(key);
+      }
+      window.addEventListener('pointermove', mv);
+      window.addEventListener('pointerup', up);
+    }
+
+    // ---- Reset Layout: dock EVERY window back into the LEFT rail at its default home
+    //      slot, clear sizes/collapse/dock-membership, and wipe persisted layout. ----
+    function resetLayout() {
+      // sort by the default home order so re-docking lands them in the original sequence
+      var keys = Object.keys(REG).sort(function (a, b) { return REG[a].defOrder - REG[b].defOrder; });
+      keys.forEach(function (key) {
+        var reg = REG[key];
+        MOVED[key] = false;
+        delete state[key];                       // drop order/dock/float so home-slot path is taken
+        reg.dock = 'left';
+        // ensure the placeholder is back in the left rail home position
+        var lr = leftRail();
+        if (lr && reg.placeholder && reg.placeholder.parentNode !== lr) {
+          // re-seat the placeholder at its default index
+          var sibs = Array.prototype.slice.call(lr.childNodes);
+          lr.appendChild(reg.placeholder);
+        }
+        dockPanel(key, 'left', true);            // move DOM back, no persist yet
+        applyHeight(reg.body, 0);
+        reg.panel.classList.remove('tw-collapsed');
+      });
+      // hard-clear persisted layout (both versioned + legacy v1)
+      Object.keys(state).forEach(function (k) { delete state[k]; });
+      saveState();
+      try { localStorage.removeItem(LSKEY_V1); } catch (e) {}
+      syncDockRight();
+      clearDockZones();
+    }
+    function installResetControl() {
+      var rail = leftRail();
+      if (!rail || document.getElementById('twResetLayout')) return;
+      var btn = document.createElement('button');
+      btn.id = 'twResetLayout';
+      btn.type = 'button';
+      btn.innerHTML = '⟲ Reset Layout';
+      btn.title = 'Dock all windows and restore the default Studio layout';
+      btn.addEventListener('click', resetLayout);
+      rail.insertBefore(btn, rail.firstChild);
+    }
+
+    // keep floats inside the viewport + re-anchor the right rail on window resize
+    window.addEventListener('resize', function () {
+      positionDockRight();
+      Object.keys(REG).forEach(function (key) {
+        var p = REG[key].panel;
+        if (p.classList.contains('tw-float')) { clampFloatIntoView(p); }
+      });
+    });
+
+    function upgradeAll() {
+      // upgrade in DEFAULT dom order first (registers home placeholders), THEN apply any
+      // persisted RIGHT-rail order so restored right-docked panels sit in saved sequence.
+      var panels = document.querySelectorAll('aside.left .panel');
+      for (var i = 0; i < panels.length; i++) upgrade(panels[i]);
+      // re-order right rail by persisted order (upgrade() restores membership; fix order)
+      var rights = Object.keys(REG).filter(function (k) { return REG[k].dock === 'right'; })
+        .sort(function (a, b) { return (state[a] && state[a].order || 0) - (state[b] && state[b].order || 0); });
+      if (rights.length) { var rr = ensureDockRight(); rights.forEach(function (k) { rr.appendChild(REG[k].panel); }); }
+      installResetControl();
+      positionDockRight();
+      syncDockRight();
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', upgradeAll);
+    else upgradeAll();
+    // expose for harness verification
+    window.__twUpgradeAll = upgradeAll;
+    window.__twState = function () { var s = loadState(); return (s && s.panels) ? s.panels : s; };
+    // HF-DOCKABLE harness hooks
+    window.__twFloat = function (key, geo) { floatPanel(key, geo); };
+    window.__twDock = function (key, dock) { dockPanel(key, dock); };
+    window.__twReset = resetLayout;
+    window.__twKeys = function () { return Object.keys(REG); };
+    // dock membership + container for a key (rail id, or 'float'/'none')
+    window.__twDockInfo = function (key) {
+      var reg = REG[key]; if (!reg) return null;
+      var p = reg.panel;
+      if (p.classList.contains('tw-float')) return { state: 'float' };
+      var rail = p.closest('aside.left') ? 'left' : (p.closest('#twDockRight') ? 'right' : 'detached');
+      var sibs = p.parentNode ? Array.prototype.slice.call(p.parentNode.querySelectorAll('.panel')) : [];
+      return { state: 'docked', dock: rail, order: sibs.indexOf(p) };
+    };
+    // dock-zone overlay visibility (for screenshots/asserts): which zones are shown + which is hot
+    window.__twZones = function () {
+      var out = { shown: [], hot: null };
+      ['left','right','center'].forEach(function (id) {
+        var el = ZONES[id]; if (!el) return;
+        if (el.classList.contains('show')) out.shown.push(id);
+        if (el.classList.contains('hot')) out.hot = id;
+      });
+      return out;
+    };
+    // force-show the zones (lets a harness screenshot the overlays without a live drag)
+    window.__twShowZones = function (hot) { showZones(); if (hot && ZONES[hot]) ZONES[hot].classList.add('hot'); };
+    window.__twHideZones = clearDockZones;
+    window.__twFloatRect = function (key) {
+      var reg = REG[key]; if (!reg) return null;
+      var p = reg.panel;
+      if (!p.classList.contains('tw-float')) return { floating: false };
+      var r = p.getBoundingClientRect();
+      return { floating: true, x: r.left, y: r.top, w: r.width, h: r.height,
+               cssX: parseFloat(p.style.getPropertyValue('--twf-x')),
+               cssY: parseFloat(p.style.getPropertyValue('--twf-y')),
+               cssW: parseFloat(p.style.getPropertyValue('--twf-w')),
+               cssH: parseFloat(p.style.getPropertyValue('--twf-h')),
+               parentIsBody: p.parentNode === document.body };
+    };
+  })();
+</script>
 </body>
 </html>

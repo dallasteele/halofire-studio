@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 const board = readFileSync(fileURLToPath(new URL('../autobid-board.html', import.meta.url)), 'utf8');
 const send = readFileSync(fileURLToPath(new URL('../autobid-send.html', import.meta.url)), 'utf8');
+const studio = readFileSync(fileURLToPath(new URL('../autosprink.html', import.meta.url)), 'utf8');
 
 describe('AutoBid canonical source-document binding', () => {
   it('routes board 3D/drawing links through the resolved plan-set document', () => {
@@ -19,5 +20,14 @@ describe('AutoBid canonical source-document binding', () => {
     expect(send).toContain('p.meta&&p.meta.geometry_document_id');
     expect(send).toContain('var docId = p.geometry_document_id');
     expect(send).not.toContain('p.meta&&p.meta.document_id) || rb.document_id');
+  });
+
+  it('resolves doc-bound Studio identity before the plan loader and never renders the default fixture identity', () => {
+    expect(studio).toContain('bindSourceDocumentIdentity');
+    expect(studio).toContain('document.body.dataset.sourceDocumentId');
+    expect(studio).toContain('Loading source-bound job');
+    expect(studio).toContain('await bindSourceDocumentIdentity()');
+    expect(studio).toContain("$('projectTarget').value = COOPERATIVE_1881_PROJECT_NAME");
+    expect(studio).not.toContain('<div class="job-title">Home Depot — Rexburg</div>');
   });
 });
