@@ -30,6 +30,9 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('PNG SHA-256');
     expect(html).toContain('Manifest SHA-256');
     expect(html).toContain('Rendered page SHA-256');
+    expect(html).toContain("'/api/autobid/package/'+encodeURIComponent(REF)+'/review-packet'");
+    expect(html).toContain('Open canonical review packet');
+    expect(html).toContain('contains no answer key');
     expect(html).toContain('Source PDF SHA-256');
     expect(html).toContain('plate.viewport_provenance');
     expect(html).toContain('Registered source viewports:');

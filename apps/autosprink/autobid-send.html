@@ -557,8 +557,9 @@
           + '</div></div>';
       }).join('');
       if(!plates) plates='<div class="note">No current overlay artifacts are available. The spatial badge remains unearned.</div>';
+      var packetUrl='/api/autobid/package/'+encodeURIComponent(REF)+'/review-packet';
       return '<section class="hf-panel mt" id="spatialVerificationPanel"><div class="phd"><span class="t">Final spatial verification</span>'+head+'<span class="pill warn" id="spatialReviewerContext">reviewer session: verifying…</span></div><div class="pbd">'
-        + '<div class="note" style="margin-bottom:12px">Review the stored overlay against the named physical sheet before accepting. This controls only the spatial-verification badge; it never auto-accepts and never blocks honest package export.</div>'
+        + '<div class="note" style="margin-bottom:12px">Review the stored overlay against the named physical sheet before accepting. This controls only the spatial-verification badge; it never auto-accepts and never blocks honest package export. <a class="btn" href="'+packetUrl+'" target="_blank" rel="noopener" style="margin-left:8px;text-decoration:none">Open canonical review packet ↗</a><br><small>Packet is source-bound to the resolved plan-set document, physical pages, and rendered-page hashes; it contains no answer key.</small></div>'
         + plates+'</div></section>';
     }
 
