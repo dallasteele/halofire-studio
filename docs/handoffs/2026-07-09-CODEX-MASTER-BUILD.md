@@ -1025,3 +1025,20 @@ The continuation work remains deliberately below the completion bar:
   acceptance is still FP 0/1, spatial 0/8, density pending, N6 pending, and
   production blocked. No acceptance row, scorecard, or deployment authorization
   was fabricated.
+
+## 45. CODEX CONTINUATION EVIDENCE - 2026-07-11 (CURRENT WHOLE-STACK REGRESSION)
+
+- The exact current root tree (`69571a16a`, including N6 readback and deployment
+  authorization adversarial coverage) passes **906 engine tests, 10 skipped, 24
+  warnings**. The latest focused runtime/N6 suite is **40 passed**; latest Studio
+  Board/density/spatial suite is **16 passed**. Rulebook, compilation, loop
+  contracts, and scoped diff checks pass.
+- The live Board auth/runtime audit was captured and inspected in
+  `out/agent-loops/halofire-master-build-20260711/ops-audit/04-board-auth-runtime.png`.
+  Unauthenticated 401s now produce a truthful sign-in card; runtime/network
+  failures remain a separate retryable state. No bid state is inferred from
+  failed probes.
+- Release authorization remains intentionally absent: healthy services and
+  matching evidence hashes are insufficient without the signed v2 receipt and
+  dedicated `release_authorizer` identity. The production acceptance audit is
+  unchanged and remains fail-closed.
