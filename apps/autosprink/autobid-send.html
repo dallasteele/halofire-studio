@@ -570,6 +570,7 @@
         var page=artifact.page||{};
         var review=artifact.review||{};
         var decision=review.decision||'pending';
+        var pointReview=artifact.point_review||null;
         var familyGroups=Array.isArray(artifact.family_groups)?artifact.family_groups:[];
         var familyReviews=Array.isArray(artifact.family_reviews)?artifact.family_reviews:[];
         var familyRows=familyGroups.map(function(group){
@@ -584,7 +585,9 @@
           var familyDecision=familyReview.decision||'pending';
           var familyReviewer=familyReview.reviewer_name
             ? ' · '+esc(familyReview.reviewer_name)+' ('+esc(familyReview.reviewer_role||'reviewer')+')' : '';
+          var pointStatus=pointReview ? (pointReview.decision||'accepted')+' · '+esc(pointReview.reviewer_name||pointReview.reviewer_id||'trusted reviewer')+' · '+esc(pointReview.reviewed_at||'') : 'pending';
           return '<div class="note"><b>Family review:</b> '+esc(familyDecision)+familyReviewer+'</div>'
+            + '<div class="note"><b>Blind point receipt:</b> '+esc(pointStatus)+(pointReview?'<br><small>packet '+esc(digest(pointReview.packet_hash))+' · overlay '+esc(digest(pointReview.point_overlay_sha256))+'</small>':'')+'</div>'
             + '<div class="family-review-actions" data-family-group="'+esc(group.group_id||'')+'">'
             + '<textarea class="fpVectorFamilyNote" aria-label="Family review note for '+esc(group.group_id||'candidate')+'" placeholder="Family review note">'+esc(familyReview.note||'')+'</textarea>'
             + '<button class="btn fpVectorFamilyDecision" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'" data-decision="accepted"'+(familyDecision==='accepted'?' disabled':'')+'>Accept family</button>'
@@ -779,10 +782,10 @@
                 if(decision==='accepted' && !points.length){if(result) result.textContent='Mark at least one clearly visible sprinkler head before accepting.'; return;}
                 Array.prototype.forEach.call(mount.querySelectorAll('.fpPointDecision'),function(item){item.disabled=true;});
                 var selected=decision==='accepted'?points:[];
-                pointDigest(selected).then(function(pointOverlaySha){
+                Promise.resolve().then(function(){
                   return api('/fp-vector-artifacts/'+encodeURIComponent(artifact.artifact_id)+'/point-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
                     packet_hash:packet.packet_hash, artifact_id:artifact.artifact_id, candidate_id:packet.candidate_id,
-                    family_id:familyId, point_overlay_sha256:pointOverlaySha, points:selected, decision:decision,
+                    family_id:familyId, points:selected, decision:decision,
                     note:'Estimator point review from source-bound blind page'
                   })});
                 }).then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
@@ -889,12 +892,16 @@
       window.__SD = p.studio_drawing || null;
       window.__AGD = p.accepted_geometry_drawing || null;
       // doc id for the 3D viewer + Bluebeam draw links (package ref is the doc when ?by=doc).
-      var docId = (p.meta&&p.meta.document_id) || rb.document_id || ((p.studio_drawing||{}).plates? p.ref : null);
+      // Use only the canonical resolved plan-set source for drawing/3D. A priced
+      // workbook or package ref is not a drawable PDF and must never be a fallback.
+      var docId = p.geometry_document_id || (p.meta&&p.meta.geometry_document_id) || null;
       var navLinks = docId
         ? '<a class="btn" href="/autosprink.html?doc='+encodeURIComponent(docId)+'" style="text-decoration:none;margin-left:8px">⬡ Open 3D model</a>'
           + '<a class="btn" href="/autobid-draw.html?doc='+encodeURIComponent(docId)+'" style="text-decoration:none;margin-left:8px">✎ Open drawing</a>'
         : '';
-      var sent = p.sent_status && (p.sent_status.sent || p.sent_status.status==='sent');
+      var sentStatus = p.sent_status || {};
+      var sent = sentStatus.transmission_confirmed === true;
+      var exportedPending = sentStatus.transmission_status === 'exported_manual_transmission_pending';
       var heads = rb.head_count, bomHeads = rb.bom_head_count;
       var agree = rb.heads_agree!==false && rb.cross_check_pass!==false;
 
@@ -996,9 +1003,9 @@
       + '</div>'
 
       + '<div class="sendbar hf-card">'
-      +   '<div class="summary">'+(sent? 'This bid was already sent ('+esc((p.sent_status&&p.sent_status.sent_at)||'')+').' : 'Reviewing-and-sending is the one human gate. Send exports the package for confirmed transmission — it does not auto-email the client.')+'</div>'
+      +   '<div class="summary">'+(sent? 'Transmission confirmed ('+esc((p.sent_status&&p.sent_status.sent_at)||'')+').' : (exportedPending ? 'Package exported — manual transmission still pending; files or external delivery are not confirmed.' : 'Reviewing-and-sending is the one human gate. Export stages the package for confirmed transmission — it does not auto-email the client.'))+'</div>'
       +   '<button class="btn" onclick="window.location=\'/autobid-board.html\'">Back to board</button>'
-      +   '<button class="btn send" id="sendBtn"'+(sent?' disabled':'')+'>'+(sent?'Sent ✓':'Send bid package →')+'</button>'
+      +   '<button class="btn send" id="sendBtn"'+(sent?' disabled':'')+'>'+(sent?'Transmission confirmed ✓':(exportedPending?'Re-export package →':'Export bid package →'))+'</button>'
       + '</div>';
 
       document.getElementById('root').innerHTML = html;

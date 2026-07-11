@@ -74,6 +74,18 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain("'/fp-vector-review'");
     expect(html).toContain('expected_bundle_sha256');
     expect(html).toContain('expected_overlay_sha256');
+    expect(html).toContain('artifact.point_review');
+    expect(html).toContain('Blind point receipt:');
+    expect(html).toContain('point_overlay_sha256');
+  });
+
+  it('uses canonical geometry source IDs and does not treat export history as transmission', () => {
+    expect(html).toContain('p.geometry_document_id');
+    expect(html).toContain('p.meta&&p.meta.geometry_document_id');
+    expect(html).toContain("transmission_confirmed === true");
+    expect(html).toContain('exported_manual_transmission_pending');
+    expect(html).toContain('manual transmission still pending');
+    expect(html).not.toContain("p.meta&&p.meta.document_id) || rb.document_id");
   });
 
   it('surfaces density provenance as diagnostic-only evidence', () => {

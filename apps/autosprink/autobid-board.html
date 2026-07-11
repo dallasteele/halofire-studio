@@ -53,7 +53,7 @@
     </div>
 
     <section class="hf-panel">
-      <div class="phd"><span class="t">Ready to review &amp; send</span><a class="btn" href="/autobid-catalog.html" style="margin-left:auto;text-decoration:none">⚙ CAD catalog</a><a class="btn" href="/autosprink.html?doc=34978" style="margin-left:8px;text-decoration:none" title="PDF→3D model for the indexed demo doc">⬡ 3D (doc 34978)</a><a class="btn" href="/autobid-draw.html?doc=34978" style="margin-left:8px;text-decoration:none">✎ Open drawing</a><span class="hf-chip" style="margin-left:8px"><span class="gl"></span> <span id="srcChip">live engine</span></span></div>
+      <div class="phd"><span class="t">Ready to review &amp; send</span><a class="btn" href="/autobid-catalog.html" style="margin-left:auto;text-decoration:none">⚙ CAD catalog</a><a class="btn" id="boardHeader3d" href="#" style="margin-left:8px;text-decoration:none;display:none" title="PDF→3D model">⬡ 3D</a><a class="btn" id="boardHeaderDraw" href="#" style="margin-left:8px;text-decoration:none;display:none">✎ Open drawing</a><span class="hf-chip" style="margin-left:8px"><span class="gl"></span> <span id="srcChip">live engine</span></span></div>
       <div class="pbd">
         <div id="bbWrap"><div class="note">Loading ready bids from the AutoBid engine…</div></div>
       </div>
@@ -109,6 +109,16 @@
         return;
       }
       var bids = rts.bids || [];
+      var headerBid = bids.find(function(item){ return item.geometry_document_id!=null; });
+      if(headerBid){
+        var headerDoc=headerBid.geometry_document_id;
+        var h3=document.getElementById('boardHeader3d');
+        var hd=document.getElementById('boardHeaderDraw');
+        h3.href='/autosprink.html?doc='+encodeURIComponent(headerDoc);
+        h3.textContent='⬡ 3D (doc '+headerDoc+')'; h3.style.display='inline-block';
+        hd.href='/autobid-draw.html?doc='+encodeURIComponent(headerDoc);
+        hd.style.display='inline-block';
+      }
       // KPIs
       document.getElementById('kReady').textContent = (rts.ready_count!=null?rts.ready_count:bids.length);
       var totalVal = bids.reduce(function(a,b){ return a+(b.total||0); },0);
@@ -136,8 +146,8 @@
           + '<td>'+verifyPill(b.verification)+' '+govPill(b.governance)+'</td>'
           + '<td>'+statusPill+' '+anomalyPill(b.anomaly_state)+'</td>'
           + '<td style="text-align:right;white-space:nowrap">'
-          +   (b.document_id!=null? '<a class="btn" title="PDF→3D model" href="/autosprink.html?doc='+encodeURIComponent(b.document_id)+'" style="text-decoration:none;padding:7px 10px">⬡ 3D</a>'
-          +     ' <a class="btn" title="Bluebeam-clone per-room layout" href="/autobid-draw.html?doc='+encodeURIComponent(b.document_id)+'" style="text-decoration:none;padding:7px 10px">✎ Draw</a> ' : '')
+          +   (b.geometry_document_id!=null? '<a class="btn" title="PDF→3D model" href="/autosprink.html?doc='+encodeURIComponent(b.geometry_document_id)+'" style="text-decoration:none;padding:7px 10px">⬡ 3D</a>'
+          +     ' <a class="btn" title="Bluebeam-clone per-room layout" href="/autobid-draw.html?doc='+encodeURIComponent(b.geometry_document_id)+'" style="text-decoration:none;padding:7px 10px">✎ Draw</a> ' : '<span class="note">source PDF unavailable</span>')
           +   '<a class="btn send" href="/autobid-send.html?ref='+encodeURIComponent(ref)+'">Review &amp; Send →</a></td>'
           + '</tr>';
       }).join('');
