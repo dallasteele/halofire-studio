@@ -819,3 +819,30 @@ The continuation work remains deliberately below the completion bar:
   remaining unblock is to provision the trusted source-PDF mount and authorized
   reviewer/identity path, then collect independent receipts without answer-key
   leakage and re-run the frozen gates.
+
+## 37. CODEX CONTINUATION EVIDENCE - 2026-07-11 (HASH-VERIFIED SOURCE MIRROR UNBLOCK)
+
+- Root `093a5e96d` adds a controlled `AUTOBID_SOURCE_MIRROR_ROOT` resolver. When the
+  Windows Egnyte/Y: locator is absent, only the DB-indexed `rel_path` is joined
+  beneath that operator-provisioned root; arbitrary explicit paths never use the
+  fallback. Without the environment setting or the mirrored file, the resolver
+  remains the original typed 404. Focused resolver/packet coverage is **30 passed**;
+  full AutoBid engine regression is **871 passed, 10 skipped, 18 warnings**.
+- The exact source PDF for Cooperative document 34978 was found locally and
+  provisioned to the VPS mirror. Its byte size is **343,489,824** and its SHA-256 is
+  `ab25bee6eb303a54470e00259c1f94719e1c89b6372fe8dc7bc1ba44cc68bc01`, exactly
+  matching the package's source binding. `halofire-autobid.service` is active with
+  `AUTOBID_SOURCE_MIRROR_ROOT=/opt/openclaw/halofire-autobid/source-mirror`.
+- Live `/api/autobid/pdf/page?doc=34978&page=43` now returns a real PNG (HTTP 200,
+  1,762,050 bytes). Live `/package/9/review-packet` now reports non-null rendered
+  page hashes for all eight physical targets 44/47/50/53/56/59/62/65. The
+  authenticated Send page renders eight bound hashes with zero source-unavailable
+  warnings; A-101 Accept remains disabled until its upper/lower viewport
+  attestations are independently checked, while the other plates expose the
+  source-bound review controls. Evidence screenshot:
+  `out/agent-loops/halofire-master-build-20260711/live-ops/send-source-raster-bound.png`.
+- This is a genuine runtime/data-path unblock, not a human acceptance claim. No
+  reviewer decision, FP semantic receipt, density score, N6 production score, or
+  bid-grade geometry was fabricated. The remaining gates are independent trusted
+  review (including A-101 upper/lower), held-out density at the frozen 12% threshold,
+  strict N6 scoring, and deployment authorization separation.
