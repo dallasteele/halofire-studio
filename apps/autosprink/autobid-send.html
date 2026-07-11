@@ -69,6 +69,11 @@
   .spatial-review-toolbar output{ min-width:42px; text-align:right; color:var(--hf-text); font-variant-numeric:tabular-nums; }
   .spatial-review-frame .spatial-overlay{ display:block; width:100%; min-width:100%; height:auto; margin:0; border:0; border-radius:0; background:#fff; transform-origin:top left; }
   .spatial-review-frame .spatial-overlay[data-overlay-visible="false"]{ opacity:.65; }
+  .fp-point-review{ margin-top:10px; padding:10px; border:1px solid var(--hf-line); border-radius:8px; background:rgba(0,0,0,.18); }
+  .fp-point-review-stage{ position:relative; overflow:auto; max-height:520px; background:#fff; }
+  .fp-point-review-stage img{ display:block; width:100%; height:auto; }
+  .fp-point-review-stage canvas{ position:absolute; inset:0; width:100%; height:100%; cursor:crosshair; }
+  .fp-point-review-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
   .spatial-viewport{ display:inline-block; }
   .spatial-digests{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px 14px; margin-top:9px; }
   .spatial-digests code{ color:var(--hf-muted); font-size:10px; overflow-wrap:anywhere; }
@@ -581,6 +586,8 @@
             + '<textarea class="fpVectorFamilyNote" aria-label="Family review note for '+esc(group.group_id||'candidate')+'" placeholder="Family review note">'+esc(familyReview.note||'')+'</textarea>'
             + '<button class="btn fpVectorFamilyDecision" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'" data-decision="accepted"'+(familyDecision==='accepted'?' disabled':'')+'>Accept family</button>'
             + '<button class="btn fpVectorFamilyDecision" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'" data-decision="rejected">Reject family</button>'
+            + '<button class="btn fpPointPacket" data-fp-vector-index="'+index+'" data-family-id="'+esc(group.group_id||'')+'">Open blind point review</button>'
+            + '<div class="fpPointReviewMount"></div>'
             + '<div class="note fpVectorFamilyResult"></div></div>';
         }).join('');
         return '<div class="spatial-plate" data-fp-vector-artifact="'+esc(artifact.artifact_id||'')+'">'
@@ -708,6 +715,80 @@
             .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
             .then(function(response){if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'family review failed'); location.reload();})
             .catch(function(error){if(result) result.textContent='FP family review failed: '+error.message; Array.prototype.forEach.call(actions.querySelectorAll('.fpVectorFamilyDecision'),function(item){item.disabled=false;});});
+        });
+      });
+      function proxyAutobidUrl(url){
+        return String(url||'').indexOf('/api/autobid')===0?String(url):'/api/autobid'+String(url||'');
+      }
+      function pointDigest(points){
+        var ordered=points.slice().sort(function(a,b){return a.x-b.x||a.y-b.y;});
+        return crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify({points:ordered}))).then(function(buffer){
+          return Array.prototype.map.call(new Uint8Array(buffer),function(byte){return byte.toString(16).padStart(2,'0');}).join('');
+        });
+      }
+      Array.prototype.forEach.call(document.querySelectorAll('.fpPointPacket'),function(button){
+        button.addEventListener('click',function(){
+          var index=Number(button.getAttribute('data-fp-vector-index'));
+          var familyId=button.getAttribute('data-family-id')||'';
+          var artifact=artifacts[index]||{};
+          var actions=button.parentNode;
+          var mount=actions.querySelector('.fpPointReviewMount');
+          var result=actions.querySelector('.fpVectorFamilyResult');
+          var template=artifact.point_review_packet_url_template||'';
+          if(!template){if(result) result.textContent='Blind point packet is not available for this artifact.'; return;}
+          var packetUrl=template.replace('{artifact_id}',encodeURIComponent(artifact.artifact_id||'')).replace('{family_id}',encodeURIComponent(familyId));
+          button.disabled=true;
+          if(result) result.textContent='Loading the source-bound blind page...';
+          api(packetUrl.replace(/^\/api\/autobid/,'')).then(function(response){
+            return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});
+          }).then(function(response){
+            if(!response.ok) throw new Error((response.json&&response.json.detail)||'point packet unavailable; accept the family first');
+            var packet=response.json;
+            mount.innerHTML='<div class="fp-point-review"><div class="note">Blind review: source PDF hash <code>'+esc(digest(packet.source_pdf_sha256))+'</code> · physical page '+esc(packet.physical_page_number)+' · no expected count is supplied.</div>'
+              +'<div class="fp-point-review-stage"><img class="fpPointPage" alt="Source PDF page for blind sprinkler-head point review" src="'+esc(proxyAutobidUrl(packet.source_pdf_page_url))+'" /><canvas class="fpPointCanvas"></canvas></div>'
+              +'<div class="fp-point-review-actions"><button class="btn fpPointDecision" data-decision="accepted">Accept reviewed points</button><button class="btn fpPointDecision" data-decision="rejected">Reject page</button><span class="note fpPointCount">0 points marked</span></div></div>';
+            var stage=mount.querySelector('.fp-point-review-stage');
+            var image=mount.querySelector('.fpPointPage');
+            var canvas=mount.querySelector('.fpPointCanvas');
+            var count=mount.querySelector('.fpPointCount');
+            var points=[];
+            var redraw=function(){
+              if(!image.naturalWidth) return;
+              canvas.width=image.naturalWidth; canvas.height=image.naturalHeight;
+              var ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);
+              ctx.fillStyle='#f0a868'; ctx.strokeStyle='#24170b'; ctx.lineWidth=Math.max(2,canvas.width/700);
+              points.forEach(function(point){
+                var px=point.x/packet.page_width_pt*canvas.width;
+                var py=point.y/packet.page_height_pt*canvas.height;
+                ctx.beginPath(); ctx.arc(px,py,Math.max(5,canvas.width/180),0,Math.PI*2); ctx.fill(); ctx.stroke();
+              });
+              if(count) count.textContent=points.length+' point'+(points.length===1?'':'s')+' marked';
+            };
+            image.addEventListener('load',redraw); if(image.complete) redraw();
+            canvas.addEventListener('click',function(event){
+              var rect=canvas.getBoundingClientRect();
+              points.push({x:(event.clientX-rect.left)/rect.width*packet.page_width_pt,y:(event.clientY-rect.top)/rect.height*packet.page_height_pt});
+              redraw();
+            });
+            Array.prototype.forEach.call(mount.querySelectorAll('.fpPointDecision'),function(decisionButton){
+              decisionButton.addEventListener('click',function(){
+                var decision=decisionButton.getAttribute('data-decision');
+                if(decision==='accepted' && !points.length){if(result) result.textContent='Mark at least one clearly visible sprinkler head before accepting.'; return;}
+                Array.prototype.forEach.call(mount.querySelectorAll('.fpPointDecision'),function(item){item.disabled=true;});
+                var selected=decision==='accepted'?points:[];
+                pointDigest(selected).then(function(pointOverlaySha){
+                  return api('/fp-vector-artifacts/'+encodeURIComponent(artifact.artifact_id)+'/point-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+                    packet_hash:packet.packet_hash, artifact_id:artifact.artifact_id, candidate_id:packet.candidate_id,
+                    family_id:familyId, point_overlay_sha256:pointOverlaySha, points:selected, decision:decision,
+                    note:'Estimator point review from source-bound blind page'
+                  })});
+                }).then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+                  .then(function(response){if(!response.ok) throw new Error((response.json&&response.json.detail)||'point review failed'); if(result) result.textContent='Canonical point receipt stored: '+response.json.decision_id.slice(0,12)+'…';})
+                  .catch(function(error){if(result) result.textContent='Point review failed: '+error.message; Array.prototype.forEach.call(mount.querySelectorAll('.fpPointDecision'),function(item){item.disabled=false;});});
+              });
+            });
+            if(result) result.textContent='Source-bound blind page ready. Mark only symbols you can verify.';
+          }).catch(function(error){if(result) result.textContent='Blind point packet failed: '+error.message; button.disabled=false;});
         });
       });
     }
