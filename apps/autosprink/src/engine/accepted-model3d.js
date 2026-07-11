@@ -33,6 +33,37 @@ function validRooms(value) {
   ));
 }
 
+function validAcceptedHeads(plan) {
+  const evidence = plan && plan.sprinklerEvidence;
+  const heads = plan && plan.heads;
+  return evidence && evidence.systemVerified === true
+    && evidence.source === 'accepted-geometry-layout'
+    && Number(evidence.outsideHeadCount) === 0
+    && Array.isArray(heads) && heads.length > 0
+    && Number(evidence.headCount) === heads.length
+    && heads.every((head) => head && Number.isFinite(Number(head.x)) && Number.isFinite(Number(head.y)));
+}
+
+function validAcceptedPipe(plan) {
+  const evidence = plan && plan.sprinklerEvidence;
+  const segments = plan && plan.pipeSegments;
+  const nodes = plan && plan.pipeNodes;
+  const penetrations = plan && plan.wallPenetrations;
+  return evidence && evidence.pipeSystemVerified === true
+    && evidence.pipeAvailable === true
+    && typeof evidence.routeSetDigest === 'string' && /^[0-9a-f]{64}$/.test(evidence.routeSetDigest)
+    && Array.isArray(segments) && segments.length > 0
+    && Number(evidence.pipeSegmentCount) === segments.length
+    && Array.isArray(nodes) && nodes.length > 0
+    && Array.isArray(penetrations)
+    && Number(evidence.wallPenetrationCount) === penetrations.length
+    && segments.every((segment) => segment
+      && Number.isFinite(Number(segment.x1)) && Number.isFinite(Number(segment.y1))
+      && Number.isFinite(Number(segment.x2)) && Number.isFinite(Number(segment.y2))
+      && Number(segment.size_in) > 0
+      && typeof segment.from_node === 'string' && typeof segment.to_node === 'string');
+}
+
 function reject(reason) {
   return { levels: null, reason };
 }
@@ -71,6 +102,8 @@ export function acceptedModel3dToLevels(payload) {
     if (!(Number(plan.scaleFtPerUnit) > 0)) return reject(`accepted_model3d_scale_missing:${level}`);
     if (!validWallRuns(plan.wallRuns)) return reject(`accepted_model3d_walls_missing:${level}`);
     if (!validRooms(plan.roomBoundaries)) return reject(`accepted_model3d_rooms_missing:${level}`);
+    if (!validAcceptedHeads(plan)) return reject(`accepted_model3d_heads_missing:${level}`);
+    if (!validAcceptedPipe(plan)) return reject(`accepted_model3d_pipe_missing:${level}`);
     if (typeof plan.vectorOverlayArtifact !== 'string' || plan.vectorOverlayArtifact.trim() === '') {
       return reject(`accepted_model3d_overlay_missing:${level}`);
     }

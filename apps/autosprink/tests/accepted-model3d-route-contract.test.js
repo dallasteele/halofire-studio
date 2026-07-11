@@ -18,7 +18,7 @@ describe('accepted AutoBid model3d route contract', () => {
   });
 
   it('does not replace the accepted overlay with a typical-floor repeat', () => {
-    expect(html).toContain('accepted vector overlays (physical-page bound; needs-verification)');
+    expect(html).toContain('system-verified vector geometry, accepted sprinkler heads, and connected wall-aware pipe');
     expect(html).toContain('acceptedModel3d: data.source ===');
     expect(html).toContain('sourceDocumentId: data.sourceDocumentId || null');
   });

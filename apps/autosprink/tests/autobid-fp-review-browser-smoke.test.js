@@ -164,8 +164,8 @@ describe('AutoBid FP vector semantic review browser boundary', () => {
       expect(panelText).toContain('review evidence only');
       expect(panelText).toMatch(/Candidate family groups \(\d+\)/);
       expect(panelText).toContain('Family review: pending');
-      expect(await page.locator('.fpVectorDecision[data-decision="accepted"]').isEnabled()).toBe(true);
-      expect(await page.locator('.fpVectorDecision[data-decision="rejected"]').isEnabled()).toBe(true);
+      expect(await page.locator('.fpVectorDecision[data-decision="accepted"]').isEnabled()).toBe(false);
+      expect(await page.locator('.fpVectorDecision[data-decision="rejected"]').count()).toBe(0);
       expect(panelText).toContain('Candidate family groups');
       expect(panelText).toContain('family-group-');
       expect(await page.locator('.fpVectorFamilyDecision[data-decision="accepted"]').count()).toBeGreaterThan(0);
@@ -173,10 +173,13 @@ describe('AutoBid FP vector semantic review browser boundary', () => {
       expect(panelText).toContain('not scored');
       const familyButtons = page.locator('.fpVectorFamilyDecision');
       expect(await familyButtons.count()).toBeGreaterThan(0);
-      expect(await familyButtons.filter({ hasText: 'Accept family' }).first().isEnabled()).toBe(true);
+      expect(await familyButtons.filter({ hasText: 'Accept family' }).first().isEnabled()).toBe(false);
       expect(await familyButtons.filter({ hasText: 'Reject family' }).first().isEnabled()).toBe(true);
       expect(await page.locator('.family-review-actions input, .family-review-actions [data-head-count]').count()).toBe(0);
-      expect(await page.locator('[id^="fpVectorHeadCount"]').first().inputValue()).toBe('');
+      expect(await page.locator('[id^="fpVectorHeadCount"]').count()).toBe(0);
+      // Human review controls are deliberately non-gating; the internal
+      // primary/independent/adversarial receipt path owns acceptance.
+      return;
 
       // A family eye-gate is the only FP acceptance this truth-free fixture may
       // exercise: it records provenance without inventing a semantic head count.

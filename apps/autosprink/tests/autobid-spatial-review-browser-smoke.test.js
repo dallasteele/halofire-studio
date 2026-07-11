@@ -25,6 +25,7 @@ let browser;
 let enginePort;
 let studioPort;
 let base;
+let initialReviewCount;
 
 function freePort() {
   return new Promise((resolve, reject) => {
@@ -71,10 +72,19 @@ async function api(pathname, token, options = {}) {
 async function stop(child) {
   if (!child || child.exitCode != null) return;
   child.kill();
-  await new Promise((resolve) => {
-    child.once('exit', resolve);
-    setTimeout(resolve, 3000).unref();
-  });
+  await Promise.race([
+    new Promise((resolve) => child.once('exit', resolve)),
+    new Promise((resolve) => setTimeout(resolve, 3000)),
+  ]);
+  if (child.exitCode == null) {
+    child.kill('SIGKILL');
+    await Promise.race([
+      new Promise((resolve) => child.once('exit', resolve)),
+      new Promise((resolve) => setTimeout(resolve, 2000)),
+    ]);
+  }
+  child.stdout?.destroy();
+  child.stderr?.destroy();
 }
 
 beforeAll(async () => {
@@ -83,6 +93,7 @@ beforeAll(async () => {
   tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'halofire-spatial-review-browser-'));
   copiedDb = path.join(tempDir, 'autobid-review-smoke.db');
   const source = new Database(SOURCE_DB, { readonly: true });
+  initialReviewCount = source.prepare('SELECT COUNT(*) AS n FROM spatial_overlay_reviews').get().n;
   await source.backup(copiedDb);
   source.close();
   const copiedArtifacts = path.join(tempDir, 'spatial-overlays');
@@ -132,7 +143,7 @@ afterAll(async () => {
   if (browser) await browser.close();
   await stop(studio);
   await stop(engine);
-  if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
 });
 
 describe('AutoBid spatial review live browser boundary', () => {
@@ -241,7 +252,7 @@ describe('AutoBid spatial review live browser boundary', () => {
       });
       const copiedBeforeEstimatorReview = new Database(copiedDb, { readonly: true });
       expect(copiedBeforeEstimatorReview
-        .prepare('SELECT COUNT(*) AS n FROM spatial_overlay_reviews').get().n).toBe(0);
+        .prepare('SELECT COUNT(*) AS n FROM spatial_overlay_reviews').get().n).toBe(initialReviewCount);
       copiedBeforeEstimatorReview.close();
 
       const accepts = page.locator('.spatialDecision[data-decision="accepted"]');
@@ -261,18 +272,21 @@ describe('AutoBid spatial review live browser boundary', () => {
 
       const manifest = (await api('/api/autobid/package/9', setup.token)).spatial_verification;
       expect(manifest.plates).toHaveLength(8);
-      const accepted = manifest.plates.filter((plate) => plate.review.decision === 'accepted');
-      expect(accepted).toHaveLength(1);
-      expect(accepted[0].review.reviewer_name).toBe('Spatial Smoke Estimator');
-      expect(accepted[0].review.reviewer_role).toBe('estimator');
-      expect(accepted[0].review.reviewed_structural_wall_recall).toBe(0.95);
-      expect(accepted[0].review.phantom_room_count).toBe(0);
+      const estimatorRows = manifest.plates.filter((plate) => plate.review?.reviewer_name === 'Spatial Smoke Estimator');
+      expect(estimatorRows).toHaveLength(1);
+      expect(estimatorRows[0].review.decision).toBe('accepted');
+      expect(estimatorRows[0].review.reviewer_role).toBe('estimator');
+      expect(estimatorRows[0].review.reviewed_structural_wall_recall).toBe(0.95);
+      expect(estimatorRows[0].review.phantom_room_count).toBe(0);
+      // The copied DB intentionally excludes the content-addressed machine ledger;
+      // a human row is recorded but cannot substitute for that missing receipt.
+      expect(manifest.passed).toBe(false);
 
       const copied = new Database(copiedDb, { readonly: true });
-      expect(copied.prepare('SELECT COUNT(*) AS n FROM spatial_overlay_reviews').get().n).toBe(1);
+      expect(copied.prepare('SELECT COUNT(*) AS n FROM spatial_overlay_reviews').get().n).toBe(initialReviewCount + 1);
       copied.close();
       const canonical = new Database(SOURCE_DB, { readonly: true });
-      expect(canonical.prepare('SELECT COUNT(*) AS n FROM spatial_overlay_reviews').get().n).toBe(0);
+      expect(canonical.prepare('SELECT COUNT(*) AS n FROM spatial_overlay_reviews').get().n).toBe(initialReviewCount);
       canonical.close();
     } finally {
       await page.close();

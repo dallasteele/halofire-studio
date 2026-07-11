@@ -20,7 +20,7 @@
  * manufacturer-exact / AutoSprink parity.
  */
 
-const SLAB_COLOR = 0x2dd4bf;
+const SLAB_COLOR = 0x3a4150; // opaque concrete floor plate (was translucent teal film)
 const WALL_COLOR = 0x8b9bb4;
 const KIND_COLORS = Object.freeze({
   parking: 0x5b6b7a,
@@ -93,20 +93,22 @@ export function computePlanUnderlayTransform({
       y: Number(elevationFt) + Number(liftFt),
       z: pageHFt / 2 - Number(unionCenterYFt),
     },
-    // -PI/2: textured face up (+Y) -> readable from the top-down plan camera (RECORE fix; +PI/2
-    // showed the plane's BACK = backwards/mirrored text).
-    // ORIENTATION (empirically re-verified 2026-06-13 via a 4-way (U,V) texture-flip sweep on the
-    // live registered A-101 underlay at top+iso, evidence out/halofire-wallpipe/flipdiag/):
-    // u0_v0 = NO flip (flipTextureV:false, flipTextureU:false) reads sheet text FORWARD at BOTH
-    // top AND iso; flipTextureV:true MIRRORS top<->bottom (upside-down), flipTextureU:true mirrors
-    // left<->right. So the registered underlay is ALREADY oriented correctly with NO flip — the
-    // prior RECORE fix (-PI/2, no flip) stands. flipTextureV:true is WRONG for this path and is NOT
-    // used. (flipTextureU is exposed on createUnderlayMesh as an inert default-off live-QA option.)
-    // RESIDUAL: re-confirm iso-forward in a real browser when the underlay texture registers — the
-    // headless build occasionally fails to register the 165MB-PDF texture (underlay===null), in
-    // which case no sheet text renders and forward-at-iso is not observable (not a code defect).
+    // REGISTRATION (single source of truth) — the texture V axis MUST run the SAME direction as the
+    // geometry's plan-Y -> world-Z map (worldZ = planY - cy, monotonically INCREASING). The plane is
+    // rotated rotation.x = -PI/2 (textured face up, toward the top-down plan camera). With the default
+    // CanvasTexture flipY=true, a -PI/2 plane maps PNG-top (PDF-HIGH-Y) to world -Z and PNG-bottom
+    // (PDF-LOW-Y) to world +Z — i.e. PDF-Y DECREASES as world-Z increases, the OPPOSITE of the
+    // geometry. That inversion is exactly the observed "3D lands over the UPPER title-block band, not
+    // the main lower plan" defect: the extracted footprint (PDF-Y 35.8..117.7, the MAIN plan) was
+    // rendered under the WRONG sheet band. flipTextureV:true mirrors V so PNG rows run with +Z, making
+    // PDF-Y INCREASE with world-Z — now the geometry's footprint sits over the SAME sheet region it was
+    // extracted from. VERIFIED LIVE 2026-06-15 on the 1881 top view: flipV=true registers the 3D over
+    // the detailed main floor plan (split-/overlap-zoom evidence in
+    // out/building-reconstruction/underlay-registration/); flipV=false placed it over the typical-floor
+    // /title-block band. The prior "no-flip" note conflated text-readability with ink-registration; the
+    // registration-correct value for THIS plan-Y->world-Z path is flipTextureV:true.
     rotation: { x: -Math.PI / 2, y: 0, z: 0 },
-    flipTextureV: false,
+    flipTextureV: true,
     scaleSource: 'registered to extracted geometry at the sheet-derived true scale — NOT a title-block-verified plot scale; needs-verification',
     needsVerification: true,
   };
@@ -180,14 +182,76 @@ function makeFootprintSlab(THREE, footprintFt, bounds, elevationFt, slabThicknes
   const geo = new THREE.ExtrudeGeometry(shape, { depth: slabThicknessFt, bevelEnabled: false });
   // Extrude is along +Z of the shape plane; rotate so it lies flat (XZ plane), thickness up Y.
   geo.rotateX(-Math.PI / 2);
+  // REAL floor slab: an OPAQUE concrete-grey plate whose TOP sits exactly at the level elevation
+  // (z=0 on L1), so walls/columns stand ON it and pipes lie ABOVE it — not a translucent film with
+  // pipes flush through it. After rotateX(-PI/2) the extruded thickness runs along -Y, so the mesh
+  // spans [elev - thickness, elev]; the top face is at elev. (Was opacity 0.32 with top at elev +
+  // thickness, which let the network sit visually inside the plate.)
+  // Opaque-reading concrete plate, but kept lightly translucent (0.6) so the registered plan ink
+  // underneath stays legible in the TOP/registration view (a fully opaque slab occludes the sheet
+  // and breaks the overlay check). In iso it still reads as a solid floor, not a translucent film.
   const mat = new THREE.MeshStandardMaterial
-    ? new THREE.MeshStandardMaterial({ color: SLAB_COLOR, transparent: true, opacity: 0.32, metalness: 0, roughness: 0.95 })
-    : new THREE.MeshBasicMaterial({ color: SLAB_COLOR, transparent: true, opacity: 0.32 });
+    ? new THREE.MeshStandardMaterial({ color: SLAB_COLOR, transparent: true, opacity: 0.6, metalness: 0.0, roughness: 0.98 })
+    : new THREE.MeshBasicMaterial({ color: SLAB_COLOR, transparent: true, opacity: 0.6 });
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.y = elevationFt;
+  mesh.renderOrder = -1; // draw slab first so transparent walls/columns sort above it
   mesh.name = `footprint-slab:elev${elevationFt}`;
   mesh.userData = { kind: 'footprint-slab', needsVerification: true };
   return mesh;
+}
+
+const PERIMETER_COLOR = 0x6b7a90; // continuous exterior shell wall — slightly cooler than partitions
+
+/**
+ * Build the CONTINUOUS PERIMETER WALL SHELL from a footprint polygon (PLAN feet). Each edge of
+ * the closed footprint loop becomes one wall box extruded slab->ceiling, so the building reads as
+ * an enclosed shell instead of scattered interior partitions sitting on a bare plate. The extracted
+ * `wallRuns` are interior partitions that (on the 1881 set) do NOT trace the building envelope and
+ * stop partway across the plan — the envelope must come from the footprint loop itself, the one
+ * geometry we KNOW closes. Returned as ONE group of edge walls (selectable as the shell).
+ *
+ * @param {Array<[number,number]>} footprintFt - closed footprint loop in plan feet.
+ * @param {{cx,cy}} bounds - shared world origin (footprint -> world: x-cx, y-cy).
+ * @param {number} elevationFt - level slab elevation.
+ * @param {number} heightFt - shell height (= ceiling height).
+ * @param {number} thicknessFt - exterior wall thickness.
+ * @returns {THREE.Group|null}
+ */
+function makePerimeterShell(THREE, footprintFt, bounds, elevationFt, heightFt, thicknessFt) {
+  if (!Array.isArray(footprintFt) || footprintFt.length < 3 || !THREE.BoxGeometry) return null;
+  // Drop a trailing duplicate closing vertex so we don't emit a zero-length edge.
+  const pts = footprintFt.slice();
+  const f = pts[0], l = pts[pts.length - 1];
+  if (pts.length > 3 && Array.isArray(f) && Array.isArray(l) && Math.hypot(f[0] - l[0], f[1] - l[1]) < 0.01) pts.pop();
+  if (pts.length < 3) return null;
+  const mat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: PERIMETER_COLOR, transparent: true, opacity: 0.82, metalness: 0.05, roughness: 0.85 })
+    : new THREE.MeshBasicMaterial({ color: PERIMETER_COLOR, transparent: true, opacity: 0.82 });
+  const g = new THREE.Group();
+  g.name = 'perimeter-shell';
+  g.userData = { kind: 'plan-perimeter-shell', toggleKey: 'WALLS', edgeCount: 0, needsVerification: true };
+  let n = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i], b = pts[(i + 1) % pts.length];
+    if (!Array.isArray(a) || !Array.isArray(b)) continue;
+    const ax = a[0] - bounds.cx, az = a[1] - bounds.cy;
+    const bx = b[0] - bounds.cx, bz = b[1] - bounds.cy;
+    const len = Math.hypot(bx - ax, bz - az);
+    if (!(len > 0.05)) continue;
+    // Extend each edge by half-thickness at both ends so adjacent edges overlap at the corner
+    // (no gap at the building corners — a continuous shell, not 4 disconnected sticks).
+    const lenEx = len + thicknessFt;
+    const geo = new THREE.BoxGeometry(lenEx, heightFt, thicknessFt);
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set((ax + bx) / 2, elevationFt + heightFt / 2, (az + bz) / 2);
+    mesh.rotation.y = -Math.atan2(bz - az, bx - ax);
+    mesh.name = 'plan-perimeter-wall';
+    mesh.userData = { kind: 'plan-perimeter-wall', lengthFt: Math.round(len * 100) / 100, needsVerification: true };
+    g.add(mesh); n += 1;
+  }
+  g.userData.edgeCount = n;
+  return n ? g : null;
 }
 
 /** Build one extruded wall box from a plan-feet segment {a:[x,y], b:[x,y]}. */
@@ -516,9 +580,31 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     widthFt: uMaxX - uMinX, depthFt: uMaxY - uMinY,
   };
 
+  // ASSEMBLY-COHERENCE (2026-06-15): the per-region extractors (column markers, room flood-fill,
+  // fixture-symbol clusters) pick up near-square / enclosed glyphs from OTHER parts of the SHEET
+  // (key plans, detail callouts, schedule tables, title block, the "22" logo) that sit OUTSIDE the
+  // building footprint. Rendered as-is they scatter columns/rooms/fixtures off the slab — the
+  // "floating pieces / hovering at the wrong place" the user sees. We clip every extracted entity
+  // to the level's footprint bbox (+ margin for perimeter members on the wall face). Walls/windows
+  // /openings already test clean (inside the envelope) so the clip is a no-op for them. The dropped
+  // counts are reported honestly on each level's columnSource / counts. clipPtFt(point, bbox) is the
+  // shared gate; an entity is kept iff its representative point(s) fall within the (margined) bbox.
+  const clipMarginFt = Number.isFinite(opts.footprintClipMarginFt) ? opts.footprintClipMarginFt : 6;
+  const ptInBbox = (x, y, fb) => fb && x >= fb.minX - clipMarginFt && x <= fb.maxX + clipMarginFt &&
+    y >= fb.minY - clipMarginFt && y <= fb.maxY + clipMarginFt;
+
   const root = new THREE.Group();
   root.name = 'building-from-plan';
-  root.userData = { kind: 'building-from-plan', needsVerification: true };
+  const acceptedSystemModel = levelPlans.every((entry) => (
+    entry && entry.plan && entry.plan.geometryGrounded === true
+    && entry.plan.sprinklerEvidence && entry.plan.sprinklerEvidence.systemVerified === true
+    && entry.plan.sprinklerEvidence.pipeSystemVerified === true
+  ));
+  root.userData = {
+    kind: 'building-from-plan',
+    needsVerification: !acceptedSystemModel,
+    systemVerified: acceptedSystemModel,
+  };
 
   const wallMat = THREE.MeshStandardMaterial
     ? new THREE.MeshStandardMaterial({ color: WALL_COLOR, transparent: true, opacity: 0.6, metalness: 0, roughness: 0.9 })
@@ -539,15 +625,28 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       scaleFtPerUnit: plan.scaleFtPerUnit,
       scaleText: plan.scaleText,
       provenance: plan.provenance,
-      needsVerification: true,
+      needsVerification: !acceptedSystemModel,
+      systemVerified: acceptedSystemModel,
     };
 
     let wallCount = 0, roomCount = 0, stairCount = 0;
+    let sprinklerHeadCount = 0, sprinklerPipeSegmentCount = 0;
 
     // Footprint slab.
     if (Array.isArray(plan.footprintFt) && plan.footprintFt.length >= 3) {
       const slab = makeFootprintSlab(THREE, plan.footprintFt, bounds, elevationFt, slabThicknessFt);
       group.add(slab);
+    }
+
+    // CONTINUOUS PERIMETER WALL SHELL — extrude every edge of the closed footprint loop slab->ceiling
+    // so the building reads as an ENCLOSED shell. The extracted `wallRuns`/`walls` are interior
+    // partitions that do NOT trace the envelope (on the 1881 L1 set they stop ~X210 of a 360ft-wide
+    // plan); the footprint loop is the one geometry we know closes, so the exterior shell comes from
+    // it. Toggleable with WALLS. needs-verification (footprint is plan-derived, not a stamped survey).
+    let perimeterEdges = 0;
+    if (includeWalls && Array.isArray(plan.footprintFt) && plan.footprintFt.length >= 3) {
+      const shell = makePerimeterShell(THREE, plan.footprintFt, bounds, elevationFt, wallHeightFt, Math.max(wallThicknessFt, 0.66));
+      if (shell) { group.add(shell); perimeterEdges = (shell.userData && shell.userData.edgeCount) || 0; }
     }
 
     // Walls. RECORE: prefer the collinear-merged wall RUNS (envelope + partitions, non-wall ink
@@ -591,12 +690,24 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       }
     }
 
-    // Rooms as labeled tiles.
-    if (includeRooms && Array.isArray(plan.rooms)) {
-      for (const room of plan.rooms) {
+    // Rooms as labeled tiles. Prefer the TRUE traced room boundaries (marching-squares polygons +
+    // shoelace areas + wall-coverage closure) over the legacy bbox-rectangle flood-fill rooms.
+    const roomSrc = (Array.isArray(plan.roomBoundaries) && plan.roomBoundaries.length) ? plan.roomBoundaries
+      : (Array.isArray(plan.rooms) ? plan.rooms : []);
+    let roomAreaSqft = 0, roomsClipped = 0;
+    if (includeRooms && roomSrc.length) {
+      const fbR = plan.footprintBboxFt;
+      for (const room of roomSrc) {
         if (!room || !Array.isArray(room.poly) || room.poly.length < 3) continue;
+        // ASSEMBLY-COHERENCE: drop rooms whose CENTROID sits outside the footprint — those are
+        // enclosed voids traced in detail blocks / key plans / schedule cells on the same sheet,
+        // not real building spaces. The footprint rooms (the actual plan) are kept.
+        if (fbR && Number.isFinite(fbR.minX)) {
+          const c = polyCentroid(room.poly);
+          if (!ptInBbox(c[0], c[1], fbR)) { roomsClipped += 1; continue; }
+        }
         const tile = makeRoomTile(THREE, room, bounds, elevationFt);
-        if (tile) { group.add(tile); roomCount += 1; }
+        if (tile) { group.add(tile); roomCount += 1; roomAreaSqft += Number(room.areaSqft) || 0; }
       }
     }
 
@@ -671,15 +782,28 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       group.add(wGroup);
     }
 
-    // HF-W2: FIXTURES / cores — labeled space content, toggleable.
-    let fixtureCount = 0;
-    if (Array.isArray(plan.fixtures) && plan.fixtures.length) {
+    // HF-W2: FIXTURES / cores — geometric symbol clusters (fixtureSymbols) + label/room-kind cores
+    // (fixtures), toggleable. Symbols are typed plumbing only inside a restroom w/ a footprint match,
+    // else 'equipment' (honest: an overall plan carries workstation/casework glyphs, not plumbing).
+    let fixtureCount = 0, fixtureSymbolCount = 0, fixturePlumbingCount = 0;
+    const fixtureSrc = []
+      .concat(Array.isArray(plan.fixtureSymbols) ? plan.fixtureSymbols : [])
+      .concat(Array.isArray(plan.fixtures) ? plan.fixtures : []);
+    if (fixtureSrc.length) {
       const fGroup = new THREE.Group();
       fGroup.name = 'fixtures';
       fGroup.userData = { kind: 'plan-fixtures-layer', toggleKey: 'FIXTURES', needsVerification: true };
-      for (const fx of plan.fixtures) {
+      const fbF = plan.footprintBboxFt;
+      for (const fx of fixtureSrc) {
+        // ASSEMBLY-COHERENCE: drop fixture/equipment symbols outside the footprint (schedule-table
+        // and legend glyphs that the symbol-cluster pass picks up).
+        if (fbF && Number.isFinite(fbF.minX) && Array.isArray(fx.position) && !ptInBbox(fx.position[0], fx.position[1], fbF)) continue;
         const m = makeFixtureMarker(THREE, fx, bounds, elevationFt);
-        if (m) { fGroup.add(m); fixtureCount += 1; }
+        if (m) {
+          fGroup.add(m); fixtureCount += 1;
+          if (fx.source && /symbol/.test(String(fx.source))) fixtureSymbolCount += 1;
+          if (fx.fixtureKind && !['equipment', 'mech', 'elec', 'stair', 'elevator', 'trash'].includes(fx.fixtureKind)) fixturePlumbingCount += 1;
+        }
       }
       fGroup.visible = false; // off by default — toggle in LAYERS
       group.add(fGroup);
@@ -699,6 +823,19 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       // Prefer the specific extraction provenance the data carries (e.g. 'marker-extraction' —
       // real column marker boxes), falling back to the generic 'extracted' label.
       columnSource = (typeof plan.columnSource === 'string' && plan.columnSource) ? plan.columnSource : 'extracted';
+      // ASSEMBLY-COHERENCE FIX (2026-06-15): marker-extraction picks up near-square glyphs from
+      // OTHER regions of the sheet (key plans, detail callouts, schedule tables, the title block,
+      // logo blocks) that sit OUTSIDE the building footprint — on the 1881 L1 set, 56 of 131
+      // columns landed at plan-Y up to 225 ft while the footprint is Y 36..118. Those render as
+      // disconnected red bars floating off the slab. Clip extracted columns to the footprint bbox
+      // (shared ptInBbox gate) so every emitted column stands ON the floor plate. Honest count.
+      const fb = plan.footprintBboxFt;
+      if (fb && Number.isFinite(fb.minX) && Number.isFinite(fb.maxX) && Number.isFinite(fb.minY) && Number.isFinite(fb.maxY)) {
+        const before = planColumns.length;
+        planColumns = planColumns.filter((c) => ptInBbox(c.x, c.y, fb));
+        const dropped = before - planColumns.length;
+        if (dropped > 0) columnSource += `(footprint-clipped: ${dropped} off-plate of ${before} dropped)`;
+      }
     }
     if (planColumns.length && THREE.BoxGeometry) {
       const cGroup = new THREE.Group();
@@ -711,6 +848,86 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       group.add(cGroup);
     }
 
+    // Accepted N3 heads share the grounded plan's coordinate frame and page
+    // evidence. Provisional or unverified plans can never enter this branch.
+    if (plan.sprinklerEvidence && plan.sprinklerEvidence.systemVerified === true
+        && Array.isArray(plan.heads) && plan.heads.length && THREE.BoxGeometry) {
+      const hGroup = new THREE.Group();
+      hGroup.name = 'accepted-sprinkler-heads';
+      hGroup.userData = {
+        kind: 'accepted-sprinkler-heads', toggleKey: 'HEADS',
+        systemVerified: true, needsVerification: false,
+        evidence: plan.sprinklerEvidence,
+      };
+      const headMat = THREE.MeshStandardMaterial
+        ? new THREE.MeshStandardMaterial({ color: 0xff3b30, metalness: 0.15, roughness: 0.45 })
+        : new THREE.MeshBasicMaterial({ color: 0xff3b30 });
+      for (const head of plan.heads) {
+        const x = Number(head && head.x), y = Number(head && head.y);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        const marker = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.22, 0.55), headMat);
+        marker.position.set(x - bounds.cx, elevationFt + wallHeightFt - 0.15, y - bounds.cy);
+        marker.name = 'accepted-sprinkler-head';
+        marker.userData = {
+          kind: 'head', systemVerified: true, needsVerification: false,
+          roomId: head.roomId || null,
+        };
+        hGroup.add(marker);
+        sprinklerHeadCount += 1;
+      }
+      group.add(hGroup);
+    }
+
+    // The same immutable route-set digest that released accepted heads also
+    // releases the connected wall-aware pipe graph. Pipe is mounted just above
+    // the heads at system height; stale/unverified route bytes render nothing.
+    if (plan.sprinklerEvidence && plan.sprinklerEvidence.pipeSystemVerified === true
+        && Array.isArray(plan.pipeSegments) && plan.pipeSegments.length
+        && THREE.BoxGeometry) {
+      const pGroup = new THREE.Group();
+      pGroup.name = 'accepted-sprinkler-pipe';
+      pGroup.userData = {
+        kind: 'accepted-sprinkler-pipe', toggleKey: 'PIPE',
+        systemVerified: true, needsVerification: false,
+        routeSetDigest: plan.sprinklerEvidence.routeSetDigest,
+        evidence: plan.sprinklerEvidence,
+      };
+      const mainMat = THREE.MeshStandardMaterial
+        ? new THREE.MeshStandardMaterial({ color: 0xe53935, metalness: 0.35, roughness: 0.4 })
+        : new THREE.MeshBasicMaterial({ color: 0xe53935 });
+      const branchMat = THREE.MeshStandardMaterial
+        ? new THREE.MeshStandardMaterial({ color: 0x3b82f6, metalness: 0.3, roughness: 0.45 })
+        : new THREE.MeshBasicMaterial({ color: 0x3b82f6 });
+      for (const segment of plan.pipeSegments) {
+        const x1 = Number(segment && segment.x1), y1 = Number(segment && segment.y1);
+        const x2 = Number(segment && segment.x2), y2 = Number(segment && segment.y2);
+        const sizeIn = Number(segment && segment.size_in);
+        if (![x1, y1, x2, y2, sizeIn].every(Number.isFinite) || !(sizeIn > 0)) continue;
+        const lengthFt = Math.hypot(x2 - x1, y2 - y1);
+        if (!(lengthFt > 0.001)) continue;
+        const diameterFt = Math.max(sizeIn / 12, 0.08);
+        const marker = new THREE.Mesh(
+          new THREE.BoxGeometry(lengthFt, diameterFt, diameterFt),
+          segment.kind === 'main' || segment.kind === 'riser' ? mainMat : branchMat,
+        );
+        marker.position.set(
+          (x1 + x2) / 2 - bounds.cx,
+          elevationFt + wallHeightFt - 0.35,
+          (y1 + y2) / 2 - bounds.cy,
+        );
+        marker.rotation.y = -Math.atan2(y2 - y1, x2 - x1);
+        marker.name = 'accepted-pipe-segment';
+        marker.userData = {
+          kind: 'pipe', role: segment.kind, sizeIn,
+          segmentId: segment.id || null,
+          systemVerified: true, needsVerification: false,
+        };
+        pGroup.add(marker);
+        sprinklerPipeSegmentCount += 1;
+      }
+      group.add(pGroup);
+    }
+
     root.add(group);
     levels.push({
       level: lp.level,
@@ -721,9 +938,17 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       columns: planColumns,
       columnSource,
       counts: {
-        walls: wallCount, rooms: roomCount, stairs: stairCount,
+        walls: wallCount, perimeterEdges, rooms: roomCount, stairs: stairCount,
+        sprinklerHeads: sprinklerHeadCount,
+        sprinklerPipeSegments: sprinklerPipeSegmentCount,
         doors: doorCount, windows: windowCount, openings: openingCount, fixtures: fixtureCount,
+        // FIXTURES + ROOMS chunk: honest splits + measured room area.
+        fixtureSymbols: fixtureSymbolCount, fixturePlumbing: fixturePlumbingCount,
+        roomAreaSqft: Math.round(roomAreaSqft),
+        roomSource: (Array.isArray(plan.roomBoundaries) && plan.roomBoundaries.length) ? 'boundary-trace' : (roomCount ? 'bbox-floodfill' : 'none'),
+        roomMeanCoverage: (plan.roomBoundaryMeta && Number.isFinite(plan.roomBoundaryMeta.meanWallCoverage)) ? plan.roomBoundaryMeta.meanWallCoverage : null,
         columns: columnCount, columnSource,
+        roomsClippedOffFootprint: roomsClipped,
         wallsFull: wallsFullCount,
         // RECORE: the honest primary wall count is the merged wall RUNS (when present).
         wallRuns: (Array.isArray(plan.wallRuns) ? plan.wallRuns.length : 0),
@@ -781,6 +1006,10 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       inEnvelopeRecallPct: (recallLevel.recallMeasure && Number.isFinite(recallLevel.recallMeasure.inEnvelopeRecallPct))
         ? recallLevel.recallMeasure.inEnvelopeRecallPct : null,
       fixtures: recallLevel.counts.fixtures, fixtureCounts: recallLevel.fixtureCounts,
+      // FIXTURES + ROOMS chunk: geometric fixture-symbol split + traced-room metrics (honest signals).
+      fixtureSymbols: recallLevel.counts.fixtureSymbols, fixturePlumbing: recallLevel.counts.fixturePlumbing,
+      rooms: recallLevel.counts.rooms, roomSource: recallLevel.counts.roomSource,
+      roomAreaSqft: recallLevel.counts.roomAreaSqft, roomMeanCoverage: recallLevel.counts.roomMeanCoverage,
       columns: recallLevel.counts.columns, columnSource: recallLevel.counts.columnSource,
       // PHASE 4 — honest column split (marker-extraction: medium = real-sized marker box on the
       // 2-D grid; low = on-grid size outlier). Grid-intersection synth levels are all 'low'.
@@ -798,8 +1027,11 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       doorExtraction: recallLevel.doorExtraction,
       level: recallLevel.level, needsVerification: true,
     } : null,
-    needsVerification: true,
-    provenance: 'built from extracted LevelPlans — true scale derived from sheet, needs-verification',
+    needsVerification: !acceptedSystemModel,
+    systemVerified: acceptedSystemModel,
+    provenance: acceptedSystemModel
+      ? 'built from system-accepted vector LevelPlans with independently recomputed and adversarially mutation-tested N3 head and connected-pipe layouts'
+      : 'built from extracted LevelPlans — true scale derived from sheet, needs-verification',
   };
 
   return { root, levels, setActiveLevel, setLevelVisible, setLayerVisible, bounds, summary };

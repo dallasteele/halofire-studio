@@ -30,7 +30,8 @@ describe('AutoBid canonical source-document binding', () => {
     expect(studio).toContain("$('projectTarget').value = COOPERATIVE_1881_PROJECT_NAME");
     expect(studio).toContain("api('/autobid/bid/' + encodeURIComponent(docId) + '?by=doc')");
     expect(studio).toContain('fast identity surface');
-    expect(studio).toContain('if (!packagePayload && !identityRow)');
+    expect(studio).toContain('if (!packagePayload)');
+    expect(studio).toContain('pipe_system_verified === true');
     expect(studio).toContain('const meta = packagePayload && packagePayload.meta ? packagePayload.meta : (identityRow || {});');
     expect(studio).not.toContain('<div class="job-title">Home Depot — Rexburg</div>');
   });
