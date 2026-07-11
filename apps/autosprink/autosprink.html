@@ -1082,19 +1082,26 @@ async function bindSourceDocumentIdentity() {
   const docId = Number(doc);
   window.__sourceDocIdentity = { state: 'resolving', docId };
   let packagePayload = null;
+  let identityRow = null;
   try {
     const ready = await api('/autobid/ready-to-send');
     const rows = Array.isArray(ready && ready.bids) ? ready.bids : [];
     const row = rows.find((item) => Number(item.geometry_document_id) === docId);
-    if (row && row.ref != null) packagePayload = await api('/autobid/package/' + encodeURIComponent(row.ref));
+    if (row) {
+      identityRow = row;
+      if (row.ref != null) packagePayload = await api('/autobid/package/' + encodeURIComponent(row.ref));
+    }
   } catch (_) {
     // The direct document lookup below remains the honest identity fallback.
   }
-  if (!packagePayload) {
+  // A ready-to-send row is already a canonical source identity. Do not make the
+  // page wait on the much slower document lookup after a package-by-ref succeeds
+  // (or when the row itself can provide the visible job/location fallback).
+  if (!packagePayload && !identityRow) {
     try { packagePayload = await api('/autobid/package/' + encodeURIComponent(docId) + '?by=doc'); }
     catch (_) { packagePayload = null; }
   }
-  const meta = packagePayload && packagePayload.meta ? packagePayload.meta : {};
+  const meta = packagePayload && packagePayload.meta ? packagePayload.meta : (identityRow || {});
   const name = String(meta.job_name || '').trim();
   const jobLocation = String(meta.location || '').trim();
   const isCooperative = /cooperative[ ]*1881/i.test(name);
