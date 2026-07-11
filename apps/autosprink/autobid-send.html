@@ -497,6 +497,7 @@
       var plates=(sv.plates||[]).map(function(plate,index){
         var page=plate.page||{}, gate=plate.automated_gate||{}, review=plate.review||{};
         var integrity=plate.integrity||{}, source=plate.source||{}, urls=plate.urls||{};
+        var renderedHash=String(integrity.rendered_page_sha256||'').trim();
         var priorViewportAttestations=Array.isArray(review.viewport_attestations)?review.viewport_attestations:[];
         var autoPassed=gate.passed===true;
         var metricRows=SPATIAL_METRICS.map(function(spec){
@@ -541,6 +542,7 @@
           + '<div class="spatial-digests">'
           + '<div><span class="note">PNG SHA-256</span><br><code title="'+esc(integrity.png_sha256||'')+'">'+esc(digest(integrity.png_sha256))+'</code></div>'
           + '<div><span class="note">Manifest SHA-256</span><br><code title="'+esc(integrity.manifest_sha256||'')+'">'+esc(digest(integrity.manifest_sha256))+'</code></div>'
+          + '<div><span class="note">Rendered page SHA-256</span><br><code title="'+esc(renderedHash)+'">'+esc(digest(renderedHash))+'</code></div>'
           + '<div><span class="note">Source PDF SHA-256</span><br><code title="'+esc(source.pdf_sha256||'')+'">'+esc(digest(source.pdf_sha256))+'</code></div>'
           + '<div><span class="note">Input fingerprint</span><br><code title="'+esc(source.input_fingerprint||'')+'">'+esc(digest(source.input_fingerprint))+'</code></div>'
           + '</div>'
@@ -548,8 +550,9 @@
           + '<label class="spatial-review-metric">Reviewed wall recall (0.90-1.00)<input id="spatialRecall'+index+'" type="number" min="0.90" max="1" step="0.01" value="'+esc(review.reviewed_structural_wall_recall==null?'':review.reviewed_structural_wall_recall)+'" /></label>'
           + '<label class="spatial-review-metric">Phantom room count<input id="spatialPhantoms'+index+'" type="number" min="0" step="1" value="'+esc(review.phantom_room_count==null?'':review.phantom_room_count)+'" /></label>'
           + '<textarea id="spatialNote'+index+'" aria-label="Spatial review note for '+esc(page.sheet_label||('plate '+(index+1)))+'" placeholder="Review note">'+esc(review.note||'')+'</textarea>'
-          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="accepted" disabled title="The automated gate must pass and this stored overlay must finish loading before acceptance">Accept overlay</button>'
-          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="rejected">Reject overlay</button>'
+          + (!renderedHash?'<div class="note spatial-source-binding-warning">Source raster unavailable on the canonical runtime; no spatial decision can be recorded until the rendered source-page hash is bound.</div>':'')
+          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="accepted" disabled title="The automated gate must pass, the rendered source-page hash must be bound, and this stored overlay must finish loading before acceptance">Accept overlay</button>'
+          + '<button class="btn spatialDecision" data-plate-index="'+index+'" data-decision="rejected"'+(!renderedHash?' disabled title="Canonical rendered source-page hash is unavailable; rejection is also blocked to preserve source binding"':'')+'>Reject overlay</button>'
           + '<div class="note spatial-result" id="spatialResult'+index+'"></div>'
           + '</div></div>';
       }).join('');
@@ -805,21 +808,25 @@
         var gate=plate.automated_gate||{};
         var image=document.querySelector('[data-spatial-overlay-index="'+index+'"]');
         var accept=document.querySelector('.spatialDecision[data-plate-index="'+index+'"][data-decision="accepted"]');
+        var reject=document.querySelector('.spatialDecision[data-plate-index="'+index+'"][data-decision="rejected"]');
         var result=document.getElementById('spatialResult'+index);
         if(!image || !accept) return;
         function markVisible(){
           if(image.naturalWidth<=0 || image.naturalHeight<=0) return markBroken();
           accept.setAttribute('data-overlay-visible','true');
+          var renderedHash=String((plate.integrity||{}).rendered_page_sha256||'').trim();
           var viewportReady=Array.prototype.every.call(
             document.querySelectorAll('[data-spatial-artifact="'+plate.artifact_id+'"] .viewport-attestation'),
             function(item){return item.checked;});
-          accept.disabled=gate.passed!==true || !viewportReady;
-          accept.title=gate.passed!==true?'Automated overlay gate must pass before acceptance':(viewportReady?'Stored overlay loaded and all source viewports attested':'Inspect and check every registered source viewport before acceptance');
+          accept.disabled=gate.passed!==true || !viewportReady || renderedHash.length!==64;
+          if(reject) reject.disabled=renderedHash.length!==64;
+          accept.title=gate.passed!==true?'Automated overlay gate must pass before acceptance':(renderedHash.length!==64?'Canonical rendered source-page hash is unavailable; acceptance is blocked':(viewportReady?'Stored overlay loaded and all source viewports attested':'Inspect and check every registered source viewport before acceptance'));
           if(result) result.textContent='Stored overlay loaded. Review the pixels before recording a decision.';
         }
         function markBroken(){
           accept.removeAttribute('data-overlay-visible');
           accept.disabled=true;
+          if(reject) reject.disabled=true;
           accept.title='Stored overlay could not be displayed; acceptance is unavailable';
           if(result) result.textContent='Stored overlay failed to load or decode. Acceptance remains disabled.';
         }
@@ -835,6 +842,12 @@
           var index=Number(button.getAttribute('data-plate-index'));
           var decision=button.getAttribute('data-decision');
           var plate=plates[index]||{}, gate=plate.automated_gate||{}, integrity=plate.integrity||{};
+          var renderedHash=String(integrity.rendered_page_sha256||'').trim();
+          if(renderedHash.length!==64){
+            var unavailableResult=document.getElementById('spatialResult'+index);
+            if(unavailableResult) unavailableResult.textContent='Canonical rendered source-page hash is unavailable; no spatial decision can be recorded.';
+            return;
+          }
           if(decision==='accepted' && (gate.passed!==true || button.getAttribute('data-overlay-visible')!=='true')) return;
           var note=document.getElementById('spatialNote'+index);
           var recallInput=document.getElementById('spatialRecall'+index);
@@ -865,7 +878,8 @@
               block_id:viewport.block_id, role:viewport.role, source_bbox_pt:viewport.source_bbox_pt
             };}):null,
             expected_png_sha256:integrity.png_sha256,
-            expected_manifest_sha256:integrity.manifest_sha256
+            expected_manifest_sha256:integrity.manifest_sha256,
+            expected_rendered_page_sha256:integrity.rendered_page_sha256
           };
           api('/package/'+encodeURIComponent(REF)+'/spatial-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
             .then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})

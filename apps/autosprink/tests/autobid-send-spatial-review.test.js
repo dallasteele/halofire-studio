@@ -111,7 +111,10 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('Stored overlay failed to load or decode. Acceptance remains disabled.');
     expect(html).toContain('data-decision="accepted" disabled');
     expect(html).toContain('>Accept overlay</button>');
-    expect(html).toContain('data-decision="rejected">Reject overlay</button>');
+    expect(html).toContain('data-decision="rejected"');
+    expect(html).toContain('Source raster unavailable on the canonical runtime');
+    expect(html).toContain('Canonical rendered source-page hash is unavailable; no spatial decision can be recorded.');
+    expect(html).toContain('renderedHash.length!==64');
     expect(html).toContain("gate.passed!==true || button.getAttribute('data-overlay-visible')!=='true'");
     expect(html).toContain('Reviewed wall recall (0.90-1.00)');
     expect(html).toContain('Phantom room count');
@@ -120,7 +123,7 @@ describe('AutoBid final spatial review panel', () => {
 
   it('posts the concurrency-bound review command and reloads current state', () => {
     expect(html).toContain("'/spatial-review'");
-    expect(html).toMatch(/artifact_id:plate\.artifact_id,[\s\S]*decision:decision,[\s\S]*note:note\?note\.value:'',[\s\S]*reviewed_structural_wall_recall:decision==='accepted'\?recall:null,[\s\S]*phantom_room_count:decision==='accepted'\?phantoms:null,[\s\S]*expected_png_sha256:integrity\.png_sha256,[\s\S]*expected_manifest_sha256:integrity\.manifest_sha256/);
+    expect(html).toMatch(/artifact_id:plate\.artifact_id,[\s\S]*decision:decision,[\s\S]*note:note\?note\.value:'',[\s\S]*reviewed_structural_wall_recall:decision==='accepted'\?recall:null,[\s\S]*phantom_room_count:decision==='accepted'\?phantoms:null,[\s\S]*expected_png_sha256:integrity\.png_sha256,[\s\S]*expected_manifest_sha256:integrity\.manifest_sha256,[\s\S]*expected_rendered_page_sha256:integrity\.rendered_page_sha256/);
     expect(html).toContain('location.reload();');
   });
 
