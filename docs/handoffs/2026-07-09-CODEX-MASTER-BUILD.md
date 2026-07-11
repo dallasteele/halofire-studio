@@ -964,3 +964,20 @@ The continuation work remains deliberately below the completion bar:
 - The full objective remains active. Live acceptance is still FP semantic 0/1,
   spatial 0/8, density pending, N6 pending, and production blocked. No human
   review row, density score, or deployment authorization was manufactured.
+
+## 42. CODEX CONTINUATION EVIDENCE - 2026-07-11 (WHOLE-ENGINE REGRESSION AND DEPLOYMENT PARITY)
+
+- Whole AutoBid engine regression after the new API/store/scorer paths is **899
+  passed, 10 skipped, 22 warnings**. The current focused acceptance set is **68
+  passed**; Studio review/source/proxy/browser coverage is **20 passed** in the
+  latest combined run. Rulebook, loop-contract, compile, and scoped diff checks
+  pass.
+- The VPS `halofire-autobid.service` is active after deploying the exact current
+  API and density-store hashes; `/health` is 200 and the authenticated density
+  manifest still returns 401 without identity. The synthetic write-path smoke
+  receipt was moved out of the production store immediately; no density receipt
+  remains, and `/package/9/acceptance-audit` still reports FP 0/1, spatial 0/8,
+  density pending, N6 pending, production blocked.
+- The VPS Studio service is active and the combined Send page hash matches the
+  deployed file exactly. The A-101 upper/lower review cards remain unchecked by
+  design; they expose the next human action rather than promoting geometry.
