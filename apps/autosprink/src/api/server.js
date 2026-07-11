@@ -829,7 +829,11 @@ app.all('/api/autobid/*', authMiddleware, async (req, res, next) => {
   const isSpatialReviewWrite = req.method === 'POST'
     && /^package\/[^/]+\/spatial-review$/.test(subPath);
   const isFpReviewWrite = req.method === 'POST'
-    && /^package\/[^/]+\/fp-vector-(?:review|family-review)$/.test(subPath);
+    && (
+      /^package\/[^/]+\/fp-vector-(?:review|family-review)$/.test(subPath)
+      || subPath === 'fp-vector-artifacts/materialize'
+      || /^fp-vector-artifacts\/[0-9a-f]{64}\/(?:point-review|semantic-review|point-review-score)$/.test(subPath)
+    );
   // Spatial review is a narrow write capability. Estimators may record the
   // hash-bound overlay decision, while ordinary users remain read-only and all
   // other administrator-only routes keep their existing role checks.

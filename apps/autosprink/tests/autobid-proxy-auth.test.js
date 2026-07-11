@@ -252,4 +252,45 @@ describe('AutoBid authenticated proxy boundary', () => {
     expect(await denied.json()).toEqual({ error: 'Estimator or admin role required for FP review' });
     expect(received).toHaveLength(count);
   });
+
+  it('guards source-bound FP artifact writes before upstream and forwards verified roles', async () => {
+    const artifactId = 'a'.repeat(64);
+    const paths = [
+      '/api/autobid/fp-vector-artifacts/materialize',
+      `/api/autobid/fp-vector-artifacts/` + artifactId + `/point-review`,
+      `/api/autobid/fp-vector-artifacts/` + artifactId + `/semantic-review`,
+      `/api/autobid/fp-vector-artifacts/` + artifactId + `/point-review-score`,
+    ];
+    for (const path of paths) {
+      const before = received.length;
+      const accepted = await fetch(`${base}${path}`, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${estimatorToken}`,
+          'content-type': 'application/json',
+          'x-halofire-reviewer-id': 'forged-id',
+          'x-halofire-reviewer-role': 'admin',
+        },
+        body: '{}',
+      });
+      expect(accepted.status).toBe(200);
+      const forwarded = received.at(-1);
+      expect(forwarded.url).toBe(path.replace('/api/autobid', ''));
+      expect(forwarded.headers['x-halofire-reviewer-id']).not.toBe('forged-id');
+      expect(forwarded.headers['x-halofire-reviewer-role']).toBe('estimator');
+
+      const denied = await fetch(`${base}${path}`, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${userToken}`,
+          'content-type': 'application/json',
+          'x-halofire-reviewer-role': 'admin',
+        },
+        body: '{}',
+      });
+      expect(denied.status).toBe(403);
+      expect(received).toHaveLength(before + 1);
+    }
+  });
+
 });
