@@ -846,3 +846,32 @@ The continuation work remains deliberately below the completion bar:
   bid-grade geometry was fabricated. The remaining gates are independent trusted
   review (including A-101 upper/lower), held-out density at the frozen 12% threshold,
   strict N6 scoring, and deployment authorization separation.
+
+## 38. CODEX CONTINUATION EVIDENCE - 2026-07-11 (INDEPENDENCE, REVIEWER IDENTITY, AND 3D RESILIENCE)
+
+- Root `26c164289` adds the truth-free held-out density review manifest bridge.
+  The real artifact `halofire-autobid/out/corpus_backtest/density-heldout-review-manifest.v1.json`
+  contains **8 exact source bindings / 0 unresolved**, with source PDF/page/render/
+  overlay hashes and no expected counts, head counts, or answer-key fields. The
+  bridge is diagnostic-only and never changes the frozen production gate.
+- Root `db028be00` hardens N6 independence: family and point reviewers are compared
+  using canonical case-folded identities, and same-person self-validation rejects
+  with `independent_point_reviewer_required`. The focused N6 suite is **25 passed**;
+  the Lean 4.13 `same_reviewer_blocks` theorem also verifies. The live score route
+  requires trusted proxy identity and returns 401 without it.
+- Studio `4a00268` projects the verified estimator/admin reviewer identity in the
+  spatial panel and keeps every decision disabled until identity, rendered-page
+  hash, decoded overlay, and required viewport attestations are all present.
+  Focused Studio review/source/proxy coverage is **17 passed**. The deployed Send
+  page now shows the verified reviewer chip and eight source-bound plates.
+- Studio `3f3f003` adds a timeout-bounded degraded-kernel path. If OpenGeometry WASM
+  stalls, extracted plan geometry and registered source sheets still render for
+  review, while sprinkler generation/export stays disabled. Studio `66a70e1` avoids
+  a redundant slow document fallback after a ready-row source identity match.
+  Live evidence `out/agent-loops/halofire-master-build-20260711/ops-audit/03-3d-after-bound.png`
+  shows the source-bound Cooperative job and real extracted walls/rooms in the 3D
+  viewport; state remains `Review pending` / `needs-verification`.
+- These changes improve independent reviewability and runtime resilience only. No
+  FP semantic decision, spatial acceptance, density score, N6 production score, or
+  deployment authorization was created. The full objective remains open pending
+  trusted external review receipts and the frozen acceptance gates.
