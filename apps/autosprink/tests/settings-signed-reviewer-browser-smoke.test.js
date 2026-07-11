@@ -98,7 +98,7 @@ describe('Settings signed reviewer browser smoke', () => {
     page.setDefaultTimeout(8000);
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       const blockedGateButton = page.locator('[data-claim-gate-signed-reviewer-workflow="PROFESSIONAL_REVIEW_MISSING"]').first();
       await blockedGateButton.waitFor();
       await blockedGateButton.click();
@@ -156,7 +156,7 @@ describe('Settings signed reviewer browser smoke', () => {
     page.setDefaultTimeout(8000);
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.getByText('Signed reviewer packet browser-smoke PR-1881-100').waitFor();
       const savedRow = page.locator(`#evidence-${recorded.id}`).first();
       await savedRow.waitFor();
@@ -204,7 +204,7 @@ describe('Settings signed reviewer browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
       const blockedGateButton = page.locator(`[data-claim-gate-signed-reviewer-workflow="${gateCode}"]`).first();
       await blockedGateButton.waitFor();
       await blockedGateButton.click();
@@ -239,7 +239,7 @@ describe('Settings signed reviewer browser smoke', () => {
       expect(savedNotes.claim_gate_effect).toBe('gate_cleared_after_explicit_signed_validation');
       expect(savedNotes.settings_prefill_href).toBe(preSubmitHref);
 
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
         waitUntil: 'domcontentloaded',
       });
       const savedRow = page.locator(`#evidence-${saved.id}`).first();
@@ -281,7 +281,7 @@ describe('Settings signed reviewer browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
       const blockedGateButton = page.locator(`[data-claim-gate-signed-reviewer-workflow="${gateCode}"]`).first();
       await blockedGateButton.waitFor();
       await blockedGateButton.click();
@@ -321,7 +321,7 @@ describe('Settings signed reviewer browser smoke', () => {
       const gates = await api(`${projectPath}/claim-gates`, token);
       expect(gates.find((gate) => gate.code === gateCode).status).toBe('blocked');
 
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
         waitUntil: 'domcontentloaded',
       });
       const savedRow = page.locator(`#evidence-${saved.id}`).first();
@@ -375,7 +375,7 @@ describe('Settings signed reviewer browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
       const blockedGateButton = page.locator(`[data-claim-gate-signed-reviewer-workflow="${gateCode}"]`).first();
       await blockedGateButton.waitFor();
       await blockedGateButton.click();
@@ -415,7 +415,7 @@ describe('Settings signed reviewer browser smoke', () => {
       const gates = await api(`${projectPath}/claim-gates`, token);
       expect(gates.find((gate) => gate.code === gateCode).status).toBe('cleared');
 
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
         waitUntil: 'domcontentloaded',
       });
       const savedRow = page.locator(`#evidence-${saved.id}`).first();
@@ -662,7 +662,7 @@ describe('Settings signed reviewer browser smoke', () => {
       const gates = await api(`/api/projects/${encodeURIComponent(projectName)}/claim-gates`, token);
       expect(gates.find((gate) => gate.code === targetGateCode).status).toBe('cleared');
 
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
         waitUntil: 'domcontentloaded',
       });
       const savedRow = page.locator(`#evidence-${saved.id}`).first();

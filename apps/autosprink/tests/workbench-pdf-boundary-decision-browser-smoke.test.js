@@ -115,7 +115,7 @@ describe('Workbench PDF boundary decision browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.locator('#projectTarget').selectOption(PROJECT_NAME);
       const saveButton = page.locator(`[data-pdf-boundary-decision-save-evidence-id="${savedBoundary.evidence.id}"]`);
       await saveButton.waitFor({ state: 'attached' });

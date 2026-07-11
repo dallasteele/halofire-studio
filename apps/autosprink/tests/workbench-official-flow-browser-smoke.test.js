@@ -89,7 +89,7 @@ describe('Workbench official-flow browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#officialFlowAttachmentIntake`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}#officialFlowAttachmentIntake`, {
         waitUntil: 'domcontentloaded',
       });
       const details = page.locator('#officialFlowAttachmentIntake').first();
@@ -150,7 +150,7 @@ describe('Workbench official-flow browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#official-flow-replay-review`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}#official-flow-replay-review`, {
         waitUntil: 'domcontentloaded',
       });
       const details = page.locator('#official-flow-replay-review details').first();
@@ -216,7 +216,7 @@ describe('Workbench official-flow browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#officialFlowAttachmentIntake`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}#officialFlowAttachmentIntake`, {
         waitUntil: 'domcontentloaded',
       });
       const intakeDetails = page.locator('#officialFlowAttachmentIntake').first();
@@ -382,7 +382,7 @@ describe('Workbench official-flow browser smoke', () => {
       expect(decisionRowAfterRefreshText).toContain('source_attachment_intake_row_index 0');
       expect(decisionRowAfterRefreshText).toContain('Download signed evidence upload packet');
 
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
       await page.locator('[data-resolver-queue-filter="officialFlowSignedReviewer=pending&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval"]').first().click();
       await page.waitForFunction((expected) => {
         const text = document.querySelector('#resolverQueue')?.textContent || '';
@@ -467,7 +467,7 @@ describe('Workbench official-flow browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#resolverQueue');
       await page.locator('[data-resolver-queue-filter="officialFlowSignedReviewer=pending&targetGate=PROFESSIONAL_REVIEW_MISSING&evidenceType=professional_review"]').first().click();
       await page.waitForFunction((expected) => {
@@ -562,7 +562,7 @@ describe('Workbench official-flow browser smoke', () => {
         expect.objectContaining({ status: 'blocked' }),
       );
 
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#evidence`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}#evidence`, { waitUntil: 'domcontentloaded' });
       const savedReplacementRow = page.locator(`#evidence-${savedReplacement.id}`).first();
       await savedReplacementRow.waitFor();
       const savedReplacementRowText = await savedReplacementRow.innerText();
@@ -692,7 +692,7 @@ describe('Workbench official-flow browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(projectName)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#resolverQueue');
       await page.locator('[data-resolver-queue-filter="officialFlowSignedReviewer=pending&targetGate=MANUFACTURER_MODEL_APPROVAL_MISSING&evidenceType=manufacturer_approval"]').first().click();
 

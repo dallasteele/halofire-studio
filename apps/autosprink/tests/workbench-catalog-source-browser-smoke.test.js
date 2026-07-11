@@ -92,7 +92,7 @@ describe('Workbench catalog source browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(DISPOSABLE_PROJECT_NAME)}#catalogSourceAcquisition`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(DISPOSABLE_PROJECT_NAME)}#catalogSourceAcquisition`, {
         waitUntil: 'domcontentloaded',
       });
       await page.locator('#projectTarget').waitFor();
@@ -137,7 +137,7 @@ describe('Workbench catalog source browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#catalogSourceAcquisition`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}#catalogSourceAcquisition`, {
         waitUntil: 'domcontentloaded',
       });
       const recordButton = page.locator(`[data-catalog-source-record-family-ref="${FAMILY_REF}"]`).first();
@@ -212,7 +212,7 @@ describe('Workbench catalog source browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#catalogSourceAcquisition`, {
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}#catalogSourceAcquisition`, {
         waitUntil: 'domcontentloaded',
       });
       const approvalButton = page.locator(`[data-catalog-source-approval-family-ref="${FAMILY_REF}"]`).first();

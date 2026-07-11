@@ -179,7 +179,7 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.locator('#projectTarget').selectOption(PROJECT_NAME);
       await page.locator('[data-resolver-queue-filter="sam31ApprovalValidation=ready_for_explicit_gate_resolve"]').click();
       const resolveButton = page.locator(`[data-sam31-approval-upload-resolve-evidence-id="${approvalValidationDecision.evidence_id}"]`).first();
@@ -260,7 +260,7 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await page.locator('#wizGate').inputValue()).toBe(gateCode);
       expect(await page.locator('#wizSubmit').isDisabled()).toBe(true);
 
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
       await page.locator('[data-resolver-queue-filter="claimGateAudit=cleared"]').first().click();
       await page.waitForFunction((decisionEvidenceId) => {
         const text = document.getElementById('resolverQueue')?.innerText || '';
@@ -781,7 +781,7 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html`, { waitUntil: 'domcontentloaded' });
       await page.locator('#projectTarget').selectOption(PROJECT_NAME);
       const overrideButton = page.locator(`[data-floor-plan-override-action-evidence-id="${savedBoundary.evidence.id}"]`);
       await overrideButton.waitFor({ state: 'attached' });
@@ -1406,7 +1406,7 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
     await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
-      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}`, { waitUntil: 'domcontentloaded' });
+      await page.goto(`${BASE}/official-flow.html?project=${encodeURIComponent(PROJECT_NAME)}`, { waitUntil: 'domcontentloaded' });
 
       const evidenceRow = page.locator(`#evidence-${resolved.resolved_evidence_id}`);
       await evidenceRow.waitFor({ state: 'attached' });
