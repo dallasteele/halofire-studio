@@ -929,3 +929,38 @@ The continuation work remains deliberately below the completion bar:
   cannot silently become a production scorer.  NeMo is not installed and is not
   used as a truth source; any future curator job must produce only a blinded,
   source-hashed candidate dataset for the same human gates.
+
+## 41. CODEX CONTINUATION EVIDENCE - 2026-07-11 (SOURCE-BOUND DENSITY INGESTION, INDEPENDENT SCORING, AND A-101 REVIEW UX)
+
+- Root `9124d212a` adds the canonical `POST /heldout-density/review-evidence`
+  and redacted receipt readback. The route requires trusted estimator/admin
+  identity, exact manifest/binding/fold/page/source/render/overlay hashes, and
+  stores the observed count only in the private scorer receipt. The browser
+  response never contains `observed_head_count`, answer-key fields, or a gate
+  effect. A live smoke was removed immediately after verification; the VPS
+  density review store is empty and the acceptance audit still reports density
+  pending.
+- Root `e5184704c`, `d430bc12d`, `ab3bd8eac`, `2225f1a46`, `aa99780a5`,
+  `3c8aa6f8d`, and `2eccb5bd3` provide the content-addressed receipt store,
+  tamper detection, evaluator-source binding, independent scorer, diagnostic
+  score persistence, and the explicit anti-tautology boundary. The scorer only
+  compares predictions built before review receipts, rejects review-derived
+  predictions and same-reviewer scoring, enforces the frozen 12% tolerance, and
+  emits no observed counts or answer keys. Density/receipt coverage is **56
+  focused tests passed**.
+- Root `36136fa0e` exposes the bounded local Qwen/Hugging Face candidate route.
+  It is authenticated, restricted to operator-provisioned review roots, and
+  returns a typed non-gating 503 when the VPS lacks the runtime/model snapshot.
+  The route is deployed; the VPS remains CPU-only and cannot silently score.
+- Studio `ddf44e7` and `4b24f4d` make A-101's composite review explicit: separate
+  upper/lower viewport cards show physical page/index, network identity, source
+  and geometry bboxes, decoded-overlay state, and unchecked attestation controls.
+  Browser source-byte verification uses a Blob URL after matching the canonical
+  rendered-page hash; mismatch or unavailable bytes leave both decision buttons
+  disabled. Focused Studio coverage is **10 static spatial tests**, **1 spatial
+  browser smoke**, and **1 FP browser smoke**. The combined `autobid-send.html`
+  is deployed with SHA-256
+  `45cbce23e9d7d8080a0ceb44fb70bfeb21653fb854a0ae20fc44b441e6c9079d`.
+- The full objective remains active. Live acceptance is still FP semantic 0/1,
+  spatial 0/8, density pending, N6 pending, and production blocked. No human
+  review row, density score, or deployment authorization was manufactured.
