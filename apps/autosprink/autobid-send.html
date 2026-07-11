@@ -100,6 +100,27 @@
   .spatial-review-metric input{ width:100%; color:var(--hf-text); background:rgba(255,255,255,0.03); border:1px solid var(--hf-line); border-radius:6px; padding:7px 9px; font:inherit; }
   .spatial-actions .btn:disabled{ opacity:.45; cursor:not-allowed; }
   .spatial-result{ width:100%; }
+  /* Held-out density review: source-bound, diagnostic-only reviewer worklist. */
+  .density-heldout-card{ border-top:1px solid var(--hf-line); padding-top:14px; margin-top:14px; }
+  .density-heldout-card:first-child{ border-top:0; padding-top:0; margin-top:0; }
+  .density-heldout-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 14px; margin:10px 0; }
+  .density-heldout-grid .stat{ min-width:0; }
+  .density-heldout-page{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:8px 0; }
+  .density-heldout-page select{ min-width:190px; color:var(--hf-text); background:rgba(255,255,255,.04); border:1px solid var(--hf-line); border-radius:6px; padding:7px 9px; font:inherit; }
+  .density-heldout-source{ color:var(--hf-color-interactive-text,#9ec3ff); text-decoration:none; }
+  .density-heldout-source:hover{ text-decoration:underline; }
+  .density-heldout-form{ display:grid; grid-template-columns:minmax(140px,180px) minmax(200px,1fr) auto; gap:8px; align-items:end; margin-top:10px; }
+  .density-heldout-field{ display:flex; flex-direction:column; gap:4px; color:var(--hf-muted); font-size:11px; }
+  .density-heldout-field input{ width:100%; box-sizing:border-box; color:var(--hf-text); background:rgba(255,255,255,.04); border:1px solid var(--hf-line); border-radius:6px; padding:8px 9px; font:inherit; }
+  .density-heldout-field input:focus{ outline:2px solid rgba(158,195,255,.75); outline-offset:1px; }
+  .density-heldout-field input[aria-invalid="true"]{ border-color:#fca5a5; }
+  .density-heldout-actions{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .density-heldout-actions .btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .density-heldout-result{ flex:1 1 260px; min-width:0; }
+  .density-heldout-result.ok{ color:#86efac; }
+  .density-heldout-result.warn{ color:#fcd34d; }
+  .density-heldout-unresolved{ margin-top:10px; padding:8px 10px; border:1px solid rgba(251,191,36,.28); border-radius:8px; color:#fcd34d; font-size:var(--hf-fs-sm); }
+  @media(max-width:760px){ .density-heldout-grid,.density-heldout-form{ grid-template-columns:1fr; } }
   .sendbar{ position:sticky; bottom:0; margin-top:18px; padding:14px 16px; display:flex; align-items:center; gap:14px; border-radius:var(--hf-r-win,12px); }
   .sendbar .summary{ flex:1; font-size:var(--hf-fs-sm); color:var(--hf-muted); }
   .btn{ font:inherit; cursor:pointer; padding:11px 22px; border-radius:var(--hf-r-ctl,7px); border:1px solid var(--hf-line); background:var(--hf-glass,rgba(255,255,255,0.04)); color:var(--hf-text); font-weight:600; }
@@ -443,6 +464,149 @@
       else if(hydraulic.qualifier) body+='<div class="note"><b>Required Division-21 evidence:</b><br>'+esc(hydraulic.qualifier)+'</div>';
       if(d.reason) body+='<div class="note"><b>Residual:</b> '+esc(d.reason.replace(/_/g,' '))+'</div>';
       return '<section class="hf-panel mt" id="densityResolutionPanel"><div class="phd"><span class="t">Density provenance</span>'+head+'</div><div class="pbd">'+body+'</div></section>';
+    }
+
+    // Held-out density review worklist. The manifest is truth-free and the
+    // receipt endpoint returns only a redacted decision; no answer key or gate
+    // promotion is rendered here. Counts are accepted only in a verified
+    // estimator/admin session and remain a diagnostic observation.
+    var DENSITY_REVIEW_HASH=/^[0-9a-f]{64}$/i;
+    function densityHeldoutReviewPanel(){
+      return '<section class="hf-panel mt" id="densityHeldoutReviewPanel">'
+        + '<div class="phd"><span class="t">Held-out density review</span><span class="pill warn" id="densityHeldoutStatus">verifying reviewer…</span></div>'
+        + '<div class="pbd"><div class="note">Source-bound blind worklist for independent density measurement. It shows only the exact FP page and hashes; expected totals are intentionally withheld. A submitted receipt is diagnostic-only and cannot change pricing, geometry, or acceptance.</div>'
+        + '<div id="densityHeldoutBody"><div class="note" style="margin-top:10px">Loading truth-free review manifest…</div></div></div></section>';
+    }
+    function bindDensityHeldoutReview(){
+      var panel=document.getElementById('densityHeldoutReviewPanel');
+      var status=document.getElementById('densityHeldoutStatus');
+      var body=document.getElementById('densityHeldoutBody');
+      if(!panel||!status||!body) return;
+      var reviewer=null;
+      function setStatus(text,ok){
+        status.className='pill '+(ok?'ok':'warn');
+        status.textContent=text;
+      }
+      function pageUrl(binding,page){
+        return '/api/autobid/pdf/page?doc='+encodeURIComponent(binding.fp_document_id)+'&page='+encodeURIComponent(page.page_index);
+      }
+      function renderBindings(manifest){
+        var bindings=Array.isArray(manifest.bindings)?manifest.bindings:[];
+        var unresolved=Array.isArray(manifest.unresolved_folds)?manifest.unresolved_folds:[];
+        if(!bindings.length){
+          body.innerHTML='<div class="density-heldout-unresolved">No source-bound held-out density rows are currently available. No review can be recorded.</div>';
+          return;
+        }
+        var rows=bindings.map(function(binding,index){
+          var pages=Array.isArray(binding.pages)?binding.pages:[];
+          var first=pages[0]||{};
+          var options=pages.map(function(page,pageIndex){
+            return '<option value="'+pageIndex+'">Physical page '+esc(page.physical_page_number)+' · indexed '+esc(page.page_index)+'</option>';
+          }).join('');
+          var source=first.page_index!=null?pageUrl(binding,first):'#';
+          return '<article class="density-heldout-card" data-density-fold-index="'+index+'">'
+            + '<div class="phd" style="padding:0 0 8px;border-bottom:0"><span class="t" style="font-size:12px;color:var(--hf-text)">'+esc(binding.project_group||binding.fold_id)+'</span><span class="pill warn">review only</span></div>'
+            + '<div class="density-heldout-grid">'
+            + '<div class="stat"><span class="l">Fold</span><span class="v">'+esc(binding.fold_id)+'</span></div>'
+            + '<div class="stat"><span class="l">FP sheet</span><span class="v">'+esc(binding.sheet_label||'—')+'</span></div>'
+            + '<div class="stat"><span class="l">FP document</span><span class="v">'+num(binding.fp_document_id)+'</span></div>'
+            + '<div class="stat"><span class="l">Available pages</span><span class="v">'+num(pages.length)+'</span></div>'
+            + '</div>'
+            + '<div class="density-heldout-page"><label class="density-heldout-field" style="flex:1 1 220px"><span>Source page to inspect</span><select class="densityHeldoutPage">'+options+'</select></label>'
+            + '<a class="density-heldout-source" data-density-source href="'+esc(source)+'" target="_blank" rel="noopener">Open canonical source page ↗</a></div>'
+            + '<div class="density-heldout-grid" data-density-page-meta>'
+            + '<div class="stat"><span class="l">Physical page</span><span class="v" data-density-physical>'+esc(first.physical_page_number==null?'—':first.physical_page_number)+'</span></div>'
+            + '<div class="stat"><span class="l">Rendered page SHA-256</span><span class="v"><code data-density-rendered title="'+esc(first.rendered_page_sha256||'')+'">'+esc(digest(first.rendered_page_sha256))+'</code></span></div>'
+            + '<div class="stat"><span class="l">Source PDF SHA-256</span><span class="v"><code title="'+esc(binding.source_pdf_sha256||'')+'">'+esc(digest(binding.source_pdf_sha256))+'</code></span></div>'
+            + '<div class="stat"><span class="l">Source status</span><span class="v">'+esc(binding.source_status||'unknown')+'</span></div>'
+            + '</div>'
+            + '<div class="density-heldout-form">'
+            + '<label class="density-heldout-field">Observed heads<input class="densityHeldoutCount" type="number" min="1" max="10000000" step="1" inputmode="numeric" aria-label="Observed sprinkler head count for '+esc(binding.fold_id)+'" placeholder="Count visible heads" /></label>'
+            + '<label class="density-heldout-field">Marked overlay SHA-256<input class="densityHeldoutOverlay" type="text" inputmode="text" autocomplete="off" spellcheck="false" pattern="[0-9a-fA-F]{64}" aria-label="Marked overlay SHA-256 for '+esc(binding.fold_id)+'" placeholder="64-character hash of your marked review overlay" /></label>'
+            + '<div class="density-heldout-actions"><button class="btn densityHeldoutSubmit" type="button" disabled>Submit observation</button></div>'
+            + '</div>'
+            + '<div class="density-heldout-actions"><span class="note density-heldout-result" role="status">No observation submitted.</span><span class="pill warn">gate effect: none</span></div>'
+            + '</article>';
+        }).join('');
+        if(unresolved.length) rows+='<div class="density-heldout-unresolved">Unresolved folds remain review-blocked: '+unresolved.map(function(item){return esc(item);}).join(', ')+'</div>';
+        body.innerHTML=rows;
+        Array.prototype.forEach.call(document.querySelectorAll('[data-density-fold-index]'),function(card){
+          var index=Number(card.getAttribute('data-density-fold-index'));
+          var binding=bindings[index]||{};
+          var pages=Array.isArray(binding.pages)?binding.pages:[];
+          var select=card.querySelector('.densityHeldoutPage');
+          var source=card.querySelector('[data-density-source]');
+          var physical=card.querySelector('[data-density-physical]');
+          var rendered=card.querySelector('[data-density-rendered]');
+          var count=card.querySelector('.densityHeldoutCount');
+          var overlay=card.querySelector('.densityHeldoutOverlay');
+          var submit=card.querySelector('.densityHeldoutSubmit');
+          var result=card.querySelector('.density-heldout-result');
+          function selectedPage(){return pages[Number(select&&select.value)||0]||{};}
+          function updatePage(){
+            var page=selectedPage();
+            if(source) source.href=page.page_index==null?'#':pageUrl(binding,page);
+            if(physical) physical.textContent=page.physical_page_number==null?'—':String(page.physical_page_number);
+            if(rendered){rendered.textContent=digest(page.rendered_page_sha256); rendered.title=page.rendered_page_sha256||'';}
+            updateReady();
+          }
+          function updateReady(){
+            var validCount=!!count && Number.isInteger(Number(count.value)) && Number(count.value)>0 && Number(count.value)<=10000000;
+            var validOverlay=!!overlay && DENSITY_REVIEW_HASH.test(String(overlay.value||'').trim());
+            var page=selectedPage();
+            var validPage=!!page && page.page_index!=null && DENSITY_REVIEW_HASH.test(String(page.rendered_page_sha256||''));
+            if(count) count.setAttribute('aria-invalid',validCount?'false':'true');
+            if(overlay) overlay.setAttribute('aria-invalid',validOverlay?'false':'true');
+            if(submit) submit.disabled=!(window.__densityReviewerAuthorized===true && validCount && validOverlay && validPage && binding.source_status==='available');
+          }
+          if(select) select.addEventListener('change',updatePage);
+          if(count) count.addEventListener('input',updateReady);
+          if(overlay) overlay.addEventListener('input',updateReady);
+          if(submit) submit.addEventListener('click',function(){
+            var page=selectedPage();
+            var observed=Number(count&&count.value);
+            var overlayHash=String(overlay&&overlay.value||'').trim().toLowerCase();
+            if(window.__densityReviewerAuthorized!==true){result.textContent='Verified estimator/admin reviewer session required; no receipt was recorded.'; result.className='note density-heldout-result warn'; return;}
+            if(!Number.isInteger(observed)||observed<=0||observed>10000000){result.textContent='Enter a positive integer count visible on the selected source page.'; result.className='note density-heldout-result warn'; updateReady(); return;}
+            if(!DENSITY_REVIEW_HASH.test(overlayHash)){result.textContent='Enter the 64-character SHA-256 of the marked review overlay; the source-page hash is not an overlay receipt.'; result.className='note density-heldout-result warn'; updateReady(); return;}
+            submit.disabled=true; result.textContent='Submitting source-bound observation…'; result.className='note density-heldout-result';
+            api('/heldout-density/review-evidence',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+              manifest_sha256:manifest.manifest_sha256,
+              binding_id:manifest.binding_id,
+              fold_id:binding.fold_id,
+              decision:'accepted',
+              page_index:page.page_index,
+              source_pdf_sha256:binding.source_pdf_sha256,
+              rendered_page_sha256:page.rendered_page_sha256,
+              overlay_sha256:overlayHash,
+              observed_head_count:observed
+            })}).then(function(response){return response.json().catch(function(){return {};}).then(function(json){return {ok:response.ok,json:json};});})
+              .then(function(response){
+                if(!response.ok) throw new Error((response.json&&(response.json.detail||response.json.error))||'review receipt rejected');
+                var receipt=response.json&&response.json.receipt||{};
+                if(receipt.observed_head_count!=null||receipt.actual_heads!=null||receipt.answer_key!=null) throw new Error('server returned forbidden truth fields');
+                result.textContent='Receipt stored '+digest(receipt.decision_id)+'… · diagnostic-only · gate effect: none';
+                result.className='note density-heldout-result ok';
+              }).catch(function(error){result.textContent='Density review failed: '+error.message; result.className='note density-heldout-result warn'; updateReady();});
+          });
+          updatePage();
+        });
+      }
+      window.__densityReviewerAuthorized=false;
+      fetch('/api/auth/me',{credentials:'include'}).then(function(response){return response.ok?response.json():null;}).then(function(user){
+        reviewer=user||null;
+        var role=String((user&&user.role)||'').toLowerCase();
+        var allowed=role==='estimator'||role==='admin';
+        window.__densityReviewerAuthorized=allowed;
+        if(!allowed){setStatus('reviewer not authorized',false); body.innerHTML='<div class="density-heldout-unresolved">A verified estimator/admin session is required to view or submit held-out observations. No review controls are enabled.</div>'; return null;}
+        setStatus('reviewer: '+String((user&&(user.name||user.username))||'User')+' · '+role+' · verified',true);
+        return api('/heldout-density/review-manifest').then(function(response){return response.ok?response.json():response.json().then(function(error){throw error;});});
+      }).then(function(payload){
+        if(payload) renderBindings(payload.review_manifest||{});
+      }).catch(function(error){
+        setStatus('manifest unavailable',false);
+        body.innerHTML='<div class="density-heldout-unresolved">Held-out density review is unavailable: '+esc((error&& (error.detail||error.error||error.message))||'unknown error')+'. No observation was recorded.</div>';
+      });
     }
 
     // Head reconcile disclosure — priced whole-building count vs geometry-grounded count.
@@ -1069,6 +1233,7 @@
       // straight off the /package manifest (all honest three-state, never faked).
       +     geometryPanel(p)
       +     densityResolutionPanel(p)
+      +     densityHeldoutReviewPanel()
       +     spatialVerificationPanel(p.spatial_verification)
       +     fpVectorReviewPanel(p.fp_vector_review)
       +     reconcilePanel(p.head_reconcile)
@@ -1128,6 +1293,7 @@
       bindSpatialReviewerContext();
       bindSpatialReviewFrames();
       bindFpVectorReview(p.fp_vector_review);
+      bindDensityHeldoutReview();
 
       var btn = document.getElementById('sendBtn');
       if(btn && !sent){
