@@ -85,10 +85,12 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('family_id:familyId');
     expect(html).toContain('bundle_sha256:(artifact.integrity||{}).bundle_sha256');
     expect(html).toContain('overlay_sha256:(artifact.integrity||{}).overlay_sha256');
-    expect(html).toContain('Reviewed sprinkler-head count');
+    expect(html).toContain('Semantic acceptance is blind');
     expect(html).toContain('data-decision="accepted"');
-    expect(html).toContain('Accept semantic count');
-    expect(html).toContain("'/fp-vector-review'");
+    expect(html).toContain('Accept semantic review');
+    expect(html).toContain("'/semantic-review'");
+    expect(html).toContain('point_review_decision_id');
+    expect(html).toContain('pointReview.candidate_id');
     expect(html).toContain('expected_bundle_sha256');
     expect(html).toContain('expected_overlay_sha256');
     expect(html).toContain('artifact.point_review');

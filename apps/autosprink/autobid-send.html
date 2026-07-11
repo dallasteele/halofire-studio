@@ -877,6 +877,7 @@
         var review=artifact.review||{};
         var decision=review.decision||'pending';
         var pointReview=artifact.point_review||null;
+        var pointAccepted=!!(pointReview&&pointReview.decision==='accepted');
         var familyGroups=Array.isArray(artifact.family_groups)?artifact.family_groups:[];
         var familyReviews=Array.isArray(artifact.family_reviews)?artifact.family_reviews:[];
         var familyRows=familyGroups.map(function(group){
@@ -905,17 +906,16 @@
         return '<div class="spatial-plate" data-fp-vector-artifact="'+esc(artifact.artifact_id||'')+'">'
           + '<div class="stat"><span class="l">Sheet / physical page</span><span class="v">'+esc(page.sheet_label||'-')+' / '+num(page.physical_page_number)+'</span></div>'
           + '<div class="stat"><span class="l">Semantic status</span><span class="v">not attempted · not scored</span></div>'
-          + '<div class="stat"><span class="l">Human semantic review</span><span class="v">'+esc(decision.replace(/_/g,' '))+(review.head_count!=null?' · '+num(review.head_count)+' heads':'')+'</span></div>'
+          + '<div class="stat"><span class="l">Human semantic review</span><span class="v">'+esc(decision.replace(/_/g,' '))+(decision==='accepted'?' · bound to independent point receipt':(pointAccepted?' · point receipt ready':' · requires accepted independent point receipt'))+'</span></div>'
           + (familyRows?'<div class="note"><b>Candidate family groups ('+num(familyGroups.length)+'):</b> '+familyRows+familyControlRows+'</div>':'<div class="note">No candidate family groups are present in the verified bundle.</div>')
           + (artifact.overlay_url?'<img class="spatial-overlay fp-vector-overlay" data-fp-vector-overlay-index="'+index+'" src="'+esc(artifact.overlay_url)+'" alt="FP vector-symbol candidate overlay for sheet '+esc(page.sheet_label||'')+', physical page '+esc(page.physical_page_number||'')+'" loading="lazy" />':'<div class="note">Candidate overlay URL missing.</div>')
           + '<div class="spatial-digests"><div><span class="note">Source PDF SHA-256</span><br><code title="'+esc(artifact.source_pdf_sha256||'')+'">'+esc(digest(artifact.source_pdf_sha256))+'</code></div>'
           + (artifact.bundle_url?'<div><span class="note">Truth-free bundle</span><br><a href="'+esc(artifact.bundle_url)+'">Open bundle JSON</a></div>':'')
           + '</div>'
           + '<div class="spatial-actions fp-vector-actions">'
-          + '<label class="spatial-review-metric">Reviewed sprinkler-head count<input id="fpVectorHeadCount'+index+'" type="number" min="1" step="1" value="'+esc(review.head_count==null?'':review.head_count)+'" /></label>'
+          + '<div class="note">Semantic acceptance is blind: the server derives the observed count from an accepted independent point receipt. No answer-key count is entered here.</div>'
           + '<textarea id="fpVectorNote'+index+'" aria-label="FP vector review note for '+esc(page.sheet_label||('candidate '+(index+1)))+'" placeholder="Review note">'+esc(review.note||'')+'</textarea>'
-          + '<button class="btn fpVectorDecision" data-fp-vector-index="'+index+'" data-decision="accepted"'+(decision==='accepted'?' disabled':'')+'>Accept semantic count</button>'
-          + '<button class="btn fpVectorDecision" data-fp-vector-index="'+index+'" data-decision="rejected">Reject candidate</button>'
+          + '<button class="btn fpVectorDecision" data-fp-vector-index="'+index+'" data-decision="accepted"'+(decision==='accepted'||!pointAccepted?' disabled':'')+'>Accept semantic review</button>'
           + '<div class="note spatial-result" id="fpVectorResult'+index+'"></div>'
           + '</div></div>';
       }).join('');
@@ -1024,23 +1024,23 @@
           var artifact=artifacts[index]||{};
           var result=document.getElementById('fpVectorResult'+index);
           var image=document.querySelector('[data-fp-vector-overlay-index="'+index+'"]');
-          var countInput=document.getElementById('fpVectorHeadCount'+index);
           var note=document.getElementById('fpVectorNote'+index);
-          var count=countInput&&countInput.value!==''?Number(countInput.value):null;
           if(decision==='accepted' && (!image || image.getAttribute('data-overlay-visible')!=='true')){
             if(result) result.textContent='Accept only after the stored candidate overlay decodes in the browser.';
             return;
           }
-          if(decision==='accepted' && (!Number.isInteger(count) || count<=0)){
-            if(result) result.textContent='Acceptance requires a positive integer count verified by the estimator.';
+          var pointReview=artifact.point_review||null;
+          if(decision==='accepted' && (!pointReview || pointReview.decision!=='accepted')){
+            if(result) result.textContent='Accept only after an independent blind point receipt is accepted.';
             return;
           }
           Array.prototype.forEach.call(button.parentNode.querySelectorAll('.fpVectorDecision'),function(item){item.disabled=true;});
           if(result) result.textContent='Saving '+decision+' semantic review...';
-          api('/package/'+encodeURIComponent(REF)+'/fp-vector-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+          api('/fp-vector-artifacts/'+encodeURIComponent(artifact.artifact_id)+'/semantic-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
             artifact_id:artifact.artifact_id,
-            decision:decision,
-            head_count:decision==='accepted'?count:null,
+            candidate_id:pointReview?pointReview.candidate_id:'',
+            packet_hash:pointReview?pointReview.packet_hash:'',
+            point_review_decision_id:pointReview?pointReview.decision_id:'',
             note:note?note.value:'',
             expected_bundle_sha256:(artifact.integrity||{}).bundle_sha256,
             expected_overlay_sha256:(artifact.integrity||{}).overlay_sha256
