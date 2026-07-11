@@ -1153,7 +1153,7 @@ function roleMat(role) {
 // export time (buildExportScene), so STEP/IFC/STL stay complete & true-scale.
 // HF-A1-TRUESCALE: TRUE NFPA pipe scale (1) is the only render mode.
 const pipeVizScale = 1; // true NFPA pipe scale — the only render mode
-let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false;
+let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false, ogDegraded = false;
 let gridHelper = null;       // HF-TOGGLE: Grid 1ft button toggles this helper's visibility
 let orthoLock = true;        // HF-TOGGLE: Ortho button — persistent ortho constraint for draw (no Shift needed)
 // HF-PHASE1-POLAR: polar tracking config. When `enabled`, the draw vector snaps to
@@ -1593,11 +1593,28 @@ async function initStudio() {
     });
     return { dimmed, total };
   };
-  await OpenGeometry.create({ wasmURL: '/vendor/opengeometry/opengeometry_bg.wasm' });
-  ogReady = true;
-  try { buildPhase4Intake(); } catch (_) {} // PHASE 4: ensure __hfPhase4.intake/calibrate exist pre-build
-  await loadPartMeshes(); // best-effort; heads render as a real part mesh when available
-  $('status').textContent = 'OpenGeometry ready' + (headPartGeo ? ` · head part: ${partsSource}` : '');
+  // The plan-comprehension path is pure Three.js and must remain usable when the
+  // optional OpenGeometry WASM kernel is unavailable on a VPS/headless runtime.
+  // Time out rather than leaving initStudio pending forever; degraded mode never
+  // permits sprinkler generation or exports, but does render real extracted walls,
+  // rooms, openings, and the registered source sheet for review.
+  try {
+    await Promise.race([
+      OpenGeometry.create({ wasmURL: '/vendor/opengeometry/opengeometry_bg.wasm' }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('OpenGeometry WASM initialization timed out')), 8000)),
+    ]);
+    ogReady = true;
+    try { buildPhase4Intake(); } catch (_) {} // PHASE 4: ensure __hfPhase4.intake/calibrate exist pre-build
+    await loadPartMeshes(); // best-effort; heads render as a real part mesh when available
+    $('status').textContent = 'OpenGeometry ready' + (headPartGeo ? ` · head part: ${partsSource}` : '');
+  } catch (error) {
+    ogDegraded = true;
+    ogReady = true; // allows the extracted-plan loader to run
+    window.__hfOgDegraded = { degraded: true, reason: String(error && error.message || error) };
+    if ($('genBtn')) { $('genBtn').disabled = true; $('genBtn').title = 'Sprinkler generation is unavailable until OpenGeometry loads'; }
+    if ($('regenBtn')) { $('regenBtn').disabled = true; $('regenBtn').title = 'Sprinkler generation is unavailable until OpenGeometry loads'; }
+    $('status').textContent = 'OpenGeometry unavailable · plan geometry only (needs-verification)';
+  }
 }
 function onResize() {
   const c = $('canvas'); const w = c.clientWidth, h = c.clientHeight;
@@ -4186,6 +4203,7 @@ async function loadPdfBoundaryDecision() {
 }
 
 async function generate() {
+  if (ogDegraded) { $('status').textContent = 'OpenGeometry unavailable · plan geometry is review-only; sprinkler generation is disabled'; return; }
   if (!ogReady) { $('status').textContent = 'kernel still loading…'; return; }
   const btn = $('genBtn'); btn.disabled = true; btn.textContent = 'Generating…';
   $('status').textContent = 'building layout…';

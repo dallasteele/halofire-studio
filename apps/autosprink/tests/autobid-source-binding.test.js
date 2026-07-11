@@ -30,4 +30,12 @@ describe('AutoBid canonical source-document binding', () => {
     expect(studio).toContain("$('projectTarget').value = COOPERATIVE_1881_PROJECT_NAME");
     expect(studio).not.toContain('<div class="job-title">Home Depot — Rexburg</div>');
   });
+
+  it('degrades to real extracted plan geometry when the optional WASM kernel is unavailable', () => {
+    expect(studio).toContain('OpenGeometry WASM initialization timed out');
+    expect(studio).toContain('window.__hfOgDegraded');
+    expect(studio).toContain('OpenGeometry unavailable · plan geometry only (needs-verification)');
+    expect(studio).toContain('plan geometry is review-only; sprinkler generation is disabled');
+    expect(studio).toContain('await renderRealOrFixtureUnderlay(null)');
+  });
 });
