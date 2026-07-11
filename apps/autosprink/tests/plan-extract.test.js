@@ -420,15 +420,16 @@ describe('computePlanUnderlayTransform (register sheet UNDER geometry at true sc
     expect(t.position.x).toBeCloseTo(pageWFt / 2 - center.cx, 6);
     expect(t.position.z).toBeCloseTo(pageHFt / 2 - center.cy, 6);
   });
-  // RE-VERIFIED LIVE 2026-06-13 (wall-pipeline): a 4-way (U,V) flip sweep captured top+iso of the
-  // live registered A-101 underlay. u0_v0 (NO flip) reads text FORWARD at BOTH top AND iso;
-  // flipTextureV:true mirrors top->bottom (backwards at top), flipTextureU:true mirrors left->right
-  // (backwards at iso). So NO flip is correct on the registered path — the prior "mirrored at iso"
-  // report was the pre-RECORE state, already fixed here. Evidence: out/halofire-wallpipe/flipdiag/.
-  it('uses -PI/2 with NO texture flip (RECORE: face UP toward the top-down camera = upright FORWARD text at top AND iso; +PI/2 showed the mirrored back-face, flipTextureV mirrored top<->bottom — both verified-wrong live)', () => {
+  // REGISTRATION-CORRECTED LIVE 2026-06-15 (underlay-registration): the texture V axis must run the
+  // SAME direction as the geometry's plan-Y -> world-Z map (worldZ = planY - cy, INCREASING). With the
+  // -PI/2 plane and the default CanvasTexture flipY=true, NO flip maps PDF-Y DECREASING with world-Z —
+  // the inverse of the geometry — which placed the extracted footprint under the WRONG sheet band.
+  // flipTextureV:true mirrors V so PDF-Y runs WITH world-Z, registering geometry over the plan region
+  // it was extracted from. The earlier no-flip assertion tested readability, not ink registration.
+  it('uses -PI/2 with flipTextureV:true so texture V matches the geometry plan-Y -> world-Z direction', () => {
     const t = computePlanUnderlayTransform({ pageWidthPt: 100, pageHeightPt: 100, scaleFtPerUnit: 0.15 });
     expect(t.rotation.x).toBeCloseTo(-Math.PI / 2, 9);
-    expect(t.flipTextureV).toBe(false);
+    expect(t.flipTextureV).toBe(true);
     expect(t.needsVerification).toBe(true);
     expect(t.scaleSource).toMatch(/needs-verification/i);
   });
