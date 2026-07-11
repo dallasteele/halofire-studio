@@ -85,6 +85,19 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain('pointReview.point_overlay_url');
   });
 
+  it('verifies blind point source bytes before enabling any decision', () => {
+    expect(html).toContain('fpPointSourceStatus');
+    expect(html).toContain('rendered-page SHA-256');
+    expect(html).toContain("fetch(sourceUrl,{credentials:'include',cache:'no-store'})");
+    expect(html).toContain("window.crypto.subtle.digest('SHA-256',buffer)");
+    expect(html).toContain('new Blob([buffer],{type:\'image/png\'})');
+    expect(html).toContain('Display the exact bytes that were hashed');
+    expect(html).toContain('rendered source-page SHA-256 mismatch');
+    expect(html).toContain('Decision controls remain disabled.');
+    expect(html).toContain('if(!sourceVerified || !image.naturalWidth || !image.naturalHeight) return;');
+    expect(html).toContain('if(!sourceVerified){if(result) result.textContent=');
+  });
+
   it('uses canonical geometry source IDs and does not treat export history as transmission', () => {
     expect(html).toContain('p.geometry_document_id');
     expect(html).toContain('p.meta&&p.meta.geometry_document_id');

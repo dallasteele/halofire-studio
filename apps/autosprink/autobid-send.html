@@ -535,7 +535,7 @@
           + '<div class="stat"><span class="l">Indexed source page (zero-based)</span><span class="v">'+pageIndex+'</span></div>'
           + '<div class="stat"><span class="l">Automated overlay gate</span><span class="v">'+(autoPassed?'<span class="pill ok">pass</span>':'<span class="pill warn">fail</span>')+'</span></div>'
           + '<div class="stat"><span class="l">Human review</span><span class="v">'+esc(decision.replace(/_/g,' '))+'</span></div>'
-          + (viewportRows?'<div class="note"><b>Registered source viewports:</b> '+viewportRows+(viewportProvenance.length>1?'<br><small>Check each viewport after comparing its red source bounds to the PDF; acceptance requires every checked viewport.</small>':'')+'</div>':'')
+          + (viewportScope||'')
           + (gateReasons?'<div class="note"><b>Automated residual:</b> '+gateReasons+'</div>':'')
           + overlayFrame
           + metricRows
@@ -755,13 +755,22 @@
             if(!response.ok) throw new Error((response.json&&response.json.detail)||'point packet unavailable; accept the family first');
             var packet=response.json;
             mount.innerHTML='<div class="fp-point-review"><div class="note">Blind review: source PDF hash <code>'+esc(digest(packet.source_pdf_sha256))+'</code> · physical page '+esc(packet.physical_page_number)+' · no expected count is supplied.</div>'
-              +'<div class="fp-point-review-stage"><img class="fpPointPage" alt="Source PDF page for blind sprinkler-head point review" src="'+esc(proxyAutobidUrl(packet.source_pdf_page_url))+'" /><canvas class="fpPointCanvas"></canvas></div>'
-              +'<div class="fp-point-review-actions"><button class="btn fpPointDecision" data-decision="accepted">Accept reviewed points</button><button class="btn fpPointDecision" data-decision="rejected">Reject page</button><span class="note fpPointCount">0 points marked</span></div></div>';
+              +'<div class="note fpPointSourceStatus" role="status">Verifying the fetched source raster against rendered-page hash…</div>'
+              +'<div class="fp-point-review-stage"><img class="fpPointPage" alt="Source PDF page for blind sprinkler-head point review" /><canvas class="fpPointCanvas"></canvas></div>'
+              +'<div class="fp-point-review-actions"><button class="btn fpPointDecision" data-decision="accepted" disabled>Accept reviewed points</button><button class="btn fpPointDecision" data-decision="rejected" disabled>Reject page</button><span class="note fpPointCount">0 points marked</span></div></div>';
             var stage=mount.querySelector('.fp-point-review-stage');
             var image=mount.querySelector('.fpPointPage');
             var canvas=mount.querySelector('.fpPointCanvas');
             var count=mount.querySelector('.fpPointCount');
+            var sourceStatus=mount.querySelector('.fpPointSourceStatus');
+            var decisionButtons=mount.querySelectorAll('.fpPointDecision');
             var points=[];
+            var sourceVerified=false;
+            var sourceUrl=proxyAutobidUrl(packet.source_pdf_page_url);
+            var sourceBlobUrl=null;
+            var hexDigest=function(buffer){
+              return Array.prototype.map.call(new Uint8Array(buffer),function(byte){return byte.toString(16).padStart(2,'0');}).join('');
+            };
             var redraw=function(){
               if(!image.naturalWidth) return;
               canvas.width=image.naturalWidth; canvas.height=image.naturalHeight;
@@ -774,8 +783,29 @@
               });
               if(count) count.textContent=points.length+' point'+(points.length===1?'':'s')+' marked';
             };
-            image.addEventListener('load',redraw); if(image.complete) redraw();
+            image.addEventListener('load',redraw);
+            fetch(sourceUrl,{credentials:'include',cache:'no-store'}).then(function(response){
+              if(!response.ok) throw new Error('source raster fetch returned HTTP '+response.status);
+              return response.arrayBuffer();
+            }).then(function(buffer){
+              if(!window.crypto || !window.crypto.subtle) throw new Error('browser SHA-256 support is unavailable');
+              return window.crypto.subtle.digest('SHA-256',buffer).then(function(digestBuffer){
+                var actual=hexDigest(digestBuffer);
+                if(actual!==String(packet.rendered_page_sha256||'').toLowerCase()) throw new Error('rendered source-page SHA-256 mismatch');
+                sourceVerified=true;
+                Array.prototype.forEach.call(decisionButtons,function(item){item.disabled=false;});
+                if(sourceStatus){sourceStatus.className='note fpPointSourceStatus ok'; sourceStatus.textContent='Source raster verified · rendered-page SHA-256 '+digest(actual)+'…';}
+                // Display the exact bytes that were hashed; do not fetch a second
+                // mutable copy between verification and point placement.
+                sourceBlobUrl=URL.createObjectURL(new Blob([buffer],{type:'image/png'}));
+                image.src=sourceBlobUrl;
+              });
+            }).catch(function(error){
+              sourceVerified=false;
+              if(sourceStatus){sourceStatus.className='note fpPointSourceStatus warn'; sourceStatus.textContent='Blind review unavailable: '+error.message+'. Decision controls remain disabled.';}
+            });
             canvas.addEventListener('click',function(event){
+              if(!sourceVerified || !image.naturalWidth || !image.naturalHeight) return;
               var rect=canvas.getBoundingClientRect();
               points.push({x:(event.clientX-rect.left)/rect.width*packet.page_width_pt,y:(event.clientY-rect.top)/rect.height*packet.page_height_pt});
               redraw();
@@ -783,6 +813,7 @@
             Array.prototype.forEach.call(mount.querySelectorAll('.fpPointDecision'),function(decisionButton){
               decisionButton.addEventListener('click',function(){
                 var decision=decisionButton.getAttribute('data-decision');
+                if(!sourceVerified){if(result) result.textContent='Verify the canonical rendered source page before submitting a decision.'; return;}
                 if(decision==='accepted' && !points.length){if(result) result.textContent='Mark at least one clearly visible sprinkler head before accepting.'; return;}
                 Array.prototype.forEach.call(mount.querySelectorAll('.fpPointDecision'),function(item){item.disabled=true;});
                 var selected=decision==='accepted'?points:[];
