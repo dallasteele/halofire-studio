@@ -246,6 +246,10 @@ describe('AutoBid spatial review live browser boundary', () => {
 
       const accepts = page.locator('.spatialDecision[data-decision="accepted"]');
       expect(await accepts.count()).toBe(8);
+      const viewportAttestations = page.locator('.viewport-attestation');
+      for (let index = 0; index < await viewportAttestations.count(); index += 1) {
+        await viewportAttestations.nth(index).check();
+      }
       for (let index = 0; index < 8; index += 1) expect(await accepts.nth(index).isEnabled()).toBe(true);
       await page.locator('#spatialRecall0').fill('0.95');
       await page.locator('#spatialPhantoms0').fill('0');
