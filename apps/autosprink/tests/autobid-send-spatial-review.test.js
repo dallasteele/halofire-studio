@@ -177,6 +177,20 @@ describe('AutoBid final spatial review panel', () => {
     expect(actionSection).not.toContain('answer_key');
   });
 
+  it('makes the transcript operations flow visible with restrained reduced-motion-safe motion', () => {
+    expect(html).toContain('function operationsFlowRail(p)');
+    expect(html).toContain('aria-label="HaloFire operations flow"');
+    expect(html).toContain('01 · Intake');
+    expect(html).toContain('02 · Review');
+    expect(html).toContain('03 · Verify');
+    expect(html).toContain('04 · Export');
+    expect(html).toContain('animation-timeline:view()');
+    expect(html).toContain('animation-range:entry 0% cover 24%');
+    expect(html).toContain('transform:translateY(16px)');
+    expect(html).toContain('prefers-reduced-motion: reduce');
+    expect(html).not.toContain('animation: hf-ops-rail-reveal infinite');
+  });
+
   it('separates sign-in and role denial from engine outage on package load', () => {
     expect(html).toContain('data-auth-required="true"');
     expect(html).toContain('data-auth-forbidden="true"');

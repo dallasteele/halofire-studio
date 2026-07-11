@@ -138,7 +138,24 @@
   .review-action-link{ align-self:flex-start; color:var(--hf-color-interactive-text,#9ec3ff); font-size:11px; text-decoration:none; }
   .review-action-link:hover{ text-decoration:underline; }
   .review-action-count{ color:var(--hf-text); font-variant-numeric:tabular-nums; }
+  .ops-flow-rail{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:0 0 18px; padding:12px; border:1px solid rgba(158,195,255,.24); border-radius:12px; background:linear-gradient(120deg,rgba(158,195,255,.08),rgba(255,255,255,.025)); }
+  .ops-flow-step{ position:relative; min-width:0; padding:10px 10px 9px; border:1px solid var(--hf-line); border-radius:9px; background:rgba(0,0,0,.12); }
+  .ops-flow-step:not(:last-child)::after{ content:'>'; position:absolute; right:-8px; top:50%; transform:translateY(-50%); color:#f0a868; font-size:13px; font-weight:700; z-index:1; }
+  .ops-flow-step .flow-k{ display:block; color:var(--hf-muted); font-size:10px; letter-spacing:.7px; text-transform:uppercase; }
+  .ops-flow-step .flow-v{ display:block; margin-top:4px; color:var(--hf-text); font-size:var(--hf-fs-sm); font-weight:650; }
+  .ops-flow-step .flow-note{ display:block; margin-top:4px; color:var(--hf-faint); font-size:11px; line-height:1.35; }
+  .ops-flow-step.current{ border-color:rgba(240,168,104,.55); background:rgba(240,168,104,.09); }
+  .ops-flow-step.complete .flow-v{ color:#86efac; }
+  @supports (animation-timeline: view()){
+    @media (prefers-reduced-motion: no-preference){
+      .ops-flow-rail{ animation:hf-ops-rail-reveal linear both; animation-duration:1s; animation-timeline:view(); animation-range:entry 0% cover 24%; }
+      @keyframes hf-ops-rail-reveal{ from{ opacity:.72; transform:translateY(16px); } to{ opacity:1; transform:none; } }
+    }
+  }
+  @media (prefers-reduced-motion: reduce){ .ops-flow-rail{ opacity:1; transform:none; animation:none; } }
   @media(max-width:760px){ .review-action-grid{ grid-template-columns:1fr; } }
+  @media(max-width:760px){ .ops-flow-rail{ grid-template-columns:1fr 1fr; } .ops-flow-step:nth-child(2)::after{ display:none; } .ops-flow-step:nth-child(4)::after{ display:none; } }
+  @media(max-width:480px){ .ops-flow-rail{ grid-template-columns:1fr; } .ops-flow-step::after{ display:none !important; } }
   .sendbar{ position:sticky; bottom:0; margin-top:18px; padding:14px 16px; display:flex; align-items:center; gap:14px; border-radius:var(--hf-r-win,12px); }
   .sendbar .summary{ flex:1; font-size:var(--hf-fs-sm); color:var(--hf-muted); }
   .btn{ font:inherit; cursor:pointer; padding:11px 22px; border-radius:var(--hf-r-ctl,7px); border:1px solid var(--hf-line); background:var(--hf-glass,rgba(255,255,255,0.04)); color:var(--hf-text); font-weight:600; }
@@ -1303,6 +1320,21 @@
       });
     }
 
+    function operationsFlowRail(p){
+      var ready=(p&&p.readyBid)||{};
+      var verification=(p&&p.verification)||{};
+      var sent=(p&&p.sent_status)||{};
+      var intakeState=ready.job_name||ready.head_count!=null?'complete':'pending';
+      var verificationState=verification.converged===true?'complete':'current';
+      var exportState=sent.transmission_confirmed===true?'complete':'pending';
+      return '<section class="ops-flow-rail" aria-label="HaloFire operations flow" data-active="review">'
+        + '<article class="ops-flow-step '+(intakeState==='complete'?'complete':'')+'"><span class="flow-k">01 · Intake</span><span class="flow-v">'+(intakeState==='complete'?'Package built':'Package pending')+'</span><span class="flow-note">Source, scope, and pricing inputs are bound.</span></article>'
+        + '<article class="ops-flow-step current"><span class="flow-k">02 · Review</span><span class="flow-v">Human review</span><span class="flow-note">Inspect source-bound overlays, counts, and qualifiers.</span></article>'
+        + '<article class="ops-flow-step '+(verificationState==='complete'?'complete':'current')+'"><span class="flow-k">03 · Verify</span><span class="flow-v">'+(verificationState==='complete'?'Checks converged':'Receipts required')+'</span><span class="flow-note">Independent evidence stays separate from candidate tooling.</span></article>'
+        + '<article class="ops-flow-step '+(exportState==='complete'?'complete':'')+'"><span class="flow-k">04 · Export</span><span class="flow-v">'+(exportState==='complete'?'Transmission confirmed':'Manual export')+'</span><span class="flow-note">Export stages the package; sending remains explicit.</span></article>'
+        + '</section>';
+    }
+
     function render(p){
       var rb = p.readyBid||{}, cd = p.charts_data||{}, m3 = p.model3d||{};
       var quals = p.qualifiers||[];
@@ -1368,6 +1400,7 @@
       + confidenceBadge(conf)
       + governanceLine(p.governance)
 
+      + operationsFlowRail(p)
       + '<div class="cols">'
       // LEFT: numbers + charts + massing
       +   '<div>'
