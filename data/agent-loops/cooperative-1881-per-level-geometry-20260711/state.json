@@ -1,7 +1,7 @@
 {
   "iteration": 4,
-  "phase": "verify",
-  "status": "in_progress",
+  "phase": "complete",
+  "status": "completed",
   "findings": [
     "The former Level 2 through Level 5 fragment polygons and Level 6 through Level 8 fallback rectangles were replaced by eight distinct source-bound A-101 through A-108 polygons.",
     "Each level is bound to current architectural PDF SHA256 179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53 and its own immutable rendered-page SHA256.",
@@ -39,6 +39,14 @@
       "isolatedReruns": "cad-dxf 4 passed; dxf-import 3 passed; evidence-api 8 passed",
       "remainingEnvironmentalSuites": "autobid FP/spatial browser smokes require the absent external _tmp_autobid database/artifact directories and are not acceptance reviewers or geometry gates"
     },
-    "liveDeployment": "pending"
+    "liveDeployment": {
+      "status": "passed",
+      "deployedCommit": "d69cec2fa0f7e2609b7001c073086ef9e0cff0db",
+      "service": "halofire.service active",
+      "publicHealth": "HTTP 200 with status ok",
+      "publicLogin": "secure login page rendered; invalid credentials rejected with HTTP 401; configured local admin login reached the authenticated workbench before deployment",
+      "publicGeometry": "current architectural SHA256 179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53, footprint receipt b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d, eight underlays",
+      "artifactParity": "Studio HTML, plan-level JSON, and underlay manifest SHA256 values match local and VPS byte-for-byte"
+    }
   }
 }
