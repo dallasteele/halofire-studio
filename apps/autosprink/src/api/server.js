@@ -40,6 +40,7 @@ import {
 import { buildSlopedCeilingModel3d, verifySlopedCeilingModel3d } from '../engine/sloped-ceiling-model3d.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
 import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
+import { renderDillonFloorByFloorViews, validateDillonFloorByFloorModel } from '../engine/dillon-floor-by-floor-model.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -86,6 +87,8 @@ const COOPERATIVE_1881_ROOF_ARTIFACT_PATH = path.resolve(__dirname, '../data/roo
 const COOPERATIVE_1881_PLAN_LEVELS_PATH = path.resolve(__dirname, '../data/plan-levels.cooperative-1881.json');
 const COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-fp8-calibration.cooperative-1881.json');
 const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-sloped-ceiling-calibration.dillon.json');
+const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-dwg-source-geometry.json');
+const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -1678,6 +1681,25 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
   } catch (error) {
     log.error('Failed to load submitted sloped-ceiling calibration', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'submitted_sloped_calibration_load_failed', message: 'The source-bound submitted sloped-ceiling calibration could not be loaded.', complianceReady: false });
+  }
+});
+
+app.get('/api/projects/:name/floor-by-floor-model', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'Dillon Residence') return res.status(404).json({ error: 'floor_by_floor_model_not_found' });
+  try {
+    const source = JSON.parse(fs.readFileSync(DILLON_DWG_SOURCE_GEOMETRY_PATH, 'utf8'));
+    const model = JSON.parse(fs.readFileSync(DILLON_FLOOR_MODEL_PATH, 'utf8'));
+    const validation = await validateDillonFloorByFloorModel(model, source);
+    if (validation.status !== 'passed') return res.status(422).json(validation);
+    const views = renderDillonFloorByFloorViews(validation);
+    return res.json({
+      status: 'passed', artifactType: 'halofire.autobid-floor-by-floor-model.v1', projectName: req.params.name,
+      receiptSha256: model.receiptSha256, counts: validation.counts, model, views,
+      geometryGrounded: true, complianceReady: false, approvalReady: false, claimStatus: model.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Dillon floor-by-floor model', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'floor_by_floor_model_load_failed', complianceReady: false });
   }
 });
 

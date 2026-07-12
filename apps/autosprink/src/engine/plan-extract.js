@@ -118,7 +118,17 @@ export function deriveScaleFromText(joinedText) {
   const norm = String(joinedText)
     .replace(/[′‘’´]/g, "'")
     .replace(/[″“”]/g, '"');
-  const m = norm.match(/(?:scale\s*:?\s*)?(\d+(?:\s+\d+\s*\/\s*\d+|\s*\/\s*\d+)?|\d*\.\d+)\s*"\s*=\s*(\d+(?:\.\d+)?)\s*'/i);
+  const scalePattern = /(\d+(?:\s+\d+\s*\/\s*\d+|\s*\/\s*\d+)?|\d*\.\d+)\s*"\s*=\s*(\d+(?:\.\d+)?)\s*'/i;
+  const matches = [...norm.matchAll(new RegExp(scalePattern.source, 'ig'))];
+  const labeled = norm.match(new RegExp(`scale\\s*:?\\s*${scalePattern.source}`, 'i'));
+  const graphicScale = norm.match(/(\d+\s*\/\s*\d+)\s*"\s*=\s*(\d+(?:\.\d+)?)\s*'(?:\s*-\s*0\s*")?\s*0\s+feet\s+scale/i);
+  const scalePositions = [...norm.matchAll(/\bscale\b/ig)].map((match) => match.index);
+  const distanceToScale = (match) => scalePositions.length
+    ? Math.min(...scalePositions.map((index) => Math.min(Math.abs(index - match.index), Math.abs(index - (match.index + match[0].length)))))
+    : Infinity;
+  const m = graphicScale || labeled || (scalePositions.length
+    ? matches.sort((a, b) => distanceToScale(a) - distanceToScale(b) || a.index - b.index)[0]
+    : matches[0]);
   const scaleText = m ? m[0].replace(/\s+/g, ' ').trim() : `derived feetPerUnit=${round(feetPerUnit)}`;
   return { feetPerUnit, scaleText, source: 'sheet-printed-scale-notation' };
 }

@@ -1,0 +1,40 @@
+{
+  "name": "dillon-floor-by-floor-model-20260712",
+  "owner": "codex",
+  "loop_type": "closed",
+  "goal": "Extract the Dillon main, upper, and detached toy-garage wall geometry from the actual architectural DWGs, corroborate scale and vertical controls against the matching PDFs, bind vertical placement to source floor, ceiling, and roof-framing datums, build top, side/elevation, and source-grounded 3D wall-extrusion views without guessed floor heights, and expose the result in the authenticated Studio.",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Dillon Residence",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/main-plans",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/toy-plans",
+    "apps/autosprink/src/engine/plan-extract.js"
+  ],
+  "exit_criteria": [
+    "Main, upper, and toy-garage plan scale is bound to DWG inches divided by 12 and corroborated by each sheet's printed 3/16 inch equals 1 foot notation",
+    "Every modeled wall solid is extracted from its matching architectural DWG Wall-Hatch boundary rather than synthesized from sprinkler linework or an automatic PDF outline",
+    "Main floor model elevation 0 ft and upper floor model elevation 12.5 ft are bound to the upper-plan dual datums 112 ft 6 in and project elevation 1537 ft",
+    "Toy-garage model elevation is bound to its project finish floor 1503 ft and the main-house project datum rather than a default story offset",
+    "Ceiling and roof controls use source RCP and framing annotations including 9/10/11.5/16.5 ft ceiling heights, 3:12 roof slope, and explicit beam or plate elevations",
+    "Top, side/elevation, and 3D model outputs numerically agree on wall geometry, floor elevations, nominal wall-extrusion heights, and roof-control annotations",
+    "Adversarial mutations to source hashes, scale, footprint, floor datum, ceiling datum, or roof slope fail closed",
+    "Authenticated API and Studio surface the source-derived model, its limitations, and per-level visibility without claiming code compliance or fabrication readiness",
+    "Focused tests, production build, loop guard, rules verifier, live login, browser, and VPS health checks pass"
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-floor-by-floor-model-20260712/contract.json",
+    "npx vitest run tests/dillon-floor-by-floor-model.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/dillon-floor-by-floor-model-20260712/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/dillon-floor-by-floor-model.json",
+    "apps/autosprink/out/agent-loops/dillon-floor-by-floor-model-20260712",
+    "data/agent-loops/dillon-floor-by-floor-model-20260712/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "brain_writeback_required": true,
+  "human_gate_required": false
+}

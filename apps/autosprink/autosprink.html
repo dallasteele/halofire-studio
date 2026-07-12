@@ -1351,7 +1351,12 @@ async function hfShowSubmittedCalibrationViews() {
     const dillonModel3dVerification = hfVerifySlopedCeilingModel3d(dillonModel3d, dillonLayout, dillonModelInput);
     if (dillonModel3dVerification.status !== 'passed') throw new Error(dillonModel3dVerification.issues.map((entry) => entry.code).join(', '));
     const dillonLayoutViews = hfRenderSlopedCeilingLayoutViews(dillonLayout, dillonParity, dillonModel3d);
+    const floorModelResponse = await fetch('/api/projects/Dillon%20Residence/floor-by-floor-model', { credentials: 'same-origin' });
+    if (!floorModelResponse.ok) throw new Error(`Dillon floor-by-floor model HTTP ${floorModelResponse.status}`);
+    const floorModel = await floorModelResponse.json();
+    if (floorModel.status !== 'passed' || floorModel.views?.status !== 'passed') throw new Error('Dillon floor-by-floor model validation failed');
     window.__hfRoofGeometry.dillonSlopedModel3d = dillonModel3d;
+    window.__hfRoofGeometry.dillonFloorByFloorModel = floorModel;
     let viewer = document.getElementById('hfSubmittedCalibrationViewer');
     if (!viewer) {
       viewer = document.createElement('div');
@@ -1368,8 +1373,45 @@ async function hfShowSubmittedCalibrationViews() {
       <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:12px;min-height:0;overflow:auto">
         <section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered top view · FP-8 → A-108</h3>${calibration.views.topSvg}</section>
         <div style="display:grid;gap:12px;min-height:0"><section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered elevation view · DA-3 nodes</h3>${calibration.views.elevationSvg}</section><section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Dillon · submitted 3:12 regions and generated parity</h3>${dillonView.topSvg}${dillonLayoutViews.topSvg}${dillonLayoutViews.elevationSvg}<p style="color:#334155;font:11px/1.4 var(--mono);margin:8px">Schedule closure: 40 round + 11 alternate vectors on FP-1, plus the twelfth alternate on the submitted FP-2 continuation; 52 of 52 scheduled symbols are source-classified. Four source-bound 3:12 regions · two generated heads · ${dillonParity.metrics.precision * 100}% precision · ${dillonParity.metrics.recall * 100}% recall · ${dillonParity.metrics.maxPlanErrorFt.toFixed(2)} ft maximum plan error after source fan-clearance alignment. 3D: ${dillonModel3dVerification.counts.surfaces} surfaces, ${dillonModel3dVerification.counts.heads} non-flat heads, ${dillonModel3dVerification.counts.pipes} slope-following pipe, ${dillonModel3dVerification.maxPlaneResidualFt.toFixed(3)} ft plane residual, absolute project elevation from ${dillonPacket.slopeRegions.find((region) => region.elevationDatum)?.elevationDatum.sourceText}. ${dillonModel3dVerification.counts.hydraulicNodesJoined} RA nodes share the sealed 100 ft project datum; protected-head node identity, compliance, and approval remain fail-closed.</p></section></div>
-      </div>`;
-    viewer.querySelector('#hfSubmittedCalibrationClose').onclick = () => { viewer.remove(); };
+      </div>
+      <section id="hfDillonFloorModelEvidence" style="background:linear-gradient(145deg,rgba(8,47,73,.88),rgba(30,41,59,.92));border:1px solid rgba(103,232,249,.32);border-radius:14px;padding:12px;box-shadow:inset 0 1px rgba(255,255,255,.12);overflow:auto">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px"><div><h3 style="margin:0;color:#ecfeff;font:650 13px var(--mono)">Dillon actual-drawing building model · top + side/elevation + 3D extrusion</h3><p style="margin:5px 0 0;color:#bae6fd;font:11px/1.45 var(--mono)">${floorModel.counts.wallSolids} exact DWG Wall-Hatch polygons across ${floorModel.counts.levels} levels and ${floorModel.counts.sourceEntities} source entities. Main-to-upper stack: 12.5 ft; project floors 1524.5 ft / 1537.0 ft. Toy garage: 1503.0 ft in its separate local horizontal frame. Receipt ${floorModel.receiptSha256.slice(0, 16)}...</p></div><span style="white-space:nowrap;color:#fbbf24;font:10px/1.35 var(--mono)">SOURCE-GROUNDED<br>NOT CODE APPROVAL</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:10px">${floorModel.views.topViews.map((view) => `<div style="background:#fff;border-radius:10px;overflow:hidden">${view.svg}</div>`).join('')}</div>
+        <div style="display:grid;grid-template-columns:minmax(300px,.9fr) minmax(420px,1.4fr);gap:10px;margin-top:10px"><div style="background:#fff;border-radius:10px;overflow:hidden">${floorModel.views.elevationSvg}</div><div id="hfDillonFloorModel3d" style="position:relative;background:#07111f;border-radius:10px;overflow:hidden;min-height:330px">${floorModel.views.isometricSvg}</div></div>
+        <p style="margin:9px 2px 0;color:#cbd5e1;font:10.5px/1.45 var(--mono)">Fail-closed limits: no dedicated exterior-elevation sheet was present in the client archive, so the side view uses actual floor, ceiling, beam, plate, mass, and 3:12 framing annotations. The toy-garage horizontal site registration, complete bounded roof faces, coordinated penetrations, and feature-specific obstruction clearances remain unresolved.</p>
+      </section>`;
+    const floorModel3dHost = viewer.querySelector('#hfDillonFloorModel3d');
+    let floorModelRenderer = null;
+    if (floorModel3dHost) {
+      try {
+        floorModelRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        floorModelRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        floorModelRenderer.setSize(Math.max(520, floorModel3dHost.clientWidth), 330, false);
+        floorModelRenderer.domElement.setAttribute('aria-label', 'Interactive Dillon source-DWG floor-by-floor extrusion');
+        floorModel3dHost.replaceChildren(floorModelRenderer.domElement);
+        const floorScene = new THREE.Scene();
+        floorScene.background = new THREE.Color(0x07111f);
+        floorScene.add(new THREE.HemisphereLight(0xcffafe, 0x172554, 2.2));
+        const floorLight = new THREE.DirectionalLight(0xffffff, 2.4); floorLight.position.set(70, 90, 50); floorScene.add(floorLight);
+        const floorGroup = new THREE.Group(); floorScene.add(floorGroup);
+        const floorMaterials = [new THREE.MeshStandardMaterial({ color: 0x06b6d4, roughness: .42, metalness: .08, transparent: true, opacity: .78 }), new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: .42, metalness: .08, transparent: true, opacity: .72 }), new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: .48, metalness: .06, transparent: true, opacity: .76 })];
+        floorModel.model.levels.forEach((level, levelIndex) => {
+          const frameOffsetX = level.coordinateFrame === 'main-house' ? 0 : 185;
+          level.wallPolygonsFt.forEach((polygon) => {
+            const shape = new THREE.Shape(); polygon.forEach(([x, y], index) => { if (index === 0) shape.moveTo(x + frameOffsetX, y); else shape.lineTo(x + frameOffsetX, y); }); shape.closePath();
+            const geometry = new THREE.ExtrudeGeometry(shape, { depth: level.nominalWallTopElevationFt - level.modelElevationFt, bevelEnabled: false });
+            geometry.rotateX(-Math.PI / 2); geometry.translate(0, level.modelElevationFt, 0);
+            floorGroup.add(new THREE.Mesh(geometry, floorMaterials[levelIndex]));
+          });
+        });
+        const floorBounds = new THREE.Box3().setFromObject(floorGroup); const floorCenter = floorBounds.getCenter(new THREE.Vector3()); const floorSize = floorBounds.getSize(new THREE.Vector3());
+        const floorCamera = new THREE.PerspectiveCamera(38, Math.max(520, floorModel3dHost.clientWidth) / 330, .1, 2000); floorCamera.position.set(floorCenter.x + floorSize.x * .8, floorCenter.y + Math.max(75, floorSize.y * 3.2), floorCenter.z + floorSize.z * .9); floorCamera.lookAt(floorCenter);
+        const floorControls = new OrbitControls(floorCamera, floorModelRenderer.domElement); floorControls.target.copy(floorCenter); floorControls.enableDamping = true;
+        let floorAnimation = 0; const animateFloorModel = () => { floorControls.update(); floorModelRenderer.render(floorScene, floorCamera); floorAnimation = requestAnimationFrame(animateFloorModel); }; animateFloorModel();
+        floorModel3dHost.__disposeFloorModel = () => { cancelAnimationFrame(floorAnimation); floorControls.dispose(); floorGroup.traverse((item) => item.geometry?.dispose?.()); floorMaterials.forEach((material) => material.dispose()); floorModelRenderer.dispose(); };
+      } catch (error) { console.warn('Dillon interactive floor model fallback', error); }
+    }
+    viewer.querySelector('#hfSubmittedCalibrationClose').onclick = () => { floorModel3dHost?.__disposeFloorModel?.(); viewer.remove(); };
     $('status').textContent = `completed-bid calibration loaded — Dillon classified all ${dillonValidation.counts.vectorCandidates} scheduled FP-1 + FP-2 head symbols, sealed four 3:12 surface polygons, and generated two-head parity at ${dillonParity.metrics.precision * 100}% precision / ${dillonParity.metrics.recall * 100}% recall (${dillonParity.metrics.maxPlanErrorFt.toFixed(2)} ft maximum plan error). Code compliance and approval remain fail-closed.`;
     return calibration;
   } catch (error) {

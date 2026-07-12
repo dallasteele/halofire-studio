@@ -24,6 +24,21 @@ describe('deriveScaleFromText', () => {
   it('derives 1/8" = 1\' as 0.11111', () => {
     expect(deriveScaleFromText('SCALE: 1/8" = 1\'').feetPerUnit).toBeCloseTo(0.1111111, 6);
   });
+  it('prefers the explicit title-block SCALE clause over an earlier dimension fragment', () => {
+    const r = deriveScaleFromText('DOOR 14 3/16" = 1\'-0" NOTES SCALE: 3/16" = 1\'-0"');
+    expect(r.feetPerUnit).toBeCloseTo(0.07407407, 6);
+    expect(r.scaleText).toMatch(/SCALE: 3\/16/);
+  });
+  it('prefers the scale notation nearest a trailing SCALE label', () => {
+    const r = deriveScaleFromText('DOOR 14 3/16" = 1\'-0" NOTES 3/16" = 1\'-0" 0 FEET SCALE');
+    expect(r.feetPerUnit).toBeCloseTo(0.07407407, 6);
+    expect(r.scaleText).toMatch(/3\/16/);
+  });
+  it('separates a scale-bar tick from the fraction before a trailing FEET SCALE label', () => {
+    const r = deriveScaleFromText('2 4 6 8 10 12 14 3/16" = 1\'-0" 0 FEET SCALE');
+    expect(r.feetPerUnit).toBeCloseTo(0.07407407, 6);
+    expect(r.scaleText).toMatch(/^3\/16/);
+  });
   it('returns null when no scale notation present', () => {
     expect(deriveScaleFromText('REVISION LIST DESCRIPTION DATE')).toBeNull();
   });

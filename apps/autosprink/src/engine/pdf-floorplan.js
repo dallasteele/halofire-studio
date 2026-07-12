@@ -920,20 +920,26 @@ export function parseArchitecturalScale(text) {
     .replace(/[′‘’´]/g, "'") // primes / curly singles -> '
     .replace(/[″“”]/g, '"'); // double-primes / curly doubles -> "
 
-  // <lhs> "  =  <rhs> '  [ - 0 " ]   with optional leading SCALE[:] label.
-  // lhs: mixed number / fraction / decimal. rhs: decimal/integer.
-  const re = new RegExp(
-    String.raw`(?:scale\s*:?\s*)?` + // optional SCALE label
+  // <lhs> "  =  <rhs> '  [ - 0 " ]. Prefer a SCALE:-prefixed clause when one exists.
+  // This prevents an earlier door/window dimension such as "14 3/16\" = 1'-0\"" from
+  // shadowing the actual title-block "SCALE: 3/16\" = 1'-0\"" notation.
+  const body =
     String.raw`(\d+(?:\s+\d+\s*\/\s*\d+|\s*\/\s*\d+)?|\d*\.\d+)` + // (1) lhs inches
     String.raw`\s*"` + // inch mark
     String.raw`\s*=\s*` + // =
     String.raw`(\d+(?:\.\d+)?)` + // (2) rhs feet
     String.raw`\s*'` + // foot mark
-    String.raw`(?:\s*-\s*0\s*")?`, // optional - 0" suffix
-    'i',
-  );
-
-  const m = norm.match(re);
+    String.raw`(?:\s*-\s*0\s*")?`; // optional - 0" suffix
+  const matches = [...norm.matchAll(new RegExp(body, 'ig'))];
+  const labeled = norm.match(new RegExp(String.raw`scale\s*:?\s*` + body, 'i'));
+  const graphicScale = norm.match(new RegExp(String.raw`(\d+\s*\/\s*\d+)\s*"\s*=\s*(\d+(?:\.\d+)?)\s*'(?:\s*-\s*0\s*")?\s*0\s+feet\s+scale`, 'i'));
+  const scalePositions = [...norm.matchAll(/\bscale\b/ig)].map((match) => match.index);
+  const distanceToScale = (match) => scalePositions.length
+    ? Math.min(...scalePositions.map((index) => Math.min(Math.abs(index - match.index), Math.abs(index - (match.index + match[0].length)))))
+    : Infinity;
+  const m = graphicScale || labeled || (scalePositions.length
+    ? matches.sort((a, b) => distanceToScale(a) - distanceToScale(b) || a.index - b.index)[0]
+    : matches[0]);
   if (!m) return null;
 
   const lhsInches = parseNumberOrFraction(m[1]);

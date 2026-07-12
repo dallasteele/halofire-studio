@@ -124,6 +124,18 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Select the matching project before loading roof evidence');
   });
 
+  it('surfaces the authenticated actual-DWG floor-by-floor model without expanding its claim', async () => {
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('/api/projects/Dillon%20Residence/floor-by-floor-model');
+    expect(html).toContain('Dillon actual-drawing building model');
+    expect(html).toContain('Interactive Dillon source-DWG floor-by-floor extrusion');
+    expect(html).toContain('new THREE.ExtrudeGeometry');
+    expect(html).toContain('no dedicated exterior-elevation sheet was present');
+    expect(html).toContain('NOT CODE APPROVAL');
+  });
+
   it('lets the workbench target the Cooperative 1881 project instead of only Home Depot', async () => {
     const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

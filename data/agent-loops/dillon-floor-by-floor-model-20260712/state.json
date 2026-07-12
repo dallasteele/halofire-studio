@@ -1,0 +1,25 @@
+{
+  "status": "slice_complete",
+  "iteration": 2,
+  "truth": [
+    "The completed client archive contains main, upper, reflected-ceiling, framing, electrical, DWG, and detached toy-garage source files.",
+    "No dedicated exterior-elevation sheet is present in the supplied archive; vertical reconstruction uses the actual floor, ceiling, framing, beam, plate, and roof-slope annotations that are present.",
+    "Offline LibreDWG extraction returned 13225 entities with zero unknown types and 563 exact Wall-Hatch boundary polygons: main 314, upper 169, toy garage 80.",
+    "Main and upper share a DWG coordinate frame and are stacked 12.5 ft apart from the upper dual datum; the toy garage remains in its separate local horizontal frame at project finish floor 1503 ft.",
+    "The authenticated Studio renders top and source-control elevation views plus an interactive Three.js extrusion of every extracted wall polygon."
+  ],
+  "remaining": [
+    "Acquire a dedicated exterior-elevation or section sheet if a facade-faithful exterior shell is required",
+    "Acquire a site control point or shared survey coordinates before horizontally joining the toy garage to the main house",
+    "Register complete bounded roof faces and coordinated penetration clearances before code or fabrication claims",
+    "Continue the master goal from the source-grounded wall model into full floor slabs, roof surfaces, and whole-building sprinkler routing"
+  ],
+  "verification": {
+    "sourceGeometryReceipt": "bb97fc2c743adea68a86c5ff591a5a4783b499bb046cf3327534032813f38749",
+    "focusedTests": "120 passed",
+    "browser": "secure login passed; Studio modal loaded 563 wall solids and interactive WebGL canvas with zero captured browser errors",
+    "productionBuild": "passed",
+    "claim": "source-grounded floor-by-floor wall geometry only; compliance and approval false"
+  },
+  "globalGoalComplete": false
+}

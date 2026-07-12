@@ -76,6 +76,24 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request(`${PROJECT_PATH}/submitted-sprinkler-calibration`)).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.pdf')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.fdf')).status).toBe(401);
+    expect((await request('/api/projects/Dillon%20Residence/floor-by-floor-model')).status).toBe(401);
+  });
+
+  it('serves the sealed source-DWG floor-by-floor model and views', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/Dillon%20Residence/floor-by-floor-model', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result.status).toBe('passed');
+    expect(result.receiptSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(result.counts).toEqual({ levels: 3, wallSolids: 563, sourceEntities: 13225 });
+    expect(result.model.levels.map((level) => level.projectFloorElevationFt)).toEqual([1524.5, 1537, 1503]);
+    expect(result.model.levels[2].coordinateFrame).toBe('toy-garage-local');
+    expect(result.views.topViews).toHaveLength(3);
+    expect(result.views.elevationSvg).toContain('exterior elevation sheet absent');
+    expect(result.views.isometricSvg).toContain('extruded floor by floor');
+    expect(result.geometryGrounded).toBe(true);
+    expect(result.complianceReady).toBe(false);
   });
 
   it('returns registered FP-8 top/elevation evidence with a non-roof protection basis', async () => {
