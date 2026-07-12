@@ -1,0 +1,21 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { buildBluebeamSlopedPackage } from '../src/engine/bluebeam-sloped-package.js';
+import { generateSlopedCeilingLayout, verifySlopedCeilingLayoutParity } from '../src/engine/sloped-ceiling-layout.js';
+import { buildSlopedCeilingModel3d, verifySlopedCeilingModel3d } from '../src/engine/sloped-ceiling-model3d.js';
+
+const packet = JSON.parse(fs.readFileSync(new URL('../src/data/submitted-sloped-ceiling-calibration.dillon.json', import.meta.url), 'utf8'));
+const layoutRegions = packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected', obstructions: region.obstructions.map(({ id, kind, centerSubmittedPt, clearanceFt, preferredSide }) => ({ id, kind, centerSubmittedPt, clearanceFt, preferredSide })) }));
+const modelRegions = packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected', elevationDatum: region.elevationDatum ? { datumPointSubmittedPt: region.elevationDatum.datumPointSubmittedPt, projectElevationFt: region.elevationDatum.projectElevationFt, slopeDirection: region.elevationDatum.slopeDirection, sourceText: region.elevationDatum.sourceText } : null }));
+const layout = generateSlopedCeilingLayout({ artifactType: 'halofire.sloped-ceiling-layout-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt, regions: layoutRegions, maxAcrossSlopeSpanFt: 20, maxAlongSlopeSpanFt: 12 });
+const parity = verifySlopedCeilingLayoutParity(layout, packet, 5);
+const modelInput = { artifactType: 'halofire.sloped-ceiling-model3d-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt, regions: modelRegions, hydraulicDatumJoin: { projectDatumOffsetFt: packet.hydraulicDatumJoin.projectDatumOffsetFt, activeNodes: packet.hydraulicDatumJoin.activeNodes, protectedRegionHeadNodeMappingReady: packet.hydraulicDatumJoin.protectedRegionHeadNodeMappingReady } };
+const model3d = buildSlopedCeilingModel3d(layout, modelInput);
+const model3dVerification = verifySlopedCeilingModel3d(model3d, layout, modelInput);
+const result = buildBluebeamSlopedPackage({ artifactType: 'halofire.bluebeam-sloped-package-input.v1', packet, layout, parity, model3d, model3dVerification });
+if (result.status !== 'passed') throw new Error(result.issues.map((entry) => entry.code).join(', '));
+const outputDir = path.resolve(import.meta.dirname, '../out/agent-loops/dillon-sloped-ceiling-calibration-20260712');
+fs.mkdirSync(outputDir, { recursive: true });
+fs.writeFileSync(path.join(outputDir, result.manifest.fileName), result.buffer);
+fs.writeFileSync(path.join(outputDir, 'bluebeam-package-manifest.json'), `${JSON.stringify(result.manifest, null, 2)}\n`);
+process.stdout.write(`${JSON.stringify(result.manifest)}\n`);

@@ -74,6 +74,7 @@ afterAll(async () => {
 describe('AutoBid submitted sprinkler calibration API', () => {
   it('requires authentication', async () => {
     expect((await request(`${PROJECT_PATH}/submitted-sprinkler-calibration`)).status).toBe(401);
+    expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.pdf')).status).toBe(401);
   });
 
   it('returns registered FP-8 top/elevation evidence with a non-roof protection basis', async () => {
@@ -133,5 +134,20 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.view.submittedTopSvg).toContain('Dillon submitted FP-1 heads registered to RCP 3:12 annotation screens');
     expect(result.view.generatedTopSvg).toContain('Generated Dillon slope-aware top view');
     expect(result.view.generatedElevationSvg).toContain('Generated Dillon 3:12 absolute project elevation view');
+  });
+
+  it('downloads a layered two-page Bluebeam-compatible vector PDF', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.pdf', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/pdf');
+    expect(response.headers.get('content-disposition')).toContain('Dillon-Residence-sloped-ceiling-calibration.pdf');
+    expect(response.headers.get('x-halofire-artifact-sha256')).toMatch(/^[0-9a-f]{64}$/);
+    const buffer = Buffer.from(await response.arrayBuffer());
+    expect(buffer.subarray(0, 8).toString('ascii')).toBe('%PDF-1.7');
+    const raw = buffer.toString('latin1');
+    expect(raw).toContain('/Type /OCG /Name (SOURCE_GEOMETRY)');
+    expect(raw).toContain('/Type /OCG /Name (GENERATED_LAYOUT)');
+    expect(raw).toContain('/Type /OCG /Name (VERIFICATION_EVIDENCE)');
   });
 });

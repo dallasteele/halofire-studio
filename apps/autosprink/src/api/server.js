@@ -38,6 +38,7 @@ import {
   verifySlopedCeilingLayoutParity,
 } from '../engine/sloped-ceiling-layout.js';
 import { buildSlopedCeilingModel3d, verifySlopedCeilingModel3d } from '../engine/sloped-ceiling-model3d.js';
+import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -1676,6 +1677,33 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
   } catch (error) {
     log.error('Failed to load submitted sloped-ceiling calibration', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'submitted_sloped_calibration_load_failed', message: 'The source-bound submitted sloped-ceiling calibration could not be loaded.', complianceReady: false });
+  }
+});
+
+app.get('/api/projects/:name/submitted-sloped-ceiling-bluebeam.pdf', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'Dillon Residence') return res.status(404).json({ error: 'bluebeam_sloped_package_not_found' });
+  try {
+    const packet = JSON.parse(fs.readFileSync(DILLON_SLOPED_CALIBRATION_PATH, 'utf8'));
+    const validation = await validateSubmittedSlopedCeilingCalibration(packet);
+    if (validation.status !== 'passed') return res.status(422).json(validation);
+    const layoutRegions = packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected', obstructions: region.obstructions.map(({ id, kind, centerSubmittedPt, clearanceFt, preferredSide }) => ({ id, kind, centerSubmittedPt, clearanceFt, preferredSide })) }));
+    const layout = generateSlopedCeilingLayout({ artifactType: 'halofire.sloped-ceiling-layout-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt, regions: layoutRegions, maxAcrossSlopeSpanFt: 20, maxAlongSlopeSpanFt: 12 });
+    const parity = verifySlopedCeilingLayoutParity(layout, packet, 5);
+    const modelRegions = packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected', elevationDatum: region.elevationDatum ? { datumPointSubmittedPt: region.elevationDatum.datumPointSubmittedPt, projectElevationFt: region.elevationDatum.projectElevationFt, slopeDirection: region.elevationDatum.slopeDirection, sourceText: region.elevationDatum.sourceText } : null }));
+    const modelInput = { artifactType: 'halofire.sloped-ceiling-model3d-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt, regions: modelRegions, hydraulicDatumJoin: { projectDatumOffsetFt: packet.hydraulicDatumJoin.projectDatumOffsetFt, activeNodes: packet.hydraulicDatumJoin.activeNodes, protectedRegionHeadNodeMappingReady: packet.hydraulicDatumJoin.protectedRegionHeadNodeMappingReady } };
+    const model3d = buildSlopedCeilingModel3d(layout, modelInput);
+    const model3dVerification = verifySlopedCeilingModel3d(model3d, layout, modelInput);
+    const result = buildBluebeamSlopedPackage({ artifactType: 'halofire.bluebeam-sloped-package-input.v1', packet, layout, parity, model3d, model3dVerification });
+    if (result.status !== 'passed') return res.status(422).json(result);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${result.manifest.fileName}"`);
+    res.setHeader('X-HaloFire-Artifact-SHA256', result.manifest.sha256);
+    res.setHeader('X-HaloFire-Evidence-Receipt', result.manifest.evidenceReceiptSha256);
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.send(result.buffer);
+  } catch (error) {
+    log.error('Failed to build Bluebeam sloped package', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'bluebeam_sloped_package_failed', complianceReady: false });
   }
 });
 

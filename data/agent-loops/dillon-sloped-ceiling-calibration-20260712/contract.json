@@ -17,6 +17,8 @@
     "The source four-blade fan shifts the shared branch centerline with a sealed six-foot calibration clearance and maximum completed-head residual at or below three feet",
     "The protected 3:12 surface is bound to the RCP SOFFIT 9 ft / project elevation 109 ft datum and renders absolute project elevations",
     "Five RA active nodes share a sealed 100 ft hydraulic-local-to-project datum transform without inventing protected-head node identities",
+    "An authenticated two-page PDF 1.7 export renders top and absolute elevation views with Bluebeam-readable SOURCE_GEOMETRY, GENERATED_LAYOUT, and VERIFICATION_EVIDENCE layers",
+    "The PDF embeds scale, receipt, residual, datum, unresolved work, and non-release limitations and passes parser plus raster visual inspection",
     "Top, relative-elevation, and source-grounded 3D surface/head/pipe views pass adversarial plane-residual verification",
     "10 ft and 22 ft active sprinkler elevations are bound from submitted hydraulic reports",
     "Receipt, transform, polygon, slope-point, false-positive-region, elevation, and 3D plane tampering fail closed",
@@ -24,7 +26,7 @@
   ],
   "verification_gates": [
     "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-sloped-ceiling-calibration-20260712/contract.json",
-    "npx vitest run tests/submitted-sloped-ceiling-calibration.test.js tests/sloped-ceiling-layout.test.js tests/sloped-ceiling-model3d.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npx vitest run tests/bluebeam-sloped-package.test.js tests/submitted-sloped-ceiling-calibration.test.js tests/sloped-ceiling-layout.test.js tests/sloped-ceiling-model3d.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
     "npm run build",
     "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
   ],
