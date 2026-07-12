@@ -1,13 +1,14 @@
 {
   "status": "complete",
-  "iteration": 5,
+  "iteration": 6,
   "truth": [
     "The completed FP-1 schedule reports 52 heads: 40 round pendent and 12 alternate pendent.",
     "The deterministic vector classifier seals 51 candidates, including all 40 round pendent and 11 of 12 alternate pendent symbols; one alternate remains unresolved.",
     "Multiple submitted heads fall within nine feet of source-registered 3:12 RCP annotations, which is positive calibration evidence but not a full sloped-surface or code-compliance proof.",
     "RA-1 through RA-3 bind active sprinkler elevations at 10 ft and 22 ft.",
     "The protected 3:12 region binds a four-blade ceiling-fan obstruction and SOFFIT 9 ft / project elevation 109 ft source datum.",
-    "Five submitted RA active nodes share a sealed 100 ft hydraulic-local-to-project elevation offset without falsely assigning protected-region head identities."
+    "Five submitted RA active nodes share a sealed 100 ft hydraulic-local-to-project elevation offset without falsely assigning protected-region head identities.",
+    "A deterministic two-page PDF 1.7 package exports calibrated top and absolute elevation views with three Bluebeam-readable optional-content layers."
   ],
   "remaining": [
     "Classify the one remaining alternate pendent symbol",
@@ -15,16 +16,17 @@
     "Keep approval and code-compliance claims fail-closed"
   ],
   "verification": {
-    "featureCommit": "1d1e15f1",
+    "featureCommit": "ed270996",
     "evidenceReceiptSha256": "62849ebb2f8c048f38afe3056c38818d9e9e1d679b3791f3a6435df3c15fa47b",
-    "focusedTests": "34 passed across sealed sloped calibration, generated layout, grounded 3D model, authenticated API, and Studio static-origin tests; 20 node-native geometry/UI tests remain green",
+    "focusedTests": "37 passed across Bluebeam vector PDF, authenticated download, sealed calibration, generated layout, grounded 3D model, API, and Studio static-origin tests; 20 node-native geometry/UI tests remain green",
     "adversarialGates": "receipt, transform-control, polygon, obstruction, elevation-datum, hydraulic-datum, node substitution, slope-point, empty-region false-positive, hydraulic-elevation, and 3D plane mutations rejected",
     "build": "Vite production build passed locally and on VPS",
     "rules": "agent loop contract and AGENTIC_RULES verifier passed",
-    "deployment": "VPS /opt/openclaw/halofire-studio HEAD 1d1e15f; halofire.service active",
+    "deployment": "VPS /opt/openclaw/halofire-studio HEAD ed27099; halofire.service active",
     "liveApi": "authenticated Dillon route passed with 51 of 52 vector candidates, five RA nodes joined through the 100 ft datum, precision 1.0, recall 1.0, maximum plan error 2.614 ft, zero plane residual, and complianceReady false",
-    "public": "health 200; login page 200; invalid login 401; Studio 200 with Dillon viewer; sealed artifact 200",
-    "browser": "live Studio viewer rendered the five-node hydraulic datum join and explicit protected-head identity blocker; login username/password/sign-in controls remained unique and error-free"
+    "public": "health 200; login page 200; Studio 200 with authenticated Download Bluebeam PDF action",
+    "bluebeamPdf": "live authenticated PDF is 6131 bytes, PDF 1.7, two ARCH-D pages, three OCG layers, SHA256 1db3ce3cf4308e2ea3b5a8c37a54aa59653782b3131c625e359fb8e9ca0ce077, and receipt 62849ebb2f8c048f38afe3056c38818d9e9e1d679b3791f3a6435df3c15fa47b",
+    "browser": "live Studio exposed one correctly named Bluebeam download with the authenticated Dillon route and zero console errors"
   },
   "globalGoalComplete": false
 }
