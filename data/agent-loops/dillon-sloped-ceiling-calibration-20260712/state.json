@@ -1,0 +1,16 @@
+{
+  "status": "in_progress",
+  "iteration": 1,
+  "truth": [
+    "The completed FP-1 schedule reports 52 heads: 40 round pendent and 12 alternate pendent.",
+    "The deterministic vector classifier currently seals 50 candidates, including all 40 round pendent symbols; two alternate symbols remain unresolved.",
+    "Multiple submitted heads fall within nine feet of source-registered 3:12 RCP annotations, which is positive calibration evidence but not a full sloped-surface or code-compliance proof.",
+    "RA-1 through RA-3 bind active sprinkler elevations at 10 ft and 22 ft."
+  ],
+  "remaining": [
+    "Seal full sloped-ceiling boundary polygons",
+    "Classify the two remaining alternate pendent symbols",
+    "Run generated-layout parity against the completed answer key",
+    "Keep approval and code-compliance claims fail-closed"
+  ]
+}

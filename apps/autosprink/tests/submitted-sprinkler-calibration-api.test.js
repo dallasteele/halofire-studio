@@ -106,4 +106,22 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(response.status).toBe(404);
     expect((await response.json()).error).toBe('submitted_calibration_not_found');
   });
+
+  it('serves the authenticated Dillon 3:12 completed-bid calibration without claiming compliance', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-calibration', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result.status).toBe('passed');
+    expect(result.counts.submittedScheduleHeads).toBe(52);
+    expect(result.counts.vectorCandidates).toBe(50);
+    expect(result.counts.positiveAnnotationProximityMatches).toBeGreaterThanOrEqual(3);
+    expect(result.slopeEvidenceReady).toBe(true);
+    expect(result.fullSlopeSurfaceRegistrationReady).toBe(false);
+    expect(result.generatedLayoutParityReady).toBe(false);
+    expect(result.complianceReady).toBe(false);
+    expect(result.view.topSvg).toContain('Dillon submitted FP-1 heads registered to RCP 3:12 annotation screens');
+  });
 });

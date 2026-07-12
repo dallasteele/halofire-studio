@@ -1,0 +1,625 @@
+{
+  "artifactType": "halofire.submitted-sloped-ceiling-calibration.v1",
+  "projectName": "Dillon Residence",
+  "units": "pdf-pt",
+  "printedScalePtPerFt": 13.5,
+  "sources": [
+    {
+      "id": "submitted-FP1",
+      "sha256": "ea09a1fe2b1e175170e980a0e0960a7e7f2bf82f949668ae1c895e163c604a63"
+    },
+    {
+      "id": "architectural-RCP",
+      "sha256": "ed51fe47cdbb0c95db5d3a4f64117fe2625d3c0bf4e7170c6f3dec0d38ed11ba"
+    },
+    {
+      "id": "hydraulic-RA1",
+      "sha256": "773a2c38d2c9e2a9807828c91ec5b6f5c56900f2c10c68c25473c7e1eb60e705"
+    },
+    {
+      "id": "hydraulic-RA2",
+      "sha256": "4cecd2c732934b4f8e000d634664b6b3e10ba3a7fa85b91a462ecc90da69ffe0"
+    },
+    {
+      "id": "hydraulic-RA3",
+      "sha256": "65ec2e6709642cddda97de90bd902cc6efd4f8a459e3d94eedc04f7d494e219c"
+    }
+  ],
+  "registration": {
+    "method": "three-independent-raster-control-crops",
+    "architectureFromSubmitted": {
+      "xOffsetPt": -114,
+      "yOffsetPt": 460,
+      "scale": 1,
+      "rotationDeg": 0
+    },
+    "controls": [
+      {
+        "id": "whole-plan",
+        "xOffsetPt": -113,
+        "yOffsetPt": 460,
+        "score": 0.1946
+      },
+      {
+        "id": "main-building",
+        "xOffsetPt": -114,
+        "yOffsetPt": 460,
+        "score": 0.1766
+      },
+      {
+        "id": "east-wing",
+        "xOffsetPt": -114,
+        "yOffsetPt": 460,
+        "score": 0.1661
+      }
+    ],
+    "xRmsResidualPt": 0.4714,
+    "yRmsResidualPt": 0,
+    "scaleErrorPct": 0
+  },
+  "ceilingSlopeAnnotations": [
+    {
+      "id": "slope-1",
+      "sourcePointUnrotatedPt": [
+        1658.6746,
+        1560.5979
+      ],
+      "registeredSubmittedPointPt": [
+        1577.4021,
+        1198.6746
+      ],
+      "riseIn": 3,
+      "runIn": 12,
+      "text": "3\"/12\""
+    },
+    {
+      "id": "slope-2",
+      "sourcePointUnrotatedPt": [
+        1534.2318,
+        1320.5962
+      ],
+      "registeredSubmittedPointPt": [
+        1817.4038,
+        1074.2318
+      ],
+      "riseIn": 3,
+      "runIn": 12,
+      "text": "3\"/12\""
+    },
+    {
+      "id": "slope-3",
+      "sourcePointUnrotatedPt": [
+        1285.1718,
+        918.9564
+      ],
+      "registeredSubmittedPointPt": [
+        2219.0436,
+        825.1718000000001
+      ],
+      "riseIn": 3,
+      "runIn": 12,
+      "text": "3\"/12\""
+    },
+    {
+      "id": "slope-4",
+      "sourcePointUnrotatedPt": [
+        1390.4718,
+        1403.2162
+      ],
+      "registeredSubmittedPointPt": [
+        1734.7838,
+        930.4718
+      ],
+      "riseIn": 3,
+      "runIn": 12,
+      "text": "3\"/12\""
+    },
+    {
+      "id": "slope-5",
+      "sourcePointUnrotatedPt": [
+        1365.8718,
+        1289.2761
+      ],
+      "registeredSubmittedPointPt": [
+        1848.7239,
+        905.8717999999999
+      ],
+      "riseIn": 3,
+      "runIn": 12,
+      "text": "3\"/12\""
+    },
+    {
+      "id": "slope-6",
+      "sourcePointUnrotatedPt": [
+        1175.7917,
+        1218.2362
+      ],
+      "registeredSubmittedPointPt": [
+        1919.7638,
+        715.7917
+      ],
+      "riseIn": 3,
+      "runIn": 12,
+      "text": "3\"/12\""
+    },
+    {
+      "id": "slope-7",
+      "sourcePointUnrotatedPt": [
+        1526.8483,
+        1306.8906
+      ],
+      "registeredSubmittedPointPt": [
+        1831.1094,
+        1066.8483
+      ],
+      "riseIn": 3,
+      "runIn": 12,
+      "text": "3\"/12\""
+    },
+    {
+      "id": "slope-8",
+      "sourcePointUnrotatedPt": [
+        1661.0082,
+        1543.2307
+      ],
+      "registeredSubmittedPointPt": [
+        1594.7693,
+        1201.0082
+      ],
+      "riseIn": 3,
+      "runIn": 12,
+      "text": "3\"/12\""
+    }
+  ],
+  "submittedHeads": [
+    {
+      "id": "round-1",
+      "pointPt": [
+        445.67,
+        336.72
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-2",
+      "pointPt": [
+        527.37,
+        444.48
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-3",
+      "pointPt": [
+        684.06,
+        678.72
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-4",
+      "pointPt": [
+        684.06,
+        735.9
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-5",
+      "pointPt": [
+        684.06,
+        795.96
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-6",
+      "pointPt": [
+        666.04,
+        1001.25
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-7",
+      "pointPt": [
+        858.67,
+        1150.44
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-8",
+      "pointPt": [
+        666.01,
+        1150.44
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-9",
+      "pointPt": [
+        960.03,
+        1111.47
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-10",
+      "pointPt": [
+        858.67,
+        1001.37
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-11",
+      "pointPt": [
+        1014.43,
+        1001.37
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-12",
+      "pointPt": [
+        1014.44,
+        950.22
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-13",
+      "pointPt": [
+        774.97,
+        625.68
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-14",
+      "pointPt": [
+        918.08,
+        625.68
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-15",
+      "pointPt": [
+        774.98,
+        774.78
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-16",
+      "pointPt": [
+        918.08,
+        774.78
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-17",
+      "pointPt": [
+        1139.01,
+        1097.85
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-18",
+      "pointPt": [
+        1139.02,
+        896.55
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-19",
+      "pointPt": [
+        1139.02,
+        699.15
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-20",
+      "pointPt": [
+        1267.92,
+        1097.85
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-21",
+      "pointPt": [
+        1267.93,
+        896.55
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-22",
+      "pointPt": [
+        1267.96,
+        699.15
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-23",
+      "pointPt": [
+        1014.44,
+        673.23
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-24",
+      "pointPt": [
+        1049.63,
+        615.03
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-25",
+      "pointPt": [
+        1721.43,
+        713.97
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-26",
+      "pointPt": [
+        1721.43,
+        838.95
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-27",
+      "pointPt": [
+        1841.03,
+        838.95
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-28",
+      "pointPt": [
+        2015.37,
+        683.67
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-29",
+      "pointPt": [
+        1859.07,
+        683.67
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-30",
+      "pointPt": [
+        2015.37,
+        469.35
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-31",
+      "pointPt": [
+        1859.07,
+        469.35
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-32",
+      "pointPt": [
+        2087.04,
+        575.79
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-33",
+      "pointPt": [
+        2087.04,
+        289.47
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-34",
+      "pointPt": [
+        2214.78,
+        274.35
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-35",
+      "pointPt": [
+        2028.81,
+        370.95
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-36",
+      "pointPt": [
+        2087.04,
+        167.91
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-37",
+      "pointPt": [
+        2173.22,
+        569.37
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-38",
+      "pointPt": [
+        2173.22,
+        381.6
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-39",
+      "pointPt": [
+        937.81,
+        894.66
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "round-40",
+      "pointPt": [
+        1014.43,
+        805.29
+      ],
+      "symbolClass": "round-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-1",
+      "pointPt": [
+        406.41,
+        660.71
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-2",
+      "pointPt": [
+        555.99,
+        660.7
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-3",
+      "pointPt": [
+        451.77,
+        589.95
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-4",
+      "pointPt": [
+        518.85,
+        589.95
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-5",
+      "pointPt": [
+        598.89,
+        589.95
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-6",
+      "pointPt": [
+        406.41,
+        871
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-7",
+      "pointPt": [
+        555.99,
+        870.96
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-8",
+      "pointPt": [
+        406.41,
+        1038.57
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-9",
+      "pointPt": [
+        555.99,
+        1038.57
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-10",
+      "pointPt": [
+        652.83,
+        926.34
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
+    }
+  ],
+  "schedule": {
+    "totalHeads": 52,
+    "roundPendent": 40,
+    "alternatePendent": 12
+  },
+  "hydraulicEvidence": [
+    {
+      "report": "RA-1",
+      "nodeId": "1",
+      "elevationFt": 10,
+      "nodeKind": "active-sprinkler"
+    },
+    {
+      "report": "RA-1",
+      "nodeId": "7",
+      "elevationFt": 10,
+      "nodeKind": "active-sprinkler"
+    },
+    {
+      "report": "RA-2",
+      "nodeId": "4",
+      "elevationFt": 10,
+      "nodeKind": "active-sprinkler"
+    },
+    {
+      "report": "RA-3",
+      "nodeId": "13",
+      "elevationFt": 22,
+      "nodeKind": "active-sprinkler"
+    },
+    {
+      "report": "RA-3",
+      "nodeId": "15",
+      "elevationFt": 22,
+      "nodeKind": "active-sprinkler"
+    }
+  ],
+  "coverage": {
+    "complete": false,
+    "detectedVectorCandidates": 50,
+    "unresolved": [
+      "two-alternate-pendent-symbols-not-yet-vector-classified",
+      "full-sloped-ceiling-boundary-polygons-not-yet-sealed",
+      "generated-layout-parity-not-yet-executed",
+      "code-compliance-and-approval-not-inferred-from-completed-bid"
+    ]
+  },
+  "claimStatus": "completed-bid-sloped-ceiling-calibration-not-code-compliance-or-approval",
+  "evidenceReceiptSha256": "e746c0ec89ab8c61c5c717b85feae5bc9467f66de2f0127921379ff386efd313"
+}

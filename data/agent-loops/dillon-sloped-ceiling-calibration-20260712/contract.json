@@ -1,0 +1,36 @@
+{
+  "name": "dillon-sloped-ceiling-calibration-20260712",
+  "owner": "codex",
+  "loop_type": "closed",
+  "goal": "Bind the completed Dillon FP-1, reflected ceiling plan, and RA-1 through RA-3 calculations into an immutable positive 3:12 sloped-ceiling calibration, expose it in AutoBid and Studio, and keep full surface parity and code compliance fail-closed.",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Dillon Residence",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration",
+    "apps/autosprink/src/data/submitted-sloped-ceiling-calibration.dillon.json"
+  ],
+  "exit_criteria": [
+    "Three independent registration controls agree within one PDF point RMS",
+    "All 40 round pendent submitted vectors are classified and the unresolved two-of-52 alternate symbols remain explicit",
+    "At least three completed heads screen positively against source-registered 3:12 annotations",
+    "10 ft and 22 ft active sprinkler elevations are bound from submitted hydraulic reports",
+    "Receipt, transform, slope-point, and elevation tampering fail closed",
+    "Authenticated API, Studio, build, rules, and live login checks pass"
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-sloped-ceiling-calibration-20260712/contract.json",
+    "npx vitest run tests/submitted-sloped-ceiling-calibration.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/dillon-sloped-ceiling-calibration-20260712/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/submitted-sloped-ceiling-calibration.dillon.json",
+    "apps/autosprink/out/agent-loops/dillon-sloped-ceiling-calibration-20260712",
+    "data/agent-loops/dillon-sloped-ceiling-calibration-20260712/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 50000,
+  "model_tier": "balanced",
+  "brain_writeback_required": true,
+  "human_gate_required": false
+}

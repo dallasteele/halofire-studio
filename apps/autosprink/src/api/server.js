@@ -28,6 +28,10 @@ import {
   renderSubmittedCalibrationViews,
   validateSubmittedSprinklerCalibration,
 } from '../engine/submitted-sprinkler-calibration.js';
+import {
+  renderSubmittedSlopedCeilingCalibration,
+  validateSubmittedSlopedCeilingCalibration,
+} from '../engine/submitted-sloped-ceiling-calibration.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -73,6 +77,7 @@ const log = createLogger('api-server');
 const COOPERATIVE_1881_ROOF_ARTIFACT_PATH = path.resolve(__dirname, '../data/roof-reconstruction.cooperative-1881.json');
 const COOPERATIVE_1881_PLAN_LEVELS_PATH = path.resolve(__dirname, '../data/plan-levels.cooperative-1881.json');
 const COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-fp8-calibration.cooperative-1881.json');
+const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-sloped-ceiling-calibration.dillon.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -1621,6 +1626,31 @@ app.get('/api/projects/:name/submitted-sprinkler-calibration', authMiddleware, a
       message: 'The source-bound submitted sprinkler calibration could not be loaded.',
       complianceReady: false,
     });
+  }
+});
+
+app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'Dillon Residence') {
+    return res.status(404).json({ error: 'submitted_sloped_calibration_not_found', message: 'No source-bound submitted sloped-ceiling calibration exists for this project.' });
+  }
+  try {
+    const packet = JSON.parse(fs.readFileSync(DILLON_SLOPED_CALIBRATION_PATH, 'utf8'));
+    const validation = await validateSubmittedSlopedCeilingCalibration(packet);
+    if (validation.status !== 'passed') return res.status(422).json({ ...validation, projectName: req.params.name });
+    const view = renderSubmittedSlopedCeilingCalibration(validation);
+    return res.json({
+      status: 'passed', artifactType: 'halofire.autobid-submitted-sloped-ceiling-calibration.v1',
+      projectName: req.params.name, evidenceReceiptSha256: packet.evidenceReceiptSha256,
+      sources: packet.sources, registration: packet.registration, counts: validation.counts,
+      proximityMatches: validation.proximityMatches, coverage: packet.coverage,
+      slopeEvidenceReady: validation.slopeEvidenceReady,
+      fullSlopeSurfaceRegistrationReady: false, generatedLayoutParityReady: false,
+      view: { status: view.status, topSvg: view.topSvg }, complianceReady: false,
+      claimStatus: validation.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load submitted sloped-ceiling calibration', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'submitted_sloped_calibration_load_failed', message: 'The source-bound submitted sloped-ceiling calibration could not be loaded.', complianceReady: false });
   }
 });
 

@@ -1024,6 +1024,7 @@ import { generateSection as hfGenerateSection, planeFromPoints as hfPlaneFromPoi
 import { reconstructRoofPlanes as hfReconstructRoofPlanes, projectCadModelToRoof as hfProjectCadModelToRoof } from '/src/engine/roof-geometry.js';
 import { validateRoofCoordination as hfValidateRoofCoordination, mergeRoofCoordination as hfMergeRoofCoordination, checkRoofRouteAgainstCoordination as hfCheckRoofRouteAgainstCoordination } from '/src/engine/roof-coordination.js';
 import { validateSubmittedSprinklerCalibration as hfValidateSubmittedSprinklerCalibration, renderSubmittedCalibrationViews as hfRenderSubmittedCalibrationViews } from '/src/engine/submitted-sprinkler-calibration.js';
+import { validateSubmittedSlopedCeilingCalibration as hfValidateSubmittedSlopedCeilingCalibration, renderSubmittedSlopedCeilingCalibration as hfRenderSubmittedSlopedCeilingCalibration } from '/src/engine/submitted-sloped-ceiling-calibration.js';
 // PHASE 4 chunk 3: submittal sheet set (FP-0..FP-D) on a titleblock (pure builder).
 import { buildSubmittalSheets as hfBuildSubmittalSheets, renderSheetSetHtml as hfRenderSheetSetHtml, SUBMITTAL_SHEETS_DISCLAIMER } from '/src/engine/submittal-sheets.js';
 // PHASE 4: drop-ceiling tile grid + center-heads-on-tile (pure synthesizer). Drives the
@@ -1330,6 +1331,11 @@ async function hfLoadSubmittedCalibration() {
 async function hfShowSubmittedCalibrationViews() {
   try {
     const calibration = await hfLoadSubmittedCalibration();
+    const dillonResponse = await fetch('/src/data/submitted-sloped-ceiling-calibration.dillon.json', { credentials: 'same-origin' });
+    if (!dillonResponse.ok) throw new Error(`Dillon sloped-ceiling calibration HTTP ${dillonResponse.status}`);
+    const dillonValidation = await hfValidateSubmittedSlopedCeilingCalibration(await dillonResponse.json());
+    if (dillonValidation.status !== 'passed') throw new Error(dillonValidation.issues.map((entry) => entry.code).join(', '));
+    const dillonView = hfRenderSubmittedSlopedCeilingCalibration(dillonValidation);
     let viewer = document.getElementById('hfSubmittedCalibrationViewer');
     if (!viewer) {
       viewer = document.createElement('div');
@@ -1343,12 +1349,12 @@ async function hfShowSubmittedCalibrationViews() {
         <div><b>Cooperative 1881 · submitted FP-8 / DA-3 calibration</b><div style="font:11px/1.45 var(--mono);color:#a5b4c8;margin-top:4px">${counts.heads} vector head candidates · ${counts.pipeSegments} pipe segments · ${counts.hydraulicNodes} registered DA-3 nodes · <span style="color:#4ade80">${counts.pitchedRoofNodes} nodes on pitched roof planes</span><br>Finished-bid reference: Level 8 ceiling/sky-balcony geometry. Do not blindly project this layout to the pitched roof. Attic requirement and code approval remain fail-closed.</div></div>
         <button id="hfSubmittedCalibrationClose" style="border:1px solid #475569;background:#111827;color:#fff;border-radius:10px;padding:7px 11px;cursor:pointer">Close</button>
       </div>
-      <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:12px;min-height:0">
+      <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:12px;min-height:0;overflow:auto">
         <section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered top view · FP-8 → A-108</h3>${calibration.views.topSvg}</section>
-        <section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered elevation view · DA-3 nodes</h3>${calibration.views.elevationSvg}</section>
+        <div style="display:grid;gap:12px;min-height:0"><section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered elevation view · DA-3 nodes</h3>${calibration.views.elevationSvg}</section><section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Dillon completed bid · FP-1 heads near registered 3:12 RCP annotations</h3>${dillonView.topSvg}<p style="color:#334155;font:11px/1.4 var(--mono);margin:8px">${dillonValidation.counts.positiveAnnotationProximityMatches} positive annotation-proximity matches from ${dillonValidation.counts.vectorCandidates}/52 classified head vectors. Full sloped-surface polygons, generated-layout parity, compliance, and approval remain open.</p></section></div>
       </div>`;
     viewer.querySelector('#hfSubmittedCalibrationClose').onclick = () => { viewer.remove(); };
-    $('status').textContent = `submitted FP-8/DA-3 calibration loaded — ${counts.heads} vector head candidates, ${counts.pipeSegments} pipe segments, ${counts.hydraulicNodes} elevation nodes, and 0 nodes on pitched roof planes. Finished design uses Level 8 ceiling/sky-balcony reference; code compliance remains fail-closed.`;
+    $('status').textContent = `completed-bid calibration loaded — Cooperative has 0 pitched-roof nodes; Dillon adds ${dillonValidation.counts.positiveAnnotationProximityMatches} source-registered 3:12 annotation-proximity matches from ${dillonValidation.counts.vectorCandidates}/52 vector-classified heads. Full surface parity and code compliance remain fail-closed.`;
     return calibration;
   } catch (error) {
     $('status').textContent = `submitted FP-8/DA-3 calibration blocked — ${error.message || error}`;
