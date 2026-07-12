@@ -1,29 +1,29 @@
 {
   "status": "complete",
-  "iteration": 3,
+  "iteration": 4,
   "truth": [
     "The completed FP-1 schedule reports 52 heads: 40 round pendent and 12 alternate pendent.",
     "The deterministic vector classifier currently seals 50 candidates, including all 40 round pendent symbols; two alternate symbols remain unresolved.",
     "Multiple submitted heads fall within nine feet of source-registered 3:12 RCP annotations, which is positive calibration evidence but not a full sloped-surface or code-compliance proof.",
-    "RA-1 through RA-3 bind active sprinkler elevations at 10 ft and 22 ft."
+    "RA-1 through RA-3 bind active sprinkler elevations at 10 ft and 22 ft.",
+    "The protected 3:12 region binds a four-blade ceiling-fan obstruction and SOFFIT 9 ft / project elevation 109 ft source datum."
   ],
   "remaining": [
     "Classify the two remaining alternate pendent symbols",
-    "Reduce the 4.842 ft maximum plan residual by modeling the source beam and obstruction offset",
-    "Bind the relative 3:12 surface to an absolute architectural elevation datum",
+    "Join the absolute architectural ceiling plane to specific submitted hydraulic nodes",
     "Keep approval and code-compliance claims fail-closed"
   ],
   "verification": {
-    "featureCommit": "282686f4",
-    "evidenceReceiptSha256": "452bb3fdcdbb3d86a44fea011862b94e919364cf8d484b0732da5f7b51aedf01",
+    "featureCommit": "a2244f37",
+    "evidenceReceiptSha256": "ec0a69dabef38212cac8db7a3a3d0af400fcd0ab0c0301330b516ee50240fe2f",
     "focusedTests": "33 passed across sealed sloped calibration, generated layout, grounded 3D model, authenticated API, and Studio static-origin tests; 20 node-native geometry/UI tests passed",
-    "adversarialGates": "receipt, transform-control, polygon, slope-point, empty-region false-positive, hydraulic-elevation, and 3D plane mutations rejected",
+    "adversarialGates": "receipt, transform-control, polygon, obstruction, elevation-datum, slope-point, empty-region false-positive, hydraulic-elevation, and 3D plane mutations rejected",
     "build": "Vite production build passed locally and on VPS",
     "rules": "agent loop contract and AGENTIC_RULES verifier passed",
-    "deployment": "VPS /opt/openclaw/halofire-studio HEAD 282686f; halofire.service active",
-    "liveApi": "authenticated Dillon route passed with four sealed 3:12 polygons, two generated heads, precision 1.0, recall 1.0, maximum plan error 4.842 ft, and complianceReady false",
+    "deployment": "VPS /opt/openclaw/halofire-studio HEAD a2244f3; halofire.service active",
+    "liveApi": "authenticated Dillon route passed with precision 1.0, recall 1.0, maximum plan error 2.614 ft, source-bound project elevations 108.17 ft and 105.90 ft, zero 3D plane residual, and complianceReady false",
     "public": "health 200; login page 200; invalid login 401; Studio 200 with Dillon viewer; sealed artifact 200",
-    "browser": "live Studio Roof Planes viewer rendered submitted, generated top, relative elevation, and 3D metrics: four surfaces, two non-flat heads, one slope-following pipe, zero plane residual; zero console errors"
+    "browser": "live Studio viewer rendered fan-clearance alignment, absolute SOFFIT/project datum, two generated head elevations, and zero plane residual; login username/password/sign-in controls remained unique and error-free"
   },
   "globalGoalComplete": false
 }
