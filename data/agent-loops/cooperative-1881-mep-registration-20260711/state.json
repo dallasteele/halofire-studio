@@ -1,7 +1,7 @@
 {
   "iteration": 2,
-  "phase": "verify",
-  "status": "verified_ready_to_deploy",
+  "phase": "iterate",
+  "status": "deployed_verified",
   "findings": [
     "The former missing-coordination-input blocker is obsolete because current Egnyte architectural, MEP, submitted sprinkler, and hydraulic PDFs are readable and sealed.",
     "Independent A121-to-M109/P109 grid spacings agree within approximately 0.1 percent across Areas B and C.",
@@ -18,6 +18,7 @@
     "production_build": "passed",
     "rulebook": "AGENTIC_RULES_VERIFY ok",
     "formal_proof": "LEAN_PROVED on GX10 provers-lean4-runner",
-    "local_browser": "login passed; Cooperative project selection passed; 15 roof planes, 135 heat pumps, 4 outdoor units, and 83 vents rendered; residual limitations visible; zero console errors (one pre-existing scale-bar warning)"
+    "local_browser": "login passed; Cooperative project selection passed; 15 roof planes, 135 heat pumps, 4 outdoor units, and 83 vents rendered; residual limitations visible; zero console errors (one pre-existing scale-bar warning)",
+    "deployment": "VPS code commit 140359949d89229beed501e07a537a1dfbcb2895; halofire.service active; public health and login page 200; invalid-login contract 401; roof coordination edge artifact SHA-256 3a8cdf3d42bc4861249c113467bf21179ff4fb90cfc522a88a8a840092479fa5 matches local and VPS"
   }
 }
