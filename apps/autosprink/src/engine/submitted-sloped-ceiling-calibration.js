@@ -3,6 +3,7 @@ import { sha256Hex } from './elevation-datums.js';
 
 const SHA256_RE = /^[0-9a-f]{64}$/;
 const Point = z.tuple([z.number().finite(), z.number().finite()]);
+const Polygon = z.array(Point).min(4);
 const Source = z.object({ id: z.string().min(1), sha256: z.string().regex(SHA256_RE) }).strict();
 const Draft = z.object({
   artifactType: z.literal('halofire.submitted-sloped-ceiling-calibration.v1'),
@@ -20,6 +21,12 @@ const Draft = z.object({
     id: z.string(), sourcePointUnrotatedPt: Point, registeredSubmittedPointPt: Point,
     riseIn: z.literal(3), runIn: z.literal(12), text: z.literal('3"/12"'),
   }).strict()).min(3),
+  slopeRegions: z.array(z.object({
+    id: z.string(), annotationId: z.string(), polygonRcpPt: Polygon,
+    polygonSubmittedPt: Polygon, slopeAxis: z.enum(['x', 'y']), downhillDirection: z.enum(['positive-x', 'negative-x', 'positive-y', 'negative-y']),
+    protectionBasis: z.enum(['completed-bid-protected', 'completed-bid-no-submitted-heads']),
+    submittedHeadIds: z.array(z.string()),
+  }).strict()).length(4),
   submittedHeads: z.array(z.object({ id: z.string(), pointPt: Point, symbolClass: z.enum(['round-pendent-vector-candidate', 'cross-pendent-vector-candidate']) }).strict()).min(1),
   schedule: z.object({ totalHeads: z.literal(52), roundPendent: z.literal(40), alternatePendent: z.literal(12) }).strict(),
   hydraulicEvidence: z.array(z.object({ report: z.enum(['RA-1', 'RA-2', 'RA-3']), nodeId: z.string(), elevationFt: z.number(), nodeKind: z.literal('active-sprinkler') }).strict()).min(3),
@@ -30,6 +37,14 @@ const Packet = Draft.extend({ evidenceReceiptSha256: z.string().regex(SHA256_RE)
 
 const blocking = (code, message, refs = []) => ({ severity: 'blocking', code, message, refs });
 const distance = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const pointInPolygon = (point, polygon) => {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const [xi, yi] = polygon[i]; const [xj, yj] = polygon[j];
+    if ((yi > point[1]) !== (yj > point[1]) && point[0] < ((xj - xi) * (point[1] - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+};
 
 export async function sealSubmittedSlopedCeilingCalibration(draft) {
   const parsed = Draft.parse(draft);
@@ -62,6 +77,27 @@ export async function validateSubmittedSlopedCeilingCalibration(input) {
     const expected = transformSlopePoint(annotation.sourcePointUnrotatedPt);
     if (distance(expected, annotation.registeredSubmittedPointPt) > 0.1) issues.push(blocking('SLOPED_CALIBRATION_SLOPE_POINT_DRIFT', `Slope annotation ${annotation.id} is not registered by the sealed transform.`, [annotation.id]));
   }
+  const annotationById = new Map(packet.ceilingSlopeAnnotations.map((annotation) => [annotation.id, annotation]));
+  const headById = new Map(packet.submittedHeads.map((head) => [head.id, head]));
+  for (const region of packet.slopeRegions) {
+    const annotation = annotationById.get(region.annotationId);
+    if (!annotation) {
+      issues.push(blocking('SLOPED_CALIBRATION_REGION_ANNOTATION_MISSING', `Region ${region.id} has no source annotation.`, [region.id]));
+      continue;
+    }
+    const displayPoint = [3024 - annotation.sourcePointUnrotatedPt[1], annotation.sourcePointUnrotatedPt[0]];
+    if (!pointInPolygon(displayPoint, region.polygonRcpPt)) issues.push(blocking('SLOPED_CALIBRATION_ANNOTATION_OUTSIDE_REGION', `Annotation ${annotation.id} is outside ${region.id}.`, [region.id, annotation.id]));
+    for (let index = 0; index < region.polygonRcpPt.length; index += 1) {
+      const expected = [region.polygonRcpPt[index][0] - registration.architectureFromSubmitted.xOffsetPt, region.polygonRcpPt[index][1] - registration.architectureFromSubmitted.yOffsetPt];
+      if (distance(expected, region.polygonSubmittedPt[index]) > 0.1) issues.push(blocking('SLOPED_CALIBRATION_REGION_TRANSFORM_DRIFT', `Region ${region.id} does not follow the sealed RCP-to-FP transform.`, [region.id]));
+    }
+    const actualHeadIds = packet.submittedHeads.filter((head) => pointInPolygon(head.pointPt, region.polygonSubmittedPt)).map((head) => head.id).sort();
+    const declaredHeadIds = [...region.submittedHeadIds].sort();
+    if (actualHeadIds.join(',') !== declaredHeadIds.join(',')) issues.push(blocking('SLOPED_CALIBRATION_REGION_HEAD_MEMBERSHIP_DRIFT', `Region ${region.id} submitted-head membership is not source-derived.`, [region.id]));
+    if (region.protectionBasis === 'completed-bid-protected' && declaredHeadIds.length === 0) issues.push(blocking('SLOPED_CALIBRATION_PROTECTED_REGION_EMPTY', `Protected region ${region.id} has no submitted heads.`, [region.id]));
+    if (region.protectionBasis === 'completed-bid-no-submitted-heads' && declaredHeadIds.length !== 0) issues.push(blocking('SLOPED_CALIBRATION_EMPTY_REGION_FALSE', `Reference-empty region ${region.id} contains submitted heads.`, [region.id]));
+    for (const headId of declaredHeadIds) if (!headById.has(headId)) issues.push(blocking('SLOPED_CALIBRATION_REGION_HEAD_MISSING', `Region ${region.id} references missing head ${headId}.`, [region.id, headId]));
+  }
   if (packet.coverage.detectedVectorCandidates !== packet.submittedHeads.length) issues.push(blocking('SLOPED_CALIBRATION_HEAD_COUNT_DRIFT', 'Detected vector count does not match the sealed candidate list.'));
   if (packet.submittedHeads.filter((head) => head.symbolClass === 'round-pendent-vector-candidate').length !== 40) issues.push(blocking('SLOPED_CALIBRATION_ROUND_SYMBOL_COUNT', 'The sealed round-pendent vector class must reproduce the submitted schedule count of 40.'));
 
@@ -80,7 +116,7 @@ export async function validateSubmittedSlopedCeilingCalibration(input) {
     counts: { submittedScheduleHeads: 52, vectorCandidates: packet.submittedHeads.length, positiveAnnotationProximityMatches: proximityMatches.length },
     proximityMatches,
     slopeEvidenceReady: issues.length === 0,
-    fullSlopeSurfaceRegistrationReady: false,
+    fullSlopeSurfaceRegistrationReady: issues.length === 0,
     generatedLayoutParityReady: false,
     complianceReady: false,
     claimStatus: 'completed-bid-sloped-ceiling-calibration-validated-not-code-compliance-or-approval',

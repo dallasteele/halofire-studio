@@ -13,7 +13,7 @@ describe('Dillon submitted sloped-ceiling calibration', () => {
     expect(result.counts.vectorCandidates).toBe(50);
     expect(result.counts.positiveAnnotationProximityMatches).toBeGreaterThanOrEqual(3);
     expect(result.slopeEvidenceReady).toBe(true);
-    expect(result.fullSlopeSurfaceRegistrationReady).toBe(false);
+    expect(result.fullSlopeSurfaceRegistrationReady).toBe(true);
     expect(result.generatedLayoutParityReady).toBe(false);
     expect(result.complianceReady).toBe(false);
   });
@@ -34,5 +34,7 @@ describe('Dillon submitted sloped-ceiling calibration', () => {
     expect((await validateSubmittedSlopedCeilingCalibration(badSlope)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_SLOPE_POINT_DRIFT');
     const badElevation = await reseal((draft) => { draft.hydraulicEvidence = draft.hydraulicEvidence.filter((entry) => entry.elevationFt !== 22); });
     expect((await validateSubmittedSlopedCeilingCalibration(badElevation)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_ELEVATION_COVERAGE');
+    const badRegion = await reseal((draft) => { draft.slopeRegions[0].polygonSubmittedPt[0][0] += 20; });
+    expect((await validateSubmittedSlopedCeilingCalibration(badRegion)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_REGION_TRANSFORM_DRIFT');
   });
 });

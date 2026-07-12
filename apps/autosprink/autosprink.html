@@ -1025,6 +1025,8 @@ import { reconstructRoofPlanes as hfReconstructRoofPlanes, projectCadModelToRoof
 import { validateRoofCoordination as hfValidateRoofCoordination, mergeRoofCoordination as hfMergeRoofCoordination, checkRoofRouteAgainstCoordination as hfCheckRoofRouteAgainstCoordination } from '/src/engine/roof-coordination.js';
 import { validateSubmittedSprinklerCalibration as hfValidateSubmittedSprinklerCalibration, renderSubmittedCalibrationViews as hfRenderSubmittedCalibrationViews } from '/src/engine/submitted-sprinkler-calibration.js';
 import { validateSubmittedSlopedCeilingCalibration as hfValidateSubmittedSlopedCeilingCalibration, renderSubmittedSlopedCeilingCalibration as hfRenderSubmittedSlopedCeilingCalibration } from '/src/engine/submitted-sloped-ceiling-calibration.js';
+import { generateSlopedCeilingLayout as hfGenerateSlopedCeilingLayout, verifySlopedCeilingLayoutParity as hfVerifySlopedCeilingLayoutParity, renderSlopedCeilingLayoutViews as hfRenderSlopedCeilingLayoutViews } from '/src/engine/sloped-ceiling-layout.js';
+import { buildSlopedCeilingModel3d as hfBuildSlopedCeilingModel3d, verifySlopedCeilingModel3d as hfVerifySlopedCeilingModel3d } from '/src/engine/sloped-ceiling-model3d.js';
 // PHASE 4 chunk 3: submittal sheet set (FP-0..FP-D) on a titleblock (pure builder).
 import { buildSubmittalSheets as hfBuildSubmittalSheets, renderSheetSetHtml as hfRenderSheetSetHtml, SUBMITTAL_SHEETS_DISCLAIMER } from '/src/engine/submittal-sheets.js';
 // PHASE 4: drop-ceiling tile grid + center-heads-on-tile (pure synthesizer). Drives the
@@ -1333,9 +1335,23 @@ async function hfShowSubmittedCalibrationViews() {
     const calibration = await hfLoadSubmittedCalibration();
     const dillonResponse = await fetch('/src/data/submitted-sloped-ceiling-calibration.dillon.json', { credentials: 'same-origin' });
     if (!dillonResponse.ok) throw new Error(`Dillon sloped-ceiling calibration HTTP ${dillonResponse.status}`);
-    const dillonValidation = await hfValidateSubmittedSlopedCeilingCalibration(await dillonResponse.json());
+    const dillonPacket = await dillonResponse.json();
+    const dillonValidation = await hfValidateSubmittedSlopedCeilingCalibration(dillonPacket);
     if (dillonValidation.status !== 'passed') throw new Error(dillonValidation.issues.map((entry) => entry.code).join(', '));
     const dillonView = hfRenderSubmittedSlopedCeilingCalibration(dillonValidation);
+    const dillonLayout = hfGenerateSlopedCeilingLayout({
+      artifactType: 'halofire.sloped-ceiling-layout-input.v1', printedScalePtPerFt: dillonPacket.printedScalePtPerFt,
+      regions: dillonPacket.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected' })),
+      maxAcrossSlopeSpanFt: 20, maxAlongSlopeSpanFt: 12,
+    });
+    const dillonParity = hfVerifySlopedCeilingLayoutParity(dillonLayout, dillonPacket, 5);
+    if (dillonParity.status !== 'passed') throw new Error(dillonParity.issues.map((entry) => entry.code).join(', '));
+    const dillonLayoutViews = hfRenderSlopedCeilingLayoutViews(dillonLayout, dillonParity);
+    const dillonModelInput = { artifactType: 'halofire.sloped-ceiling-model3d-input.v1', printedScalePtPerFt: dillonPacket.printedScalePtPerFt, regions: dillonPacket.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected' })) };
+    const dillonModel3d = hfBuildSlopedCeilingModel3d(dillonLayout, dillonModelInput);
+    const dillonModel3dVerification = hfVerifySlopedCeilingModel3d(dillonModel3d, dillonLayout, dillonModelInput);
+    if (dillonModel3dVerification.status !== 'passed') throw new Error(dillonModel3dVerification.issues.map((entry) => entry.code).join(', '));
+    window.__hfRoofGeometry.dillonSlopedModel3d = dillonModel3d;
     let viewer = document.getElementById('hfSubmittedCalibrationViewer');
     if (!viewer) {
       viewer = document.createElement('div');
@@ -1351,10 +1367,10 @@ async function hfShowSubmittedCalibrationViews() {
       </div>
       <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:12px;min-height:0;overflow:auto">
         <section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered top view · FP-8 → A-108</h3>${calibration.views.topSvg}</section>
-        <div style="display:grid;gap:12px;min-height:0"><section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered elevation view · DA-3 nodes</h3>${calibration.views.elevationSvg}</section><section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Dillon completed bid · FP-1 heads near registered 3:12 RCP annotations</h3>${dillonView.topSvg}<p style="color:#334155;font:11px/1.4 var(--mono);margin:8px">${dillonValidation.counts.positiveAnnotationProximityMatches} positive annotation-proximity matches from ${dillonValidation.counts.vectorCandidates}/52 classified head vectors. Full sloped-surface polygons, generated-layout parity, compliance, and approval remain open.</p></section></div>
+        <div style="display:grid;gap:12px;min-height:0"><section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered elevation view · DA-3 nodes</h3>${calibration.views.elevationSvg}</section><section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Dillon · submitted 3:12 regions and generated parity</h3>${dillonView.topSvg}${dillonLayoutViews.topSvg}${dillonLayoutViews.elevationSvg}<p style="color:#334155;font:11px/1.4 var(--mono);margin:8px">Four source-bound 3:12 regions · two generated heads · ${dillonParity.metrics.precision * 100}% precision · ${dillonParity.metrics.recall * 100}% recall · ${dillonParity.metrics.maxPlanErrorFt.toFixed(2)} ft maximum plan error. 3D: ${dillonModel3dVerification.counts.surfaces} surfaces, ${dillonModel3dVerification.counts.heads} non-flat heads, ${dillonModel3dVerification.counts.pipes} slope-following pipe, ${dillonModel3dVerification.maxPlaneResidualFt.toFixed(3)} ft plane residual. Absolute elevation, compliance, and approval remain fail-closed.</p></section></div>
       </div>`;
     viewer.querySelector('#hfSubmittedCalibrationClose').onclick = () => { viewer.remove(); };
-    $('status').textContent = `completed-bid calibration loaded — Cooperative has 0 pitched-roof nodes; Dillon adds ${dillonValidation.counts.positiveAnnotationProximityMatches} source-registered 3:12 annotation-proximity matches from ${dillonValidation.counts.vectorCandidates}/52 vector-classified heads. Full surface parity and code compliance remain fail-closed.`;
+    $('status').textContent = `completed-bid calibration loaded — Dillon has four sealed 3:12 surface polygons and generated two-head parity at ${dillonParity.metrics.precision * 100}% precision / ${dillonParity.metrics.recall * 100}% recall (${dillonParity.metrics.maxPlanErrorFt.toFixed(2)} ft maximum plan error). Code compliance and approval remain fail-closed.`;
     return calibration;
   } catch (error) {
     $('status').textContent = `submitted FP-8/DA-3 calibration blocked — ${error.message || error}`;

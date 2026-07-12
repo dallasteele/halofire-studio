@@ -171,6 +171,187 @@
       "text": "3\"/12\""
     }
   ],
+  "slopeRegions": [
+    {
+      "id": "slope-region-east-patio",
+      "annotationId": "slope-3",
+      "polygonRcpPt": [
+        [
+          1940,
+          1215
+        ],
+        [
+          2225,
+          1215
+        ],
+        [
+          2225,
+          1415
+        ],
+        [
+          1940,
+          1415
+        ]
+      ],
+      "polygonSubmittedPt": [
+        [
+          2054,
+          755
+        ],
+        [
+          2339,
+          755
+        ],
+        [
+          2339,
+          955
+        ],
+        [
+          2054,
+          955
+        ]
+      ],
+      "slopeAxis": "y",
+      "downhillDirection": "positive-y",
+      "protectionBasis": "completed-bid-no-submitted-heads",
+      "submittedHeadIds": []
+    },
+    {
+      "id": "slope-region-east-covered",
+      "annotationId": "slope-6",
+      "polygonRcpPt": [
+        [
+          1670,
+          1085
+        ],
+        [
+          1900,
+          1085
+        ],
+        [
+          1900,
+          1330
+        ],
+        [
+          1670,
+          1330
+        ]
+      ],
+      "polygonSubmittedPt": [
+        [
+          1784,
+          625
+        ],
+        [
+          2014,
+          625
+        ],
+        [
+          2014,
+          870
+        ],
+        [
+          1784,
+          870
+        ]
+      ],
+      "slopeAxis": "y",
+      "downhillDirection": "positive-y",
+      "protectionBasis": "completed-bid-protected",
+      "submittedHeadIds": [
+        "round-27",
+        "round-29"
+      ]
+    },
+    {
+      "id": "slope-region-south-covered",
+      "annotationId": "slope-7",
+      "polygonRcpPt": [
+        [
+          1560,
+          1425
+        ],
+        [
+          1805,
+          1425
+        ],
+        [
+          1805,
+          1750
+        ],
+        [
+          1560,
+          1750
+        ]
+      ],
+      "polygonSubmittedPt": [
+        [
+          1674,
+          965
+        ],
+        [
+          1919,
+          965
+        ],
+        [
+          1919,
+          1290
+        ],
+        [
+          1674,
+          1290
+        ]
+      ],
+      "slopeAxis": "y",
+      "downhillDirection": "positive-y",
+      "protectionBasis": "completed-bid-no-submitted-heads",
+      "submittedHeadIds": []
+    },
+    {
+      "id": "slope-region-west-covered",
+      "annotationId": "slope-8",
+      "polygonRcpPt": [
+        [
+          1285,
+          1560
+        ],
+        [
+          1590,
+          1560
+        ],
+        [
+          1590,
+          1850
+        ],
+        [
+          1285,
+          1850
+        ]
+      ],
+      "polygonSubmittedPt": [
+        [
+          1399,
+          1100
+        ],
+        [
+          1704,
+          1100
+        ],
+        [
+          1704,
+          1390
+        ],
+        [
+          1399,
+          1390
+        ]
+      ],
+      "slopeAxis": "y",
+      "downhillDirection": "positive-y",
+      "protectionBasis": "completed-bid-no-submitted-heads",
+      "submittedHeadIds": []
+    }
+  ],
   "submittedHeads": [
     {
       "id": "round-1",
@@ -621,5 +802,5 @@
     ]
   },
   "claimStatus": "completed-bid-sloped-ceiling-calibration-not-code-compliance-or-approval",
-  "evidenceReceiptSha256": "e746c0ec89ab8c61c5c717b85feae5bc9467f66de2f0127921379ff386efd313"
+  "evidenceReceiptSha256": "452bb3fdcdbb3d86a44fea011862b94e919364cf8d484b0732da5f7b51aedf01"
 }

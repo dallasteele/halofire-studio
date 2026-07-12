@@ -32,6 +32,12 @@ import {
   renderSubmittedSlopedCeilingCalibration,
   validateSubmittedSlopedCeilingCalibration,
 } from '../engine/submitted-sloped-ceiling-calibration.js';
+import {
+  generateSlopedCeilingLayout,
+  renderSlopedCeilingLayoutViews,
+  verifySlopedCeilingLayoutParity,
+} from '../engine/sloped-ceiling-layout.js';
+import { buildSlopedCeilingModel3d, verifySlopedCeilingModel3d } from '../engine/sloped-ceiling-model3d.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -1638,14 +1644,32 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
     const validation = await validateSubmittedSlopedCeilingCalibration(packet);
     if (validation.status !== 'passed') return res.status(422).json({ ...validation, projectName: req.params.name });
     const view = renderSubmittedSlopedCeilingCalibration(validation);
+    const layout = generateSlopedCeilingLayout({
+      artifactType: 'halofire.sloped-ceiling-layout-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt,
+      regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected' })),
+      maxAcrossSlopeSpanFt: 20, maxAlongSlopeSpanFt: 12,
+    });
+    const parity = verifySlopedCeilingLayoutParity(layout, packet, 5);
+    if (parity.status !== 'passed') return res.status(422).json({ ...parity, projectName: req.params.name });
+    const layoutViews = renderSlopedCeilingLayoutViews(layout, parity);
+    const modelInput = {
+      artifactType: 'halofire.sloped-ceiling-model3d-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt,
+      regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected' })),
+    };
+    const model3d = buildSlopedCeilingModel3d(layout, modelInput);
+    const model3dVerification = verifySlopedCeilingModel3d(model3d, layout, modelInput);
+    if (model3dVerification.status !== 'passed') return res.status(422).json({ ...model3dVerification, projectName: req.params.name });
     return res.json({
       status: 'passed', artifactType: 'halofire.autobid-submitted-sloped-ceiling-calibration.v1',
       projectName: req.params.name, evidenceReceiptSha256: packet.evidenceReceiptSha256,
       sources: packet.sources, registration: packet.registration, counts: validation.counts,
       proximityMatches: validation.proximityMatches, coverage: packet.coverage,
       slopeEvidenceReady: validation.slopeEvidenceReady,
-      fullSlopeSurfaceRegistrationReady: false, generatedLayoutParityReady: false,
-      view: { status: view.status, topSvg: view.topSvg }, complianceReady: false,
+      fullSlopeSurfaceRegistrationReady: validation.fullSlopeSurfaceRegistrationReady,
+      generatedLayoutParityReady: parity.generatedLayoutParityReady,
+      parityMetrics: parity.metrics, generatedHeads: layout.heads,
+      model3d, model3dVerification,
+      view: { status: view.status, submittedTopSvg: view.topSvg, generatedTopSvg: layoutViews.topSvg, generatedElevationSvg: layoutViews.elevationSvg }, complianceReady: false,
       claimStatus: validation.claimStatus,
     });
   } catch (error) {
