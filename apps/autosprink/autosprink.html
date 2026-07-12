@@ -929,7 +929,8 @@ window.addEventListener('unhandledrejection', (event) => {
   "imports": {
     "three": "/vendor/three/build/three.module.js",
     "three/examples/jsm/": "/vendor/three/examples/jsm/",
-    "opengeometry": "/vendor/opengeometry/index.js"
+    "opengeometry": "/vendor/opengeometry/index.js",
+    "zod": "/vendor/zod/index.js"
   }
 }
 </script>
@@ -1017,6 +1018,10 @@ import { buildSupply, evaluateSupplies, supplyDemandCurve, defaultCityWaterSpec,
 // PHASE 4 chunk 2: section / elevation cut (pure projector). Drives the SECTION tool
 // (pick a cut line on the plan -> generated 2D elevation in a selectable/closable panel).
 import { generateSection as hfGenerateSection, planeFromPoints as hfPlaneFromPoints, SECTION_DISCLAIMER } from '/src/engine/section-cut.js';
+// Source-bound A-121/A-201 pitched-roof reconstruction. This is geometry-only:
+// unresolved MEP penetrations / obstruction clearances keep project projection
+// fail-closed and prevent any code-compliance claim.
+import { reconstructRoofPlanes as hfReconstructRoofPlanes, projectCadModelToRoof as hfProjectCadModelToRoof } from '/src/engine/roof-geometry.js';
 // PHASE 4 chunk 3: submittal sheet set (FP-0..FP-D) on a titleblock (pure builder).
 import { buildSubmittalSheets as hfBuildSubmittalSheets, renderSheetSetHtml as hfRenderSheetSetHtml, SUBMITTAL_SHEETS_DISCLAIMER } from '/src/engine/submittal-sheets.js';
 // PHASE 4: drop-ceiling tile grid + center-heads-on-tile (pure synthesizer). Drives the
@@ -1209,6 +1214,93 @@ let lastPolarEngaged = null; // { angleDeg, lengthFt, from:[x,y], to:[x,y] } whe
 const layerGroups = {};
 let modelGroup, currentCadModel = null;
 let planGroup = null, planVisible = true, lastPlanBbox = null; // HF-A1-UNDERLAY ground-plane floor plan
+let hfRoofModel = null, hfRoofModelPromise = null, hfRoofPlaneGroup = null;
+
+function hfRenderRoofPlaneOverlay(model) {
+  if (hfRoofPlaneGroup) scene.remove(hfRoofPlaneGroup);
+  hfRoofPlaneGroup = new THREE.Group();
+  hfRoofPlaneGroup.name = 'source-bound-pitched-roof-planes';
+  for (const plane of (model && model.planes || [])) {
+    const points = plane.boundaryPlanFt.map(([x, y]) => new THREE.Vector2(x, y));
+    const faces = THREE.ShapeUtils.triangulateShape(points, []);
+    const positions = [];
+    for (const face of faces) {
+      for (const index of face) {
+        const [x, y] = plane.boundaryPlanFt[index];
+        const elevation = plane.equation.a * x + plane.equation.b * y + plane.equation.c;
+        positions.push(x, elevation + 0.03, y);
+      }
+    }
+    if (!positions.length) continue;
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.computeVertexNormals();
+    const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+      color: 0x38bdf8, transparent: true, opacity: 0.18,
+      side: THREE.DoubleSide, depthWrite: false,
+    }));
+    mesh.userData.hfRoofPlane = { id: plane.id, slopeRisePerFoot: plane.slopeRisePerFoot, sourceBindingRefs: plane.sourceBindingRefs };
+    hfRoofPlaneGroup.add(mesh);
+    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geometry), new THREE.LineBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.8 }));
+    hfRoofPlaneGroup.add(edges);
+  }
+  scene.add(hfRoofPlaneGroup);
+}
+
+async function hfLoadSourceBoundRoof() {
+  if (hfRoofModel) return hfRoofModel;
+  if (!hfRoofModelPromise) hfRoofModelPromise = fetch('/src/data/roof-reconstruction.cooperative-1881.json', { credentials: 'same-origin' })
+    .then((response) => { if (!response.ok) throw new Error(`roof evidence HTTP ${response.status}`); return response.json(); })
+    .then((packet) => hfReconstructRoofPlanes(packet))
+    .then((model) => {
+      if (!model || model.status !== 'passed') throw new Error((model && model.issues || []).map((entry) => entry.code).join(', ') || 'roof reconstruction failed');
+      hfRoofModel = model;
+      window.__hfRoofGeometry.model = model;
+      return model;
+    })
+    .catch((error) => { hfRoofModelPromise = null; throw error; });
+  return hfRoofModelPromise;
+}
+
+async function hfShowSourceBoundRoof() {
+  try {
+    const model = await hfLoadSourceBoundRoof();
+    hfRenderRoofPlaneOverlay(model);
+    const gate = model.coverage.complete ? 'projection gate passed' : `projection blocked: ${model.coverage.unresolvedRegions.join(', ')}`;
+    $('status').textContent = `${model.planes.length} source-bound pitched-roof planes + ${model.features.length} roof features loaded from A-121/A-201 — ${gate}; not a code-compliance claim.`;
+    return model;
+  } catch (error) {
+    $('status').textContent = `roof reconstruction blocked — ${error.message || error}`;
+    return null;
+  }
+}
+
+async function hfElevateModelToSourceBoundRoof() {
+  const model = await hfShowSourceBoundRoof();
+  if (!model || !currentCadModel) {
+    if (model && !currentCadModel) $('status').textContent = 'roof projection blocked — generate or load a CAD model first.';
+    return null;
+  }
+  const result = hfProjectCadModelToRoof({
+    cadModel: currentCadModel, roofModel: model,
+    offsets: { headOffsetBelowRoofFt: 0.5, pipeOffsetBelowRoofFt: 1, hangerSpacingFt: 8 },
+  });
+  window.__hfRoofGeometry.lastProjection = result;
+  if (result.status !== 'passed') {
+    $('status').textContent = `roof projection blocked — ${result.issues.map((entry) => entry.code).join(', ')}. A-121 requires coordinated MEP penetrations / feature clearances; no code-compliance claim.`;
+    return result;
+  }
+  renderModel(result.model, { preserveView: true });
+  $('status').textContent = `${result.counts.headsProjected} heads, ${result.counts.pipesProjected} pipes, and ${result.counts.hangersProjected} hangers projected to verified roof planes — geometry verified; not code compliant.`;
+  return result;
+}
+
+window.__hfRoofGeometry = {
+  model: null, lastProjection: null,
+  load: hfLoadSourceBoundRoof,
+  show: hfShowSourceBoundRoof,
+  projectCurrent: hfElevateModelToSourceBoundRoof,
+};
 // R3: real CAD part mesh for sprinkler heads, loaded from the parts library
 // (GET /api/parts -> /parts/<key>.stl). Falls back to a primitive when no part
 // is available. Generated parts are best-effort, NOT manufacturer-exact.
@@ -11049,14 +11141,15 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'wizards.advanced-drop-connect': () => dropConnectMenu('Advanced Drop-Connect'),
     'wizards.place-hangers': hfHonestStub('hanger placement runs inside the Generate detail pass — no separate client pass.'),
     'wizards.place-sprinklers-in-ceiling-grid': hfHonestStub('ceiling-grid sprinkler placement needs a ceiling-grid element — not yet built.'),
-    // ── HF-SPK: Roof Planes — roof generation/elevation is a deep structural
-    // pipeline; no client roof-plane element exists. Honest stubs (every one).
-    'roof-planes.automatic-roof-planes': hfHonestStub('roof-plane generation from columns/walls is a structural pipeline — no client roof element yet.'),
-    'roof-planes.elevate-elements-to-roof-planes': hfHonestStub('needs roof-plane elements to elevate to — none in the client model.'),
+    // Source-bound Cooperative 1881 roof geometry. Automatic Roof Planes loads
+    // and renders the sealed A-121/A-201 reconstruction. Projection remains
+    // fail-closed until the sheet-required MEP/clearance coordination is supplied.
+    'roof-planes.automatic-roof-planes': () => hfShowSourceBoundRoof(),
+    'roof-planes.elevate-elements-to-roof-planes': () => hfElevateModelToSourceBoundRoof(),
     'roof-planes.rotate-beams-to-roof-planes': hfHonestStub('needs roof-plane + beam elements — not in the client model.'),
-    'roof-planes.rotate-sprinklers-to-roof-planes': hfHonestStub('needs roof-plane elements — not in the client model.'),
+    'roof-planes.rotate-sprinklers-to-roof-planes': () => hfElevateModelToSourceBoundRoof(),
     'roof-planes.stretch-columns-to-roof-plane': hfHonestStub('needs roof-plane + column elements — not in the client model.'),
-    'roof-planes.stretch-hangers': hfHonestStub('needs roof-plane elements above hangers — not in the client model.'),
+    'roof-planes.stretch-hangers': () => hfElevateModelToSourceBoundRoof(),
     'roof-planes.stretch-sway-braces': hfHonestStub('needs roof-plane + sway-brace elements — not in the client model.'),
     // ── HF-SPK: AutoPREP — host-drawing management, multi-drawing compare, and
     // report logs are native desktop/server features with no browser engine.

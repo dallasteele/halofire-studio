@@ -1,0 +1,1840 @@
+{
+  "artifactType": "halofire.roof-reconstruction-input.v1",
+  "sourceBindings": [
+    {
+      "id": "roof-plan-A121",
+      "binding": {
+        "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+        "physicalPageNumber": 32,
+        "pageIndex": 31,
+        "renderedPageSha256": "fd6a414aba729b5a1b115bde5537405df7d5142e1bb01bd7651aea544d11fc47",
+        "sheetId": "A-121",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "elevation-A201",
+      "binding": {
+        "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+        "physicalPageNumber": 58,
+        "pageIndex": 57,
+        "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c",
+        "sheetId": "A-201",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    }
+  ],
+  "datums": [
+    {
+      "id": "north-main-valley-left",
+      "kind": "valley",
+      "label": "north-main-valley-left",
+      "elevationFt": 81,
+      "planPointFt": [
+        56.613333,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          382.14,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "north-main-valley-right",
+      "kind": "valley",
+      "label": "north-main-valley-right",
+      "elevationFt": 81,
+      "planPointFt": [
+        281.666667,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          1901.25,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "north-main-slope-point",
+      "kind": "roof-point",
+      "label": "north-main-slope-point",
+      "elevationFt": 81.452222,
+      "planPointFt": [
+        78.318519,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.041666666666666664,
+        "sourceSlopeText": "SLOPE 1/2 IN PER FOOT",
+        "sourcePdfPoint": [
+          528.65,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-1-left-low",
+      "kind": "valley",
+      "label": "cricket-1-left-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        56.613333,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          382.14,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-1-left-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-1-left-ridge-base",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        78.318519,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          528.65,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-1-left-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-1-left-ridge-peak",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        78.318519,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          528.65,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-1-right-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-1-right-ridge-base",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        78.318519,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          528.65,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-1-right-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-1-right-ridge-peak",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        78.318519,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          528.65,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-1-right-low",
+      "kind": "valley",
+      "label": "cricket-1-right-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        100.023704,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          675.16,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-2-left-low",
+      "kind": "valley",
+      "label": "cricket-2-left-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        102.023704,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          688.66,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-2-left-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-2-left-ridge-base",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        123.728889,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          835.17,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-2-left-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-2-left-ridge-peak",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        123.728889,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          835.17,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-2-right-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-2-right-ridge-base",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        123.728889,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          835.17,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-2-right-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-2-right-ridge-peak",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        123.728889,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          835.17,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-2-right-low",
+      "kind": "valley",
+      "label": "cricket-2-right-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        145.434074,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          981.68,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-3-left-low",
+      "kind": "valley",
+      "label": "cricket-3-left-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        147.481481,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          995.5,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-3-left-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-3-left-ridge-base",
+      "elevationFt": 81.451204,
+      "planPointFt": [
+        169.139259,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1141.69,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-3-left-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-3-left-ridge-peak",
+      "elevationFt": 81.451204,
+      "planPointFt": [
+        169.139259,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1141.69,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-3-right-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-3-right-ridge-base",
+      "elevationFt": 81.451235,
+      "planPointFt": [
+        169.139259,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1141.69,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-3-right-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-3-right-ridge-peak",
+      "elevationFt": 81.451235,
+      "planPointFt": [
+        169.139259,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1141.69,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-3-right-low",
+      "kind": "valley",
+      "label": "cricket-3-right-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        190.798519,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          1287.89,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-4-left-low",
+      "kind": "valley",
+      "label": "cricket-4-left-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        192.844444,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          1301.7,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-4-left-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-4-left-ridge-base",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        214.54963,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1448.21,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-4-left-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-4-left-ridge-peak",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        214.54963,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1448.21,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-4-right-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-4-right-ridge-base",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        214.54963,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1448.21,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-4-right-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-4-right-ridge-peak",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        214.54963,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1448.21,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-4-right-low",
+      "kind": "valley",
+      "label": "cricket-4-right-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        236.254815,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          1594.72,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-5-left-low",
+      "kind": "valley",
+      "label": "cricket-5-left-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        238.254815,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          1608.22,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-5-left-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-5-left-ridge-base",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        259.96,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1754.73,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-5-left-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-5-left-ridge-peak",
+      "elevationFt": 81.452191,
+      "planPointFt": [
+        259.96,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1754.73,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-5-right-ridge-base",
+      "kind": "ridge",
+      "label": "cricket-5-right-ridge-base",
+      "elevationFt": 81.452222,
+      "planPointFt": [
+        259.96,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1754.73,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-5-right-ridge-peak",
+      "kind": "ridge",
+      "label": "cricket-5-right-ridge-peak",
+      "elevationFt": 81.452222,
+      "planPointFt": [
+        259.96,
+        94.6
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.020833333333333332,
+        "sourceSlopeText": "SLOPE 1/4 IN PER FOOT",
+        "sourcePdfPoint": [
+          1754.73,
+          1089.45
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "cricket-5-right-low",
+      "kind": "valley",
+      "label": "cricket-5-right-low",
+      "elevationFt": 81,
+      "planPointFt": [
+        281.666667,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          1901.25,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "north-west-end-inner-left",
+      "kind": "valley",
+      "label": "north-west-end-inner-left",
+      "elevationFt": 81,
+      "planPointFt": [
+        12.592593,
+        88.434074
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          85,
+          1131.07
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "north-west-end-inner-right",
+      "kind": "valley",
+      "label": "north-west-end-inner-right",
+      "elevationFt": 81,
+      "planPointFt": [
+        54.358519,
+        88.434074
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          366.92,
+          1131.07
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "north-west-end-outer-left",
+      "kind": "roof-point",
+      "label": "north-west-end-outer-left",
+      "elevationFt": 87.234568,
+      "planPointFt": [
+        12.592593,
+        125.841481
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.16666666666666666,
+        "sourceSlopeText": "SLOPE 2 IN PER FOOT",
+        "sourcePdfPoint": [
+          85,
+          878.57
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "north-east-end-inner-left",
+      "kind": "valley",
+      "label": "north-east-end-inner-left",
+      "elevationFt": 81,
+      "planPointFt": [
+        283.754074,
+        88.434074
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          1915.34,
+          1131.07
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "north-east-end-inner-right",
+      "kind": "valley",
+      "label": "north-east-end-inner-right",
+      "elevationFt": 81,
+      "planPointFt": [
+        335.176296,
+        88.434074
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          2262.44,
+          1131.07
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "north-east-end-outer-left",
+      "kind": "roof-point",
+      "label": "north-east-end-outer-left",
+      "elevationFt": 87.234568,
+      "planPointFt": [
+        283.754074,
+        125.841481
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.16666666666666666,
+        "sourceSlopeText": "SLOPE 2 IN PER FOOT",
+        "sourcePdfPoint": [
+          1915.34,
+          878.57
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "south-west-inner-left",
+      "kind": "valley",
+      "label": "south-west-inner-left",
+      "elevationFt": 81,
+      "planPointFt": [
+        12.592593,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          85,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "south-west-inner-right",
+      "kind": "valley",
+      "label": "south-west-inner-right",
+      "elevationFt": 81,
+      "planPointFt": [
+        163.894815,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          1106.29,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "south-west-outer-left",
+      "kind": "roof-point",
+      "label": "south-west-outer-left",
+      "elevationFt": 87.234321,
+      "planPointFt": [
+        12.592593,
+        46.340741
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.16666666666666666,
+        "sourceSlopeText": "SLOPE 2 IN PER FOOT",
+        "sourcePdfPoint": [
+          85,
+          1415.2
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "south-east-inner-left",
+      "kind": "valley",
+      "label": "south-east-inner-left",
+      "elevationFt": 81,
+      "planPointFt": [
+        196.207407,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          1324.4,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "south-east-inner-right",
+      "kind": "valley",
+      "label": "south-east-inner-right",
+      "elevationFt": 81,
+      "planPointFt": [
+        335.176296,
+        83.746667
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "direct-elevation-datum",
+        "anchorDatumId": "roof-eave",
+        "sourcePdfPoint": [
+          2262.44,
+          1162.71
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    },
+    {
+      "id": "south-east-outer-left",
+      "kind": "roof-point",
+      "label": "south-east-outer-left",
+      "elevationFt": 87.234321,
+      "planPointFt": [
+        196.207407,
+        46.340741
+      ],
+      "sourceBindingRefs": [
+        "elevation-A201",
+        "roof-plan-A121"
+      ],
+      "derivation": {
+        "method": "slope-from-anchor",
+        "anchorDatumId": "roof-eave",
+        "slopeRisePerFoot": 0.16666666666666666,
+        "sourceSlopeText": "SLOPE 2 IN PER FOOT",
+        "sourcePdfPoint": [
+          1324.4,
+          1415.2
+        ],
+        "sheetScaleFtPerPoint": 0.14814814814814814
+      }
+    }
+  ],
+  "regions": [
+    {
+      "id": "north-center-primary",
+      "boundaryPlanFt": [
+        [
+          54.613333,
+          116.736296
+        ],
+        [
+          283.665185,
+          116.736296
+        ],
+        [
+          281.666667,
+          83.746667
+        ],
+        [
+          259.96,
+          94.6
+        ],
+        [
+          238.254815,
+          83.746667
+        ],
+        [
+          236.254815,
+          83.746667
+        ],
+        [
+          214.54963,
+          94.6
+        ],
+        [
+          192.844444,
+          83.746667
+        ],
+        [
+          190.798519,
+          83.746667
+        ],
+        [
+          169.139259,
+          94.6
+        ],
+        [
+          147.481481,
+          83.746667
+        ],
+        [
+          145.434074,
+          83.746667
+        ],
+        [
+          123.728889,
+          94.6
+        ],
+        [
+          102.023704,
+          83.746667
+        ],
+        [
+          100.023704,
+          83.746667
+        ],
+        [
+          78.318519,
+          94.6
+        ],
+        [
+          56.613333,
+          83.746667
+        ]
+      ],
+      "datumIds": [
+        "north-main-valley-left",
+        "north-main-valley-right",
+        "north-main-slope-point"
+      ]
+    },
+    {
+      "id": "cricket-1-left",
+      "boundaryPlanFt": [
+        [
+          56.613333,
+          83.746667
+        ],
+        [
+          78.318519,
+          83.746667
+        ],
+        [
+          78.318519,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-1-left-low",
+        "cricket-1-left-ridge-base",
+        "cricket-1-left-ridge-peak"
+      ]
+    },
+    {
+      "id": "cricket-1-right",
+      "boundaryPlanFt": [
+        [
+          78.318519,
+          83.746667
+        ],
+        [
+          100.023704,
+          83.746667
+        ],
+        [
+          78.318519,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-1-right-ridge-base",
+        "cricket-1-right-low",
+        "cricket-1-right-ridge-peak"
+      ]
+    },
+    {
+      "id": "cricket-2-left",
+      "boundaryPlanFt": [
+        [
+          102.023704,
+          83.746667
+        ],
+        [
+          123.728889,
+          83.746667
+        ],
+        [
+          123.728889,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-2-left-low",
+        "cricket-2-left-ridge-base",
+        "cricket-2-left-ridge-peak"
+      ]
+    },
+    {
+      "id": "cricket-2-right",
+      "boundaryPlanFt": [
+        [
+          123.728889,
+          83.746667
+        ],
+        [
+          145.434074,
+          83.746667
+        ],
+        [
+          123.728889,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-2-right-ridge-base",
+        "cricket-2-right-low",
+        "cricket-2-right-ridge-peak"
+      ]
+    },
+    {
+      "id": "cricket-3-left",
+      "boundaryPlanFt": [
+        [
+          147.481481,
+          83.746667
+        ],
+        [
+          169.139259,
+          83.746667
+        ],
+        [
+          169.139259,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-3-left-low",
+        "cricket-3-left-ridge-base",
+        "cricket-3-left-ridge-peak"
+      ]
+    },
+    {
+      "id": "cricket-3-right",
+      "boundaryPlanFt": [
+        [
+          169.139259,
+          83.746667
+        ],
+        [
+          190.798519,
+          83.746667
+        ],
+        [
+          169.139259,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-3-right-ridge-base",
+        "cricket-3-right-low",
+        "cricket-3-right-ridge-peak"
+      ]
+    },
+    {
+      "id": "cricket-4-left",
+      "boundaryPlanFt": [
+        [
+          192.844444,
+          83.746667
+        ],
+        [
+          214.54963,
+          83.746667
+        ],
+        [
+          214.54963,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-4-left-low",
+        "cricket-4-left-ridge-base",
+        "cricket-4-left-ridge-peak"
+      ]
+    },
+    {
+      "id": "cricket-4-right",
+      "boundaryPlanFt": [
+        [
+          214.54963,
+          83.746667
+        ],
+        [
+          236.254815,
+          83.746667
+        ],
+        [
+          214.54963,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-4-right-ridge-base",
+        "cricket-4-right-low",
+        "cricket-4-right-ridge-peak"
+      ]
+    },
+    {
+      "id": "cricket-5-left",
+      "boundaryPlanFt": [
+        [
+          238.254815,
+          83.746667
+        ],
+        [
+          259.96,
+          83.746667
+        ],
+        [
+          259.96,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-5-left-low",
+        "cricket-5-left-ridge-base",
+        "cricket-5-left-ridge-peak"
+      ]
+    },
+    {
+      "id": "cricket-5-right",
+      "boundaryPlanFt": [
+        [
+          259.96,
+          83.746667
+        ],
+        [
+          281.666667,
+          83.746667
+        ],
+        [
+          259.96,
+          94.6
+        ]
+      ],
+      "datumIds": [
+        "cricket-5-right-ridge-base",
+        "cricket-5-right-low",
+        "cricket-5-right-ridge-peak"
+      ]
+    },
+    {
+      "id": "north-west-end",
+      "boundaryPlanFt": [
+        [
+          12.592593,
+          88.434074
+        ],
+        [
+          54.358519,
+          88.434074
+        ],
+        [
+          54.358519,
+          125.841481
+        ],
+        [
+          12.592593,
+          125.841481
+        ]
+      ],
+      "datumIds": [
+        "north-west-end-inner-left",
+        "north-west-end-inner-right",
+        "north-west-end-outer-left"
+      ]
+    },
+    {
+      "id": "north-east-end",
+      "boundaryPlanFt": [
+        [
+          283.754074,
+          88.434074
+        ],
+        [
+          335.176296,
+          88.434074
+        ],
+        [
+          335.176296,
+          125.841481
+        ],
+        [
+          283.754074,
+          125.841481
+        ]
+      ],
+      "datumIds": [
+        "north-east-end-inner-left",
+        "north-east-end-inner-right",
+        "north-east-end-outer-left"
+      ]
+    },
+    {
+      "id": "south-west",
+      "boundaryPlanFt": [
+        [
+          12.592593,
+          83.746667
+        ],
+        [
+          163.894815,
+          83.746667
+        ],
+        [
+          163.894815,
+          46.340741
+        ],
+        [
+          12.592593,
+          46.340741
+        ]
+      ],
+      "datumIds": [
+        "south-west-inner-left",
+        "south-west-inner-right",
+        "south-west-outer-left"
+      ]
+    },
+    {
+      "id": "south-east",
+      "boundaryPlanFt": [
+        [
+          196.207407,
+          83.746667
+        ],
+        [
+          335.176296,
+          83.746667
+        ],
+        [
+          335.176296,
+          46.340741
+        ],
+        [
+          196.207407,
+          46.340741
+        ]
+      ],
+      "datumIds": [
+        "south-east-inner-left",
+        "south-east-inner-right",
+        "south-east-outer-left"
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "central-south-open-core",
+      "boundaryPlanFt": [
+        [
+          163.894815,
+          83.746667
+        ],
+        [
+          196.207407,
+          83.746667
+        ],
+        [
+          196.207407,
+          46.340741
+        ],
+        [
+          163.894815,
+          46.340741
+        ]
+      ],
+      "reason": "open-core",
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "id": "drain-west-1",
+      "type": "internal-roof-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          56.637148,
+          84.496961
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.01",
+      "sourcePdfPoint": [
+        382.30075,
+        1157.64551
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "overflow-west-1",
+      "type": "internal-overflow-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          55.433996,
+          84.496961
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.02",
+      "sourcePdfPoint": [
+        374.17947,
+        1157.64551
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "drain-west-2",
+      "type": "internal-roof-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          132.314742,
+          84.496961
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.01",
+      "sourcePdfPoint": [
+        893.12451,
+        1157.64551
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "overflow-west-2",
+      "type": "internal-overflow-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          131.117893,
+          84.496961
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.02",
+      "sourcePdfPoint": [
+        885.04578,
+        1157.64551
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "drain-east-1",
+      "type": "internal-roof-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          208.00537,
+          84.496961
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.01",
+      "sourcePdfPoint": [
+        1404.03625,
+        1157.64551
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "overflow-east-1",
+      "type": "internal-overflow-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          206.80221,
+          84.496961
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.02",
+      "sourcePdfPoint": [
+        1395.91492,
+        1157.64551
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "drain-east-2",
+      "type": "internal-roof-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          283.68967,
+          84.496961
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.01",
+      "sourcePdfPoint": [
+        1914.90527,
+        1157.64551
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "overflow-east-2",
+      "type": "internal-overflow-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          282.486111,
+          84.496961
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.02",
+      "sourcePdfPoint": [
+        1906.78125,
+        1157.64551
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "overflow-north-west",
+      "type": "internal-overflow-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          111.185908,
+          111.173782
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.02",
+      "sourcePdfPoint": [
+        750.50488,
+        977.57697
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "overflow-north-east",
+      "type": "internal-overflow-drain",
+      "geometry": {
+        "kind": "point",
+        "planPointFt": [
+          254.47139,
+          112.009033
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "07.02",
+      "sourcePdfPoint": [
+        1717.68188,
+        971.93903
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    },
+    {
+      "id": "roof-access-hatch-1",
+      "type": "roof-hatch",
+      "geometry": {
+        "kind": "polygon",
+        "boundaryPlanFt": [
+          [
+            168.060727,
+            83.194698
+          ],
+          [
+            171.060855,
+            83.194698
+          ],
+          [
+            171.060855,
+            75.19468
+          ],
+          [
+            168.060727,
+            75.19468
+          ]
+        ]
+      },
+      "sourceBindingRefs": [
+        "roof-plan-A121"
+      ],
+      "sourceCallout": "08.01",
+      "sourcePdfPoint": [
+        1154.66077,
+        1166.43579
+      ],
+      "dimensionsFt": [
+        3,
+        8
+      ],
+      "clearance": {
+        "status": "unresolved",
+        "basis": "A-121 locates the feature, but does not establish NFPA sprinkler obstruction clearance or coordinated MEP penetration extents."
+      }
+    }
+  ],
+  "coverage": {
+    "complete": false,
+    "resolvedScope": "A-121 primary planes, five paired cricket planes, dimensioned roof hatch, and visible 07.01/07.02 drain callouts",
+    "unresolvedRegions": [
+      "roof-feature-clearances-and-uncoordinated-mep-penetrations"
+    ]
+  },
+  "evidenceReceiptSha256": "69eb9520e2b372cfbb5da49e0ff658f74ad7939d87ea9dcd1913bdb7e1999765"
+}

@@ -9,6 +9,13 @@ export const SourceBindingSchema = z.object({
   renderedPageSha256: z.string().toLowerCase().regex(SHA256_RE),
   sheetId: z.string().trim().min(1),
   coordinateSpace: z.enum(['pdf-points', 'sheet-feet', 'plan-feet']),
+  renderProfile: z.object({
+    renderer: z.string().trim().min(1),
+    rendererVersion: z.string().trim().min(1),
+    matrixScale: z.number().positive(),
+    colorspace: z.enum(['rgb', 'gray', 'cmyk']),
+    alpha: z.boolean(),
+  }).strict().optional(),
 }).strict().superRefine((value, ctx) => {
   if (value.physicalPageNumber !== value.pageIndex + 1) {
     ctx.addIssue({

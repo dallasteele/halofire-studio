@@ -1,26 +1,63 @@
-import { describe, expect, it } from 'vitest';
-import { projectCadModelToRoof, reconstructRoofPlanes, roofElevationAt } from '../src/engine/roof-geometry.js';
+import { beforeAll, describe, expect, it } from 'vitest';
+import fs from 'node:fs';
+import {
+  projectCadModelToRoof,
+  reconstructRoofPlanes,
+  roofElevationAt,
+  sealRoofReconstructionInput,
+} from '../src/engine/roof-geometry.js';
 
-const binding = {
-  sourcePdfSha256: 'b'.repeat(64), physicalPageNumber: 32, pageIndex: 31,
-  renderedPageSha256: 'f'.repeat(64), sheetId: 'A-121', coordinateSpace: 'plan-feet',
+const roofPlanBinding = {
+  id: 'roof-plan', binding: {
+    sourcePdfSha256: 'b'.repeat(64), physicalPageNumber: 32, pageIndex: 31,
+    renderedPageSha256: 'f'.repeat(64), sheetId: 'A-121', coordinateSpace: 'plan-feet',
+  },
 };
-const receipt = 'a'.repeat(64);
+const elevationBinding = {
+  id: 'elevation', binding: {
+    sourcePdfSha256: 'b'.repeat(64), physicalPageNumber: 58, pageIndex: 57,
+    renderedPageSha256: '4'.repeat(64), sheetId: 'A-201', coordinateSpace: 'pdf-points',
+  },
+};
 
-function datum(id, kind, x, y, elevationFt) {
-  return { id, kind, label: id, planPointFt: [x, y], elevationFt, sourceBinding: binding, evidenceReceiptSha256: receipt };
+function datum(id, kind, x, y, elevationFt, sourceBindingRefs = ['roof-plan']) {
+  return {
+    id, kind, label: id, planPointFt: [x, y], elevationFt, sourceBindingRefs,
+    derivation: { method: sourceBindingRefs.length > 1 ? 'slope-from-anchor' : 'direct-elevation-datum' },
+  };
 }
 
-function reconstruct(datums, regions) {
-  return reconstructRoofPlanes({
-    artifactType: 'halofire.roof-reconstruction-input.v1', sourceBinding: binding,
-    evidenceReceiptSha256: receipt, datums, regions,
+async function sealAndReconstruct(datums, regions, sourceBindings = [roofPlanBinding]) {
+  const sealed = await sealRoofReconstructionInput({
+    artifactType: 'halofire.roof-reconstruction-input.v1', sourceBindings, datums, regions, exclusions: [], features: [],
+    coverage: { complete: true, resolvedScope: 'test fixture', unresolvedRegions: [] },
   });
+  return reconstructRoofPlanes(sealed);
 }
 
 describe('source-bound pitched roof reconstruction', () => {
-  it('reconstructs a mono-slope plane and reports its true rise per foot', () => {
-    const model = reconstruct([
+  it('reconstructs the sealed Cooperative 1881 A-121 partial roof packet and preserves its fail-closed coverage boundary', async () => {
+    const packet = JSON.parse(fs.readFileSync(new URL('../src/data/roof-reconstruction.cooperative-1881.json', import.meta.url), 'utf8'));
+    const model = await reconstructRoofPlanes(packet);
+    expect(model.status).toBe('passed');
+    expect(model.planes).toHaveLength(15);
+    expect(model.coverage.complete).toBe(false);
+    expect(model.coverage.unresolvedRegions).toEqual(['roof-feature-clearances-and-uncoordinated-mep-penetrations']);
+    expect(model.exclusions.map((entry) => entry.id)).toContain('central-south-open-core');
+    expect(model.features).toHaveLength(11);
+    expect(model.features.filter((entry) => entry.type === 'roof-hatch')).toHaveLength(1);
+    expect(model.planes.every((plane) => plane.sourceBindingRefs.join(',') === 'elevation-A201,roof-plan-A121')).toBe(true);
+    const projection = projectCadModelToRoof({
+      cadModel: { solids: [{ kind: 'head', name: 'partial-scope-head', position: [100, 100, 80] }] },
+      roofModel: model,
+      offsets: { headOffsetBelowRoofFt: 0.5, pipeOffsetBelowRoofFt: 1, hangerSpacingFt: 8 },
+    });
+    expect(projection.status).toBe('blocked');
+    expect(projection.issues.map((entry) => entry.code)).toContain('ROOF_MODEL_COVERAGE_INCOMPLETE');
+  });
+
+  it('reconstructs a mono-slope plane and reports its true rise per foot', async () => {
+    const model = await sealAndReconstruct([
       datum('eave-a', 'eave', 0, 0, 20), datum('eave-b', 'eave', 0, 30, 20), datum('ridge', 'ridge', 40, 15, 30),
     ], [{ id: 'mono', boundaryPlanFt: [[0, 0], [40, 0], [40, 30], [0, 30]], datumIds: ['eave-a', 'eave-b', 'ridge'] }]);
     expect(model.status).toBe('passed');
@@ -29,8 +66,8 @@ describe('source-bound pitched roof reconstruction', () => {
     expect(model.complianceReady).toBe(false);
   });
 
-  it('reconstructs both sides of a gable and agrees at the shared ridge', () => {
-    const model = reconstruct([
+  it('reconstructs both sides of a gable and agrees at the shared ridge', async () => {
+    const model = await sealAndReconstruct([
       datum('west-1', 'eave', 0, 0, 20), datum('west-2', 'eave', 0, 30, 20),
       datum('ridge-1', 'ridge', 20, 0, 25), datum('ridge-2', 'ridge', 20, 30, 25),
       datum('east-1', 'eave', 40, 0, 20), datum('east-2', 'eave', 40, 30, 20),
@@ -45,23 +82,66 @@ describe('source-bound pitched roof reconstruction', () => {
     expect(ridge.planeIds).toEqual(['east', 'west']);
   });
 
-  it('rejects non-coplanar evidence, outside datums, and mismatched source bindings', () => {
-    const nonPlanar = reconstruct([
+  it('accepts derived datums bound jointly to roof-plan and elevation pages', async () => {
+    const refs = ['roof-plan', 'elevation'];
+    const model = await sealAndReconstruct([
+      datum('valley-a', 'valley', 0, 0, 81, refs), datum('valley-b', 'valley', 20, 0, 81, refs),
+      datum('outer-a', 'roof-point', 0, 24, 85, refs), datum('outer-b', 'roof-point', 20, 24, 85, refs),
+    ], [{ id: 'south-plane', boundaryPlanFt: [[0, 0], [20, 0], [20, 24], [0, 24]], datumIds: ['valley-a', 'valley-b', 'outer-a', 'outer-b'] }], [roofPlanBinding, elevationBinding]);
+    expect(model.status).toBe('passed');
+    expect(model.planes[0].sourceBindingRefs).toEqual(['elevation', 'roof-plan']);
+  });
+
+  it('rejects packet tampering after the source bundle is sealed', async () => {
+    const sealed = await sealRoofReconstructionInput({
+      artifactType: 'halofire.roof-reconstruction-input.v1', sourceBindings: [roofPlanBinding],
+      datums: [datum('a', 'eave', 0, 0, 20), datum('b', 'eave', 0, 20, 20), datum('c', 'ridge', 20, 0, 25)],
+      regions: [{ id: 'roof', boundaryPlanFt: [[0, 0], [20, 0], [20, 20], [0, 20]], datumIds: ['a', 'b', 'c'] }],
+      exclusions: [], features: [],
+      coverage: { complete: true, resolvedScope: 'test fixture', unresolvedRegions: [] },
+    });
+    sealed.datums[2].elevationFt = 35;
+    const result = await reconstructRoofPlanes(sealed);
+    expect(result.status).toBe('blocked');
+    expect(result.issues[0].code).toBe('ROOF_EVIDENCE_RECEIPT_MISMATCH');
+  });
+
+  it('rejects non-coplanar evidence, outside datums, and unknown source refs', async () => {
+    const nonPlanar = await sealAndReconstruct([
       datum('a', 'eave', 0, 0, 20), datum('b', 'eave', 0, 20, 20), datum('c', 'ridge', 20, 0, 25), datum('d', 'ridge', 20, 20, 27),
     ], [{ id: 'bad', boundaryPlanFt: [[0, 0], [20, 0], [20, 20], [0, 20]], datumIds: ['a', 'b', 'c', 'd'] }]);
     expect(nonPlanar.status).toBe('blocked');
     expect(nonPlanar.issues.map((entry) => entry.code)).toContain('ROOF_PLANE_RESIDUAL_EXCEEDED');
 
-    const outside = reconstruct([
+    const outside = await sealAndReconstruct([
       datum('a', 'eave', 0, 0, 20), datum('b', 'eave', 0, 20, 20), datum('c', 'ridge', 30, 0, 25),
     ], [{ id: 'bad', boundaryPlanFt: [[0, 0], [20, 0], [20, 20], [0, 20]], datumIds: ['a', 'b', 'c'] }]);
     expect(outside.issues.map((entry) => entry.code)).toContain('ROOF_DATUM_OUTSIDE_REGION');
 
-    const tampered = datum('c', 'ridge', 20, 0, 25);
-    tampered.sourceBinding = { ...binding, sheetId: 'A-999' };
-    const sourceMismatch = reconstruct([datum('a', 'eave', 0, 0, 20), datum('b', 'eave', 0, 20, 20), tampered],
+    const unknown = datum('c', 'ridge', 20, 0, 25, ['substituted-page']);
+    const sourceMismatch = await sealAndReconstruct([datum('a', 'eave', 0, 0, 20), datum('b', 'eave', 0, 20, 20), unknown],
       [{ id: 'bad', boundaryPlanFt: [[0, 0], [20, 0], [20, 20], [0, 20]], datumIds: ['a', 'b', 'c'] }]);
     expect(sourceMismatch.issues.map((entry) => entry.code)).toContain('ROOF_DATUM_SOURCE_MISMATCH');
+  });
+
+  it('rejects source substitution and false completeness for roof features', async () => {
+    const base = {
+      artifactType: 'halofire.roof-reconstruction-input.v1', sourceBindings: [roofPlanBinding],
+      datums: [datum('a', 'eave', 0, 0, 20), datum('b', 'eave', 0, 20, 20), datum('c', 'ridge', 20, 0, 25)],
+      regions: [{ id: 'roof', boundaryPlanFt: [[0, 0], [20, 0], [20, 20], [0, 20]], datumIds: ['a', 'b', 'c'] }],
+      exclusions: [],
+      features: [{
+        id: 'drain', type: 'internal-roof-drain', geometry: { kind: 'point', planPointFt: [5, 5] },
+        sourceBindingRefs: ['substituted-sheet'], sourceCallout: '07.01', sourcePdfPoint: [100, 100],
+        clearance: { status: 'unresolved', basis: 'A-121 locates the drain but does not dimension its sprinkler obstruction clearance.' },
+      }],
+      coverage: { complete: true, resolvedScope: 'adversarial fixture', unresolvedRegions: [] },
+    };
+    const model = await reconstructRoofPlanes(await sealRoofReconstructionInput(base));
+    expect(model.status).toBe('blocked');
+    expect(model.issues.map((entry) => entry.code)).toEqual(expect.arrayContaining([
+      'ROOF_FEATURE_SOURCE_MISMATCH', 'ROOF_COVERAGE_COMPLETENESS_CONTRADICTED',
+    ]));
   });
 
   it('blocks conflicting overlap instead of choosing a convenient roof plane', () => {
@@ -76,10 +156,14 @@ describe('source-bound pitched roof reconstruction', () => {
     expect(result.issues[0].code).toBe('ROOF_OVERLAP_CONFLICT');
   });
 });
+
 describe('sprinkler, pipe, and hanger roof projection', () => {
-  const roofModel = reconstruct([
-    datum('eave-a', 'eave', 0, 0, 20), datum('eave-b', 'eave', 0, 20, 20), datum('ridge-a', 'ridge', 20, 0, 25), datum('ridge-b', 'ridge', 20, 20, 25),
-  ], [{ id: 'west', boundaryPlanFt: [[0, 0], [20, 0], [20, 20], [0, 20]], datumIds: ['eave-a', 'eave-b', 'ridge-a', 'ridge-b'] }]);
+  let roofModel;
+  beforeAll(async () => {
+    roofModel = await sealAndReconstruct([
+      datum('eave-a', 'eave', 0, 0, 20), datum('eave-b', 'eave', 0, 20, 20), datum('ridge-a', 'ridge', 20, 0, 25), datum('ridge-b', 'ridge', 20, 20, 25),
+    ], [{ id: 'west', boundaryPlanFt: [[0, 0], [20, 0], [20, 20], [0, 20]], datumIds: ['eave-a', 'eave-b', 'ridge-a', 'ridge-b'] }]);
+  });
 
   it('projects connected carriers, drops, heads, and roof rods while preserving shared topology nodes', () => {
     const cadModel = { solids: [
@@ -110,5 +194,24 @@ describe('sprinkler, pipe, and hanger roof projection', () => {
     expect(result.status).toBe('blocked');
     expect(result.model).toBeNull();
     expect(result.issues.map((entry) => entry.code)).toContain('ROOF_POINT_OUTSIDE_MODEL');
+  });
+
+  it('fails closed at an opening boundary, a clearance boundary, and a point penetration', async () => {
+    const sealed = await sealRoofReconstructionInput({
+      artifactType: 'halofire.roof-reconstruction-input.v1', sourceBindings: [roofPlanBinding],
+      datums: [datum('a', 'eave', 0, 0, 20), datum('b', 'eave', 0, 20, 20), datum('c', 'ridge', 20, 0, 25)],
+      regions: [{ id: 'roof', boundaryPlanFt: [[0, 0], [20, 0], [20, 20], [0, 20]], datumIds: ['a', 'b', 'c'] }],
+      exclusions: [],
+      features: [
+        { id: 'hatch', type: 'roof-hatch', geometry: { kind: 'polygon', boundaryPlanFt: [[2, 2], [5, 2], [5, 10], [2, 10]] }, sourceBindingRefs: ['roof-plan'], sourceCallout: '08.01', dimensionsFt: [3, 8], clearance: { status: 'resolved', boundaryPlanFt: [[1, 1], [6, 1], [6, 11], [1, 11]], basis: 'test fixture' } },
+        { id: 'drain', type: 'internal-roof-drain', geometry: { kind: 'point', planPointFt: [15, 15] }, sourceBindingRefs: ['roof-plan'], sourceCallout: '07.01', clearance: { status: 'resolved', basis: 'test fixture' } },
+      ],
+      coverage: { complete: true, resolvedScope: 'test fixture', unresolvedRegions: [] },
+    });
+    const model = await reconstructRoofPlanes(sealed);
+    expect(model.status).toBe('passed');
+    expect(roofElevationAt(model, [3, 3]).issues[0].code).toBe('ROOF_POINT_IN_FEATURE_OR_CLEARANCE');
+    expect(roofElevationAt(model, [1, 6]).issues[0].code).toBe('ROOF_POINT_IN_FEATURE_OR_CLEARANCE');
+    expect(roofElevationAt(model, [15, 15]).issues[0].code).toBe('ROOF_POINT_IN_FEATURE_OR_CLEARANCE');
   });
 });

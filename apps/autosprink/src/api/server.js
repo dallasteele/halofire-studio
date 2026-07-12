@@ -505,6 +505,7 @@ app.use(express.static(path.resolve(__dirname, '../../')));
 // Serve the bundled Three.js + OpenGeometry CAD kernel locally (no CDN).
 app.use('/vendor/three', express.static(path.resolve(__dirname, '../../node_modules/three')));
 app.use('/vendor/opengeometry', express.static(path.resolve(__dirname, '../../node_modules/opengeometry')));
+app.use('/vendor/zod', express.static(path.resolve(__dirname, '../../node_modules/zod')));
 
 // ── Auth Middleware ──
 function cookieValue(req, name) {

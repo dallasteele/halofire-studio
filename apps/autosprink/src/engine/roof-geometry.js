@@ -1,8 +1,13 @@
 import { z } from 'zod';
-import { SourceBindingSchema, sourceBindingKey } from './elevation-datums.js';
+import { SourceBindingSchema, sha256Hex } from './elevation-datums.js';
 
 const SHA256_RE = /^[0-9a-f]{64}$/;
 const EPS = 1e-9;
+
+const EvidenceSourceSchema = z.object({
+  id: z.string().trim().min(1),
+  binding: SourceBindingSchema,
+}).strict();
 
 const DatumSchema = z.object({
   id: z.string().min(1),
@@ -10,8 +15,15 @@ const DatumSchema = z.object({
   label: z.string().min(1),
   elevationFt: z.number().finite(),
   planPointFt: z.tuple([z.number().finite(), z.number().finite()]),
-  sourceBinding: SourceBindingSchema,
-  evidenceReceiptSha256: z.string().regex(SHA256_RE),
+  sourceBindingRefs: z.array(z.string().trim().min(1)).min(1),
+  derivation: z.object({
+    method: z.enum(['direct-elevation-datum', 'slope-from-anchor', 'section-intersection']),
+    anchorDatumId: z.string().trim().min(1).optional(),
+    slopeRisePerFoot: z.number().finite().optional(),
+    sourceSlopeText: z.string().trim().min(1).optional(),
+    sourcePdfPoint: z.tuple([z.number().finite(), z.number().finite()]).optional(),
+    sheetScaleFtPerPoint: z.number().positive().optional(),
+  }).strict(),
 }).passthrough();
 
 const RoofRegionSchema = z.object({
@@ -20,12 +32,53 @@ const RoofRegionSchema = z.object({
   datumIds: z.array(z.string().min(1)).min(3),
 }).strict();
 
-const ReconstructionInputSchema = z.object({
+const RoofExclusionSchema = z.object({
+  id: z.string().trim().min(1),
+  boundaryPlanFt: z.array(z.tuple([z.number().finite(), z.number().finite()])).min(3),
+  reason: z.enum(['open-core', 'roof-hatch', 'shaft', 'mechanical-opening', 'unresolved-obstruction']),
+  sourceBindingRefs: z.array(z.string().trim().min(1)).min(1),
+}).strict();
+
+const RoofFeatureSchema = z.object({
+  id: z.string().trim().min(1),
+  type: z.enum(['internal-roof-drain', 'internal-overflow-drain', 'roof-hatch', 'other-penetration']),
+  geometry: z.discriminatedUnion('kind', [
+    z.object({
+      kind: z.literal('point'),
+      planPointFt: z.tuple([z.number().finite(), z.number().finite()]),
+    }).strict(),
+    z.object({
+      kind: z.literal('polygon'),
+      boundaryPlanFt: z.array(z.tuple([z.number().finite(), z.number().finite()])).min(3),
+    }).strict(),
+  ]),
+  sourceBindingRefs: z.array(z.string().trim().min(1)).min(1),
+  sourceCallout: z.string().trim().min(1),
+  sourcePdfPoint: z.tuple([z.number().finite(), z.number().finite()]).optional(),
+  dimensionsFt: z.tuple([z.number().positive(), z.number().positive()]).optional(),
+  clearance: z.object({
+    status: z.enum(['resolved', 'unresolved']),
+    boundaryPlanFt: z.array(z.tuple([z.number().finite(), z.number().finite()])).min(3).optional(),
+    basis: z.string().trim().min(1),
+  }).strict(),
+}).strict();
+
+const ReconstructionDraftSchema = z.object({
   artifactType: z.literal('halofire.roof-reconstruction-input.v1'),
-  sourceBinding: SourceBindingSchema,
-  evidenceReceiptSha256: z.string().regex(SHA256_RE),
+  sourceBindings: z.array(EvidenceSourceSchema).min(1),
   datums: z.array(DatumSchema).min(3),
   regions: z.array(RoofRegionSchema).min(1),
+  exclusions: z.array(RoofExclusionSchema),
+  features: z.array(RoofFeatureSchema),
+  coverage: z.object({
+    complete: z.boolean(),
+    resolvedScope: z.string().trim().min(1),
+    unresolvedRegions: z.array(z.string().trim().min(1)),
+  }).strict(),
+}).strict();
+
+const ReconstructionInputSchema = ReconstructionDraftSchema.extend({
+  evidenceReceiptSha256: z.string().regex(SHA256_RE),
 }).strict();
 
 function issue(code, message, refs = []) {
@@ -95,20 +148,35 @@ function elevationOnPlane(plane, point) {
   return plane.a * point[0] + plane.b * point[1] + plane.c;
 }
 
-export function reconstructRoofPlanes(input, opts = {}) {
+export async function sealRoofReconstructionInput(draft) {
+  const parsed = ReconstructionDraftSchema.parse(draft);
+  return { ...parsed, evidenceReceiptSha256: await sha256Hex(parsed) };
+}
+
+export async function reconstructRoofPlanes(input, opts = {}) {
   const parsed = ReconstructionInputSchema.safeParse(input);
   if (!parsed.success) {
     return { status: 'blocked', planes: [], issues: [issue('ROOF_INPUT_SCHEMA_INVALID', parsed.error.issues.map((entry) => entry.message).join('; '))], complianceReady: false };
   }
   const data = parsed.data;
-  const bindingKey = sourceBindingKey(data.sourceBinding);
+  const { evidenceReceiptSha256, ...draft } = data;
+  const actualReceipt = await sha256Hex(draft);
+  if (actualReceipt !== evidenceReceiptSha256) {
+    return { status: 'blocked', planes: [], issues: [issue('ROOF_EVIDENCE_RECEIPT_MISMATCH', 'Roof reconstruction content does not match its immutable SHA-256 receipt.', [evidenceReceiptSha256])], complianceReady: false };
+  }
   const toleranceFt = Number.isFinite(Number(opts.residualToleranceFt)) ? Math.abs(Number(opts.residualToleranceFt)) : 1 / 96;
   const issues = [];
+  const sourceIds = new Set();
+  for (const source of data.sourceBindings) {
+    if (sourceIds.has(source.id)) issues.push(issue('ROOF_SOURCE_ID_DUPLICATE', `Duplicate roof evidence source id: ${source.id}`, [source.id]));
+    sourceIds.add(source.id);
+  }
   const datumMap = new Map();
   for (const datum of data.datums) {
     if (datumMap.has(datum.id)) issues.push(issue('ROOF_DATUM_ID_DUPLICATE', `Duplicate roof datum id: ${datum.id}`, [datum.id]));
-    if (sourceBindingKey(datum.sourceBinding) !== bindingKey || datum.evidenceReceiptSha256 !== data.evidenceReceiptSha256) {
-      issues.push(issue('ROOF_DATUM_SOURCE_MISMATCH', `Roof datum ${datum.id} is not bound to the reconstruction evidence.`, [datum.id]));
+    const missingRefs = datum.sourceBindingRefs.filter((ref) => !sourceIds.has(ref));
+    if (missingRefs.length) {
+      issues.push(issue('ROOF_DATUM_SOURCE_MISMATCH', `Roof datum ${datum.id} references evidence outside the sealed source bundle.`, [datum.id, ...missingRefs]));
     }
     datumMap.set(datum.id, datum);
   }
@@ -155,15 +223,38 @@ export function reconstructRoofPlanes(input, opts = {}) {
       slopeRisePerFoot: round(Math.hypot(equation.a, equation.b)),
       slopeDegrees: round(Math.atan(Math.hypot(equation.a, equation.b)) * 180 / Math.PI),
       maxResidualFt: round(maxResidualFt),
-      sourceBinding: data.sourceBinding,
+      sourceBindingRefs: [...new Set(datums.flatMap((datum) => datum.sourceBindingRefs))].sort(),
       evidenceReceiptSha256: data.evidenceReceiptSha256,
     });
+  }
+  const featureIds = new Set();
+  for (const feature of data.features) {
+    if (featureIds.has(feature.id)) issues.push(issue('ROOF_FEATURE_ID_DUPLICATE', `Duplicate roof feature id: ${feature.id}`, [feature.id]));
+    featureIds.add(feature.id);
+    const missingRefs = feature.sourceBindingRefs.filter((ref) => !sourceIds.has(ref));
+    if (missingRefs.length) issues.push(issue('ROOF_FEATURE_SOURCE_MISMATCH', `Roof feature ${feature.id} references evidence outside the sealed source bundle.`, [feature.id, ...missingRefs]));
+    if (feature.geometry.kind === 'polygon' && Math.abs(polygonArea(feature.geometry.boundaryPlanFt)) <= EPS) {
+      issues.push(issue('ROOF_FEATURE_BOUNDARY_DEGENERATE', `Roof feature ${feature.id} has a zero-area boundary.`, [feature.id]));
+    }
+    if (feature.clearance.boundaryPlanFt && Math.abs(polygonArea(feature.clearance.boundaryPlanFt)) <= EPS) {
+      issues.push(issue('ROOF_FEATURE_CLEARANCE_DEGENERATE', `Roof feature ${feature.id} has a zero-area clearance boundary.`, [feature.id]));
+    }
+  }
+  const unresolvedFeatureClearances = data.features.filter((feature) => feature.clearance.status !== 'resolved');
+  if (data.coverage.complete && (data.coverage.unresolvedRegions.length || unresolvedFeatureClearances.length)) {
+    issues.push(issue('ROOF_COVERAGE_COMPLETENESS_CONTRADICTED', 'Roof coverage cannot be complete while regions or feature clearances remain unresolved.', [
+      ...data.coverage.unresolvedRegions,
+      ...unresolvedFeatureClearances.map((feature) => feature.id),
+    ]));
   }
   return {
     status: issues.length ? 'blocked' : 'passed',
     artifactType: 'halofire.roof-plane-model.v1',
-    sourceBinding: data.sourceBinding,
+    sourceBindings: data.sourceBindings,
     evidenceReceiptSha256: data.evidenceReceiptSha256,
+    coverage: data.coverage,
+    exclusions: data.exclusions,
+    features: data.features,
     planes: issues.length ? [] : planes,
     issues,
     verification: { sourceBound: issues.every((entry) => entry.code !== 'ROOF_DATUM_SOURCE_MISMATCH'), residualToleranceFt: toleranceFt },
@@ -175,6 +266,20 @@ export function reconstructRoofPlanes(input, opts = {}) {
 export function roofElevationAt(roofModel, planPointFt, opts = {}) {
   if (!roofModel || roofModel.status !== 'passed' || !Array.isArray(roofModel.planes)) {
     return { status: 'blocked', issues: [issue('ROOF_MODEL_NOT_VERIFIED', 'A passed source-bound roof model is required.')] };
+  }
+  const exclusion = (Array.isArray(roofModel.exclusions) ? roofModel.exclusions : [])
+    .find((entry) => pointInPolygon(planPointFt, entry.boundaryPlanFt));
+  if (exclusion) {
+    return { status: 'blocked', issues: [issue('ROOF_POINT_IN_EXCLUDED_OPENING', `Plan point falls inside excluded roof geometry: ${exclusion.reason}.`, [exclusion.id])] };
+  }
+  const featurePointToleranceFt = Number.isFinite(Number(opts.featurePointToleranceFt)) ? Math.abs(Number(opts.featurePointToleranceFt)) : 1 / 96;
+  const feature = (Array.isArray(roofModel.features) ? roofModel.features : []).find((entry) => {
+    if (entry.clearance && entry.clearance.boundaryPlanFt && pointInPolygon(planPointFt, entry.clearance.boundaryPlanFt)) return true;
+    if (entry.geometry.kind === 'polygon') return pointInPolygon(planPointFt, entry.geometry.boundaryPlanFt);
+    return Math.hypot(planPointFt[0] - entry.geometry.planPointFt[0], planPointFt[1] - entry.geometry.planPointFt[1]) <= featurePointToleranceFt;
+  });
+  if (feature) {
+    return { status: 'blocked', issues: [issue('ROOF_POINT_IN_FEATURE_OR_CLEARANCE', `Plan point conflicts with source-bound roof feature: ${feature.type}.`, [feature.id])] };
   }
   const toleranceFt = Number.isFinite(Number(opts.overlapToleranceFt)) ? Math.abs(Number(opts.overlapToleranceFt)) : 1 / 96;
   const candidates = roofModel.planes
@@ -212,6 +317,9 @@ export function projectCadModelToRoof(input) {
   const issues = [];
   if (!cadModel || !Array.isArray(cadModel.solids)) issues.push(issue('ROOF_PROJECTION_MODEL_INVALID', 'cadModel.solids is required.'));
   if (!roofModel || roofModel.status !== 'passed') issues.push(issue('ROOF_MODEL_NOT_VERIFIED', 'A passed roof model is required for projection.'));
+  if (roofModel && roofModel.coverage && roofModel.coverage.complete !== true) {
+    issues.push(issue('ROOF_MODEL_COVERAGE_INCOMPLETE', 'Full-model projection requires every roof region to be resolved and source-bound.', roofModel.coverage.unresolvedRegions || []));
+  }
   const headOffset = Number(offsets && offsets.headOffsetBelowRoofFt);
   const pipeOffset = Number(offsets && offsets.pipeOffsetBelowRoofFt);
   const hangerSpacing = Number(offsets && offsets.hangerSpacingFt);
