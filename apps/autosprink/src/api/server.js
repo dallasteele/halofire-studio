@@ -42,6 +42,7 @@ import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js
 import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
 import { renderDillonFloorByFloorViews, validateDillonFloorByFloorModel } from '../engine/dillon-floor-by-floor-model.js';
 import { renderDillonCompletedBidViews, validateDillonCompletedBidGeometry } from '../engine/dillon-completed-bid-geometry.js';
+import { buildDillonVerticalModel, renderDillonVerticalElevationView, validateDillonVerticalRegistration } from '../engine/dillon-vertical-registration.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -91,6 +92,7 @@ const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitte
 const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-dwg-source-geometry.json');
 const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
 const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
+const DILLON_VERTICAL_REGISTRATION_PATH = path.resolve(__dirname, '../data/dillon-vertical-registration.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -1717,6 +1719,23 @@ app.get('/api/projects/:name/completed-bid-geometry', authMiddleware, async (req
   } catch (error) {
     log.error('Failed to load Dillon completed-bid geometry', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'completed_bid_geometry_load_failed', complianceReady: false });
+  }
+});
+
+app.get('/api/projects/:name/vertical-registration', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'Dillon Residence') return res.status(404).json({ error: 'vertical_registration_not_found' });
+  try {
+    const floorModel = JSON.parse(fs.readFileSync(DILLON_FLOOR_MODEL_PATH, 'utf8'));
+    const bidGeometry = JSON.parse(fs.readFileSync(DILLON_COMPLETED_BID_GEOMETRY_PATH, 'utf8'));
+    const slopedCalibration = JSON.parse(fs.readFileSync(DILLON_SLOPED_CALIBRATION_PATH, 'utf8'));
+    const packet = JSON.parse(fs.readFileSync(DILLON_VERTICAL_REGISTRATION_PATH, 'utf8'));
+    const validation = await validateDillonVerticalRegistration(packet, { bidGeometry, floorModel, slopedCalibration });
+    if (validation.status !== 'passed') return res.status(422).json(validation);
+    const model3d = buildDillonVerticalModel(validation); const elevationView = renderDillonVerticalElevationView(model3d);
+    return res.json({ status: 'passed', artifactType: 'halofire.autobid-partial-vertical-registration.v1', projectName: req.params.name, receiptSha256: packet.receiptSha256, counts: validation.counts, sheets: packet.sheets, model3d, elevationView, complete: false, geometryGrounded: true, complianceReady: false, approvalReady: false, limitations: packet.limitations, claimStatus: packet.claimStatus });
+  } catch (error) {
+    log.error('Failed to load Dillon vertical registration', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'vertical_registration_load_failed', complianceReady: false });
   }
 });
 

@@ -707,6 +707,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('FP-2 is a separate 25-head upper-level schedule and cannot close FP-1');
     expect(html).toContain('/api/projects/Dillon%20Residence/completed-bid-geometry');
     expect(html).toContain('no cross-sheet substitution');
+    expect(html).toContain('/api/projects/Dillon%20Residence/vertical-registration');
+    expect(html).toContain('no default flat-roof height');
+    expect(html).toContain('verticalGeometry.model3d.heads.forEach');
+    expect(html).toContain('verticalGeometry.model3d.pipes.forEach');
     expect(html).toContain('protected-head node identity, compliance, and approval remain fail-closed');
   });
 });

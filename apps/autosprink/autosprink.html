@@ -1359,9 +1359,14 @@ async function hfShowSubmittedCalibrationViews() {
     if (!bidGeometryResponse.ok) throw new Error(`Dillon completed-bid geometry HTTP ${bidGeometryResponse.status}`);
     const bidGeometry = await bidGeometryResponse.json();
     if (bidGeometry.status !== 'passed' || bidGeometry.views?.status !== 'passed') throw new Error('Dillon completed-bid geometry validation failed');
+    const verticalResponse = await fetch('/api/projects/Dillon%20Residence/vertical-registration', { credentials: 'same-origin' });
+    if (!verticalResponse.ok) throw new Error(`Dillon vertical registration HTTP ${verticalResponse.status}`);
+    const verticalGeometry = await verticalResponse.json();
+    if (verticalGeometry.status !== 'passed' || verticalGeometry.model3d?.status !== 'passed') throw new Error('Dillon vertical registration validation failed');
     window.__hfRoofGeometry.dillonSlopedModel3d = dillonModel3d;
     window.__hfRoofGeometry.dillonFloorByFloorModel = floorModel;
     window.__hfRoofGeometry.dillonCompletedBidGeometry = bidGeometry;
+    window.__hfRoofGeometry.dillonVerticalGeometry = verticalGeometry;
     let viewer = document.getElementById('hfSubmittedCalibrationViewer');
     if (!viewer) {
       viewer = document.createElement('div');
@@ -1383,6 +1388,8 @@ async function hfShowSubmittedCalibrationViews() {
         <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px"><div><h3 style="margin:0;color:#ecfeff;font:650 13px var(--mono)">Dillon actual-drawing building model · top + side/elevation + 3D extrusion</h3><p style="margin:5px 0 0;color:#bae6fd;font:11px/1.45 var(--mono)">${floorModel.counts.wallSolids} exact DWG Wall-Hatch polygons across ${floorModel.counts.levels} levels and ${floorModel.counts.sourceEntities} source entities. Main-to-upper stack: 12.5 ft; project floors 1524.5 ft / 1537.0 ft. Toy garage: 1503.0 ft in its separate local horizontal frame. Receipt ${floorModel.receiptSha256.slice(0, 16)}...</p></div><span style="white-space:nowrap;color:#fbbf24;font:10px/1.35 var(--mono)">SOURCE-GROUNDED<br>NOT CODE APPROVAL</span></div>
         <div style="border:1px solid rgba(251,191,36,.38);background:rgba(69,26,3,.28);border-radius:10px;padding:9px;margin-bottom:10px;color:#fde68a;font:11px/1.45 var(--mono)">Completed-bid coordinate join: ${bidGeometry.counts.detectedHeads}/${bidGeometry.counts.declaredHeads} head vectors and ${bidGeometry.counts.pipeSegments} connected pipe vectors registered to the actual main/upper DWGs. FP-1: 51/52, one unresolved. FP-2: 25/25, schedule closed. Per-element Z remains unresolved; no cross-sheet substitution.</div>
         <div style="display:grid;grid-template-columns:repeat(2,minmax(340px,1fr));gap:10px;margin-bottom:10px">${bidGeometry.views.planViews.map((view) => `<div style="background:#fff;border-radius:10px;overflow:hidden">${view.svg}</div>`).join('')}</div>
+        <div style="border:1px solid rgba(52,211,153,.36);background:rgba(6,78,59,.22);border-radius:10px;padding:9px;margin-bottom:10px;color:#a7f3d0;font:11px/1.45 var(--mono)">Partial vertical join: ${verticalGeometry.counts.sourceAssignedHeads}/${verticalGeometry.counts.totalHeads} heads and ${verticalGeometry.counts.sourceAssignedPipeSegments}/${verticalGeometry.counts.totalPipeSegments} pipe vectors have source-bound Z from redundant RCP/upper ceiling annotations or the sealed 3:12 plane. The other ${verticalGeometry.counts.unresolvedHeads} heads and ${verticalGeometry.counts.unresolvedPipeSegments} pipes are omitted from 3D—no default flat-roof height.</div>
+        <div style="background:#07111f;border-radius:10px;overflow:hidden;margin-bottom:10px">${verticalGeometry.elevationView.svg}</div>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:10px">${floorModel.views.topViews.map((view) => `<div style="background:#fff;border-radius:10px;overflow:hidden">${view.svg}</div>`).join('')}</div>
         <div style="display:grid;grid-template-columns:minmax(300px,.9fr) minmax(420px,1.4fr);gap:10px;margin-top:10px"><div style="background:#fff;border-radius:10px;overflow:hidden">${floorModel.views.elevationSvg}</div><div id="hfDillonFloorModel3d" style="position:relative;background:#07111f;border-radius:10px;overflow:hidden;min-height:330px">${floorModel.views.isometricSvg}</div></div>
         <p style="margin:9px 2px 0;color:#cbd5e1;font:10.5px/1.45 var(--mono)">Fail-closed limits: no dedicated exterior-elevation sheet was present in the client archive, so the side view uses actual floor, ceiling, beam, plate, mass, and 3:12 framing annotations. The toy-garage horizontal site registration, complete bounded roof faces, coordinated penetrations, and feature-specific obstruction clearances remain unresolved.</p>
@@ -1411,15 +1418,21 @@ async function hfShowSubmittedCalibrationViews() {
             floorGroup.add(new THREE.Mesh(geometry, floorMaterials[levelIndex]));
           });
         });
+        const verticalHeadGeometry = new THREE.SphereGeometry(.38, 12, 8);
+        const verticalHeadMaterial = new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x052e16, roughness: .3 });
+        const verticalSlopeHeadMaterial = new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0x451a03, roughness: .3 });
+        verticalGeometry.model3d.heads.forEach((head) => { const mesh = new THREE.Mesh(verticalHeadGeometry, head.surfaceKind === 'sloped-ceiling' ? verticalSlopeHeadMaterial : verticalHeadMaterial); mesh.position.set(head.pointFt[0], head.pointFt[1], head.pointFt[2]); mesh.name = `source-bound-${head.id}`; floorGroup.add(mesh); });
+        const verticalPipeMaterial = new THREE.MeshStandardMaterial({ color: 0xd946ef, emissive: 0x4a044e, roughness: .32 });
+        verticalGeometry.model3d.pipes.forEach((pipe) => { const from = new THREE.Vector3(...pipe.fromFt); const to = new THREE.Vector3(...pipe.toFt); const delta = to.clone().sub(from); const geometry = new THREE.CylinderGeometry(.12, .12, delta.length(), 10); const mesh = new THREE.Mesh(geometry, verticalPipeMaterial); mesh.position.copy(from).add(to).multiplyScalar(.5); mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), delta.clone().normalize()); mesh.name = `source-bound-${pipe.id}`; floorGroup.add(mesh); });
         const floorBounds = new THREE.Box3().setFromObject(floorGroup); const floorCenter = floorBounds.getCenter(new THREE.Vector3()); const floorSize = floorBounds.getSize(new THREE.Vector3());
         const floorCamera = new THREE.PerspectiveCamera(38, Math.max(520, floorModel3dHost.clientWidth) / 330, .1, 2000); floorCamera.position.set(floorCenter.x + floorSize.x * .8, floorCenter.y + Math.max(75, floorSize.y * 3.2), floorCenter.z + floorSize.z * .9); floorCamera.lookAt(floorCenter);
         const floorControls = new OrbitControls(floorCamera, floorModelRenderer.domElement); floorControls.target.copy(floorCenter); floorControls.enableDamping = true;
         let floorAnimation = 0; const animateFloorModel = () => { floorControls.update(); floorModelRenderer.render(floorScene, floorCamera); floorAnimation = requestAnimationFrame(animateFloorModel); }; animateFloorModel();
-        floorModel3dHost.__disposeFloorModel = () => { cancelAnimationFrame(floorAnimation); floorControls.dispose(); floorGroup.traverse((item) => item.geometry?.dispose?.()); floorMaterials.forEach((material) => material.dispose()); floorModelRenderer.dispose(); };
+        floorModel3dHost.__disposeFloorModel = () => { cancelAnimationFrame(floorAnimation); floorControls.dispose(); floorGroup.traverse((item) => item.geometry?.dispose?.()); [...floorMaterials, verticalHeadMaterial, verticalSlopeHeadMaterial, verticalPipeMaterial].forEach((material) => material.dispose()); floorModelRenderer.dispose(); };
       } catch (error) { console.warn('Dillon interactive floor model fallback', error); }
     }
     viewer.querySelector('#hfSubmittedCalibrationClose').onclick = () => { floorModel3dHost?.__disposeFloorModel?.(); viewer.remove(); };
-    $('status').textContent = `completed-bid geometry loaded — ${bidGeometry.counts.detectedHeads}/${bidGeometry.counts.declaredHeads} head vectors and ${bidGeometry.counts.pipeSegments} pipe vectors registered to the actual DWGs. FP-1 remains one head short of its own schedule; FP-2 is independently complete. Per-element Z, code compliance, and approval remain fail-closed.`;
+    $('status').textContent = `completed-bid geometry loaded — ${bidGeometry.counts.detectedHeads}/${bidGeometry.counts.declaredHeads} plan heads; ${verticalGeometry.counts.sourceAssignedHeads} heads and ${verticalGeometry.counts.sourceAssignedPipeSegments} pipes have source-bound Z in 3D. FP-1 remains one head short; ${verticalGeometry.counts.unresolvedHeads} detected heads stay vertically unresolved. Code compliance and approval remain fail-closed.`;
     return calibration;
   } catch (error) {
     $('status').textContent = `submitted FP-8/DA-3 calibration blocked — ${error.message || error}`;

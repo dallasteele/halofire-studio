@@ -1,0 +1,39 @@
+{
+  "name": "dillon-partial-vertical-registration-20260712",
+  "owner": "codex",
+  "loop_type": "closed",
+  "goal": "Register real main-RCP and upper-ceiling annotations to the Dillon DWGs; assign per-element sprinkler Z only when redundant nearby annotations agree or the sealed 3:12 plane applies; render the supported heads and pipes in 3D; and leave every unsupported element visibly unresolved without a default story height.",
+  "sources_of_truth": [
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/main-plans/6 - MAIN LEVEL REFLECTED CEILING PLAN.pdf",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/main-plans/5 - UPPER LEVEL PLANS.pdf",
+    "apps/autosprink/src/data/dillon-completed-bid-geometry.json",
+    "apps/autosprink/src/data/dillon-floor-by-floor-model.json",
+    "apps/autosprink/src/data/submitted-sloped-ceiling-calibration.dillon.json"
+  ],
+  "exit_criteria": [
+    "Main RCP and cropped upper ceiling view annotations are registered to their actual DWG frames",
+    "Every assigned flat Z is bound to a source annotation within 3 ft or two nearest agreeing annotations within 6 ft",
+    "Every assigned sloped Z follows the sealed source 3:12 plane",
+    "Head and pipe model/site elevations follow the actual floor datums",
+    "Unresolved elements receive no Z and are omitted from the 3D sprinkler layer",
+    "Authenticated API and Studio expose assigned/unresolved counts, partial elevation view, and interactive 3D heads/pipes",
+    "Receipt, dependency, annotation, head datum, pipe datum, and count mutations fail closed",
+    "Focused tests, build, loop guard, rules, live login, API, browser, and VPS health pass"
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-partial-vertical-registration-20260712/contract.json",
+    "npx vitest run tests/dillon-vertical-registration.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/dillon-partial-vertical-registration-20260712/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/dillon-vertical-registration.json",
+    "data/agent-loops/dillon-partial-vertical-registration-20260712/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "brain_writeback_required": true,
+  "human_gate_required": false
+}

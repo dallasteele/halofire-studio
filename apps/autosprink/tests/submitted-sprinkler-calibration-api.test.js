@@ -78,6 +78,21 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.fdf')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/floor-by-floor-model')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/completed-bid-geometry')).status).toBe(401);
+    expect((await request('/api/projects/Dillon%20Residence/vertical-registration')).status).toBe(401);
+  });
+
+  it('serves only source-supported 3D sprinkler Z and omits unresolved elements', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/Dillon%20Residence/vertical-registration', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result.status).toBe('passed');
+    expect(result.counts).toEqual({ totalHeads: 76, sourceAssignedHeads: 35, unresolvedHeads: 41, totalPipeSegments: 67, sourceAssignedPipeSegments: 8, unresolvedPipeSegments: 59 });
+    expect(result.model3d.heads).toHaveLength(35);
+    expect(result.model3d.pipes).toHaveLength(8);
+    expect(result.elevationView.svg).toContain('unresolved elements are omitted');
+    expect(result.complete).toBe(false);
+    expect(result.complianceReady).toBe(false);
   });
 
   it('serves per-sheet completed bid heads and pipe vectors registered to the actual DWGs', async () => {

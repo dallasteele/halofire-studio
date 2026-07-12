@@ -1,0 +1,23 @@
+{
+  "status": "in_progress",
+  "iteration": 1,
+  "truth": [
+    "The main RCP contributes 54 single ceiling/soffit annotations and the cropped upper ceiling view contributes 22.",
+    "Only annotations within 3 ft, two agreeing nearest annotations within 6 ft, or the sealed 3:12 plane may assign an element Z.",
+    "35 of 76 detected heads and 8 of 67 pipe vectors have source-bound Z; 41 heads and 59 pipes remain unresolved and omitted from 3D.",
+    "Site project elevations use actual main/upper finish floors 1524.5 ft and 1537 ft rather than the RCP local 100 ft reference."
+  ],
+  "remaining": [
+    "Verify the partial vertical layer in a real authenticated browser",
+    "Commit, push, deploy, and verify the live employee surface",
+    "Derive room/ceiling zone boundaries to safely resolve more elements",
+    "Resolve complete roof faces and the missing FP-1 head from source evidence"
+  ],
+  "verification": {
+    "packetReceiptSha256": "800fcceebcee7276d73ae4aa92d817d7658ec56e8e7eb72c3a7b7e8902c5af5e",
+    "focusedTests": "57 passed",
+    "productionBuild": "passed",
+    "claim": "partial source-bound Z only; incomplete, compliance false, approval false"
+  },
+  "globalGoalComplete": false
+}
