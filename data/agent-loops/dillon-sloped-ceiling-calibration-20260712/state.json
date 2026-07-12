@@ -1,6 +1,6 @@
 {
-  "status": "in_progress",
-  "iteration": 1,
+  "status": "complete",
+  "iteration": 2,
   "truth": [
     "The completed FP-1 schedule reports 52 heads: 40 round pendent and 12 alternate pendent.",
     "The deterministic vector classifier currently seals 50 candidates, including all 40 round pendent symbols; two alternate symbols remain unresolved.",
@@ -12,5 +12,18 @@
     "Classify the two remaining alternate pendent symbols",
     "Run generated-layout parity against the completed answer key",
     "Keep approval and code-compliance claims fail-closed"
-  ]
+  ],
+  "verification": {
+    "featureCommit": "95c29f82",
+    "evidenceReceiptSha256": "e746c0ec89ab8c61c5c717b85feae5bc9467f66de2f0127921379ff386efd313",
+    "focusedTests": "28 passed across sloped calibration, authenticated API, and Studio static-origin tests",
+    "adversarialGates": "receipt, transform-control, slope-point, and hydraulic-elevation mutations rejected",
+    "build": "Vite production build passed locally and on VPS",
+    "rules": "agent loop contract and AGENTIC_RULES verifier passed",
+    "deployment": "VPS /opt/openclaw/halofire-studio HEAD 95c29f8; halofire.service active",
+    "liveApi": "authenticated Dillon route passed with 52 scheduled, 50 vector candidates, 4 positive 3:12 annotation-proximity matches, and complianceReady false",
+    "public": "health 200; login page 200; invalid login 401; Studio 200 with Dillon viewer; sealed artifact 200",
+    "browser": "live Secure Portal rendered with unique username/password/sign-in controls; invalid credentials surfaced; zero console errors"
+  },
+  "globalGoalComplete": false
 }
