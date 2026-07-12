@@ -607,6 +607,9 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
 
   const root = new THREE.Group();
   root.name = 'building-from-plan';
+  const sourceBoundGeometryVerified = levelPlans.length > 0
+    && levelPlans.every((entry) => entry?.plan?.sourceBoundGeometryStatus === 'passed'
+    && entry?.plan?.sourceBinding?.sheetId && entry?.plan?.sourceBoundFootprintEvidenceReceiptSha256);
   const acceptedSystemModel = levelPlans.every((entry) => (
     entry && entry.plan && entry.plan.geometryGrounded === true
     && entry.plan.sprinklerEvidence && entry.plan.sprinklerEvidence.systemVerified === true
@@ -616,6 +619,8 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     kind: 'building-from-plan',
     needsVerification: !acceptedSystemModel,
     systemVerified: acceptedSystemModel,
+    sourceBoundGeometryVerified,
+    geometryClaimStatus: sourceBoundGeometryVerified ? 'per-level-building-geometry-verified-not-sprinkler-compliance' : 'building-geometry-needs-verification',
   };
 
   const wallMat = THREE.MeshStandardMaterial
@@ -637,6 +642,10 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       scaleFtPerUnit: plan.scaleFtPerUnit,
       scaleText: plan.scaleText,
       provenance: plan.provenance,
+      sourceBinding: plan.sourceBinding || lp.sourceBinding || null,
+      sourceBoundGeometryStatus: plan.sourceBoundGeometryStatus || 'unverified',
+      sourceBoundFootprintEvidenceReceiptSha256: plan.sourceBoundFootprintEvidenceReceiptSha256 || null,
+      footprintAreaSqft: Number.isFinite(Number(plan.footprintAreaSqft)) ? Number(plan.footprintAreaSqft) : null,
       needsVerification: !acceptedSystemModel,
       systemVerified: acceptedSystemModel,
     };
@@ -1002,6 +1011,18 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     levelCount: levels.length,
     bounds: { widthFt: Math.round(bounds.widthFt * 100) / 100, depthFt: Math.round(bounds.depthFt * 100) / 100 },
     perLevel: levels.map((l) => ({ level: l.level, elevationFt: l.elevationFt, ...l.counts, recallPct: l.recallPct })),
+    sourceBoundGeometry: {
+      verified: sourceBoundGeometryVerified,
+      levelCount: levels.length,
+      levels: levels.map((entry) => ({
+        level: entry.level, elevationFt: entry.elevationFt,
+        sheetId: entry.group.userData.sourceBinding?.sheetId || null,
+        renderedPageSha256: entry.group.userData.sourceBinding?.renderedPageSha256 || null,
+        footprintAreaSqft: entry.group.userData.footprintAreaSqft,
+        status: entry.group.userData.sourceBoundGeometryStatus,
+      })),
+      claimStatus: 'per-level-building-geometry-only-not-sprinkler-code-compliance',
+    },
     extractionCompleteness: recallLevel ? {
       wallRecallPct: recallLevel.recallPct,
       recallMeasure: recallLevel.recallMeasure,

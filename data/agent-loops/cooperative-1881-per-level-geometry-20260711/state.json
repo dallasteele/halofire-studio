@@ -1,0 +1,44 @@
+{
+  "iteration": 4,
+  "phase": "verify",
+  "status": "in_progress",
+  "findings": [
+    "The former Level 2 through Level 5 fragment polygons and Level 6 through Level 8 fallback rectangles were replaced by eight distinct source-bound A-101 through A-108 polygons.",
+    "Each level is bound to current architectural PDF SHA256 179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53 and its own immutable rendered-page SHA256.",
+    "Current A-201 physical page 61 supplies elevations 0, 10, 20, 31, 41, 51, 61, and 71 feet under receipt 2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df.",
+    "The current footprint receipt b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d passes all eight levels; total derived area is 176371.03 square feet, 3.35 percent above the completed-bid 170654 square foot control.",
+    "Level 3 derives to 22438.28 square feet, 0.35 percent above the independent 22359.12 square foot A-103 printed control without fitting selection to that target.",
+    "Level 8 is registered to submitted FP-8-R2 physical page 12 render SHA256 2f20907cec537c92bff749f476d7c14712941421b367c2f6f4b428ccae2e6d20 as a calibration answer key only, not approval.",
+    "Studio now separates verified building footprint/elevation geometry from unresolved interior extraction and sprinkler code compliance."
+  ],
+  "verification": {
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "focusedTests": "176 passed across 9 focused files",
+    "productionBuild": "passed",
+    "formalProof": {
+      "status": "passed on GX10 Lean runner",
+      "fileSha256": "3efe7d887b81fb42175f62433c7cd42f32833f5328e4f40546dd5071dfb6ff69",
+      "theorems": [
+        "every_level_has_a_passed_geometry_receipt",
+        "distinct_levels_do_not_share_a_sheet",
+        "upper_levels_use_true_elevation_datums",
+        "no_single_floor_x8_substitution"
+      ]
+    },
+    "browser": {
+      "status": "passed locally",
+      "login": "configured admin login reached authenticated workbench",
+      "studio": "Cooperative 1881 selected and Level 8 rendered over current A-108 baked underlay",
+      "level8": "A-108, 22356 square feet, elevation 71 feet, zero unverified sprinkler heads or pipe",
+      "claimBoundary": "source-bound building geometry verified; sprinkler layout, compliance, and approval fail-closed"
+    },
+    "fullRegression": {
+      "status": "slice-passed-with-environmental-fixtures-explicit",
+      "wholeSuite": "1560 passed, 10 skipped; seven API assertions and evidence setup initially failed only because the local browser server occupied the legacy fixed port 3198; all 15 affected tests passed in isolated reruns after stopping that server",
+      "isolatedReruns": "cad-dxf 4 passed; dxf-import 3 passed; evidence-api 8 passed",
+      "remainingEnvironmentalSuites": "autobid FP/spatial browser smokes require the absent external _tmp_autobid database/artifact directories and are not acceptance reviewers or geometry gates"
+    },
+    "liveDeployment": "pending"
+  }
+}

@@ -3033,7 +3033,7 @@ function appendPlanW2LayerToggles() {
   const host = $('layers');
   const sep = document.createElement('div');
   sep.style.cssText = 'margin:6px 0 2px;font-size:10px;color:var(--muted);font-family:var(--mono)';
-  sep.textContent = '— plan extraction (needs-verification) —';
+  sep.textContent = '— interior extraction (needs-verification; footprint/elevation separate) —';
   host.appendChild(sep);
   for (const it of items) {
     const row = document.createElement('div'); row.className = 'layer';
@@ -3272,8 +3272,9 @@ window.__levelPanelToggle = () => {
 // A-101..A-108 sheet stays as an aligned underlay UNDER the geometry, registered at the
 // SAME drawing-derived scale + shared origin (computePlanUnderlayTransform) — both move
 // together when the level switcher changes level. Accepted package geometry and heads
-// are system-verified; the static extraction fallback remains needs-verification.
-const PLAN_BUILD_ARCH = '/plans/cooperative-1881/1881-architecturals.pdf'; // same PLAN_ROOT as plan-manifest.js (Express/vite root = the autosprink app dir)
+// are system-verified. The current static packet can independently verify the
+// building footprint/elevation geometry without implying sprinkler acceptance.
+const PLAN_BUILD_ARCH = '/plans/cooperative-1881/1881-architecturals.pdf'; // optional live-PDF fallback; production prefers current hash-bound baked sheets
 const W2_HEATMAP_URL = '/public/halofire-W2b/recall-definitive.png'; // HF-W2b: DEFINITIVE version-consistent wall-recall heatmap (covered green / missed red = sheet furniture, not walls), served static
 const PLAN_BUILD_LEVEL_PAGES = { 1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 23, 7: 26, 8: 29 };
 let planBuildState = null; // { project, data, levelPlans, api, center, activeLevel, loadedSheets:Set, failures }
@@ -3422,12 +3423,27 @@ async function ensurePlanBuildSheet(levelN) {
     const baked = manifest && Array.isArray(manifest.sheets)
       ? manifest.sheets.find((x) => Number(x.level) === Number(levelN) && Number(x.page) === Number(page))
       : null;
-    if (baked && baked.url && Number(baked.widthPt) > 0 && Number(baked.heightPt) > 0) {
+    const binding = lvlSrc?.plan?.sourceBinding || null;
+    const currentStaticPacket = st.data?.perLevelFootprintsVerified === true;
+    const bakedBindingMatches = !currentStaticPacket || (baked
+      && manifest.sourcePdfSha256 === st.data.sourcePdfSha256
+      && manifest.footprintEvidenceReceiptSha256 === st.data.footprintEvidenceReceiptSha256
+      && baked.sourcePdfSha256 === binding?.sourcePdfSha256
+      && baked.sourceRenderedPageSha256 === binding?.renderedPageSha256
+      && baked.footprintEvidenceReceiptSha256 === lvlSrc?.plan?.sourceBoundFootprintEvidenceReceiptSha256);
+    if (baked && bakedBindingMatches && baked.url && Number(baked.widthPt) > 0 && Number(baked.heightPt) > 0) {
       $('status').textContent = `loading baked A-10${levelN} underlay…`;
       const img = await loadUnderlayImage(baked.url);
       registerPlanBuildUnderlay(entry, levelN, page, img, Number(baked.widthPt), Number(baked.heightPt), s, st, 'baked-png');
-      window.__underlayMode = { mode: 'baked-png', project: st.project, level: Number(levelN), url: baked.url, needsVerification: true };
-      $('status').textContent = `A-10${levelN} sheet registered under extracted geometry (baked underlay, true scale ${scaleText}; needs-verification)`;
+      const geometryVerified = st.data?.source === 'accepted-vector-overlay' || (st.data?.perLevelFootprintsVerified === true
+        && st.api.summary?.sourceBoundGeometry?.verified === true && st.api.summary?.levelCount === 8);
+      window.__underlayMode = {
+        mode: 'baked-png', project: st.project, level: Number(levelN), url: baked.url,
+        needsVerification: true, systemVerified: false, buildingGeometryVerified: geometryVerified,
+      };
+      $('status').textContent = geometryVerified
+        ? `A-10${levelN} current source-bound sheet registered under verified building geometry (true scale ${scaleText}; sprinkler acceptance separate)`
+        : `A-10${levelN} sheet registered under extracted geometry (baked underlay, true scale ${scaleText}; needs-verification)`;
       return;
     }
   } catch (e) {
@@ -3443,8 +3459,15 @@ async function ensurePlanBuildSheet(levelN) {
   try {
     const rendered = await renderSheetToCanvas(lib, { url: PLAN_BUILD_ARCH, page, targetPx: LEVEL_TARGET_PX });
     registerPlanBuildUnderlay(entry, levelN, page, rendered.canvas, rendered.widthPt, rendered.heightPt, s, st, 'live-pdf');
-    window.__underlayMode = { mode: 'real-pdf', project: st.project, level: Number(levelN), needsVerification: true };
-    $('status').textContent = `REAL A-10${levelN} sheet registered under extracted geometry (true scale ${scaleText}; needs-verification)`;
+    const geometryVerified = st.data?.source === 'accepted-vector-overlay' || (st.data?.perLevelFootprintsVerified === true
+      && st.api.summary?.sourceBoundGeometry?.verified === true && st.api.summary?.levelCount === 8);
+    window.__underlayMode = {
+      mode: 'real-pdf', project: st.project, level: Number(levelN),
+      needsVerification: true, systemVerified: false, buildingGeometryVerified: geometryVerified,
+    };
+    $('status').textContent = geometryVerified
+      ? `REAL A-10${levelN} current source-bound sheet registered under verified building geometry (true scale ${scaleText}; sprinkler acceptance separate)`
+      : `REAL A-10${levelN} sheet registered under extracted geometry (true scale ${scaleText}; needs-verification)`;
   } catch (e) {
     st.loadedSheets.delete(key);
     st.failures.push({ level: levelN, page, error: String(e.message || e) });
@@ -3473,9 +3496,12 @@ function buildPlanBuildPanel() {
     .map((v) => `<button data-lvl="${v}" class="${String(st.activeLevel) === String(v) ? 'on' : ''}">${v === 'all' ? 'All' : 'L' + v}</button>`).join('');
   const active = st.api.levels.find((l) => l.level === Number(st.activeLevel));
   const c = active ? active.counts : null;
+  const sourceBound = st.data?.perLevelFootprintsVerified === true
+    && st.api.summary?.sourceBoundGeometry?.verified === true && st.api.summary?.levelCount === 8;
+  const activeEvidence = active ? st.api.summary?.sourceBoundGeometry?.levels?.find((l) => l.level === active.level) : null;
   const cntLine = c
-    ? `walls ${(c.wallRuns || c.walls).toLocaleString()} · rooms ${c.rooms} · heads ${(c.sprinklerHeads || 0).toLocaleString()} · pipe ${(c.sprinklerPipeSegments || 0).toLocaleString()} · stairs ${c.stairs}`
-    : (st.data && st.data.source === 'accepted-vector-overlay' ? '8 system-verified levels' : 'extracted geometry');
+    ? `${activeEvidence?.sheetId || 'sheet unknown'} · ${Number(activeEvidence?.footprintAreaSqft || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} sq ft · elev ${Number(active?.elevationFt || 0).toFixed(2)} ft<br>walls ${(c.wallRuns || c.walls).toLocaleString()} · rooms ${c.rooms} · heads ${(c.sprinklerHeads || 0).toLocaleString()} · pipe ${(c.sprinklerPipeSegments || 0).toLocaleString()} · stairs ${c.stairs}`
+    : (st.data && st.data.source === 'accepted-vector-overlay' ? '8 system-verified levels' : (sourceBound ? '8 source-bound building levels' : 'extracted geometry'));
   // HF-W2: surface extraction completeness — wall recall %, door/fixture counts, + a heatmap link.
   const ext = st.api.summary && st.api.summary.extractionCompleteness;
   let w2Block = '';
@@ -3518,7 +3544,7 @@ function buildPlanBuildPanel() {
       : '';
     w2Block = `
       <div class="disc-row" style="font-family:var(--mono);font-size:10px;margin-top:6px;border-top:1px solid var(--line,#283042);padding-top:6px">
-        <div><b style="color:var(--text)">plan extraction</b> — needs-verification</div>
+        <div><b style="color:var(--text)">interior wall/room extraction</b> — needs-verification (building footprint/elevation gate is separate)</div>
         ${runLine ? `<div>${runLine}</div>` : ''}
         ${inEnv ? `<div>wall-ink coverage (diagnostic): <b style="color:${ext.inEnvelopeRecallPct >= 90 ? '#4ade80' : '#fbbf24'}">${inEnv}</b> in-envelope</div>` : ''}
         <div>whole-sheet wall-ink coverage (diagnostic): <b style="color:#fbbf24">${recall}</b> floor (denominator incl. border/grid/dim ink) (L${ext.level})</div>
@@ -3542,7 +3568,9 @@ function buildPlanBuildPanel() {
     ? (pipeAccepted
       ? '<div class="nv-flag" style="color:#4ade80">SYSTEM-VERIFIED — accepted vector walls/rooms, polygon-clipped heads, and the connected wall-aware pipe graph are physical-page bound; independent and adversarial route mutations passed.</div>'
       : '<div class="nv-flag" style="color:#fbbf24">GEOMETRY VERIFIED — accepted walls/rooms/heads are bound; pipe is hidden because its current route digest has no matching internal-loop receipt.</div>')
-    : '<div class="nv-flag">⚠ NEEDS-VERIFICATION — geometry extracted from the vector PDF; true scale derived from each sheet. NOT AHJ/PE/manufacturer-exact, NOT AutoSprink-parity.</div>';
+    : (sourceBound
+      ? '<div class="nv-flag" style="color:#4ade80">SOURCE-BOUND BUILDING GEOMETRY VERIFIED — eight distinct A-101 through A-108 footprints and A-201 elevations passed immutable source, scale, area, simple-polygon, and adversarial gates. Sprinkler layout, code compliance, and approval remain separate and fail-closed.</div>'
+      : '<div class="nv-flag">⚠ NEEDS-VERIFICATION — geometry extracted from the vector PDF; true scale derived from each sheet. NOT AHJ/PE/manufacturer-exact, NOT AutoSprink-parity.</div>');
   lp.innerHTML = `
     <h4>Levels — built from plan</h4>
     <div class="lvl-row">${lvlBtns}</div>
@@ -3611,10 +3639,16 @@ async function renderPlanComprehensionBuild(name) {
     source: data.source || 'static-extracted',
     sourceDocumentId: data.sourceDocumentId || null,
     acceptedModel3d: data.source === 'accepted-vector-overlay',
+    buildingGeometryVerified: data.source === 'accepted-vector-overlay' || (data.perLevelFootprintsVerified === true
+      && api.summary?.sourceBoundGeometry?.verified === true && api.summary?.levelCount === 8),
+    buildingGeometryClaimStatus: api.summary?.sourceBoundGeometry?.claimStatus || 'building-geometry-needs-verification',
     pendingReason: data.source === 'accepted-vector-overlay' ? null : (acceptedModel3dState && acceptedModel3dState.reason) || null,
     note: data.source === 'accepted-vector-overlay'
       ? 'system-verified vector geometry, accepted sprinkler heads, and connected wall-aware pipe; source sheet registered at true scale'
-      : 'building geometry extracted from vector PDF; sheet registered at sheet-derived true scale — needs-verification',
+      : (data.perLevelFootprintsVerified === true
+        && api.summary?.sourceBoundGeometry?.verified === true && api.summary?.levelCount === 8
+        ? 'per-level building footprint and elevation geometry is source-bound to current A-101 through A-108 and A-201; sprinkler/code acceptance remains fail-closed'
+        : 'building geometry extracted from vector PDF; sheet registered at sheet-derived true scale — needs-verification'),
     failures: planBuildState.failures,
     needsVerification: data.source !== 'accepted-vector-overlay',
     systemVerified: data.source === 'accepted-vector-overlay',

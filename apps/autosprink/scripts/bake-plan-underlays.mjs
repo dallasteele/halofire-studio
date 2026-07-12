@@ -20,13 +20,16 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { renderSheetToCanvas } from '../src/engine/pdf-underlay.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const APP_DIR = path.resolve(__dirname, '..');
-const ARCH_PDF = path.join(APP_DIR, 'plans', 'cooperative-1881', '1881-architecturals.pdf');
+const ARCH_PDF = path.resolve(process.env.COOPERATIVE_1881_ARCH_PDF
+  || path.join(APP_DIR, 'plans', 'cooperative-1881', '1881-architecturals.pdf'));
+const PLAN_LEVELS = path.join(APP_DIR, 'src', 'data', 'plan-levels.cooperative-1881.json');
 const OUT_DIR = path.join(APP_DIR, 'public', 'plan-underlays', 'cooperative-1881');
 // Same mapping the app uses (autosprink.html PLAN_BUILD_LEVEL_PAGES).
 const LEVEL_PAGES = { 1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 23, 7: 26, 8: 29 };
@@ -41,6 +44,11 @@ if (!fs.existsSync(ARCH_PDF)) {
   process.exit(2);
 }
 fs.mkdirSync(OUT_DIR, { recursive: true });
+const sourcePdfSha256 = createHash('sha256').update(fs.readFileSync(ARCH_PDF)).digest('hex');
+const planLevels = JSON.parse(fs.readFileSync(PLAN_LEVELS, 'utf8'));
+if (planLevels.sourcePdfSha256 !== sourcePdfSha256 || planLevels.perLevelFootprintsVerified !== true) {
+  throw new Error('underlay source does not match the current verified per-level geometry packet');
+}
 
 const sheets = [];
 for (const lvl of levels) {
@@ -57,6 +65,10 @@ for (const lvl of levels) {
   fs.writeFileSync(outPng, buf);
   const bytes = buf.length;
   const ms = Date.now() - t0;
+  const sourceLevel = planLevels.levels.find((entry) => Number(entry.level) === lvl);
+  if (sourceLevel?.plan?.sourceBinding?.sheetId !== sheet || sourceLevel?.plan?.sourceBinding?.physicalPageNumber !== page) {
+    throw new Error(`L${lvl} source binding mismatch`);
+  }
   sheets.push({
     level: lvl,
     sheet,
@@ -68,6 +80,10 @@ for (const lvl of levels) {
     widthPx: rendered.widthPx,
     heightPx: rendered.heightPx,
     bytes,
+    pngSha256: createHash('sha256').update(buf).digest('hex'),
+    sourcePdfSha256,
+    sourceRenderedPageSha256: sourceLevel.plan.sourceBinding.renderedPageSha256,
+    footprintEvidenceReceiptSha256: sourceLevel.plan.sourceBoundFootprintEvidenceReceiptSha256,
   });
   console.log(`OK  L${lvl} ${sheet} p${page} -> ${name} (${rendered.widthPx}x${rendered.heightPx}px, ${(bytes / 1e6).toFixed(2)} MB, ${ms}ms, page ${rendered.widthPt.toFixed(1)}x${rendered.heightPt.toFixed(1)}pt)`);
 }
@@ -84,10 +100,12 @@ for (const s of sheets) byKey.set(`${s.level}`, s);
 const merged = [...byKey.values()].sort((a, b) => a.level - b.level);
 fs.writeFileSync(manifestPath, JSON.stringify({
   project: 'cooperative-1881',
-  source: 'plans/cooperative-1881/1881-architecturals.pdf',
+  source: path.basename(ARCH_PDF),
+  sourcePdfSha256,
+  footprintEvidenceReceiptSha256: planLevels.footprintEvidenceReceiptSha256,
   targetPx: TARGET_PX,
   generatedAt: new Date().toISOString(),
-  note: 'Pre-baked registered underlays. Register with computePlanUnderlayTransform using each sheet widthPt/heightPt + the level scaleFtPerUnit from plan-levels.cooperative-1881.json. needs-verification.',
+  note: 'Current hash-bound baked underlays. Building footprint/elevation geometry is source-bound; sprinkler layout and code acceptance remain separate and fail-closed.',
   sheets: merged,
 }, null, 2));
 console.log(`\nmanifest -> ${manifestPath} (${merged.length} sheets)`);

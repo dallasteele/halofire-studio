@@ -1,0 +1,1684 @@
+{
+  "artifactType": "halofire.source-bound-level-footprints.v1",
+  "projectName": "The Cooperative 1881 - Salt Lake City UT",
+  "units": "ft",
+  "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+  "scaleFtPerPoint": 0.14814814814814814,
+  "scaleBasis": "Each A-101 through A-108 sheet prints SCALE: 3/32 inch = 1 foot.",
+  "elevationEvidenceReceiptSha256": "2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df",
+  "levels": [
+    {
+      "level": 1,
+      "sheetId": "A-101",
+      "sourceBinding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 8,
+        "pageIndex": 7,
+        "renderedPageSha256": "6cdde061de3593155b47062efbfdb4e34d628a4891ad3f05ef00378c53fa93a5",
+        "sheetId": "A-101",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 0,
+      "elevationEvidenceReceiptSha256": "2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          -13.562905,
+          46.08429
+        ],
+        [
+          159.437095,
+          46.08429
+        ],
+        [
+          159.437095,
+          46.58429
+        ],
+        [
+          172.937095,
+          46.58429
+        ],
+        [
+          172.937095,
+          46.33429
+        ],
+        [
+          228.187095,
+          46.33429
+        ],
+        [
+          228.187095,
+          46.08429
+        ],
+        [
+          275.937095,
+          46.08429
+        ],
+        [
+          275.937095,
+          46.33429
+        ],
+        [
+          284.187095,
+          46.33429
+        ],
+        [
+          284.187095,
+          46.58429
+        ],
+        [
+          292.187095,
+          46.58429
+        ],
+        [
+          292.187095,
+          46.83429
+        ],
+        [
+          300.187095,
+          46.83429
+        ],
+        [
+          300.187095,
+          47.08429
+        ],
+        [
+          308.437095,
+          47.08429
+        ],
+        [
+          308.437095,
+          47.33429
+        ],
+        [
+          316.437095,
+          47.33429
+        ],
+        [
+          316.437095,
+          47.58429
+        ],
+        [
+          324.687095,
+          47.58429
+        ],
+        [
+          324.687095,
+          47.83429
+        ],
+        [
+          328.687095,
+          47.83429
+        ],
+        [
+          328.687095,
+          48.08429
+        ],
+        [
+          328.937095,
+          48.08429
+        ],
+        [
+          328.937095,
+          48.33429
+        ],
+        [
+          329.187095,
+          48.33429
+        ],
+        [
+          329.187095,
+          48.58429
+        ],
+        [
+          329.437095,
+          48.58429
+        ],
+        [
+          329.437095,
+          48.83429
+        ],
+        [
+          329.687095,
+          48.83429
+        ],
+        [
+          329.687095,
+          49.08429
+        ],
+        [
+          329.937095,
+          49.08429
+        ],
+        [
+          329.937095,
+          49.33429
+        ],
+        [
+          330.187095,
+          49.33429
+        ],
+        [
+          330.187095,
+          49.58429
+        ],
+        [
+          330.437095,
+          49.58429
+        ],
+        [
+          330.437095,
+          49.83429
+        ],
+        [
+          330.687095,
+          49.83429
+        ],
+        [
+          330.687095,
+          50.08429
+        ],
+        [
+          330.937095,
+          50.08429
+        ],
+        [
+          330.937095,
+          107.58429
+        ],
+        [
+          330.687095,
+          107.58429
+        ],
+        [
+          330.687095,
+          107.83429
+        ],
+        [
+          330.437095,
+          107.83429
+        ],
+        [
+          330.437095,
+          108.08429
+        ],
+        [
+          330.187095,
+          108.08429
+        ],
+        [
+          330.187095,
+          108.33429
+        ],
+        [
+          329.937095,
+          108.33429
+        ],
+        [
+          329.937095,
+          108.58429
+        ],
+        [
+          329.687095,
+          108.58429
+        ],
+        [
+          329.687095,
+          108.83429
+        ],
+        [
+          329.437095,
+          108.83429
+        ],
+        [
+          329.437095,
+          109.08429
+        ],
+        [
+          329.187095,
+          109.08429
+        ],
+        [
+          329.187095,
+          109.33429
+        ],
+        [
+          328.937095,
+          109.33429
+        ],
+        [
+          328.937095,
+          109.58429
+        ],
+        [
+          328.687095,
+          109.58429
+        ],
+        [
+          328.687095,
+          109.83429
+        ],
+        [
+          324.437095,
+          109.83429
+        ],
+        [
+          324.437095,
+          110.08429
+        ],
+        [
+          316.437095,
+          110.08429
+        ],
+        [
+          316.437095,
+          110.33429
+        ],
+        [
+          308.437095,
+          110.33429
+        ],
+        [
+          308.437095,
+          110.58429
+        ],
+        [
+          300.437095,
+          110.58429
+        ],
+        [
+          300.437095,
+          110.83429
+        ],
+        [
+          261.687095,
+          110.83429
+        ],
+        [
+          261.687095,
+          110.58429
+        ],
+        [
+          212.437095,
+          110.58429
+        ],
+        [
+          212.437095,
+          110.33429
+        ],
+        [
+          162.937095,
+          110.33429
+        ],
+        [
+          162.937095,
+          110.08429
+        ],
+        [
+          113.687095,
+          110.08429
+        ],
+        [
+          113.687095,
+          109.83429
+        ],
+        [
+          86.687095,
+          109.83429
+        ],
+        [
+          86.687095,
+          109.58429
+        ],
+        [
+          82.937095,
+          109.58429
+        ],
+        [
+          82.937095,
+          109.33429
+        ],
+        [
+          79.187095,
+          109.33429
+        ],
+        [
+          79.187095,
+          109.08429
+        ],
+        [
+          75.437095,
+          109.08429
+        ],
+        [
+          75.437095,
+          108.83429
+        ],
+        [
+          67.687095,
+          108.83429
+        ],
+        [
+          67.687095,
+          109.08429
+        ],
+        [
+          38.187095,
+          109.08429
+        ],
+        [
+          38.187095,
+          108.83429
+        ],
+        [
+          26.437095,
+          108.83429
+        ],
+        [
+          26.437095,
+          108.58429
+        ],
+        [
+          14.687095,
+          108.58429
+        ],
+        [
+          14.687095,
+          108.33429
+        ],
+        [
+          2.937095,
+          108.33429
+        ],
+        [
+          2.937095,
+          108.08429
+        ],
+        [
+          -3.812905,
+          108.08429
+        ],
+        [
+          -3.812905,
+          107.83429
+        ],
+        [
+          -5.812905,
+          107.83429
+        ],
+        [
+          -5.812905,
+          107.58429
+        ],
+        [
+          -7.812905,
+          107.58429
+        ],
+        [
+          -7.812905,
+          107.33429
+        ],
+        [
+          -9.562905,
+          107.33429
+        ],
+        [
+          -9.562905,
+          107.08429
+        ],
+        [
+          -10.562905,
+          107.08429
+        ],
+        [
+          -10.562905,
+          106.58429
+        ],
+        [
+          -10.812905,
+          106.58429
+        ],
+        [
+          -10.812905,
+          104.83429
+        ],
+        [
+          -11.062905,
+          104.83429
+        ],
+        [
+          -11.062905,
+          103.08429
+        ],
+        [
+          -11.312905,
+          103.08429
+        ],
+        [
+          -11.312905,
+          101.58429
+        ],
+        [
+          -11.562905,
+          101.58429
+        ],
+        [
+          -11.562905,
+          99.83429
+        ],
+        [
+          -11.812905,
+          99.83429
+        ],
+        [
+          -11.812905,
+          98.08429
+        ],
+        [
+          -12.062905,
+          98.08429
+        ],
+        [
+          -12.062905,
+          96.33429
+        ],
+        [
+          -12.312905,
+          96.33429
+        ],
+        [
+          -12.312905,
+          94.83429
+        ],
+        [
+          -12.562905,
+          94.83429
+        ],
+        [
+          -12.562905,
+          93.08429
+        ],
+        [
+          -12.812905,
+          93.08429
+        ],
+        [
+          -12.812905,
+          91.33429
+        ],
+        [
+          -13.062905,
+          91.33429
+        ],
+        [
+          -13.062905,
+          89.58429
+        ],
+        [
+          -13.312905,
+          89.58429
+        ],
+        [
+          -13.312905,
+          87.83429
+        ],
+        [
+          -13.562905,
+          87.83429
+        ]
+      ],
+      "areaSqft": 21862.0625,
+      "derivation": {
+        "method": "registered-split-wing-heavy-neutral-layer-hull-union",
+        "graphicsState": "0.18|#4a4a4a",
+        "wingSegmentCounts": [
+          967,
+          571
+        ],
+        "registration": {
+          "dx": -57.0162,
+          "dy": -113.4322,
+          "sharedCols": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23"
+          ],
+          "sharedRows": [
+            "A"
+          ],
+          "inlierCols": [
+            "19",
+            "20",
+            "21",
+            "22",
+            "23"
+          ],
+          "inlierRows": [],
+          "colInlierCount": 5,
+          "rowInlierCount": 1,
+          "method": "shared-grid-columns(consensus)+wall-bbox-bottom-edge-Y(equal-height)",
+          "confidence": "medium"
+        },
+        "rasterUnionCellSizeFt": 0.25,
+        "simplePolygon": true
+      },
+      "issues": []
+    },
+    {
+      "level": 2,
+      "sheetId": "A-102",
+      "sourceBinding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 11,
+        "pageIndex": 10,
+        "renderedPageSha256": "4cd01de9bfe78f8af548a60750f9901b66ed82f5dfa271c72d842a065c122d54",
+        "sheetId": "A-102",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 10,
+      "elevationEvidenceReceiptSha256": "2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          10.740762,
+          49.849256
+        ],
+        [
+          15.990762,
+          49.849256
+        ],
+        [
+          15.990762,
+          49.099256
+        ],
+        [
+          162.490762,
+          49.099256
+        ],
+        [
+          162.490762,
+          45.349256
+        ],
+        [
+          226.490762,
+          45.349256
+        ],
+        [
+          226.490762,
+          49.099256
+        ],
+        [
+          306.240762,
+          49.099256
+        ],
+        [
+          306.240762,
+          49.349256
+        ],
+        [
+          310.240762,
+          49.349256
+        ],
+        [
+          310.240762,
+          45.349256
+        ],
+        [
+          335.740762,
+          45.349256
+        ],
+        [
+          335.740762,
+          114.849256
+        ],
+        [
+          310.240762,
+          114.849256
+        ],
+        [
+          310.240762,
+          110.849256
+        ],
+        [
+          297.740762,
+          110.849256
+        ],
+        [
+          297.740762,
+          111.099256
+        ],
+        [
+          296.240762,
+          111.099256
+        ],
+        [
+          296.240762,
+          112.099256
+        ],
+        [
+          284.740762,
+          112.099256
+        ],
+        [
+          284.740762,
+          111.099256
+        ],
+        [
+          262.990762,
+          111.099256
+        ],
+        [
+          262.990762,
+          111.349256
+        ],
+        [
+          252.240762,
+          111.349256
+        ],
+        [
+          252.240762,
+          111.099256
+        ],
+        [
+          229.740762,
+          111.099256
+        ],
+        [
+          229.740762,
+          111.349256
+        ],
+        [
+          186.240762,
+          111.349256
+        ],
+        [
+          186.240762,
+          111.099256
+        ],
+        [
+          163.990762,
+          111.099256
+        ],
+        [
+          163.990762,
+          111.349256
+        ],
+        [
+          120.490762,
+          111.349256
+        ],
+        [
+          120.490762,
+          111.099256
+        ],
+        [
+          98.240762,
+          111.099256
+        ],
+        [
+          98.240762,
+          111.349256
+        ],
+        [
+          87.240762,
+          111.349256
+        ],
+        [
+          87.240762,
+          111.099256
+        ],
+        [
+          65.740762,
+          111.099256
+        ],
+        [
+          65.740762,
+          111.349256
+        ],
+        [
+          53.990762,
+          111.349256
+        ],
+        [
+          53.990762,
+          112.099256
+        ],
+        [
+          43.240762,
+          112.099256
+        ],
+        [
+          43.240762,
+          111.099256
+        ],
+        [
+          34.740762,
+          111.099256
+        ],
+        [
+          34.740762,
+          111.349256
+        ],
+        [
+          23.990762,
+          111.349256
+        ],
+        [
+          23.990762,
+          111.099256
+        ],
+        [
+          15.990762,
+          111.099256
+        ],
+        [
+          15.990762,
+          110.099256
+        ],
+        [
+          10.740762,
+          110.099256
+        ],
+        [
+          10.740762,
+          109.849256
+        ],
+        [
+          15.990762,
+          109.849256
+        ],
+        [
+          15.990762,
+          94.349256
+        ],
+        [
+          10.740762,
+          94.349256
+        ],
+        [
+          10.740762,
+          92.099256
+        ],
+        [
+          13.740762,
+          92.099256
+        ],
+        [
+          13.740762,
+          88.099256
+        ],
+        [
+          14.490762,
+          88.099256
+        ],
+        [
+          14.490762,
+          72.349256
+        ],
+        [
+          13.740762,
+          72.349256
+        ],
+        [
+          13.740762,
+          71.849256
+        ],
+        [
+          14.490762,
+          71.849256
+        ],
+        [
+          14.490762,
+          70.849256
+        ],
+        [
+          15.990762,
+          70.849256
+        ],
+        [
+          15.990762,
+          50.099256
+        ],
+        [
+          10.740762,
+          50.099256
+        ]
+      ],
+      "areaSqft": 20356.375,
+      "derivation": {
+        "method": "dimension-and-grid-controlled-two-layer-open-floor-union",
+        "baseGraphicsState": "0.18|#506e96",
+        "shellGraphicsState": "0.18|#4a4a4a",
+        "baseSegmentCount": 884,
+        "shellSegmentCount": 1468,
+        "controls": {
+          "baseLengthFt": 313.677377,
+          "printedInnerLengthFt": 312.3958333333333,
+          "innerLengthResidualPct": 0.410231,
+          "gridSpanFt": 316.5921,
+          "gridResidualPct": 0.920656,
+          "baseDepthFt": 62.083454,
+          "printedMainDepthFt": 60,
+          "mainDepthResidualPct": 3.472423,
+          "printedOverallDepthFt": 69.5
+        },
+        "rasterUnionCellSizeFt": 0.25,
+        "submittedCalibrationBinding": {
+          "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+          "physicalPageNumber": 6,
+          "pageIndex": 5,
+          "renderedPageSha256": "cf476dc5a98e51e51d90e8bda8b8e5232e2ded6d1fc199153e5f1cbf84647731",
+          "sheetId": "FP-2-R2",
+          "coordinateSpace": "pdf-points",
+          "approvalStatus": "submittal-only-not-approved",
+          "role": "calibration-answer-key"
+        },
+        "sourceConflict": "A-102 also contains a 346 foot dimension token that conflicts with the 312 foot 4 3/4 inch inner control, the 316.6 foot grid span, and the sealed vector geometry. It is retained as a source-quality warning and is not used to fit the footprint."
+      },
+      "issues": []
+    },
+    {
+      "level": 3,
+      "sheetId": "A-103",
+      "sourceBinding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 14,
+        "pageIndex": 13,
+        "renderedPageSha256": "3de969fb18ed2474b56d62dc9cf9a9e2df3cbbffa90e73ee080f0ed59198cd9e",
+        "sheetId": "A-103",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 20,
+      "elevationEvidenceReceiptSha256": "2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          18.175399,
+          42.272011
+        ],
+        [
+          167.358232,
+          42.272011
+        ],
+        [
+          167.358232,
+          45.305518
+        ],
+        [
+          176.491875,
+          45.305518
+        ],
+        [
+          176.491875,
+          44.968462
+        ],
+        [
+          181.819834,
+          44.968462
+        ],
+        [
+          181.819834,
+          43.451708
+        ],
+        [
+          198.564845,
+          43.451708
+        ],
+        [
+          198.564845,
+          42.272011
+        ],
+        [
+          336.330625,
+          42.272011
+        ],
+        [
+          336.330625,
+          73.955308
+        ],
+        [
+          337.852899,
+          73.955308
+        ],
+        [
+          337.852899,
+          81.370547
+        ],
+        [
+          336.330625,
+          81.370547
+        ],
+        [
+          336.330625,
+          113.053844
+        ],
+        [
+          297.512643,
+          113.053844
+        ],
+        [
+          297.512643,
+          111.368562
+        ],
+        [
+          288.379,
+          111.368562
+        ],
+        [
+          288.379,
+          113.053844
+        ],
+        [
+          55.471107,
+          113.053844
+        ],
+        [
+          55.471107,
+          111.368562
+        ],
+        [
+          46.337464,
+          111.368562
+        ],
+        [
+          46.337464,
+          113.053844
+        ],
+        [
+          18.175399,
+          113.053844
+        ]
+      ],
+      "areaSqft": 22438.284982,
+      "derivation": {
+        "method": "independent-heavy-graphics-state-consensus",
+        "graphicsState": "0.18|#4a4a4a",
+        "consensus": [
+          {
+            "graphicsState": "0.18|#4a4a4a",
+            "hullAreaSqft": 22551.213014,
+            "segmentCount": 686
+          },
+          {
+            "graphicsState": "0.18|#506e96",
+            "hullAreaSqft": 22471.990267,
+            "segmentCount": 1872
+          }
+        ],
+        "controlResidualPct": 0.354061,
+        "candidateSummary": []
+      },
+      "issues": []
+    },
+    {
+      "level": 4,
+      "sheetId": "A-104",
+      "sourceBinding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 17,
+        "pageIndex": 16,
+        "renderedPageSha256": "09dfedd6cb7498664742d4f1dfa4f0a1d91b1e8607afe134cbb327b4caa346ff",
+        "sheetId": "A-104",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 31,
+      "elevationEvidenceReceiptSha256": "2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          18.175399,
+          40.09039
+        ],
+        [
+          167.059255,
+          40.09039
+        ],
+        [
+          167.059255,
+          43.123681
+        ],
+        [
+          181.418611,
+          43.123681
+        ],
+        [
+          181.418611,
+          41.270003
+        ],
+        [
+          198.80099,
+          41.270003
+        ],
+        [
+          198.80099,
+          40.09039
+        ],
+        [
+          335.592756,
+          40.09039
+        ],
+        [
+          335.592756,
+          110.867186
+        ],
+        [
+          297.804975,
+          110.867186
+        ],
+        [
+          297.804975,
+          108.339443
+        ],
+        [
+          287.980152,
+          108.339443
+        ],
+        [
+          287.980152,
+          110.867186
+        ],
+        [
+          55.96318,
+          110.867186
+        ],
+        [
+          55.96318,
+          108.339443
+        ],
+        [
+          46.138357,
+          108.339443
+        ],
+        [
+          46.138357,
+          110.867186
+        ],
+        [
+          18.175399,
+          110.867186
+        ]
+      ],
+      "areaSqft": 22352.053683,
+      "derivation": {
+        "method": "independent-heavy-graphics-state-consensus",
+        "graphicsState": "0.18|#4a4a4a",
+        "consensus": [
+          {
+            "graphicsState": "0.18|#4a4a4a",
+            "hullAreaSqft": 22449.187284,
+            "segmentCount": 666
+          },
+          {
+            "graphicsState": "0.18|#506e96",
+            "hullAreaSqft": 22500.185513,
+            "segmentCount": 2086
+          },
+          {
+            "graphicsState": "0.35|#750077",
+            "hullAreaSqft": 21885.047736,
+            "segmentCount": 1615
+          }
+        ],
+        "controlResidualPct": null,
+        "candidateSummary": []
+      },
+      "issues": []
+    },
+    {
+      "level": 5,
+      "sheetId": "A-105",
+      "sourceBinding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 20,
+        "pageIndex": 19,
+        "renderedPageSha256": "8c52ac61afeabf72f065fb762428ef99e74e3793673a7b08f129afb7a95e2c6d",
+        "sheetId": "A-105",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 41,
+      "elevationEvidenceReceiptSha256": "2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          18.175399,
+          44.737105
+        ],
+        [
+          167.039549,
+          44.737105
+        ],
+        [
+          167.039549,
+          47.598498
+        ],
+        [
+          181.397006,
+          47.598498
+        ],
+        [
+          181.397006,
+          45.915326
+        ],
+        [
+          198.777084,
+          45.915326
+        ],
+        [
+          198.777084,
+          44.737105
+        ],
+        [
+          335.550745,
+          44.737105
+        ],
+        [
+          335.550745,
+          115.430342
+        ],
+        [
+          297.767966,
+          115.430342
+        ],
+        [
+          297.767966,
+          113.74717
+        ],
+        [
+          287.944443,
+          113.74717
+        ],
+        [
+          287.944443,
+          115.430342
+        ],
+        [
+          55.958178,
+          115.430342
+        ],
+        [
+          55.958178,
+          113.073901
+        ],
+        [
+          46.134656,
+          113.073901
+        ],
+        [
+          46.134656,
+          115.430342
+        ],
+        [
+          18.175399,
+          115.430342
+        ]
+      ],
+      "areaSqft": 22335.047424,
+      "derivation": {
+        "method": "independent-heavy-graphics-state-consensus",
+        "graphicsState": "0.18|#4a4a4a",
+        "consensus": [
+          {
+            "graphicsState": "0.18|#4a4a4a",
+            "hullAreaSqft": 22430.815835,
+            "segmentCount": 1094
+          },
+          {
+            "graphicsState": "0.18|#506e96",
+            "hullAreaSqft": 22500.246306,
+            "segmentCount": 2012
+          },
+          {
+            "graphicsState": "0.35|#750077",
+            "hullAreaSqft": 21971.361728,
+            "segmentCount": 1561
+          }
+        ],
+        "controlResidualPct": null,
+        "candidateSummary": []
+      },
+      "issues": []
+    },
+    {
+      "level": 6,
+      "sheetId": "A-106",
+      "sourceBinding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 23,
+        "pageIndex": 22,
+        "renderedPageSha256": "05f9f3aee716f002eeee3509d01a77e18af98046c809ef8b39949362f9ce82cd",
+        "sheetId": "A-106",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 51,
+      "elevationEvidenceReceiptSha256": "2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          18.175399,
+          45.761779
+        ],
+        [
+          167.039549,
+          45.761779
+        ],
+        [
+          167.039549,
+          48.623172
+        ],
+        [
+          181.397006,
+          48.623172
+        ],
+        [
+          181.397006,
+          46.94
+        ],
+        [
+          198.777084,
+          46.94
+        ],
+        [
+          198.777084,
+          45.761779
+        ],
+        [
+          335.550745,
+          45.761779
+        ],
+        [
+          335.550745,
+          116.455016
+        ],
+        [
+          297.767966,
+          116.455016
+        ],
+        [
+          297.767966,
+          114.098575
+        ],
+        [
+          287.944443,
+          114.098575
+        ],
+        [
+          287.944443,
+          116.455016
+        ],
+        [
+          55.958178,
+          116.455016
+        ],
+        [
+          55.958178,
+          114.098575
+        ],
+        [
+          46.134656,
+          114.098575
+        ],
+        [
+          46.134656,
+          116.455016
+        ],
+        [
+          18.175399,
+          116.455016
+        ]
+      ],
+      "areaSqft": 22328.433551,
+      "derivation": {
+        "method": "independent-heavy-graphics-state-consensus",
+        "graphicsState": "0.18|#4a4a4a",
+        "consensus": [
+          {
+            "graphicsState": "0.18|#4a4a4a",
+            "hullAreaSqft": 22430.815835,
+            "segmentCount": 1061
+          },
+          {
+            "graphicsState": "0.18|#506e96",
+            "hullAreaSqft": 22500.184113,
+            "segmentCount": 2064
+          },
+          {
+            "graphicsState": "0.35|#750077",
+            "hullAreaSqft": 21885.047419,
+            "segmentCount": 1615
+          }
+        ],
+        "controlResidualPct": null,
+        "candidateSummary": []
+      },
+      "issues": []
+    },
+    {
+      "level": 7,
+      "sheetId": "A-107",
+      "sourceBinding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 26,
+        "pageIndex": 25,
+        "renderedPageSha256": "a1b341d515523868e860f799d696d70e03c4d2150ad8e5bb596a17614b10ccb8",
+        "sheetId": "A-107",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 61,
+      "elevationEvidenceReceiptSha256": "2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          18.175399,
+          46.381206
+        ],
+        [
+          167.039549,
+          46.381206
+        ],
+        [
+          167.039549,
+          49.242615
+        ],
+        [
+          176.107416,
+          49.242615
+        ],
+        [
+          176.107416,
+          49.074297
+        ],
+        [
+          181.397006,
+          49.074297
+        ],
+        [
+          181.397006,
+          47.559433
+        ],
+        [
+          198.777084,
+          47.559433
+        ],
+        [
+          198.777084,
+          46.381206
+        ],
+        [
+          335.550745,
+          46.381206
+        ],
+        [
+          335.550745,
+          117.074852
+        ],
+        [
+          297.767966,
+          117.074852
+        ],
+        [
+          297.767966,
+          115.39167
+        ],
+        [
+          287.944443,
+          115.39167
+        ],
+        [
+          287.944443,
+          117.074852
+        ],
+        [
+          55.958178,
+          117.074852
+        ],
+        [
+          55.958178,
+          115.39167
+        ],
+        [
+          46.134656,
+          115.39167
+        ],
+        [
+          46.134656,
+          117.074852
+        ],
+        [
+          18.175399,
+          117.074852
+        ]
+      ],
+      "areaSqft": 22342.680906,
+      "derivation": {
+        "method": "independent-heavy-graphics-state-consensus",
+        "graphicsState": "0.18|#4a4a4a",
+        "consensus": [
+          {
+            "graphicsState": "0.18|#4a4a4a",
+            "hullAreaSqft": 22430.945606,
+            "segmentCount": 1261
+          },
+          {
+            "graphicsState": "0.18|#506e96",
+            "hullAreaSqft": 22500.255535,
+            "segmentCount": 2158
+          },
+          {
+            "graphicsState": "0.35|#750077",
+            "hullAreaSqft": 21885.149472,
+            "segmentCount": 1534
+          }
+        ],
+        "controlResidualPct": null,
+        "candidateSummary": []
+      },
+      "issues": []
+    },
+    {
+      "level": 8,
+      "sheetId": "A-108",
+      "sourceBinding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 29,
+        "pageIndex": 28,
+        "renderedPageSha256": "50dfcc5dcf3a63845e5adef6ff95ab317731760b0ea2034d9476972209927e6b",
+        "sheetId": "A-108",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 71,
+      "elevationEvidenceReceiptSha256": "2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          18.040174,
+          40.709212
+        ],
+        [
+          166.904321,
+          40.709212
+        ],
+        [
+          166.904321,
+          43.639874
+        ],
+        [
+          180.506121,
+          43.639874
+        ],
+        [
+          180.506121,
+          34.481555
+        ],
+        [
+          200.153166,
+          34.481555
+        ],
+        [
+          200.153166,
+          40.709212
+        ],
+        [
+          335.415513,
+          40.709212
+        ],
+        [
+          335.415513,
+          111.411435
+        ],
+        [
+          297.632735,
+          111.411435
+        ],
+        [
+          297.632735,
+          102.985781
+        ],
+        [
+          287.809212,
+          102.985781
+        ],
+        [
+          287.809212,
+          111.411435
+        ],
+        [
+          55.822952,
+          111.411435
+        ],
+        [
+          55.822952,
+          102.985781
+        ],
+        [
+          45.99943,
+          102.985781
+        ],
+        [
+          45.99943,
+          111.411435
+        ],
+        [
+          18.040174,
+          111.411435
+        ]
+      ],
+      "areaSqft": 22356.095568,
+      "derivation": {
+        "method": "independent-heavy-graphics-state-consensus",
+        "graphicsState": "0.18|#4a4a4a",
+        "consensus": [
+          {
+            "graphicsState": "0.18|#4a4a4a",
+            "hullAreaSqft": 23478.234332,
+            "segmentCount": 884
+          },
+          {
+            "graphicsState": "0.18|#506e96",
+            "hullAreaSqft": 22827.151176,
+            "segmentCount": 2183
+          }
+        ],
+        "controlResidualPct": null,
+        "candidateSummary": [],
+        "submittedCalibrationBinding": {
+          "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+          "physicalPageNumber": 12,
+          "pageIndex": 11,
+          "renderedPageSha256": "2f20907cec537c92bff749f476d7c14712941421b367c2f6f4b428ccae2e6d20",
+          "sheetId": "FP-8-R2",
+          "coordinateSpace": "pdf-points",
+          "approvalStatus": "submittal-only-not-approved",
+          "role": "node-comparison-registration-answer-key"
+        }
+      },
+      "issues": []
+    }
+  ],
+  "coverage": {
+    "complete": true,
+    "passedLevels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "blockedLevels": [],
+    "unresolved": []
+  },
+  "claimStatus": "source-bound-building-geometry-only-not-sprinkler-code-compliance",
+  "evidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d"
+}

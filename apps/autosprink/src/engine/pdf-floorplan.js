@@ -1020,6 +1020,8 @@ export function buildingOutlinePolygon(segments, opts = {}) {
   const connectTolFt = Number.isFinite(opts.connectTolFt) ? Number(opts.connectTolFt) : 1.5;
   const gridN = Number.isInteger(opts.gridN) && opts.gridN > 1 ? opts.gridN : 140;
   const axisTolDeg = Number.isFinite(opts.axisTolDeg) ? Number(opts.axisTolDeg) : 5;
+  const networkMode = opts.networkMode === 'all-wall-like' ? 'all-wall-like' : 'dominant-component';
+  const bridgeGapsFt = Number.isFinite(opts.bridgeGapsFt) ? Math.max(0, Number(opts.bridgeGapsFt)) : 0;
   const axisTol = Math.tan((axisTolDeg * Math.PI) / 180);
 
   const segs = Array.isArray(segments) ? segments : [];
@@ -1154,7 +1156,9 @@ export function buildingOutlinePolygon(segments, opts = {}) {
   for (const [r, len] of [...compLen.entries()].sort((a, b) => a[0] - b[0])) {
     if (len > bestLen) { bestLen = len; bestRoot = r; }
   }
-  const network = compMembers.get(bestRoot).map((i) => walls[i]);
+  const network = networkMode === 'all-wall-like'
+    ? walls
+    : compMembers.get(bestRoot).map((i) => walls[i]);
   const netBbox = boundingBox(network);
 
   // Network degenerate -> fall back to wall bbox / full bbox.
@@ -1195,6 +1199,39 @@ export function buildingOutlinePolygon(segments, opts = {}) {
       const x = s.x1 + (s.x2 - s.x1) * f;
       const y = s.y1 + (s.y2 - s.y1) * f;
       wall[idx(toCx(x), toCy(y))] = 1;
+    }
+  }
+
+  // Source plans commonly break exterior wall strokes at doors, storefronts, and
+  // match-line cleanup. Optionally bridge only SHORT, COLLINEAR raster gaps before
+  // the exterior flood fill. This does not dilate or move any wall: it fills a zero
+  // run only when that run is bounded by wall cells on both sides and its physical
+  // length is <= bridgeGapsFt. The option is explicit and reported; the default is
+  // zero to preserve the conservative historical behavior.
+  if (bridgeGapsFt > 0) {
+    const maxGapX = Math.max(0, Math.floor(bridgeGapsFt / cw));
+    const maxGapY = Math.max(0, Math.floor(bridgeGapsFt / ch));
+    for (let cy = 0; cy < gridN; cy++) {
+      let previous = -1;
+      for (let cx = 0; cx < gridN; cx++) {
+        if (!wall[idx(cx, cy)]) continue;
+        const gap = cx - previous - 1;
+        if (previous >= 0 && gap > 0 && gap <= maxGapX) {
+          for (let fillX = previous + 1; fillX < cx; fillX++) wall[idx(fillX, cy)] = 1;
+        }
+        previous = cx;
+      }
+    }
+    for (let cx = 0; cx < gridN; cx++) {
+      let previous = -1;
+      for (let cy = 0; cy < gridN; cy++) {
+        if (!wall[idx(cx, cy)]) continue;
+        const gap = cy - previous - 1;
+        if (previous >= 0 && gap > 0 && gap <= maxGapY) {
+          for (let fillY = previous + 1; fillY < cy; fillY++) wall[idx(cx, fillY)] = 1;
+        }
+        previous = cy;
+      }
     }
   }
 
@@ -1244,13 +1281,19 @@ export function buildingOutlinePolygon(segments, opts = {}) {
   // areaSqft is the OCCUPANCY-GRID enclosed footprint (the honest footprint area).
   // The traced polygon's shoelace area should match it closely; we report the grid
   // area as the primary measure (discretization-stable) and round it.
-  const areaSqft = round(footprintAreaSqft);
+  // A mask may contain multiple disconnected enclosed islands. traceFilledBoundary
+  // returns the largest closed loop, so the public polygon and public area must refer
+  // to that same geometry rather than summing unrelated islands.
+  const tracedAreaSqft = outPoly && outPoly.length >= 4 ? polyArea(outPoly) : footprintAreaSqft;
+  const areaSqft = round(tracedAreaSqft);
 
   return {
     polygon: outPoly.map(([x, y]) => [round(x), round(y)]),
     areaSqft,
     bbox: bboxToObj(netBbox),
-    method,
+    method: networkMode === 'dominant-component' && bridgeGapsFt === 0
+      ? method
+      : `${method}:${networkMode}${bridgeGapsFt > 0 ? `:bridge<=${round(bridgeGapsFt)}ft` : ''}`,
     note: OUTLINE_NOTE,
     wallSegmentCount: walls.length,
     networkSegmentCount: network.length,
@@ -1263,7 +1306,7 @@ export function buildingOutlinePolygon(segments, opts = {}) {
  * filled cell from a non-filled neighbour / the grid border) and stitches them.
  * Returns vertices in feet; collinear runs are merged. Deterministic.
  */
-function traceFilledBoundary(filled, gridN, originX, originY, cw, ch) {
+export function traceFilledBoundary(filled, gridN, originX, originY, cw, ch) {
   const isFilled = (cx, cy) => cx >= 0 && cy >= 0 && cx < gridN && cy < gridN && filled[cy * gridN + cx] === 1;
   // Collect directed boundary edges so the filled region stays on the LEFT, giving a
   // CCW outer loop. Edge endpoints are grid-corner integer coords (gx,gy) in cell units.
@@ -1292,56 +1335,63 @@ function traceFilledBoundary(filled, gridN, originX, originY, cw, ch) {
   }
   if (edges.size === 0) return null;
 
-  // Pick the lexicographically smallest start corner for determinism, then walk the
-  // directed edges until we return to start. This yields the outer loop (the boundary
-  // is a set of closed loops; the outer one contains the min corner).
-  let startKey = null;
-  for (const k of edges.keys()) {
-    if (startKey === null) { startKey = k; continue; }
-    const [ax, ay] = startKey.split(',').map(Number);
-    const [bx, by] = k.split(',').map(Number);
-    if (bx < ax || (bx === ax && by < ay)) startKey = k;
-  }
+  // Enumerate every closed directed loop, then choose the loop with the greatest
+  // absolute area. Choosing only the lexicographically smallest corner can select a
+  // tiny detached island when the mask contains multiple enclosed components.
   const parseKey = (k) => k.split(',').map(Number);
-  const loop = [];
-  let cur = startKey;
   const used = new Set();
-  let guard = 0;
   const maxSteps = edges.size * 4 + 16;
-  while (guard++ < maxSteps) {
-    const outs = edges.get(cur);
-    if (!outs || outs.length === 0) break;
-    // Prefer an unused outgoing edge; deterministic order.
-    let nextPt = null;
-    for (const cand of outs) {
-      const ek = `${cur}->${cand[0]},${cand[1]}`;
-      if (!used.has(ek)) { nextPt = cand; used.add(ek); break; }
+  const starts = [...edges.keys()].sort((left, right) => {
+    const [lx, ly] = parseKey(left); const [rx, ry] = parseKey(right);
+    return (lx - rx) || (ly - ry);
+  });
+  const loops = [];
+  for (const startKey of starts) {
+    const candidates = (edges.get(startKey) || []).slice().sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
+    for (const first of candidates) {
+      const firstEdge = `${startKey}->${first[0]},${first[1]}`;
+      if (used.has(firstEdge)) continue;
+      const loop = [];
+      let cur = startKey;
+      let closed = false;
+      let guard = 0;
+      while (guard++ < maxSteps) {
+        const outs = (edges.get(cur) || []).slice().sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
+        let nextPt = null;
+        for (const cand of outs) {
+          const edgeKey = `${cur}->${cand[0]},${cand[1]}`;
+          if (!used.has(edgeKey)) { nextPt = cand; used.add(edgeKey); break; }
+        }
+        if (!nextPt) break;
+        loop.push(parseKey(cur));
+        const nextKey = cornerKey(nextPt[0], nextPt[1]);
+        if (nextKey === startKey) { closed = true; break; }
+        cur = nextKey;
+      }
+      if (closed && loop.length >= 4) loops.push(loop);
     }
-    if (!nextPt) break;
-    const [cx, cy] = parseKey(cur);
-    loop.push([cx, cy]);
-    const nk = cornerKey(nextPt[0], nextPt[1]);
-    if (nk === startKey) break;
-    cur = nk;
   }
-  if (loop.length < 4) return null;
+  if (!loops.length) return null;
+  const loopArea = (loop) => Math.abs(loop.reduce((sum, point, index) => {
+    const next = loop[(index + 1) % loop.length];
+    return sum + point[0] * next[1] - next[0] * point[1];
+  }, 0)) / 2;
+  const loop = loops.sort((a, b) => (loopArea(b) - loopArea(a)) || (b.length - a.length))[0];
 
   // Merge collinear runs, then convert grid corners -> feet.
   const merged = [];
   for (let i = 0; i < loop.length; i++) {
     const prev = loop[(i - 1 + loop.length) % loop.length];
-    const cur2 = loop[i];
+    const current = loop[i];
     const next = loop[(i + 1) % loop.length];
-    const d1x = cur2[0] - prev[0]; const d1y = cur2[1] - prev[1];
-    const d2x = next[0] - cur2[0]; const d2y = next[1] - cur2[1];
-    // keep vertex only when direction changes (not collinear)
-    if (d1x * d2y - d1y * d2x !== 0 || (d1x === 0 && d1y === 0)) merged.push(cur2);
+    const d1x = current[0] - prev[0]; const d1y = current[1] - prev[1];
+    const d2x = next[0] - current[0]; const d2y = next[1] - current[1];
+    if (d1x * d2y - d1y * d2x !== 0 || (d1x === 0 && d1y === 0)) merged.push(current);
   }
-  const poly = (merged.length >= 4 ? merged : loop).map(([gx, gy]) => [
+  return (merged.length >= 4 ? merged : loop).map(([gx, gy]) => [
     originX + gx * cw,
     originY + gy * ch,
   ]);
-  return poly;
 }
 
 const WALL_LAYER_NOTE =

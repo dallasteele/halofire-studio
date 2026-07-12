@@ -21,7 +21,8 @@ import { extractElevationDatums } from '../src/engine/elevation-datums.js';
 // and MERGE; for the rest, the single-region extractor is correct. (A-102..A-108 are single-view.)
 const STACKED_PAGES = new Set([8]); // A-101 first floor — both wings stacked on the sheet.
 
-const ARCH = path.resolve(process.cwd(), 'plans/cooperative-1881/1881-architecturals.pdf');
+const ARCH = path.resolve(process.env.COOPERATIVE_1881_ARCH_PDF
+  || path.join(process.cwd(), 'plans/cooperative-1881/1881-architecturals.pdf'));
 const OUT = path.resolve(process.cwd(), 'src/data/plan-levels.cooperative-1881.json');
 const ELEVATION_PACKET = path.resolve(process.cwd(), 'src/data/elevation-datums.cooperative-1881.json');
 const LEVEL_PAGES = [8, 11, 14, 17, 20, 23, 26, 29]; // A-101..A-108 overall floor plans

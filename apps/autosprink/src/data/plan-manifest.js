@@ -35,12 +35,12 @@ export const PLAN_DISCIPLINES = Object.freeze([
 export const SOURCE_BOUND_LEVEL_ELEVATIONS_FT = Object.freeze([null, 0, 10, 20, 31, 41, 51, 61, 71]);
 export const ELEVATION_EVIDENCE = Object.freeze({
   artifact: 'src/data/elevation-datums.cooperative-1881.json',
-  sourcePdfSha256: 'bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f',
-  physicalPageNumber: 58,
-  pageIndex: 57,
-  renderedPageSha256: '40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c',
+  sourcePdfSha256: '179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53',
+  physicalPageNumber: 61,
+  pageIndex: 60,
+  renderedPageSha256: 'ea47dd4c5f6d38be5cf1b53172048cb9ac57ed24877ff4b063d38028cdc3b888',
   sheetId: 'A-201',
-  receiptSha256: 'fd36d747d77d256c3b76f145acadc1386e3d5262eb90855d8f72853717a06734',
+  receiptSha256: '2d0e71167beaa3315d611e3f9495d64b4c7ec849fcab60060b023beec76a34df',
 });
 
 const PLAN_ROOT = '/plans/cooperative-1881';

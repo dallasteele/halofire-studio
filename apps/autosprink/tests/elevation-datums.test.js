@@ -23,7 +23,7 @@ function draft(observations) {
 describe('source-bound elevation datum extraction', () => {
   it('validates the checked-in Cooperative 1881 A-201 evidence packet', async () => {
     const packet = JSON.parse(fs.readFileSync(new URL('../src/data/elevation-datums.cooperative-1881.json', import.meta.url), 'utf8'));
-    const result = await extractElevationDatums(packet, { expectedSourcePdfSha256: 'bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f' });
+    const result = await extractElevationDatums(packet, { expectedSourcePdfSha256: '179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53' });
     expect(result.status).toBe('passed');
     expect(result.sourceBinding.sheetId).toBe('A-201');
     expect(result.datums.map((datum) => datum.elevationFt)).toEqual([0, 10, 20, 31, 41, 51, 61, 71, 81, 89.5625]);

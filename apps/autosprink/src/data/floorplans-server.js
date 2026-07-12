@@ -13,9 +13,10 @@ import { COOPERATIVE_1881_PROJECT_NAME } from './floorplans.js';
 
 const __floorplansDir = path.dirname(fileURLToPath(import.meta.url));
 
-// Path to the client-EXTRACTED per-level plan (vector-PDF extraction, Stream A
-// two-view merge). The Floor-1 entry carries the REAL building footprint at the
-// drawing-derived true scale (3/32"=1'-0", scaleFtPerUnit 0.1481).
+// Path to the current source-bound per-level plan. All eight architectural
+// footprints are independently bound to A-101..A-108 and their current render
+// hashes; this adapter intentionally still returns only L1 to the single-floor
+// sprinkler engine.
 const COOPERATIVE_1881_PLAN_LEVELS_PATH = path.join(__floorplansDir, 'plan-levels.cooperative-1881.json');
 
 /** Shoelace area (sqft, always positive) of a [[x,y],...] polygon. */
@@ -30,7 +31,7 @@ function polyAreaSqft(poly) {
 }
 
 /**
- * Build the Cooperative 1881 floor plan from the REAL extracted Floor-1 plate
+ * Build the Cooperative 1881 floor plan from the source-bound Floor-1 plate
  * instead of the square area-only placeholder.
  *
  * WHY: the sprinkler network must be generated against the SAME footprint, at
@@ -39,16 +40,16 @@ function polyAreaSqft(poly) {
  * buildBuildingFromPlans). The old cooperative1881FloorPlan() returned a
  * 413x413 ft square at the origin, so the network floated off-axis and at the
  * wrong footprint relative to the building. This consumes the extracted L1
- * `footprintFt` polygon (real ~361.6 x 81.9 ft plate) so heads / branch lines /
+ * `footprintFt` polygon (21,862 sqft current A-101 plate) so heads / branch lines /
  * cross-main are laid across the real plate at real plan coordinates.
  *
  * Stair / elevator cores from the extraction are passed as `excludeRects` so no
  * ceiling head is laid over an open shaft (those get their own protection).
  *
- * HONESTY: this is ONE floor's plate. The total REAL sprinklered area across all
- * floors (170,654 sqft, Building (1)!G6) is unchanged and stays documented in
- * the source/disclaimer. The footprint is the extracted vector geometry, still
- * needs-verification — NOT surveyed, NOT AHJ/PE-reviewed, NOT AutoSprink parity.
+ * HONESTY: this is ONE floor's sprinkler adapter. The building model has eight
+ * distinct source-bound footprints, but this function does not generate a full
+ * eight-floor sprinkler system. Geometry verification is not code compliance,
+ * AHJ/PE approval, or AutoSprink parity.
  * Falls back (returns null) on any read/parse error so the caller can use the
  * documented placeholder rather than fabricate.
  *
@@ -69,6 +70,8 @@ export function cooperative1881FloorPlanFromExtractedPlate() {
     || levels.find((l) => l && l.plan && Array.isArray(l.plan.footprintFt) && l.plan.footprintFt.length >= 3);
   if (!l1) return null;
   const plan = l1.plan;
+  if (data.perLevelFootprintsVerified !== true || plan.sourceBoundGeometryStatus !== 'passed'
+    || !plan.sourceBinding?.renderedPageSha256 || !plan.sourceBoundFootprintEvidenceReceiptSha256) return null;
   // footprintFt may be a closed ring (first==last); drop the duplicate closing
   // vertex so the engine's polygon helpers see a clean ring.
   let poly = plan.footprintFt.map((p) => [Number(p[0]), Number(p[1])]);
@@ -127,16 +130,19 @@ export function cooperative1881FloorPlanFromExtractedPlate() {
     name: COOPERATIVE_1881_PROJECT_NAME,
     units: 'ft',
     source:
-      'REAL extracted Floor-1 plate from the architectural PDF (A-101) at the '
+      'SOURCE-BOUND Floor-1 plate from current architectural A-101 at the '
       + `drawing-derived true scale (${plan.scaleText || '3/32"=1\'-0"'}, `
       + `scaleFtPerUnit ${plan.scaleFtPerUnit}); footprint ~${plateAreaSqft} sqft. `
-      + 'Total REAL sprinklered area across all floors is 170,654 sqft '
-      + '(Building (1)!G6). Vector extraction — needs-verification, NOT surveyed, '
-      + 'NOT AHJ/PE-reviewed.',
+      + `Building footprint receipt ${plan.sourceBoundFootprintEvidenceReceiptSha256}; `
+      + 'eight-floor building geometry is separately assembled from distinct A-101 through A-108 plates. '
+      + 'This adapter generates L1 sprinklers only; NOT code-compliant, AHJ/PE-reviewed, or AutoSprink parity.',
     hazardAssumption:
       'ordinary (residential apartment standard-spray, NOT ESFR; matches the real '
       + '~120 sqft/head density — internal-alpha assumption, not an engineering call)',
     extractedPlate: true,
+    sourceBoundGeometryVerified: true,
+    sourceBinding: plan.sourceBinding,
+    sourceBoundFootprintEvidenceReceiptSha256: plan.sourceBoundFootprintEvidenceReceiptSha256,
     footprintFt: poly,
     wallRuns: Array.isArray(plan.wallRuns) ? plan.wallRuns : [],
     wallsFull: Array.isArray(plan.wallsFull) ? plan.wallsFull : [],

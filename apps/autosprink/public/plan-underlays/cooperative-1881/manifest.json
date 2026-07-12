@@ -1,9 +1,11 @@
 {
   "project": "cooperative-1881",
-  "source": "plans/cooperative-1881/1881-architecturals.pdf",
+  "source": "cooperative-1881-updated-architectural.pdf",
+  "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+  "footprintEvidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d",
   "targetPx": 2400,
-  "generatedAt": "2026-06-13T20:32:32.200Z",
-  "note": "Pre-baked registered underlays. Register with computePlanUnderlayTransform using each sheet widthPt/heightPt + the level scaleFtPerUnit from plan-levels.cooperative-1881.json. needs-verification.",
+  "generatedAt": "2026-07-12T06:19:28.209Z",
+  "note": "Current hash-bound baked underlays. Building footprint/elevation geometry is source-bound; sprinkler layout and code acceptance remain separate and fail-closed.",
   "sheets": [
     {
       "level": 1,
@@ -15,7 +17,11 @@
       "heightPt": 1728,
       "widthPx": 2400,
       "heightPx": 1600,
-      "bytes": 708366
+      "bytes": 718329,
+      "pngSha256": "97ccb4f43463f52df0eafafa7b02b6897e69c72e4dd13eca32a46746087c62be",
+      "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+      "sourceRenderedPageSha256": "6cdde061de3593155b47062efbfdb4e34d628a4891ad3f05ef00378c53fa93a5",
+      "footprintEvidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d"
     },
     {
       "level": 2,
@@ -27,7 +33,11 @@
       "heightPt": 1728,
       "widthPx": 2400,
       "heightPx": 1600,
-      "bytes": 596460
+      "bytes": 510099,
+      "pngSha256": "4ba4aa031049ac59b9075c9a2dd6b9f92a2ab3735cbd3306ca8e8920ec8aa67d",
+      "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+      "sourceRenderedPageSha256": "4cd01de9bfe78f8af548a60750f9901b66ed82f5dfa271c72d842a065c122d54",
+      "footprintEvidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d"
     },
     {
       "level": 3,
@@ -39,7 +49,11 @@
       "heightPt": 1728,
       "widthPx": 2400,
       "heightPx": 1600,
-      "bytes": 765183
+      "bytes": 823240,
+      "pngSha256": "d5eaf9807ed0a9800ac6e0bf051fa055d34f88320d0251e8995b66621d29e015",
+      "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+      "sourceRenderedPageSha256": "3de969fb18ed2474b56d62dc9cf9a9e2df3cbbffa90e73ee080f0ed59198cd9e",
+      "footprintEvidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d"
     },
     {
       "level": 4,
@@ -51,7 +65,11 @@
       "heightPt": 1728,
       "widthPx": 2400,
       "heightPx": 1600,
-      "bytes": 673675
+      "bytes": 686628,
+      "pngSha256": "ecaa9754274a66b3900ed13d4efa3273992929ba0094b42b8175d0c62e3aea88",
+      "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+      "sourceRenderedPageSha256": "09dfedd6cb7498664742d4f1dfa4f0a1d91b1e8607afe134cbb327b4caa346ff",
+      "footprintEvidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d"
     },
     {
       "level": 5,
@@ -63,7 +81,11 @@
       "heightPt": 1728,
       "widthPx": 2400,
       "heightPx": 1600,
-      "bytes": 658931
+      "bytes": 657133,
+      "pngSha256": "fd6055deca6285e779eb07a6ff8393d097fb990e11090a5b457d716262702648",
+      "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+      "sourceRenderedPageSha256": "8c52ac61afeabf72f065fb762428ef99e74e3793673a7b08f129afb7a95e2c6d",
+      "footprintEvidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d"
     },
     {
       "level": 6,
@@ -75,7 +97,11 @@
       "heightPt": 1728,
       "widthPx": 2400,
       "heightPx": 1600,
-      "bytes": 632022
+      "bytes": 650083,
+      "pngSha256": "24d973ec6fae87ed3da8e5a62c061b49ea04b876bbadbf0684cbc5d242b0203e",
+      "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+      "sourceRenderedPageSha256": "05f9f3aee716f002eeee3509d01a77e18af98046c809ef8b39949362f9ce82cd",
+      "footprintEvidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d"
     },
     {
       "level": 7,
@@ -87,7 +113,11 @@
       "heightPt": 1728,
       "widthPx": 2400,
       "heightPx": 1600,
-      "bytes": 633290
+      "bytes": 648151,
+      "pngSha256": "0e7a195b58be7a17e07624e2fc3f1639049266c4cf3e62bd0fc00c090bcb197b",
+      "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+      "sourceRenderedPageSha256": "a1b341d515523868e860f799d696d70e03c4d2150ad8e5bb596a17614b10ccb8",
+      "footprintEvidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d"
     },
     {
       "level": 8,
@@ -99,7 +129,11 @@
       "heightPt": 1728,
       "widthPx": 2400,
       "heightPx": 1600,
-      "bytes": 642867
+      "bytes": 660308,
+      "pngSha256": "1c25967f7e989be2d042606a9b6f63999366ea1a552174096ed3f937638f85b3",
+      "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+      "sourceRenderedPageSha256": "50dfcc5dcf3a63845e5adef6ff95ab317731760b0ea2034d9476972209927e6b",
+      "footprintEvidenceReceiptSha256": "b6d51ef81a0708f487a16c6285bbe734b9890b1ca16020244b1c12cd65f6e48d"
     }
   ]
 }

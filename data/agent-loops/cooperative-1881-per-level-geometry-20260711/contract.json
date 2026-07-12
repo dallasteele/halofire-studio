@@ -1,0 +1,46 @@
+{
+  "name": "cooperative-1881-per-level-geometry-20260711",
+  "owner": "codex",
+  "goal": "Replace invalid Cooperative 1881 floor footprints with source-bound, sheet-specific A-101 through A-108 geometry and A-201 elevations so the 3D building is extruded from each actual level rather than a repeated or fragmentary proxy.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/04-GC PDF Plans & Specs",
+    "apps/autosprink/src/engine/pdf-floorplan.js",
+    "apps/autosprink/src/engine/plan-extract.js",
+    "apps/autosprink/src/engine/building-from-plan.js",
+    "apps/autosprink/src/data/elevation-datums.cooperative-1881.json",
+    "apps/autosprink/src/data/plan-levels.cooperative-1881.json"
+  ],
+  "exit_criteria": [
+    "All eight levels bind their own A-101 through A-108 physical page, rendered-page hash, printed scale, and A-201 elevation receipt.",
+    "Every emitted footprint is a simple non-self-crossing polygon whose shoelace area agrees with its reported area within a declared raster tolerance.",
+    "No level uses another level's footprint or an x8 quantity multiplier as a substitute for per-level geometry.",
+    "The Level 3 footprint is independently checked against the 22,359.12 square foot area printed on A-103 without fitting the extractor to that target.",
+    "Fallback rectangles and incomplete connected-component traces stay blocked unless explicitly source-bounded and independently validated.",
+    "The building assembly extrudes each validated footprint at the source-bound elevations 0, 10, 20, 31, 41, 51, 61, and 71 feet.",
+    "Level 8 geometry can be registered to FP-8 for subsequent node-by-node sprinkler comparison.",
+    "Adversarial, focused/full regression, build, formal, browser, and live deployment gates pass before closing this slice."
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/cooperative-1881-per-level-geometry-20260711/contract.json",
+    "npx vitest run tests/pdf-floorplan.test.js tests/plan-extract.test.js tests/building-from-plan-assembly.test.js tests/elevation-datums.test.js",
+    "real A-101 through A-108 extraction diagnostics with polygon validity and per-level area receipts",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "GX10 Lean proof that eight level records do not imply valid per-level geometry",
+    "authenticated Studio browser and live VPS smoke"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-per-level-geometry-20260711/state.json",
+  "evidence_paths": [
+    "apps/autosprink/out/agent-loops/cooperative-1881-per-level-geometry-20260711",
+    "data/agent-loops/cooperative-1881-per-level-geometry-20260711/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 180000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
