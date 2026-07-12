@@ -1,7 +1,7 @@
 {
-  "iteration": 3,
-  "phase": "verification",
-  "status": "in_progress",
+  "iteration": 5,
+  "phase": "complete",
+  "status": "completed",
   "findings": [
     "The completed FP-8 reference yields 297 source-bound sprinkler symbol candidates and 254 submitted pipe vectors after two-view A-108 grid registration.",
     "DA-3 yields 17 registered hydraulic nodes at submitted elevations from 81 feet 4 inches through 89 feet 5 inches.",
@@ -11,11 +11,38 @@
     "Studio and AutoBid now expose registered top/elevation evidence and reject blind roof projection while leaving code compliance and attic sprinkler requirements fail-closed."
   ],
   "verification": {
-    "focusedTests": "in progress",
-    "productionBuild": "passed",
-    "formalProof": "pending",
-    "browser": "pending",
-    "fullRegression": "pending",
-    "liveDeployment": "pending"
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "focusedTests": "54 passed across submitted calibration, authenticated API, roof geometry, roof coordination, per-level geometry, and Studio static integration; final generator replay plus calibration/API rerun passed 9 of 9",
+    "productionBuild": "passed locally and on VPS",
+    "formalProof": {
+      "status": "LEAN_PROVED on GX10 Lean 4.13.0",
+      "fileSha256": "09cc37c81ad1805ef62cb898d75fd7de3b676b84e9492d3f7ae8a303743345e7",
+      "theorems": [
+        "every_submitted_node_is_non_roof",
+        "zero_roof_nodes_blocks_blind_projection"
+      ]
+    },
+    "browser": {
+      "status": "passed locally with configured admin authentication",
+      "login": "secure login reached authenticated Workbench",
+      "studio": "Cooperative 1881 selected and Roof Planes action opened the submitted calibration viewer",
+      "renderedEntities": "254 top-view pipe lines, 297 top-view head symbols, and 17 DA-3 elevation nodes",
+      "claimBoundary": "viewer reports zero pitched-roof nodes, blocks blind projection, and keeps attic requirement and code compliance fail-closed"
+    },
+    "fullRegression": {
+      "status": "slice-passed-with-optional-external-fixtures-explicit",
+      "wholeSuite": "1584 passed, 2 skipped across 157 passing files",
+      "externalFixtureOnly": "autobid FP/spatial live-review browser files stop in beforeAll because external _tmp_autobid database/artifact directories are absent; neither file executed application assertions and neither is an acceptance reviewer gate"
+    },
+    "liveDeployment": {
+      "status": "passed",
+      "deployedCommit": "7c06b8d3687fdcaf53454d3c9e9250b92360ed06",
+      "service": "halofire.service active",
+      "publicHealth": "HTTP 200 status ok",
+      "publicLogin": "HTTP 200 Secure Portal; invalid credentials rejected HTTP 401",
+      "authenticatedApi": "HTTP 200 with 297 heads, 254 pipe segments, 17 hydraulic nodes, zero pitched-roof nodes, blind projection false, complianceReady false",
+      "artifactParity": "Studio HTML, submitted calibration JSON, calibration engine, and API server hashes match local and VPS; public curl hashes match deployed Studio, JSON, and engine bytes"
+    }
   }
 }
