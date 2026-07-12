@@ -1,0 +1,6891 @@
+{
+  "artifactType": "halofire.submitted-sprinkler-calibration.v1",
+  "projectName": "The Cooperative 1881 - Salt Lake City UT",
+  "level": 8,
+  "units": "ft",
+  "sourceBindings": [
+    {
+      "id": "target-architectural-A108",
+      "binding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 29,
+        "pageIndex": 28,
+        "renderedPageSha256": "50dfcc5dcf3a63845e5adef6ff95ab317731760b0ea2034d9476972209927e6b",
+        "sheetId": "A-108",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "target-roof-A121",
+      "binding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 36,
+        "pageIndex": 35,
+        "renderedPageSha256": "658402dc30c2ff57c0bc95c81ce1d5e23f9efe5b6c899296e7d8391c29ddc1fa",
+        "sheetId": "A-121",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "submitted-fire-FP8-r2",
+      "binding": {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 12,
+        "pageIndex": 11,
+        "renderedPageSha256": "2f20907cec537c92bff749f476d7c14712941421b367c2f6f4b428ccae2e6d20",
+        "sheetId": "FP-8-R2",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "submitted-hydraulic-DA3-r2",
+      "binding": {
+        "sourcePdfSha256": "389c8943c4bac1f6eeac9a884cd91da8f29920ef513cf7b0be48ae2da8de18fb",
+        "physicalPageNumber": 20,
+        "pageIndex": 19,
+        "renderedPageSha256": "574bf1b357f226666a7d36323ee7e435216fd76b9eb1be10a272b03e390d18f5",
+        "sheetId": "DA-3-node-analysis-R2",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    }
+  ],
+  "viewRegistrations": [
+    {
+      "viewId": "south",
+      "sourceSheetId": "FP-8-R2",
+      "targetSheetId": "A-108",
+      "transform": {
+        "planXFromSourceTopY": [
+          -0.111111214197,
+          179.514091796
+        ],
+        "planYFromSourceX": [
+          -0.11111135897,
+          177.801822087
+        ]
+      },
+      "controls": {
+        "numberGridLabels": [
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28"
+        ],
+        "letterGridLabels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "J",
+          "K",
+          "L",
+          "M"
+        ],
+        "planXRmsResidualFt": 0.000112,
+        "planYRmsResidualFt": 0.000119
+      }
+    },
+    {
+      "viewId": "north",
+      "sourceSheetId": "FP-8-R2",
+      "targetSheetId": "A-108",
+      "transform": {
+        "planXFromSourceTopY": [
+          -0.111559303327,
+          400.276742185
+        ],
+        "planYFromSourceX": [
+          -0.111111337441,
+          352.533441759
+        ]
+      },
+      "controls": {
+        "numberGridLabels": [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15"
+        ],
+        "letterGridLabels": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G",
+          "H",
+          "J",
+          "K",
+          "L",
+          "M"
+        ],
+        "planXRmsResidualFt": 0.130203,
+        "planYRmsResidualFt": 0.00012
+      }
+    }
+  ],
+  "submittedTopView": {
+    "pipeSegments": [
+      {
+        "id": "south-pipe-1",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          152.601462,
+          57.743896
+        ],
+        "toPlanFt": [
+          152.601462,
+          56.243893
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-2",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          159.789288,
+          55.854854
+        ],
+        "toPlanFt": [
+          159.789288,
+          59.2439
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-3",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          152.601462,
+          57.743896
+        ],
+        "toPlanFt": [
+          159.789288,
+          57.743896
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-4",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          159.789288,
+          51.396511
+        ],
+        "toPlanFt": [
+          159.789288,
+          46.941789
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-5",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          152.528851,
+          48.441792
+        ],
+        "toPlanFt": [
+          159.789288,
+          48.441792
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-6",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          131.726748,
+          45.150674
+        ],
+        "toPlanFt": [
+          131.726748,
+          46.650678
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-7",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          137.789267,
+          41.89649
+        ],
+        "toPlanFt": [
+          137.789267,
+          46.650678
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-8",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          131.726748,
+          45.150674
+        ],
+        "toPlanFt": [
+          137.789267,
+          45.150674
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-9",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          165.481988,
+          67.868912
+        ],
+        "toPlanFt": [
+          165.481988,
+          72.66059
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-10",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          165.481988,
+          67.868912
+        ],
+        "toPlanFt": [
+          160.445525,
+          67.868912
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-11",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          87.27879,
+          69.051356
+        ],
+        "toPlanFt": [
+          87.27879,
+          67.551352
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-12",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          91.289211,
+          69.051356
+        ],
+        "toPlanFt": [
+          91.289211,
+          67.551352
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-13",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          87.27879,
+          69.051356
+        ],
+        "toPlanFt": [
+          91.289211,
+          69.051356
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-14",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          51.388566,
+          105.83104
+        ],
+        "toPlanFt": [
+          51.388566,
+          87.887891
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-15",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          51.231068,
+          87.73038
+        ],
+        "toPlanFt": [
+          38.045631,
+          87.73038
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-16",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          13.57774,
+          85.988507
+        ],
+        "toPlanFt": [
+          19.5405,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-17",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          37.888119,
+          87.887891
+        ],
+        "toPlanFt": [
+          37.888119,
+          105.83104
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-18",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          13.57774,
+          65.137942
+        ],
+        "toPlanFt": [
+          19.5405,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-19",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          51.546078,
+          105.988552
+        ],
+        "toPlanFt": [
+          57.524911,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-20",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          19.881525,
+          85.988507
+        ],
+        "toPlanFt": [
+          32.500202,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-21",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          23.872468,
+          105.988552
+        ],
+        "toPlanFt": [
+          32.500202,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-22",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          14.309959,
+          105.988552
+        ],
+        "toPlanFt": [
+          19.5405,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-23",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          52.115929,
+          85.988507
+        ],
+        "toPlanFt": [
+          56.77491,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-24",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          66.553443,
+          65.137942
+        ],
+        "toPlanFt": [
+          77.670769,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-25",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          32.841226,
+          65.137942
+        ],
+        "toPlanFt": [
+          44.337398,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-26",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          19.881525,
+          65.137942
+        ],
+        "toPlanFt": [
+          32.500202,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-27",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          152.699356,
+          105.988552
+        ],
+        "toPlanFt": [
+          159.691679,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-28",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          98.897223,
+          105.988552
+        ],
+        "toPlanFt": [
+          110.6708,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-29",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          78.011787,
+          105.988552
+        ],
+        "toPlanFt": [
+          86.358278,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-30",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          57.865935,
+          105.988552
+        ],
+        "toPlanFt": [
+          66.212426,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-31",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          22.864722,
+          45.137898
+        ],
+        "toPlanFt": [
+          32.500202,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-32",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          14.309959,
+          45.137898
+        ],
+        "toPlanFt": [
+          19.5405,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-33",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          32.841226,
+          85.988507
+        ],
+        "toPlanFt": [
+          38.165491,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-34",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          78.011787,
+          85.988507
+        ],
+        "toPlanFt": [
+          86.430889,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-35",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          66.553443,
+          85.988507
+        ],
+        "toPlanFt": [
+          77.670769,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-36",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          87.449296,
+          65.137942
+        ],
+        "toPlanFt": [
+          93.774951,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-37",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          78.011787,
+          65.137942
+        ],
+        "toPlanFt": [
+          86.430889,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-38",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          57.115934,
+          65.137942
+        ],
+        "toPlanFt": [
+          66.212426,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-39",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          131.897253,
+          105.988552
+        ],
+        "toPlanFt": [
+          143.670831,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-40",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          111.011817,
+          105.988552
+        ],
+        "toPlanFt": [
+          119.358308,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-41",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          86.699295,
+          105.988552
+        ],
+        "toPlanFt": [
+          93.774951,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-42",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          66.553443,
+          105.988552
+        ],
+        "toPlanFt": [
+          77.670769,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-43",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          152.699356,
+          45.137898
+        ],
+        "toPlanFt": [
+          158.660021,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-44",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          131.897253,
+          45.137898
+        ],
+        "toPlanFt": [
+          143.670831,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-45",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          78.011787,
+          45.137898
+        ],
+        "toPlanFt": [
+          86.358278,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-46",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          45.678423,
+          45.137898
+        ],
+        "toPlanFt": [
+          50.118654,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-47",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          111.011817,
+          85.988507
+        ],
+        "toPlanFt": [
+          120.108309,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-48",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          87.449296,
+          85.988507
+        ],
+        "toPlanFt": [
+          99.556206,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-49",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          111.011817,
+          65.137942
+        ],
+        "toPlanFt": [
+          120.108309,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-50",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          94.115968,
+          65.137942
+        ],
+        "toPlanFt": [
+          99.556206,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-51",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          144.011848,
+          105.988552
+        ],
+        "toPlanFt": [
+          152.358339,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-52",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          119.699325,
+          105.988552
+        ],
+        "toPlanFt": [
+          126.774982,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-53",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          144.011848,
+          45.137898
+        ],
+        "toPlanFt": [
+          152.358339,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-54",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          98.897223,
+          45.137898
+        ],
+        "toPlanFt": [
+          110.6708,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-55",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          86.699295,
+          45.137898
+        ],
+        "toPlanFt": [
+          93.774951,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-56",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          66.553443,
+          45.137898
+        ],
+        "toPlanFt": [
+          77.670769,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-57",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          57.865935,
+          45.137898
+        ],
+        "toPlanFt": [
+          66.212426,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-58",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          153.449357,
+          85.988507
+        ],
+        "toPlanFt": [
+          159.691679,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-59",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          144.011848,
+          85.988507
+        ],
+        "toPlanFt": [
+          153.108339,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-60",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          120.449326,
+          85.988507
+        ],
+        "toPlanFt": [
+          126.774982,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-61",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          120.449326,
+          65.137942
+        ],
+        "toPlanFt": [
+          126.774982,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-62",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          111.011817,
+          45.137898
+        ],
+        "toPlanFt": [
+          119.358308,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-63",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          160.032696,
+          85.988507
+        ],
+        "toPlanFt": [
+          166.556262,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-64",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          119.699325,
+          45.137898
+        ],
+        "toPlanFt": [
+          126.774982,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-65",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          144.011848,
+          65.137942
+        ],
+        "toPlanFt": [
+          152.43095,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-66",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          157.069165,
+          65.137942
+        ],
+        "toPlanFt": [
+          165.311469,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-67",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          165.652493,
+          65.137942
+        ],
+        "toPlanFt": [
+          171.969258,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-68",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          152.771974,
+          65.137942
+        ],
+        "toPlanFt": [
+          156.728148,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-69",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          127.115999,
+          45.137898
+        ],
+        "toPlanFt": [
+          131.556236,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-70",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          132.897254,
+          65.137942
+        ],
+        "toPlanFt": [
+          143.670831,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-71",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          94.115968,
+          45.137898
+        ],
+        "toPlanFt": [
+          98.556206,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-72",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          99.897224,
+          65.137942
+        ],
+        "toPlanFt": [
+          110.6708,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-73",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          50.459678,
+          45.137898
+        ],
+        "toPlanFt": [
+          57.524911,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-74",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          44.678423,
+          65.137942
+        ],
+        "toPlanFt": [
+          56.77491,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-75",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          33.17456,
+          45.137898
+        ],
+        "toPlanFt": [
+          45.337399,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-76",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          19.881525,
+          45.137898
+        ],
+        "toPlanFt": [
+          22.539201,
+          45.137898
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-77",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          160.032696,
+          105.988552
+        ],
+        "toPlanFt": [
+          165.556261,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-78",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          99.897224,
+          85.988507
+        ],
+        "toPlanFt": [
+          110.6708,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-79",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          94.115968,
+          105.988552
+        ],
+        "toPlanFt": [
+          98.556206,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-80",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          57.793316,
+          85.988507
+        ],
+        "toPlanFt": [
+          66.212426,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-81",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          33.17456,
+          105.988552
+        ],
+        "toPlanFt": [
+          37.730608,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-82",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          19.881525,
+          105.988552
+        ],
+        "toPlanFt": [
+          23.531444,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-83",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          132.897254,
+          85.988507
+        ],
+        "toPlanFt": [
+          143.670831,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-84",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          127.115999,
+          105.988552
+        ],
+        "toPlanFt": [
+          131.556236,
+          105.988552
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-85",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          127.115999,
+          85.988507
+        ],
+        "toPlanFt": [
+          132.556237,
+          85.988507
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-86",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          127.115999,
+          65.137942
+        ],
+        "toPlanFt": [
+          132.556237,
+          65.137942
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "south-pipe-87",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          32.670721,
+          63.110079
+        ],
+        "toPlanFt": [
+          28.01311,
+          63.110079
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-88",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          66.440372,
+          48.403286
+        ],
+        "toPlanFt": [
+          67.940373,
+          48.403286
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-89",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          66.440372,
+          40.782921
+        ],
+        "toPlanFt": [
+          67.940373,
+          40.782921
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-90",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          66.440372,
+          48.403286
+        ],
+        "toPlanFt": [
+          66.440372,
+          40.782921
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-91",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          98.726718,
+          45.150674
+        ],
+        "toPlanFt": [
+          98.726718,
+          40.782921
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-92",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          77.841282,
+          64.403328
+        ],
+        "toPlanFt": [
+          72.445443,
+          64.403328
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-93",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          19.711019,
+          66.403353
+        ],
+        "toPlanFt": [
+          12.711013,
+          66.403353
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-94",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          110.841312,
+          64.403328
+        ],
+        "toPlanFt": [
+          105.445474,
+          64.403328
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-95",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          66.382938,
+          64.403328
+        ],
+        "toPlanFt": [
+          71.789193,
+          64.403328
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-96",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          56.945429,
+          69.356458
+        ],
+        "toPlanFt": [
+          52.945425,
+          69.356458
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-97",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          131.726748,
+          45.150674
+        ],
+        "toPlanFt": [
+          131.726748,
+          40.782921
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-98",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          143.841343,
+          48.1471
+        ],
+        "toPlanFt": [
+          143.841343,
+          46.647097
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-99",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          138.445504,
+          48.1471
+        ],
+        "toPlanFt": [
+          138.445504,
+          46.647097
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-100",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          143.841343,
+          48.1471
+        ],
+        "toPlanFt": [
+          138.445504,
+          48.1471
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-101",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          99.726719,
+          59.299143
+        ],
+        "toPlanFt": [
+          104.534015,
+          59.299143
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-102",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          111.146407,
+          48.403286
+        ],
+        "toPlanFt": [
+          112.646408,
+          48.403286
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-103",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          111.146407,
+          40.782921
+        ],
+        "toPlanFt": [
+          112.646408,
+          40.782921
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "south-pipe-104",
+        "sourceViewId": "south",
+        "fromPlanFt": [
+          111.146407,
+          48.403286
+        ],
+        "toPlanFt": [
+          111.146407,
+          40.782921
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-105",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          152.560725,
+          57.743887
+        ],
+        "toPlanFt": [
+          152.560725,
+          56.243884
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-106",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          159.777517,
+          55.854859
+        ],
+        "toPlanFt": [
+          159.777517,
+          59.24389
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-107",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          152.560725,
+          57.743887
+        ],
+        "toPlanFt": [
+          159.777517,
+          57.743887
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-108",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          159.777517,
+          51.396517
+        ],
+        "toPlanFt": [
+          159.777517,
+          46.941782
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-109",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          152.487787,
+          48.441785
+        ],
+        "toPlanFt": [
+          159.777517,
+          48.441785
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-110",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          193.569528,
+          46.704531
+        ],
+        "toPlanFt": [
+          193.569528,
+          48.204534
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-111",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          199.264268,
+          46.704531
+        ],
+        "toPlanFt": [
+          193.569528,
+          46.704531
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-112",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          165.493161,
+          67.868908
+        ],
+        "toPlanFt": [
+          165.493161,
+          72.660584
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-113",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          165.493161,
+          67.868908
+        ],
+        "toPlanFt": [
+          160.436387,
+          67.868908
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-114",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          218.826924,
+          57.694978
+        ],
+        "toPlanFt": [
+          223.533646,
+          57.694978
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-115",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          189.188265,
+          59.128303
+        ],
+        "toPlanFt": [
+          190.694315,
+          59.128303
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-116",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          189.188265,
+          45.695984
+        ],
+        "toPlanFt": [
+          190.694315,
+          45.695984
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-117",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          189.188265,
+          59.128303
+        ],
+        "toPlanFt": [
+          189.188265,
+          45.695984
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-118",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          189.188265,
+          65.844463
+        ],
+        "toPlanFt": [
+          190.694315,
+          65.844463
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-119",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          189.188265,
+          65.844463
+        ],
+        "toPlanFt": [
+          189.188265,
+          59.128303
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-120",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          180.436225,
+          58.128301
+        ],
+        "toPlanFt": [
+          180.436225,
+          56.628298
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-121",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          176.562208,
+          58.128301
+        ],
+        "toPlanFt": [
+          176.562208,
+          56.628298
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-122",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          180.436225,
+          58.128301
+        ],
+        "toPlanFt": [
+          176.562208,
+          58.128301
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-123",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          188.184231,
+          58.128301
+        ],
+        "toPlanFt": [
+          188.184231,
+          56.628298
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-124",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          188.184231,
+          58.128301
+        ],
+        "toPlanFt": [
+          180.436225,
+          58.128301
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-125",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          189.188265,
+          38.979825
+        ],
+        "toPlanFt": [
+          190.694315,
+          38.979825
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-126",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          189.188265,
+          45.695984
+        ],
+        "toPlanFt": [
+          189.188265,
+          38.979825
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-127",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          192.058248,
+          58.128301
+        ],
+        "toPlanFt": [
+          192.058248,
+          56.628298
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-128",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          192.058248,
+          58.128301
+        ],
+        "toPlanFt": [
+          188.184231,
+          58.128301
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-129",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          280.775225,
+          87.959037
+        ],
+        "toPlanFt": [
+          280.775225,
+          105.831035
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-130",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          286.161353,
+          83.723107
+        ],
+        "toPlanFt": [
+          302.179087,
+          83.723107
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-131",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          194.195714,
+          45.137905
+        ],
+        "toPlanFt": [
+          199.093075,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-132",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          280.933372,
+          87.801511
+        ],
+        "toPlanFt": [
+          285.291089,
+          87.801511
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-133",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          293.414941,
+          85.043015
+        ],
+        "toPlanFt": [
+          293.414941,
+          105.831035
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-134",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          293.573087,
+          105.98856
+        ],
+        "toPlanFt": [
+          298.162952,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-135",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          293.408404,
+          85.036505
+        ],
+        "toPlanFt": [
+          286.161353,
+          85.036505
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-136",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          302.521486,
+          83.723107
+        ],
+        "toPlanFt": [
+          309.270089,
+          83.723107
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-137",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          210.202677,
+          45.137905
+        ],
+        "toPlanFt": [
+          218.582834,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-138",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          199.435461,
+          45.137905
+        ],
+        "toPlanFt": [
+          209.860291,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-139",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          309.612488,
+          65.137945
+        ],
+        "toPlanFt": [
+          322.297702,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-140",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          294.14408,
+          65.137945
+        ],
+        "toPlanFt": [
+          298.162952,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-141",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          298.505351,
+          45.137905
+        ],
+        "toPlanFt": [
+          309.270089,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-142",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          286.958964,
+          45.137905
+        ],
+        "toPlanFt": [
+          298.162952,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-143",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          165.910147,
+          105.98856
+        ],
+        "toPlanFt": [
+          176.3925,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-144",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          152.658993,
+          105.98856
+        ],
+        "toPlanFt": [
+          159.679522,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-145",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          309.612488,
+          83.723107
+        ],
+        "toPlanFt": [
+          322.297702,
+          83.723107
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-146",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          276.468903,
+          45.137905
+        ],
+        "toPlanFt": [
+          285.291089,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-147",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          231.145062,
+          45.137905
+        ],
+        "toPlanFt": [
+          243.003849,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-148",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          218.92522,
+          45.137905
+        ],
+        "toPlanFt": [
+          226.002127,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-149",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          319.621449,
+          105.98856
+        ],
+        "toPlanFt": [
+          322.282054,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-150",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          252.821817,
+          85.988519
+        ],
+        "toPlanFt": [
+          264.967087,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-151",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          196.789414,
+          65.137945
+        ],
+        "toPlanFt": [
+          199.093075,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-152",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          176.734886,
+          105.98856
+        ],
+        "toPlanFt": [
+          189.643653,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-153",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          152.658993,
+          45.137905
+        ],
+        "toPlanFt": [
+          158.643703,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-154",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          252.068791,
+          45.137905
+        ],
+        "toPlanFt": [
+          259.162517,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-155",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          243.346248,
+          45.137905
+        ],
+        "toPlanFt": [
+          251.726392,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-156",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          272.975702,
+          85.988519
+        ],
+        "toPlanFt": [
+          275.404854,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-157",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          319.621449,
+          45.137905
+        ],
+        "toPlanFt": [
+          322.282054,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-158",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          202.667194,
+          65.137945
+        ],
+        "toPlanFt": [
+          209.860291,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-159",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          275.747254,
+          105.98856
+        ],
+        "toPlanFt": [
+          280.617079,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-160",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          243.346248,
+          105.98856
+        ],
+        "toPlanFt": [
+          251.726392,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-161",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          210.202677,
+          105.98856
+        ],
+        "toPlanFt": [
+          218.582834,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-162",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          189.986039,
+          105.98856
+        ],
+        "toPlanFt": [
+          198.366196,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-163",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          264.305453,
+          45.137905
+        ],
+        "toPlanFt": [
+          276.126503,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-164",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          210.202677,
+          85.988519
+        ],
+        "toPlanFt": [
+          218.655731,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-165",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          153.412019,
+          85.988519
+        ],
+        "toPlanFt": [
+          159.679522,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-166",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          210.202677,
+          65.137945
+        ],
+        "toPlanFt": [
+          218.655731,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-167",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          264.305453,
+          105.98856
+        ],
+        "toPlanFt": [
+          275.404854,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-168",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          252.068791,
+          105.98856
+        ],
+        "toPlanFt": [
+          259.162517,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-169",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          218.92522,
+          105.98856
+        ],
+        "toPlanFt": [
+          226.002127,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-170",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          198.708582,
+          105.98856
+        ],
+        "toPlanFt": [
+          209.860291,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-171",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          243.346248,
+          85.988519
+        ],
+        "toPlanFt": [
+          252.479417,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-172",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          219.678245,
+          85.988519
+        ],
+        "toPlanFt": [
+          231.806697,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-173",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          198.708582,
+          85.988519
+        ],
+        "toPlanFt": [
+          209.860291,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-174",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          160.021908,
+          85.988519
+        ],
+        "toPlanFt": [
+          166.571795,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-175",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          252.821817,
+          65.137945
+        ],
+        "toPlanFt": [
+          264.967087,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-176",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          243.346248,
+          65.137945
+        ],
+        "toPlanFt": [
+          252.479417,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-177",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          219.678245,
+          65.137945
+        ],
+        "toPlanFt": [
+          231.806697,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-178",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          231.145062,
+          105.98856
+        ],
+        "toPlanFt": [
+          243.003849,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-179",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          167.447574,
+          85.988519
+        ],
+        "toPlanFt": [
+          174.855073,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-180",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          276.468903,
+          65.137945
+        ],
+        "toPlanFt": [
+          285.291089,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-181",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          188.964138,
+          65.137945
+        ],
+        "toPlanFt": [
+          196.447028,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-182",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          157.046412,
+          65.137945
+        ],
+        "toPlanFt": [
+          165.321982,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-183",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          289.578878,
+          65.137945
+        ],
+        "toPlanFt": [
+          293.801681,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-184",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          322.624454,
+          45.137905
+        ],
+        "toPlanFt": [
+          327.891736,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-185",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          286.958964,
+          65.137945
+        ],
+        "toPlanFt": [
+          289.236478,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-186",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          298.505351,
+          65.137945
+        ],
+        "toPlanFt": [
+          309.270089,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-187",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          310.114505,
+          45.137905
+        ],
+        "toPlanFt": [
+          319.27905,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-188",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          309.947166,
+          105.98856
+        ],
+        "toPlanFt": [
+          319.27905,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-189",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          298.840029,
+          105.98856
+        ],
+        "toPlanFt": [
+          309.270089,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-190",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          322.624454,
+          105.98856
+        ],
+        "toPlanFt": [
+          327.891736,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-191",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          180.607418,
+          65.137945
+        ],
+        "toPlanFt": [
+          188.013038,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-192",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          172.349006,
+          65.137945
+        ],
+        "toPlanFt": [
+          179.179739,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-193",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          165.664368,
+          65.137945
+        ],
+        "toPlanFt": [
+          172.006607,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-194",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          152.731905,
+          65.137945
+        ],
+        "toPlanFt": [
+          156.704026,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-195",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          275.747254,
+          85.988519
+        ],
+        "toPlanFt": [
+          285.291089,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-196",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          265.309486,
+          85.988519
+        ],
+        "toPlanFt": [
+          272.633303,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-197",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          259.504916,
+          105.98856
+        ],
+        "toPlanFt": [
+          263.963053,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-198",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          232.149096,
+          85.988519
+        ],
+        "toPlanFt": [
+          243.003849,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-199",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          226.344526,
+          105.98856
+        ],
+        "toPlanFt": [
+          230.802663,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-200",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          182.957803,
+          85.988519
+        ],
+        "toPlanFt": [
+          188.890628,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-201",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          189.913128,
+          85.988519
+        ],
+        "toPlanFt": [
+          198.366196,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-202",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          175.730852,
+          85.988519
+        ],
+        "toPlanFt": [
+          182.280739,
+          85.988519
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-203",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          160.021908,
+          105.98856
+        ],
+        "toPlanFt": [
+          165.567761,
+          105.98856
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-204",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          259.504916,
+          45.137905
+        ],
+        "toPlanFt": [
+          263.963053,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-205",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          265.309486,
+          65.137945
+        ],
+        "toPlanFt": [
+          276.126503,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-206",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          226.344526,
+          45.137905
+        ],
+        "toPlanFt": [
+          230.802663,
+          45.137905
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-207",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          232.149096,
+          65.137945
+        ],
+        "toPlanFt": [
+          243.003849,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-208",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          199.435461,
+          65.137945
+        ],
+        "toPlanFt": [
+          202.324809,
+          65.137945
+        ],
+        "submittedColorRole": "primary-orange"
+      },
+      {
+        "id": "north-pipe-209",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          298.334152,
+          56.324207
+        ],
+        "toPlanFt": [
+          298.334152,
+          54.824204
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-210",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          302.998725,
+          56.324207
+        ],
+        "toPlanFt": [
+          302.998725,
+          54.824204
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-211",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          298.334152,
+          56.324207
+        ],
+        "toPlanFt": [
+          302.998725,
+          56.324207
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-212",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          309.441289,
+          46.318381
+        ],
+        "toPlanFt": [
+          309.441289,
+          40.782617
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-213",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          276.29771,
+          48.410535
+        ],
+        "toPlanFt": [
+          276.29771,
+          40.782617
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-214",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          230.97387,
+          45.150681
+        ],
+        "toPlanFt": [
+          236.732506,
+          45.150681
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-215",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          322.453254,
+          66.403356
+        ],
+        "toPlanFt": [
+          315.455019,
+          66.403356
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-216",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          323.858585,
+          78.063237
+        ],
+        "toPlanFt": [
+          323.858585,
+          80.178042
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-217",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          325.270494,
+          78.063237
+        ],
+        "toPlanFt": [
+          325.270494,
+          80.178042
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-218",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          308.437255,
+          63.110082
+        ],
+        "toPlanFt": [
+          306.236049,
+          63.110082
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-219",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          308.437255,
+          70.086659
+        ],
+        "toPlanFt": [
+          306.236049,
+          70.086659
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-220",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          307.7421,
+          63.110082
+        ],
+        "toPlanFt": [
+          307.7421,
+          70.086659
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-221",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          173.181847,
+          49.900121
+        ],
+        "toPlanFt": [
+          174.74681,
+          49.900121
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-222",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          173.181847,
+          43.798275
+        ],
+        "toPlanFt": [
+          174.74681,
+          43.798275
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-223",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          173.240759,
+          49.900121
+        ],
+        "toPlanFt": [
+          173.240759,
+          43.798275
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-224",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          285.726228,
+          82.229913
+        ],
+        "toPlanFt": [
+          285.726228,
+          80.288991
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-225",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          281.919253,
+          82.229913
+        ],
+        "toPlanFt": [
+          281.919253,
+          80.288991
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-226",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          285.726228,
+          81.788994
+        ],
+        "toPlanFt": [
+          281.919253,
+          81.788994
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-227",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          309.441289,
+          63.110082
+        ],
+        "toPlanFt": [
+          304.013218,
+          63.110082
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-228",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          285.726228,
+          82.749336
+        ],
+        "toPlanFt": [
+          285.726228,
+          80.288991
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-229",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          286.939415,
+          82.749336
+        ],
+        "toPlanFt": [
+          286.939415,
+          80.288991
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-230",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          243.175056,
+          48.403292
+        ],
+        "toPlanFt": [
+          237.752228,
+          48.403292
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-231",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          265.138293,
+          58.994053
+        ],
+        "toPlanFt": [
+          265.138293,
+          57.49405
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-232",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          270.032958,
+          58.994053
+        ],
+        "toPlanFt": [
+          270.032958,
+          57.49405
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-233",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          265.138293,
+          58.994053
+        ],
+        "toPlanFt": [
+          270.032958,
+          58.994053
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-234",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          321.44922,
+          52.892342
+        ],
+        "toPlanFt": [
+          317.783989,
+          52.892342
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-235",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          321.073109,
+          49.886124
+        ],
+        "toPlanFt": [
+          317.783989,
+          49.886124
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-236",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          319.29004,
+          52.892342
+        ],
+        "toPlanFt": [
+          319.29004,
+          49.886124
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-237",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          205.65191,
+          77.063235
+        ],
+        "toPlanFt": [
+          207.425732,
+          77.063235
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-238",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          205.65191,
+          78.066845
+        ],
+        "toPlanFt": [
+          207.425732,
+          78.066845
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-239",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          205.65191,
+          73.066835
+        ],
+        "toPlanFt": [
+          207.425732,
+          73.066835
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-240",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          205.919682,
+          77.063235
+        ],
+        "toPlanFt": [
+          205.919682,
+          73.066835
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-241",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          218.754027,
+          48.392875
+        ],
+        "toPlanFt": [
+          218.754027,
+          40.782617
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-242",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          243.175056,
+          48.403292
+        ],
+        "toPlanFt": [
+          243.175056,
+          40.782915
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-243",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          210.031484,
+          48.403292
+        ],
+        "toPlanFt": [
+          204.619114,
+          48.403292
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-244",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          286.787764,
+          46.28629
+        ],
+        "toPlanFt": [
+          286.787764,
+          44.786287
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-245",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          291.953326,
+          46.28629
+        ],
+        "toPlanFt": [
+          291.953326,
+          44.786287
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-246",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          286.787764,
+          46.28629
+        ],
+        "toPlanFt": [
+          291.953326,
+          46.28629
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-247",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          276.29771,
+          48.410535
+        ],
+        "toPlanFt": [
+          281.291732,
+          48.410535
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-248",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          264.440585,
+          45.150681
+        ],
+        "toPlanFt": [
+          265.946635,
+          45.150681
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-249",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          264.440585,
+          40.782617
+        ],
+        "toPlanFt": [
+          265.946635,
+          40.782617
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-250",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          264.440585,
+          45.150681
+        ],
+        "toPlanFt": [
+          264.440585,
+          40.782617
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-251",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          319.45025,
+          45.137905
+        ],
+        "toPlanFt": [
+          319.45025,
+          41.345118
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-252",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          251.897599,
+          48.392875
+        ],
+        "toPlanFt": [
+          256.666759,
+          48.392875
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-253",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          199.264268,
+          46.704531
+        ],
+        "toPlanFt": [
+          199.264268,
+          40.782617
+        ],
+        "submittedColorRole": "secondary-green"
+      },
+      {
+        "id": "north-pipe-254",
+        "sourceViewId": "north",
+        "fromPlanFt": [
+          298.334152,
+          47.785534
+        ],
+        "toPlanFt": [
+          298.334152,
+          40.782617
+        ],
+        "submittedColorRole": "secondary-green"
+      }
+    ],
+    "heads": [
+      {
+        "id": "south-head-1",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          155.398659,
+          64.7507
+        ],
+        "symbolClass": "horizontal-sidewall-reference",
+        "nearestSubmittedPipeFt": 0.387242
+      },
+      {
+        "id": "south-head-2",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          153.097441,
+          64.7507
+        ],
+        "symbolClass": "horizontal-sidewall-reference",
+        "nearestSubmittedPipeFt": 0.387242
+      },
+      {
+        "id": "south-head-3",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          29.630896,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-4",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          21.029326,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-5",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          159.15445,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-6",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          133.154426,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-7",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          35.45253,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-8",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          97.545018,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-9",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          74.154372,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-10",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          125.628378,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-11",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          101.545022,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-12",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          107.154402,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-13",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          129.154423,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-14",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          90.98772,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-15",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          53.716856,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-16",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          59.998112,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-17",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          48.709066,
+          87.730376
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 4e-06
+      },
+      {
+        "id": "south-head-18",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          54.164773,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-19",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          55.633524,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-20",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          20.873075,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-21",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          40.555385,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-22",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          150.367984,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-23",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          26.873081,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-24",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          141.545059,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-25",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          105.045025,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-26",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          160.215751,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-27",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          84.545006,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-28",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          123.545042,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-29",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          68.711658,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-30",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          112.711699,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-31",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          74.154372,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-32",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          75.544998,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-33",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          84.987715,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-34",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          59.550195,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-35",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          154.98778,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-36",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          146.154438,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-37",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          134.987761,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-38",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          134.545053,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-39",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          92.628347,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-40",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          161.987786,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-41",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          39.055384,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-42",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          92.987722,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-43",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          29.619191,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-44",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          92.545014,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-45",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          79.711668,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-46",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          150.987776,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-47",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          25.039746,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-48",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          141.987768,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-49",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          108.545028,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-50",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          154.98778,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-51",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          64.544991,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-52",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          156.201323,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-53",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          108.711695,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-54",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          117.711704,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-55",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          69.154367,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-56",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          121.54504,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-57",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          150.367984,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-58",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          101.987731,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-59",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          125.987753,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-60",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          84.987715,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-61",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          40.542392,
+          87.730376
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 4e-06
+      },
+      {
+        "id": "south-head-62",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          50.055394,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-63",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          51.633521,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-64",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          35.464235,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-65",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          145.71173,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-66",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          21.039742,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-67",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          134.711719,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-68",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          100.154396,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-69",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          117.987746,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-70",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          63.154365,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-71",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          79.711668,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-72",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          69.154367,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-73",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          68.711658,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-74",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          80.154377,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-75",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          141.711726,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-76",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          56.081441,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-77",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          156.367989,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-78",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          29.619191,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-79",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          129.154423,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-80",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          18.862657,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-81",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          88.54501,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-82",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          35.464235,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-83",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          117.987746,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-84",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          88.987719,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-85",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          26.862664,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-86",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          88.711677,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-87",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          145.987771,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-88",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          163.987788,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-89",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          18.873074,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-90",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          138.045056,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-91",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          101.711689,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-92",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          59.716862,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-93",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          130.545049,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-94",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          105.045025,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-95",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          112.711699,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-96",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          145.71173,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-97",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          96.154392,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-98",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          121.987749,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-99",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          79.98771,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-100",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          64.9877,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-101",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          44.625729,
+          87.730376
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 4e-06
+      },
+      {
+        "id": "south-head-102",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          35.45253,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-103",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          44.722056,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-104",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          29.630896,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-105",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          46.722058,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-106",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          108.987737,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-107",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          128.711714,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-108",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          75.544998,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-109",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          117.545037,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-110",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          113.154408,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-111",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          59.998112,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-112",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          21.029326,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-113",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          64.544991,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-114",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          158.987784,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-115",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          150.987776,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-116",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          140.154433,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-117",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          138.045056,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-118",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          97.545018,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-119",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          165.987793,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-120",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          42.722054,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-121",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          154.201321,
+          45.137898
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-122",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          25.029329,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-123",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          123.987751,
+          85.988507
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-124",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          96.154392,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-125",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          112.987741,
+          105.988552
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-126",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          84.711673,
+          65.137939
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "south-head-127",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          159.130864,
+          48.137904
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.303888
+      },
+      {
+        "id": "south-head-128",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          37.888119,
+          103.706279
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-129",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          37.888119,
+          90.012649
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-130",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          143.841339,
+          46.795053
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 4e-06
+      },
+      {
+        "id": "south-head-131",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          51.388573,
+          94.577193
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 7e-06
+      },
+      {
+        "id": "south-head-132",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          37.888119,
+          99.141738
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-133",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          51.388573,
+          99.141738
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 7e-06
+      },
+      {
+        "id": "south-head-134",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          87.278787,
+          67.247197
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.304155
+      },
+      {
+        "id": "south-head-135",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          37.888119,
+          94.577193
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "south-head-136",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          51.388573,
+          90.012649
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 7e-06
+      },
+      {
+        "id": "south-head-137",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          93.94546,
+          105.447497
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.567286
+      },
+      {
+        "id": "south-head-138",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          66.382934,
+          46.770592
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.057438
+      },
+      {
+        "id": "south-head-139",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          110.841309,
+          46.770592
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.305098
+      },
+      {
+        "id": "south-head-140",
+        "sourceViewId": "south",
+        "positionPlanFt": [
+          126.94549,
+          45.680122
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.568401
+      },
+      {
+        "id": "north-head-141",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          155.369182,
+          64.75071
+        ],
+        "symbolClass": "horizontal-sidewall-reference",
+        "nearestSubmittedPipeFt": 0.387235
+      },
+      {
+        "id": "north-head-142",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          153.058684,
+          64.75071
+        ],
+        "symbolClass": "horizontal-sidewall-reference",
+        "nearestSubmittedPipeFt": 0.387235
+      },
+      {
+        "id": "north-head-143",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          189.547591,
+          48.639132
+        ],
+        "symbolClass": "horizontal-sidewall-reference",
+        "nearestSubmittedPipeFt": 0.359326
+      },
+      {
+        "id": "north-head-144",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          317.022483,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-145",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          278.162597,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-146",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          237.331892,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-147",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          159.140123,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-148",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          270.465005,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-149",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          233.985113,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-150",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          192.105897,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-151",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          173.112926,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-152",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          173.196595,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-153",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          206.329709,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-154",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          311.29571,
+          83.72312
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-155",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          250.049652,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-156",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          278.162597,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-157",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          300.251339,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-158",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          193.794975,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-159",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          289.039629,
+          83.72312
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-160",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          267.118226,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-161",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          287.1989,
+          85.036491
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.4e-05
+      },
+      {
+        "id": "north-head-162",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          250.339854,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-163",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          160.205711,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-164",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          228.418451,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-165",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          228.418451,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-166",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          184.073628,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-167",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          296.235204,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-168",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          278.620137,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-169",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          184.073628,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-170",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          187.770773,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-171",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          262.934752,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-172",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          258.372124,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-173",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          245.029484,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-174",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          311.29571,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-175",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          311.29571,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-176",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          265.40036,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-177",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          229.801639,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-178",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          161.984886,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-179",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          232.434586,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-180",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          303.765457,
+          83.72312
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-181",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          181.061526,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-182",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          311.29571,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-183",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          233.817774,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-184",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          156.175086,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-185",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          266.950887,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-186",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          227.96091,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-187",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          325.938696,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-188",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          321.038618,
+          83.72312
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-189",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          170.017155,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-190",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          168.176427,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-191",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          201.30954,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-192",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          250.339854,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-193",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          245.029484,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-194",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          300.084,
+          83.72312
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-195",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          216.916539,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-196",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          278.452798,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-197",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          217.206741,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-198",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          206.329709,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-199",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          196.668526,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-200",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          195.285338,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-201",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          307.112236,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-202",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          207.880236,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-203",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          261.094024,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-204",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          172.08677,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.080163
+      },
+      {
+        "id": "north-head-205",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          239.462822,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-206",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          307.112236,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-207",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          291.215035,
+          85.036491
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.4e-05
+      },
+      {
+        "id": "north-head-208",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          245.487024,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-209",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          283.182766,
+          87.801525
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.4e-05
+      },
+      {
+        "id": "north-head-210",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          223.230943,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-211",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          225.23901,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-212",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          175.722368,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-213",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          179.053459,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-214",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          207.712897,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-215",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          274.603995,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-216",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          296.067865,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-217",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          272.595928,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-218",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          217.206741,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-219",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          321.038618,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-220",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          257.998253,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-221",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          254.355989,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-222",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          216.7492,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-223",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          156.342425,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-224",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          259.601019,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-225",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          241.30355,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-226",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          224.86514,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-227",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          325.864859,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-228",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          283.015427,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-229",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          241.013349,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-230",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          177.045391,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-231",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          274.146462,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-232",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          240.84601,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-233",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          197.126066,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-234",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          222.773403,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-235",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          321.205957,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-236",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          315.181755,
+          83.72312
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-237",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          283.182766,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-238",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          307.112236,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-239",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          245.319685,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-240",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          294.059798,
+          83.72312
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-241",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          211.896371,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-242",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          273.979123,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-243",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          174.262176,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-244",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          212.186572,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-245",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          201.30954,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-246",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          192.105897,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-247",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          300.251339,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-248",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          204.366118,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-249",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          255.906516,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-250",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          168.070642,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-251",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          234.275314,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-252",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          188.089762,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-253",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          302.092067,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-254",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          283.182766,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-255",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          188.089762,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-256",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          221.222876,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-257",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          181.74657,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-258",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          198.843932,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-259",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          202.692728,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-260",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          289.206968,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-261",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          267.408427,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-262",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          261.551564,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-263",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          249.882314,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-264",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          212.353911,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-265",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          315.181755,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-266",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          317.022483,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-267",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          158.972784,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-268",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          253.898448,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-269",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          289.039629,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-270",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          270.478051,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-271",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          211.896371,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-272",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          166.00102,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-273",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          254.523328,
+          85.988506
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-274",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          237.344938,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-275",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          220.765335,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-276",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          292.553747,
+          65.137945
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-277",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          307.279575,
+          83.72312
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-278",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          321.205957,
+          105.988547
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 1.3e-05
+      },
+      {
+        "id": "north-head-279",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          188.792946,
+          65.604757
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.395319
+      },
+      {
+        "id": "north-head-280",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          286.256992,
+          45.137905
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.530772
+      },
+      {
+        "id": "north-head-281",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          159.116441,
+          48.137911
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.303874
+      },
+      {
+        "id": "north-head-282",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          280.775225,
+          103.715159
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-283",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          280.775225,
+          90.074899
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-284",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          285.726224,
+          83.801761
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.442181
+      },
+      {
+        "id": "north-head-285",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          293.414937,
+          98.131529
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 4e-06
+      },
+      {
+        "id": "north-head-286",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          276.297703,
+          46.774233
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 7e-06
+      },
+      {
+        "id": "north-head-287",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          280.775225,
+          99.16841
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-288",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          293.414937,
+          92.893522
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 4e-06
+      },
+      {
+        "id": "north-head-289",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          199.264268,
+          45.921231
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-290",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          280.775225,
+          94.621662
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-291",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          293.414937,
+          87.655501
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 4e-06
+      },
+      {
+        "id": "north-head-292",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          231.97789,
+          86.373137
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.420996
+      },
+      {
+        "id": "north-head-293",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          286.787767,
+          45.864645
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "north-head-294",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          309.441292,
+          45.728143
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "north-head-295",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          298.334155,
+          46.461733
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 3e-06
+      },
+      {
+        "id": "north-head-296",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          218.754027,
+          46.76539
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      },
+      {
+        "id": "north-head-297",
+        "sourceViewId": "north",
+        "positionPlanFt": [
+          243.175056,
+          46.770598
+        ],
+        "symbolClass": "round-standard-spray-reference",
+        "nearestSubmittedPipeFt": 0.0
+      }
+    ]
+  },
+  "submittedElevationView": {
+    "hydraulicNodes": [
+      {
+        "nodeId": "1007",
+        "elevationFt": 82.5,
+        "sourceElevationText": "82'-6",
+        "fittings": "Spr(-8.643), fd(32'-0)",
+        "pressurePsi": 8.643,
+        "dischargeGpm": 16.46,
+        "nodeKind": "sprinkler",
+        "planPointFt": [
+          188.180195,
+          45.699483
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1008",
+        "elevationFt": 82.5,
+        "sourceElevationText": "82'-6",
+        "fittings": "Spr(-8.528), fd(32'-0)",
+        "pressurePsi": 8.528,
+        "dischargeGpm": 16.35,
+        "nodeKind": "sprinkler",
+        "planPointFt": [
+          180.437979,
+          45.699483
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1496",
+        "elevationFt": 83.333333,
+        "sourceElevationText": "83'-4",
+        "fittings": "",
+        "pressurePsi": 12.335,
+        "dischargeGpm": 0.0,
+        "nodeKind": "pipe",
+        "planPointFt": [
+          194.070526,
+          45.132816
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1525",
+        "elevationFt": 83.333333,
+        "sourceElevationText": "83'-4",
+        "fittings": "PO(5'-0)",
+        "pressurePsi": 11.641,
+        "dischargeGpm": 0.0,
+        "nodeKind": "pipe",
+        "planPointFt": [
+          189.184228,
+          45.132816
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1542",
+        "elevationFt": 83.333333,
+        "sourceElevationText": "83'-4",
+        "fittings": "PO(5'-0)",
+        "pressurePsi": 11.58,
+        "dischargeGpm": 0.0,
+        "nodeKind": "pipe",
+        "planPointFt": [
+          188.180195,
+          45.132816
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1577",
+        "elevationFt": 83.333333,
+        "sourceElevationText": "83'-4",
+        "fittings": "T(5'-0), Tr(1'-0)",
+        "pressurePsi": 10.708,
+        "dischargeGpm": 0.0,
+        "nodeKind": "pipe",
+        "planPointFt": [
+          188.180195,
+          65.132856
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1602",
+        "elevationFt": 89.416667,
+        "sourceElevationText": "89'-5",
+        "fittings": "T(3'-7)",
+        "pressurePsi": 7.505,
+        "dischargeGpm": 0.0,
+        "nodeKind": "pipe",
+        "planPointFt": [
+          188.180195,
+          39.166137
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1626",
+        "elevationFt": 83.333333,
+        "sourceElevationText": "83'-4",
+        "fittings": "PO(5'-0)",
+        "pressurePsi": 11.485,
+        "dischargeGpm": 0.0,
+        "nodeKind": "pipe",
+        "planPointFt": [
+          181.442013,
+          45.132816
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1657",
+        "elevationFt": 83.333333,
+        "sourceElevationText": "83'-4",
+        "fittings": "T(5'-0)",
+        "pressurePsi": 10.652,
+        "dischargeGpm": 0.0,
+        "nodeKind": "pipe",
+        "planPointFt": [
+          180.437979,
+          65.132856
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1658",
+        "elevationFt": 83.333333,
+        "sourceElevationText": "83'-4",
+        "fittings": "PO(5'-0)",
+        "pressurePsi": 11.486,
+        "dischargeGpm": 0.0,
+        "nodeKind": "pipe",
+        "planPointFt": [
+          180.437979,
+          45.132816
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "1730",
+        "elevationFt": 89.416667,
+        "sourceElevationText": "89'-5",
+        "fittings": "T(3'-7)",
+        "pressurePsi": 7.425,
+        "dischargeGpm": 0.0,
+        "nodeKind": "pipe",
+        "planPointFt": [
+          180.437979,
+          39.166137
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "3922",
+        "elevationFt": 82.5,
+        "sourceElevationText": "82'-6\u00bd",
+        "fittings": "Spr(-10.268)",
+        "pressurePsi": 10.268,
+        "dischargeGpm": 17.94,
+        "nodeKind": "sprinkler",
+        "planPointFt": [
+          188.793771,
+          67.588417
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "3933",
+        "elevationFt": 82.5,
+        "sourceElevationText": "82'-6\u00bd",
+        "fittings": "Spr(-10.027)",
+        "pressurePsi": 10.027,
+        "dischargeGpm": 17.73,
+        "nodeKind": "sprinkler",
+        "planPointFt": [
+          188.180195,
+          59.132844
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "3974",
+        "elevationFt": 82.5,
+        "sourceElevationText": "82'-6\u00bd",
+        "fittings": "Spr(-9.975)",
+        "pressurePsi": 9.975,
+        "dischargeGpm": 17.69,
+        "nodeKind": "sprinkler",
+        "planPointFt": [
+          180.437979,
+          59.132844
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "3980",
+        "elevationFt": 81.333333,
+        "sourceElevationText": "81'-4\u00bd",
+        "fittings": "Spr(-10.465)",
+        "pressurePsi": 10.465,
+        "dischargeGpm": 18.12,
+        "nodeKind": "sprinkler",
+        "planPointFt": [
+          179.355854,
+          69.57731
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "4032",
+        "elevationFt": 89.416667,
+        "sourceElevationText": "89'-5",
+        "fittings": "Spr(-7.076)",
+        "pressurePsi": 7.076,
+        "dischargeGpm": 14.9,
+        "nodeKind": "sprinkler",
+        "planPointFt": [
+          188.180195,
+          38.666136
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      },
+      {
+        "nodeId": "4074",
+        "elevationFt": 89.416667,
+        "sourceElevationText": "89'-5",
+        "fittings": "Spr(-7.000)",
+        "pressurePsi": 7.0,
+        "dischargeGpm": 14.82,
+        "nodeKind": "sprinkler",
+        "planPointFt": [
+          180.437979,
+          38.666136
+        ],
+        "sourceViewId": "north",
+        "calloutRegistration": "yellow-node-callout-to-black-vector-leader-endpoint",
+        "protectionSurfaceKind": "level8-ceiling-or-sky-balcony-not-pitched-roof"
+      }
+    ],
+    "sourcePageRole": "DA-3 submitted node analysis"
+  },
+  "atticProtectionBasis": {
+    "sourceNote": "ATTIC SPACE WILL BE FILLED WITH NON-COMBUSTIBLE INSULATION",
+    "physicalPages": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pageBindings": [
+      {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 5,
+        "pageIndex": 4,
+        "renderedPageSha256": "5cbce52b8130358639a8cba95ee00774e96e5b2694af1619c34e51de19b38866",
+        "sheetId": "submitted-fire-physical-5",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 6,
+        "pageIndex": 5,
+        "renderedPageSha256": "cf476dc5a98e51e51d90e8bda8b8e5232e2ded6d1fc199153e5f1cbf84647731",
+        "sheetId": "submitted-fire-physical-6",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 7,
+        "pageIndex": 6,
+        "renderedPageSha256": "1967e3fe1340dc54b87d037c9225a5074c52aad4267ad6ec5ec7e27ae72615b0",
+        "sheetId": "submitted-fire-physical-7",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 8,
+        "pageIndex": 7,
+        "renderedPageSha256": "d9cf92d5dc31a0632104327db5b9c189a85e585b80415a5d3f06c5c682d03e8f",
+        "sheetId": "submitted-fire-physical-8",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 9,
+        "pageIndex": 8,
+        "renderedPageSha256": "9fa3df955130ebe755b2e2e638019347eb83edf55d41195cdbf4cf099b314425",
+        "sheetId": "submitted-fire-physical-9",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 10,
+        "pageIndex": 9,
+        "renderedPageSha256": "01ed01d37238b597ba8174604d64ab6d4fa01a04ffd8f1c75637b835928c14f7",
+        "sheetId": "submitted-fire-physical-10",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 11,
+        "pageIndex": 10,
+        "renderedPageSha256": "9f123ec689506ed8186c50f82b60b5203e8ecca2df2ecdbf08ec510ec00add4d",
+        "sheetId": "submitted-fire-physical-11",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 12,
+        "pageIndex": 11,
+        "renderedPageSha256": "2f20907cec537c92bff749f476d7c14712941421b367c2f6f4b428ccae2e6d20",
+        "sheetId": "submitted-fire-physical-12",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    ],
+    "interpretation": "The submitted design keeps Level 8 ceiling/sky-balcony nodes separate from the pitched roof planes; it does not prove a universal code exemption."
+  },
+  "coverage": {
+    "complete": false,
+    "registeredViews": [
+      "FP-8 south",
+      "FP-8 north",
+      "DA-3 node analysis"
+    ],
+    "headCount": 297,
+    "pipeSegmentCount": 254,
+    "hydraulicNodeCount": 17,
+    "unresolved": [
+      "remaining-FP8-symbol-classes-not-vector-classified",
+      "submitted-node-callouts-outside-DA3-not-plan-registered",
+      "code-compliance-and-approval-not-inferred-from-submitted-reference"
+    ]
+  },
+  "claimStatus": "completed-bid-calibration-reference-not-code-compliance-or-approval",
+  "evidenceReceiptSha256": "8c6c0ccc421b14c25ad18b22f1157cf0c4853c9835e5b9ee5a9b7f07cb47a645"
+}

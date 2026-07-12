@@ -1023,6 +1023,7 @@ import { generateSection as hfGenerateSection, planeFromPoints as hfPlaneFromPoi
 // fail-closed and prevent any code-compliance claim.
 import { reconstructRoofPlanes as hfReconstructRoofPlanes, projectCadModelToRoof as hfProjectCadModelToRoof } from '/src/engine/roof-geometry.js';
 import { validateRoofCoordination as hfValidateRoofCoordination, mergeRoofCoordination as hfMergeRoofCoordination, checkRoofRouteAgainstCoordination as hfCheckRoofRouteAgainstCoordination } from '/src/engine/roof-coordination.js';
+import { validateSubmittedSprinklerCalibration as hfValidateSubmittedSprinklerCalibration, renderSubmittedCalibrationViews as hfRenderSubmittedCalibrationViews } from '/src/engine/submitted-sprinkler-calibration.js';
 // PHASE 4 chunk 3: submittal sheet set (FP-0..FP-D) on a titleblock (pure builder).
 import { buildSubmittalSheets as hfBuildSubmittalSheets, renderSheetSetHtml as hfRenderSheetSetHtml, SUBMITTAL_SHEETS_DISCLAIMER } from '/src/engine/submittal-sheets.js';
 // PHASE 4: drop-ceiling tile grid + center-heads-on-tile (pure synthesizer). Drives the
@@ -1216,6 +1217,7 @@ const layerGroups = {};
 let modelGroup, currentCadModel = null;
 let planGroup = null, planVisible = true, lastPlanBbox = null; // HF-A1-UNDERLAY ground-plane floor plan
 let hfRoofModel = null, hfRoofModelPromise = null, hfRoofPlaneGroup = null;
+let hfSubmittedCalibration = null, hfSubmittedCalibrationPromise = null;
 
 function hfRoofDisplayElevation(model, point) {
   const plane = (model && model.planes || []).find((entry) => pointInPolygon(point, entry.boundaryPlanFt));
@@ -1299,6 +1301,61 @@ async function hfLoadSourceBoundRoof() {
   return hfRoofModelPromise;
 }
 
+async function hfLoadSubmittedCalibration() {
+  if (hfSubmittedCalibration) return hfSubmittedCalibration;
+  if (!hfSubmittedCalibrationPromise) hfSubmittedCalibrationPromise = Promise.all([
+    hfLoadSourceBoundRoof(),
+    fetch('/src/data/submitted-fp8-calibration.cooperative-1881.json', { credentials: 'same-origin' }),
+    fetch('/src/data/plan-levels.cooperative-1881.json', { credentials: 'same-origin' }),
+  ]).then(async ([roofModel, calibrationResponse, levelsResponse]) => {
+    if (!calibrationResponse.ok) throw new Error(`submitted FP-8 calibration HTTP ${calibrationResponse.status}`);
+    if (!levelsResponse.ok) throw new Error(`current A-108 geometry HTTP ${levelsResponse.status}`);
+    const levels = await levelsResponse.json();
+    const level8 = (levels.levels || []).find((entry) => Number(entry.level) === 8);
+    if (!level8 || !level8.plan || !Array.isArray(level8.plan.footprintFt)) throw new Error('current A-108 footprint unavailable');
+    const validation = await hfValidateSubmittedSprinklerCalibration(await calibrationResponse.json(), {
+      planFootprint: level8.plan.footprintFt, roofModel,
+    });
+    if (!validation || validation.status !== 'passed') throw new Error((validation && validation.issues || []).map((entry) => entry.code).join(', ') || 'submitted FP-8 calibration failed');
+    const views = hfRenderSubmittedCalibrationViews(validation);
+    if (!views || views.status !== 'passed') throw new Error('submitted FP-8 calibration view generation failed');
+    hfSubmittedCalibration = { validation, views };
+    window.__hfRoofGeometry.calibration = validation;
+    window.__hfRoofGeometry.calibrationViews = views;
+    return hfSubmittedCalibration;
+  }).catch((error) => { hfSubmittedCalibrationPromise = null; throw error; });
+  return hfSubmittedCalibrationPromise;
+}
+
+async function hfShowSubmittedCalibrationViews() {
+  try {
+    const calibration = await hfLoadSubmittedCalibration();
+    let viewer = document.getElementById('hfSubmittedCalibrationViewer');
+    if (!viewer) {
+      viewer = document.createElement('div');
+      viewer.id = 'hfSubmittedCalibrationViewer';
+      viewer.style.cssText = 'position:fixed;inset:72px 44px 42px 44px;z-index:10060;background:rgba(12,13,18,.96);backdrop-filter:blur(22px);border:1px solid rgba(125,211,252,.35);border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.55);padding:18px;display:grid;grid-template-rows:auto 1fr;gap:12px;color:#e5e7eb';
+      document.body.appendChild(viewer);
+    }
+    const counts = calibration.validation.counts;
+    viewer.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+        <div><b>Cooperative 1881 · submitted FP-8 / DA-3 calibration</b><div style="font:11px/1.45 var(--mono);color:#a5b4c8;margin-top:4px">${counts.heads} vector head candidates · ${counts.pipeSegments} pipe segments · ${counts.hydraulicNodes} registered DA-3 nodes · <span style="color:#4ade80">${counts.pitchedRoofNodes} nodes on pitched roof planes</span><br>Finished-bid reference: Level 8 ceiling/sky-balcony geometry. Do not blindly project this layout to the pitched roof. Attic requirement and code approval remain fail-closed.</div></div>
+        <button id="hfSubmittedCalibrationClose" style="border:1px solid #475569;background:#111827;color:#fff;border-radius:10px;padding:7px 11px;cursor:pointer">Close</button>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:12px;min-height:0">
+        <section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered top view · FP-8 → A-108</h3>${calibration.views.topSvg}</section>
+        <section style="background:#fff;border-radius:12px;overflow:auto;padding:8px"><h3 style="color:#111;margin:2px 8px 8px;font:600 12px var(--mono)">Registered elevation view · DA-3 nodes</h3>${calibration.views.elevationSvg}</section>
+      </div>`;
+    viewer.querySelector('#hfSubmittedCalibrationClose').onclick = () => { viewer.remove(); };
+    $('status').textContent = `submitted FP-8/DA-3 calibration loaded — ${counts.heads} vector head candidates, ${counts.pipeSegments} pipe segments, ${counts.hydraulicNodes} elevation nodes, and 0 nodes on pitched roof planes. Finished design uses Level 8 ceiling/sky-balcony reference; code compliance remains fail-closed.`;
+    return calibration;
+  } catch (error) {
+    $('status').textContent = `submitted FP-8/DA-3 calibration blocked — ${error.message || error}`;
+    return null;
+  }
+}
+
 async function hfShowSourceBoundRoof() {
   try {
     const model = await hfLoadSourceBoundRoof();
@@ -1307,9 +1364,12 @@ async function hfShowSourceBoundRoof() {
       return null;
     }
     hfRenderRoofPlaneOverlay(model);
+    let calibration = null;
+    try { calibration = await hfLoadSubmittedCalibration(); } catch (_) { calibration = null; }
     const gate = model.coverage.complete ? 'projection gate passed' : `projection blocked: ${model.coverage.unresolvedRegions.join(', ')}`;
     const counts = model.coordination.counts;
-    $('status').textContent = `${model.planes.length} pitched-roof planes + ${counts.acceptedHeatPumpFootprints} M109 heat pumps + ${counts.acceptedOutdoorUnitFootprints} outdoor units + ${counts.acceptedVentPoints} P109 vents registered to A-121 (${counts.unmatchedMechanicalLabels} mechanical and ${counts.unmatchedVentLabels} vent labels unmatched) — ${gate}; equipment heights/clearances unresolved; not a code-compliance or approval claim.`;
+    const reference = calibration ? ` Finished FP-8/DA-3 reference has ${calibration.validation.counts.pitchedRoofNodes} nodes on pitched planes and is classified as Level 8 ceiling/sky-balcony geometry.` : '';
+    $('status').textContent = `${model.planes.length} pitched-roof planes + ${counts.acceptedHeatPumpFootprints} M109 heat pumps + ${counts.acceptedOutdoorUnitFootprints} outdoor units + ${counts.acceptedVentPoints} P109 vents registered to A-121 (${counts.unmatchedMechanicalLabels} mechanical and ${counts.unmatchedVentLabels} vent labels unmatched) — ${gate}; equipment heights/clearances unresolved.${reference} This is not a code-compliance or approval claim.`;
     return model;
   } catch (error) {
     $('status').textContent = `roof reconstruction blocked — ${error.message || error}`;
@@ -1322,6 +1382,17 @@ async function hfElevateModelToSourceBoundRoof() {
   if (!model || !currentCadModel) {
     if (model && !currentCadModel) $('status').textContent = 'roof projection blocked — generate or load a CAD model first.';
     return null;
+  }
+  const calibration = await hfLoadSubmittedCalibration().catch(() => null);
+  if (calibration && calibration.validation.protectionBasis.projectLevel8LayoutMayBeBlindlyProjectedToRoof === false) {
+    const result = {
+      status: 'blocked', model: null, complianceReady: false,
+      issues: [{ severity: 'blocking', code: 'SUBMITTED_LEVEL8_REFERENCE_NOT_PITCHED_ROOF_PROJECTION', refs: ['FP-8-R2', 'DA-3-node-analysis-R2'], message: 'The completed Level 8 design is registered to ceiling/sky-balcony surfaces; none of its DA-3 nodes land on a pitched roof plane.' }],
+      nextAction: 'Use the submitted top/elevation calibration viewer and derive a separate attic/ceiling protection basis before creating any pitched-roof sprinkler layout.',
+    };
+    window.__hfRoofGeometry.lastProjection = result;
+    $('status').textContent = 'roof projection blocked by finished-bid calibration — FP-8/DA-3 contains 0 pitched-roof nodes and the submitted attic note is bound on pages 5–12. Use the registered top/elevation reference; do not rotate the Level 8 system onto the roof.';
+    return result;
   }
   const routeCheck = hfCheckRoofRouteAgainstCoordination(
     (currentCadModel.solids || []).filter((solid) => solid && solid.kind === 'pipe').map((solid) => ({ from: solid.from, to: solid.to })),
@@ -1347,9 +1418,11 @@ async function hfElevateModelToSourceBoundRoof() {
 }
 
 window.__hfRoofGeometry = {
-  model: null, coordination: null, lastRouteCheck: null, lastProjection: null,
+  model: null, coordination: null, calibration: null, calibrationViews: null, lastRouteCheck: null, lastProjection: null,
   load: hfLoadSourceBoundRoof,
   show: hfShowSourceBoundRoof,
+  loadCalibration: hfLoadSubmittedCalibration,
+  showCalibrationViews: hfShowSubmittedCalibrationViews,
   projectCurrent: hfElevateModelToSourceBoundRoof,
 };
 // R3: real CAD part mesh for sprinkler heads, loaded from the parts library
@@ -11232,7 +11305,7 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'roof-planes.automatic-roof-planes': () => hfShowSourceBoundRoof(),
     'roof-planes.elevate-elements-to-roof-planes': () => hfElevateModelToSourceBoundRoof(),
     'roof-planes.rotate-beams-to-roof-planes': hfHonestStub('needs roof-plane + beam elements — not in the client model.'),
-    'roof-planes.rotate-sprinklers-to-roof-planes': () => hfElevateModelToSourceBoundRoof(),
+    'roof-planes.rotate-sprinklers-to-roof-planes': () => hfShowSubmittedCalibrationViews(),
     'roof-planes.stretch-columns-to-roof-plane': hfHonestStub('needs roof-plane + column elements — not in the client model.'),
     'roof-planes.stretch-hangers': () => hfElevateModelToSourceBoundRoof(),
     'roof-planes.stretch-sway-braces': hfHonestStub('needs roof-plane + sway-brace elements — not in the client model.'),

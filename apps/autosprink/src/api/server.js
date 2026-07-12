@@ -23,6 +23,11 @@ import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
 import { floorPlanFromSvg, floorPlanFromDxf, normalizeFloorPlan, buildingFromSvg, buildingFromDxf } from '../engine/floorplan-import.js';
 import { floorPlanFromPdf } from '../engine/pdf-floorplan.js';
+import { reconstructRoofPlanes } from '../engine/roof-geometry.js';
+import {
+  renderSubmittedCalibrationViews,
+  validateSubmittedSprinklerCalibration,
+} from '../engine/submitted-sprinkler-calibration.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -65,6 +70,9 @@ import { createSmtpTransport, createMockSmtpTransport } from '../autobid/smtp-tr
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const log = createLogger('api-server');
+const COOPERATIVE_1881_ROOF_ARTIFACT_PATH = path.resolve(__dirname, '../data/roof-reconstruction.cooperative-1881.json');
+const COOPERATIVE_1881_PLAN_LEVELS_PATH = path.resolve(__dirname, '../data/plan-levels.cooperative-1881.json');
+const COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-fp8-calibration.cooperative-1881.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -1553,6 +1561,67 @@ app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
       review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
     };
   }));
+});
+
+app.get('/api/projects/:name/submitted-sprinkler-calibration', authMiddleware, async (req, res) => {
+  if (req.params.name !== COOPERATIVE_1881_PROJECT_NAME) {
+    return res.status(404).json({
+      error: 'submitted_calibration_not_found',
+      message: 'No source-bound submitted sprinkler calibration exists for this project.',
+    });
+  }
+
+  try {
+    const roofInput = JSON.parse(fs.readFileSync(COOPERATIVE_1881_ROOF_ARTIFACT_PATH, 'utf8'));
+    const planLevels = JSON.parse(fs.readFileSync(COOPERATIVE_1881_PLAN_LEVELS_PATH, 'utf8'));
+    const packet = JSON.parse(fs.readFileSync(COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH, 'utf8'));
+    const level8 = planLevels.levels?.find((entry) => entry.level === 8);
+    const roofModel = await reconstructRoofPlanes(roofInput);
+    const validation = await validateSubmittedSprinklerCalibration(packet, {
+      planFootprint: level8?.plan?.footprintFt,
+      roofModel,
+    });
+
+    if (validation.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked',
+        artifactType: validation.artifactType,
+        projectName: req.params.name,
+        issues: validation.issues,
+        complianceReady: false,
+        claimStatus: validation.claimStatus,
+      });
+    }
+
+    const views = renderSubmittedCalibrationViews(validation);
+    return res.json({
+      status: 'passed',
+      artifactType: 'halofire.autobid-submitted-sprinkler-calibration.v1',
+      projectName: req.params.name,
+      level: packet.level,
+      evidenceReceiptSha256: packet.evidenceReceiptSha256,
+      sourceBindings: packet.sourceBindings,
+      counts: validation.counts,
+      protectionBasis: validation.protectionBasis,
+      roofRelations: validation.roofRelations,
+      coverage: packet.coverage,
+      views: {
+        status: views.status,
+        topSvg: views.topSvg,
+        elevationSvg: views.elevationSvg,
+      },
+      complianceReady: false,
+      claimStatus: validation.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load submitted sprinkler calibration', { error: error.message });
+    return res.status(500).json({
+      status: 'blocked',
+      error: 'submitted_calibration_load_failed',
+      message: 'The source-bound submitted sprinkler calibration could not be loaded.',
+      complianceReady: false,
+    });
+  }
 });
 
 app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {

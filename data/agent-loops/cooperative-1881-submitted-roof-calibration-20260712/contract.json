@@ -1,0 +1,43 @@
+{
+  "name": "cooperative-1881-submitted-roof-calibration-20260712",
+  "owner": "codex",
+  "goal": "Use the completed Cooperative 1881 fire-sprinkler and hydraulic bid files as sealed calibration evidence, register FP-8 and DA-3 to current A-108/A-121 geometry, expose top/elevation reference views in Studio and AutoBid, and prevent blind pitched-roof projection when the submitted design uses ceiling and sky-balcony surfaces.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design",
+    "apps/autosprink/src/data/plan-levels.cooperative-1881.json",
+    "apps/autosprink/src/data/roof-reconstruction.cooperative-1881.json",
+    "apps/autosprink/src/data/submitted-fp8-calibration.cooperative-1881.json"
+  ],
+  "exit_criteria": [
+    "FP-8 physical page 12 and DA-3 physical page 20 are immutably bound to the completed fire and hydraulic PDF hashes.",
+    "Both FP-8 rotated views are registered to A-108 with printed scale and grid residual gates.",
+    "Submitted pipe vectors, sprinkler symbol candidates, and DA-3 hydraulic nodes render as registered top and elevation views.",
+    "All submitted DA-3 nodes are adversarially checked against the source-bound pitched roof model.",
+    "A malicious node relocation onto a pitched roof plane is rejected.",
+    "Studio and AutoBid block blind Level 8 roof projection and retain code-compliance and attic-requirement claims fail-closed.",
+    "Focused/full regression, production build, formal proof, authenticated browser, deployment, login, and live artifact parity gates pass."
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/cooperative-1881-submitted-roof-calibration-20260712/contract.json",
+    "npx vitest run tests/submitted-sprinkler-calibration.test.js tests/submitted-sprinkler-calibration-api.test.js tests/roof-geometry.test.js tests/roof-coordination.test.js tests/cooperative-per-level-geometry.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "GX10 Lean proof that 17 non-roof submitted nodes do not authorize blind roof projection",
+    "authenticated Studio and AutoBid browser smoke",
+    "live VPS service, login, API, and artifact hash parity"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-submitted-roof-calibration-20260712/state.json",
+  "evidence_paths": [
+    "apps/autosprink/out/agent-loops/cooperative-1881-submitted-roof-calibration-20260712",
+    "data/agent-loops/cooperative-1881-submitted-roof-calibration-20260712/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 180000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
