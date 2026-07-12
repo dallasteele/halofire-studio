@@ -10,13 +10,14 @@ describe('Dillon submitted sloped-ceiling calibration', () => {
     const result = await validateSubmittedSlopedCeilingCalibration(packet);
     expect(result.status).toBe('passed');
     expect(result.counts.submittedScheduleHeads).toBe(52);
-    expect(result.counts.vectorCandidates).toBe(51);
-    expect(result.counts.unresolvedHeadSymbols).toBe(1);
+    expect(result.counts).toMatchObject({ vectorCandidates: 52, fp1VectorCandidates: 51, fp2ContinuationCandidates: 1, unresolvedHeadSymbols: 0 });
     expect(result.counts.positiveAnnotationProximityMatches).toBeGreaterThanOrEqual(3);
     expect(result.slopeEvidenceReady).toBe(true);
     expect(result.fullSlopeSurfaceRegistrationReady).toBe(true);
     expect(result.generatedLayoutParityReady).toBe(false);
     expect(result.complianceReady).toBe(false);
+    expect(packet.coverage).toEqual({ complete: true, detectedVectorCandidates: 52, unresolved: [] });
+    expect(packet.continuationHeads).toEqual([{ id: 'cross-12', sourceId: 'submitted-FP2', sourcePageIndex: 0, pointPortraitTopLeftPt: [1398.27, 1032.33], symbolClass: 'cross-pendent-vector-candidate', vectorSignature: 'paired-8.7pt-diagonals-over-filled-pendent-center', sourceDrawingIndices: [2408, 2434] }]);
   });
 
   it('renders only after the immutable evidence loop passes', async () => {
@@ -43,5 +44,7 @@ describe('Dillon submitted sloped-ceiling calibration', () => {
     expect((await validateSubmittedSlopedCeilingCalibration(badDatum)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_DATUM_TRANSFORM_DRIFT');
     const badHydraulicDatum = await reseal((draft) => { draft.hydraulicDatumJoin.activeNodes[0].projectElevationFt += 1; });
     expect((await validateSubmittedSlopedCeilingCalibration(badHydraulicDatum)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_HYDRAULIC_DATUM_JOIN_INVALID');
+    const badContinuation = await reseal((draft) => { draft.continuationHeads[0].pointPortraitTopLeftPt[0] += 5; });
+    expect((await validateSubmittedSlopedCeilingCalibration(badContinuation)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_FP2_CONTINUATION_DRIFT');
   });
 });

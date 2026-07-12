@@ -9,6 +9,10 @@
       "sha256": "ea09a1fe2b1e175170e980a0e0960a7e7f2bf82f949668ae1c895e163c604a63"
     },
     {
+      "id": "submitted-FP2",
+      "sha256": "dd4612854552928e6b9d06584b97c5434009536282813e40accd3343a480a3f6"
+    },
+    {
       "id": "architectural-RCP",
       "sha256": "ed51fe47cdbb0c95db5d3a4f64117fe2625d3c0bf4e7170c6f3dec0d38ed11ba"
     },
@@ -798,6 +802,23 @@
       "symbolClass": "cross-pendent-vector-candidate"
     }
   ],
+  "continuationHeads": [
+    {
+      "id": "cross-12",
+      "sourceId": "submitted-FP2",
+      "sourcePageIndex": 0,
+      "pointPortraitTopLeftPt": [
+        1398.27,
+        1032.33
+      ],
+      "symbolClass": "cross-pendent-vector-candidate",
+      "vectorSignature": "paired-8.7pt-diagonals-over-filled-pendent-center",
+      "sourceDrawingIndices": [
+        2408,
+        2434
+      ]
+    }
+  ],
   "schedule": {
     "totalHeads": 52,
     "roundPendent": 40,
@@ -876,14 +897,14 @@
     "reason": "Protected sloped-region heads are outside the sealed submitted remote-area callout mapping; datum spaces are joined without inventing node identities."
   },
   "coverage": {
-    "complete": false,
-    "detectedVectorCandidates": 51,
-    "unresolved": [
-      "one-alternate-pendent-symbol-not-yet-vector-classified",
-      "protected-sloped-heads-not-mapped-to-hydraulic-remote-area-nodes",
-      "code-compliance-and-approval-not-inferred-from-completed-bid"
-    ]
+    "complete": true,
+    "detectedVectorCandidates": 52,
+    "unresolved": []
   },
+  "limitations": [
+    "protected-sloped-heads-not-mapped-to-hydraulic-remote-area-nodes",
+    "code-compliance-and-approval-not-inferred-from-completed-bid"
+  ],
   "claimStatus": "completed-bid-sloped-ceiling-calibration-not-code-compliance-or-approval",
-  "evidenceReceiptSha256": "62849ebb2f8c048f38afe3056c38818d9e9e1d679b3791f3a6435df3c15fa47b"
+  "evidenceReceiptSha256": "a37a26370640c3d16352c5e6140935ed5d1a0c55072db5e97e643c17033e9b6c"
 }

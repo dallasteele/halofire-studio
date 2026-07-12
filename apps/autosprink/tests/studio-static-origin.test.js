@@ -685,4 +685,12 @@ describe('studio static origin handling', () => {
     expect(html).toContain('employee_decision');
     expect(html).toContain('source_refs');
   });
+
+  it('shows employees the completed Dillon FP-1 plus FP-2 schedule closure without clearing regulated gates', async () => {
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('52 of 52 scheduled symbols are source-classified');
+    expect(html).toContain('protected-head node identity, compliance, and approval remain fail-closed');
+  });
 });

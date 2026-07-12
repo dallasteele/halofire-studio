@@ -2,7 +2,7 @@
   "name": "dillon-sloped-ceiling-calibration-20260712",
   "owner": "codex",
   "loop_type": "closed",
-  "goal": "Bind the completed Dillon FP-1, reflected ceiling plan, and RA-1 through RA-3 calculations into an immutable positive 3:12 sloped-ceiling calibration, expose it in AutoBid and Studio, and keep full surface parity and code compliance fail-closed.",
+  "goal": "Bind the completed Dillon FP-1 and FP-2 continuation, reflected ceiling plan, and RA-1 through RA-3 calculations into an immutable positive 3:12 sloped-ceiling calibration, expose it in AutoBid and Studio, and keep unproven hydraulic identity and code compliance fail-closed.",
   "sources_of_truth": [
     "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Dillon Residence",
     "apps/autosprink/tmp/pdfs/dillon-roof-calibration",
@@ -10,7 +10,7 @@
   ],
   "exit_criteria": [
     "Three independent registration controls agree within one PDF point RMS",
-    "All 40 round pendent and 11 of 12 alternate pendent submitted vectors are classified; the single remaining symbol stays explicit",
+    "All 40 round pendent and 12 alternate pendent submitted vectors are classified across FP-1 and the explicit FP-2 continuation, with zero unresolved schedule symbols",
     "At least three completed heads screen positively against source-registered 3:12 annotations",
     "Four explicit 3:12 ceiling-region polygons are sealed to the RCP-to-FP transform and submitted-head membership",
     "The geometry-only generator reproduces both protected-region heads without false positives in the three completed empty regions",

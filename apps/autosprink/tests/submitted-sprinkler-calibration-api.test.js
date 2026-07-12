@@ -118,8 +118,9 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     const result = await response.json();
     expect(result.status).toBe('passed');
     expect(result.counts.submittedScheduleHeads).toBe(52);
-    expect(result.counts.vectorCandidates).toBe(51);
-    expect(result.counts.unresolvedHeadSymbols).toBe(1);
+    expect(result.counts).toMatchObject({ vectorCandidates: 52, fp1VectorCandidates: 51, fp2ContinuationCandidates: 1, unresolvedHeadSymbols: 0 });
+    expect(result.coverage).toEqual({ complete: true, detectedVectorCandidates: 52, unresolved: [] });
+    expect(result.continuationHeads).toEqual([expect.objectContaining({ id: 'cross-12', sourceId: 'submitted-FP2', pointPortraitTopLeftPt: [1398.27, 1032.33] })]);
     expect(result.counts.positiveAnnotationProximityMatches).toBeGreaterThanOrEqual(3);
     expect(result.slopeEvidenceReady).toBe(true);
     expect(result.fullSlopeSurfaceRegistrationReady).toBe(true);

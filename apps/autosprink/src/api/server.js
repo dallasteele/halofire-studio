@@ -1666,7 +1666,7 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
       status: 'passed', artifactType: 'halofire.autobid-submitted-sloped-ceiling-calibration.v1',
       projectName: req.params.name, evidenceReceiptSha256: packet.evidenceReceiptSha256,
       sources: packet.sources, registration: packet.registration, counts: validation.counts,
-      proximityMatches: validation.proximityMatches, coverage: packet.coverage,
+      proximityMatches: validation.proximityMatches, coverage: packet.coverage, continuationHeads: packet.continuationHeads, limitations: packet.limitations,
       slopeEvidenceReady: validation.slopeEvidenceReady,
       fullSlopeSurfaceRegistrationReady: validation.fullSlopeSurfaceRegistrationReady,
       generatedLayoutParityReady: parity.generatedLayoutParityReady,

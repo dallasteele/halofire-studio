@@ -14,6 +14,7 @@ const draft = {
   artifactType: 'halofire.submitted-sloped-ceiling-calibration.v1', projectName: 'Dillon Residence', units: 'pdf-pt', printedScalePtPerFt: 13.5,
   sources: [
     { id: 'submitted-FP1', sha256: 'ea09a1fe2b1e175170e980a0e0960a7e7f2bf82f949668ae1c895e163c604a63' },
+    { id: 'submitted-FP2', sha256: 'dd4612854552928e6b9d06584b97c5434009536282813e40accd3343a480a3f6' },
     { id: 'architectural-RCP', sha256: 'ed51fe47cdbb0c95db5d3a4f64117fe2625d3c0bf4e7170c6f3dec0d38ed11ba' },
     { id: 'hydraulic-RA1', sha256: '773a2c38d2c9e2a9807828c91ec5b6f5c56900f2c10c68c25473c7e1eb60e705' },
     { id: 'hydraulic-RA2', sha256: '4cecd2c732934b4f8e000d634664b6b3e10ba3a7fa85b91a462ecc90da69ffe0' },
@@ -23,10 +24,12 @@ const draft = {
   ceilingSlopeAnnotations: slopeRaw.map((point, index) => ({ id: `slope-${index + 1}`, sourcePointUnrotatedPt: point, registeredSubmittedPointPt: [3024 - point[1] + 114, point[0] - 460], riseIn: 3, runIn: 12, text: '3"/12"' })),
   slopeRegions: rcpRegions.map((region) => ({ id: region.id, annotationId: region.annotationId, polygonRcpPt: region.polygon, polygonSubmittedPt: region.polygon.map(([x, y]) => [x + 114, y - 460]), slopeAxis: 'y', downhillDirection: 'positive-y', protectionBasis: region.protectionBasis, submittedHeadIds: region.submittedHeadIds, obstructions: region.obstructions.map((obstruction) => ({ ...obstruction, centerSubmittedPt: [obstruction.centerRcpPt[0] + 114, obstruction.centerRcpPt[1] - 460] })), elevationDatum: region.elevationDatum ? { ...region.elevationDatum, datumPointSubmittedPt: [region.elevationDatum.datumPointRcpPt[0] + 114, region.elevationDatum.datumPointRcpPt[1] - 460] } : null })),
   submittedHeads: [...round.map((point, index) => ({ id: `round-${index + 1}`, pointPt: point, symbolClass: 'round-pendent-vector-candidate' })), ...cross.map((point, index) => ({ id: `cross-${index + 1}`, pointPt: point, symbolClass: 'cross-pendent-vector-candidate' }))],
+  continuationHeads: [{ id: 'cross-12', sourceId: 'submitted-FP2', sourcePageIndex: 0, pointPortraitTopLeftPt: [1398.27, 1032.33], symbolClass: 'cross-pendent-vector-candidate', vectorSignature: 'paired-8.7pt-diagonals-over-filled-pendent-center', sourceDrawingIndices: [2408, 2434] }],
   schedule: { totalHeads: 52, roundPendent: 40, alternatePendent: 12 },
   hydraulicEvidence: [{ report: 'RA-1', nodeId: '1', elevationFt: 10, nodeKind: 'active-sprinkler' },{ report: 'RA-1', nodeId: '7', elevationFt: 10, nodeKind: 'active-sprinkler' },{ report: 'RA-2', nodeId: '4', elevationFt: 10, nodeKind: 'active-sprinkler' },{ report: 'RA-3', nodeId: '13', elevationFt: 22, nodeKind: 'active-sprinkler' },{ report: 'RA-3', nodeId: '15', elevationFt: 22, nodeKind: 'active-sprinkler' }],
   hydraulicDatumJoin: { method: 'architectural-project-elevation-minus-100ft-to-hydraulic-local-elevation', projectDatumOffsetFt: 100, architecturalDatumProjectElevationFt: 109, architecturalDatumLocalElevationFt: 9, activeNodes: [{ report: 'RA-1', nodeId: '1', hydraulicLocalElevationFt: 10, projectElevationFt: 110 },{ report: 'RA-1', nodeId: '7', hydraulicLocalElevationFt: 10, projectElevationFt: 110 },{ report: 'RA-2', nodeId: '4', hydraulicLocalElevationFt: 10, projectElevationFt: 110 },{ report: 'RA-3', nodeId: '13', hydraulicLocalElevationFt: 22, projectElevationFt: 122 },{ report: 'RA-3', nodeId: '15', hydraulicLocalElevationFt: 22, projectElevationFt: 122 }], protectedRegionHeadNodeMappingReady: false, reason: 'Protected sloped-region heads are outside the sealed submitted remote-area callout mapping; datum spaces are joined without inventing node identities.' },
-  coverage: { complete: false, detectedVectorCandidates: 51, unresolved: ['one-alternate-pendent-symbol-not-yet-vector-classified','protected-sloped-heads-not-mapped-to-hydraulic-remote-area-nodes','code-compliance-and-approval-not-inferred-from-completed-bid'] },
+  coverage: { complete: true, detectedVectorCandidates: 52, unresolved: [] },
+  limitations: ['protected-sloped-heads-not-mapped-to-hydraulic-remote-area-nodes','code-compliance-and-approval-not-inferred-from-completed-bid'],
   claimStatus: 'completed-bid-sloped-ceiling-calibration-not-code-compliance-or-approval',
 };
 const packet = await sealSubmittedSlopedCeilingCalibration(draft);
