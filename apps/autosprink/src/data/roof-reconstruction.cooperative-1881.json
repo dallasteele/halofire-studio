@@ -1,13 +1,14 @@
 {
   "artifactType": "halofire.roof-reconstruction-input.v1",
+  "projectName": "The Cooperative 1881 - Salt Lake City UT",
   "sourceBindings": [
     {
       "id": "roof-plan-A121",
       "binding": {
-        "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
-        "physicalPageNumber": 32,
-        "pageIndex": 31,
-        "renderedPageSha256": "fd6a414aba729b5a1b115bde5537405df7d5142e1bb01bd7651aea544d11fc47",
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 36,
+        "pageIndex": 35,
+        "renderedPageSha256": "658402dc30c2ff57c0bc95c81ce1d5e23f9efe5b6c899296e7d8391c29ddc1fa",
         "sheetId": "A-121",
         "coordinateSpace": "pdf-points",
         "renderProfile": {
@@ -22,11 +23,119 @@
     {
       "id": "elevation-A201",
       "binding": {
-        "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
-        "physicalPageNumber": 58,
-        "pageIndex": 57,
-        "renderedPageSha256": "40b57bce5407d403d2daf1b857313559da821b225ebc7e1fc8241bf45e97087c",
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 61,
+        "pageIndex": 60,
+        "renderedPageSha256": "ea47dd4c5f6d38be5cf1b53172048cb9ac57ed24877ff4b063d38028cdc3b888",
         "sheetId": "A-201",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "section-A301",
+      "binding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 65,
+        "pageIndex": 64,
+        "renderedPageSha256": "aefea2121a7727af85a506cd6996a3491259051f55d8da71228071e34d127780",
+        "sheetId": "A-301",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "mechanical-M109",
+      "binding": {
+        "sourcePdfSha256": "56ee069667ceac63be2012bc3a93fb2e3806cb502bcc963cf05b39097a39b4bc",
+        "physicalPageNumber": 10,
+        "pageIndex": 9,
+        "renderedPageSha256": "f252bd4539461bdbcb7e45b9c94855ba9f6f8a7a5714b5c4a02f93e674fbadd9",
+        "sheetId": "M109",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "plumbing-P109",
+      "binding": {
+        "sourcePdfSha256": "56ee069667ceac63be2012bc3a93fb2e3806cb502bcc963cf05b39097a39b4bc",
+        "physicalPageNumber": 69,
+        "pageIndex": 68,
+        "renderedPageSha256": "b55701c3c985cff21015d6a9822776991ce0da59a49bebab4ac44e1488275545",
+        "sheetId": "P109",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "submitted-fire-cover-r2",
+      "binding": {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 1,
+        "pageIndex": 0,
+        "renderedPageSha256": "a698a2459dcb6d3f89c02cce7cf6ad4f1bc0afa86bbf15b7a9876bbd1524d107",
+        "sheetId": "FP-cover-R2",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "submitted-fire-FP8-r2",
+      "binding": {
+        "sourcePdfSha256": "bae3cbfeb4c93812fe9a5a168dcf3e16836a6d13a3a75bb33c147cc1ebc0ac29",
+        "physicalPageNumber": 12,
+        "pageIndex": 11,
+        "renderedPageSha256": "2f20907cec537c92bff749f476d7c14712941421b367c2f6f4b428ccae2e6d20",
+        "sheetId": "FP-8-R2",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "submitted-hydraulic-DA3-r2",
+      "binding": {
+        "sourcePdfSha256": "389c8943c4bac1f6eeac9a884cd91da8f29920ef513cf7b0be48ae2da8de18fb",
+        "physicalPageNumber": 20,
+        "pageIndex": 19,
+        "renderedPageSha256": "574bf1b357f226666a7d36323ee7e435216fd76b9eb1be10a272b03e390d18f5",
+        "sheetId": "DA-3-node-analysis-R2",
         "coordinateSpace": "pdf-points",
         "renderProfile": {
           "renderer": "PyMuPDF",
@@ -1812,9 +1921,10 @@
         ]
       },
       "sourceBindingRefs": [
-        "roof-plan-A121"
+        "roof-plan-A121",
+        "section-A301"
       ],
-      "sourceCallout": "08.01",
+      "sourceCallout": "08.01 roof access hatch; A-301 section",
       "sourcePdfPoint": [
         1154.66077,
         1166.43579
@@ -1829,12 +1939,97 @@
       }
     }
   ],
+  "coordinationEvidence": [
+    {
+      "id": "roof-mechanical-coordination",
+      "role": "roof-mechanical",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "evidenceStatus": "issued-coordination-source",
+      "approvalStatus": "not-an-approval-artifact",
+      "observations": [
+        "M109 locates rooftop HP and ODU equipment fields for Areas B and C at 1/8 inch equals 1 foot."
+      ],
+      "registration": {
+        "status": "unregistered",
+        "basis": "Equipment footprints have not yet been transformed from the M109 area views into the sealed A-121 plan coordinate space."
+      }
+    },
+    {
+      "id": "roof-plumbing-coordination",
+      "role": "roof-plumbing",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "evidenceStatus": "issued-coordination-source",
+      "approvalStatus": "not-an-approval-artifact",
+      "observations": [
+        "P109 locates RD-1 roof drains and vent-through-roof penetrations and requires vents to terminate at least 10 feet from mechanical intakes and building openings."
+      ],
+      "registration": {
+        "status": "partially-registered",
+        "basis": "A-121 drain points are registered; the complete P109 vent inventory is not yet transformed into A-121 coordinates."
+      }
+    },
+    {
+      "id": "roof-section-coordination",
+      "role": "architectural-section",
+      "sourceBindingRefs": [
+        "section-A301"
+      ],
+      "evidenceStatus": "issued-coordination-source",
+      "approvalStatus": "not-an-approval-artifact",
+      "observations": [
+        "A-301 shows the eighth-floor ceiling below the pitched roof cavity and identifies the insulated roof access hatch."
+      ],
+      "registration": {
+        "status": "registered",
+        "basis": "A-301 is bound to the roof hatch and vertical roof/eighth-floor relationship; it does not by itself establish the attic sprinkler protection basis."
+      }
+    },
+    {
+      "id": "submitted-sprinkler-calibration",
+      "role": "submitted-sprinkler-plan",
+      "sourceBindingRefs": [
+        "submitted-fire-cover-r2",
+        "submitted-fire-FP8-r2"
+      ],
+      "evidenceStatus": "submitted-reference",
+      "approvalStatus": "submittal-only-not-approved",
+      "observations": [
+        "The R2 set contains submitted level-by-level sprinkler plans through FP-8 and no separate roof or attic sprinkler plan."
+      ],
+      "registration": {
+        "status": "unregistered",
+        "basis": "The submitted FP-8 head and pipe geometry has not yet been transformed and compared node-by-node with generated Level 8 output."
+      }
+    },
+    {
+      "id": "submitted-hydraulic-calibration",
+      "role": "submitted-hydraulic-calculation",
+      "sourceBindingRefs": [
+        "submitted-hydraulic-DA3-r2"
+      ],
+      "evidenceStatus": "submitted-reference",
+      "approvalStatus": "submittal-only-not-approved",
+      "observations": [
+        "DA-3 node analysis includes sprinkler elevations at 89 feet 5 inches and upstream pipe elevations at 83 feet 4 inches."
+      ],
+      "registration": {
+        "status": "unregistered",
+        "basis": "Hydraulic nodes have not yet been mapped to FP-8 plan coordinates or used as proof of an attic/ceiling protection classification."
+      }
+    }
+  ],
   "coverage": {
     "complete": false,
-    "resolvedScope": "A-121 primary planes, five paired cricket planes, dimensioned roof hatch, and visible 07.01/07.02 drain callouts",
+    "resolvedScope": "Current A-121 primary planes, five paired cricket planes, A-301 roof hatch, visible A-121 drain callouts, and available M109/P109/R2 calibration sources",
     "unresolvedRegions": [
-      "roof-feature-clearances-and-uncoordinated-mep-penetrations"
+      "mep-feature-coordinate-registration-and-clearances",
+      "level-8-ceiling-versus-attic-protection-basis",
+      "submitted-output-node-by-node-comparison"
     ]
   },
-  "evidenceReceiptSha256": "69eb9520e2b372cfbb5da49e0ff658f74ad7939d87ea9dcd1913bdb7e1999765"
+  "evidenceReceiptSha256": "d024a6fe5f4f66527e9f3f55a5501154c5404f8a31a19d7909a07060c89d57f0"
 }

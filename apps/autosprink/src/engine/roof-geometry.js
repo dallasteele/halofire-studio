@@ -63,13 +63,28 @@ const RoofFeatureSchema = z.object({
   }).strict(),
 }).strict();
 
+const CoordinationEvidenceSchema = z.object({
+  id: z.string().trim().min(1),
+  role: z.enum(['architectural-section', 'roof-mechanical', 'roof-plumbing', 'submitted-sprinkler-plan', 'submitted-hydraulic-calculation']),
+  sourceBindingRefs: z.array(z.string().trim().min(1)).min(1),
+  evidenceStatus: z.enum(['issued-coordination-source', 'submitted-reference']),
+  approvalStatus: z.enum(['not-an-approval-artifact', 'submittal-only-not-approved']),
+  observations: z.array(z.string().trim().min(1)).min(1),
+  registration: z.object({
+    status: z.enum(['unregistered', 'partially-registered', 'registered']),
+    basis: z.string().trim().min(1),
+  }).strict(),
+}).strict();
+
 const ReconstructionDraftSchema = z.object({
   artifactType: z.literal('halofire.roof-reconstruction-input.v1'),
+  projectName: z.string().trim().min(1).default('test fixture'),
   sourceBindings: z.array(EvidenceSourceSchema).min(1),
   datums: z.array(DatumSchema).min(3),
   regions: z.array(RoofRegionSchema).min(1),
   exclusions: z.array(RoofExclusionSchema),
   features: z.array(RoofFeatureSchema),
+  coordinationEvidence: z.array(CoordinationEvidenceSchema).default([]),
   coverage: z.object({
     complete: z.boolean(),
     resolvedScope: z.string().trim().min(1),
@@ -241,20 +256,29 @@ export async function reconstructRoofPlanes(input, opts = {}) {
     }
   }
   const unresolvedFeatureClearances = data.features.filter((feature) => feature.clearance.status !== 'resolved');
-  if (data.coverage.complete && (data.coverage.unresolvedRegions.length || unresolvedFeatureClearances.length)) {
+  const unregisteredCoordinationEvidence = data.coordinationEvidence
+    .filter((entry) => entry.registration.status !== 'registered');
+  for (const evidence of data.coordinationEvidence) {
+    const missingRefs = evidence.sourceBindingRefs.filter((ref) => !sourceIds.has(ref));
+    if (missingRefs.length) issues.push(issue('ROOF_COORDINATION_SOURCE_MISMATCH', `Coordination evidence ${evidence.id} references evidence outside the sealed source bundle.`, [evidence.id, ...missingRefs]));
+  }
+  if (data.coverage.complete && (data.coverage.unresolvedRegions.length || unresolvedFeatureClearances.length || unregisteredCoordinationEvidence.length)) {
     issues.push(issue('ROOF_COVERAGE_COMPLETENESS_CONTRADICTED', 'Roof coverage cannot be complete while regions or feature clearances remain unresolved.', [
       ...data.coverage.unresolvedRegions,
       ...unresolvedFeatureClearances.map((feature) => feature.id),
+      ...unregisteredCoordinationEvidence.map((entry) => entry.id),
     ]));
   }
   return {
     status: issues.length ? 'blocked' : 'passed',
     artifactType: 'halofire.roof-plane-model.v1',
+    projectName: data.projectName,
     sourceBindings: data.sourceBindings,
     evidenceReceiptSha256: data.evidenceReceiptSha256,
     coverage: data.coverage,
     exclusions: data.exclusions,
     features: data.features,
+    coordinationEvidence: data.coordinationEvidence,
     planes: issues.length ? [] : planes,
     issues,
     verification: { sourceBound: issues.every((entry) => entry.code !== 'ROOF_DATUM_SOURCE_MISMATCH'), residualToleranceFt: toleranceFt },

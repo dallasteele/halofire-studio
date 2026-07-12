@@ -1,0 +1,42 @@
+{
+  "name": "cooperative-1881-egnyte-calibration-20260711",
+  "owner": "codex",
+  "goal": "Replace the stale missing-coordination blocker with sealed source bindings to the current Cooperative 1881 architectural, MEP, submitted sprinkler, and hydraulic evidence while keeping feature registration, attic protection basis, regulated compliance, and approval claims fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/04-GC PDF Plans & Specs",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/07-AHJ Submittals/R2",
+    "apps/autosprink/src/engine/roof-geometry.js",
+    "apps/autosprink/src/data/roof-reconstruction.cooperative-1881.json"
+  ],
+  "exit_criteria": [
+    "The sealed roof packet binds the current A-121 and A-201 pages instead of the superseded architectural PDF.",
+    "The packet binds M109 and P109 as available coordination evidence and no longer reports coordinated MEP files as missing.",
+    "The packet binds the R2 submitted sprinkler plan and hydraulic calculation as calibration references without labeling them approved or as-built.",
+    "The Studio refuses to load the Cooperative roof packet when a different project is selected.",
+    "The unresolved gate precisely names remaining MEP feature registration and attic/ceiling protection-basis work.",
+    "Adversarial tests reject false claims that sheet availability means feature registration, clearance resolution, code compliance, or approval.",
+    "Focused tests, production build, loop guard, rules verifier, and formal invariant check pass before deployment."
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/cooperative-1881-egnyte-calibration-20260711/contract.json",
+    "npx vitest run tests/roof-geometry.test.js tests/elevation-datums.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "GX10 Lean proof for evidence-availability not implying registration/compliance",
+    "Authenticated local and live login smoke plus roof evidence API/browser truth inspection"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-egnyte-calibration-20260711/state.json",
+  "evidence_paths": [
+    "apps/autosprink/out/agent-loops/cooperative-1881-egnyte-calibration-20260711",
+    "data/agent-loops/cooperative-1881-egnyte-calibration-20260711/state.json"
+  ],
+  "max_iterations": 5,
+  "max_tokens": 120000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

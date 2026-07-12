@@ -113,6 +113,17 @@ describe('studio static origin handling', () => {
     expect(html).toContain("encodeURIComponent(currentProjectName())");
   });
 
+  it('surfaces present roof coordination sources without claiming registration or approval', async () => {
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('M109/P109 are present');
+    expect(html).toContain('complete feature registration, clearances, and the Level 8 ceiling/attic protection basis remain unresolved');
+    expect(html).toContain('not a code-compliance or approval claim');
+    expect(html).toContain('currentProjectName() !== model.projectName');
+    expect(html).toContain('Select the matching project before loading roof evidence');
+  });
+
   it('lets the workbench target the Cooperative 1881 project instead of only Home Depot', async () => {
     const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

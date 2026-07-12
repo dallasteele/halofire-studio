@@ -40,13 +40,21 @@ describe('source-bound pitched roof reconstruction', () => {
     const packet = JSON.parse(fs.readFileSync(new URL('../src/data/roof-reconstruction.cooperative-1881.json', import.meta.url), 'utf8'));
     const model = await reconstructRoofPlanes(packet);
     expect(model.status).toBe('passed');
+    expect(model.projectName).toBe('The Cooperative 1881 - Salt Lake City UT');
     expect(model.planes).toHaveLength(15);
     expect(model.coverage.complete).toBe(false);
-    expect(model.coverage.unresolvedRegions).toEqual(['roof-feature-clearances-and-uncoordinated-mep-penetrations']);
+    expect(model.coverage.unresolvedRegions).toEqual([
+      'mep-feature-coordinate-registration-and-clearances',
+      'level-8-ceiling-versus-attic-protection-basis',
+      'submitted-output-node-by-node-comparison',
+    ]);
     expect(model.exclusions.map((entry) => entry.id)).toContain('central-south-open-core');
     expect(model.features).toHaveLength(11);
     expect(model.features.filter((entry) => entry.type === 'roof-hatch')).toHaveLength(1);
     expect(model.planes.every((plane) => plane.sourceBindingRefs.join(',') === 'elevation-A201,roof-plan-A121')).toBe(true);
+    expect(model.coordinationEvidence).toHaveLength(5);
+    expect(model.coordinationEvidence.find((entry) => entry.id === 'roof-mechanical-coordination').registration.status).toBe('unregistered');
+    expect(model.coordinationEvidence.find((entry) => entry.id === 'submitted-sprinkler-calibration').approvalStatus).toBe('submittal-only-not-approved');
     const projection = projectCadModelToRoof({
       cadModel: { solids: [{ kind: 'head', name: 'partial-scope-head', position: [100, 100, 80] }] },
       roofModel: model,
@@ -142,6 +150,26 @@ describe('source-bound pitched roof reconstruction', () => {
     expect(model.issues.map((entry) => entry.code)).toEqual(expect.arrayContaining([
       'ROOF_FEATURE_SOURCE_MISMATCH', 'ROOF_COVERAGE_COMPLETENESS_CONTRADICTED',
     ]));
+  });
+
+  it('rejects the adversarial claim that available coordination sheets imply registered complete coverage', async () => {
+    const sealed = await sealRoofReconstructionInput({
+      artifactType: 'halofire.roof-reconstruction-input.v1', sourceBindings: [roofPlanBinding],
+      datums: [datum('a', 'eave', 0, 0, 20), datum('b', 'eave', 0, 20, 20), datum('c', 'ridge', 20, 0, 25)],
+      regions: [{ id: 'roof', boundaryPlanFt: [[0, 0], [20, 0], [20, 20], [0, 20]], datumIds: ['a', 'b', 'c'] }],
+      exclusions: [], features: [],
+      coordinationEvidence: [{
+        id: 'mep-present', role: 'roof-mechanical', sourceBindingRefs: ['roof-plan'],
+        evidenceStatus: 'issued-coordination-source', approvalStatus: 'not-an-approval-artifact',
+        observations: ['A coordination sheet exists.'],
+        registration: { status: 'unregistered', basis: 'No coordinate transform or feature inventory was supplied in this adversarial fixture.' },
+      }],
+      coverage: { complete: true, resolvedScope: 'false completeness fixture', unresolvedRegions: [] },
+    });
+    const model = await reconstructRoofPlanes(sealed);
+    expect(model.status).toBe('blocked');
+    expect(model.issues.map((entry) => entry.code)).toContain('ROOF_COVERAGE_COMPLETENESS_CONTRADICTED');
+    expect(model.complianceReady).toBe(false);
   });
 
   it('blocks conflicting overlap instead of choosing a convenient roof plane', () => {

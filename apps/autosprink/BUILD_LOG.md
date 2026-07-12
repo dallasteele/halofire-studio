@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-07-11 - Egnyte-bound roof coordination calibration
+
+- Replaced the stale `uncoordinated MEP` roof blocker with sealed bindings to the current A-121/A-201/A-301 architectural pages, M109 roof mechanical plan, P109 roof plumbing plan, R2 submitted sprinkler cover/FP-8 sheets, and DA-3 hydraulic node analysis from the protected Egnyte job files.
+- Preserved the real remaining gates: full MEP feature coordinate registration and clearances, Level 8 ceiling-versus-attic protection basis, and node-by-node comparison to submitted output. The R2 material is labeled submittal-only, not approved or as-built.
+- Added a source-project identity boundary so the Cooperative roof packet is rejected when another Studio project is selected; the browser loop found and rejected the prior cross-project overlay behavior.
+- Verification: loop guard passed; 40 focused tests passed; production build passed; 20 node-native tests passed; 1,556 full-suite tests passed with two unrelated external-fixture browser suites unable to start because their source DB/artifact directories are absent; `AGENTIC_RULES_VERIFY ok`; GX10 Lean 4.13 proved sheet availability does not imply registered completeness and submission does not imply approval; authenticated local Playwright login, wrong-project rejection, and matching-project roof load passed with zero console errors.
+- Still blocked: code-compliant pitched-roof sprinkler output until the registered MEP obstruction inventory, Level 8 ceiling/attic protection basis, and submitted FP-8 node comparison converge; AHJ/PE/permit/fabrication and AutoSprink parity claims remain separate and fail-closed.
+
 ## 2026-06-05 - Settings resolved signed-reviewer read-only reopen
 
 - Updated [`settings.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/settings.html) so each resolved signed-reviewer gate row now exposes `Open accepted evidence read-only`, carrying the resolved evidence id and gate into the existing Settings `action=inspect` flow instead of forcing operators back through Workbench.

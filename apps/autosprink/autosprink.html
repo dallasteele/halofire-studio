@@ -1265,9 +1265,13 @@ async function hfLoadSourceBoundRoof() {
 async function hfShowSourceBoundRoof() {
   try {
     const model = await hfLoadSourceBoundRoof();
+    if (currentProjectName() !== model.projectName) {
+      $('status').textContent = `roof reconstruction blocked — source packet belongs to ${model.projectName}, not ${currentProjectName()}. Select the matching project before loading roof evidence.`;
+      return null;
+    }
     hfRenderRoofPlaneOverlay(model);
     const gate = model.coverage.complete ? 'projection gate passed' : `projection blocked: ${model.coverage.unresolvedRegions.join(', ')}`;
-    $('status').textContent = `${model.planes.length} source-bound pitched-roof planes + ${model.features.length} roof features loaded from A-121/A-201 — ${gate}; not a code-compliance claim.`;
+    $('status').textContent = `${model.planes.length} source-bound pitched-roof planes + ${model.features.length} roof features loaded with current A-121/A-201/A-301, M109/P109, and submitted R2 calibration evidence — ${gate}; not a code-compliance or approval claim.`;
     return model;
   } catch (error) {
     $('status').textContent = `roof reconstruction blocked — ${error.message || error}`;
@@ -1287,7 +1291,7 @@ async function hfElevateModelToSourceBoundRoof() {
   });
   window.__hfRoofGeometry.lastProjection = result;
   if (result.status !== 'passed') {
-    $('status').textContent = `roof projection blocked — ${result.issues.map((entry) => entry.code).join(', ')}. A-121 requires coordinated MEP penetrations / feature clearances; no code-compliance claim.`;
+    $('status').textContent = `roof projection blocked — ${result.issues.map((entry) => entry.code).join(', ')}. M109/P109 are present; complete feature registration, clearances, and the Level 8 ceiling/attic protection basis remain unresolved. No code-compliance or approval claim.`;
     return result;
   }
   renderModel(result.model, { preserveView: true });
