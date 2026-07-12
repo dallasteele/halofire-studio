@@ -75,6 +75,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
   it('requires authentication', async () => {
     expect((await request(`${PROJECT_PATH}/submitted-sprinkler-calibration`)).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.pdf')).status).toBe(401);
+    expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.fdf')).status).toBe(401);
   });
 
   it('returns registered FP-8 top/elevation evidence with a non-roof protection basis', async () => {
@@ -149,5 +150,18 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(raw).toContain('/Type /OCG /Name (SOURCE_GEOMETRY)');
     expect(raw).toContain('/Type /OCG /Name (GENERATED_LAYOUT)');
     expect(raw).toContain('/Type /OCG /Name (VERIFICATION_EVIDENCE)');
+  });
+
+  it('downloads a deterministic FDF overlay for the original FP-1 sheet', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.fdf', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/vnd.fdf');
+    expect(response.headers.get('content-disposition')).toContain('Dillon-Residence-FP1-generated-slope-overlay.fdf');
+    const buffer = Buffer.from(await response.arrayBuffer()); const raw = buffer.toString('ascii');
+    expect(buffer.subarray(0, 8).toString('ascii')).toBe('%FDF-1.2');
+    expect((raw.match(/\/Subtype \/PolyLine/g) || [])).toHaveLength(4);
+    expect((raw.match(/\/Subj \(Generated sprinkler head\)/g) || [])).toHaveLength(2);
+    expect(raw).toContain('/Subj (Generated slope-following branch)');
   });
 });
