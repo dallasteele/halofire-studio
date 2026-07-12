@@ -1,7 +1,7 @@
 {
   "iteration": 2,
-  "phase": "verify",
-  "status": "verified_ready_to_deploy",
+  "phase": "iterate",
+  "status": "deployed_verified",
   "findings": [
     "Protected Egnyte evidence exists and is readable.",
     "M109 locates rooftop mechanical equipment and P109 locates roof drains and vent penetrations.",
@@ -16,6 +16,7 @@
     "full_suite": "1556 passed, 2 skipped, 2 external-fixture startup failures unrelated to changed files",
     "rulebook": "AGENTIC_RULES_VERIFY ok",
     "formal_proof": "LEAN_PROVED on GX10 Lean 4.13.0",
-    "local_browser": "authenticated login passed; wrong-project rejection passed; matching-project source-bound roof load passed; zero console errors"
+    "local_browser": "authenticated login passed; wrong-project rejection passed; matching-project source-bound roof load passed; zero console errors",
+    "deployment": "VPS code commit 736a9f509f37b81e5ba8b9759a7b31effbed2fc9; halofire.service active; public health 200; critical-file SHA-256 parity passed; live login API 200 and auth/me 200; public login page rendered in Playwright"
   }
 }
