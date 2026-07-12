@@ -1,10 +1,12 @@
 import { z } from 'zod';
 
 const Point = z.tuple([z.number().finite(), z.number().finite()]);
+const Obstruction = z.object({ id: z.string(), kind: z.literal('ceiling-fan'), centerSubmittedPt: Point, clearanceFt: z.number().positive(), preferredSide: z.enum(['negative-x', 'positive-x', 'negative-y', 'positive-y']) }).strict();
 const Region = z.object({
   id: z.string().min(1), polygonSubmittedPt: z.array(Point).min(4),
   slopeAxis: z.enum(['x', 'y']), downhillDirection: z.enum(['positive-x', 'negative-x', 'positive-y', 'negative-y']),
   riseIn: z.number().positive(), runIn: z.number().positive(), shouldProtect: z.boolean(),
+  obstructions: z.array(Obstruction),
 }).strict();
 const Input = z.object({
   artifactType: z.literal('halofire.sloped-ceiling-layout-input.v1'),
@@ -37,6 +39,7 @@ export function generateSlopedCeilingLayout(inputValue) {
     const alongFt = region.slopeAxis === 'y' ? heightFt : widthFt;
     const acrossCount = Math.max(1, Math.ceil(acrossFt / input.maxAcrossSlopeSpanFt));
     const alongCount = Math.max(1, Math.ceil(alongFt / input.maxAlongSlopeSpanFt));
+    const regionHeads = [];
     for (let acrossIndex = 0; acrossIndex < acrossCount; acrossIndex += 1) {
       for (let alongIndex = 0; alongIndex < alongCount; alongIndex += 1) {
         const acrossFraction = (acrossIndex + 0.5) / acrossCount;
@@ -46,10 +49,26 @@ export function generateSlopedCeilingLayout(inputValue) {
         const pointPt = [box.minX + xFraction * (box.maxX - box.minX), box.minY + yFraction * (box.maxY - box.minY)];
         const downhillFraction = region.downhillDirection.startsWith('positive-') ? alongFraction : 1 - alongFraction;
         const relativeElevationFt = (1 - downhillFraction) * alongFt * region.riseIn / region.runIn;
-        heads.push({ id: `${region.id}-generated-${heads.length + 1}`, regionId: region.id, pointPt, relativeElevationFt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection });
+        regionHeads.push({ id: `${region.id}-generated-${heads.length + regionHeads.length + 1}`, regionId: region.id, pointPt, relativeElevationFt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, acrossIndex });
       }
     }
-    regions.push({ regionId: region.id, shouldProtect: true, generatedHeadCount: acrossCount * alongCount, widthFt, heightFt, acrossCount, alongCount });
+    const obstructionAdjustments = [];
+    for (const obstruction of region.obstructions) {
+      const clearancePt = obstruction.clearanceFt * input.printedScalePtPerFt;
+      for (let acrossIndex = 0; acrossIndex < acrossCount; acrossIndex += 1) {
+        const column = regionHeads.filter((head) => head.acrossIndex === acrossIndex);
+        if (region.slopeAxis === 'y' && obstruction.preferredSide.endsWith('-x')) {
+          const allowed = column.flatMap((head) => { const dy = Math.abs(head.pointPt[1] - obstruction.centerSubmittedPt[1]); if (dy >= clearancePt) return []; const dx = Math.sqrt(clearancePt ** 2 - dy ** 2); return [obstruction.centerSubmittedPt[0] + (obstruction.preferredSide === 'negative-x' ? -dx : dx)]; });
+          if (allowed.length) {
+            const current = column[0].pointPt[0]; const adjusted = obstruction.preferredSide === 'negative-x' ? Math.min(current, ...allowed) : Math.max(current, ...allowed);
+            for (const head of column) head.pointPt[0] = adjusted;
+            obstructionAdjustments.push({ obstructionId: obstruction.id, acrossIndex, fromPt: current, toPt: adjusted, clearanceFt: obstruction.clearanceFt, alignment: 'shared-branch-centerline' });
+          }
+        }
+      }
+    }
+    heads.push(...regionHeads.map(({ acrossIndex: _acrossIndex, ...head }) => head));
+    regions.push({ regionId: region.id, shouldProtect: true, generatedHeadCount: acrossCount * alongCount, widthFt, heightFt, acrossCount, alongCount, obstructionAdjustments });
   }
   return { status: 'passed', artifactType: 'halofire.sloped-ceiling-layout.v1', heads, regions, issues: [], complianceReady: false, claimStatus: 'calibration-candidate-not-code-compliance-or-approval' };
 }
@@ -89,13 +108,15 @@ export function verifySlopedCeilingLayoutParity(layout, calibrationPacket, match
   };
 }
 
-export function renderSlopedCeilingLayoutViews(layout, parity) {
+export function renderSlopedCeilingLayoutViews(layout, parity, model3d = null) {
   if (!layout || layout.status !== 'passed' || !parity || parity.status !== 'passed') return { status: 'blocked', issues: [issue('SLOPED_LAYOUT_VIEW_NOT_VERIFIED', 'Passed layout and parity evidence are required.')] };
   const topMarks = layout.heads.map((head) => `<g data-generated-head-id="${head.id}"><circle cx="${head.pointPt[0]}" cy="${head.pointPt[1]}" r="8" fill="#007aff"/><path d="M ${head.pointPt[0] - 10} ${head.pointPt[1]} H ${head.pointPt[0] + 10} M ${head.pointPt[0]} ${head.pointPt[1] - 10} V ${head.pointPt[1] + 10}" stroke="#fff" stroke-width="2"/></g>`).join('');
   const topSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3024 2160" role="img" aria-label="Generated Dillon slope-aware top view"><rect width="3024" height="2160" fill="#fff"/>${topMarks}</svg>`;
   const ordered = [...layout.heads].sort((a, b) => a.pointPt[1] - b.pointPt[1]);
-  const minZ = Math.min(...ordered.map((head) => head.relativeElevationFt)); const maxZ = Math.max(...ordered.map((head) => head.relativeElevationFt));
-  const elevationMarks = ordered.map((head, index) => { const x = 120 + index * 700; const y = 500 - ((head.relativeElevationFt - minZ) / Math.max(.01, maxZ - minZ)) * 360; return `<g data-elevation-head-id="${head.id}"><circle cx="${x}" cy="${y}" r="9" fill="#007aff"/><text x="${x + 14}" y="${y - 8}" font-size="18">${head.relativeElevationFt.toFixed(2)} ft relative</text></g>`; }).join('');
-  const elevationSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560" role="img" aria-label="Generated Dillon 3:12 relative elevation view"><rect width="1600" height="560" fill="#fff"/><path d="M 60 500 L 1540 130" stroke="#ff9f0a" stroke-width="5"/>${elevationMarks}</svg>`;
+  const elevationValues = ordered.map((head) => model3d?.heads?.find((entry) => entry.id === head.id)?.pointFt?.[2] ?? head.relativeElevationFt);
+  const absolute = Boolean(model3d?.absoluteElevationReady);
+  const minZ = Math.min(...elevationValues); const maxZ = Math.max(...elevationValues);
+  const elevationMarks = ordered.map((head, index) => { const value = elevationValues[index]; const x = 120 + index * 700; const y = 500 - ((value - minZ) / Math.max(.01, maxZ - minZ)) * 360; return `<g data-elevation-head-id="${head.id}"><circle cx="${x}" cy="${y}" r="9" fill="#007aff"/><text x="${x + 14}" y="${y - 8}" font-size="18">${value.toFixed(2)} ft ${absolute ? 'project elevation' : 'relative'}</text></g>`; }).join('');
+  const elevationSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560" role="img" aria-label="Generated Dillon 3:12 ${absolute ? 'absolute project' : 'relative'} elevation view"><rect width="1600" height="560" fill="#fff"/><path d="M 60 500 L 1540 130" stroke="#ff9f0a" stroke-width="5"/>${elevationMarks}</svg>`;
   return { status: 'passed', topSvg, elevationSvg, complianceReady: false };
 }

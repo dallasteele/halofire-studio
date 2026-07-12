@@ -214,7 +214,9 @@
       "slopeAxis": "y",
       "downhillDirection": "positive-y",
       "protectionBasis": "completed-bid-no-submitted-heads",
-      "submittedHeadIds": []
+      "submittedHeadIds": [],
+      "obstructions": [],
+      "elevationDatum": null
     },
     {
       "id": "slope-region-east-covered",
@@ -261,7 +263,37 @@
       "submittedHeadIds": [
         "round-27",
         "round-29"
-      ]
+      ],
+      "obstructions": [
+        {
+          "id": "east-covered-fan-1",
+          "kind": "ceiling-fan",
+          "centerRcpPt": [
+            1814.7,
+            1188
+          ],
+          "centerSubmittedPt": [
+            1928.7,
+            728
+          ],
+          "clearanceFt": 6,
+          "preferredSide": "negative-x",
+          "sourceGeometry": "four-blade-ceiling-fan-vector"
+        }
+      ],
+      "elevationDatum": {
+        "sourceText": "SOFFIT @ 9'-0\" (109'-0\")",
+        "datumPointRcpPt": [
+          1805.5,
+          1101.5
+        ],
+        "datumPointSubmittedPt": [
+          1919.5,
+          641.5
+        ],
+        "projectElevationFt": 109,
+        "slopeDirection": "positive-y-down"
+      }
     },
     {
       "id": "slope-region-south-covered",
@@ -305,7 +337,9 @@
       "slopeAxis": "y",
       "downhillDirection": "positive-y",
       "protectionBasis": "completed-bid-no-submitted-heads",
-      "submittedHeadIds": []
+      "submittedHeadIds": [],
+      "obstructions": [],
+      "elevationDatum": null
     },
     {
       "id": "slope-region-west-covered",
@@ -349,7 +383,9 @@
       "slopeAxis": "y",
       "downhillDirection": "positive-y",
       "protectionBasis": "completed-bid-no-submitted-heads",
-      "submittedHeadIds": []
+      "submittedHeadIds": [],
+      "obstructions": [],
+      "elevationDatum": null
     }
   ],
   "submittedHeads": [
@@ -802,5 +838,5 @@
     ]
   },
   "claimStatus": "completed-bid-sloped-ceiling-calibration-not-code-compliance-or-approval",
-  "evidenceReceiptSha256": "452bb3fdcdbb3d86a44fea011862b94e919364cf8d484b0732da5f7b51aedf01"
+  "evidenceReceiptSha256": "ec0a69dabef38212cac8db7a3a3d0af400fcd0ab0c0301330b516ee50240fe2f"
 }

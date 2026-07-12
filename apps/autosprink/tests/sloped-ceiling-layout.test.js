@@ -5,7 +5,7 @@ import { generateSlopedCeilingLayout, renderSlopedCeilingLayoutViews, verifySlop
 const packet = JSON.parse(fs.readFileSync(new URL('../src/data/submitted-sloped-ceiling-calibration.dillon.json', import.meta.url), 'utf8'));
 const input = {
   artifactType: 'halofire.sloped-ceiling-layout-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt,
-  regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected' })),
+  regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected', obstructions: region.obstructions.map(({ id, kind, centerSubmittedPt, clearanceFt, preferredSide }) => ({ id, kind, centerSubmittedPt, clearanceFt, preferredSide })) })),
   maxAcrossSlopeSpanFt: 20, maxAlongSlopeSpanFt: 12,
 };
 
@@ -25,7 +25,8 @@ describe('slope-aware calibration layout', () => {
     expect(parity.matches).toHaveLength(2);
     expect(parity.metrics.precision).toBe(1);
     expect(parity.metrics.recall).toBe(1);
-    expect(parity.metrics.maxPlanErrorFt).toBeLessThanOrEqual(5);
+    expect(parity.metrics.maxPlanErrorFt).toBeLessThanOrEqual(3);
+    expect(layout.regions.find((region) => region.regionId === 'slope-region-east-covered').obstructionAdjustments).toHaveLength(1);
     const views = renderSlopedCeilingLayoutViews(layout, parity);
     expect(views.status).toBe('passed');
     expect((views.topSvg.match(/data-generated-head-id=/g) || [])).toHaveLength(2);

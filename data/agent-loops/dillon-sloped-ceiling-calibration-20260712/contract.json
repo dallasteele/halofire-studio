@@ -14,6 +14,8 @@
     "At least three completed heads screen positively against source-registered 3:12 annotations",
     "Four explicit 3:12 ceiling-region polygons are sealed to the RCP-to-FP transform and submitted-head membership",
     "The geometry-only generator reproduces both protected-region heads without false positives in the three completed empty regions",
+    "The source four-blade fan shifts the shared branch centerline with a sealed six-foot calibration clearance and maximum completed-head residual at or below three feet",
+    "The protected 3:12 surface is bound to the RCP SOFFIT 9 ft / project elevation 109 ft datum and renders absolute project elevations",
     "Top, relative-elevation, and source-grounded 3D surface/head/pipe views pass adversarial plane-residual verification",
     "10 ft and 22 ft active sprinkler elevations are bound from submitted hydraulic reports",
     "Receipt, transform, polygon, slope-point, false-positive-region, elevation, and 3D plane tampering fail closed",

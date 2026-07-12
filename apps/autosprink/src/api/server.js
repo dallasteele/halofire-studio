@@ -1646,19 +1646,19 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
     const view = renderSubmittedSlopedCeilingCalibration(validation);
     const layout = generateSlopedCeilingLayout({
       artifactType: 'halofire.sloped-ceiling-layout-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt,
-      regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected' })),
+      regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected', obstructions: region.obstructions.map(({ id, kind, centerSubmittedPt, clearanceFt, preferredSide }) => ({ id, kind, centerSubmittedPt, clearanceFt, preferredSide })) })),
       maxAcrossSlopeSpanFt: 20, maxAlongSlopeSpanFt: 12,
     });
     const parity = verifySlopedCeilingLayoutParity(layout, packet, 5);
     if (parity.status !== 'passed') return res.status(422).json({ ...parity, projectName: req.params.name });
-    const layoutViews = renderSlopedCeilingLayoutViews(layout, parity);
     const modelInput = {
       artifactType: 'halofire.sloped-ceiling-model3d-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt,
-      regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected' })),
+      regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected', elevationDatum: region.elevationDatum ? { datumPointSubmittedPt: region.elevationDatum.datumPointSubmittedPt, projectElevationFt: region.elevationDatum.projectElevationFt, slopeDirection: region.elevationDatum.slopeDirection, sourceText: region.elevationDatum.sourceText } : null })),
     };
     const model3d = buildSlopedCeilingModel3d(layout, modelInput);
     const model3dVerification = verifySlopedCeilingModel3d(model3d, layout, modelInput);
     if (model3dVerification.status !== 'passed') return res.status(422).json({ ...model3dVerification, projectName: req.params.name });
+    const layoutViews = renderSlopedCeilingLayoutViews(layout, parity, model3d);
     return res.json({
       status: 'passed', artifactType: 'halofire.autobid-submitted-sloped-ceiling-calibration.v1',
       projectName: req.params.name, evidenceReceiptSha256: packet.evidenceReceiptSha256,

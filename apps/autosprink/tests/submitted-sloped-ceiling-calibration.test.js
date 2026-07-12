@@ -36,5 +36,9 @@ describe('Dillon submitted sloped-ceiling calibration', () => {
     expect((await validateSubmittedSlopedCeilingCalibration(badElevation)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_ELEVATION_COVERAGE');
     const badRegion = await reseal((draft) => { draft.slopeRegions[0].polygonSubmittedPt[0][0] += 20; });
     expect((await validateSubmittedSlopedCeilingCalibration(badRegion)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_REGION_TRANSFORM_DRIFT');
+    const badObstruction = await reseal((draft) => { draft.slopeRegions[1].obstructions[0].centerSubmittedPt[0] += 20; });
+    expect((await validateSubmittedSlopedCeilingCalibration(badObstruction)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_OBSTRUCTION_TRANSFORM_DRIFT');
+    const badDatum = await reseal((draft) => { draft.slopeRegions[1].elevationDatum.datumPointSubmittedPt[1] += 20; });
+    expect((await validateSubmittedSlopedCeilingCalibration(badDatum)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_DATUM_TRANSFORM_DRIFT');
   });
 });

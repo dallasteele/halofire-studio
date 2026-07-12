@@ -5,6 +5,7 @@ const Region = z.object({
   id: z.string(), polygonSubmittedPt: z.array(Point).min(4), slopeAxis: z.enum(['x', 'y']),
   downhillDirection: z.enum(['positive-x', 'negative-x', 'positive-y', 'negative-y']),
   riseIn: z.number().positive(), runIn: z.number().positive(), shouldProtect: z.boolean(),
+  elevationDatum: z.object({ datumPointSubmittedPt: Point, projectElevationFt: z.number().finite(), slopeDirection: z.literal('positive-y-down'), sourceText: z.string().min(1) }).strict().nullable(),
 }).strict();
 const Input = z.object({
   artifactType: z.literal('halofire.sloped-ceiling-model3d-input.v1'),
@@ -24,6 +25,12 @@ const inside = (point, polygon) => {
 
 function elevationAt(pointPt, region, scale) {
   const box = bbox(region.polygonSubmittedPt);
+  if (region.elevationDatum) {
+    const along = region.slopeAxis === 'y' ? pointPt[1] : pointPt[0];
+    const datumAlong = region.slopeAxis === 'y' ? region.elevationDatum.datumPointSubmittedPt[1] : region.elevationDatum.datumPointSubmittedPt[0];
+    const sign = region.downhillDirection.startsWith('positive-') ? -1 : 1;
+    return region.elevationDatum.projectElevationFt + sign * ((along - datumAlong) / scale) * region.riseIn / region.runIn;
+  }
   const alongMin = region.slopeAxis === 'y' ? box.minY : box.minX;
   const alongMax = region.slopeAxis === 'y' ? box.maxY : box.maxX;
   const along = region.slopeAxis === 'y' ? pointPt[1] : pointPt[0];
@@ -40,15 +47,19 @@ export function buildSlopedCeilingModel3d(layout, inputValue) {
     vertices: region.polygonSubmittedPt.map((pointPt) => ({ pointPt, pointFt: [pointPt[0] / input.printedScalePtPerFt, pointPt[1] / input.printedScalePtPerFt, elevationAt(pointPt, region, input.printedScalePtPerFt)] })),
     triangles: [[0, 1, 2], [0, 2, 3]], slope: { riseIn: region.riseIn, runIn: region.runIn, axis: region.slopeAxis, downhillDirection: region.downhillDirection },
   }));
-  const heads = layout.heads.map((head) => ({ id: head.id, regionId: head.regionId, pointFt: [head.pointPt[0] / input.printedScalePtPerFt, head.pointPt[1] / input.printedScalePtPerFt, head.relativeElevationFt], orientation: 'normal-to-3-12-ceiling-plane' }));
+  const heads = layout.heads.map((head) => {
+    const region = input.regions.find((entry) => entry.id === head.regionId);
+    return { id: head.id, regionId: head.regionId, pointFt: [head.pointPt[0] / input.printedScalePtPerFt, head.pointPt[1] / input.printedScalePtPerFt, elevationAt(head.pointPt, region, input.printedScalePtPerFt)], orientation: 'normal-to-3-12-ceiling-plane' };
+  });
   const pipes = [];
   for (const region of input.regions.filter((entry) => entry.shouldProtect)) {
     const regionHeads = heads.filter((head) => head.regionId === region.id).sort((a, b) => region.slopeAxis === 'y' ? a.pointFt[1] - b.pointFt[1] : a.pointFt[0] - b.pointFt[0]);
     for (let index = 1; index < regionHeads.length; index += 1) pipes.push({ id: `${region.id}-pipe-${index}`, regionId: region.id, fromHeadId: regionHeads[index - 1].id, toHeadId: regionHeads[index].id, fromFt: regionHeads[index - 1].pointFt, toFt: regionHeads[index].pointFt, routeKind: 'slope-following-centerline' });
   }
+  const absoluteElevationReady = input.regions.filter((region) => region.shouldProtect).every((region) => region.elevationDatum);
   return {
-    status: 'passed', artifactType: 'halofire.sloped-ceiling-model3d.v1', units: 'ft', datumMode: 'relative-to-downhill-ceiling-edge',
-    surfaces, heads, pipes, geometryGrounded: true, absoluteElevationReady: false, complianceReady: false,
+    status: 'passed', artifactType: 'halofire.sloped-ceiling-model3d.v1', units: 'ft', datumMode: absoluteElevationReady ? 'source-bound-project-elevation' : 'relative-to-downhill-ceiling-edge',
+    surfaces, heads, pipes, geometryGrounded: true, absoluteElevationReady, complianceReady: false,
     claimStatus: 'source-grounded-relative-3d-calibration-not-code-compliance-or-approval', issues: [],
   };
 }
@@ -72,5 +83,5 @@ export function verifySlopedCeilingModel3d(model, layout, inputValue) {
   for (const pipe of model.pipes) if (!headIds.has(pipe.fromHeadId) || !headIds.has(pipe.toHeadId)) issues.push(issue('SLOPED_MODEL3D_PIPE_ENDPOINT_MISSING', `Pipe ${pipe.id} is not connected to generated heads.`, [pipe.id]));
   const nonFlatHeadCount = new Set(model.heads.map((head) => head.pointFt[2].toFixed(4))).size;
   if (model.heads.length > 1 && nonFlatHeadCount < 2) issues.push(issue('SLOPED_MODEL3D_FALSE_FLAT', 'Generated heads collapsed onto a flat elevation.'));
-  return { status: issues.length ? 'blocked' : 'passed', artifactType: 'halofire.sloped-ceiling-model3d-verification.v1', issues, counts: { surfaces: model.surfaces.length, heads: model.heads.length, pipes: model.pipes.length, nonFlatHeadElevations: nonFlatHeadCount }, maxPlaneResidualFt, geometryGrounded: issues.length === 0, absoluteElevationReady: false, complianceReady: false };
+  return { status: issues.length ? 'blocked' : 'passed', artifactType: 'halofire.sloped-ceiling-model3d-verification.v1', issues, counts: { surfaces: model.surfaces.length, heads: model.heads.length, pipes: model.pipes.length, nonFlatHeadElevations: nonFlatHeadCount }, maxPlaneResidualFt, geometryGrounded: issues.length === 0, absoluteElevationReady: model.absoluteElevationReady, complianceReady: false };
 }

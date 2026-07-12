@@ -26,6 +26,8 @@ const Draft = z.object({
     polygonSubmittedPt: Polygon, slopeAxis: z.enum(['x', 'y']), downhillDirection: z.enum(['positive-x', 'negative-x', 'positive-y', 'negative-y']),
     protectionBasis: z.enum(['completed-bid-protected', 'completed-bid-no-submitted-heads']),
     submittedHeadIds: z.array(z.string()),
+    obstructions: z.array(z.object({ id: z.string(), kind: z.literal('ceiling-fan'), centerRcpPt: Point, centerSubmittedPt: Point, clearanceFt: z.number().positive(), preferredSide: z.enum(['negative-x', 'positive-x', 'negative-y', 'positive-y']), sourceGeometry: z.literal('four-blade-ceiling-fan-vector') }).strict()),
+    elevationDatum: z.object({ sourceText: z.string().min(1), datumPointRcpPt: Point, datumPointSubmittedPt: Point, projectElevationFt: z.number().finite(), slopeDirection: z.literal('positive-y-down') }).strict().nullable(),
   }).strict()).length(4),
   submittedHeads: z.array(z.object({ id: z.string(), pointPt: Point, symbolClass: z.enum(['round-pendent-vector-candidate', 'cross-pendent-vector-candidate']) }).strict()).min(1),
   schedule: z.object({ totalHeads: z.literal(52), roundPendent: z.literal(40), alternatePendent: z.literal(12) }).strict(),
@@ -97,6 +99,16 @@ export async function validateSubmittedSlopedCeilingCalibration(input) {
     if (region.protectionBasis === 'completed-bid-protected' && declaredHeadIds.length === 0) issues.push(blocking('SLOPED_CALIBRATION_PROTECTED_REGION_EMPTY', `Protected region ${region.id} has no submitted heads.`, [region.id]));
     if (region.protectionBasis === 'completed-bid-no-submitted-heads' && declaredHeadIds.length !== 0) issues.push(blocking('SLOPED_CALIBRATION_EMPTY_REGION_FALSE', `Reference-empty region ${region.id} contains submitted heads.`, [region.id]));
     for (const headId of declaredHeadIds) if (!headById.has(headId)) issues.push(blocking('SLOPED_CALIBRATION_REGION_HEAD_MISSING', `Region ${region.id} references missing head ${headId}.`, [region.id, headId]));
+    for (const obstruction of region.obstructions) {
+      const expected = [obstruction.centerRcpPt[0] - registration.architectureFromSubmitted.xOffsetPt, obstruction.centerRcpPt[1] - registration.architectureFromSubmitted.yOffsetPt];
+      if (distance(expected, obstruction.centerSubmittedPt) > 0.1) issues.push(blocking('SLOPED_CALIBRATION_OBSTRUCTION_TRANSFORM_DRIFT', `Obstruction ${obstruction.id} does not follow the sealed transform.`, [region.id, obstruction.id]));
+      if (!pointInPolygon(obstruction.centerRcpPt, region.polygonRcpPt)) issues.push(blocking('SLOPED_CALIBRATION_OBSTRUCTION_OUTSIDE_REGION', `Obstruction ${obstruction.id} is outside ${region.id}.`, [region.id, obstruction.id]));
+    }
+    if (region.protectionBasis === 'completed-bid-protected' && !region.elevationDatum) issues.push(blocking('SLOPED_CALIBRATION_ABSOLUTE_DATUM_MISSING', `Protected region ${region.id} has no absolute elevation datum.`, [region.id]));
+    if (region.elevationDatum) {
+      const expected = [region.elevationDatum.datumPointRcpPt[0] - registration.architectureFromSubmitted.xOffsetPt, region.elevationDatum.datumPointRcpPt[1] - registration.architectureFromSubmitted.yOffsetPt];
+      if (distance(expected, region.elevationDatum.datumPointSubmittedPt) > 0.1) issues.push(blocking('SLOPED_CALIBRATION_DATUM_TRANSFORM_DRIFT', `Elevation datum for ${region.id} does not follow the sealed transform.`, [region.id]));
+    }
   }
   if (packet.coverage.detectedVectorCandidates !== packet.submittedHeads.length) issues.push(blocking('SLOPED_CALIBRATION_HEAD_COUNT_DRIFT', 'Detected vector count does not match the sealed candidate list.'));
   if (packet.submittedHeads.filter((head) => head.symbolClass === 'round-pendent-vector-candidate').length !== 40) issues.push(blocking('SLOPED_CALIBRATION_ROUND_SYMBOL_COUNT', 'The sealed round-pendent vector class must reproduce the submitted schedule count of 40.'));

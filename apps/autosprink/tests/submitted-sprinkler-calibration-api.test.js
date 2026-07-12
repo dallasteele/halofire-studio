@@ -123,11 +123,12 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.generatedLayoutParityReady).toBe(true);
     expect(result.parityMetrics).toMatchObject({ precision: 1, recall: 1 });
     expect(result.generatedHeads).toHaveLength(2);
-    expect(result.model3dVerification).toMatchObject({ status: 'passed', geometryGrounded: true, absoluteElevationReady: false, complianceReady: false });
+    expect(result.model3dVerification).toMatchObject({ status: 'passed', geometryGrounded: true, absoluteElevationReady: true, complianceReady: false });
+    expect(result.parityMetrics.maxPlanErrorFt).toBeLessThanOrEqual(3);
     expect(result.model3dVerification.counts).toEqual({ surfaces: 4, heads: 2, pipes: 1, nonFlatHeadElevations: 2 });
     expect(result.complianceReady).toBe(false);
     expect(result.view.submittedTopSvg).toContain('Dillon submitted FP-1 heads registered to RCP 3:12 annotation screens');
     expect(result.view.generatedTopSvg).toContain('Generated Dillon slope-aware top view');
-    expect(result.view.generatedElevationSvg).toContain('Generated Dillon 3:12 relative elevation view');
+    expect(result.view.generatedElevationSvg).toContain('Generated Dillon 3:12 absolute project elevation view');
   });
 });
