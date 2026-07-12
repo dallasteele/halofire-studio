@@ -1,0 +1,47 @@
+{
+  "name": "cooperative-1881-mep-registration-20260711",
+  "owner": "codex",
+  "goal": "Register visible Cooperative 1881 M109 rooftop equipment and P109 vent penetrations to the A121 true-scale plan coordinate system, expose the evidence in Studio, and make roof routing fail closed on registered conflicts without claiming unproven equipment height, clearance, approval, or code compliance.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/04-GC PDF Plans & Specs",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/07-AHJ Submittals/R2",
+    "apps/autosprink/src/engine/roof-geometry.js",
+    "apps/autosprink/src/engine/roof-coordination.js",
+    "apps/autosprink/src/data/roof-reconstruction.cooperative-1881.json",
+    "apps/autosprink/src/data/roof-coordination.cooperative-1881.json"
+  ],
+  "exit_criteria": [
+    "A121 and M109/P109 coordinates are related by explicit sheet scales and independently checked grid anchors in Areas B and C.",
+    "Every accepted visible equipment footprint and vent point has source PDF coordinates, A121 plan coordinates, a stable id, and sealed source bindings.",
+    "The registered inventory reports 135 heat-pump footprints, 4 outdoor-unit footprints, and 83 vent penetrations unless re-extraction produces stronger evidence.",
+    "Five mechanical labels and six vent labels remain explicit unmatched residuals and are never silently synthesized.",
+    "The M114 schedule-count versus visible-plan-count discrepancy remains explicit and does not become a false completeness claim.",
+    "Unknown equipment height and feature-specific clearance remain unresolved unless model-specific primary evidence is bound.",
+    "Roof routes intersecting a registered equipment footprint or vent buffer are blocked; a clear route is allowed only as geometry-safe, not code-compliant.",
+    "Studio renders registered obstruction and penetration geometry with source counts, residuals, and fail-closed limitations.",
+    "Adversarial tests, focused/full regressions, production build, formal invariant proof, browser verification, deployment, and live login pass."
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/cooperative-1881-mep-registration-20260711/contract.json",
+    "npx vitest run tests/roof-coordination.test.js tests/roof-geometry.test.js tests/studio-static-origin.test.js",
+    "npm test -- --run",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "GX10 Lean proof that registration does not imply completeness, clearance, approval, or compliance",
+    "Authenticated browser inspection and live login smoke"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-mep-registration-20260711/state.json",
+  "evidence_paths": [
+    "apps/autosprink/out/agent-loops/cooperative-1881-mep-registration-20260711",
+    "data/agent-loops/cooperative-1881-mep-registration-20260711/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 140000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

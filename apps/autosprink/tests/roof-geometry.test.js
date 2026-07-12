@@ -44,7 +44,8 @@ describe('source-bound pitched roof reconstruction', () => {
     expect(model.planes).toHaveLength(15);
     expect(model.coverage.complete).toBe(false);
     expect(model.coverage.unresolvedRegions).toEqual([
-      'mep-feature-coordinate-registration-and-clearances',
+      'mep-feature-specific-clearances-and-equipment-heights',
+      'mep-unmatched-label-residuals',
       'level-8-ceiling-versus-attic-protection-basis',
       'submitted-output-node-by-node-comparison',
     ]);
@@ -53,7 +54,8 @@ describe('source-bound pitched roof reconstruction', () => {
     expect(model.features.filter((entry) => entry.type === 'roof-hatch')).toHaveLength(1);
     expect(model.planes.every((plane) => plane.sourceBindingRefs.join(',') === 'elevation-A201,roof-plan-A121')).toBe(true);
     expect(model.coordinationEvidence).toHaveLength(5);
-    expect(model.coordinationEvidence.find((entry) => entry.id === 'roof-mechanical-coordination').registration.status).toBe('unregistered');
+    expect(model.coordinationEvidence.find((entry) => entry.id === 'roof-mechanical-coordination').registration.status).toBe('registered');
+    expect(model.coordinationEvidence.find((entry) => entry.id === 'roof-plumbing-coordination').registration.status).toBe('registered');
     expect(model.coordinationEvidence.find((entry) => entry.id === 'submitted-sprinkler-calibration').approvalStatus).toBe('submittal-only-not-approved');
     const projection = projectCadModelToRoof({
       cadModel: { solids: [{ kind: 'head', name: 'partial-scope-head', position: [100, 100, 80] }] },

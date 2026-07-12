@@ -254,15 +254,15 @@ const sealed = await sealRoofReconstructionInput({
       id: 'roof-mechanical-coordination', role: 'roof-mechanical',
       sourceBindingRefs: ['mechanical-M109'], evidenceStatus: 'issued-coordination-source',
       approvalStatus: 'not-an-approval-artifact',
-      observations: ['M109 locates rooftop HP and ODU equipment fields for Areas B and C at 1/8 inch equals 1 foot.'],
-      registration: { status: 'unregistered', basis: 'Equipment footprints have not yet been transformed from the M109 area views into the sealed A-121 plan coordinate space.' },
+      observations: ['M109 locates rooftop HP and ODU equipment fields for Areas B and C at 1/8 inch equals 1 foot.', 'The companion sealed roof-coordination packet registers 135 visible HP footprints and four ODU footprints to A-121 plan feet; five source labels remain unmatched.'],
+      registration: { status: 'registered', basis: 'Issued sheet scales plus independent Area B and C grid controls bind accepted one-to-one M109 footprints to A-121 plan coordinates. Model-specific heights and feature clearances remain unresolved.' },
     },
     {
       id: 'roof-plumbing-coordination', role: 'roof-plumbing',
       sourceBindingRefs: ['plumbing-P109'], evidenceStatus: 'issued-coordination-source',
       approvalStatus: 'not-an-approval-artifact',
-      observations: ['P109 locates RD-1 roof drains and vent-through-roof penetrations and requires vents to terminate at least 10 feet from mechanical intakes and building openings.'],
-      registration: { status: 'partially-registered', basis: 'A-121 drain points are registered; the complete P109 vent inventory is not yet transformed into A-121 coordinates.' },
+      observations: ['P109 locates RD-1 roof drains and vent-through-roof penetrations and requires vents to terminate at least 10 feet from mechanical intakes and building openings.', 'The companion sealed roof-coordination packet registers 83 visible vent endpoints to A-121 plan feet; six source labels remain unmatched.'],
+      registration: { status: 'registered', basis: 'Issued sheet scales plus independent Area B and C grid controls bind accepted one-to-one P109 vent endpoints to A-121 plan coordinates. Feature-specific sprinkler obstruction clearances remain unresolved.' },
     },
     {
       id: 'roof-section-coordination', role: 'architectural-section',
@@ -288,8 +288,8 @@ const sealed = await sealRoofReconstructionInput({
   ],
   coverage: {
     complete: false,
-    resolvedScope: 'Current A-121 primary planes, five paired cricket planes, A-301 roof hatch, visible A-121 drain callouts, and available M109/P109/R2 calibration sources',
-    unresolvedRegions: ['mep-feature-coordinate-registration-and-clearances', 'level-8-ceiling-versus-attic-protection-basis', 'submitted-output-node-by-node-comparison'],
+    resolvedScope: 'Current A-121 primary planes, five paired cricket planes, A-301 roof hatch, visible A-121 drain callouts, registered visible M109 equipment/P109 vent geometry, and R2 calibration sources',
+    unresolvedRegions: ['mep-feature-specific-clearances-and-equipment-heights', 'mep-unmatched-label-residuals', 'level-8-ceiling-versus-attic-protection-basis', 'submitted-output-node-by-node-comparison'],
   },
 });
 

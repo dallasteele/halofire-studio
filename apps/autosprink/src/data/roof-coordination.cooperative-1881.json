@@ -1,0 +1,7253 @@
+{
+  "artifactType": "halofire.roof-coordination-input.v1",
+  "projectName": "The Cooperative 1881 - Salt Lake City UT",
+  "sourceBindings": [
+    {
+      "id": "roof-plan-A121",
+      "binding": {
+        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "physicalPageNumber": 36,
+        "pageIndex": 35,
+        "renderedPageSha256": "658402dc30c2ff57c0bc95c81ce1d5e23f9efe5b6c899296e7d8391c29ddc1fa",
+        "sheetId": "A-121",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "mechanical-M109",
+      "binding": {
+        "sourcePdfSha256": "56ee069667ceac63be2012bc3a93fb2e3806cb502bcc963cf05b39097a39b4bc",
+        "physicalPageNumber": 10,
+        "pageIndex": 9,
+        "renderedPageSha256": "f252bd4539461bdbcb7e45b9c94855ba9f6f8a7a5714b5c4a02f93e674fbadd9",
+        "sheetId": "M109",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "plumbing-P109",
+      "binding": {
+        "sourcePdfSha256": "56ee069667ceac63be2012bc3a93fb2e3806cb502bcc963cf05b39097a39b4bc",
+        "physicalPageNumber": 69,
+        "pageIndex": 68,
+        "renderedPageSha256": "b55701c3c985cff21015d6a9822776991ce0da59a49bebab4ac44e1488275545",
+        "sheetId": "P109",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "PyMuPDF",
+          "rendererVersion": "1.27.2.2",
+          "matrixScale": 2.5,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    }
+  ],
+  "transforms": [
+    {
+      "id": "m109-area-b",
+      "sourceSheetId": "M109",
+      "area": "B",
+      "sourceScaleFtPerPoint": 0.1111111111111111,
+      "targetScaleFtPerPoint": 0.14814814814814814,
+      "sourceAnchorPdf": [
+        149.558,
+        126.61
+      ],
+      "targetAnchorA121Pdf": [
+        109.888,
+        912.259
+      ],
+      "targetAnchorPlanFt": [
+        16.279704,
+        120.850519
+      ],
+      "controls": [
+        {
+          "id": "grid-28.1-A",
+          "sourcePdfPoint": [
+            149.558,
+            126.61
+          ],
+          "targetA121PdfPoint": [
+            109.888,
+            912.259
+          ],
+          "derivedPlanPointFt": [
+            16.279704,
+            120.850519
+          ],
+          "expectedPlanPointFt": [
+            16.279704,
+            120.850519
+          ],
+          "residualFt": 0
+        },
+        {
+          "id": "grid-20-A",
+          "sourcePdfPoint": [
+            980.559,
+            126.61
+          ],
+          "targetA121PdfPoint": [
+            733.63,
+            912.259
+          ],
+          "derivedPlanPointFt": [
+            108.613148,
+            120.850519
+          ],
+          "expectedPlanPointFt": [
+            108.685926,
+            120.850519
+          ],
+          "residualFt": 0.072778
+        },
+        {
+          "id": "grid-28.1-K",
+          "sourcePdfPoint": [
+            149.558,
+            709.211
+          ],
+          "targetA121PdfPoint": [
+            109.888,
+            1349.552
+          ],
+          "derivedPlanPointFt": [
+            16.279704,
+            56.117075
+          ],
+          "expectedPlanPointFt": [
+            16.279704,
+            56.06637
+          ],
+          "residualFt": 0.050705
+        }
+      ],
+      "maxResidualFt": 0.072778
+    },
+    {
+      "id": "p109-area-b",
+      "sourceSheetId": "P109",
+      "area": "B",
+      "sourceScaleFtPerPoint": 0.1111111111111111,
+      "targetScaleFtPerPoint": 0.14814814814814814,
+      "sourceAnchorPdf": [
+        149.558,
+        126.61
+      ],
+      "targetAnchorA121Pdf": [
+        109.888,
+        912.259
+      ],
+      "targetAnchorPlanFt": [
+        16.279704,
+        120.850519
+      ],
+      "controls": [
+        {
+          "id": "grid-28.1-A",
+          "sourcePdfPoint": [
+            149.558,
+            126.61
+          ],
+          "targetA121PdfPoint": [
+            109.888,
+            912.259
+          ],
+          "derivedPlanPointFt": [
+            16.279704,
+            120.850519
+          ],
+          "expectedPlanPointFt": [
+            16.279704,
+            120.850519
+          ],
+          "residualFt": 0
+        },
+        {
+          "id": "grid-20-A",
+          "sourcePdfPoint": [
+            980.559,
+            126.61
+          ],
+          "targetA121PdfPoint": [
+            733.63,
+            912.259
+          ],
+          "derivedPlanPointFt": [
+            108.613148,
+            120.850519
+          ],
+          "expectedPlanPointFt": [
+            108.685926,
+            120.850519
+          ],
+          "residualFt": 0.072778
+        },
+        {
+          "id": "grid-28.1-K",
+          "sourcePdfPoint": [
+            149.558,
+            709.211
+          ],
+          "targetA121PdfPoint": [
+            109.888,
+            1349.552
+          ],
+          "derivedPlanPointFt": [
+            16.279704,
+            56.117075
+          ],
+          "expectedPlanPointFt": [
+            16.279704,
+            56.06637
+          ],
+          "residualFt": 0.050705
+        }
+      ],
+      "maxResidualFt": 0.072778
+    },
+    {
+      "id": "m109-area-c",
+      "sourceSheetId": "M109",
+      "area": "C",
+      "sourceScaleFtPerPoint": 0.1111111111111111,
+      "targetScaleFtPerPoint": 0.14814814814814814,
+      "sourceAnchorPdf": [
+        205.358,
+        910.572
+      ],
+      "targetAnchorA121Pdf": [
+        733.63,
+        912.259
+      ],
+      "targetAnchorPlanFt": [
+        108.685926,
+        120.850519
+      ],
+      "controls": [
+        {
+          "id": "grid-20-A",
+          "sourcePdfPoint": [
+            205.358,
+            910.572
+          ],
+          "targetA121PdfPoint": [
+            733.63,
+            912.259
+          ],
+          "derivedPlanPointFt": [
+            108.685926,
+            120.850519
+          ],
+          "expectedPlanPointFt": [
+            108.685926,
+            120.850519
+          ],
+          "residualFt": 0
+        },
+        {
+          "id": "grid-1-A",
+          "sourcePdfPoint": [
+            2085.101,
+            910.572
+          ],
+          "targetA121PdfPoint": [
+            2144.384,
+            912.259
+          ],
+          "derivedPlanPointFt": [
+            317.546259,
+            120.850519
+          ],
+          "expectedPlanPointFt": [
+            317.686519,
+            120.850519
+          ],
+          "residualFt": 0.14026
+        },
+        {
+          "id": "grid-20-K",
+          "sourcePdfPoint": [
+            205.358,
+            1493.293
+          ],
+          "targetA121PdfPoint": [
+            733.63,
+            1349.552
+          ],
+          "derivedPlanPointFt": [
+            108.685926,
+            56.103741
+          ],
+          "expectedPlanPointFt": [
+            108.685926,
+            56.06637
+          ],
+          "residualFt": 0.037371
+        }
+      ],
+      "maxResidualFt": 0.14026
+    },
+    {
+      "id": "p109-area-c",
+      "sourceSheetId": "P109",
+      "area": "C",
+      "sourceScaleFtPerPoint": 0.1111111111111111,
+      "targetScaleFtPerPoint": 0.14814814814814814,
+      "sourceAnchorPdf": [
+        205.358,
+        910.572
+      ],
+      "targetAnchorA121Pdf": [
+        733.63,
+        912.259
+      ],
+      "targetAnchorPlanFt": [
+        108.685926,
+        120.850519
+      ],
+      "controls": [
+        {
+          "id": "grid-20-A",
+          "sourcePdfPoint": [
+            205.358,
+            910.572
+          ],
+          "targetA121PdfPoint": [
+            733.63,
+            912.259
+          ],
+          "derivedPlanPointFt": [
+            108.685926,
+            120.850519
+          ],
+          "expectedPlanPointFt": [
+            108.685926,
+            120.850519
+          ],
+          "residualFt": 0
+        },
+        {
+          "id": "grid-1-A",
+          "sourcePdfPoint": [
+            2085.101,
+            910.572
+          ],
+          "targetA121PdfPoint": [
+            2144.384,
+            912.259
+          ],
+          "derivedPlanPointFt": [
+            317.546259,
+            120.850519
+          ],
+          "expectedPlanPointFt": [
+            317.686519,
+            120.850519
+          ],
+          "residualFt": 0.14026
+        },
+        {
+          "id": "grid-20-K",
+          "sourcePdfPoint": [
+            205.358,
+            1493.293
+          ],
+          "targetA121PdfPoint": [
+            733.63,
+            1349.552
+          ],
+          "derivedPlanPointFt": [
+            108.685926,
+            56.103741
+          ],
+          "expectedPlanPointFt": [
+            108.685926,
+            56.06637
+          ],
+          "residualFt": 0.037371
+        }
+      ],
+      "maxResidualFt": 0.14026
+    }
+  ],
+  "equipment": [
+    {
+      "id": "m109-hp-3-010",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        510.4,
+        305.16,
+        536.9,
+        316.079
+      ],
+      "boundaryPlanFt": [
+        [
+          56.373259,
+          101.01163
+        ],
+        [
+          59.317704,
+          101.01163
+        ],
+        [
+          59.317704,
+          99.798407
+        ],
+        [
+          56.373259,
+          99.798407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-011",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        575.4,
+        305.16,
+        602.1,
+        316.079
+      ],
+      "boundaryPlanFt": [
+        [
+          63.595481,
+          101.01163
+        ],
+        [
+          66.562148,
+          101.01163
+        ],
+        [
+          66.562148,
+          99.798407
+        ],
+        [
+          63.595481,
+          99.798407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-014",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        542.9,
+        316.079,
+        569.4,
+        326.4
+      ],
+      "boundaryPlanFt": [
+        [
+          59.98437,
+          99.798407
+        ],
+        [
+          62.928815,
+          99.798407
+        ],
+        [
+          62.928815,
+          98.65163
+        ],
+        [
+          59.98437,
+          98.65163
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-073",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1434.5,
+        1116.721,
+        1461.1,
+        1127.641
+      ],
+      "boundaryPlanFt": [
+        [
+          245.257259,
+          97.945074
+        ],
+        [
+          248.212815,
+          97.945074
+        ],
+        [
+          248.212815,
+          96.731741
+        ],
+        [
+          245.257259,
+          96.731741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-052",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1402,
+        1049.281,
+        1428.5,
+        1060.201
+      ],
+      "boundaryPlanFt": [
+        [
+          241.646148,
+          105.438407
+        ],
+        [
+          244.590593,
+          105.438407
+        ],
+        [
+          244.590593,
+          104.225074
+        ],
+        [
+          241.646148,
+          104.225074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-007",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        798.7,
+        275.879,
+        825.4,
+        286.919
+      ],
+      "boundaryPlanFt": [
+        [
+          88.406593,
+          104.265074
+        ],
+        [
+          91.373259,
+          104.265074
+        ],
+        [
+          91.373259,
+          103.038407
+        ],
+        [
+          88.406593,
+          103.038407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-079",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        823.8,
+        1138.921,
+        850.3,
+        1149.961
+      ],
+      "boundaryPlanFt": [
+        [
+          177.401704,
+          95.478407
+        ],
+        [
+          180.346148,
+          95.478407
+        ],
+        [
+          180.346148,
+          94.251741
+        ],
+        [
+          177.401704,
+          94.251741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-078",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        747.1,
+        1138.921,
+        773.8,
+        1149.961
+      ],
+      "boundaryPlanFt": [
+        [
+          168.879481,
+          95.478407
+        ],
+        [
+          171.846148,
+          95.478407
+        ],
+        [
+          171.846148,
+          94.251741
+        ],
+        [
+          168.879481,
+          94.251741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-047",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        250.2,
+        1043.281,
+        276.9,
+        1054.321
+      ],
+      "boundaryPlanFt": [
+        [
+          113.66837,
+          106.105074
+        ],
+        [
+          116.635037,
+          106.105074
+        ],
+        [
+          116.635037,
+          104.878407
+        ],
+        [
+          113.66837,
+          104.878407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-050",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        897.9,
+        1044.361,
+        924.5,
+        1055.401
+      ],
+      "boundaryPlanFt": [
+        [
+          185.635037,
+          105.985074
+        ],
+        [
+          188.590593,
+          105.985074
+        ],
+        [
+          188.590593,
+          104.758407
+        ],
+        [
+          185.635037,
+          104.758407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-048",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        555,
+        1044.361,
+        581.7,
+        1055.401
+      ],
+      "boundaryPlanFt": [
+        [
+          147.535037,
+          105.985074
+        ],
+        [
+          150.501704,
+          105.985074
+        ],
+        [
+          150.501704,
+          104.758407
+        ],
+        [
+          147.535037,
+          104.758407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-053",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1529.4,
+        1050.721,
+        1556.1,
+        1061.761
+      ],
+      "boundaryPlanFt": [
+        [
+          255.801704,
+          105.278407
+        ],
+        [
+          258.76837,
+          105.278407
+        ],
+        [
+          258.76837,
+          104.051741
+        ],
+        [
+          255.801704,
+          104.051741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-106",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1125.9,
+        1182.001,
+        1152.5,
+        1193.042
+      ],
+      "boundaryPlanFt": [
+        [
+          210.96837,
+          90.691741
+        ],
+        [
+          213.923926,
+          90.691741
+        ],
+        [
+          213.923926,
+          89.464963
+        ],
+        [
+          210.96837,
+          89.464963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-108",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1282.1,
+        1182.001,
+        1308.7,
+        1193.042
+      ],
+      "boundaryPlanFt": [
+        [
+          228.323926,
+          90.691741
+        ],
+        [
+          231.279481,
+          90.691741
+        ],
+        [
+          231.279481,
+          89.464963
+        ],
+        [
+          228.323926,
+          89.464963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-109",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1358.3,
+        1182.001,
+        1384.9,
+        1193.042
+      ],
+      "boundaryPlanFt": [
+        [
+          236.790593,
+          90.691741
+        ],
+        [
+          239.746148,
+          90.691741
+        ],
+        [
+          239.746148,
+          89.464963
+        ],
+        [
+          236.790593,
+          89.464963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-110",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1434.5,
+        1182.001,
+        1461.1,
+        1193.042
+      ],
+      "boundaryPlanFt": [
+        [
+          245.257259,
+          90.691741
+        ],
+        [
+          248.212815,
+          90.691741
+        ],
+        [
+          248.212815,
+          89.464963
+        ],
+        [
+          245.257259,
+          89.464963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-111",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1513,
+        1182.001,
+        1539.5,
+        1193.042
+      ],
+      "boundaryPlanFt": [
+        [
+          253.979481,
+          90.691741
+        ],
+        [
+          256.923926,
+          90.691741
+        ],
+        [
+          256.923926,
+          89.464963
+        ],
+        [
+          253.979481,
+          89.464963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-112",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1584.9,
+        1182.001,
+        1611.4,
+        1193.042
+      ],
+      "boundaryPlanFt": [
+        [
+          261.96837,
+          90.691741
+        ],
+        [
+          264.912815,
+          90.691741
+        ],
+        [
+          264.912815,
+          89.464963
+        ],
+        [
+          261.96837,
+          89.464963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-049",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        827.1,
+        1044.361,
+        853.6,
+        1055.401
+      ],
+      "boundaryPlanFt": [
+        [
+          177.76837,
+          105.985074
+        ],
+        [
+          180.712815,
+          105.985074
+        ],
+        [
+          180.712815,
+          104.758407
+        ],
+        [
+          177.76837,
+          104.758407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-102",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        250.2,
+        1176.841,
+        276.9,
+        1187.761
+      ],
+      "boundaryPlanFt": [
+        [
+          113.66837,
+          91.265074
+        ],
+        [
+          116.635037,
+          91.265074
+        ],
+        [
+          116.635037,
+          90.051741
+        ],
+        [
+          113.66837,
+          90.051741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-103",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        329.4,
+        1176.841,
+        356.1,
+        1187.761
+      ],
+      "boundaryPlanFt": [
+        [
+          122.46837,
+          91.265074
+        ],
+        [
+          125.435037,
+          91.265074
+        ],
+        [
+          125.435037,
+          90.051741
+        ],
+        [
+          122.46837,
+          90.051741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-105",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        942.4,
+        1176.841,
+        969,
+        1187.761
+      ],
+      "boundaryPlanFt": [
+        [
+          190.579481,
+          91.265074
+        ],
+        [
+          193.535037,
+          91.265074
+        ],
+        [
+          193.535037,
+          90.051741
+        ],
+        [
+          190.579481,
+          90.051741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-084",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        412.6,
+        1149.241,
+        439.2,
+        1160.161
+      ],
+      "boundaryPlanFt": [
+        [
+          131.712815,
+          94.331741
+        ],
+        [
+          134.66837,
+          94.331741
+        ],
+        [
+          134.66837,
+          93.118407
+        ],
+        [
+          131.712815,
+          93.118407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-104",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        522.5,
+        1176.841,
+        549,
+        1187.761
+      ],
+      "boundaryPlanFt": [
+        [
+          143.923926,
+          91.265074
+        ],
+        [
+          146.86837,
+          91.265074
+        ],
+        [
+          146.86837,
+          90.051741
+        ],
+        [
+          143.923926,
+          90.051741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-024",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        792.6,
+        396.72,
+        819.1,
+        407.64
+      ],
+      "boundaryPlanFt": [
+        [
+          87.728815,
+          90.838296
+        ],
+        [
+          90.673259,
+          90.838296
+        ],
+        [
+          90.673259,
+          89.624963
+        ],
+        [
+          87.728815,
+          89.624963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-074",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1282.1,
+        1121.401,
+        1308.7,
+        1132.321
+      ],
+      "boundaryPlanFt": [
+        [
+          228.323926,
+          97.425074
+        ],
+        [
+          231.279481,
+          97.425074
+        ],
+        [
+          231.279481,
+          96.211741
+        ],
+        [
+          228.323926,
+          96.211741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-051",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1093.3,
+        1045.561,
+        1119.9,
+        1056.481
+      ],
+      "boundaryPlanFt": [
+        [
+          207.346148,
+          105.851741
+        ],
+        [
+          210.301704,
+          105.851741
+        ],
+        [
+          210.301704,
+          104.638407
+        ],
+        [
+          207.346148,
+          104.638407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-023",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        660.1,
+        396.72,
+        686.7,
+        407.64
+      ],
+      "boundaryPlanFt": [
+        [
+          73.006593,
+          90.838296
+        ],
+        [
+          75.962148,
+          90.838296
+        ],
+        [
+          75.962148,
+          89.624963
+        ],
+        [
+          73.006593,
+          89.624963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-025",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        944.4,
+        396.72,
+        970.9,
+        407.64
+      ],
+      "boundaryPlanFt": [
+        [
+          104.595481,
+          90.838296
+        ],
+        [
+          107.539926,
+          90.838296
+        ],
+        [
+          107.539926,
+          89.624963
+        ],
+        [
+          104.595481,
+          89.624963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-093",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1480.3,
+        1171.681,
+        1507,
+        1182.001
+      ],
+      "boundaryPlanFt": [
+        [
+          250.346148,
+          91.838407
+        ],
+        [
+          253.312815,
+          91.838407
+        ],
+        [
+          253.312815,
+          90.691741
+        ],
+        [
+          250.346148,
+          90.691741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-094",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1552.3,
+        1171.681,
+        1578.9,
+        1182.001
+      ],
+      "boundaryPlanFt": [
+        [
+          258.346148,
+          91.838407
+        ],
+        [
+          261.301704,
+          91.838407
+        ],
+        [
+          261.301704,
+          90.691741
+        ],
+        [
+          258.346148,
+          90.691741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-092",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1402,
+        1171.681,
+        1428.5,
+        1182.001
+      ],
+      "boundaryPlanFt": [
+        [
+          241.646148,
+          91.838407
+        ],
+        [
+          244.590593,
+          91.838407
+        ],
+        [
+          244.590593,
+          90.691741
+        ],
+        [
+          241.646148,
+          90.691741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-028",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        944.4,
+        421.2,
+        970.9,
+        432.12
+      ],
+      "boundaryPlanFt": [
+        [
+          104.595481,
+          88.118296
+        ],
+        [
+          107.539926,
+          88.118296
+        ],
+        [
+          107.539926,
+          86.904963
+        ],
+        [
+          104.595481,
+          86.904963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-027",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        792.6,
+        421.2,
+        819.1,
+        432.12
+      ],
+      "boundaryPlanFt": [
+        [
+          87.728815,
+          88.118296
+        ],
+        [
+          90.673259,
+          88.118296
+        ],
+        [
+          90.673259,
+          86.904963
+        ],
+        [
+          87.728815,
+          86.904963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-026",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        660.1,
+        421.2,
+        686.7,
+        432.12
+      ],
+      "boundaryPlanFt": [
+        [
+          73.006593,
+          88.118296
+        ],
+        [
+          75.962148,
+          88.118296
+        ],
+        [
+          75.962148,
+          86.904963
+        ],
+        [
+          73.006593,
+          86.904963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-059",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1402,
+        1073.761,
+        1428.5,
+        1084.681
+      ],
+      "boundaryPlanFt": [
+        [
+          241.646148,
+          102.718407
+        ],
+        [
+          244.590593,
+          102.718407
+        ],
+        [
+          244.590593,
+          101.505074
+        ],
+        [
+          241.646148,
+          101.505074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-123",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1552.3,
+        1206.481,
+        1578.9,
+        1217.401
+      ],
+      "boundaryPlanFt": [
+        [
+          258.346148,
+          87.971741
+        ],
+        [
+          261.301704,
+          87.971741
+        ],
+        [
+          261.301704,
+          86.758407
+        ],
+        [
+          258.346148,
+          86.758407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-121",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1402,
+        1206.481,
+        1428.5,
+        1217.401
+      ],
+      "boundaryPlanFt": [
+        [
+          241.646148,
+          87.971741
+        ],
+        [
+          244.590593,
+          87.971741
+        ],
+        [
+          244.590593,
+          86.758407
+        ],
+        [
+          241.646148,
+          86.758407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-120",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1325.8,
+        1206.481,
+        1352.3,
+        1217.401
+      ],
+      "boundaryPlanFt": [
+        [
+          233.179481,
+          87.971741
+        ],
+        [
+          236.123926,
+          87.971741
+        ],
+        [
+          236.123926,
+          86.758407
+        ],
+        [
+          233.179481,
+          86.758407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-056",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        827.1,
+        1068.841,
+        853.6,
+        1079.761
+      ],
+      "boundaryPlanFt": [
+        [
+          177.76837,
+          103.265074
+        ],
+        [
+          180.712815,
+          103.265074
+        ],
+        [
+          180.712815,
+          102.051741
+        ],
+        [
+          177.76837,
+          102.051741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-083",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1282.1,
+        1145.881,
+        1308.7,
+        1156.801
+      ],
+      "boundaryPlanFt": [
+        [
+          228.323926,
+          94.705074
+        ],
+        [
+          231.279481,
+          94.705074
+        ],
+        [
+          231.279481,
+          93.491741
+        ],
+        [
+          228.323926,
+          93.491741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-081",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1434.5,
+        1141.201,
+        1461.1,
+        1152.121
+      ],
+      "boundaryPlanFt": [
+        [
+          245.257259,
+          95.225074
+        ],
+        [
+          248.212815,
+          95.225074
+        ],
+        [
+          248.212815,
+          94.011741
+        ],
+        [
+          245.257259,
+          94.011741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-009",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        942.1,
+        300.359,
+        968.8,
+        311.28
+      ],
+      "boundaryPlanFt": [
+        [
+          104.339926,
+          101.545074
+        ],
+        [
+          107.306593,
+          101.545074
+        ],
+        [
+          107.306593,
+          100.33163
+        ],
+        [
+          104.339926,
+          100.33163
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-008",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        798.7,
+        300.359,
+        825.4,
+        311.28
+      ],
+      "boundaryPlanFt": [
+        [
+          88.406593,
+          101.545074
+        ],
+        [
+          91.373259,
+          101.545074
+        ],
+        [
+          91.373259,
+          100.33163
+        ],
+        [
+          88.406593,
+          100.33163
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-085",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        747.1,
+        1163.401,
+        773.8,
+        1174.321
+      ],
+      "boundaryPlanFt": [
+        [
+          168.879481,
+          92.758407
+        ],
+        [
+          171.846148,
+          92.758407
+        ],
+        [
+          171.846148,
+          91.545074
+        ],
+        [
+          168.879481,
+          91.545074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-122",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1480.3,
+        1206.481,
+        1507,
+        1217.401
+      ],
+      "boundaryPlanFt": [
+        [
+          250.346148,
+          87.971741
+        ],
+        [
+          253.312815,
+          87.971741
+        ],
+        [
+          253.312815,
+          86.758407
+        ],
+        [
+          250.346148,
+          86.758407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-098",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        412.6,
+        1173.721,
+        439.2,
+        1184.641
+      ],
+      "boundaryPlanFt": [
+        [
+          131.712815,
+          91.611741
+        ],
+        [
+          134.66837,
+          91.611741
+        ],
+        [
+          134.66837,
+          90.398407
+        ],
+        [
+          131.712815,
+          90.398407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-054",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        250.2,
+        1067.761,
+        276.9,
+        1078.681
+      ],
+      "boundaryPlanFt": [
+        [
+          113.66837,
+          103.385074
+        ],
+        [
+          116.635037,
+          103.385074
+        ],
+        [
+          116.635037,
+          102.171741
+        ],
+        [
+          113.66837,
+          102.171741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-055",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        555,
+        1068.841,
+        581.7,
+        1079.761
+      ],
+      "boundaryPlanFt": [
+        [
+          147.535037,
+          103.265074
+        ],
+        [
+          150.501704,
+          103.265074
+        ],
+        [
+          150.501704,
+          102.051741
+        ],
+        [
+          147.535037,
+          102.051741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-057",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        897.9,
+        1068.841,
+        924.5,
+        1079.761
+      ],
+      "boundaryPlanFt": [
+        [
+          185.635037,
+          103.265074
+        ],
+        [
+          188.590593,
+          103.265074
+        ],
+        [
+          188.590593,
+          102.051741
+        ],
+        [
+          185.635037,
+          102.051741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-118",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1125.9,
+        1206.481,
+        1152.5,
+        1217.401
+      ],
+      "boundaryPlanFt": [
+        [
+          210.96837,
+          87.971741
+        ],
+        [
+          213.923926,
+          87.971741
+        ],
+        [
+          213.923926,
+          86.758407
+        ],
+        [
+          210.96837,
+          86.758407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-058",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1093.3,
+        1069.921,
+        1119.9,
+        1080.961
+      ],
+      "boundaryPlanFt": [
+        [
+          207.346148,
+          103.145074
+        ],
+        [
+          210.301704,
+          103.145074
+        ],
+        [
+          210.301704,
+          101.918407
+        ],
+        [
+          207.346148,
+          101.918407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-116",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        522.5,
+        1201.201,
+        549,
+        1212.241
+      ],
+      "boundaryPlanFt": [
+        [
+          143.923926,
+          88.558407
+        ],
+        [
+          146.86837,
+          88.558407
+        ],
+        [
+          146.86837,
+          87.331741
+        ],
+        [
+          143.923926,
+          87.331741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-060",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1529.4,
+        1075.201,
+        1556.1,
+        1086.241
+      ],
+      "boundaryPlanFt": [
+        [
+          255.801704,
+          102.558407
+        ],
+        [
+          258.76837,
+          102.558407
+        ],
+        [
+          258.76837,
+          101.331741
+        ],
+        [
+          255.801704,
+          101.331741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-117",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        942.4,
+        1201.201,
+        969,
+        1212.241
+      ],
+      "boundaryPlanFt": [
+        [
+          190.579481,
+          88.558407
+        ],
+        [
+          193.535037,
+          88.558407
+        ],
+        [
+          193.535037,
+          87.331741
+        ],
+        [
+          190.579481,
+          87.331741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-115",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        329.4,
+        1201.201,
+        356.1,
+        1212.241
+      ],
+      "boundaryPlanFt": [
+        [
+          122.46837,
+          88.558407
+        ],
+        [
+          125.435037,
+          88.558407
+        ],
+        [
+          125.435037,
+          87.331741
+        ],
+        [
+          122.46837,
+          87.331741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-114",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        250.2,
+        1201.201,
+        276.9,
+        1212.241
+      ],
+      "boundaryPlanFt": [
+        [
+          113.66837,
+          88.558407
+        ],
+        [
+          116.635037,
+          88.558407
+        ],
+        [
+          116.635037,
+          87.331741
+        ],
+        [
+          113.66837,
+          87.331741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-022",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        911.9,
+        386.4,
+        938.4,
+        396.72
+      ],
+      "boundaryPlanFt": [
+        [
+          100.98437,
+          91.984963
+        ],
+        [
+          103.928815,
+          91.984963
+        ],
+        [
+          103.928815,
+          90.838296
+        ],
+        [
+          100.98437,
+          90.838296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-038",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        522.5,
+        1034.041,
+        549,
+        1044.361
+      ],
+      "boundaryPlanFt": [
+        [
+          143.923926,
+          107.131741
+        ],
+        [
+          146.86837,
+          107.131741
+        ],
+        [
+          146.86837,
+          105.985074
+        ],
+        [
+          143.923926,
+          105.985074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-037",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        217.7,
+        1032.961,
+        244.2,
+        1043.281
+      ],
+      "boundaryPlanFt": [
+        [
+          110.057259,
+          107.251741
+        ],
+        [
+          113.001704,
+          107.251741
+        ],
+        [
+          113.001704,
+          106.105074
+        ],
+        [
+          110.057259,
+          106.105074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-021",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        825.1,
+        386.4,
+        851.8,
+        396.72
+      ],
+      "boundaryPlanFt": [
+        [
+          91.339926,
+          91.984963
+        ],
+        [
+          94.306593,
+          91.984963
+        ],
+        [
+          94.306593,
+          90.838296
+        ],
+        [
+          91.339926,
+          90.838296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-042",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1434.5,
+        1038.961,
+        1461.1,
+        1049.281
+      ],
+      "boundaryPlanFt": [
+        [
+          245.257259,
+          106.585074
+        ],
+        [
+          248.212815,
+          106.585074
+        ],
+        [
+          248.212815,
+          105.438407
+        ],
+        [
+          245.257259,
+          105.438407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-089",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        975,
+        1166.521,
+        1001.5,
+        1176.841
+      ],
+      "boundaryPlanFt": [
+        [
+          194.201704,
+          92.411741
+        ],
+        [
+          197.146148,
+          92.411741
+        ],
+        [
+          197.146148,
+          91.265074
+        ],
+        [
+          194.201704,
+          91.265074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-091",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1325.8,
+        1171.681,
+        1352.3,
+        1182.001
+      ],
+      "boundaryPlanFt": [
+        [
+          233.179481,
+          91.838407
+        ],
+        [
+          236.123926,
+          91.838407
+        ],
+        [
+          236.123926,
+          90.691741
+        ],
+        [
+          233.179481,
+          90.691741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-040",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        930.5,
+        1034.041,
+        957,
+        1044.361
+      ],
+      "boundaryPlanFt": [
+        [
+          189.257259,
+          107.131741
+        ],
+        [
+          192.201704,
+          107.131741
+        ],
+        [
+          192.201704,
+          105.985074
+        ],
+        [
+          189.257259,
+          105.985074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-036",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        911.9,
+        432.12,
+        938.4,
+        442.44
+      ],
+      "boundaryPlanFt": [
+        [
+          100.98437,
+          86.904963
+        ],
+        [
+          103.928815,
+          86.904963
+        ],
+        [
+          103.928815,
+          85.758296
+        ],
+        [
+          100.98437,
+          85.758296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-062",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        522.5,
+        1079.761,
+        549,
+        1090.081
+      ],
+      "boundaryPlanFt": [
+        [
+          143.923926,
+          102.051741
+        ],
+        [
+          146.86837,
+          102.051741
+        ],
+        [
+          146.86837,
+          100.905074
+        ],
+        [
+          143.923926,
+          100.905074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-061",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        217.7,
+        1078.681,
+        244.2,
+        1089.001
+      ],
+      "boundaryPlanFt": [
+        [
+          110.057259,
+          102.171741
+        ],
+        [
+          113.001704,
+          102.171741
+        ],
+        [
+          113.001704,
+          101.025074
+        ],
+        [
+          110.057259,
+          101.025074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-039",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        794.5,
+        1034.041,
+        821.1,
+        1044.361
+      ],
+      "boundaryPlanFt": [
+        [
+          174.146148,
+          107.131741
+        ],
+        [
+          177.101704,
+          107.131741
+        ],
+        [
+          177.101704,
+          105.985074
+        ],
+        [
+          174.146148,
+          105.985074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-066",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1434.5,
+        1084.681,
+        1461.1,
+        1095.001
+      ],
+      "boundaryPlanFt": [
+        [
+          245.257259,
+          101.505074
+        ],
+        [
+          248.212815,
+          101.505074
+        ],
+        [
+          248.212815,
+          100.358407
+        ],
+        [
+          245.257259,
+          100.358407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-088",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        555,
+        1166.521,
+        581.7,
+        1176.841
+      ],
+      "boundaryPlanFt": [
+        [
+          147.535037,
+          92.411741
+        ],
+        [
+          150.501704,
+          92.411741
+        ],
+        [
+          150.501704,
+          91.265074
+        ],
+        [
+          147.535037,
+          91.265074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-087",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        296.9,
+        1166.521,
+        323.4,
+        1176.841
+      ],
+      "boundaryPlanFt": [
+        [
+          118.857259,
+          92.411741
+        ],
+        [
+          121.801704,
+          92.411741
+        ],
+        [
+          121.801704,
+          91.265074
+        ],
+        [
+          118.857259,
+          91.265074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-086",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        217.7,
+        1166.521,
+        244.2,
+        1176.841
+      ],
+      "boundaryPlanFt": [
+        [
+          110.057259,
+          92.411741
+        ],
+        [
+          113.001704,
+          92.411741
+        ],
+        [
+          113.001704,
+          91.265074
+        ],
+        [
+          110.057259,
+          91.265074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-041",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1125.9,
+        1035.241,
+        1152.5,
+        1045.561
+      ],
+      "boundaryPlanFt": [
+        [
+          210.96837,
+          106.998407
+        ],
+        [
+          213.923926,
+          106.998407
+        ],
+        [
+          213.923926,
+          105.851741
+        ],
+        [
+          210.96837,
+          105.851741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-127",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        975,
+        1212.241,
+        1001.5,
+        1222.562
+      ],
+      "boundaryPlanFt": [
+        [
+          194.201704,
+          87.331741
+        ],
+        [
+          197.146148,
+          87.331741
+        ],
+        [
+          197.146148,
+          86.184963
+        ],
+        [
+          194.201704,
+          86.184963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-075",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        779.8,
+        1128.601,
+        806.3,
+        1138.921
+      ],
+      "boundaryPlanFt": [
+        [
+          172.512815,
+          96.625074
+        ],
+        [
+          175.457259,
+          96.625074
+        ],
+        [
+          175.457259,
+          95.478407
+        ],
+        [
+          172.512815,
+          95.478407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-076",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        856.3,
+        1128.601,
+        882.9,
+        1138.921
+      ],
+      "boundaryPlanFt": [
+        [
+          181.012815,
+          96.625074
+        ],
+        [
+          183.96837,
+          96.625074
+        ],
+        [
+          183.96837,
+          95.478407
+        ],
+        [
+          181.012815,
+          95.478407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-113",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        380.1,
+        1184.641,
+        406.6,
+        1194.961
+      ],
+      "boundaryPlanFt": [
+        [
+          128.101704,
+          90.398407
+        ],
+        [
+          131.046148,
+          90.398407
+        ],
+        [
+          131.046148,
+          89.251741
+        ],
+        [
+          128.101704,
+          89.251741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-045",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1637.8,
+        1040.521,
+        1664.3,
+        1050.721
+      ],
+      "boundaryPlanFt": [
+        [
+          267.846148,
+          106.411741
+        ],
+        [
+          270.790593,
+          106.411741
+        ],
+        [
+          270.790593,
+          105.278407
+        ],
+        [
+          267.846148,
+          105.278407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-001",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        766.2,
+        265.559,
+        792.7,
+        275.879
+      ],
+      "boundaryPlanFt": [
+        [
+          84.795481,
+          105.411741
+        ],
+        [
+          87.739926,
+          105.411741
+        ],
+        [
+          87.739926,
+          104.265074
+        ],
+        [
+          84.795481,
+          104.265074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-003",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        942.1,
+        265.559,
+        968.8,
+        275.879
+      ],
+      "boundaryPlanFt": [
+        [
+          104.339926,
+          105.411741
+        ],
+        [
+          107.306593,
+          105.411741
+        ],
+        [
+          107.306593,
+          104.265074
+        ],
+        [
+          104.339926,
+          104.265074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-019",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        712,
+        386.4,
+        738.6,
+        396.72
+      ],
+      "boundaryPlanFt": [
+        [
+          78.773259,
+          91.984963
+        ],
+        [
+          81.728815,
+          91.984963
+        ],
+        [
+          81.728815,
+          90.838296
+        ],
+        [
+          78.773259,
+          90.838296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-018",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        627.6,
+        386.4,
+        654.1,
+        396.72
+      ],
+      "boundaryPlanFt": [
+        [
+          69.395481,
+          91.984963
+        ],
+        [
+          72.339926,
+          91.984963
+        ],
+        [
+          72.339926,
+          90.838296
+        ],
+        [
+          69.395481,
+          90.838296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-035",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        825.1,
+        432.12,
+        851.8,
+        442.44
+      ],
+      "boundaryPlanFt": [
+        [
+          91.339926,
+          86.904963
+        ],
+        [
+          94.306593,
+          86.904963
+        ],
+        [
+          94.306593,
+          85.758296
+        ],
+        [
+          91.339926,
+          85.758296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-071",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1249.6,
+        1111.081,
+        1276.1,
+        1121.401
+      ],
+      "boundaryPlanFt": [
+        [
+          224.712815,
+          98.571741
+        ],
+        [
+          227.657259,
+          98.571741
+        ],
+        [
+          227.657259,
+          97.425074
+        ],
+        [
+          224.712815,
+          97.425074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-065",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1125.9,
+        1080.961,
+        1152.5,
+        1091.281
+      ],
+      "boundaryPlanFt": [
+        [
+          210.96837,
+          101.918407
+        ],
+        [
+          213.923926,
+          101.918407
+        ],
+        [
+          213.923926,
+          100.771741
+        ],
+        [
+          210.96837,
+          100.771741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-006",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        575.4,
+        270.359,
+        602.1,
+        280.679
+      ],
+      "boundaryPlanFt": [
+        [
+          63.595481,
+          104.878407
+        ],
+        [
+          66.562148,
+          104.878407
+        ],
+        [
+          66.562148,
+          103.731741
+        ],
+        [
+          63.595481,
+          103.731741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-004",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        510.4,
+        270.359,
+        536.9,
+        280.679
+      ],
+      "boundaryPlanFt": [
+        [
+          56.373259,
+          104.878407
+        ],
+        [
+          59.317704,
+          104.878407
+        ],
+        [
+          59.317704,
+          103.731741
+        ],
+        [
+          56.373259,
+          103.731741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-096",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1649.9,
+        1171.921,
+        1676.5,
+        1182.241
+      ],
+      "boundaryPlanFt": [
+        [
+          269.190593,
+          91.811741
+        ],
+        [
+          272.146148,
+          91.811741
+        ],
+        [
+          272.146148,
+          90.665074
+        ],
+        [
+          269.190593,
+          90.665074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-017",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        575.4,
+        384.84,
+        602.1,
+        395.16
+      ],
+      "boundaryPlanFt": [
+        [
+          63.595481,
+          92.158296
+        ],
+        [
+          66.562148,
+          92.158296
+        ],
+        [
+          66.562148,
+          91.01163
+        ],
+        [
+          63.595481,
+          91.01163
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-015",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        510.4,
+        384.84,
+        536.9,
+        395.16
+      ],
+      "boundaryPlanFt": [
+        [
+          56.373259,
+          92.158296
+        ],
+        [
+          59.317704,
+          92.158296
+        ],
+        [
+          59.317704,
+          91.01163
+        ],
+        [
+          56.373259,
+          91.01163
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-124",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        217.7,
+        1212.241,
+        244.2,
+        1222.562
+      ],
+      "boundaryPlanFt": [
+        [
+          110.057259,
+          87.331741
+        ],
+        [
+          113.001704,
+          87.331741
+        ],
+        [
+          113.001704,
+          86.184963
+        ],
+        [
+          110.057259,
+          86.184963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-125",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        296.9,
+        1212.241,
+        323.4,
+        1222.562
+      ],
+      "boundaryPlanFt": [
+        [
+          118.857259,
+          87.331741
+        ],
+        [
+          121.801704,
+          87.331741
+        ],
+        [
+          121.801704,
+          86.184963
+        ],
+        [
+          118.857259,
+          86.184963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-064",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        930.5,
+        1079.761,
+        957,
+        1090.081
+      ],
+      "boundaryPlanFt": [
+        [
+          189.257259,
+          102.051741
+        ],
+        [
+          192.201704,
+          102.051741
+        ],
+        [
+          192.201704,
+          100.905074
+        ],
+        [
+          189.257259,
+          100.905074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-067",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1562.1,
+        1086.241,
+        1588.6,
+        1096.441
+      ],
+      "boundaryPlanFt": [
+        [
+          259.435037,
+          101.331741
+        ],
+        [
+          262.379481,
+          101.331741
+        ],
+        [
+          262.379481,
+          100.198407
+        ],
+        [
+          259.435037,
+          100.198407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-077",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        380.1,
+        1138.921,
+        406.6,
+        1149.241
+      ],
+      "boundaryPlanFt": [
+        [
+          128.101704,
+          95.478407
+        ],
+        [
+          131.046148,
+          95.478407
+        ],
+        [
+          131.046148,
+          94.331741
+        ],
+        [
+          128.101704,
+          94.331741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-033",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        712,
+        432.12,
+        738.6,
+        442.44
+      ],
+      "boundaryPlanFt": [
+        [
+          78.773259,
+          86.904963
+        ],
+        [
+          81.728815,
+          86.904963
+        ],
+        [
+          81.728815,
+          85.758296
+        ],
+        [
+          78.773259,
+          85.758296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-069",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1637.8,
+        1086.241,
+        1664.3,
+        1096.441
+      ],
+      "boundaryPlanFt": [
+        [
+          267.846148,
+          101.331741
+        ],
+        [
+          270.790593,
+          101.331741
+        ],
+        [
+          270.790593,
+          100.198407
+        ],
+        [
+          267.846148,
+          100.198407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-090",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1093.3,
+        1171.681,
+        1119.9,
+        1182.001
+      ],
+      "boundaryPlanFt": [
+        [
+          207.346148,
+          91.838407
+        ],
+        [
+          210.301704,
+          91.838407
+        ],
+        [
+          210.301704,
+          90.691741
+        ],
+        [
+          207.346148,
+          90.691741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-012",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        766.2,
+        311.28,
+        792.7,
+        321.599
+      ],
+      "boundaryPlanFt": [
+        [
+          84.795481,
+          100.33163
+        ],
+        [
+          87.739926,
+          100.33163
+        ],
+        [
+          87.739926,
+          99.185074
+        ],
+        [
+          84.795481,
+          99.185074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-013",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        909.6,
+        311.28,
+        936.1,
+        321.599
+      ],
+      "boundaryPlanFt": [
+        [
+          100.728815,
+          100.33163
+        ],
+        [
+          103.673259,
+          100.33163
+        ],
+        [
+          103.673259,
+          99.185074
+        ],
+        [
+          100.728815,
+          99.185074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-032",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        627.6,
+        432.12,
+        654.1,
+        442.44
+      ],
+      "boundaryPlanFt": [
+        [
+          69.395481,
+          86.904963
+        ],
+        [
+          72.339926,
+          86.904963
+        ],
+        [
+          72.339926,
+          85.758296
+        ],
+        [
+          69.395481,
+          85.758296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-100",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        823.8,
+        1174.321,
+        850.3,
+        1184.641
+      ],
+      "boundaryPlanFt": [
+        [
+          177.401704,
+          91.545074
+        ],
+        [
+          180.346148,
+          91.545074
+        ],
+        [
+          180.346148,
+          90.398407
+        ],
+        [
+          177.401704,
+          90.398407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-031",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        575.4,
+        430.56,
+        602.1,
+        440.88
+      ],
+      "boundaryPlanFt": [
+        [
+          63.595481,
+          87.078296
+        ],
+        [
+          66.562148,
+          87.078296
+        ],
+        [
+          66.562148,
+          85.93163
+        ],
+        [
+          63.595481,
+          85.93163
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-029",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        510.4,
+        430.56,
+        536.9,
+        440.88
+      ],
+      "boundaryPlanFt": [
+        [
+          56.373259,
+          87.078296
+        ],
+        [
+          59.317704,
+          87.078296
+        ],
+        [
+          59.317704,
+          85.93163
+        ],
+        [
+          56.373259,
+          85.93163
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-128",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1093.3,
+        1217.401,
+        1119.9,
+        1227.721
+      ],
+      "boundaryPlanFt": [
+        [
+          207.346148,
+          86.758407
+        ],
+        [
+          210.301704,
+          86.758407
+        ],
+        [
+          210.301704,
+          85.611741
+        ],
+        [
+          207.346148,
+          85.611741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-072",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1402,
+        1116.721,
+        1428.5,
+        1127.641
+      ],
+      "boundaryPlanFt": [
+        [
+          241.646148,
+          97.945074
+        ],
+        [
+          244.590593,
+          97.945074
+        ],
+        [
+          244.590593,
+          96.731741
+        ],
+        [
+          241.646148,
+          96.731741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-063",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        794.5,
+        1079.761,
+        821.1,
+        1090.081
+      ],
+      "boundaryPlanFt": [
+        [
+          174.146148,
+          102.051741
+        ],
+        [
+          177.101704,
+          102.051741
+        ],
+        [
+          177.101704,
+          100.905074
+        ],
+        [
+          174.146148,
+          100.905074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-080",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1402,
+        1141.201,
+        1428.5,
+        1152.121
+      ],
+      "boundaryPlanFt": [
+        [
+          241.646148,
+          95.225074
+        ],
+        [
+          244.590593,
+          95.225074
+        ],
+        [
+          244.590593,
+          94.011741
+        ],
+        [
+          241.646148,
+          94.011741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-126",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        555,
+        1212.241,
+        581.7,
+        1222.562
+      ],
+      "boundaryPlanFt": [
+        [
+          147.535037,
+          87.331741
+        ],
+        [
+          150.501704,
+          87.331741
+        ],
+        [
+          150.501704,
+          86.184963
+        ],
+        [
+          147.535037,
+          86.184963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-129",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1282.1,
+        1217.401,
+        1308.7,
+        1227.721
+      ],
+      "boundaryPlanFt": [
+        [
+          228.323926,
+          86.758407
+        ],
+        [
+          231.279481,
+          86.758407
+        ],
+        [
+          231.279481,
+          85.611741
+        ],
+        [
+          228.323926,
+          85.611741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-131",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1434.5,
+        1217.401,
+        1461.1,
+        1227.721
+      ],
+      "boundaryPlanFt": [
+        [
+          245.257259,
+          86.758407
+        ],
+        [
+          248.212815,
+          86.758407
+        ],
+        [
+          248.212815,
+          85.611741
+        ],
+        [
+          245.257259,
+          85.611741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-132",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1513,
+        1217.401,
+        1539.5,
+        1227.721
+      ],
+      "boundaryPlanFt": [
+        [
+          253.979481,
+          86.758407
+        ],
+        [
+          256.923926,
+          86.758407
+        ],
+        [
+          256.923926,
+          85.611741
+        ],
+        [
+          253.979481,
+          85.611741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-130",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1358.3,
+        1217.401,
+        1384.9,
+        1227.721
+      ],
+      "boundaryPlanFt": [
+        [
+          236.790593,
+          86.758407
+        ],
+        [
+          239.746148,
+          86.758407
+        ],
+        [
+          239.746148,
+          85.611741
+        ],
+        [
+          236.790593,
+          85.611741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-002",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        909.6,
+        265.559,
+        936.1,
+        275.879
+      ],
+      "boundaryPlanFt": [
+        [
+          100.728815,
+          105.411741
+        ],
+        [
+          103.673259,
+          105.411741
+        ],
+        [
+          103.673259,
+          104.265074
+        ],
+        [
+          100.728815,
+          104.265074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-044",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1605.1,
+        1040.521,
+        1631.8,
+        1050.721
+      ],
+      "boundaryPlanFt": [
+        [
+          264.212815,
+          106.411741
+        ],
+        [
+          267.179481,
+          106.411741
+        ],
+        [
+          267.179481,
+          105.278407
+        ],
+        [
+          264.212815,
+          105.278407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-046",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1670.3,
+        1040.521,
+        1696.8,
+        1050.721
+      ],
+      "boundaryPlanFt": [
+        [
+          271.457259,
+          106.411741
+        ],
+        [
+          274.401704,
+          106.411741
+        ],
+        [
+          274.401704,
+          105.278407
+        ],
+        [
+          271.457259,
+          105.278407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-020",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        744.6,
+        386.4,
+        771.1,
+        396.72
+      ],
+      "boundaryPlanFt": [
+        [
+          82.395481,
+          91.984963
+        ],
+        [
+          85.339926,
+          91.984963
+        ],
+        [
+          85.339926,
+          90.838296
+        ],
+        [
+          82.395481,
+          90.838296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-043",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1562.1,
+        1040.521,
+        1588.6,
+        1050.721
+      ],
+      "boundaryPlanFt": [
+        [
+          259.435037,
+          106.411741
+        ],
+        [
+          262.379481,
+          106.411741
+        ],
+        [
+          262.379481,
+          105.278407
+        ],
+        [
+          259.435037,
+          105.278407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-005",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        542.9,
+        270.359,
+        569.4,
+        280.679
+      ],
+      "boundaryPlanFt": [
+        [
+          59.98437,
+          104.878407
+        ],
+        [
+          62.928815,
+          104.878407
+        ],
+        [
+          62.928815,
+          103.731741
+        ],
+        [
+          59.98437,
+          103.731741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-097",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1682.5,
+        1171.921,
+        1709.1,
+        1182.241
+      ],
+      "boundaryPlanFt": [
+        [
+          272.812815,
+          91.811741
+        ],
+        [
+          275.76837,
+          91.811741
+        ],
+        [
+          275.76837,
+          90.665074
+        ],
+        [
+          272.812815,
+          90.665074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-095",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1617.4,
+        1171.921,
+        1643.9,
+        1182.241
+      ],
+      "boundaryPlanFt": [
+        [
+          265.579481,
+          91.811741
+        ],
+        [
+          268.523926,
+          91.811741
+        ],
+        [
+          268.523926,
+          90.665074
+        ],
+        [
+          265.579481,
+          90.665074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-099",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        779.8,
+        1174.321,
+        806.3,
+        1184.641
+      ],
+      "boundaryPlanFt": [
+        [
+          172.512815,
+          91.545074
+        ],
+        [
+          175.457259,
+          91.545074
+        ],
+        [
+          175.457259,
+          90.398407
+        ],
+        [
+          172.512815,
+          90.398407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-101",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        856.3,
+        1174.321,
+        882.9,
+        1184.641
+      ],
+      "boundaryPlanFt": [
+        [
+          181.012815,
+          91.545074
+        ],
+        [
+          183.96837,
+          91.545074
+        ],
+        [
+          183.96837,
+          90.398407
+        ],
+        [
+          181.012815,
+          90.398407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-016",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        542.9,
+        384.84,
+        569.4,
+        395.16
+      ],
+      "boundaryPlanFt": [
+        [
+          59.98437,
+          92.158296
+        ],
+        [
+          62.928815,
+          92.158296
+        ],
+        [
+          62.928815,
+          91.01163
+        ],
+        [
+          59.98437,
+          91.01163
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-2-034",
+      "kind": "heat-pump",
+      "modelTag": "HP-2",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        744.6,
+        432.12,
+        771.1,
+        442.44
+      ],
+      "boundaryPlanFt": [
+        [
+          82.395481,
+          86.904963
+        ],
+        [
+          85.339926,
+          86.904963
+        ],
+        [
+          85.339926,
+          85.758296
+        ],
+        [
+          82.395481,
+          85.758296
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-070",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1670.3,
+        1086.241,
+        1696.8,
+        1096.441
+      ],
+      "boundaryPlanFt": [
+        [
+          271.457259,
+          101.331741
+        ],
+        [
+          274.401704,
+          101.331741
+        ],
+        [
+          274.401704,
+          100.198407
+        ],
+        [
+          271.457259,
+          100.198407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-068",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1605.1,
+        1086.241,
+        1631.8,
+        1096.441
+      ],
+      "boundaryPlanFt": [
+        [
+          264.212815,
+          101.331741
+        ],
+        [
+          267.179481,
+          101.331741
+        ],
+        [
+          267.179481,
+          100.198407
+        ],
+        [
+          264.212815,
+          100.198407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-030",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "B",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        542.9,
+        430.56,
+        569.4,
+        440.88
+      ],
+      "boundaryPlanFt": [
+        [
+          59.98437,
+          87.078296
+        ],
+        [
+          62.928815,
+          87.078296
+        ],
+        [
+          62.928815,
+          85.93163
+        ],
+        [
+          59.98437,
+          85.93163
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-134",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1617.4,
+        1217.641,
+        1643.9,
+        1227.961
+      ],
+      "boundaryPlanFt": [
+        [
+          265.579481,
+          86.731741
+        ],
+        [
+          268.523926,
+          86.731741
+        ],
+        [
+          268.523926,
+          85.585074
+        ],
+        [
+          265.579481,
+          85.585074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-3-135",
+      "kind": "heat-pump",
+      "modelTag": "HP-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1682.5,
+        1217.641,
+        1709.1,
+        1227.961
+      ],
+      "boundaryPlanFt": [
+        [
+          272.812815,
+          86.731741
+        ],
+        [
+          275.76837,
+          86.731741
+        ],
+        [
+          275.76837,
+          85.585074
+        ],
+        [
+          272.812815,
+          85.585074
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-082",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1249.6,
+        1145.881,
+        1276.1,
+        1156.801
+      ],
+      "boundaryPlanFt": [
+        [
+          224.712815,
+          94.705074
+        ],
+        [
+          227.657259,
+          94.705074
+        ],
+        [
+          227.657259,
+          93.491741
+        ],
+        [
+          224.712815,
+          93.491741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-133",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1552.3,
+        1217.401,
+        1578.9,
+        1227.721
+      ],
+      "boundaryPlanFt": [
+        [
+          258.346148,
+          86.758407
+        ],
+        [
+          261.301704,
+          86.758407
+        ],
+        [
+          261.301704,
+          85.611741
+        ],
+        [
+          258.346148,
+          85.611741
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-107",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1249.6,
+        1182.001,
+        1276.1,
+        1193.042
+      ],
+      "boundaryPlanFt": [
+        [
+          224.712815,
+          90.691741
+        ],
+        [
+          227.657259,
+          90.691741
+        ],
+        [
+          227.657259,
+          89.464963
+        ],
+        [
+          224.712815,
+          89.464963
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-hp-1-119",
+      "kind": "heat-pump",
+      "modelTag": "HP-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        1249.6,
+        1206.481,
+        1276.1,
+        1217.401
+      ],
+      "boundaryPlanFt": [
+        [
+          224.712815,
+          87.971741
+        ],
+        [
+          227.657259,
+          87.971741
+        ],
+        [
+          227.657259,
+          86.758407
+        ],
+        [
+          224.712815,
+          86.758407
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-odu-1",
+      "kind": "outdoor-unit",
+      "modelTag": "ODU-1",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        654.26,
+        1086,
+        692.42,
+        1109.28
+      ],
+      "boundaryPlanFt": [
+        [
+          158.563926,
+          101.358519
+        ],
+        [
+          162.803926,
+          101.358519
+        ],
+        [
+          162.803926,
+          98.771852
+        ],
+        [
+          158.563926,
+          98.771852
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-odu-2",
+      "kind": "outdoor-unit",
+      "modelTag": "ODU-2",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        654.26,
+        1122.84,
+        692.42,
+        1146.12
+      ],
+      "boundaryPlanFt": [
+        [
+          158.563926,
+          97.265186
+        ],
+        [
+          162.803926,
+          97.265186
+        ],
+        [
+          162.803926,
+          94.678519
+        ],
+        [
+          158.563926,
+          94.678519
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-odu-3",
+      "kind": "outdoor-unit",
+      "modelTag": "ODU-3",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        654.26,
+        1160.28,
+        692.42,
+        1183.56
+      ],
+      "boundaryPlanFt": [
+        [
+          158.563926,
+          93.105186
+        ],
+        [
+          162.803926,
+          93.105186
+        ],
+        [
+          162.803926,
+          90.518519
+        ],
+        [
+          158.563926,
+          90.518519
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "m109-odu-4",
+      "kind": "outdoor-unit",
+      "modelTag": "ODU-4",
+      "area": "C",
+      "sourceBindingRefs": [
+        "mechanical-M109"
+      ],
+      "sourceRectPdf": [
+        654.26,
+        1198.32,
+        692.42,
+        1221.72
+      ],
+      "boundaryPlanFt": [
+        [
+          158.563926,
+          88.878519
+        ],
+        [
+          162.803926,
+          88.878519
+        ],
+        [
+          162.803926,
+          86.278519
+        ],
+        [
+          158.563926,
+          86.278519
+        ]
+      ],
+      "heightFt": null,
+      "heightStatus": "unresolved-model-specific-dimension",
+      "clearanceStatus": "unresolved"
+    }
+  ],
+  "vents": [
+    {
+      "id": "p109-vent-073",
+      "kind": "vent-penetration",
+      "diameterIn": 4,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        631.396,
+        1404.33
+      ],
+      "sourcePointPdf": [
+        627.921,
+        1412.582
+      ],
+      "planPointFt": [
+        155.63737,
+        65.07163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-005",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        527.956,
+        247.048
+      ],
+      "sourcePointPdf": [
+        523.581,
+        255.239
+      ],
+      "planPointFt": [
+        57.837815,
+        106.558407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-042",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1936.158,
+        1095.57
+      ],
+      "sourcePointPdf": [
+        1927.764,
+        1110.901
+      ],
+      "planPointFt": [
+        300.06437,
+        98.591741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-066",
+      "kind": "vent-penetration",
+      "diameterIn": 3,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        694.756,
+        1338.45
+      ],
+      "sourcePointPdf": [
+        714.142,
+        1337.402
+      ],
+      "planPointFt": [
+        165.217481,
+        73.424963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-059",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1969.878,
+        1276.65
+      ],
+      "sourcePointPdf": [
+        1985.484,
+        1264.742
+      ],
+      "planPointFt": [
+        306.477704,
+        81.498296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-071",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        669.556,
+        1375.89
+      ],
+      "sourcePointPdf": [
+        684.561,
+        1361.102
+      ],
+      "planPointFt": [
+        161.930704,
+        70.79163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-057",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1663.998,
+        1258.89
+      ],
+      "sourcePointPdf": [
+        1685.244,
+        1262.102
+      ],
+      "planPointFt": [
+        273.117704,
+        81.79163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-003",
+      "kind": "vent-penetration",
+      "diameterIn": 4,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        815.956,
+        251.848
+      ],
+      "sourcePointPdf": [
+        794.362,
+        244.199
+      ],
+      "planPointFt": [
+        87.924593,
+        107.785074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-067",
+      "kind": "vent-penetration",
+      "diameterIn": 3,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        685.276,
+        1338.45
+      ],
+      "sourcePointPdf": [
+        661.101,
+        1337.942
+      ],
+      "planPointFt": [
+        159.324037,
+        73.364963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-034",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        584.236,
+        1029.21
+      ],
+      "sourcePointPdf": [
+        612.681,
+        1028.221
+      ],
+      "planPointFt": [
+        153.944037,
+        107.778407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-016",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        198.555,
+        493.049
+      ],
+      "sourcePointPdf": [
+        227,
+        492.06
+      ],
+      "planPointFt": [
+        24.88437,
+        80.244963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-068",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        279.555,
+        1347.33
+      ],
+      "sourcePointPdf": [
+        308.001,
+        1346.342
+      ],
+      "planPointFt": [
+        120.090704,
+        72.43163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-021",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        281.715,
+        577.529
+      ],
+      "sourcePointPdf": [
+        310.161,
+        576.54
+      ],
+      "planPointFt": [
+        34.124481,
+        70.858296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-009",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        757.996,
+        316.648
+      ],
+      "sourcePointPdf": [
+        786.442,
+        315.66
+      ],
+      "planPointFt": [
+        87.044593,
+        99.844963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-025",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        362.475,
+        737.369
+      ],
+      "sourcePointPdf": [
+        390.921,
+        736.38
+      ],
+      "planPointFt": [
+        43.097815,
+        53.098296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-017",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        899.476,
+        536.369
+      ],
+      "sourcePointPdf": [
+        927.922,
+        535.38
+      ],
+      "planPointFt": [
+        102.764593,
+        75.43163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-055",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        469.515,
+        1263.09
+      ],
+      "sourcePointPdf": [
+        497.961,
+        1262.102
+      ],
+      "planPointFt": [
+        141.19737,
+        81.79163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-070",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        477.676,
+        1351.53
+      ],
+      "sourcePointPdf": [
+        506.121,
+        1350.482
+      ],
+      "planPointFt": [
+        142.104037,
+        71.97163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-018",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        412.395,
+        536.609
+      ],
+      "sourcePointPdf": [
+        440.841,
+        535.56
+      ],
+      "planPointFt": [
+        48.644481,
+        75.41163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-022",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        545.596,
+        630.329
+      ],
+      "sourcePointPdf": [
+        574.041,
+        629.22
+      ],
+      "planPointFt": [
+        63.444481,
+        65.004963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-019",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        553.396,
+        558.929
+      ],
+      "sourcePointPdf": [
+        581.841,
+        557.82
+      ],
+      "planPointFt": [
+        64.311148,
+        72.938296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-039",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        576.316,
+        1100.73
+      ],
+      "sourcePointPdf": [
+        604.761,
+        1099.621
+      ],
+      "planPointFt": [
+        153.064037,
+        99.845074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-012",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        198.195,
+        372.689
+      ],
+      "sourcePointPdf": [
+        226.64,
+        371.58
+      ],
+      "planPointFt": [
+        24.84437,
+        93.63163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-038",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        279.555,
+        1100.73
+      ],
+      "sourcePointPdf": [
+        308.001,
+        1099.621
+      ],
+      "planPointFt": [
+        120.090704,
+        99.845074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-020",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        757.996,
+        558.929
+      ],
+      "sourcePointPdf": [
+        786.442,
+        557.82
+      ],
+      "planPointFt": [
+        87.044593,
+        72.938296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-015",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        363.795,
+        479.369
+      ],
+      "sourcePointPdf": [
+        392.241,
+        478.26
+      ],
+      "planPointFt": [
+        43.244481,
+        81.778296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-061",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        421.035,
+        1320.45
+      ],
+      "sourcePointPdf": [
+        449.481,
+        1319.342
+      ],
+      "planPointFt": [
+        135.810704,
+        75.43163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-044",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        420.795,
+        1126.77
+      ],
+      "sourcePointPdf": [
+        449.241,
+        1125.661
+      ],
+      "planPointFt": [
+        135.784037,
+        96.951741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-011",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        899.476,
+        342.809
+      ],
+      "sourcePointPdf": [
+        927.922,
+        341.7
+      ],
+      "planPointFt": [
+        102.764593,
+        96.95163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-079",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        470.955,
+        1521.211
+      ],
+      "sourcePointPdf": [
+        499.401,
+        1520.102
+      ],
+      "planPointFt": [
+        141.35737,
+        53.124963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-076",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        287.355,
+        1418.73
+      ],
+      "sourcePointPdf": [
+        315.861,
+        1417.742
+      ],
+      "planPointFt": [
+        120.964037,
+        64.498296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-033",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        287.355,
+        1029.21
+      ],
+      "sourcePointPdf": [
+        315.861,
+        1028.221
+      ],
+      "planPointFt": [
+        120.964037,
+        107.778407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-053",
+      "kind": "vent-penetration",
+      "diameterIn": 4,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        754.036,
+        1197.45
+      ],
+      "sourcePointPdf": [
+        783.262,
+        1196.401
+      ],
+      "planPointFt": [
+        172.897481,
+        89.091741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-002",
+      "kind": "vent-penetration",
+      "diameterIn": 4,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        205.035,
+        189.808
+      ],
+      "sourcePointPdf": [
+        234.321,
+        188.699
+      ],
+      "planPointFt": [
+        25.697815,
+        113.951741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-007",
+      "kind": "vent-penetration",
+      "diameterIn": 4,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        319.515,
+        298.888
+      ],
+      "sourcePointPdf": [
+        348.861,
+        297.779
+      ],
+      "planPointFt": [
+        38.424481,
+        101.831741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-077",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1206.797,
+        1384.29
+      ],
+      "sourcePointPdf": [
+        1206.263,
+        1417.742
+      ],
+      "planPointFt": [
+        219.897593,
+        64.498296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-040",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        993.916,
+        1066.17
+      ],
+      "sourcePointPdf": [
+        993.322,
+        1099.621
+      ],
+      "planPointFt": [
+        196.237481,
+        99.845074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-075",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1503.677,
+        1381.29
+      ],
+      "sourcePointPdf": [
+        1503.083,
+        1414.742
+      ],
+      "planPointFt": [
+        252.877593,
+        64.83163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-078",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        177.675,
+        1496.731
+      ],
+      "sourcePointPdf": [
+        202.64,
+        1520.102
+      ],
+      "planPointFt": [
+        108.383926,
+        53.124963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-024",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        952.876,
+        712.769
+      ],
+      "sourcePointPdf": [
+        977.842,
+        736.14
+      ],
+      "planPointFt": [
+        108.311259,
+        53.124963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-008",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        649.996,
+        287.128
+      ],
+      "sourcePointPdf": [
+        678.081,
+        308.099
+      ],
+      "planPointFt": [
+        75.004481,
+        100.685074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-037",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1511.477,
+        1065.57
+      ],
+      "sourcePointPdf": [
+        1495.163,
+        1099.021
+      ],
+      "planPointFt": [
+        251.997593,
+        99.911741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-041",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1214.717,
+        1066.17
+      ],
+      "sourcePointPdf": [
+        1198.403,
+        1099.621
+      ],
+      "planPointFt": [
+        219.024259,
+        99.845074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-014",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1013.717,
+        486.329
+      ],
+      "sourcePointPdf": [
+        976.522,
+        478.08
+      ],
+      "planPointFt": [
+        108.164593,
+        81.798296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-054",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        238.515,
+        1270.29
+      ],
+      "sourcePointPdf": [
+        201.2,
+        1262.102
+      ],
+      "planPointFt": [
+        108.223926,
+        81.79163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-052",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        2074.279,
+        1221.21
+      ],
+      "sourcePointPdf": [
+        2065.884,
+        1183.321
+      ],
+      "planPointFt": [
+        315.411037,
+        90.545074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-029",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1694.718,
+        962.73
+      ],
+      "sourcePointPdf": [
+        1686.324,
+        924.841
+      ],
+      "planPointFt": [
+        273.237704,
+        119.265074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-082",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1992.558,
+        1561.651
+      ],
+      "sourcePointPdf": [
+        1984.104,
+        1523.762
+      ],
+      "planPointFt": [
+        306.32437,
+        52.718296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-028",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1398.557,
+        962.73
+      ],
+      "sourcePointPdf": [
+        1390.103,
+        924.841
+      ],
+      "planPointFt": [
+        240.324259,
+        119.265074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-064",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1046.236,
+        1369.65
+      ],
+      "sourcePointPdf": [
+        1037.842,
+        1331.702
+      ],
+      "planPointFt": [
+        201.184148,
+        74.058296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-065",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1954.518,
+        1369.77
+      ],
+      "sourcePointPdf": [
+        1946.124,
+        1331.822
+      ],
+      "planPointFt": [
+        302.10437,
+        74.044963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-062",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1348.277,
+        1357.29
+      ],
+      "sourcePointPdf": [
+        1339.883,
+        1319.342
+      ],
+      "planPointFt": [
+        234.744259,
+        75.43163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-069",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1700.838,
+        1386.33
+      ],
+      "sourcePointPdf": [
+        1692.444,
+        1348.382
+      ],
+      "planPointFt": [
+        273.917704,
+        72.204963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-058",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1005.677,
+        1302.57
+      ],
+      "sourcePointPdf": [
+        997.282,
+        1264.622
+      ],
+      "planPointFt": [
+        196.677481,
+        81.51163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-045",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1644.797,
+        1163.61
+      ],
+      "sourcePointPdf": [
+        1636.404,
+        1125.661
+      ],
+      "planPointFt": [
+        267.691037,
+        96.951741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-047",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1796.238,
+        1217.37
+      ],
+      "sourcePointPdf": [
+        1787.844,
+        1179.421
+      ],
+      "planPointFt": [
+        284.517704,
+        90.978407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-046",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1896.798,
+        1215.93
+      ],
+      "sourcePointPdf": [
+        1888.404,
+        1177.981
+      ],
+      "planPointFt": [
+        295.691037,
+        91.138407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-010",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        531.556,
+        358.528
+      ],
+      "sourcePointPdf": [
+        523.161,
+        320.58
+      ],
+      "planPointFt": [
+        57.791148,
+        99.298296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-049",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        506.116,
+        1220.85
+      ],
+      "sourcePointPdf": [
+        497.721,
+        1182.901
+      ],
+      "planPointFt": [
+        141.170704,
+        90.591741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-001",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        986.236,
+        178.888
+      ],
+      "sourcePointPdf": [
+        977.842,
+        140.939
+      ],
+      "planPointFt": [
+        108.311259,
+        119.258407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-023",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        802.756,
+        667.169
+      ],
+      "sourcePointPdf": [
+        794.362,
+        629.22
+      ],
+      "planPointFt": [
+        87.924593,
+        65.004963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-043",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1756.878,
+        1150.29
+      ],
+      "sourcePointPdf": [
+        1748.484,
+        1112.341
+      ],
+      "planPointFt": [
+        280.14437,
+        98.431741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-080",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1398.197,
+        1558.051
+      ],
+      "sourcePointPdf": [
+        1389.803,
+        1520.102
+      ],
+      "planPointFt": [
+        240.290926,
+        53.124963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-083",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1008.197,
+        1562.131
+      ],
+      "sourcePointPdf": [
+        999.802,
+        1524.182
+      ],
+      "planPointFt": [
+        196.957481,
+        52.67163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-027",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1794.918,
+        958.41
+      ],
+      "sourcePointPdf": [
+        1786.524,
+        920.461
+      ],
+      "planPointFt": [
+        284.371037,
+        119.751741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-031",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        507.556,
+        962.85
+      ],
+      "sourcePointPdf": [
+        499.161,
+        924.901
+      ],
+      "planPointFt": [
+        141.330704,
+        119.258407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-063",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1645.157,
+        1357.29
+      ],
+      "sourcePointPdf": [
+        1636.704,
+        1319.342
+      ],
+      "planPointFt": [
+        267.72437,
+        75.43163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-051",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1693.398,
+        1220.85
+      ],
+      "sourcePointPdf": [
+        1684.944,
+        1182.901
+      ],
+      "planPointFt": [
+        273.08437,
+        90.591741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-081",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1695.078,
+        1558.051
+      ],
+      "sourcePointPdf": [
+        1686.624,
+        1520.102
+      ],
+      "planPointFt": [
+        273.271037,
+        53.124963
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-026",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1898.238,
+        956.85
+      ],
+      "sourcePointPdf": [
+        1889.784,
+        918.901
+      ],
+      "planPointFt": [
+        295.84437,
+        119.925074
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-030",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        211.035,
+        962.85
+      ],
+      "sourcePointPdf": [
+        202.58,
+        924.901
+      ],
+      "planPointFt": [
+        108.377259,
+        119.258407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-074",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1822.638,
+        1450.89
+      ],
+      "sourcePointPdf": [
+        1814.124,
+        1412.942
+      ],
+      "planPointFt": [
+        287.437704,
+        65.03163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-013",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        986.356,
+        436.889
+      ],
+      "sourcePointPdf": [
+        976.762,
+        398.94
+      ],
+      "planPointFt": [
+        108.191259,
+        90.59163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-048",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        211.155,
+        1220.85
+      ],
+      "sourcePointPdf": [
+        201.44,
+        1182.901
+      ],
+      "planPointFt": [
+        108.250593,
+        90.591741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-060",
+      "kind": "vent-penetration",
+      "diameterIn": 3,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        919.036,
+        1344.33
+      ],
+      "sourcePointPdf": [
+        910.582,
+        1305.962
+      ],
+      "planPointFt": [
+        187.044148,
+        76.918296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-006",
+      "kind": "vent-penetration",
+      "diameterIn": 4,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        494.356,
+        256.288
+      ],
+      "sourcePointPdf": [
+        499.641,
+        297.419
+      ],
+      "planPointFt": [
+        55.177815,
+        101.871741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-056",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1428.197,
+        1281.57
+      ],
+      "sourcePointPdf": [
+        1388.423,
+        1262.102
+      ],
+      "planPointFt": [
+        240.137593,
+        81.79163
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-050",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1348.637,
+        1163.61
+      ],
+      "sourcePointPdf": [
+        1388.723,
+        1182.901
+      ],
+      "planPointFt": [
+        240.170926,
+        90.591741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-072",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        599.476,
+        1413.69
+      ],
+      "sourcePointPdf": [
+        660.681,
+        1403.342
+      ],
+      "planPointFt": [
+        159.27737,
+        66.098296
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-004",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "B",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        765.916,
+        245.248
+      ],
+      "sourcePointPdf": [
+        845.242,
+        250.739
+      ],
+      "planPointFt": [
+        93.577926,
+        107.058407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-036",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1001.717,
+        1137.57
+      ],
+      "sourcePointPdf": [
+        1091.722,
+        1082.461
+      ],
+      "planPointFt": [
+        207.170815,
+        101.751741
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-035",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1206.797,
+        1137.57
+      ],
+      "sourcePointPdf": [
+        1206.263,
+        1028.221
+      ],
+      "planPointFt": [
+        219.897593,
+        107.778407
+      ],
+      "clearanceStatus": "unresolved"
+    },
+    {
+      "id": "p109-vent-032",
+      "kind": "vent-penetration",
+      "diameterIn": 2,
+      "area": "C",
+      "sourceBindingRefs": [
+        "plumbing-P109"
+      ],
+      "sourceLabelPdf": [
+        1503.677,
+        1136.97
+      ],
+      "sourcePointPdf": [
+        1503.083,
+        1027.621
+      ],
+      "planPointFt": [
+        252.877593,
+        107.845074
+      ],
+      "clearanceStatus": "unresolved"
+    }
+  ],
+  "counts": {
+    "acceptedHeatPumpFootprints": 135,
+    "acceptedOutdoorUnitFootprints": 4,
+    "acceptedVentPoints": 83,
+    "unmatchedMechanicalLabels": 5,
+    "unmatchedVentLabels": 6,
+    "scheduleCounts": {
+      "HP-1": 84,
+      "HP-2": 84,
+      "HP-3": 24
+    }
+  },
+  "coverage": {
+    "complete": false,
+    "resolvedScope": "Visible one-to-one M109 rooftop equipment footprints and P109 vent endpoints registered to A121 plan feet.",
+    "unresolved": [
+      "five-unmatched-M109-labels",
+      "six-unmatched-P109-labels",
+      "equipment-model-specific-heights",
+      "feature-specific-obstruction-clearances",
+      "schedule-versus-visible-plan-count-discrepancy"
+    ]
+  },
+  "derivation": {
+    "method": "Vector rectangles/circles matched one-to-one to source labels, then transformed by issued sheet scales and independently checked grids.",
+    "oneToOneMatching": true,
+    "syntheticFeaturesAdded": false
+  },
+  "evidenceReceiptSha256": "1adbdb39f5b36f284976b4a091bc11604b08804e71869dbe7ccc7eabea3fb8c1"
+}
