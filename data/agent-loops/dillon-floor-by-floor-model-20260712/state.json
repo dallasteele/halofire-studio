@@ -16,8 +16,11 @@
   ],
   "verification": {
     "sourceGeometryReceipt": "bb97fc2c743adea68a86c5ff591a5a4783b499bb046cf3327534032813f38749",
+    "featureCommit": "071b910d1c92b055a72b07bbcc0789babec52591",
     "focusedTests": "120 passed",
     "browser": "secure login passed; Studio modal loaded 563 wall solids and interactive WebGL canvas with zero captured browser errors",
+    "live": "VPS fast-forwarded to 071b910d; health, login, authenticated model API, Studio HTML, and deployed interactive canvas passed",
+    "brainEpisodeId": 125408,
     "productionBuild": "passed",
     "claim": "source-grounded floor-by-floor wall geometry only; compliance and approval false"
   },
