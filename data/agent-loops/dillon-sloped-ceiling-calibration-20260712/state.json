@@ -1,34 +1,35 @@
 {
   "status": "complete",
-  "iteration": 7,
+  "iteration": 8,
   "truth": [
     "The completed FP-1 schedule reports 52 heads: 40 round pendent and 12 alternate pendent.",
-    "The deterministic vector classifier seals 51 candidates, including all 40 round pendent and 11 of 12 alternate pendent symbols; one alternate remains unresolved.",
+    "The deterministic vector classifier seals all 52 scheduled candidates: 40 round and 11 alternate pendent symbols on FP-1 plus the twelfth alternate on the explicit FP-2 continuation.",
     "Multiple submitted heads fall within nine feet of source-registered 3:12 RCP annotations, which is positive calibration evidence but not a full sloped-surface or code-compliance proof.",
     "RA-1 through RA-3 bind active sprinkler elevations at 10 ft and 22 ft.",
     "The protected 3:12 region binds a four-blade ceiling-fan obstruction and SOFFIT 9 ft / project elevation 109 ft source datum.",
     "Five submitted RA active nodes share a sealed 100 ft hydraulic-local-to-project elevation offset without falsely assigning protected-region head identities.",
     "A deterministic two-page PDF 1.7 package exports calibrated top and absolute elevation views with three Bluebeam-readable optional-content layers.",
-    "A deterministic FDF 1.2 overlay maps four source-bound slope regions, the fan clearance, two generated heads, one generated branch, and a fail-closed evidence note onto the original portrait FP-1 coordinate system."
+    "A deterministic FDF 1.2 overlay maps four source-bound slope regions, the fan clearance, two generated heads, one generated branch, and a fail-closed evidence note onto the original portrait FP-1 coordinate system.",
+    "The FP-2 continuation head is sealed at portrait top-left coordinate 1398.27, 1032.33 from paired 8.7-point diagonal vectors with source drawing indices 2408 and 2434."
   ],
   "remaining": [
-    "Classify the one remaining alternate pendent symbol",
     "Map protected sloped-region heads to specific submitted hydraulic nodes only if source callouts prove those identities",
     "Keep approval and code-compliance claims fail-closed"
   ],
   "verification": {
-    "featureCommit": "d727552a",
-    "evidenceReceiptSha256": "62849ebb2f8c048f38afe3056c38818d9e9e1d679b3791f3a6435df3c15fa47b",
-    "focusedTests": "40 passed across Bluebeam FDF overlay, Bluebeam vector PDF, authenticated downloads, sealed calibration, generated layout, grounded 3D model, API, and Studio static-origin tests; 20 node-native geometry/UI tests remain green",
+    "featureCommit": "3047de56",
+    "evidenceReceiptSha256": "a37a26370640c3d16352c5e6140935ed5d1a0c55072db5e97e643c17033e9b6c",
+    "focusedTests": "41 passed across Bluebeam FDF overlay, Bluebeam vector PDF, authenticated downloads, sealed FP-1 plus FP-2 calibration, generated layout, grounded 3D model, API, and Studio static-origin tests",
     "adversarialGates": "receipt, transform-control, polygon, obstruction, elevation-datum, hydraulic-datum, node substitution, slope-point, empty-region false-positive, hydraulic-elevation, and 3D plane mutations rejected",
     "build": "Vite production build passed locally and on VPS",
     "rules": "agent loop contract and AGENTIC_RULES verifier passed",
-    "deployment": "VPS /opt/openclaw/halofire-studio HEAD d727552; halofire.service active",
-    "liveApi": "authenticated Dillon route passed with 51 of 52 vector candidates, five RA nodes joined through the 100 ft datum, precision 1.0, recall 1.0, maximum plan error 2.614 ft, zero plane residual, and complianceReady false",
+    "deployment": "VPS /opt/openclaw/halofire-studio HEAD 3047de5; halofire.service active",
+    "liveApi": "authenticated Dillon route passed with all 52 scheduled vector candidates across FP-1 and FP-2, zero unresolved head symbols, five RA nodes joined through the 100 ft datum, precision 1.0, recall 1.0, maximum plan error 2.614 ft, zero plane residual, and complianceReady false",
     "public": "health 200; login page 200; Studio 200 with authenticated Download Bluebeam PDF and Overlay on Original FP-1 actions",
-    "bluebeamPdf": "live authenticated PDF is 6131 bytes, PDF 1.7, two ARCH-D pages, three OCG layers, SHA256 1db3ce3cf4308e2ea3b5a8c37a54aa59653782b3131c625e359fb8e9ca0ce077, and receipt 62849ebb2f8c048f38afe3056c38818d9e9e1d679b3791f3a6435df3c15fa47b",
-    "bluebeamFdf": "live authenticated FDF is 3132 bytes, FDF 1.2, nine native annotations (four regions, two heads, one branch, one fan clearance, one evidence note), SHA256 e467a49c9550608d03d04f649c6518fc16a41515841a964ef383359a79aa1d33, and receipt 62849ebb2f8c048f38afe3056c38818d9e9e1d679b3791f3a6435df3c15fa47b",
-    "browser": "live authenticated Studio exposed both correctly named Bluebeam downloads after Roof Planes > Rotate Sprinklers to Roof Planes, with the FDF route and filename verified and zero console errors"
+    "bluebeamPdf": "live authenticated PDF is 5844 bytes, PDF 1.7, two ARCH-D pages, three OCG layers, SHA256 eb76b9c7c52131a33d5b90a0bc56f2dcbd17eb9020f761e6709b1eb45140c7e3, and receipt a37a26370640c3d16352c5e6140935ed5d1a0c55072db5e97e643c17033e9b6c",
+    "bluebeamFdf": "live authenticated FDF is 3132 bytes, FDF 1.2, nine native annotations (four regions, two heads, one branch, one fan clearance, one evidence note), SHA256 eb32d83118f4a9d00dd38f0f6957fbe1d4604dbfc505de2541b9b9c94ad5ac2a, and receipt a37a26370640c3d16352c5e6140935ed5d1a0c55072db5e97e643c17033e9b6c",
+    "browser": "live authenticated Studio visibly reported 52 of 52 scheduled symbols source-classified across FP-1 plus FP-2 after Roof Planes > Rotate Sprinklers to Roof Planes; the FDF action remained visible and the console had zero errors",
+    "hydraulicIdentityAudit": "RA-3 proves nodes 13 and 15 are active sprinklers at local elevation 22 ft, but supplies no plan coordinates and FP-1 supplies no matching protected-head node tags; identity mapping remains fail-closed"
   },
   "globalGoalComplete": false
 }
