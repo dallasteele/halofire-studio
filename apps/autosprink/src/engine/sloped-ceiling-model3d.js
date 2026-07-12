@@ -10,6 +10,7 @@ const Region = z.object({
 const Input = z.object({
   artifactType: z.literal('halofire.sloped-ceiling-model3d-input.v1'),
   printedScalePtPerFt: z.number().positive(), regions: z.array(Region).min(1),
+  hydraulicDatumJoin: z.object({ projectDatumOffsetFt: z.number().finite(), activeNodes: z.array(z.object({ report: z.string(), nodeId: z.string(), hydraulicLocalElevationFt: z.number(), projectElevationFt: z.number() }).strict()).min(1), protectedRegionHeadNodeMappingReady: z.boolean() }).strict(),
 }).strict();
 
 const issue = (code, message, refs = []) => ({ severity: 'blocking', code, message, refs });
@@ -59,7 +60,10 @@ export function buildSlopedCeilingModel3d(layout, inputValue) {
   const absoluteElevationReady = input.regions.filter((region) => region.shouldProtect).every((region) => region.elevationDatum);
   return {
     status: 'passed', artifactType: 'halofire.sloped-ceiling-model3d.v1', units: 'ft', datumMode: absoluteElevationReady ? 'source-bound-project-elevation' : 'relative-to-downhill-ceiling-edge',
-    surfaces, heads, pipes, geometryGrounded: true, absoluteElevationReady, complianceReady: false,
+    surfaces, heads, pipes, geometryGrounded: true, absoluteElevationReady,
+    hydraulicDatumJoined: true, hydraulicDatumJoin: input.hydraulicDatumJoin,
+    protectedRegionHeadNodeMappingReady: input.hydraulicDatumJoin.protectedRegionHeadNodeMappingReady,
+    complianceReady: false,
     claimStatus: 'source-grounded-relative-3d-calibration-not-code-compliance-or-approval', issues: [],
   };
 }
@@ -83,5 +87,6 @@ export function verifySlopedCeilingModel3d(model, layout, inputValue) {
   for (const pipe of model.pipes) if (!headIds.has(pipe.fromHeadId) || !headIds.has(pipe.toHeadId)) issues.push(issue('SLOPED_MODEL3D_PIPE_ENDPOINT_MISSING', `Pipe ${pipe.id} is not connected to generated heads.`, [pipe.id]));
   const nonFlatHeadCount = new Set(model.heads.map((head) => head.pointFt[2].toFixed(4))).size;
   if (model.heads.length > 1 && nonFlatHeadCount < 2) issues.push(issue('SLOPED_MODEL3D_FALSE_FLAT', 'Generated heads collapsed onto a flat elevation.'));
-  return { status: issues.length ? 'blocked' : 'passed', artifactType: 'halofire.sloped-ceiling-model3d-verification.v1', issues, counts: { surfaces: model.surfaces.length, heads: model.heads.length, pipes: model.pipes.length, nonFlatHeadElevations: nonFlatHeadCount }, maxPlaneResidualFt, geometryGrounded: issues.length === 0, absoluteElevationReady: model.absoluteElevationReady, complianceReady: false };
+  for (const node of input.hydraulicDatumJoin.activeNodes) if (node.hydraulicLocalElevationFt + input.hydraulicDatumJoin.projectDatumOffsetFt !== node.projectElevationFt) issues.push(issue('SLOPED_MODEL3D_HYDRAULIC_DATUM_DRIFT', `Hydraulic node ${node.report}:${node.nodeId} does not share the project datum.`, [node.report, node.nodeId]));
+  return { status: issues.length ? 'blocked' : 'passed', artifactType: 'halofire.sloped-ceiling-model3d-verification.v1', issues, counts: { surfaces: model.surfaces.length, heads: model.heads.length, pipes: model.pipes.length, nonFlatHeadElevations: nonFlatHeadCount, hydraulicNodesJoined: input.hydraulicDatumJoin.activeNodes.length }, maxPlaneResidualFt, geometryGrounded: issues.length === 0, absoluteElevationReady: model.absoluteElevationReady, hydraulicDatumJoined: issues.length === 0, protectedRegionHeadNodeMappingReady: input.hydraulicDatumJoin.protectedRegionHeadNodeMappingReady, complianceReady: false };
 }

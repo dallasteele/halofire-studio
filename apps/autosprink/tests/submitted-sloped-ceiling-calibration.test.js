@@ -10,7 +10,8 @@ describe('Dillon submitted sloped-ceiling calibration', () => {
     const result = await validateSubmittedSlopedCeilingCalibration(packet);
     expect(result.status).toBe('passed');
     expect(result.counts.submittedScheduleHeads).toBe(52);
-    expect(result.counts.vectorCandidates).toBe(50);
+    expect(result.counts.vectorCandidates).toBe(51);
+    expect(result.counts.unresolvedHeadSymbols).toBe(1);
     expect(result.counts.positiveAnnotationProximityMatches).toBeGreaterThanOrEqual(3);
     expect(result.slopeEvidenceReady).toBe(true);
     expect(result.fullSlopeSurfaceRegistrationReady).toBe(true);
@@ -21,7 +22,7 @@ describe('Dillon submitted sloped-ceiling calibration', () => {
   it('renders only after the immutable evidence loop passes', async () => {
     const view = renderSubmittedSlopedCeilingCalibration(await validateSubmittedSlopedCeilingCalibration(packet));
     expect(view.status).toBe('passed');
-    expect((view.topSvg.match(/data-head-id=/g) || [])).toHaveLength(50);
+    expect((view.topSvg.match(/data-head-id=/g) || [])).toHaveLength(51);
     expect((view.topSvg.match(/data-slope-id=/g) || [])).toHaveLength(8);
   });
 
@@ -40,5 +41,7 @@ describe('Dillon submitted sloped-ceiling calibration', () => {
     expect((await validateSubmittedSlopedCeilingCalibration(badObstruction)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_OBSTRUCTION_TRANSFORM_DRIFT');
     const badDatum = await reseal((draft) => { draft.slopeRegions[1].elevationDatum.datumPointSubmittedPt[1] += 20; });
     expect((await validateSubmittedSlopedCeilingCalibration(badDatum)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_DATUM_TRANSFORM_DRIFT');
+    const badHydraulicDatum = await reseal((draft) => { draft.hydraulicDatumJoin.activeNodes[0].projectElevationFt += 1; });
+    expect((await validateSubmittedSlopedCeilingCalibration(badHydraulicDatum)).issues.map((issue) => issue.code)).toContain('SLOPED_CALIBRATION_HYDRAULIC_DATUM_JOIN_INVALID');
   });
 });

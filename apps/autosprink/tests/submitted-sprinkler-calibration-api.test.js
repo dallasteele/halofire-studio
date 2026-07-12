@@ -116,7 +116,8 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     const result = await response.json();
     expect(result.status).toBe('passed');
     expect(result.counts.submittedScheduleHeads).toBe(52);
-    expect(result.counts.vectorCandidates).toBe(50);
+    expect(result.counts.vectorCandidates).toBe(51);
+    expect(result.counts.unresolvedHeadSymbols).toBe(1);
     expect(result.counts.positiveAnnotationProximityMatches).toBeGreaterThanOrEqual(3);
     expect(result.slopeEvidenceReady).toBe(true);
     expect(result.fullSlopeSurfaceRegistrationReady).toBe(true);
@@ -125,7 +126,9 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.generatedHeads).toHaveLength(2);
     expect(result.model3dVerification).toMatchObject({ status: 'passed', geometryGrounded: true, absoluteElevationReady: true, complianceReady: false });
     expect(result.parityMetrics.maxPlanErrorFt).toBeLessThanOrEqual(3);
-    expect(result.model3dVerification.counts).toEqual({ surfaces: 4, heads: 2, pipes: 1, nonFlatHeadElevations: 2 });
+    expect(result.model3dVerification.counts).toEqual({ surfaces: 4, heads: 2, pipes: 1, nonFlatHeadElevations: 2, hydraulicNodesJoined: 5 });
+    expect(result.model3dVerification).toMatchObject({ hydraulicDatumJoined: true, protectedRegionHeadNodeMappingReady: false });
+    expect(result.hydraulicDatumJoin.activeNodes).toHaveLength(5);
     expect(result.complianceReady).toBe(false);
     expect(result.view.submittedTopSvg).toContain('Dillon submitted FP-1 heads registered to RCP 3:12 annotation screens');
     expect(result.view.generatedTopSvg).toContain('Generated Dillon slope-aware top view');

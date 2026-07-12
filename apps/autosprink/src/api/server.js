@@ -1654,6 +1654,7 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
     const modelInput = {
       artifactType: 'halofire.sloped-ceiling-model3d-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt,
       regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected', elevationDatum: region.elevationDatum ? { datumPointSubmittedPt: region.elevationDatum.datumPointSubmittedPt, projectElevationFt: region.elevationDatum.projectElevationFt, slopeDirection: region.elevationDatum.slopeDirection, sourceText: region.elevationDatum.sourceText } : null })),
+      hydraulicDatumJoin: { projectDatumOffsetFt: packet.hydraulicDatumJoin.projectDatumOffsetFt, activeNodes: packet.hydraulicDatumJoin.activeNodes, protectedRegionHeadNodeMappingReady: packet.hydraulicDatumJoin.protectedRegionHeadNodeMappingReady },
     };
     const model3d = buildSlopedCeilingModel3d(layout, modelInput);
     const model3dVerification = verifySlopedCeilingModel3d(model3d, layout, modelInput);
@@ -1668,7 +1669,7 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
       fullSlopeSurfaceRegistrationReady: validation.fullSlopeSurfaceRegistrationReady,
       generatedLayoutParityReady: parity.generatedLayoutParityReady,
       parityMetrics: parity.metrics, generatedHeads: layout.heads,
-      model3d, model3dVerification,
+      hydraulicDatumJoin: packet.hydraulicDatumJoin, model3d, model3dVerification,
       view: { status: view.status, submittedTopSvg: view.topSvg, generatedTopSvg: layoutViews.topSvg, generatedElevationSvg: layoutViews.elevationSvg }, complianceReady: false,
       claimStatus: validation.claimStatus,
     });

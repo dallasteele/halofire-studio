@@ -32,6 +32,12 @@ const Draft = z.object({
   submittedHeads: z.array(z.object({ id: z.string(), pointPt: Point, symbolClass: z.enum(['round-pendent-vector-candidate', 'cross-pendent-vector-candidate']) }).strict()).min(1),
   schedule: z.object({ totalHeads: z.literal(52), roundPendent: z.literal(40), alternatePendent: z.literal(12) }).strict(),
   hydraulicEvidence: z.array(z.object({ report: z.enum(['RA-1', 'RA-2', 'RA-3']), nodeId: z.string(), elevationFt: z.number(), nodeKind: z.literal('active-sprinkler') }).strict()).min(3),
+  hydraulicDatumJoin: z.object({
+    method: z.literal('architectural-project-elevation-minus-100ft-to-hydraulic-local-elevation'), projectDatumOffsetFt: z.literal(100),
+    architecturalDatumProjectElevationFt: z.literal(109), architecturalDatumLocalElevationFt: z.literal(9),
+    activeNodes: z.array(z.object({ report: z.enum(['RA-1', 'RA-2', 'RA-3']), nodeId: z.string(), hydraulicLocalElevationFt: z.number(), projectElevationFt: z.number() }).strict()).length(5),
+    protectedRegionHeadNodeMappingReady: z.literal(false), reason: z.string().min(1),
+  }).strict(),
   coverage: z.object({ complete: z.literal(false), detectedVectorCandidates: z.number().int(), unresolved: z.array(z.string().min(1)).min(1) }).strict(),
   claimStatus: z.literal('completed-bid-sloped-ceiling-calibration-not-code-compliance-or-approval'),
 }).strict();
@@ -112,6 +118,7 @@ export async function validateSubmittedSlopedCeilingCalibration(input) {
   }
   if (packet.coverage.detectedVectorCandidates !== packet.submittedHeads.length) issues.push(blocking('SLOPED_CALIBRATION_HEAD_COUNT_DRIFT', 'Detected vector count does not match the sealed candidate list.'));
   if (packet.submittedHeads.filter((head) => head.symbolClass === 'round-pendent-vector-candidate').length !== 40) issues.push(blocking('SLOPED_CALIBRATION_ROUND_SYMBOL_COUNT', 'The sealed round-pendent vector class must reproduce the submitted schedule count of 40.'));
+  if (packet.submittedHeads.filter((head) => head.symbolClass === 'cross-pendent-vector-candidate').length !== 11) issues.push(blocking('SLOPED_CALIBRATION_ALTERNATE_SYMBOL_COUNT', 'The sealed alternate-pendent vector class must contain the 11 source-classified candidates and leave one unresolved.'));
 
   const radiusPt = 9 * packet.printedScalePtPerFt;
   const proximityMatches = packet.submittedHeads.flatMap((head) => packet.ceilingSlopeAnnotations
@@ -120,16 +127,24 @@ export async function validateSubmittedSlopedCeilingCalibration(input) {
   if (proximityMatches.length < 3) issues.push(blocking('SLOPED_CALIBRATION_POSITIVE_MATCH_MISSING', 'At least three submitted heads must fall within a nine-foot source-registered 3:12 annotation screen.'));
   const elevations = new Set(packet.hydraulicEvidence.map((entry) => entry.elevationFt));
   if (!elevations.has(10) || !elevations.has(22)) issues.push(blocking('SLOPED_CALIBRATION_ELEVATION_COVERAGE', 'Submitted active-sprinkler elevations must cover both 10 ft and 22 ft levels.'));
+  if (packet.hydraulicDatumJoin.architecturalDatumLocalElevationFt + packet.hydraulicDatumJoin.projectDatumOffsetFt !== packet.hydraulicDatumJoin.architecturalDatumProjectElevationFt) issues.push(blocking('SLOPED_CALIBRATION_ARCHITECTURAL_DATUM_JOIN_INVALID', 'Architectural local and project elevations do not share the sealed 100 ft datum offset.'));
+  const hydraulicEvidenceKeys = new Set(packet.hydraulicEvidence.map((entry) => `${entry.report}:${entry.nodeId}:${entry.elevationFt}`));
+  for (const node of packet.hydraulicDatumJoin.activeNodes) {
+    if (node.hydraulicLocalElevationFt + packet.hydraulicDatumJoin.projectDatumOffsetFt !== node.projectElevationFt) issues.push(blocking('SLOPED_CALIBRATION_HYDRAULIC_DATUM_JOIN_INVALID', `Hydraulic node ${node.report}:${node.nodeId} does not follow the sealed project datum offset.`, [node.report, node.nodeId]));
+    if (!hydraulicEvidenceKeys.has(`${node.report}:${node.nodeId}:${node.hydraulicLocalElevationFt}`)) issues.push(blocking('SLOPED_CALIBRATION_HYDRAULIC_NODE_SUBSTITUTION', `Hydraulic datum node ${node.report}:${node.nodeId} is not in the sealed RA evidence.`, [node.report, node.nodeId]));
+  }
 
   return {
     status: issues.length ? 'blocked' : 'passed', issues,
     artifactType: 'halofire.submitted-sloped-ceiling-calibration-validation.v1',
     packet: issues.length ? null : packet,
-    counts: { submittedScheduleHeads: 52, vectorCandidates: packet.submittedHeads.length, positiveAnnotationProximityMatches: proximityMatches.length },
+    counts: { submittedScheduleHeads: 52, vectorCandidates: packet.submittedHeads.length, unresolvedHeadSymbols: 52 - packet.submittedHeads.length, positiveAnnotationProximityMatches: proximityMatches.length },
     proximityMatches,
     slopeEvidenceReady: issues.length === 0,
     fullSlopeSurfaceRegistrationReady: issues.length === 0,
     generatedLayoutParityReady: false,
+    hydraulicDatumJoined: issues.length === 0,
+    protectedRegionHeadNodeMappingReady: false,
     complianceReady: false,
     claimStatus: 'completed-bid-sloped-ceiling-calibration-validated-not-code-compliance-or-approval',
   };

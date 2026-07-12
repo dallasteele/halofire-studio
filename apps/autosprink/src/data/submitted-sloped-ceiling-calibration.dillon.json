@@ -788,6 +788,14 @@
         926.34
       ],
       "symbolClass": "cross-pendent-vector-candidate"
+    },
+    {
+      "id": "cross-11",
+      "pointPt": [
+        2340.51,
+        637.66
+      ],
+      "symbolClass": "cross-pendent-vector-candidate"
     }
   ],
   "schedule": {
@@ -827,16 +835,55 @@
       "nodeKind": "active-sprinkler"
     }
   ],
+  "hydraulicDatumJoin": {
+    "method": "architectural-project-elevation-minus-100ft-to-hydraulic-local-elevation",
+    "projectDatumOffsetFt": 100,
+    "architecturalDatumProjectElevationFt": 109,
+    "architecturalDatumLocalElevationFt": 9,
+    "activeNodes": [
+      {
+        "report": "RA-1",
+        "nodeId": "1",
+        "hydraulicLocalElevationFt": 10,
+        "projectElevationFt": 110
+      },
+      {
+        "report": "RA-1",
+        "nodeId": "7",
+        "hydraulicLocalElevationFt": 10,
+        "projectElevationFt": 110
+      },
+      {
+        "report": "RA-2",
+        "nodeId": "4",
+        "hydraulicLocalElevationFt": 10,
+        "projectElevationFt": 110
+      },
+      {
+        "report": "RA-3",
+        "nodeId": "13",
+        "hydraulicLocalElevationFt": 22,
+        "projectElevationFt": 122
+      },
+      {
+        "report": "RA-3",
+        "nodeId": "15",
+        "hydraulicLocalElevationFt": 22,
+        "projectElevationFt": 122
+      }
+    ],
+    "protectedRegionHeadNodeMappingReady": false,
+    "reason": "Protected sloped-region heads are outside the sealed submitted remote-area callout mapping; datum spaces are joined without inventing node identities."
+  },
   "coverage": {
     "complete": false,
-    "detectedVectorCandidates": 50,
+    "detectedVectorCandidates": 51,
     "unresolved": [
-      "two-alternate-pendent-symbols-not-yet-vector-classified",
-      "full-sloped-ceiling-boundary-polygons-not-yet-sealed",
-      "generated-layout-parity-not-yet-executed",
+      "one-alternate-pendent-symbol-not-yet-vector-classified",
+      "protected-sloped-heads-not-mapped-to-hydraulic-remote-area-nodes",
       "code-compliance-and-approval-not-inferred-from-completed-bid"
     ]
   },
   "claimStatus": "completed-bid-sloped-ceiling-calibration-not-code-compliance-or-approval",
-  "evidenceReceiptSha256": "ec0a69dabef38212cac8db7a3a3d0af400fcd0ab0c0301330b516ee50240fe2f"
+  "evidenceReceiptSha256": "62849ebb2f8c048f38afe3056c38818d9e9e1d679b3791f3a6435df3c15fa47b"
 }
