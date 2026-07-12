@@ -1,0 +1,39 @@
+{
+  "name": "dillon-bid-to-dwg-registration-20260712",
+  "owner": "codex",
+  "loop_type": "closed",
+  "goal": "Register the completed Dillon FP-1 and FP-2 sprinkler head and connected pipe vectors to their matching actual architectural DWG coordinate frames; keep each sheet schedule independent; correct the false cross-sheet FP-1 closure; expose source-grounded plan views in the authenticated Studio; and deploy with fail-closed vertical and compliance claims.",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Dillon Residence",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/fp1.pdf",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/fp2.pdf",
+    "apps/autosprink/src/data/dillon-dwg-source-geometry.json"
+  ],
+  "exit_criteria": [
+    "FP-1 and FP-2 vector head classes are counted independently against their own printed schedules",
+    "FP-1 remains 51 detected versus 52 declared and FP-2 is 25 detected versus 25 declared; no FP-2 symbol is used to close FP-1",
+    "Connected filled-vector pipe centerlines touch every detected head and exclude unrelated drawing linework",
+    "Independent orthogonal wall-coordinate matching registers FP-1 to main and FP-2 to upper DWG with less than 0.025 ft weighted RMS on each axis",
+    "Every head and pipe endpoint follows the sealed PDF-top-left-to-DWG transform",
+    "Authenticated API and Studio show both registered plan networks and the unresolved FP-1 count without claiming per-element Z, compliance, approval, or fabrication readiness",
+    "Receipt, registration, head, pipe, schedule, and architectural-source adversarial mutations fail closed",
+    "Focused tests, production build, loop guard, rules verifier, live login, authenticated API, browser, and VPS health pass"
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-bid-to-dwg-registration-20260712/contract.json",
+    "npx vitest run tests/dillon-completed-bid-geometry.test.js tests/submitted-sloped-ceiling-calibration.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/dillon-bid-to-dwg-registration-20260712/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/dillon-completed-bid-geometry.json",
+    "apps/autosprink/src/data/submitted-sloped-ceiling-calibration.dillon.json",
+    "data/agent-loops/dillon-bid-to-dwg-registration-20260712/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "brain_writeback_required": true,
+  "human_gate_required": false
+}

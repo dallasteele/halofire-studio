@@ -41,6 +41,7 @@ import { buildSlopedCeilingModel3d, verifySlopedCeilingModel3d } from '../engine
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
 import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
 import { renderDillonFloorByFloorViews, validateDillonFloorByFloorModel } from '../engine/dillon-floor-by-floor-model.js';
+import { renderDillonCompletedBidViews, validateDillonCompletedBidGeometry } from '../engine/dillon-completed-bid-geometry.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -89,6 +90,7 @@ const COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH = path.resolve(__dirname, '../
 const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-sloped-ceiling-calibration.dillon.json');
 const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-dwg-source-geometry.json');
 const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
+const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -1700,6 +1702,21 @@ app.get('/api/projects/:name/floor-by-floor-model', authMiddleware, async (req, 
   } catch (error) {
     log.error('Failed to load Dillon floor-by-floor model', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'floor_by_floor_model_load_failed', complianceReady: false });
+  }
+});
+
+app.get('/api/projects/:name/completed-bid-geometry', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'Dillon Residence') return res.status(404).json({ error: 'completed_bid_geometry_not_found' });
+  try {
+    const floorModel = JSON.parse(fs.readFileSync(DILLON_FLOOR_MODEL_PATH, 'utf8'));
+    const packet = JSON.parse(fs.readFileSync(DILLON_COMPLETED_BID_GEOMETRY_PATH, 'utf8'));
+    const validation = await validateDillonCompletedBidGeometry(packet, floorModel);
+    if (validation.status !== 'passed') return res.status(422).json(validation);
+    const views = renderDillonCompletedBidViews(validation, floorModel);
+    return res.json({ status: 'passed', artifactType: 'halofire.autobid-completed-bid-geometry.v1', projectName: req.params.name, receiptSha256: packet.receiptSha256, counts: validation.counts, sheets: packet.sheets, limitations: packet.limitations, views, geometryGrounded: true, verticalGeometryReady: false, complianceReady: false, approvalReady: false, claimStatus: packet.claimStatus });
+  } catch (error) {
+    log.error('Failed to load Dillon completed-bid geometry', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'completed_bid_geometry_load_failed', complianceReady: false });
   }
 });
 

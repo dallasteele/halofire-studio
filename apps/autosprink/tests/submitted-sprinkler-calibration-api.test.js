@@ -77,6 +77,22 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.pdf')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.fdf')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/floor-by-floor-model')).status).toBe(401);
+    expect((await request('/api/projects/Dillon%20Residence/completed-bid-geometry')).status).toBe(401);
+  });
+
+  it('serves per-sheet completed bid heads and pipe vectors registered to the actual DWGs', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/Dillon%20Residence/completed-bid-geometry', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result.status).toBe('passed');
+    expect(result.counts).toEqual({ declaredHeads: 77, detectedHeads: 76, unresolvedHeads: 1, pipeSegments: 67 });
+    expect(result.sheets[0].schedule).toMatchObject({ declaredTotal: 52, detected: { total: 51 }, complete: false, unresolvedCount: 1 });
+    expect(result.sheets[1].schedule).toMatchObject({ declaredTotal: 25, detected: { total: 25 }, complete: true, unresolvedCount: 0 });
+    expect(result.views.planViews[0].svg).toContain('51/52 heads');
+    expect(result.views.planViews[1].svg).toContain('25/25 heads');
+    expect(result.verticalGeometryReady).toBe(false);
+    expect(result.complianceReady).toBe(false);
   });
 
   it('serves the sealed source-DWG floor-by-floor model and views', async () => {
@@ -136,9 +152,11 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     const result = await response.json();
     expect(result.status).toBe('passed');
     expect(result.counts.submittedScheduleHeads).toBe(52);
-    expect(result.counts).toMatchObject({ vectorCandidates: 52, fp1VectorCandidates: 51, fp2ContinuationCandidates: 1, unresolvedHeadSymbols: 0 });
-    expect(result.coverage).toEqual({ complete: true, detectedVectorCandidates: 52, unresolved: [] });
-    expect(result.continuationHeads).toEqual([expect.objectContaining({ id: 'cross-12', sourceId: 'submitted-FP2', pointPortraitTopLeftPt: [1398.27, 1032.33] })]);
+    expect(result.counts).toMatchObject({ vectorCandidates: 51, fp1VectorCandidates: 51, fp2ContinuationCandidates: 0, unresolvedHeadSymbols: 1 });
+    expect(result.coverage.complete).toBe(false);
+    expect(result.coverage.detectedVectorCandidates).toBe(51);
+    expect(result.coverage.unresolved[0]).toContain('FP-2 is a separate 25-head upper-level schedule');
+    expect(result.continuationHeads).toEqual([]);
     expect(result.counts.positiveAnnotationProximityMatches).toBeGreaterThanOrEqual(3);
     expect(result.slopeEvidenceReady).toBe(true);
     expect(result.fullSlopeSurfaceRegistrationReady).toBe(true);

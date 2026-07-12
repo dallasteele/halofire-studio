@@ -1,0 +1,24 @@
+{
+  "status": "in_progress",
+  "iteration": 1,
+  "truth": [
+    "FP-1 contains 40 round plus 11 alternate vector head symbols while its own schedule declares 40 plus 12.",
+    "FP-2 is a separate upper-level sheet containing 24 round plus 1 alternate vector head symbols, matching its own 25-head schedule.",
+    "The prior use of FP-2 alternate-1 as FP-1 alternate-12 was a cross-sheet substitution and has been removed.",
+    "FP-1 has 43 connected pipe centerline vectors touching all 51 detected heads; FP-2 has 24 touching all 25 detected heads.",
+    "Vector wall-coordinate matching registers FP-1 to the main DWG from 195 coordinates and FP-2 to the upper DWG from 136 coordinates with less than 0.025 ft axis RMS."
+  ],
+  "remaining": [
+    "Verify the corrected authenticated Studio in a real browser",
+    "Commit, push, deploy, and verify the corrected live API and employee surface",
+    "Map per-element Z from actual ceiling and roof regions without inventing missing zone identity",
+    "Resolve the one missing FP-1 scheduled head only from source evidence"
+  ],
+  "verification": {
+    "packetReceiptSha256": "3a763efc0873b2291803be4912567f2b9d3758e8f10d59bcc56ef8ed3d5b1422",
+    "focusedTests": "77 passed",
+    "productionBuild": "passed",
+    "claim": "76 of 77 scheduled heads and 67 pipe vectors are plan-registered; per-element Z, compliance, and approval remain false"
+  },
+  "globalGoalComplete": false
+}

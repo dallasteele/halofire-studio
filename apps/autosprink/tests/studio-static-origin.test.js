@@ -134,6 +134,7 @@ describe('studio static origin handling', () => {
     expect(html).toContain('new THREE.ExtrudeGeometry');
     expect(html).toContain('no dedicated exterior-elevation sheet was present');
     expect(html).toContain('NOT CODE APPROVAL');
+    expect(html).toContain('function initScaleBar() { updateScaleBar(); }');
   });
 
   it('lets the workbench target the Cooperative 1881 project instead of only Home Depot', async () => {
@@ -702,7 +703,10 @@ describe('studio static origin handling', () => {
     const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
-    expect(html).toContain('52 of 52 scheduled symbols are source-classified');
+    expect(html).toContain('one FP-1 head remains unresolved');
+    expect(html).toContain('FP-2 is a separate 25-head upper-level schedule and cannot close FP-1');
+    expect(html).toContain('/api/projects/Dillon%20Residence/completed-bid-geometry');
+    expect(html).toContain('no cross-sheet substitution');
     expect(html).toContain('protected-head node identity, compliance, and approval remain fail-closed');
   });
 });

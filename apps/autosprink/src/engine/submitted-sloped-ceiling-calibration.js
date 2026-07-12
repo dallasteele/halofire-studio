@@ -34,7 +34,7 @@ const Draft = z.object({
     id: z.string(), sourceId: z.literal('submitted-FP2'), sourcePageIndex: z.literal(0), pointPortraitTopLeftPt: Point,
     symbolClass: z.literal('cross-pendent-vector-candidate'), vectorSignature: z.literal('paired-8.7pt-diagonals-over-filled-pendent-center'),
     sourceDrawingIndices: z.tuple([z.literal(2408), z.literal(2434)]),
-  }).strict()).length(1),
+  }).strict()).length(0),
   schedule: z.object({ totalHeads: z.literal(52), roundPendent: z.literal(40), alternatePendent: z.literal(12) }).strict(),
   hydraulicEvidence: z.array(z.object({ report: z.enum(['RA-1', 'RA-2', 'RA-3']), nodeId: z.string(), elevationFt: z.number(), nodeKind: z.literal('active-sprinkler') }).strict()).min(3),
   hydraulicDatumJoin: z.object({
@@ -43,10 +43,11 @@ const Draft = z.object({
     activeNodes: z.array(z.object({ report: z.enum(['RA-1', 'RA-2', 'RA-3']), nodeId: z.string(), hydraulicLocalElevationFt: z.number(), projectElevationFt: z.number() }).strict()).length(5),
     protectedRegionHeadNodeMappingReady: z.literal(false), reason: z.string().min(1),
   }).strict(),
-  coverage: z.object({ complete: z.literal(true), detectedVectorCandidates: z.literal(52), unresolved: z.array(z.string()).length(0) }).strict(),
+  coverage: z.object({ complete: z.literal(false), detectedVectorCandidates: z.literal(51), unresolved: z.tuple([z.literal('FP-1 schedule declares 52 heads but the FP-1 vector sheet contains 51 symbols (40 round + 11 alternate); FP-2 is a separate 25-head upper-level schedule and cannot close this mismatch.')]) }).strict(),
   limitations: z.tuple([
     z.literal('protected-sloped-heads-not-mapped-to-hydraulic-remote-area-nodes'),
     z.literal('code-compliance-and-approval-not-inferred-from-completed-bid'),
+    z.literal('fp1-schedule-to-vector-count-mismatch-one-head-unresolved'),
   ]),
   claimStatus: z.literal('completed-bid-sloped-ceiling-calibration-not-code-compliance-or-approval'),
 }).strict();
@@ -126,11 +127,9 @@ export async function validateSubmittedSlopedCeilingCalibration(input) {
     }
   }
   const allScheduleHeads = [...packet.submittedHeads, ...packet.continuationHeads];
-  if (packet.coverage.detectedVectorCandidates !== allScheduleHeads.length) issues.push(blocking('SLOPED_CALIBRATION_HEAD_COUNT_DRIFT', 'Detected vector count does not match the sealed FP-1 plus FP-2 candidate lists.'));
+  if (packet.coverage.detectedVectorCandidates !== allScheduleHeads.length) issues.push(blocking('SLOPED_CALIBRATION_HEAD_COUNT_DRIFT', 'Detected vector count does not match the sealed FP-1 candidate list.'));
   if (allScheduleHeads.filter((head) => head.symbolClass === 'round-pendent-vector-candidate').length !== 40) issues.push(blocking('SLOPED_CALIBRATION_ROUND_SYMBOL_COUNT', 'The sealed round-pendent vector class must reproduce the submitted schedule count of 40.'));
-  if (allScheduleHeads.filter((head) => head.symbolClass === 'cross-pendent-vector-candidate').length !== 12) issues.push(blocking('SLOPED_CALIBRATION_ALTERNATE_SYMBOL_COUNT', 'The sealed alternate-pendent vector class must reproduce all 12 submitted schedule symbols across FP-1 and FP-2.'));
-  const continuationHead = packet.continuationHeads[0];
-  if (distance(continuationHead.pointPortraitTopLeftPt, [1398.27, 1032.33]) > 0.1) issues.push(blocking('SLOPED_CALIBRATION_FP2_CONTINUATION_DRIFT', 'The FP-2 continuation head does not match the paired-diagonal source vector center.', [continuationHead.id, continuationHead.sourceId]));
+  if (packet.submittedHeads.filter((head) => head.symbolClass === 'cross-pendent-vector-candidate').length !== 11) issues.push(blocking('SLOPED_CALIBRATION_FP1_ALTERNATE_VECTOR_COUNT', 'FP-1 must retain its 11 detected alternate-pendent vectors; the declared twelfth is unresolved.'));
 
   const radiusPt = 9 * packet.printedScalePtPerFt;
   const proximityMatches = packet.submittedHeads.flatMap((head) => packet.ceilingSlopeAnnotations
@@ -150,7 +149,7 @@ export async function validateSubmittedSlopedCeilingCalibration(input) {
     status: issues.length ? 'blocked' : 'passed', issues,
     artifactType: 'halofire.submitted-sloped-ceiling-calibration-validation.v1',
     packet: issues.length ? null : packet,
-    counts: { submittedScheduleHeads: 52, vectorCandidates: allScheduleHeads.length, fp1VectorCandidates: packet.submittedHeads.length, fp2ContinuationCandidates: packet.continuationHeads.length, unresolvedHeadSymbols: 52 - allScheduleHeads.length, positiveAnnotationProximityMatches: proximityMatches.length },
+    counts: { submittedScheduleHeads: 52, vectorCandidates: allScheduleHeads.length, fp1VectorCandidates: packet.submittedHeads.length, fp2ContinuationCandidates: 0, unresolvedHeadSymbols: 52 - allScheduleHeads.length, positiveAnnotationProximityMatches: proximityMatches.length },
     proximityMatches,
     slopeEvidenceReady: issues.length === 0,
     fullSlopeSurfaceRegistrationReady: issues.length === 0,
