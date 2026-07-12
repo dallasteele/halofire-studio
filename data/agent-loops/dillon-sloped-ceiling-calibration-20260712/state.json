@@ -1,29 +1,30 @@
 {
   "status": "complete",
-  "iteration": 4,
+  "iteration": 5,
   "truth": [
     "The completed FP-1 schedule reports 52 heads: 40 round pendent and 12 alternate pendent.",
-    "The deterministic vector classifier currently seals 50 candidates, including all 40 round pendent symbols; two alternate symbols remain unresolved.",
+    "The deterministic vector classifier seals 51 candidates, including all 40 round pendent and 11 of 12 alternate pendent symbols; one alternate remains unresolved.",
     "Multiple submitted heads fall within nine feet of source-registered 3:12 RCP annotations, which is positive calibration evidence but not a full sloped-surface or code-compliance proof.",
     "RA-1 through RA-3 bind active sprinkler elevations at 10 ft and 22 ft.",
-    "The protected 3:12 region binds a four-blade ceiling-fan obstruction and SOFFIT 9 ft / project elevation 109 ft source datum."
+    "The protected 3:12 region binds a four-blade ceiling-fan obstruction and SOFFIT 9 ft / project elevation 109 ft source datum.",
+    "Five submitted RA active nodes share a sealed 100 ft hydraulic-local-to-project elevation offset without falsely assigning protected-region head identities."
   ],
   "remaining": [
-    "Classify the two remaining alternate pendent symbols",
-    "Join the absolute architectural ceiling plane to specific submitted hydraulic nodes",
+    "Classify the one remaining alternate pendent symbol",
+    "Map protected sloped-region heads to specific submitted hydraulic nodes only if source callouts prove those identities",
     "Keep approval and code-compliance claims fail-closed"
   ],
   "verification": {
-    "featureCommit": "a2244f37",
-    "evidenceReceiptSha256": "ec0a69dabef38212cac8db7a3a3d0af400fcd0ab0c0301330b516ee50240fe2f",
-    "focusedTests": "33 passed across sealed sloped calibration, generated layout, grounded 3D model, authenticated API, and Studio static-origin tests; 20 node-native geometry/UI tests passed",
-    "adversarialGates": "receipt, transform-control, polygon, obstruction, elevation-datum, slope-point, empty-region false-positive, hydraulic-elevation, and 3D plane mutations rejected",
+    "featureCommit": "1d1e15f1",
+    "evidenceReceiptSha256": "62849ebb2f8c048f38afe3056c38818d9e9e1d679b3791f3a6435df3c15fa47b",
+    "focusedTests": "34 passed across sealed sloped calibration, generated layout, grounded 3D model, authenticated API, and Studio static-origin tests; 20 node-native geometry/UI tests remain green",
+    "adversarialGates": "receipt, transform-control, polygon, obstruction, elevation-datum, hydraulic-datum, node substitution, slope-point, empty-region false-positive, hydraulic-elevation, and 3D plane mutations rejected",
     "build": "Vite production build passed locally and on VPS",
     "rules": "agent loop contract and AGENTIC_RULES verifier passed",
-    "deployment": "VPS /opt/openclaw/halofire-studio HEAD a2244f3; halofire.service active",
-    "liveApi": "authenticated Dillon route passed with precision 1.0, recall 1.0, maximum plan error 2.614 ft, source-bound project elevations 108.17 ft and 105.90 ft, zero 3D plane residual, and complianceReady false",
+    "deployment": "VPS /opt/openclaw/halofire-studio HEAD 1d1e15f; halofire.service active",
+    "liveApi": "authenticated Dillon route passed with 51 of 52 vector candidates, five RA nodes joined through the 100 ft datum, precision 1.0, recall 1.0, maximum plan error 2.614 ft, zero plane residual, and complianceReady false",
     "public": "health 200; login page 200; invalid login 401; Studio 200 with Dillon viewer; sealed artifact 200",
-    "browser": "live Studio viewer rendered fan-clearance alignment, absolute SOFFIT/project datum, two generated head elevations, and zero plane residual; login username/password/sign-in controls remained unique and error-free"
+    "browser": "live Studio viewer rendered the five-node hydraulic datum join and explicit protected-head identity blocker; login username/password/sign-in controls remained unique and error-free"
   },
   "globalGoalComplete": false
 }
