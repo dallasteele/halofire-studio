@@ -16,7 +16,7 @@ describe('cross-project pitched-roof evidence', () => {
   it('requires Dillon vector controls, independent Dallas steep-roof sections, and Tallahassee level/elevation cross-checks', async () => {
     const validation = await validatePitchedRoofCrossProjectEvidence(packet);
     expect(validation.status).toBe('passed');
-    expect(validation.metrics).toMatchObject({ projectCount: 3, pitchedProjectCount: 2, dallasPitchMeanInPer12: 8.5195, dallasSectionRiseFt: 12.84375 });
+    expect(validation.metrics).toMatchObject({ projectCount: 4, pitchedProjectCount: 3, dallasPitchMeanInPer12: 8.5195, dallasSectionRiseFt: 12.84375, winterGardenPitchInPer12: 4.5, winterGardenRoofBearingFt: 115.6666666667, winterGardenRakeBeamFt: 125.9583333333 });
     expect(validation.metrics.dallasPitchSpreadInPer12).toBeLessThan(.1);
     expect(validation.complianceReady).toBe(false);
   });
@@ -24,7 +24,7 @@ describe('cross-project pitched-roof evidence', () => {
   it('replays both the 3:12 vector case and the independent 8.5195:12 scanned-section case through the same 3D plane engine', async () => {
     const cases = buildPitchedRoofCalibrationCases(await validatePitchedRoofCrossProjectEvidence(packet));
     expect(cases.status).toBe('passed');
-    expect(cases.cases).toHaveLength(2);
+    expect(cases.cases).toHaveLength(3);
     const normals = [];
     for (const calibration of cases.cases) {
       const scale = 12;
@@ -48,5 +48,7 @@ describe('cross-project pitched-roof evidence', () => {
     expect((await validatePitchedRoofCrossProjectEvidence(badPitch)).issues.map((entry) => entry.code)).toContain('PITCHED_ROOF_DALLAS_SECTION_DISAGREEMENT');
     const badDatum = await reseal((draft) => { draft.projects.find((project) => project.projectId === 'dallas-temple').datumObservations.find((entry) => entry.id === 'a10-ridge').elevationFt += 1; });
     expect((await validatePitchedRoofCrossProjectEvidence(badDatum)).issues.map((entry) => entry.code)).toContain('PITCHED_ROOF_DALLAS_DATUM_DRIFT');
+    const badWinterPitch = await reseal((draft) => { draft.projects.find((project) => project.projectId === 'winter-garden-meetinghouse').pitchObservations[0].riseIn = 5; });
+    expect((await validatePitchedRoofCrossProjectEvidence(badWinterPitch)).issues.map((entry) => entry.code)).toContain('PITCHED_ROOF_WINTER_GARDEN_PITCH_DRIFT');
   });
 });

@@ -55,16 +55,39 @@
         { "id": "a302-dome-tos", "kind": "roof", "sourceText": "DOME TOS 104'-11\"", "elevationFt": 104.9166666667 }
       ],
       "completedOutput": { "surfaceCount": 0, "protectedSurfaceCount": 0, "headCount": 0, "slopeFollowingPipeCount": 0 }
+    },
+    {
+      "projectId": "winter-garden-meetinghouse",
+      "evidenceRole": "vector-roof-plan-elevation-section-and-as-built-sprinkler-cross-check",
+      "sources": [
+        { "sheetId": "A121", "sha256": "0fa8d19cf2a8ca421a3cad7200b410763eee701bb566ca84d37321b1b51ce921", "kind": "roof-plan" },
+        { "sheetId": "A201", "sha256": "f756533aaf7bb8f1229b28226d26d0fbb53c9cd09f80af2bdcf1b271963243a8", "kind": "building-elevation" },
+        { "sheetId": "A301", "sha256": "719ae05138b3872c2ed8740fa4470ca457dcc0a9f8fec617cabf7969560ecc30", "kind": "building-section" },
+        { "sheetId": "ASBUILT-FP3", "sha256": "13aa82f90bf7b03bc0b4728d0b631321372a48932d2a55187dad6edc947de3a0", "kind": "as-built-reflected-ceiling-sprinkler-plan-and-cross-section" }
+      ],
+      "pitchObservations": [
+        { "id": "a121-main-roof", "method": "source-vector-text", "riseIn": 4.5, "runIn": 12, "sourceText": "4 1/2\" / 1'-0\"" },
+        { "id": "a301-building-section", "method": "source-vector-text", "riseIn": 4.5, "runIn": 12, "sourceText": "4 1/2\" / 1'-0\"" }
+      ],
+      "datumObservations": [
+        { "id": "a201-level-1-slab", "kind": "floor", "sourceText": "LEVEL 1 - T.O. SLAB 100'-0\"", "elevationFt": 100 },
+        { "id": "a301-roof-bearing-chapel", "kind": "roof-bearing", "sourceText": "ROOF BEARING - CHAPEL 115'-8\"", "elevationFt": 115.6666666667 },
+        { "id": "a301-bottom-of-truss", "kind": "bottom-of-truss", "sourceText": "BOTTOM OF TRUSS 119'-6\"", "elevationFt": 119.5 },
+        { "id": "a201-rake-beam", "kind": "rake-beam", "sourceText": "T.O. WALL AT RAKE BEAM 125'-11 1/2\"", "elevationFt": 125.9583333333 },
+        { "id": "a201-steeple", "kind": "steeple", "sourceText": "T.O. STEEPLE 155'-0\"", "elevationFt": 155 }
+      ],
+      "completedOutput": { "surfaceCount": 0, "protectedSurfaceCount": 0, "headCount": 329, "slopeFollowingPipeCount": 0 }
     }
   ],
   "acceptance": {
-    "minimumIndependentProjects": 2,
-    "minimumPitchedProjects": 2,
+    "minimumIndependentProjects": 3,
+    "minimumPitchedProjects": 3,
     "maximumDallasSectionPitchSpreadInPer12": 0.1,
     "dallasCalibrationRiseInPer12": 8.5195,
+    "winterGardenCalibrationRiseInPer12": 4.5,
     "structuralRoofPromotionRequiresPitchAndDatum": true,
     "complianceReady": false
   },
   "claimStatus": "cross-project-pitched-geometry-calibration-not-code-compliance-or-approval",
-  "receiptSha256": "b10490ae88a241053c39353f7a64a85ab2d54177bf42609612fa3e01733a15a0"
+  "receiptSha256": "771f40cf93c9d17f5a071d59ca0ef06246df1dfe0873ab5bb51db4d5baff8090"
 }

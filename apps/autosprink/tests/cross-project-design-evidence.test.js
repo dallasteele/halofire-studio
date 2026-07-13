@@ -11,7 +11,9 @@ describe('cross-project design evidence', () => {
     expect(result.phases).toEqual(['as_built', 'city_approved', 'source_architecture', 'stamped_submittal']);
     expect(result.sourceViews).toEqual(['building_elevation', 'building_section', 'floor_plan', 'reflected_ceiling_plan', 'roof_plan']);
     expect(result.pairedSheets).toEqual(['A001', 'A002', 'A003']);
-    expect(result.changedSheets).toEqual(['A001', 'A002', 'A003']);
+    expect(result.fileChangedSheets).toEqual(['A001', 'A002', 'A003']);
+    expect(result.geometryChangedSheets).toEqual([]);
+    expect(result.annotationChangedSheets).toEqual(['A001', 'A002', 'A003']);
   });
 
   it('fails closed when the calibration is not independent or a required view is missing', () => {
