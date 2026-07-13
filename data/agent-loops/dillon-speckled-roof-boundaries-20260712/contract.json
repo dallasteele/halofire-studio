@@ -1,0 +1,39 @@
+{
+  "name": "dillon-speckled-roof-boundaries-20260712",
+  "owner": "codex",
+  "loop_type": "closed",
+  "goal": "Recover the actual vector-speckled Roof-Hatch regions from the Dillon structural framing PDFs, associate only source-supported pitch arrows, register main and upper geometry to the source DWG, and keep absolute planes and code-compliance claims fail-closed unless a source datum and obstruction basis are joined.",
+  "sources_of_truth": [
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/main-plans/Main Level Framing Plan.pdf",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/main-plans/Upper Level Framing.pdf",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/toy-plans/Toy Garage Framing Plan.pdf",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/structural-legend-main.png",
+    "apps/autosprink/src/data/dillon-structural-framing-roof-source.json",
+    "apps/autosprink/src/engine/dillon-structural-roof-surfaces.js"
+  ],
+  "exit_criteria": [
+    "Only 0.591-gray 0.72-point vector speckle strokes from the PDF Roof-Hatch optional-content layer seed slope-roof contours",
+    "Legend and title-block hatch samples plus solid-gray recess-floor fills are excluded from plan contours",
+    "Every derived contour records its vector source count, reconstruction tolerance, sheet transform status, and pitch association status",
+    "Main and upper contours register through the previously solved source-DWG transform; ambiguous toy registration remains unresolved",
+    "No absolute roof plane or compliance claim is promoted without an associated pitch direction and absolute elevation datum",
+    "Adversarial mutations of layer, stroke style, contour receipt, transform, pitch join, or datum fail closed",
+    "Focused tests, build, rules, loop guard, live health, login, API, and final browser or Computer Use evidence pass for the promoted slice"
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-speckled-roof-boundaries-20260712/contract.json",
+    "npx vitest run tests/dillon-structural-roof-surfaces.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/dillon-speckled-roof-boundaries-20260712/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/dillon-structural-framing-roof-source.json",
+    "data/agent-loops/dillon-speckled-roof-boundaries-20260712/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 50000,
+  "model_tier": "balanced",
+  "brain_writeback_required": true,
+  "human_gate_required": false
+}

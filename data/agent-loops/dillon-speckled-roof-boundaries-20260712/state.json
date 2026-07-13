@@ -1,0 +1,26 @@
+{
+  "status": "active",
+  "iteration": 2,
+  "truth": [
+    "The structural legend maps the speckled hatch to HATCH AREA INDICATES SLOPE ROOF.",
+    "The PDFs expose the speckles on an optional-content layer named Roof-Hatch.",
+    "The hatch is exploded into clipped vector strokes rather than retained as polygon or tiling-pattern objects.",
+    "Solid-gray filled paths remain rejected as recess floor at bathroom.",
+    "The protected PDFs yield 63,267 plan-region Roof-Hatch speckle strokes and 15 reconstructed contours at a sealed 4-point boundary tolerance.",
+    "Eleven main and upper contours register through the source-DWG transform; four toy contours remain mirror-ambiguous.",
+    "Only one source pitch arrow lands directly on a contour, and it is on the unregistered toy sheet, so zero structural planes are promoted."
+  ],
+  "remaining": [
+    "Deploy the registered 2D contour evidence and verify live login, API receipt parity, and Studio rendering",
+    "Resolve source-supported pitch and absolute elevation datum joins before any structural 3D plane promotion"
+  ],
+  "verification": {
+    "deterministicReplay": "source and packet SHA-256 stable across replay",
+    "focusedTests": "45 passed",
+    "productionBuild": "passed",
+    "agenticRules": "passed",
+    "loopGuard": "passed",
+    "localBrowser": "admin login, Studio Roof Planes action, 11/15 registered contour evidence, zero promoted structural planes, and zero browser warnings/errors passed"
+  },
+  "globalGoalComplete": false
+}

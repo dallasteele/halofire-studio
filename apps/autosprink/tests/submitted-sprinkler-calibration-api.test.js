@@ -82,16 +82,18 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/projects/Dillon%20Residence/structural-roof-surfaces')).status).toBe(401);
   });
 
-  it('serves the structural legend correction without inventing roof faces', async () => {
+  it('serves registered speckled roof contours without inventing 3D planes', async () => {
     const token = await tokenForAdmin();
     const response = await request('/api/projects/Dillon%20Residence/structural-roof-surfaces', { headers: { Authorization: `Bearer ${token}` } });
     expect(response.status).toBe(200);
     const result = await response.json();
     expect(result.status).toBe('passed');
-    expect(result.counts).toMatchObject({ rejectedRecessFloorTriangles: 48, registeredRoofFacePatches: 0, structurallyResolvedPlanes: 0 });
-    expect(result.model.footprints).toEqual([]);
+    expect(result.counts).toMatchObject({ rejectedRecessFloorTriangles: 48, sourceSpeckleStrokes: 63267, sourceSpeckleContours: 15, registeredRoofFacePatches: 11, registeredPitchLinkedRoofContours: 0, structurallyResolvedPlanes: 0 });
+    expect(result.model.footprints).toHaveLength(11);
+    expect(result.model.footprints.every((footprint) => footprint.render3d === false && footprint.datumAssociationStatus === 'unlinked')).toBe(true);
     expect(result.model.surfaces3d).toEqual([]);
-    expect(result.topView.svg).toContain('RECESS FLOOR AT BATHROOM');
+    expect(result.topView.svg).toContain('11 registered speckled slope-roof contours');
+    expect(result.sourceControls[0].slopeRoofLegendText).toBe('HATCH AREA INDICATES SLOPE ROOF');
     expect(result.completeRoofPlanes).toBe(false);
     expect(result.complianceReady).toBe(false);
   });
