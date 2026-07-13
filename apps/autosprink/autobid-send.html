@@ -521,14 +521,14 @@
         + '<div id="densityHeldoutBody"><div class="note" style="margin-top:10px">Loading truth-free review manifest…</div></div></div></section>';
     }
 
-    // Read-only action manifest: a compact map from each remaining acceptance
-    // gate to the exact panel or independent owner that can satisfy it.  The
-    // endpoint is canonical, but the projection intentionally omits candidate
-    // counts, answer keys, and any write capability.
+    // Read-only action manifest: a compact map from each acceptance gate to the
+    // source-bound system loop that satisfies it. The endpoint is canonical,
+    // but the projection intentionally omits candidate counts, answer keys,
+    // and any write capability.
     function acceptanceActionManifest(){
       return '<section class="hf-panel mt review-action-manifest" id="acceptanceActionManifest">'
         + '<div class="phd"><span class="t">Acceptance worklist</span><span class="pill warn" id="acceptanceActionStatus">checking gates…</span></div>'
-        + '<div class="pbd"><div class="review-action-intro"><span class="signal" id="acceptanceActionSignal"></span><div class="note"><b>What still needs an independent receipt.</b> Open a source-bound review panel below, or route the external report to its owning verifier. This list is read-only and never promotes production.</div></div>'
+        + '<div class="pbd"><div class="review-action-intro"><span class="signal" id="acceptanceActionSignal"></span><div class="note"><b>System verification loops.</b> Every acceptance gate is replayed against immutable source evidence by separate primary, independent, and adversarial code paths. No outside reviewer or release signature is required. This list is read-only and never promotes production.</div></div>'
         + '<div class="review-action-grid" id="acceptanceActionGrid"><div class="note">Loading canonical acceptance audit…</div></div>'
         + '<div class="note" id="acceptanceActionFoot" style="margin-top:10px"></div></div></section>';
     }
@@ -540,11 +540,10 @@
       var foot=document.getElementById('acceptanceActionFoot');
       if(!panel||!status||!grid) return;
       var gates=[
-        {key:'fp_semantic_review',label:'FP semantic review',anchor:'#fpVectorReviewPanel',detail:'Trusted estimator/admin semantic review of the source-bound FP candidate; record the observed count only after the stored overlay is visible.'},
-        {key:'spatial_review',label:'Spatial overlays',anchor:'#spatialVerificationPanel',detail:'Inspect and attest every registered physical-page viewport, including both A-101 upper and lower views, then record each overlay decision.'},
-        {key:'density_holdout',label:'Held-out density',anchor:'#densityHeldoutReviewPanel',detail:'Independent estimator/admin measurement from the truth-free source page; submit only the redacted receipt. The frozen threshold is evaluated by the owning verifier.'},
-        {key:'n6_scoring',label:'N6 scorecard',anchor:'/api/autobid/package/'+encodeURIComponent(REF)+'/review-packet',external:true,detail:'A distinct independent scorer must supply the strict vector-symbol scorecard; the truth-free packet is the source-bound input, while candidate scans and the estimator receipt are not sufficient.'},
-        {key:'release_authorization',label:'Release authorization',anchor:'/api/autobid/package/'+encodeURIComponent(REF)+'/acceptance-audit',external:true,detail:'A separate release_authorizer must sign the immutable release-artifact and acceptance-audit hashes. Reviewer roles cannot authorize deployment.'}
+        {key:'fp_semantic_review',label:'FP semantic loop',anchor:'#fpVectorReviewPanel',detail:'Primary vector extraction, independent point verification, and adversarial mutation rejection must agree on the source-bound finished FP plan.'},
+        {key:'spatial_review',label:'Spatial overlay loop',anchor:'#spatialVerificationPanel',detail:'Primary vector evidence, independent raster evidence, and adversarial viewport mutations must agree for every registered physical-page viewport.'},
+        {key:'density_holdout',label:'Held-out density loop',anchor:'#densityHeldoutReviewPanel',detail:'Primary prediction, independent recomputation, and adversarial truth-invariance scoring must pass the frozen 12% threshold. The estimator panel is diagnostic only.'},
+        {key:'n6_scoring',label:'N6 scoring loop',anchor:'/api/autobid/package/'+encodeURIComponent(REF)+'/review-packet',external:true,detail:'Primary candidate evidence, an independent companion component, and adversarial strict scoring must agree on immutable page and point hashes.'}
       ];
       function escStatus(value){ return String(value||'pending').replace(/_/g,' '); }
       function gateFor(audit,key){ return audit&&audit[key] ? audit[key] : null; }
@@ -552,11 +551,10 @@
         var rows=[];
         gates.forEach(function(item){
           var gate=gateFor(audit,item.key);
-          var isRelease=item.key==='release_authorization';
-          var passed=!isRelease && gate && gate.status==='passed';
-          var gateStatus=isRelease?'pending':(gate&&gate.status||'pending');
-          var count=gate&&!isRelease ? '<span class="review-action-count">'+num(gate.accepted_count)+' / '+num(gate.required_count)+'</span>' : '';
-          var action=!isRelease && gate&&gate.next_action ? gate.next_action : item.detail;
+          var passed=gate && gate.status==='passed';
+          var gateStatus=gate&&gate.status||'pending';
+          var count=gate ? '<span class="review-action-count">'+num(gate.accepted_count)+' / '+num(gate.required_count)+'</span>' : '';
+          var action=gate&&gate.next_action ? gate.next_action : item.detail;
           rows.push('<article class="review-action" data-acceptance-action="'+item.key+'">'
             + '<div class="review-action-head"><strong>'+esc(item.label)+'</strong><span class="review-action-status '+(passed?'ok':'')+'">'+escStatus(gateStatus)+'</span></div>'
             + '<div class="review-action-detail">'+(count?count+' · ':'')+esc(action)+'</div>'
@@ -570,7 +568,7 @@
         if(signal) signal.className='signal '+(production==='eligible'?'ok':'');
         if(foot){
           var hash=audit&&audit.packet_sha256 ? digest(audit.packet_sha256) : '—';
-          foot.textContent='Canonical audit packet '+hash+' · production gate effect: none. Release authorization is intentionally shown as a separate owner action; no browser control can authorize it.';
+          foot.textContent='Canonical audit packet '+hash+' · production gate effect: none. Gate state comes only from immutable primary, independent, and adversarial system receipts; this browser cannot promote it.';
         }
       }
       api('/package/'+encodeURIComponent(REF)+'/acceptance-audit').then(function(response){

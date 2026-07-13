@@ -158,7 +158,7 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).not.toContain('densityHeldoutExpected');
   });
 
-  it('renders a canonical action manifest for every remaining external receipt', () => {
+  it('renders a canonical action manifest for every system verification loop', () => {
     expect(html).toContain('function acceptanceActionManifest()');
     expect(html).toContain('function bindAcceptanceActionManifest()');
     expect(html).toContain('id="acceptanceActionManifest"');
@@ -167,12 +167,19 @@ describe('AutoBid final spatial review panel', () => {
     expect(html).toContain("key:'spatial_review'");
     expect(html).toContain("key:'density_holdout'");
     expect(html).toContain("key:'n6_scoring'");
-    expect(html).toContain("key:'release_authorization'");
+    expect(html).not.toContain("key:'release_authorization'");
     expect(html).toContain('#fpVectorReviewPanel');
     expect(html).toContain('#spatialVerificationPanel');
     expect(html).toContain('#densityHeldoutReviewPanel');
-    expect(html).toContain('distinct independent scorer');
-    expect(html).toContain('separate release_authorizer');
+    expect(html).toContain('System verification loops.');
+    expect(html).toContain('primary, independent, and adversarial code paths');
+    expect(html).toContain('No outside reviewer or release signature is required.');
+    expect(html).toContain('adversarial mutation rejection');
+    expect(html).toContain('adversarial viewport mutations');
+    expect(html).toContain('adversarial truth-invariance scoring');
+    expect(html).toContain('adversarial strict scoring');
+    expect(html).not.toContain('distinct independent scorer');
+    expect(html).not.toContain('separate release_authorizer');
     expect(html).toContain('production gate effect: none');
     const actionSection = html.slice(html.indexOf('function acceptanceActionManifest()'), html.indexOf('function bindAcceptanceActionManifest()'));
     expect(actionSection).not.toContain('expected_count');
