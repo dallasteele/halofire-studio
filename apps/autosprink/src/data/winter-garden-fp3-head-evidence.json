@@ -1,0 +1,1960 @@
+{
+  "artifactType": "halofire.raster-bullseye-head-evidence.v1",
+  "projectId": "winter-garden-meetinghouse",
+  "sheetId": "FP3",
+  "sourcePdfSha256": "93f8df04bc84ac817ecd2e222812fede93565879094c66b4d7511f783631543e",
+  "renderedImageSha256": "c08f646e35fe14af5367b6a38fb378ce6f89e8773d50e849a95af7800d14b3a2",
+  "renderedImageSizePx": [
+    5400,
+    3601
+  ],
+  "displayPageSizePt": [
+    2592,
+    1728
+  ],
+  "planCropPx": [
+    400,
+    300,
+    4600,
+    2500
+  ],
+  "primary": {
+    "method": "normalized-template-correlation",
+    "threshold": 0.6,
+    "templateCenterPx": [
+      690,
+      586
+    ],
+    "templateSizePx": 33,
+    "count": 159
+  },
+  "independent": {
+    "method": "thresholded-contour-hierarchy",
+    "count": 158,
+    "maximumCountDelta": 1
+  },
+  "adversarial": {
+    "thresholdCounts": {
+      "0.58": 159,
+      "0.59": 159,
+      "0.60": 159
+    },
+    "centerRemovedTemplateCount": 57,
+    "centerRemovedTemplateRejected": true
+  },
+  "legendExpectedCount": 159,
+  "points": [
+    {
+      "id": "wg-fp3-pendent-001",
+      "normalized": [
+        0.45037037,
+        0.153568453
+      ],
+      "displayPdfPtTopLeft": [
+        1167.36,
+        265.3663
+      ],
+      "score": 0.882033
+    },
+    {
+      "id": "wg-fp3-pendent-002",
+      "normalized": [
+        0.498888889,
+        0.153568453
+      ],
+      "displayPdfPtTopLeft": [
+        1293.12,
+        265.3663
+      ],
+      "score": 0.860146
+    },
+    {
+      "id": "wg-fp3-pendent-003",
+      "normalized": [
+        0.631481481,
+        0.155512358
+      ],
+      "displayPdfPtTopLeft": [
+        1636.8,
+        268.7254
+      ],
+      "score": 0.913208
+    },
+    {
+      "id": "wg-fp3-pendent-004",
+      "normalized": [
+        0.548518519,
+        0.156067759
+      ],
+      "displayPdfPtTopLeft": [
+        1421.76,
+        269.6851
+      ],
+      "score": 0.897799
+    },
+    {
+      "id": "wg-fp3-pendent-005",
+      "normalized": [
+        0.592777778,
+        0.161344071
+      ],
+      "displayPdfPtTopLeft": [
+        1536.48,
+        278.8026
+      ],
+      "score": 0.837598
+    },
+    {
+      "id": "wg-fp3-pendent-006",
+      "normalized": [
+        0.661296296,
+        0.161344071
+      ],
+      "displayPdfPtTopLeft": [
+        1714.08,
+        278.8026
+      ],
+      "score": 0.882815
+    },
+    {
+      "id": "wg-fp3-pendent-007",
+      "normalized": [
+        0.699444444,
+        0.161344071
+      ],
+      "displayPdfPtTopLeft": [
+        1812.96,
+        278.8026
+      ],
+      "score": 0.894695
+    },
+    {
+      "id": "wg-fp3-pendent-008",
+      "normalized": [
+        0.127777778,
+        0.162732574
+      ],
+      "displayPdfPtTopLeft": [
+        331.2,
+        281.2019
+      ],
+      "score": 1.0
+    },
+    {
+      "id": "wg-fp3-pendent-009",
+      "normalized": [
+        0.179814815,
+        0.162732574
+      ],
+      "displayPdfPtTopLeft": [
+        466.08,
+        281.2019
+      ],
+      "score": 0.9605
+    },
+    {
+      "id": "wg-fp3-pendent-010",
+      "normalized": [
+        0.333518519,
+        0.162732574
+      ],
+      "displayPdfPtTopLeft": [
+        864.48,
+        281.2019
+      ],
+      "score": 0.891321
+    },
+    {
+      "id": "wg-fp3-pendent-011",
+      "normalized": [
+        0.384444444,
+        0.162732574
+      ],
+      "displayPdfPtTopLeft": [
+        996.48,
+        281.2019
+      ],
+      "score": 0.902394
+    },
+    {
+      "id": "wg-fp3-pendent-012",
+      "normalized": [
+        0.408703704,
+        0.162732574
+      ],
+      "displayPdfPtTopLeft": [
+        1059.36,
+        281.2019
+      ],
+      "score": 0.894802
+    },
+    {
+      "id": "wg-fp3-pendent-013",
+      "normalized": [
+        0.219074074,
+        0.164121077
+      ],
+      "displayPdfPtTopLeft": [
+        567.84,
+        283.6012
+      ],
+      "score": 0.931414
+    },
+    {
+      "id": "wg-fp3-pendent-014",
+      "normalized": [
+        0.252592593,
+        0.164121077
+      ],
+      "displayPdfPtTopLeft": [
+        654.72,
+        283.6012
+      ],
+      "score": 0.935794
+    },
+    {
+      "id": "wg-fp3-pendent-015",
+      "normalized": [
+        0.293148148,
+        0.164121077
+      ],
+      "displayPdfPtTopLeft": [
+        759.84,
+        283.6012
+      ],
+      "score": 0.970584
+    },
+    {
+      "id": "wg-fp3-pendent-016",
+      "normalized": [
+        0.350555556,
+        0.164121077
+      ],
+      "displayPdfPtTopLeft": [
+        908.64,
+        283.6012
+      ],
+      "score": 0.963789
+    },
+    {
+      "id": "wg-fp3-pendent-017",
+      "normalized": [
+        0.329814815,
+        0.200499861
+      ],
+      "displayPdfPtTopLeft": [
+        854.88,
+        346.4638
+      ],
+      "score": 0.831663
+    },
+    {
+      "id": "wg-fp3-pendent-018",
+      "normalized": [
+        0.371481481,
+        0.200499861
+      ],
+      "displayPdfPtTopLeft": [
+        962.88,
+        346.4638
+      ],
+      "score": 0.804016
+    },
+    {
+      "id": "wg-fp3-pendent-019",
+      "normalized": [
+        0.412962963,
+        0.200499861
+      ],
+      "displayPdfPtTopLeft": [
+        1070.4,
+        346.4638
+      ],
+      "score": 0.799159
+    },
+    {
+      "id": "wg-fp3-pendent-020",
+      "normalized": [
+        0.45037037,
+        0.200499861
+      ],
+      "displayPdfPtTopLeft": [
+        1167.36,
+        346.4638
+      ],
+      "score": 0.950017
+    },
+    {
+      "id": "wg-fp3-pendent-021",
+      "normalized": [
+        0.498888889,
+        0.200499861
+      ],
+      "displayPdfPtTopLeft": [
+        1293.12,
+        346.4638
+      ],
+      "score": 0.926623
+    },
+    {
+      "id": "wg-fp3-pendent-022",
+      "normalized": [
+        0.219074074,
+        0.205776173
+      ],
+      "displayPdfPtTopLeft": [
+        567.84,
+        355.5812
+      ],
+      "score": 0.734228
+    },
+    {
+      "id": "wg-fp3-pendent-023",
+      "normalized": [
+        0.252592593,
+        0.205776173
+      ],
+      "displayPdfPtTopLeft": [
+        654.72,
+        355.5812
+      ],
+      "score": 0.727783
+    },
+    {
+      "id": "wg-fp3-pendent-024",
+      "normalized": [
+        0.293148148,
+        0.205776173
+      ],
+      "displayPdfPtTopLeft": [
+        759.84,
+        355.5812
+      ],
+      "score": 0.867145
+    },
+    {
+      "id": "wg-fp3-pendent-025",
+      "normalized": [
+        0.548518519,
+        0.206886976
+      ],
+      "displayPdfPtTopLeft": [
+        1421.76,
+        357.5007
+      ],
+      "score": 0.88596
+    },
+    {
+      "id": "wg-fp3-pendent-026",
+      "normalized": [
+        0.598518519,
+        0.207164676
+      ],
+      "displayPdfPtTopLeft": [
+        1551.36,
+        357.9806
+      ],
+      "score": 0.922815
+    },
+    {
+      "id": "wg-fp3-pendent-027",
+      "normalized": [
+        0.633148148,
+        0.207164676
+      ],
+      "displayPdfPtTopLeft": [
+        1641.12,
+        357.9806
+      ],
+      "score": 0.875605
+    },
+    {
+      "id": "wg-fp3-pendent-028",
+      "normalized": [
+        0.657592593,
+        0.225215218
+      ],
+      "displayPdfPtTopLeft": [
+        1704.48,
+        389.1719
+      ],
+      "score": 0.932599
+    },
+    {
+      "id": "wg-fp3-pendent-029",
+      "normalized": [
+        0.699259259,
+        0.225215218
+      ],
+      "displayPdfPtTopLeft": [
+        1812.48,
+        389.1719
+      ],
+      "score": 0.938087
+    },
+    {
+      "id": "wg-fp3-pendent-030",
+      "normalized": [
+        0.631481481,
+        0.227159122
+      ],
+      "displayPdfPtTopLeft": [
+        1636.8,
+        392.531
+      ],
+      "score": 0.893421
+    },
+    {
+      "id": "wg-fp3-pendent-031",
+      "normalized": [
+        0.598518519,
+        0.227992224
+      ],
+      "displayPdfPtTopLeft": [
+        1551.36,
+        393.9706
+      ],
+      "score": 0.877562
+    },
+    {
+      "id": "wg-fp3-pendent-032",
+      "normalized": [
+        0.127777778,
+        0.23049153
+      ],
+      "displayPdfPtTopLeft": [
+        331.2,
+        398.2894
+      ],
+      "score": 0.969744
+    },
+    {
+      "id": "wg-fp3-pendent-033",
+      "normalized": [
+        0.179814815,
+        0.23049153
+      ],
+      "displayPdfPtTopLeft": [
+        466.08,
+        398.2894
+      ],
+      "score": 0.937945
+    },
+    {
+      "id": "wg-fp3-pendent-034",
+      "normalized": [
+        0.218518519,
+        0.231602333
+      ],
+      "displayPdfPtTopLeft": [
+        566.4,
+        400.2088
+      ],
+      "score": 0.901778
+    },
+    {
+      "id": "wg-fp3-pendent-035",
+      "normalized": [
+        0.263703704,
+        0.231602333
+      ],
+      "displayPdfPtTopLeft": [
+        683.52,
+        400.2088
+      ],
+      "score": 0.916177
+    },
+    {
+      "id": "wg-fp3-pendent-036",
+      "normalized": [
+        0.315740741,
+        0.231602333
+      ],
+      "displayPdfPtTopLeft": [
+        818.4,
+        400.2088
+      ],
+      "score": 0.919249
+    },
+    {
+      "id": "wg-fp3-pendent-037",
+      "normalized": [
+        0.364259259,
+        0.231602333
+      ],
+      "displayPdfPtTopLeft": [
+        944.16,
+        400.2088
+      ],
+      "score": 0.927348
+    },
+    {
+      "id": "wg-fp3-pendent-038",
+      "normalized": [
+        0.409444444,
+        0.231602333
+      ],
+      "displayPdfPtTopLeft": [
+        1061.28,
+        400.2088
+      ],
+      "score": 0.919804
+    },
+    {
+      "id": "wg-fp3-pendent-039",
+      "normalized": [
+        0.454444444,
+        0.231602333
+      ],
+      "displayPdfPtTopLeft": [
+        1177.92,
+        400.2088
+      ],
+      "score": 0.909963
+    },
+    {
+      "id": "wg-fp3-pendent-040",
+      "normalized": [
+        0.503148148,
+        0.231602333
+      ],
+      "displayPdfPtTopLeft": [
+        1304.16,
+        400.2088
+      ],
+      "score": 0.886286
+    },
+    {
+      "id": "wg-fp3-pendent-041",
+      "normalized": [
+        0.591481481,
+        0.232990836
+      ],
+      "displayPdfPtTopLeft": [
+        1533.12,
+        402.6082
+      ],
+      "score": 0.764832
+    },
+    {
+      "id": "wg-fp3-pendent-042",
+      "normalized": [
+        0.550185185,
+        0.246320467
+      ],
+      "displayPdfPtTopLeft": [
+        1426.08,
+        425.6418
+      ],
+      "score": 0.86419
+    },
+    {
+      "id": "wg-fp3-pendent-043",
+      "normalized": [
+        0.359259259,
+        0.264648709
+      ],
+      "displayPdfPtTopLeft": [
+        931.2,
+        457.313
+      ],
+      "score": 0.707191
+    },
+    {
+      "id": "wg-fp3-pendent-044",
+      "normalized": [
+        0.131666667,
+        0.270480422
+      ],
+      "displayPdfPtTopLeft": [
+        341.28,
+        467.3902
+      ],
+      "score": 0.929555
+    },
+    {
+      "id": "wg-fp3-pendent-045",
+      "normalized": [
+        0.176851852,
+        0.270480422
+      ],
+      "displayPdfPtTopLeft": [
+        458.4,
+        467.3902
+      ],
+      "score": 0.877225
+    },
+    {
+      "id": "wg-fp3-pendent-046",
+      "normalized": [
+        0.22537037,
+        0.270480422
+      ],
+      "displayPdfPtTopLeft": [
+        584.16,
+        467.3902
+      ],
+      "score": 0.948695
+    },
+    {
+      "id": "wg-fp3-pendent-047",
+      "normalized": [
+        0.267037037,
+        0.292974174
+      ],
+      "displayPdfPtTopLeft": [
+        692.16,
+        506.2594
+      ],
+      "score": 0.905592
+    },
+    {
+      "id": "wg-fp3-pendent-048",
+      "normalized": [
+        0.573518519,
+        0.294084976
+      ],
+      "displayPdfPtTopLeft": [
+        1486.56,
+        508.1788
+      ],
+      "score": 0.839073
+    },
+    {
+      "id": "wg-fp3-pendent-049",
+      "normalized": [
+        0.622037037,
+        0.294084976
+      ],
+      "displayPdfPtTopLeft": [
+        1612.32,
+        508.1788
+      ],
+      "score": 0.922664
+    },
+    {
+      "id": "wg-fp3-pendent-050",
+      "normalized": [
+        0.670740741,
+        0.294084976
+      ],
+      "displayPdfPtTopLeft": [
+        1738.56,
+        508.1788
+      ],
+      "score": 0.859171
+    },
+    {
+      "id": "wg-fp3-pendent-051",
+      "normalized": [
+        0.712407407,
+        0.294084976
+      ],
+      "displayPdfPtTopLeft": [
+        1846.56,
+        508.1788
+      ],
+      "score": 0.866658
+    },
+    {
+      "id": "wg-fp3-pendent-052",
+      "normalized": [
+        0.760925926,
+        0.294084976
+      ],
+      "displayPdfPtTopLeft": [
+        1972.32,
+        508.1788
+      ],
+      "score": 0.876967
+    },
+    {
+      "id": "wg-fp3-pendent-053",
+      "normalized": [
+        0.295185185,
+        0.294362677
+      ],
+      "displayPdfPtTopLeft": [
+        765.12,
+        508.6587
+      ],
+      "score": 0.855825
+    },
+    {
+      "id": "wg-fp3-pendent-054",
+      "normalized": [
+        0.322222222,
+        0.294362677
+      ],
+      "displayPdfPtTopLeft": [
+        835.2,
+        508.6587
+      ],
+      "score": 0.848085
+    },
+    {
+      "id": "wg-fp3-pendent-055",
+      "normalized": [
+        0.338703704,
+        0.304082199
+      ],
+      "displayPdfPtTopLeft": [
+        877.92,
+        525.454
+      ],
+      "score": 0.868785
+    },
+    {
+      "id": "wg-fp3-pendent-056",
+      "normalized": [
+        0.37,
+        0.304082199
+      ],
+      "displayPdfPtTopLeft": [
+        959.04,
+        525.454
+      ],
+      "score": 0.827775
+    },
+    {
+      "id": "wg-fp3-pendent-057",
+      "normalized": [
+        0.401111111,
+        0.304082199
+      ],
+      "displayPdfPtTopLeft": [
+        1039.68,
+        525.454
+      ],
+      "score": 0.876341
+    },
+    {
+      "id": "wg-fp3-pendent-058",
+      "normalized": [
+        0.444074074,
+        0.304082199
+      ],
+      "displayPdfPtTopLeft": [
+        1151.04,
+        525.454
+      ],
+      "score": 0.901451
+    },
+    {
+      "id": "wg-fp3-pendent-059",
+      "normalized": [
+        0.482222222,
+        0.304082199
+      ],
+      "displayPdfPtTopLeft": [
+        1249.92,
+        525.454
+      ],
+      "score": 0.831121
+    },
+    {
+      "id": "wg-fp3-pendent-060",
+      "normalized": [
+        0.523888889,
+        0.304082199
+      ],
+      "displayPdfPtTopLeft": [
+        1357.92,
+        525.454
+      ],
+      "score": 0.837681
+    },
+    {
+      "id": "wg-fp3-pendent-061",
+      "normalized": [
+        0.248888889,
+        0.309913913
+      ],
+      "displayPdfPtTopLeft": [
+        645.12,
+        535.5312
+      ],
+      "score": 0.774854
+    },
+    {
+      "id": "wg-fp3-pendent-062",
+      "normalized": [
+        0.171666667,
+        0.314912524
+      ],
+      "displayPdfPtTopLeft": [
+        444.96,
+        544.1688
+      ],
+      "score": 0.86599
+    },
+    {
+      "id": "wg-fp3-pendent-063",
+      "normalized": [
+        0.203703704,
+        0.314912524
+      ],
+      "displayPdfPtTopLeft": [
+        528.0,
+        544.1688
+      ],
+      "score": 0.873681
+    },
+    {
+      "id": "wg-fp3-pendent-064",
+      "normalized": [
+        0.129259259,
+        0.317134129
+      ],
+      "displayPdfPtTopLeft": [
+        335.04,
+        548.0078
+      ],
+      "score": 0.976751
+    },
+    {
+      "id": "wg-fp3-pendent-065",
+      "normalized": [
+        0.146666667,
+        0.317134129
+      ],
+      "displayPdfPtTopLeft": [
+        380.16,
+        548.0078
+      ],
+      "score": 0.855433
+    },
+    {
+      "id": "wg-fp3-pendent-066",
+      "normalized": [
+        0.235740741,
+        0.31741183
+      ],
+      "displayPdfPtTopLeft": [
+        611.04,
+        548.4876
+      ],
+      "score": 0.943116
+    },
+    {
+      "id": "wg-fp3-pendent-067",
+      "normalized": [
+        0.267037037,
+        0.320466537
+      ],
+      "displayPdfPtTopLeft": [
+        692.16,
+        553.7662
+      ],
+      "score": 0.898052
+    },
+    {
+      "id": "wg-fp3-pendent-068",
+      "normalized": [
+        0.301666667,
+        0.320466537
+      ],
+      "displayPdfPtTopLeft": [
+        781.92,
+        553.7662
+      ],
+      "score": 0.712594
+    },
+    {
+      "id": "wg-fp3-pendent-069",
+      "normalized": [
+        0.129259259,
+        0.351291308
+      ],
+      "displayPdfPtTopLeft": [
+        335.04,
+        607.0314
+      ],
+      "score": 0.911001
+    },
+    {
+      "id": "wg-fp3-pendent-070",
+      "normalized": [
+        0.15,
+        0.351291308
+      ],
+      "displayPdfPtTopLeft": [
+        388.8,
+        607.0314
+      ],
+      "score": 0.883476
+    },
+    {
+      "id": "wg-fp3-pendent-071",
+      "normalized": [
+        0.171666667,
+        0.351291308
+      ],
+      "displayPdfPtTopLeft": [
+        444.96,
+        607.0314
+      ],
+      "score": 0.89634
+    },
+    {
+      "id": "wg-fp3-pendent-072",
+      "normalized": [
+        0.203703704,
+        0.351291308
+      ],
+      "displayPdfPtTopLeft": [
+        528.0,
+        607.0314
+      ],
+      "score": 0.901682
+    },
+    {
+      "id": "wg-fp3-pendent-073",
+      "normalized": [
+        0.573518519,
+        0.366842544
+      ],
+      "displayPdfPtTopLeft": [
+        1486.56,
+        633.9039
+      ],
+      "score": 0.78844
+    },
+    {
+      "id": "wg-fp3-pendent-074",
+      "normalized": [
+        0.622037037,
+        0.366842544
+      ],
+      "displayPdfPtTopLeft": [
+        1612.32,
+        633.9039
+      ],
+      "score": 0.851631
+    },
+    {
+      "id": "wg-fp3-pendent-075",
+      "normalized": [
+        0.670555556,
+        0.366842544
+      ],
+      "displayPdfPtTopLeft": [
+        1738.08,
+        633.9039
+      ],
+      "score": 0.814726
+    },
+    {
+      "id": "wg-fp3-pendent-076",
+      "normalized": [
+        0.712407407,
+        0.366842544
+      ],
+      "displayPdfPtTopLeft": [
+        1846.56,
+        633.9039
+      ],
+      "score": 0.834057
+    },
+    {
+      "id": "wg-fp3-pendent-077",
+      "normalized": [
+        0.760925926,
+        0.366842544
+      ],
+      "displayPdfPtTopLeft": [
+        1972.32,
+        633.9039
+      ],
+      "score": 0.848447
+    },
+    {
+      "id": "wg-fp3-pendent-078",
+      "normalized": [
+        0.248888889,
+        0.367120244
+      ],
+      "displayPdfPtTopLeft": [
+        645.12,
+        634.3838
+      ],
+      "score": 0.771572
+    },
+    {
+      "id": "wg-fp3-pendent-079",
+      "normalized": [
+        0.267037037,
+        0.367120244
+      ],
+      "displayPdfPtTopLeft": [
+        692.16,
+        634.3838
+      ],
+      "score": 0.934824
+    },
+    {
+      "id": "wg-fp3-pendent-080",
+      "normalized": [
+        0.301666667,
+        0.367120244
+      ],
+      "displayPdfPtTopLeft": [
+        781.92,
+        634.3838
+      ],
+      "score": 0.763978
+    },
+    {
+      "id": "wg-fp3-pendent-081",
+      "normalized": [
+        0.235740741,
+        0.369341849
+      ],
+      "displayPdfPtTopLeft": [
+        611.04,
+        638.2227
+      ],
+      "score": 0.891011
+    },
+    {
+      "id": "wg-fp3-pendent-082",
+      "normalized": [
+        0.338703704,
+        0.36961955
+      ],
+      "displayPdfPtTopLeft": [
+        877.92,
+        638.7026
+      ],
+      "score": 0.904463
+    },
+    {
+      "id": "wg-fp3-pendent-083",
+      "normalized": [
+        0.37,
+        0.36961955
+      ],
+      "displayPdfPtTopLeft": [
+        959.04,
+        638.7026
+      ],
+      "score": 0.791248
+    },
+    {
+      "id": "wg-fp3-pendent-084",
+      "normalized": [
+        0.401111111,
+        0.36961955
+      ],
+      "displayPdfPtTopLeft": [
+        1039.68,
+        638.7026
+      ],
+      "score": 0.919572
+    },
+    {
+      "id": "wg-fp3-pendent-085",
+      "normalized": [
+        0.444074074,
+        0.36961955
+      ],
+      "displayPdfPtTopLeft": [
+        1151.04,
+        638.7026
+      ],
+      "score": 0.9379
+    },
+    {
+      "id": "wg-fp3-pendent-086",
+      "normalized": [
+        0.482222222,
+        0.36961955
+      ],
+      "displayPdfPtTopLeft": [
+        1249.92,
+        638.7026
+      ],
+      "score": 0.881837
+    },
+    {
+      "id": "wg-fp3-pendent-087",
+      "normalized": [
+        0.523888889,
+        0.36961955
+      ],
+      "displayPdfPtTopLeft": [
+        1357.92,
+        638.7026
+      ],
+      "score": 0.675746
+    },
+    {
+      "id": "wg-fp3-pendent-088",
+      "normalized": [
+        0.155555556,
+        0.380449875
+      ],
+      "displayPdfPtTopLeft": [
+        403.2,
+        657.4174
+      ],
+      "score": 0.615161
+    },
+    {
+      "id": "wg-fp3-pendent-089",
+      "normalized": [
+        0.122222222,
+        0.392391002
+      ],
+      "displayPdfPtTopLeft": [
+        316.8,
+        678.0517
+      ],
+      "score": 0.868509
+    },
+    {
+      "id": "wg-fp3-pendent-090",
+      "normalized": [
+        0.157037037,
+        0.392391002
+      ],
+      "displayPdfPtTopLeft": [
+        407.04,
+        678.0517
+      ],
+      "score": 0.878209
+    },
+    {
+      "id": "wg-fp3-pendent-091",
+      "normalized": [
+        0.203703704,
+        0.392391002
+      ],
+      "displayPdfPtTopLeft": [
+        528.0,
+        678.0517
+      ],
+      "score": 0.864203
+    },
+    {
+      "id": "wg-fp3-pendent-092",
+      "normalized": [
+        0.267037037,
+        0.414051652
+      ],
+      "displayPdfPtTopLeft": [
+        692.16,
+        715.4813
+      ],
+      "score": 0.973056
+    },
+    {
+      "id": "wg-fp3-pendent-093",
+      "normalized": [
+        0.301666667,
+        0.414051652
+      ],
+      "displayPdfPtTopLeft": [
+        781.92,
+        715.4813
+      ],
+      "score": 0.761641
+    },
+    {
+      "id": "wg-fp3-pendent-094",
+      "normalized": [
+        0.338703704,
+        0.430158289
+      ],
+      "displayPdfPtTopLeft": [
+        877.92,
+        743.3135
+      ],
+      "score": 0.882344
+    },
+    {
+      "id": "wg-fp3-pendent-095",
+      "normalized": [
+        0.37,
+        0.430158289
+      ],
+      "displayPdfPtTopLeft": [
+        959.04,
+        743.3135
+      ],
+      "score": 0.838281
+    },
+    {
+      "id": "wg-fp3-pendent-096",
+      "normalized": [
+        0.401111111,
+        0.430158289
+      ],
+      "displayPdfPtTopLeft": [
+        1039.68,
+        743.3135
+      ],
+      "score": 0.887512
+    },
+    {
+      "id": "wg-fp3-pendent-097",
+      "normalized": [
+        0.444074074,
+        0.430158289
+      ],
+      "displayPdfPtTopLeft": [
+        1151.04,
+        743.3135
+      ],
+      "score": 0.915424
+    },
+    {
+      "id": "wg-fp3-pendent-098",
+      "normalized": [
+        0.482222222,
+        0.430158289
+      ],
+      "displayPdfPtTopLeft": [
+        1249.92,
+        743.3135
+      ],
+      "score": 0.854248
+    },
+    {
+      "id": "wg-fp3-pendent-099",
+      "normalized": [
+        0.523888889,
+        0.430158289
+      ],
+      "displayPdfPtTopLeft": [
+        1357.92,
+        743.3135
+      ],
+      "score": 0.851884
+    },
+    {
+      "id": "wg-fp3-pendent-100",
+      "normalized": [
+        0.280925926,
+        0.432102194
+      ],
+      "displayPdfPtTopLeft": [
+        728.16,
+        746.6726
+      ],
+      "score": 0.754435
+    },
+    {
+      "id": "wg-fp3-pendent-101",
+      "normalized": [
+        0.122222222,
+        0.434046098
+      ],
+      "displayPdfPtTopLeft": [
+        316.8,
+        750.0317
+      ],
+      "score": 0.868508
+    },
+    {
+      "id": "wg-fp3-pendent-102",
+      "normalized": [
+        0.143148148,
+        0.434046098
+      ],
+      "displayPdfPtTopLeft": [
+        371.04,
+        750.0317
+      ],
+      "score": 0.878209
+    },
+    {
+      "id": "wg-fp3-pendent-103",
+      "normalized": [
+        0.170925926,
+        0.434046098
+      ],
+      "displayPdfPtTopLeft": [
+        443.04,
+        750.0317
+      ],
+      "score": 0.728855
+    },
+    {
+      "id": "wg-fp3-pendent-104",
+      "normalized": [
+        0.203703704,
+        0.434046098
+      ],
+      "displayPdfPtTopLeft": [
+        528.0,
+        750.0317
+      ],
+      "score": 0.864204
+    },
+    {
+      "id": "wg-fp3-pendent-105",
+      "normalized": [
+        0.573518519,
+        0.439877812
+      ],
+      "displayPdfPtTopLeft": [
+        1486.56,
+        760.1089
+      ],
+      "score": 0.816352
+    },
+    {
+      "id": "wg-fp3-pendent-106",
+      "normalized": [
+        0.622037037,
+        0.439877812
+      ],
+      "displayPdfPtTopLeft": [
+        1612.32,
+        760.1089
+      ],
+      "score": 0.922665
+    },
+    {
+      "id": "wg-fp3-pendent-107",
+      "normalized": [
+        0.670740741,
+        0.439877812
+      ],
+      "displayPdfPtTopLeft": [
+        1738.56,
+        760.1089
+      ],
+      "score": 0.85917
+    },
+    {
+      "id": "wg-fp3-pendent-108",
+      "normalized": [
+        0.712407407,
+        0.439877812
+      ],
+      "displayPdfPtTopLeft": [
+        1846.56,
+        760.1089
+      ],
+      "score": 0.881587
+    },
+    {
+      "id": "wg-fp3-pendent-109",
+      "normalized": [
+        0.760925926,
+        0.439877812
+      ],
+      "displayPdfPtTopLeft": [
+        1972.32,
+        760.1089
+      ],
+      "score": 0.887771
+    },
+    {
+      "id": "wg-fp3-pendent-110",
+      "normalized": [
+        0.256666667,
+        0.442654818
+      ],
+      "displayPdfPtTopLeft": [
+        665.28,
+        764.9075
+      ],
+      "score": 0.885709
+    },
+    {
+      "id": "wg-fp3-pendent-111",
+      "normalized": [
+        0.235740741,
+        0.44765343
+      ],
+      "displayPdfPtTopLeft": [
+        611.04,
+        773.5451
+      ],
+      "score": 0.701621
+    },
+    {
+      "id": "wg-fp3-pendent-112",
+      "normalized": [
+        0.319074074,
+        0.452929742
+      ],
+      "displayPdfPtTopLeft": [
+        827.04,
+        782.6626
+      ],
+      "score": 0.868504
+    },
+    {
+      "id": "wg-fp3-pendent-113",
+      "normalized": [
+        0.280925926,
+        0.458206054
+      ],
+      "displayPdfPtTopLeft": [
+        728.16,
+        791.7801
+      ],
+      "score": 0.859168
+    },
+    {
+      "id": "wg-fp3-pendent-114",
+      "normalized": [
+        0.122037037,
+        0.474312691
+      ],
+      "displayPdfPtTopLeft": [
+        316.32,
+        819.6123
+      ],
+      "score": 0.844085
+    },
+    {
+      "id": "wg-fp3-pendent-115",
+      "normalized": [
+        0.163703704,
+        0.474312691
+      ],
+      "displayPdfPtTopLeft": [
+        424.32,
+        819.6123
+      ],
+      "score": 0.779343
+    },
+    {
+      "id": "wg-fp3-pendent-116",
+      "normalized": [
+        0.20537037,
+        0.474312691
+      ],
+      "displayPdfPtTopLeft": [
+        532.32,
+        819.6123
+      ],
+      "score": 0.787531
+    },
+    {
+      "id": "wg-fp3-pendent-117",
+      "normalized": [
+        0.548518519,
+        0.48708692
+      ],
+      "displayPdfPtTopLeft": [
+        1421.76,
+        841.6862
+      ],
+      "score": 0.900999
+    },
+    {
+      "id": "wg-fp3-pendent-118",
+      "normalized": [
+        0.254814815,
+        0.497361844
+      ],
+      "displayPdfPtTopLeft": [
+        660.48,
+        859.4413
+      ],
+      "score": 0.915
+    },
+    {
+      "id": "wg-fp3-pendent-119",
+      "normalized": [
+        0.296481481,
+        0.497361844
+      ],
+      "displayPdfPtTopLeft": [
+        768.48,
+        859.4413
+      ],
+      "score": 0.929438
+    },
+    {
+      "id": "wg-fp3-pendent-120",
+      "normalized": [
+        0.338148148,
+        0.497361844
+      ],
+      "displayPdfPtTopLeft": [
+        876.48,
+        859.4413
+      ],
+      "score": 0.929438
+    },
+    {
+      "id": "wg-fp3-pendent-121",
+      "normalized": [
+        0.383333333,
+        0.497361844
+      ],
+      "displayPdfPtTopLeft": [
+        993.6,
+        859.4413
+      ],
+      "score": 0.952214
+    },
+    {
+      "id": "wg-fp3-pendent-122",
+      "normalized": [
+        0.421481481,
+        0.497361844
+      ],
+      "displayPdfPtTopLeft": [
+        1092.48,
+        859.4413
+      ],
+      "score": 0.945213
+    },
+    {
+      "id": "wg-fp3-pendent-123",
+      "normalized": [
+        0.463148148,
+        0.497361844
+      ],
+      "displayPdfPtTopLeft": [
+        1200.48,
+        859.4413
+      ],
+      "score": 0.955902
+    },
+    {
+      "id": "wg-fp3-pendent-124",
+      "normalized": [
+        0.504814815,
+        0.497361844
+      ],
+      "displayPdfPtTopLeft": [
+        1308.48,
+        859.4413
+      ],
+      "score": 0.955902
+    },
+    {
+      "id": "wg-fp3-pendent-125",
+      "normalized": [
+        0.587037037,
+        0.501249653
+      ],
+      "displayPdfPtTopLeft": [
+        1521.6,
+        866.1594
+      ],
+      "score": 0.879951
+    },
+    {
+      "id": "wg-fp3-pendent-126",
+      "normalized": [
+        0.691296296,
+        0.501249653
+      ],
+      "displayPdfPtTopLeft": [
+        1791.84,
+        866.1594
+      ],
+      "score": 0.944023
+    },
+    {
+      "id": "wg-fp3-pendent-127",
+      "normalized": [
+        0.621851852,
+        0.506525965
+      ],
+      "displayPdfPtTopLeft": [
+        1611.84,
+        875.2769
+      ],
+      "score": 0.877293
+    },
+    {
+      "id": "wg-fp3-pendent-128",
+      "normalized": [
+        0.66,
+        0.506525965
+      ],
+      "displayPdfPtTopLeft": [
+        1710.72,
+        875.2769
+      ],
+      "score": 0.871131
+    },
+    {
+      "id": "wg-fp3-pendent-129",
+      "normalized": [
+        0.127777778,
+        0.509025271
+      ],
+      "displayPdfPtTopLeft": [
+        331.2,
+        879.5957
+      ],
+      "score": 0.97238
+    },
+    {
+      "id": "wg-fp3-pendent-130",
+      "normalized": [
+        0.162407407,
+        0.509025271
+      ],
+      "displayPdfPtTopLeft": [
+        420.96,
+        879.5957
+      ],
+      "score": 0.930741
+    },
+    {
+      "id": "wg-fp3-pendent-131",
+      "normalized": [
+        0.193703704,
+        0.509025271
+      ],
+      "displayPdfPtTopLeft": [
+        502.08,
+        879.5957
+      ],
+      "score": 0.967305
+    },
+    {
+      "id": "wg-fp3-pendent-132",
+      "normalized": [
+        0.235740741,
+        0.509858373
+      ],
+      "displayPdfPtTopLeft": [
+        611.04,
+        881.0353
+      ],
+      "score": 0.88968
+    },
+    {
+      "id": "wg-fp3-pendent-133",
+      "normalized": [
+        0.548518519,
+        0.52624271
+      ],
+      "displayPdfPtTopLeft": [
+        1421.76,
+        909.3474
+      ],
+      "score": 0.88596
+    },
+    {
+      "id": "wg-fp3-pendent-134",
+      "normalized": [
+        0.593148148,
+        0.528464315
+      ],
+      "displayPdfPtTopLeft": [
+        1537.44,
+        913.1863
+      ],
+      "score": 0.878451
+    },
+    {
+      "id": "wg-fp3-pendent-135",
+      "normalized": [
+        0.422407407,
+        0.531241322
+      ],
+      "displayPdfPtTopLeft": [
+        1094.88,
+        917.985
+      ],
+      "score": 0.922346
+    },
+    {
+      "id": "wg-fp3-pendent-136",
+      "normalized": [
+        0.266851852,
+        0.533462927
+      ],
+      "displayPdfPtTopLeft": [
+        691.68,
+        921.8239
+      ],
+      "score": 0.80257
+    },
+    {
+      "id": "wg-fp3-pendent-137",
+      "normalized": [
+        0.305555556,
+        0.533462927
+      ],
+      "displayPdfPtTopLeft": [
+        792.0,
+        921.8239
+      ],
+      "score": 0.794168
+    },
+    {
+      "id": "wg-fp3-pendent-138",
+      "normalized": [
+        0.344259259,
+        0.533462927
+      ],
+      "displayPdfPtTopLeft": [
+        892.32,
+        921.8239
+      ],
+      "score": 0.784585
+    },
+    {
+      "id": "wg-fp3-pendent-139",
+      "normalized": [
+        0.461851852,
+        0.533462927
+      ],
+      "displayPdfPtTopLeft": [
+        1197.12,
+        921.8239
+      ],
+      "score": 0.7034
+    },
+    {
+      "id": "wg-fp3-pendent-140",
+      "normalized": [
+        0.505925926,
+        0.533462927
+      ],
+      "displayPdfPtTopLeft": [
+        1311.36,
+        921.8239
+      ],
+      "score": 0.737407
+    },
+    {
+      "id": "wg-fp3-pendent-141",
+      "normalized": [
+        0.379444444,
+        0.533740628
+      ],
+      "displayPdfPtTopLeft": [
+        983.52,
+        922.3038
+      ],
+      "score": 0.689056
+    },
+    {
+      "id": "wg-fp3-pendent-142",
+      "normalized": [
+        0.692407407,
+        0.540127742
+      ],
+      "displayPdfPtTopLeft": [
+        1794.72,
+        933.3407
+      ],
+      "score": 0.866226
+    },
+    {
+      "id": "wg-fp3-pendent-143",
+      "normalized": [
+        0.127777778,
+        0.571507914
+      ],
+      "displayPdfPtTopLeft": [
+        331.2,
+        987.5657
+      ],
+      "score": 0.961557
+    },
+    {
+      "id": "wg-fp3-pendent-144",
+      "normalized": [
+        0.162407407,
+        0.571507914
+      ],
+      "displayPdfPtTopLeft": [
+        420.96,
+        987.5657
+      ],
+      "score": 0.919893
+    },
+    {
+      "id": "wg-fp3-pendent-145",
+      "normalized": [
+        0.193703704,
+        0.571507914
+      ],
+      "displayPdfPtTopLeft": [
+        502.08,
+        987.5657
+      ],
+      "score": 0.956478
+    },
+    {
+      "id": "wg-fp3-pendent-146",
+      "normalized": [
+        0.628703704,
+        0.571507914
+      ],
+      "displayPdfPtTopLeft": [
+        1629.6,
+        987.5657
+      ],
+      "score": 0.960577
+    },
+    {
+      "id": "wg-fp3-pendent-147",
+      "normalized": [
+        0.235740741,
+        0.572618717
+      ],
+      "displayPdfPtTopLeft": [
+        611.04,
+        989.4851
+      ],
+      "score": 0.875471
+    },
+    {
+      "id": "wg-fp3-pendent-148",
+      "normalized": [
+        0.656481481,
+        0.572896418
+      ],
+      "displayPdfPtTopLeft": [
+        1701.6,
+        989.965
+      ],
+      "score": 0.870988
+    },
+    {
+      "id": "wg-fp3-pendent-149",
+      "normalized": [
+        0.548518519,
+        0.577061927
+      ],
+      "displayPdfPtTopLeft": [
+        1421.76,
+        997.163
+      ],
+      "score": 0.856146
+    },
+    {
+      "id": "wg-fp3-pendent-150",
+      "normalized": [
+        0.692407407,
+        0.581782838
+      ],
+      "displayPdfPtTopLeft": [
+        1794.72,
+        1005.3207
+      ],
+      "score": 0.88527
+    },
+    {
+      "id": "wg-fp3-pendent-151",
+      "normalized": [
+        0.422407407,
+        0.583449042
+      ],
+      "displayPdfPtTopLeft": [
+        1094.88,
+        1008.1999
+      ],
+      "score": 0.821392
+    },
+    {
+      "id": "wg-fp3-pendent-152",
+      "normalized": [
+        0.429259259,
+        0.583449042
+      ],
+      "displayPdfPtTopLeft": [
+        1112.64,
+        1008.1999
+      ],
+      "score": 0.701437
+    },
+    {
+      "id": "wg-fp3-pendent-153",
+      "normalized": [
+        0.461851852,
+        0.585670647
+      ],
+      "displayPdfPtTopLeft": [
+        1197.12,
+        1012.0389
+      ],
+      "score": 0.823575
+    },
+    {
+      "id": "wg-fp3-pendent-154",
+      "normalized": [
+        0.505925926,
+        0.585670647
+      ],
+      "displayPdfPtTopLeft": [
+        1311.36,
+        1012.0389
+      ],
+      "score": 0.854099
+    },
+    {
+      "id": "wg-fp3-pendent-155",
+      "normalized": [
+        0.593148148,
+        0.585670647
+      ],
+      "displayPdfPtTopLeft": [
+        1537.44,
+        1012.0389
+      ],
+      "score": 0.931528
+    },
+    {
+      "id": "wg-fp3-pendent-156",
+      "normalized": [
+        0.266851852,
+        0.590946959
+      ],
+      "displayPdfPtTopLeft": [
+        691.68,
+        1021.1563
+      ],
+      "score": 0.768341
+    },
+    {
+      "id": "wg-fp3-pendent-157",
+      "normalized": [
+        0.305555556,
+        0.590946959
+      ],
+      "displayPdfPtTopLeft": [
+        792.0,
+        1021.1563
+      ],
+      "score": 0.687493
+    },
+    {
+      "id": "wg-fp3-pendent-158",
+      "normalized": [
+        0.344259259,
+        0.590946959
+      ],
+      "displayPdfPtTopLeft": [
+        892.32,
+        1021.1563
+      ],
+      "score": 0.749857
+    },
+    {
+      "id": "wg-fp3-pendent-159",
+      "normalized": [
+        0.379444444,
+        0.590946959
+      ],
+      "displayPdfPtTopLeft": [
+        983.52,
+        1021.1563
+      ],
+      "score": 0.707477
+    }
+  ],
+  "projectionReady": false,
+  "complianceReady": false,
+  "status": "passed",
+  "receiptSha256": "458c5af81950028f2a8eca8a0d683c438e39729280bc19113df0ece7ae8be9e7"
+}
