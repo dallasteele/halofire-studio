@@ -1,5 +1,5 @@
 {
-  "status": "local_verified",
+  "status": "slice_complete",
   "iteration": 2,
   "truth": [
     "S-020, S-021, and the toy framing sheet contain 35 exact gray-filled slope-roof hatch drawings split into 48 source triangles.",
@@ -11,16 +11,18 @@
   "remaining": [
     "Bind each structural face to its actual pitch direction and absolute datum from asymmetric source controls",
     "Resolve the toy-garage horizontal mirror with an asymmetric source control",
-    "Deploy and verify the live authenticated surface",
     "Continue the global master goal through complete pitched 3D routing, Bluebeam output, AutoBid workflow, and employee transcript parity"
   ],
   "verification": {
     "runtimeReceiptSha256": "c4dfb49fddb1440d872334854a8c5838e590d46f858225be149abfa40940899b",
+    "featureCommit": "359063435a5bb6d97c6833aa69b2be46e60e2c1b",
     "focusedTests": "74 passed across the complete Dillon and submitted-calibration matrix",
     "productionBuild": "passed",
     "agenticRules": "passed",
     "loopGuard": "passed",
-    "browser": "authenticated login redirected to workbench; Studio rendered exact roof footprint view and fail-closed counts with zero console warnings or errors",
+    "browser": "authenticated local login redirected to workbench; Studio rendered exact roof footprint view and fail-closed counts with zero console warnings or errors; live login page exposed all sign-in controls with zero browser warnings or errors",
+    "live": "VPS fast-forwarded to 35906343; halofire.service active; public health, login, and Studio returned 200; live admin login, auth/me, and protected structural-roof endpoint returned 200 with receipt parity",
+    "brainEpisodeId": 125723,
     "claim": "registered structural slope-roof footprints only; zero unproven structural planes promoted to 3D"
   },
   "globalGoalComplete": false
