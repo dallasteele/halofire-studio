@@ -1,15 +1,16 @@
 {
   "name": "dallas-pitched-attic-hydraulic-registration-20260713",
-  "iteration": 2,
-  "status": "in_progress",
-  "updatedAt": "2026-07-13T10:12:00-07:00",
+  "iteration": 3,
+  "status": "completed",
+  "updatedAt": "2026-07-13T10:22:00-07:00",
   "completedStages": [
     "DISCOVER",
     "PLAN",
     "EXECUTE",
-    "VERIFY"
+    "VERIFY",
+    "ITERATE"
   ],
-  "nextStage": "DEPLOY",
+  "nextStage": null,
   "sourceEvidence": {
     "reviewedAtticCalculationSha256": "1398effb82f6f8bdc8a2a7d40e044ab593362497f0bbf4daf15218bff9a1b88d",
     "completedAsBuiltPlanSha256": "39ef506decf2f9a963cf5ed1ffee4b8f63998da12a8aa7e4e34c5433fd242ea7"
@@ -36,5 +37,19 @@
     ],
     "bluebeamFdfSha256": "dbb5979c631f02deac13ac99f9f130d484fc431e88e4e4ecd4a0a48fee5e695b"
   },
-  "nextAction": "Complete the post-route full-suite replay, commit, deploy to the VPS, and run live login plus authenticated evidence/FDF smokes."
+  "deployment": {
+    "featureCommit": "f76dd21f70d7c4f4d3f17fcb87623850778ce9ca",
+    "host": "halofire.rankempire.io",
+    "service": "halofire.service active",
+    "publicHealthStatus": 200,
+    "publicLoginStatus": 200,
+    "loginBytes": 58981,
+    "authenticatedLoginStatus": 200,
+    "authenticatedEvidenceStatus": 200,
+    "authenticatedBluebeamStatus": 200,
+    "liveBluebeamFdfBytes": 6005,
+    "liveBluebeamFdfSha256": "dbb5979c631f02deac13ac99f9f130d484fc431e88e4e4ecd4a0a48fee5e695b",
+    "loginVisual": "1280 px body equals viewport, required controls present, no deprecated text, no console warnings or errors"
+  },
+  "nextAction": "Continue the master goal from the next fail-closed whole-building sprinkler-design lane; do not reinterpret this completed calibration subset as whole-building compliance or fabrication release."
 }

@@ -1385,3 +1385,32 @@ User direction across 4 messages this session:
 - Shared-brain writeback succeeded as episode 138985. The broader master goal
   remains active; the existing 1881 whole-building PDF footprint test still
   reports area over-capture and is not a completed lane.
+
+### Entry 41 - Dallas pitched-attic hydraulic and Bluebeam visual proof
+
+- Bound the completed Dallas FP-1.4 Remote Area 5 drawing to its reviewed attic
+  calculation and as-built plan set: nine operating sprinklers A1-A9, eight
+  reproducible 2-inch branch edges, two hydraulic elevation classes, 4:12 roof,
+  and 334.913 gpm at 46.453 psi. The reviewed and as-built proof crop hashes are
+  identical with zero changed pixels.
+- Added a deterministic Bluebeam FDF overlay on physical page 5 with nine head,
+  eight pipe, and one evidence-note annotation. The live artifact is 6,005 bytes
+  with SHA-256 `dbb5979c631f02deac13ac99f9f130d484fc431e88e4e4ecd4a0a48fee5e695b`.
+  Its authenticated API route and local source-versus-overlay proof board passed.
+- Replayed the application-rendered Cooperative 1881 PDF-to-3D path and captured
+  all eight distinct A-101 through A-108 source-bound footprints stacked at the
+  A-201 elevations over the registered plan underlay. This is building-geometry
+  proof; sprinkler compliance remains a separate gate.
+- The two-project Dallas plus Winter Garden portfolio promotes only completed
+  pitched-hydraulic geometry registration. Dallas-only per-head identity and
+  nominal-size claims do not cross the two-project threshold; whole-building,
+  exact field deflector, obstruction, fabrication, and compliance gates remain false.
+- Verification passed: 23 focused tests, 184-file/1,731-test full Vitest run,
+  20 node-native tests, production build, loop guard, agentic-rule verifier,
+  rendered visual inspection, and Lean 4.13.0 theorem
+  `dallasPitchedPortfolioFailClosed` in 66 ms.
+- Deployed feature commit `f76dd21f70d7c4f4d3f17fcb87623850778ce9ca`.
+  Public health and login returned 200; the 58,981-byte login had all required
+  controls, no overflow, deprecated text, warning, or error. Real admin auth,
+  the two-project evidence route, and the FDF download returned 200, and the
+  downloaded live FDF hash matched the local deterministic artifact exactly.
