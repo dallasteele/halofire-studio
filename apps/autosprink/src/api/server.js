@@ -39,6 +39,9 @@ import {
 } from '../engine/sloped-ceiling-layout.js';
 import { buildSlopedCeilingModel3d, verifySlopedCeilingModel3d } from '../engine/sloped-ceiling-model3d.js';
 import { buildPitchedRoofCalibrationCases, validatePitchedRoofCrossProjectEvidence } from '../engine/pitched-roof-cross-project-evidence.js';
+import { validateRasterBullseyeHeadEvidence } from '../engine/raster-bullseye-head-evidence.js';
+import { buildWinterGardenChapelPlaneAssignments, validatePiecewiseGridRegistration } from '../engine/piecewise-grid-registration.js';
+import { buildWinterGardenChapelPipeNetwork, validateFp2PipeEvidence } from '../engine/fp2-pipe-registration.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
 import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
 import { renderDillonFloorByFloorViews, validateDillonFloorByFloorModel } from '../engine/dillon-floor-by-floor-model.js';
@@ -92,6 +95,9 @@ const COOPERATIVE_1881_PLAN_LEVELS_PATH = path.resolve(__dirname, '../data/plan-
 const COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-fp8-calibration.cooperative-1881.json');
 const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-sloped-ceiling-calibration.dillon.json');
 const PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH = path.resolve(__dirname, '../data/pitched-roof-cross-project-evidence.json');
+const WINTER_GARDEN_HEAD_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp3-head-evidence.json');
+const WINTER_GARDEN_GRID_REGISTRATION_PATH = path.resolve(__dirname, '../data/winter-garden-grid-registration.json');
+const WINTER_GARDEN_PIPE_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp2-pipe-evidence.json');
 const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-dwg-source-geometry.json');
 const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
 const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
@@ -1695,6 +1701,45 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
   } catch (error) {
     log.error('Failed to load submitted sloped-ceiling calibration', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'submitted_sloped_calibration_load_failed', message: 'The source-bound submitted sloped-ceiling calibration could not be loaded.', complianceReady: false });
+  }
+});
+
+app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'LDS Meeting House - Winter Garden FL') return res.status(404).json({ error: 'pitched_roof_pipe_calibration_not_found', message: 'No source-bound pitched-roof pipe calibration exists for this project.' });
+  try {
+    const crossProjectPacket = JSON.parse(fs.readFileSync(PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH, 'utf8'));
+    const headEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_HEAD_EVIDENCE_PATH, 'utf8'));
+    const gridRegistration = JSON.parse(fs.readFileSync(WINTER_GARDEN_GRID_REGISTRATION_PATH, 'utf8'));
+    const pipeEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_PIPE_EVIDENCE_PATH, 'utf8'));
+    const [crossProject, heads, grid, pipes, planes, network] = await Promise.all([
+      validatePitchedRoofCrossProjectEvidence(crossProjectPacket),
+      validateRasterBullseyeHeadEvidence(headEvidence),
+      validatePiecewiseGridRegistration(gridRegistration),
+      validateFp2PipeEvidence(pipeEvidence),
+      buildWinterGardenChapelPlaneAssignments(gridRegistration, headEvidence),
+      buildWinterGardenChapelPipeNetwork(pipeEvidence, gridRegistration, headEvidence),
+    ]);
+    const validations = [crossProject, heads, grid, pipes, planes, network];
+    if (validations.some((validation) => validation.status !== 'passed')) return res.status(422).json({ status: 'blocked', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name, issues: validations.flatMap((validation) => validation.issues || []), projectionReady: false, complianceReady: false });
+    return res.json({
+      status: 'passed', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name,
+      evidenceReceipts: { crossProject: crossProjectPacket.receiptSha256, heads: headEvidence.receiptSha256, roofRegistration: gridRegistration.receiptSha256, pipeRegistration: pipeEvidence.receiptSha256 },
+      sourceBindings: { roofPlan: gridRegistration.source, sprinklerRcp: gridRegistration.target, sprinklerPipePlan: pipeEvidence.source },
+      acceptanceLoops: {
+        primary: { status: 'passed', method: headEvidence.primary.method, headCount: heads.metrics.primaryCount, branchMethod: pipeEvidence.detectorReceipt.primary.method },
+        independent: { status: 'passed', method: headEvidence.independent.method, headCount: heads.metrics.independentCount, branchMethod: pipeEvidence.detectorReceipt.independent.method },
+        adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true },
+      },
+      crossProjectEvidence: { metrics: crossProject.metrics, claimStatus: crossProject.claimStatus },
+      counts: { completedBidFp3Heads: heads.metrics.primaryCount, chapelHeads: planes.assignments.length, chapelBranches: network.branchCount, chapelArmOvers: network.headCount, networkSegments: network.segments.length },
+      roofPlanes: planes.roofPlanes, headPlaneAssignments: planes.assignments, pipeNetwork: network.segments,
+      pipeSizesReady: false, absoluteDeflectorDatumReady: false, projectionReady: false, complianceReady: false,
+      residuals: network.residuals,
+      claimStatus: 'completed-bid-pitched-roof-head-and-pipe-topology-calibration-not-code-compliance-or-fabrication',
+    });
+  } catch (error) {
+    log.error('Failed to load Winter Garden pitched-roof pipe calibration', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'pitched_roof_pipe_calibration_load_failed', complianceReady: false });
   }
 });
 

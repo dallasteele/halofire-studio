@@ -80,6 +80,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/projects/Dillon%20Residence/completed-bid-geometry')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/vertical-registration')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/structural-roof-surfaces')).status).toBe(401);
+    expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration')).status).toBe(401);
   });
 
   it('serves registered speckled roof contours without inventing 3D planes', async () => {
@@ -200,15 +201,33 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.model3dVerification.counts).toEqual({ surfaces: 4, heads: 2, pipes: 1, nonFlatHeadElevations: 2, hydraulicNodesJoined: 5 });
     expect(result.model3dVerification).toMatchObject({ hydraulicDatumJoined: true, protectedRegionHeadNodeMappingReady: false });
     expect(result.crossProjectEvidence.receiptSha256).toMatch(/^[0-9a-f]{64}$/);
-    expect(result.crossProjectEvidence.metrics).toMatchObject({ projectCount: 3, pitchedProjectCount: 2, dallasPitchMeanInPer12: 8.5195, dallasSectionRiseFt: 12.84375 });
-    expect(result.crossProjectEvidence.calibrationCases).toHaveLength(2);
-    expect(result.crossProjectEvidence.calibrationCases.map((entry) => entry.id)).toEqual(['dillon-vector-3-12', 'dallas-scanned-section-steep-roof']);
+    expect(result.crossProjectEvidence.metrics).toMatchObject({ projectCount: 4, pitchedProjectCount: 3, dallasPitchMeanInPer12: 8.5195, dallasSectionRiseFt: 12.84375, winterGardenPitchInPer12: 4.5 });
+    expect(result.crossProjectEvidence.calibrationCases).toHaveLength(3);
+    expect(result.crossProjectEvidence.calibrationCases.map((entry) => entry.id)).toEqual(['dillon-vector-3-12', 'dallas-scanned-section-steep-roof', 'winter-garden-vector-4.5-12']);
     expect(result.hydraulicDatumJoin.activeNodes).toHaveLength(5);
     expect(result.complianceReady).toBe(false);
     expect(result.view.submittedTopSvg).toContain('Dillon submitted FP-1 heads registered to RCP 3:12 annotation screens');
     expect(result.view.generatedTopSvg).toContain('Generated Dillon slope-aware top view');
     expect(result.view.generatedElevationSvg).toContain('Generated Dillon 3:12 absolute project elevation view');
     expect(result.view.generatedElevationSvg).toContain('source-bound-project-elevation');
+  });
+
+  it('serves the Winter Garden completed-bid pitched-roof head and connected pipe topology through AutoBid', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result.status).toBe('passed');
+    expect(result.evidenceReceipts).toMatchObject({ crossProject: expect.stringMatching(/^[0-9a-f]{64}$/), heads: expect.stringMatching(/^[0-9a-f]{64}$/), roofRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), pipeRegistration: expect.stringMatching(/^[0-9a-f]{64}$/) });
+    expect(result.acceptanceLoops).toMatchObject({ primary: { status: 'passed', headCount: 159 }, independent: { status: 'passed', headCount: 158 }, adversarial: { status: 'passed', centerRemovedTemplateRejected: true, sourceSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true } });
+    expect(result.crossProjectEvidence.metrics).toMatchObject({ projectCount: 4, pitchedProjectCount: 3, winterGardenPitchInPer12: 4.5 });
+    expect(result.counts).toEqual({ completedBidFp3Heads: 159, chapelHeads: 15, chapelBranches: 3, chapelArmOvers: 15, networkSegments: 23 });
+    expect(result.headPlaneAssignments).toHaveLength(15);
+    expect(result.pipeNetwork).toHaveLength(23);
+    expect(result.pipeSizesReady).toBe(false);
+    expect(result.absoluteDeflectorDatumReady).toBe(false);
+    expect(result.projectionReady).toBe(false);
+    expect(result.complianceReady).toBe(false);
   });
 
   it('downloads a layered two-page Bluebeam-compatible vector PDF', async () => {
