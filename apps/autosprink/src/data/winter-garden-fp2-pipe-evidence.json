@@ -1,0 +1,62 @@
+{
+  "artifactType": "halofire.winter-garden-fp2-pipe-evidence.v1",
+  "projectId": "winter-garden-meetinghouse",
+  "source": {
+    "sheetId": "FP2",
+    "pdfSha256": "ac052124095f73e3529fd63906127bac9c2cf3b3f6abd45222c5125fa4195977",
+    "renderedSha256": "b72b609d35e6db71d7f15c82a2174dcc337ce7fb86e8e32dee25ef7e12177744",
+    "renderedSizePx": [5400, 3601]
+  },
+  "target": {
+    "sheetId": "FP3",
+    "pdfSha256": "93f8df04bc84ac817ecd2e222812fede93565879094c66b4d7511f783631543e",
+    "renderedSha256": "c08f646e35fe14af5367b6a38fb378ce6f89e8773d50e849a95af7800d14b3a2",
+    "renderedSizePx": [5400, 3601]
+  },
+  "gridX": {
+    "labels": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"],
+    "sourcePx": [661.0, 1160.2, 1273.0, 1419.4, 1499.8, 2013.4, 2689.0, 2917.0, 2996.2, 3167.8, 3243.4, 3298.6, 3927.4, 3983.8, 4346.2, 4439.8],
+    "targetPx": [572.2, 1071.4, 1185.4, 1329.4, 1409.8, 1923.4, 2600.2, 2828.2, 2906.2, 3079.0, 3154.6, 3208.6, 3838.6, 3893.8, 4257.4, 4349.8]
+  },
+  "gridY": {
+    "labels": ["A", "B", "C", "D", "E", "F", "G", "H"],
+    "sourcePx": [483.4, 802.6, 873.4, 943.0, 1721.8, 1790.2, 1862.2, 2182.6],
+    "targetPx": [473.4, 792.6, 863.4, 933.0, 1711.8, 1780.2, 1852.2, 2172.6]
+  },
+  "registration": {
+    "mode": "paired-labeled-grid-translation",
+    "meanDeltaPx": [89.25, 10.0],
+    "maxControlResidualPx": [1.65, 0.0]
+  },
+  "detectorReceipt": {
+    "primary": {
+      "method": "horizontal-line-open-plus-probabilistic-hough",
+      "branchRowsPx": [1081, 1343, 1585]
+    },
+    "independent": {
+      "method": "registered-raster-residual-occupancy",
+      "ninePixelBandBlackRatios": [0.027713, 0.059397, 0.021495],
+      "minimumAcceptedRatio": 0.015
+    },
+    "adversarial": {
+      "sourceSubstitutionRejected": true,
+      "registrationDriftRejected": true,
+      "disconnectedTopologyRejected": true
+    }
+  },
+  "segments": [
+    {"id": "branch-north", "kind": "branch", "fromPx": [3003, 1081], "toPx": [4289, 1081], "plane": "chapel-north-slope"},
+    {"id": "branch-ridge", "kind": "branch", "fromPx": [2947, 1343], "toPx": [4401, 1343], "plane": "chapel-ridge"},
+    {"id": "branch-south", "kind": "branch", "fromPx": [3003, 1585], "toPx": [4289, 1585], "plane": "chapel-south-slope"},
+    {"id": "main-north", "kind": "main", "fromPx": [3886, 800], "toPx": [3886, 1303]},
+    {"id": "main-jog-upper", "kind": "main-jog", "fromPx": [3886, 1297], "toPx": [3911, 1297]},
+    {"id": "main-middle", "kind": "main", "fromPx": [3911, 1291], "toPx": [3911, 1475]},
+    {"id": "main-jog-lower", "kind": "main-jog", "fromPx": [3911, 1448], "toPx": [3886, 1448]},
+    {"id": "main-south", "kind": "main", "fromPx": [3886, 1420], "toPx": [3886, 1773]}
+  ],
+  "pipeSizesReady": false,
+  "absoluteDeflectorDatumReady": false,
+  "projectionReady": false,
+  "complianceReady": false,
+  "receiptSha256": "44ecf142b388c63b14bb2b3aca89d98b612eae74a33c12e953ef9f6f84e708af"
+}
