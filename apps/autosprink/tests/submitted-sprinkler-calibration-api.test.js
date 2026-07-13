@@ -84,6 +84,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/evidence/completed-hydraulic-network-vertical')).status).toBe(401);
     expect((await request('/api/evidence/completed-active-hydraulic-plan-registration')).status).toBe(401);
     expect((await request('/api/evidence/completed-hydraulic-routed-plan-registration')).status).toBe(401);
+    expect((await request('/api/evidence/completed-hydraulic-sized-3d-registration')).status).toBe(401);
     expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration')).status).toBe(401);
     expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration-bluebeam.pdf')).status).toBe(401);
   });
@@ -145,6 +146,25 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.projects[1].nodes).toHaveLength(19);
     expect(result.projects[0].pipes).toHaveLength(20);
     expect(result.projects[1].pipes).toHaveLength(18);
+    expect(result.adversarialLoops.every((loop) => loop.status === 'passed')).toBe(true);
+  });
+
+  it('serves two-project hydraulic inside-diameter 3D edge registration', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/evidence/completed-hydraulic-sized-3d-registration', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result).toMatchObject({
+      status: 'passed', projectCount: 2,
+      counts: { registeredNodes: 26, registeredEdges: 23, verticalEdges: 3, diameterObservations: 23 },
+      featurePromotion: { hydraulic_inside_diameter_3d_edge_registration: { ready: true, projectCount: 2, projects: ['mit-riverside-dugout-h', 'gmr-ambulance-center-payson'] } },
+      nominalPipeSizeReady: false, fullHydraulicPlanRegistrationReady: false, fabricationCutLengthReady: false,
+      wholeBuildingNetworkElevationReady: false, exactAsBuiltDeflectorElevationReady: false, complianceReady: false,
+    });
+    expect(result.projects[0].edges).toHaveLength(20);
+    expect(result.projects[1].edges).toHaveLength(3);
+    expect(result.projects[1].diameterClasses).toEqual([1.101, 1.598]);
+    expect(result.projects[0].views.sideSvg).toContain('not nominal size');
     expect(result.adversarialLoops.every((loop) => loop.status === 'passed')).toBe(true);
   });
 

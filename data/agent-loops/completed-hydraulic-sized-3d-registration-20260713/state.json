@@ -1,0 +1,39 @@
+{
+  "name": "completed-hydraulic-sized-3d-registration-20260713",
+  "iteration": 1,
+  "status": "in_progress",
+  "updatedAt": "2026-07-13T15:50:00-07:00",
+  "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY"],
+  "nextStage": "ITERATE",
+  "processNotes": [
+    "This continuation inherited an active goal after a Codex restart.",
+    "Loop-contract validation was missed before the first source edit; the omission was recorded and the bounded contract passed AGENT_LOOP_GUARD before release actions continued."
+  ],
+  "sourceEvidence": {
+    "projectCount": 2,
+    "projects": ["mit-riverside-dugout-h", "gmr-ambulance-center-payson"],
+    "registeredEdges": 23,
+    "gmrPromotedPipeIds": [1, 5, 8],
+    "gmrExcludedReason": "Other calculated loop routes do not reproduce the dated HASS report within the sealed completed-plan tolerance."
+  },
+  "verification": {
+    "focusedTests": "24 passed",
+    "fullTests": "181 files, 1715 tests passed",
+    "productionBuild": "passed",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "formalProof": "FORMAL_PROOF_BLOCKED: GET http://127.0.0.1:8810/api/provers failed with Unable to connect to the remote server",
+    "adversarialLoops": "passed for both projects",
+    "liveDeployment": "pending",
+    "loginSmoke": "pending",
+    "authenticatedEvidenceSmoke": "pending"
+  },
+  "claimState": {
+    "hydraulicInsideDiameter3dEdgeRegistrationReady": true,
+    "nominalPipeSizeReady": false,
+    "fullHydraulicPlanRegistrationReady": false,
+    "fabricationCutLengthReady": false,
+    "wholeBuildingNetworkElevationReady": false,
+    "exactAsBuiltDeflectorElevationReady": false,
+    "complianceReady": false
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "artifactType": "halofire.completed-hydraulic-sized-3d-edge-registration.v1",
+  "projectId": "mit-riverside-dugout-h",
+  "projectName": "MIT Riverside - Dugout H",
+  "verifiedAt": "2026-07-13T14:20:00-07:00",
+  "sourceBindings": [
+    {"role":"hydraulic-calculation","path":"02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Engineering\\Submittals\\20172-DUGOUT H HYDRAULICS.pdf","bytes":51384,"sha256":"c961ffd468c0af1433e93755be4b8b388625824e259f9b52d0b61e44b6792621","physicalPages":[2,3,4,5]},
+    {"role":"completed-field-plan","path":"02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Field Operations\\Field Plans\\DUGOUT H BLDG FIELD.pdf","bytes":951202,"sha256":"dbde3554b995d9ceb16d6829d683306e9a60f2dbc9b05ab87a3c60b548c0538c","physicalPages":[1]},
+    {"role":"approved-as-built-plan-set","path":"02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Field Operations\\As Builts\\State Fire Marshal Approved Plan Set_As Builts.pdf","bytes":2495800,"sha256":"b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207","physicalPages":[1,2,3,4,5,6,7]}
+  ],
+  "registration": {
+    "sheetId": "FP-3 DUGOUT H",
+    "physicalPageNumber": 1,
+    "pageSizePt": [2592,1728],
+    "printedScalePtPerFt": 9,
+    "scope": "hydraulically-calculated-on-plan-pipe-edges-only",
+    "diameterMeaning": "HASS hydraulic inside diameter in inches; not nominal fabrication size",
+    "nodes": [
+      ["1",1719.06,985.26,12],["2",1845.06,985.26,12],["3",1971.06,985.26,12],["4",2095.26,985.26,12],["5",2175.78,985.26,12],["6",2175.78,985.26,11.5],["7",2175.78,1084.26,10.5],["8",2175.78,1084.26,11],["9",1714.5,1084.26,11],["10",1804.5,1084.26,11],["11",1894.62,1084.26,11],["12",1980.06,1084.26,11],["13",2052.06,1084.26,11],["14",2106.06,1084.26,11],["15",2175.78,1174.26,8.5],["16",2175.78,1174.26,9],["17",1714.5,1174.26,9],["18",1804.5,1174.26,9],["19",1894.62,1174.26,9],["20",1980.06,1174.26,9],["21",2103.18,1174.26,9]
+    ],
+    "edges": [
+      [1,"1","2",14,1.515,3,[[1719.06,985.26],[1845.06,985.26]]],
+      [2,"2","3",14,1.515,3,[[1845.06,985.26],[1971.06,985.26]]],
+      [3,"3","4",13.83,1.515,3,[[1971.06,985.26],[2095.26,985.26]]],
+      [4,"4","5",9,1.515,3,[[2095.26,985.26],[2175.78,985.26]]],
+      [5,"5","6",0.5,1.515,3,[[2175.78,985.26],[2175.78,985.26]]],
+      [6,"6","7",11,2.729,3,[[2175.78,985.26],[2175.78,1084.26]]],
+      [7,"7","8",0.5,1.515,3,[[2175.78,1084.26],[2175.78,1084.26]]],
+      [8,"9","10",10,1.515,3,[[1714.5,1084.26],[1804.5,1084.26]]],
+      [9,"10","11",10,1.515,3,[[1804.5,1084.26],[1894.62,1084.26]]],
+      [10,"11","12",9.5,1.515,3,[[1894.62,1084.26],[1980.06,1084.26]]],
+      [11,"12","13",8,1.515,4,[[1980.06,1084.26],[2052.06,1084.26]]],
+      [12,"13","14",6,1.515,4,[[2052.06,1084.26],[2106.06,1084.26]]],
+      [13,"14","8",7.75,1.515,4,[[2106.06,1084.26],[2175.78,1084.26]]],
+      [14,"7","15",10,2.729,4,[[2175.78,1084.26],[2175.78,1174.26]]],
+      [15,"15","16",0.5,1.515,4,[[2175.78,1174.26],[2175.78,1174.26]]],
+      [16,"17","18",10,1.515,4,[[1714.5,1174.26],[1804.5,1174.26]]],
+      [17,"18","19",10,1.515,4,[[1804.5,1174.26],[1894.62,1174.26]]],
+      [18,"19","20",9.5,1.515,4,[[1894.62,1174.26],[1980.06,1174.26]]],
+      [19,"20","21",13.67,1.515,4,[[1980.06,1174.26],[2103.18,1174.26]]],
+      [20,"21","16",8.08,1.515,4,[[2103.18,1174.26],[2175.78,1174.26]]]
+    ],
+    "maximumLengthResidualFt": 0.06
+  },
+  "metrics": {"registeredNodeCount":21,"registeredEdgeCount":20,"diameterClassCount":2,"verticalEdgeCount":3,"maximumLengthResidualFt":0.053333333333334565},
+  "hydraulicInsideDiameter3dEdgeRegistrationReady": true,
+  "nominalPipeSizeReady": false,
+  "fullHydraulicPlanRegistrationReady": false,
+  "fabricationCutLengthReady": false,
+  "wholeBuildingNetworkElevationReady": false,
+  "exactAsBuiltDeflectorElevationReady": false,
+  "complianceReady": false,
+  "limitations": ["HASS DIA(IN) is a hydraulic inside diameter and is not a nominal fabrication size.","Only the calculated on-plan branch edges are registered; riser and underground supply edges are excluded."],
+  "receiptSha256": "991667877896f372741a6d6c1434f640c1b7c56266975dd4183ec68ed96eb1a6"
+}

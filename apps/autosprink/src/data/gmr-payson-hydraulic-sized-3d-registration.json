@@ -1,0 +1,37 @@
+{
+  "artifactType": "halofire.completed-hydraulic-sized-3d-edge-registration.v1",
+  "projectId": "gmr-ambulance-center-payson",
+  "projectName": "GMR Ambulance Center - Payson AZ",
+  "verifiedAt": "2026-07-13T14:20:00-07:00",
+  "sourceBindings": [
+    {"role":"hydraulic-calculation","path":"02-Active jobs\\03-Closed\\Ak-sar-ben Companies\\GMR Ambulance Center - Payson AZ\\Engineering\\Submittal\\22112-AMR HYDRAULICS 6.24.2022.pdf","bytes":46205,"sha256":"6abaa4072d5bf7fe7430419cc3af9070078a64438ff5dbb1c61c3d8691f701a6","physicalPages":[2,3,4,5]},
+    {"role":"dated-submittal-plan","path":"02-Active jobs\\03-Closed\\Ak-sar-ben Companies\\GMR Ambulance Center - Payson AZ\\Engineering\\Submittal\\22112 AMR FP1 6.24.2022.pdf","bytes":1103720,"sha256":"44b34e6d75eb9464e2896e1e8ae395c63248da37db6af1f2117c946b4ce5e4c1","physicalPages":[1]},
+    {"role":"completed-as-built-plan","path":"02-Active jobs\\03-Closed\\Ak-sar-ben Companies\\GMR Ambulance Center - Payson AZ\\Field Operations\\As Built Drawings\\FP1_ FIRE PROTECTION_AS BUILT SET.pdf","bytes":1182667,"sha256":"de6663d8da4f8bfe15998b17b8f972d05071a6457211c59f33357734a4d9989d","physicalPages":[1]},
+    {"role":"city-approved-plan","path":"02-Active jobs\\03-Closed\\Ak-sar-ben Companies\\GMR Ambulance Center - Payson AZ\\Engineering\\City Approved FS Drawings\\FP1_ FIRE PROTECTION AND ALARM Rev.1 markup.pdf","bytes":1131260,"sha256":"215045621a9f96fc0cd6cb90f6ecc413560cbab622f7eae64a279a077d510cc5","physicalPages":[1]}
+  ],
+  "registration": {
+    "sheetId": "FP-1",
+    "physicalPageNumber": 1,
+    "pageSizePt": [2592,1728],
+    "printedScalePtPerFt": 13.5,
+    "scope": "hydraulically-calculated-on-plan-pipe-edges-only",
+    "diameterMeaning": "HASS hydraulic inside diameter in inches; not nominal fabrication size",
+    "nodes": [["1",988.68,558.72,12],["2",1177.56,558.72,12],["5",1963.08,475.2,12],["6",1963.08,365.4,12],["TOR",2081.76,523.08,12]],
+    "edges": [
+      [1,"1","2",14,1.101,3,[[988.68,558.72],[1177.56,558.72]]],
+      [5,"5","6",8.08,1.101,3,[[1963.08,475.2],[1963.08,365.4]]],
+      [8,"5","TOR",12.33,1.598,3,[[1963.08,475.2],[2081.76,475.2],[2081.76,523.08]]]
+    ],
+    "maximumLengthResidualFt": 0.06
+  },
+  "metrics": {"registeredNodeCount":5,"registeredEdgeCount":3,"diameterClassCount":2,"verticalEdgeCount":0,"maximumLengthResidualFt":0.05333333333333368},
+  "hydraulicInsideDiameter3dEdgeRegistrationReady": true,
+  "nominalPipeSizeReady": false,
+  "fullHydraulicPlanRegistrationReady": false,
+  "fabricationCutLengthReady": false,
+  "wholeBuildingNetworkElevationReady": false,
+  "exactAsBuiltDeflectorElevationReady": false,
+  "complianceReady": false,
+  "limitations": ["Only HASS pipes 1, 5, and 8 are promoted because their hydraulic tags and vector routes independently reproduce report lengths.","Other calculated loop edges remain excluded where the completed plan revision does not reproduce the HASS route within tolerance.","HASS DIA(IN) is a hydraulic inside diameter and is not a nominal fabrication size."],
+  "receiptSha256": "894c89d0957be73380d8539f5ef2f79289b5d01fcc68cc1afdd38e20a28ff1c7"
+}

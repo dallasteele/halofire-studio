@@ -1,0 +1,44 @@
+{
+  "name": "completed-hydraulic-sized-3d-registration-20260713",
+  "owner": "codex",
+  "goal": "Register completed-project plan X/Y, HASS endpoint Z, and HASS hydraulic inside diameter for independently verified calculated pipe edges without promoting nominal size, fabrication, full-plan, or compliance claims.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/Submittals/20172-DUGOUT H HYDRAULICS.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Field Operations/Field Plans/DUGOUT H BLDG FIELD.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Ak-sar-ben Companies/GMR Ambulance Center - Payson AZ/Engineering/Submittal/22112-AMR HYDRAULICS 6.24.2022.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Ak-sar-ben Companies/GMR Ambulance Center - Payson AZ/Engineering/Submittal/22112 AMR FP1 6.24.2022.pdf",
+    "apps/autosprink/src/engine/completed-hydraulic-sized-3d-registration.js"
+  ],
+  "exit_criteria": [
+    "two independent completed projects bind immutable hydraulic and completed-plan sources",
+    "each promoted edge carries vector X/Y, HASS Z, HASS hydraulic inside diameter, and a report-length projection within sealed tolerance",
+    "GMR revision-conflicted loop edges remain excluded",
+    "nominal size, fabrication cut length, full hydraulic plan, whole-building elevation, exact deflector elevation, and compliance claims remain false",
+    "built-in adversarial mutations reject source, receipt, XYZ, diameter, route, report-length, duplicate-project, and false-promotion tampering",
+    "focused and full tests, build, rulebook check, formal result, deploy, login smoke, and authenticated live evidence smoke are recorded"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "focused engine and authenticated API tests",
+    "full autosprink Vitest suite",
+    "autosprink production build",
+    "GX10 Lean 4 proof or exact prover-unavailable record",
+    "authoritative agentic-rule check",
+    "VPS deployment with live login and authenticated evidence-route smoke",
+    "brain close writeback"
+  ],
+  "state_path": "data/agent-loops/completed-hydraulic-sized-3d-registration-20260713/state.json",
+  "evidence_paths": [
+    "apps/autosprink/tests/completed-hydraulic-sized-3d-registration.test.js",
+    "apps/autosprink/tests/submitted-sprinkler-calibration-api.test.js",
+    "BUILD_LOG.md"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 500000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

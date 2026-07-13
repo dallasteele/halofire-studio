@@ -43,6 +43,7 @@ import { validateCompletedProjectEvidencePortfolio } from '../engine/cross-proje
 import { validateCompletedHydraulicNetworkVerticalPortfolio } from '../engine/completed-hydraulic-network-vertical.js';
 import { validateCompletedActiveHydraulicPlanPortfolio } from '../engine/completed-active-hydraulic-plan-registration.js';
 import { validateCompletedHydraulicRoutedPlanPortfolio } from '../engine/completed-hydraulic-routed-plan-registration.js';
+import { validateCompletedHydraulicSized3dPortfolio } from '../engine/completed-hydraulic-sized-3d-registration.js';
 import { validateRasterBullseyeHeadEvidence } from '../engine/raster-bullseye-head-evidence.js';
 import { buildWinterGardenChapelPlaneAssignments, validatePiecewiseGridRegistration } from '../engine/piecewise-grid-registration.js';
 import { buildWinterGardenChapelPipeNetwork, validateFp2PipeEvidence } from '../engine/fp2-pipe-registration.js';
@@ -113,6 +114,8 @@ const MIT_RIVERSIDE_ACTIVE_HYDRAULIC_PLAN_PATH = path.resolve(__dirname, '../dat
 const SIERRA_MARANA_ACTIVE_HYDRAULIC_PLAN_PATH = path.resolve(__dirname, '../data/sierra-marana-active-hydraulic-plan-registration.json');
 const MIT_RIVERSIDE_HYDRAULIC_ROUTED_PLAN_PATH = path.resolve(__dirname, '../data/mit-riverside-hydraulic-routed-plan-registration.json');
 const SIERRA_MARANA_HYDRAULIC_ROUTED_PLAN_PATH = path.resolve(__dirname, '../data/sierra-marana-hydraulic-routed-plan-registration.json');
+const MIT_RIVERSIDE_HYDRAULIC_SIZED_3D_PATH = path.resolve(__dirname, '../data/mit-riverside-hydraulic-sized-3d-registration.json');
+const GMR_PAYSON_HYDRAULIC_SIZED_3D_PATH = path.resolve(__dirname, '../data/gmr-payson-hydraulic-sized-3d-registration.json');
 const NASHVILLE_ELEVATION_DATUMS_PATH = path.resolve(__dirname, '../data/elevation-datums.nashville.json');
 const NASHVILLE_SOURCE_BOUND_FOOTPRINTS_PATH = path.resolve(__dirname, '../data/source-bound-footprints.nashville.json');
 const WINTER_GARDEN_HEAD_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp3-head-evidence.json');
@@ -1747,6 +1750,13 @@ function loadCompletedHydraulicRoutedPlanPortfolio() {
   ]);
 }
 
+function loadCompletedHydraulicSized3dPortfolio() {
+  return validateCompletedHydraulicSized3dPortfolio([
+    JSON.parse(fs.readFileSync(MIT_RIVERSIDE_HYDRAULIC_SIZED_3D_PATH, 'utf8')),
+    JSON.parse(fs.readFileSync(GMR_PAYSON_HYDRAULIC_SIZED_3D_PATH, 'utf8')),
+  ]);
+}
+
 app.get('/api/evidence/completed-hydraulic-network-vertical', authMiddleware, (req, res) => {
   try {
     const portfolio = loadCompletedHydraulicNetworkVerticalPortfolio();
@@ -1777,6 +1787,17 @@ app.get('/api/evidence/completed-hydraulic-routed-plan-registration', authMiddle
   } catch (error) {
     log.error('Failed to load completed hydraulic routed-plan portfolio', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'completed_hydraulic_routed_plan_load_failed', complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/completed-hydraulic-sized-3d-registration', authMiddleware, (req, res) => {
+  try {
+    const portfolio = loadCompletedHydraulicSized3dPortfolio();
+    if (portfolio.status !== 'passed') return res.status(422).json(portfolio);
+    return res.json(portfolio);
+  } catch (error) {
+    log.error('Failed to load completed hydraulic sized-3D portfolio', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'completed_hydraulic_sized_3d_load_failed', complianceReady: false });
   }
 });
 
