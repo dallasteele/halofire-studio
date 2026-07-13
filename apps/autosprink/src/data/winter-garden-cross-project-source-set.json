@@ -5,6 +5,13 @@
   "evidencePurpose": "Independent completed-project calibration for PDF-to-3D and top/elevation sprinkler projection",
   "egnyteRoot": "Y:\\Shared\\HaloOps",
   "verifiedAt": "2026-07-12T20:02:49.3936994-07:00",
+  "verifiedClaims": [
+    "as_built_feedback_loop",
+    "completed_output_to_fabrication",
+    "manufacturer_family_trace",
+    "roof_structure_coordination",
+    "source_to_completed_sprinkler_layout"
+  ],
   "requiredPhases": ["source_architecture", "stamped_submittal", "city_approved", "as_built", "fabrication"],
   "requiredSourceViews": ["floor_plan", "roof_plan", "reflected_ceiling_plan", "building_elevation", "building_section"],
   "files": [

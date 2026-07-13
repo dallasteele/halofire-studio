@@ -39,6 +39,7 @@ import {
 } from '../engine/sloped-ceiling-layout.js';
 import { buildSlopedCeilingModel3d, verifySlopedCeilingModel3d } from '../engine/sloped-ceiling-model3d.js';
 import { buildPitchedRoofCalibrationCases, validatePitchedRoofCrossProjectEvidence } from '../engine/pitched-roof-cross-project-evidence.js';
+import { validateCompletedProjectEvidencePortfolio } from '../engine/cross-project-design-evidence.js';
 import { validateRasterBullseyeHeadEvidence } from '../engine/raster-bullseye-head-evidence.js';
 import { buildWinterGardenChapelPlaneAssignments, validatePiecewiseGridRegistration } from '../engine/piecewise-grid-registration.js';
 import { buildWinterGardenChapelPipeNetwork, validateFp2PipeEvidence } from '../engine/fp2-pipe-registration.js';
@@ -98,6 +99,8 @@ const COOPERATIVE_1881_PLAN_LEVELS_PATH = path.resolve(__dirname, '../data/plan-
 const COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-fp8-calibration.cooperative-1881.json');
 const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-sloped-ceiling-calibration.dillon.json');
 const PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH = path.resolve(__dirname, '../data/pitched-roof-cross-project-evidence.json');
+const WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/winter-garden-cross-project-source-set.json');
+const TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/tallahassee-completed-project-source-set.json');
 const WINTER_GARDEN_HEAD_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp3-head-evidence.json');
 const WINTER_GARDEN_GRID_REGISTRATION_PATH = path.resolve(__dirname, '../data/winter-garden-grid-registration.json');
 const WINTER_GARDEN_PIPE_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp2-pipe-evidence.json');
@@ -1713,11 +1716,16 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
   if (req.params.name !== 'LDS Meeting House - Winter Garden FL') return res.status(404).json({ error: 'pitched_roof_pipe_calibration_not_found', message: 'No source-bound pitched-roof pipe calibration exists for this project.' });
   try {
     const crossProjectPacket = JSON.parse(fs.readFileSync(PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH, 'utf8'));
+    const completedProjectSourceSets = [
+      JSON.parse(fs.readFileSync(WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH, 'utf8')),
+      JSON.parse(fs.readFileSync(TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH, 'utf8')),
+    ];
     const headEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_HEAD_EVIDENCE_PATH, 'utf8'));
     const gridRegistration = JSON.parse(fs.readFileSync(WINTER_GARDEN_GRID_REGISTRATION_PATH, 'utf8'));
     const pipeEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_PIPE_EVIDENCE_PATH, 'utf8'));
     const ceilingEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_CEILING_ELEVATION_PATH, 'utf8'));
     const fabricationMapping = JSON.parse(fs.readFileSync(WINTER_GARDEN_FABRICATION_PLAN_MAPPING_PATH, 'utf8'));
+    const completedProjectPortfolio = validateCompletedProjectEvidencePortfolio(completedProjectSourceSets);
     const [crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered] = await Promise.all([
       validatePitchedRoofCrossProjectEvidence(crossProjectPacket),
       validateRasterBullseyeHeadEvidence(headEvidence),
@@ -1730,7 +1738,7 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
       buildWinterGardenCeilingModel3d(ceilingEvidence, gridRegistration, headEvidence),
       buildWinterGardenFabricationRegisteredModel(fabricationMapping, ceilingEvidence, gridRegistration, headEvidence),
     ]);
-    const validations = [crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered];
+    const validations = [completedProjectPortfolio, crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered];
     if (validations.some((validation) => validation.status !== 'passed')) return res.status(422).json({ status: 'blocked', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name, issues: validations.flatMap((validation) => validation.issues || []), projectionReady: false, complianceReady: false });
     return res.json({
       status: 'passed', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name,
@@ -1739,9 +1747,16 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
       acceptanceLoops: {
         primary: { status: 'passed', method: headEvidence.primary.method, headCount: heads.metrics.primaryCount, branchMethod: pipeEvidence.detectorReceipt.primary.method },
         independent: { status: 'passed', method: headEvidence.independent.method, headCount: heads.metrics.independentCount, branchMethod: pipeEvidence.detectorReceipt.independent.method },
-        adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true },
+        adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: completedProjectPortfolio.results.some((result) => result.excludedArtifactCount > 0), duplicateProjectSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true },
       },
       crossProjectEvidence: { metrics: crossProject.metrics, claimStatus: crossProject.claimStatus },
+      completedProjectEvidencePortfolio: {
+        status: completedProjectPortfolio.status,
+        projectCount: completedProjectPortfolio.projectCount,
+        projectIds: completedProjectPortfolio.projectIds,
+        featurePromotion: completedProjectPortfolio.featurePromotion,
+        projects: completedProjectPortfolio.results.map((result) => ({ projectId: result.projectId, status: result.status, verifiedClaims: result.verifiedClaims, fileCount: result.fileCount, excludedArtifactCount: result.excludedArtifactCount || 0 })),
+      },
       counts: { completedBidFp3Heads: heads.metrics.primaryCount, chapelHeads: planes.assignments.length, chapelBranches: network.branchCount, chapelArmOvers: network.headCount, networkSegments: network.segments.length, absoluteCeilingSurfaces: model3dRegistered.counts.ceilingSurfaces, headElevationEnvelopes: model3dRegistered.counts.headEnvelopes, fabricationMappedHeads: model3dRegistered.counts.fabricationMappedHeads, exactBranchRowPipes: model3dRegistered.counts.exactBranchRowPipes },
       roofPlanes: planes.roofPlanes, headPlaneAssignments: planes.assignments, pipeNetwork: network.segments,
       fabricationMappings: fabrication.mappings, model3dEnvelope: model3dRegistered, views: renderWinterGardenCeilingViews(model3dRegistered),

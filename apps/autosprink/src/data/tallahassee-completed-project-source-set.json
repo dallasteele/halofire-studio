@@ -1,0 +1,165 @@
+{
+  "artifactType": "halofire.completed-project-evidence-set.v1",
+  "projectId": "tallahassee-fl-temple",
+  "projectName": "LDS Temple - Tallahassee FL",
+  "evidencePurpose": "Independent completed-project lifecycle and fabrication calibration with adversarial archive-substitution rejection",
+  "egnyteRoot": "Y:\\Shared\\HaloOps",
+  "verifiedAt": "2026-07-12T21:58:44.1875547-07:00",
+  "verifiedClaims": [
+    "as_built_feedback_loop",
+    "completed_output_to_fabrication",
+    "manufacturer_family_trace",
+    "multi_floor_completed_output",
+    "roof_structure_coordination"
+  ],
+  "requiredEvidenceRoles": [
+    "source_coordination",
+    "approved_output",
+    "field_output",
+    "as_built_output",
+    "fabrication"
+  ],
+  "files": [
+    {
+      "evidenceRole": "source_coordination",
+      "view": "roof_framing",
+      "sheet": "S103-S106,S120-S122,S230",
+      "path": "02-Active jobs\\Out of Town\\All Others\\LDS Temple - Tallahassee FL\\Field Plans\\BIM Docs\\Structural Plans.pdf",
+      "bytes": 7736116,
+      "sha256": "c64ed238f884c48bd0db555be7c42c08b40d90852be15a19a5f6fb773e75a208",
+      "visualVerification": {
+        "pages": [1, 2, 3, 4, 5, 6, 7, 8],
+        "markers": ["LEVEL 01 FRAMING", "MEZZANINE AND LOWER ROOF FRAMING PLAN", "MID ROOF FRAMING PLAN", "MEZZANINE ROOF FRAMING PLAN"]
+      }
+    },
+    {
+      "evidenceRole": "approved_output",
+      "view": "approved_sprinkler_plan_set",
+      "sheet": "FP1-FP6",
+      "path": "02-Active jobs\\Out of Town\\All Others\\LDS Temple - Tallahassee FL\\City Approved FS Plans\\Archived\\Approved FP Plans.pdf",
+      "bytes": 11058405,
+      "sha256": "32773f9ad0fb2b8c3ba05a587e6ea0962a56fd11ec3f18e2b2f269241b8474f8",
+      "visualVerification": {
+        "pages": [1],
+        "markers": ["TEMPLE TALLAHASSEE, FL", "TFA210246", "FIRE SPRINKLER SITE PLAN"]
+      }
+    },
+    {
+      "evidenceRole": "field_output",
+      "view": "field_sprinkler_plan_set",
+      "sheet": "FP2-FP4",
+      "path": "02-Active jobs\\Out of Town\\All Others\\LDS Temple - Tallahassee FL\\Field Plans\\Combined PDF Field Set.pdf",
+      "bytes": 4584796,
+      "sha256": "20eea8a56f22fbc549e798565d3439cc27750913eac695545342dcc8cca6291f",
+      "visualVerification": {
+        "pages": [1, 2, 3],
+        "markers": ["BASEMENT LEVEL", "MAIN LEVEL", "MECH. MEZZ.", "3D OF PIPING PLAN"]
+      }
+    },
+    {
+      "evidenceRole": "as_built_output",
+      "view": "as_built_sprinkler_plan_section_and_rcp_set",
+      "sheet": "FP1-FP6",
+      "path": "02-Active jobs\\Out of Town\\All Others\\LDS Temple - Tallahassee FL\\City Approved FS Plans\\Current Approved FS Plan Set 7-26-22.PDF",
+      "bytes": 8756091,
+      "sha256": "e3b5a4376402bccf878e138fd34dcdd1964b96a0c140fedd063392b1912b2e16",
+      "completedLevels": ["basement", "main", "mezzanine"],
+      "observedManufacturerFamilies": [
+        {"manufacturer": "Tyco", "family": "RFII"},
+        {"manufacturer": "Tyco", "family": "TY-FRB"}
+      ],
+      "visualVerification": {
+        "pages": [1, 2, 3, 4, 5, 6],
+        "markers": ["AS-BUILT-7.26.2022", "BASEMENT LEVEL CROSS SECTIONAL VIEW", "MAIN LEVEL CROSS SECTIONAL VIEW", "3D OF PIPING PLAN", "FIRE SPRINKLER RCPPLAN"]
+      }
+    },
+    {
+      "evidenceRole": "design_coordination",
+      "view": "celestial_room_sprinkler_head_rfi",
+      "sheet": "RFI-315",
+      "path": "02-Active jobs\\Out of Town\\All Others\\LDS Temple - Tallahassee FL\\Field Plans\\RFI 315 Celestial Room Sprinkler Head - FP-0006-FP6-GSBS (1).pdf",
+      "bytes": 2965936,
+      "sha256": "15414e350958f211d9c82caf6d7a7346cc831d42f04328de7fd987ac36d2b22d",
+      "visualVerification": {
+        "pages": [1],
+        "markers": ["FIRE SPRINKLER RCPPLAN", "CELESTIAL ROOM", "FP6"]
+      }
+    },
+    {
+      "evidenceRole": "fabrication",
+      "view": "sprinkcad_stock_listing_tyl",
+      "levelId": "basement",
+      "sheet": "TYL-BASEMENT",
+      "path": "02-Active jobs\\Out of Town\\All Others\\LDS Temple - Tallahassee FL\\Listings Files\\Revised Listings Files\\BASEMENT 1.20.2022\\TFT BASEMENT REV.TYL",
+      "bytes": 14581,
+      "sha256": "9df8e8d9cf0b5c6d7d7a11dc0427cf4e8951f0fe54196859dc47d6770f63f4b6"
+    },
+    {
+      "evidenceRole": "fabrication",
+      "view": "sprinkcad_stock_listing_tyl",
+      "levelId": "main",
+      "sheet": "TYL-MAIN",
+      "path": "02-Active jobs\\Out of Town\\All Others\\LDS Temple - Tallahassee FL\\Listings Files\\Revised Listings Files\\MAIN FLOOR 1.20.2022\\TFT MAIN LEVEL REV.TYL",
+      "bytes": 85923,
+      "sha256": "4dd238a3a067e4fd8a16afcbc1635935f6e3fd24deb9d9251d7c8f1b106410ac"
+    },
+    {
+      "evidenceRole": "fabrication",
+      "view": "sprinkcad_stock_listing_tyl",
+      "levelId": "mezzanine",
+      "sheet": "TYL-MEZZANINE",
+      "path": "02-Active jobs\\Out of Town\\All Others\\LDS Temple - Tallahassee FL\\Listings Files\\Revised Listings Files\\SECOND FLOOR 1.20.2022\\TFT SECOND FLOOR.TYL",
+      "bytes": 19370,
+      "sha256": "505c63fb5d53db802cc684775886e7ffc418a9ca20ae74a2bc725b204c2a0925"
+    }
+  ],
+  "fabricationInventories": [
+    {
+      "levelId": "basement",
+      "fileSha256": "9df8e8d9cf0b5c6d7d7a11dc0427cf4e8951f0fe54196859dc47d6770f63f4b6",
+      "stockListingVersion": "1.50",
+      "pipingRows": 73,
+      "outletRows": 15,
+      "sprinklerFamilies": [
+        {"manufacturer": "Tyco", "family": "RFII", "partNumber": "51-790-4-1", "quantity": 2},
+        {"manufacturer": "Tyco", "family": "TY-FRB", "partNumber": "57-371-1-1", "quantity": 12}
+      ]
+    },
+    {
+      "levelId": "main",
+      "fileSha256": "4dd238a3a067e4fd8a16afcbc1635935f6e3fd24deb9d9251d7c8f1b106410ac",
+      "stockListingVersion": "1.50",
+      "pipingRows": 384,
+      "outletRows": 268,
+      "sprinklerFamilies": [
+        {"manufacturer": "Tyco", "family": "RFII", "partNumber": "51-794-4-1", "quantity": 234}
+      ]
+    },
+    {
+      "levelId": "mezzanine",
+      "fileSha256": "505c63fb5d53db802cc684775886e7ffc418a9ca20ae74a2bc725b204c2a0925",
+      "stockListingVersion": "1.50",
+      "pipingRows": 83,
+      "outletRows": 30,
+      "sprinklerFamilies": [
+        {"manufacturer": "Tyco", "family": "TY-FRB", "partNumber": "57-371-1-200", "quantity": 2}
+      ]
+    }
+  ],
+  "excludedArtifacts": [
+    {
+      "path": "02-Active jobs\\Out of Town\\All Others\\LDS Temple - Tallahassee FL\\Listings Files\\Revised Listings Files\\BASEMENT 1.20.2022\\Combined As Built Set 04-01-22 copy.pdf",
+      "bytes": 33933526,
+      "sha256": "6264a114590b0b11b663d12dc56176676baf3df72717d447818549eace7ca714",
+      "reason": "Visual review proves this is an unrelated At Home retail sprinkler set for Bronx, New York, not the Tallahassee temple",
+      "detectedProjectId": "at-home-bronx-ny",
+      "visualMarkers": ["at home", "300 BAYCHESTER AVE., BRONX, NY", "AS BUILT 7.3.24.2022"]
+    }
+  ],
+  "limitations": [
+    "This set proves a completed multi-level plan-to-fabrication lifecycle, not an exact takeoff-to-head spatial mapping.",
+    "Original architectural A107 and A302 source-file paths are not bound in this set.",
+    "Multi-floor scaled extrusion and pitched-roof fabrication spatial mapping remain unpromoted until each has two independent completed-project proofs.",
+    "This evidence is calibration data and does not assert code compliance, approval, or exact as-built deflector elevations."
+  ]
+}
