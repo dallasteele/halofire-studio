@@ -1,0 +1,58 @@
+{
+  "artifactType": "halofire.completed-hydraulic-network-vertical-evidence.v1",
+  "projectId": "mit-riverside-dugout-h",
+  "projectName": "MIT Riverside - Dugout H",
+  "evidencePurpose": "Completed-project calibration for exact hydraulic node elevations and connected pipe topology",
+  "egnyteRoot": "Y:\\Shared\\HaloOps",
+  "verifiedAt": "2026-07-13T00:35:00-07:00",
+  "sourceBindings": [
+    {
+      "role": "hydraulic-calculation",
+      "path": "02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Engineering\\Submittals\\20172-DUGOUT H HYDRAULICS.pdf",
+      "bytes": 51384,
+      "sha256": "c961ffd468c0af1433e93755be4b8b388625824e259f9b52d0b61e44b6792621",
+      "nodePages": [2],
+      "pipePages": [3, 4, 5],
+      "software": "HASS",
+      "calculationDate": "2020-09-30"
+    },
+    {
+      "role": "completed-field-plan",
+      "path": "02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Field Operations\\Field Plans\\DUGOUT H BLDG FIELD.pdf",
+      "bytes": 951202,
+      "sha256": "dbde3554b995d9ceb16d6829d683306e9a60f2dbc9b05ab87a3c60b548c0538c",
+      "physicalPages": [1],
+      "markers": ["FIRE SPRINKLER PIPING PLAN (DUGOUT H)", "BUILDING CROSS-SECTION", "TOR", "BOR", "UG"]
+    },
+    {
+      "role": "approved-as-built-plan-set",
+      "path": "02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Field Operations\\As Builts\\State Fire Marshal Approved Plan Set_As Builts.pdf",
+      "bytes": 2495800,
+      "sha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+      "physicalPages": [1, 2, 3, 4, 5, 6, 7],
+      "markers": ["Reviewed for Code Compliance", "AS-BUILT SET"]
+    },
+    {
+      "role": "fabrication-listing",
+      "path": "02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Field Operations\\Listings Files\\DUGOUT H\\MIT DUGOUT H BLDG LISTING.pdf",
+      "bytes": 197520,
+      "sha256": "9078f2e439aa01d8dd1c082a36939a217dea7c45ba918b7d52fefbd47cbc33b1",
+      "physicalPages": [1, 2, 3, 4, 5, 6, 7, 8],
+      "markers": ["SprinkCad Stock Listing Reports", "Branch Lines", "Mains"]
+    }
+  ],
+  "network": {
+    "coordinateContract": "connected hydraulic topology with exact report Z; X/Y are topological layout only until plan registration",
+    "nodes": [["1",12,5.6],["2",12,5.6],["3",12,5.6],["4",12,5.6],["5",12,null],["6",11.5,null],["7",10.5,null],["8",11,null],["9",11,5.6],["10",11,5.6],["11",11,5.6],["12",11,5.6],["13",11,5.6],["14",11,5.6],["15",8.5,null],["16",9,null],["17",9,5.6],["18",9,5.6],["19",9,5.6],["20",9,5.6],["21",9,5.6],["TOR",8.5,null],["BOR",1,null],["UG",-3,null],["UG3",-3,null],["UG4",-3,null],["UG5",-3,null],["UG6",-3,null],["BF1",3,null],["BF2",3,null],["SRC",1.5,null]],
+    "pipes": [[1,"1","2",14],[2,"2","3",14],[3,"3","4",13.83],[4,"4","5",9],[5,"5","6",0.5],[6,"6","7",11],[7,"7","8",0.5],[8,"9","10",10],[9,"10","11",10],[10,"11","12",9.5],[11,"12","13",8],[12,"13","14",6],[13,"14","8",7.75],[14,"7","15",10],[15,"15","16",0.5],[16,"17","18",10],[17,"18","19",10],[18,"19","20",9.5],[19,"20","21",13.67],[20,"21","16",8.08],[21,"15","TOR",3.83],[22,"TOR","BOR",11.17],[23,"BOR","UG",4],[24,"UG","UG3",115],[25,"UG3","UG4",133],[26,"UG4","UG5",345],[27,"UG5","UG6",180],[28,"UG6","BF1",717],[29,"BF2","BF1",null],[30,"BF2","SRC",32]],
+    "planMappedNodeIds": ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","TOR","BOR","UG"],
+    "metrics": {"nodeCount":31,"pipeCount":30,"activeSprinklerNodeCount":15,"planMappedNodeCount":24,"minimumElevationFt":-3,"maximumElevationFt":12,"distinctElevationCount":10}
+  },
+  "hydraulicNetworkVerticalGeometryReady": true,
+  "planNodeCoordinateMappingReady": false,
+  "wholeBuildingNetworkElevationReady": false,
+  "exactAsBuiltDeflectorElevationReady": false,
+  "fabricationReady": false,
+  "complianceReady": false,
+  "receiptSha256": "9097927301f4502d9d7cfc7d5ad5bd3009f0d9f70f7f241d7f4ffb64bb2a9ab5"
+}

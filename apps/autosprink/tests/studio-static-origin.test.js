@@ -725,6 +725,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('pitched_roof_fabrication_spatial_mapping');
     expect(html).toContain('35 fabricated dry-feed pieces across two plan runs and four pitched-attic transitions');
     expect(html).toContain('Full-network Z, exact field deflector elevation, fabrication release, and code approval remain fail-closed');
+    expect(html).toContain('Hydraulic-network vertical geometry: PROMOTED');
+    expect(html).toContain('hydraulic_network_vertical_geometry');
+    expect(html).toContain('Completed hydraulic-network vertical geometry cross-project gate failed');
+    expect(html).toContain('Whole-building pipe Z, exact as-built deflector setpoints, fabrication release, and code approval remain fail-closed');
     expect(html).toContain('dallasPitchMeanInPer12');
     expect(html).toContain("'roof-planes.automatic-roof-planes': () => hfShowSubmittedCalibrationViews()");
   });

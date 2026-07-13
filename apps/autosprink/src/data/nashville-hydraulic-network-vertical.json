@@ -1,0 +1,65 @@
+{
+  "artifactType": "halofire.completed-hydraulic-network-vertical-evidence.v1",
+  "projectId": "nashville-tn-temple",
+  "projectName": "LDS Temple - Nashville TN",
+  "evidencePurpose": "Completed-project calibration for exact hydraulic node elevations and connected pipe topology",
+  "egnyteRoot": "Y:\\Shared\\HaloOps",
+  "verifiedAt": "2026-07-13T00:35:00-07:00",
+  "sourceBindings": [
+    {
+      "role": "hydraulic-calculation",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\07-AHJ Submittals\\2nd Submittal 08.02.2023\\001 LDS Temple - Franklin TN_Hydraulic Calcs_V2.pdf",
+      "bytes": 57590,
+      "sha256": "27a79ee420eac08b1fb09b7efbd0f8998f464942bbe0fcc02de26a0629feaef9",
+      "nodePages": [2, 3],
+      "pipePages": [4, 5, 6, 7, 8, 9],
+      "software": "HASS",
+      "calculationDate": "2023-08-02"
+    },
+    {
+      "role": "completed-field-plan",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\10-Field Set\\Field Plan.pdf",
+      "bytes": 1907202,
+      "sha256": "4a792a82111588a8c80a6c3fe21867a78a8d4c3a7732be4e5736abd52bc7884a",
+      "physicalPages": [1],
+      "markers": ["MAIN LEVEL FIRE SPRINKLER PIPING PLAN", "UPPER LEVEL", "3/D-MODEL", "HYDRAULICALLY DESIGN AREA"]
+    },
+    {
+      "role": "completed-as-built-plan-set",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\11-As-Built Set\\combinepdf (1).pdf",
+      "bytes": 9972770,
+      "sha256": "fa92c6ddbef4e1f25171e48a48e9c320e11121f0963d3931fa3f19baf7296614",
+      "physicalPages": [1, 2, 3, 4],
+      "markers": ["AS-BUILT", "MAIN LEVEL FIRE SPRINKLER PIPING PLAN", "3/D-MODEL"]
+    },
+    {
+      "role": "final-ahj-submission-plan",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\07-AHJ Submittals\\4th Submittal 09.05.2023\\FP2 - NASHVILLE REV 2.pdf",
+      "bytes": 20381739,
+      "sha256": "53a31d498f7af2844bb52dd9e2d94ce6267eceaf5522b7657e5d7b93afa6b00c",
+      "physicalPages": [1],
+      "markers": ["MAIN LEVEL FIRE SPRINKLER PIPING PLAN", "3/D-MODEL"]
+    },
+    {
+      "role": "fabrication-listing",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\09-Listings\\Nashville TN Fab Listing 7.24.2023.pdf",
+      "bytes": 828191,
+      "sha256": "ff6791088204be0d8186f6f81955c357332588cacfd5b9a5c1b0e77aeefffa46",
+      "markers": ["SprinkCad Stock Listing Reports", "Branch Lines", "Mains"]
+    }
+  ],
+  "network": {
+    "coordinateContract": "connected hydraulic topology with exact report Z; X/Y are topological layout only until plan registration",
+    "nodes": [["1",14.5,4.62],["2",14.5,null],["3",14.5,4.62],["4",14.5,null],["5",14.5,null],["6",14.5,4.62],["7",14.5,null],["8",14.5,4.62],["9",14.5,null],["10",14.5,null],["11",14.5,4.62],["12",14.5,null],["13",14.5,null],["14",14.5,4.62],["15",14.5,null],["16",14.5,null],["16A",14.5,null],["17",14.5,null],["18",14.5,null],["19",14.5,4.62],["20",14.5,null],["21",14.5,4.62],["22",14.5,null],["23",14.5,4.62],["24",14.5,null],["25",14.5,null],["26",14.5,4.62],["27",14.5,null],["28",14.5,4.62],["29",14.5,null],["30",14.5,4.62],["31",14.5,null],["32",14.5,null],["33",14.5,null],["34",14.5,4.62],["35",14.5,null],["36",14.5,4.62],["37",14.5,null],["38",14.5,4.62],["39",14.5,null],["40",14.5,null],["41",14.5,null],["42",14.5,null],["43",14.5,null],["44",14.5,null],["45",14.5,4.62],["46",14.5,null],["47",14.5,null],["48",14.5,4.62],["49",14.5,null],["50",14.5,null],["51",14.5,4.62],["52",14.5,null],["53",14.5,4.62],["54",14.5,null],["55",14.5,null],["56",14.5,null],["57",14.5,null],["58",14.5,null],["59",14.5,null],["TOR",14.5,null],["BF1",3,null],["BF2",3,null],["BOR",1,null],["M1",-3,null],["M2",-3,null],["UG",-3,null],["SRC",1.5,null]],
+    "pipes": [[1,"1","2",3.67],[2,"2","4",10],[3,"3","4",3.67],[4,"4","5",8.75],[5,"6","7",5.17],[6,"7","5",1.92],[7,"5","9",5.92],[8,"8","9",2.42],[9,"9","10",8.17],[10,"11","12",2.42],[11,"12","10",3],[12,"10","13",0.67],[13,"14","15",2.41],[14,"15","13",2.75],[15,"13","16",33.67],[16,"16","16A",7.75],[17,"16A","17",1],[18,"17","18",1.17],[19,"19","20",4.83],[20,"20","22",10],[21,"21","22",4.83],[22,"22","24",9.92],[23,"23","24",1.83],[24,"24","26",7.17],[25,"25","26",1.83],[26,"26","27",7.58],[27,"28","29",4.5],[28,"29","27",3.92],[29,"27","31",0.75],[30,"30","31",6],[31,"31","18",35.92],[32,"16A","32",12.25],[33,"32","33",0.17],[34,"33","35",37.17],[35,"34","35",6],[36,"35","37",8.75],[37,"36","37",6],[38,"37","40",8.17],[39,"38","39",10],[40,"39","41",5.67],[41,"41","40",2.83],[42,"40","42",6.42],[43,"42","43",1.08],[44,"43","44",3.33],[45,"45","46",5],[46,"46","44",1.75],[47,"44","47",7.42],[48,"48","49",5],[49,"49","47",1.75],[50,"47","50",8.42],[51,"51","52",5],[52,"52","50",1.75],[53,"50","53",4.58],[54,"53","54",5.25],[55,"54","55",29.5],[56,"55","56",0.17],[57,"32","56",6.42],[58,"56","57",14.83],[59,"57","58",34.17],[60,"58","59",73.17],[61,"59","TOR",21.17],[62,"TOR","BOR",13.5],[63,"BOR","UG",4],[64,"UG","BF1",865],[65,"BF2","BF1",null],[66,"BF2","M1",4],[67,"M2","M1",null],[68,"M2","SRC",5]],
+    "planMappedNodeIds": [],
+    "metrics": {"nodeCount":68,"pipeCount":68,"activeSprinklerNodeCount":19,"planMappedNodeCount":0,"minimumElevationFt":-3,"maximumElevationFt":14.5,"distinctElevationCount":5}
+  },
+  "hydraulicNetworkVerticalGeometryReady": true,
+  "planNodeCoordinateMappingReady": false,
+  "wholeBuildingNetworkElevationReady": false,
+  "exactAsBuiltDeflectorElevationReady": false,
+  "fabricationReady": false,
+  "complianceReady": false,
+  "receiptSha256": "dcf6f144d19b8b7f9f3fc6b0c96cd73bdd973b822ccfb40dd0b4f0be6630f078"
+}
