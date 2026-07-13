@@ -1,0 +1,24 @@
+{
+  "artifactType": "halofire.cross-project-design-source-set.v1",
+  "projectId": "winter-garden-fl-meetinghouse",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "evidencePurpose": "Independent completed-project calibration for PDF-to-3D and top/elevation sprinkler projection",
+  "egnyteRoot": "Y:\\Shared\\HaloOps",
+  "verifiedAt": "2026-07-12T20:02:49.3936994-07:00",
+  "requiredPhases": ["source_architecture", "stamped_submittal", "city_approved", "as_built"],
+  "requiredSourceViews": ["floor_plan", "roof_plan", "reflected_ceiling_plan", "building_elevation", "building_section"],
+  "files": [
+    {"phase":"source_architecture","view":"floor_plan","sheet":"A101","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\CAD Files\\Winter-Garden,-FL-Meetinghouse_-_Drawings\\Architectural\\A101-MAIN-FLOOR-PLAN-Rev.6.pdf","bytes":520191,"sha256":"861626b3a6838ddd340d15e20c88c55d2d7896df7d8ef45276d518e4112040fb"},
+    {"phase":"source_architecture","view":"roof_plan","sheet":"A121","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\CAD Files\\Winter-Garden,-FL-Meetinghouse_-_Drawings\\Architectural\\A121-ROOF-PLAN-Rev.5.pdf","bytes":337696,"sha256":"0fa8d19cf2a8ca421a3cad7200b410763eee701bb566ca84d37321b1b51ce921"},
+    {"phase":"source_architecture","view":"reflected_ceiling_plan","sheet":"A151","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\CAD Files\\Winter-Garden,-FL-Meetinghouse_-_Drawings\\Architectural\\A151-REFLECTED-CEILING-PLAN-Rev.5.pdf","bytes":777587,"sha256":"4a6c4b29eff18a8e964627ba41807f2f8119f8a2c8012d5900acf08e61ee8e43"},
+    {"phase":"source_architecture","view":"building_elevation","sheet":"A201","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\CAD Files\\Winter-Garden,-FL-Meetinghouse_-_Drawings\\Architectural\\A201-BUILDING-ELEVATIONS-Rev.5.pdf","bytes":930503,"sha256":"f756533aaf7bb8f1229b28226d26d0fbb53c9cd09f80af2bdcf1b271963243a8"},
+    {"phase":"source_architecture","view":"building_section","sheet":"A301","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\CAD Files\\Winter-Garden,-FL-Meetinghouse_-_Drawings\\Architectural\\A301-BUILDING-SECTIONS-Rev.5.pdf","bytes":522143,"sha256":"719ae05138b3872c2ed8740fa4470ca457dcc0a9f8fec617cabf7969560ecc30"},
+    {"phase":"stamped_submittal","view":"sprinkler_plan","sheet":"A001","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\Submittal\\Stamped Submittal Set 12.28.2022\\Sprinkler Permit Submittal\\A001-FPSPlan-Meetinghouse.pdf","bytes":559104,"sha256":"d856f01e85335fba8f822c6c73d3179d540c936108592eb1a87d02a8eeb34077"},
+    {"phase":"stamped_submittal","view":"sprinkler_plan","sheet":"A002","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\Submittal\\Stamped Submittal Set 12.28.2022\\Sprinkler Permit Submittal\\A002-FPSPlan-Meetinghouse.pdf","bytes":2653154,"sha256":"ac052124095f73e3529fd63906127bac9c2cf3b3f6abd45222c5125fa4195977"},
+    {"phase":"stamped_submittal","view":"sprinkler_plan","sheet":"A003","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\Submittal\\Stamped Submittal Set 12.28.2022\\Sprinkler Permit Submittal\\A003-FPSPlan-Meetinghouse.pdf","bytes":1180922,"sha256":"93f8df04bc84ac817ecd2e222812fede93565879094c66b4d7511f783631543e"},
+    {"phase":"city_approved","view":"approved_sprinkler_set","sheet":"FP23000203","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Field Operations\\City Approved FS Plans\\Approved Plan - FP23000203.pdf","bytes":6014967,"sha256":"6e012d46dd20ff5808717d39898fd4b7fe54fcb0f35253ef7be6c3e5f48300f6"},
+    {"phase":"as_built","view":"sprinkler_plan","sheet":"A001","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Field Operations\\As Built Drawings\\A001-FPSPlan-Meetinghouse.pdf","bytes":1043434,"sha256":"6561bcb77f1c6f4f636a7b0f1dc924ae2c54d9dcbb214e4d32bc3d589c9ed86c"},
+    {"phase":"as_built","view":"sprinkler_plan","sheet":"A002","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Field Operations\\As Built Drawings\\A002-FPSPlan-Meetinghouse.pdf","bytes":2888781,"sha256":"22c8db4dde89ce0ed9ee6625b9d8f8b1918c2ecdb9baf6ff829a9c4118b5b8bb"},
+    {"phase":"as_built","view":"sprinkler_plan","sheet":"A003","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Field Operations\\As Built Drawings\\A003-FPSPlan-Meetinghouse.pdf","bytes":1430614,"sha256":"13aa82f90bf7b03bc0b4728d0b631321372a48932d2a55187dad6edc947de3a0"}
+  ]
+}
