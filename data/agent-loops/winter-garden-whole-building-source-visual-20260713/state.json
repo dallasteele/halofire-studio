@@ -1,13 +1,15 @@
 {
   "name": "winter-garden-whole-building-source-visual-20260713",
-  "iteration": 3,
+  "iteration": 4,
   "status": "in_progress",
-  "updatedAt": "2026-07-13T11:27:30-07:00",
+  "updatedAt": "2026-07-13T12:16:00-07:00",
   "completedStages": [
     "DISCOVER",
-    "PLAN"
+    "PLAN",
+    "EXECUTE",
+    "VERIFY"
   ],
-  "nextStage": "VERIFY",
+  "nextStage": "ITERATE",
   "processCorrection": {
     "codeBeforeLoopSlip": true,
     "description": "The scale-parser fix and first dimension-plan extraction helpers were edited before this loop contract was validated. Work stopped, brain preflight was run, authoritative rules were reread, and this contract was added before feature expansion continued."
@@ -59,8 +61,11 @@
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 139418,
+    "episodeId": 139750,
+    "priorRoomCheckpointEpisodeId": 139418,
     "recallVerified": true,
+    "recallScore": 1.0,
+    "recallSessionId": "winter-garden-source-building-operational-knowledge-20260713",
     "utf8TransportRequiredOnWindows": true
   },
   "roofAndElevationGate": {
@@ -134,5 +139,22 @@
     "screenshot": "apps/autosprink/output/playwright/winter-garden-source-building-brain-receipt.png",
     "releaseBlockerCorrected": "The fixed viewer originally clipped lower proof sections; grid auto-rows plus contained overflow now make the complete evidence stack reachable."
   },
-  "nextAction": "Commit, push, deploy this sealed source-building and operational-brain checkpoint, verify public login plus the authenticated live route and UI, then postflight it into GX10 recall before beginning source-only sprinkler generation."
+  "deploymentVerification": {
+    "status": "passed",
+    "commit": "fcb5c07ee5947767399268b713c06f99febe364c",
+    "service": "halofire.service",
+    "serviceState": "active",
+    "publicHealthStatus": 200,
+    "publicLoginStatus": 200,
+    "publicLoginBytes": 58981,
+    "deprecatedLoginText": false,
+    "realAdminLoginStatus": 200,
+    "authenticatedRouteStatus": 200,
+    "liveRouteReceiptSha256": "cfe27af97237459ed71a38120df7ee570ac4fb300ef7884ce235490b2f2e55e7",
+    "liveUiReceiptVisible": true,
+    "liveUiConsoleErrors": 0,
+    "liveViewerScrollHeightPx": 5570,
+    "liveScreenshotSha256": "b5ef3c21a9365448c062f9b1d4e04790b4033a5b5ed5f3a756d605e38e059ad1"
+  },
+  "nextAction": "ITERATE into source-only sprinkler generation from the sealed building and operational workflow, keep hazard and ceiling/protection basis fail-closed, then compare against held-out completed-bid evidence only after generation is sealed."
 }

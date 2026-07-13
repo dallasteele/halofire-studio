@@ -1414,3 +1414,44 @@ User direction across 4 messages this session:
   controls, no overflow, deprecated text, warning, or error. Real admin auth,
   the two-project evidence route, and the FDF download returned 200, and the
   downloaded live FDF hash matched the local deterministic artifact exactly.
+
+### Entry 42 - Winter Garden source-only pitched building and brain gate
+
+- Built a source-only Winter Garden whole-building packet from architectural
+  sheets A103, A121, A151, A201, and A301 without using completed sprinkler
+  drawings as generation input. The sealed model contains 56 traced rooms,
+  44 exterior edges, ten pitched roof surfaces, one low-roof datum surface,
+  and one steeple, with exact 4.5:12 pitch replay and source-controlled floor,
+  bearing, ridge, and steeple elevations.
+- Added dimension-plan parsing, labeled-grid registration, orthogonal gable
+  skeleton/model/view generation, deterministic packet validation, and an
+  authenticated source-building API. Receipt
+  `cfe27af97237459ed71a38120df7ee570ac4fb300ef7884ce235490b2f2e55e7`
+  binds the source hashes, geometry, operational knowledge, and claim boundary.
+- Made Halo Fire operational knowledge a product gate rather than commentary.
+  The packet requires a passed GX10/Obsidian preflight, seven recalled episodes,
+  five authoritative bid/design/fabrication/field sources, six workflow
+  guardrails, and internal primary, independent, and adversarial verification.
+  Missing operational knowledge, source drift, answer-key leakage, pitch or
+  elevation drift, and false compliance promotion are rejected.
+- Added the source-only top and isometric views plus the brain receipt to the
+  Studio employee surface. Real browser verification caught a fixed evidence
+  viewer that clipped lower sections; grid max-content rows and contained
+  scrolling now make the complete 5,570-pixel live evidence stack reachable.
+- Verification passed: focused Vitest 106/106, full Vitest 1,764/1,764 across
+  191 files, node:test 20/20, production build, loop guard, agentic-rule
+  verifier, local and live authenticated browser visual smokes, and zero
+  browser console errors. Lean 4.13.0 verified packet readiness plus both
+  missing-brain and unresolved-coordination fail-closed theorems in 100 ms.
+- Deployed feature commit `fcb5c07ee5947767399268b713c06f99febe364c`
+  to the VPS and restarted `halofire.service` active. Public health and the
+  current 58,981-byte glass login returned 200 with no deprecated text. Real
+  admin authentication and the authenticated source-building route returned
+  200 with the exact receipt and counts; the live UI visibly rendered both
+  building views and the operational brain receipt.
+- Shared-brain writeback succeeded as episode 139750 and exact scoped recall
+  returned that episode at score 1.0. Compliance and fabrication remain false:
+  outer-vestibule drainage slopes and penetration obstruction clearances are
+  unresolved. This checkpoint does not claim a generated sprinkler layout;
+  the next loop iteration is source-only sprinkler generation before any
+  held-out completed-bid comparison.
