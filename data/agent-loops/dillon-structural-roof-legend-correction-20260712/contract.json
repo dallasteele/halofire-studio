@@ -1,0 +1,35 @@
+{
+  "name": "dillon-structural-roof-legend-correction-20260712",
+  "owner": "codex",
+  "loop_type": "closed",
+  "goal": "Retract the incorrect classification of solid-gray structural hatch polygons as slope roof, bind them to the legend's recess-floor-at-bathroom class, restore the live roof surface endpoint to zero promoted structural roof faces, and preserve evidence for subsequent extraction of the actual speckled slope-roof hatch.",
+  "sources_of_truth": [
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/main-plans/Main Level Framing Plan.pdf",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/structural-legend-main.png",
+    "apps/autosprink/src/data/dillon-structural-framing-roof-source.json",
+    "apps/autosprink/src/engine/dillon-structural-roof-surfaces.js"
+  ],
+  "exit_criteria": [
+    "No solid-gray structural polygon is reported as a slope-roof face",
+    "The source artifact identifies the extracted fill as recess floor at bathroom",
+    "Authenticated API and Studio report zero registered structural roof faces and the rejected false-positive count",
+    "Receipt, source classification, count, and attempted promotion mutations fail closed",
+    "Focused tests, build, rules, loop guard, live health, login, API, and browser pass"
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-structural-roof-legend-correction-20260712/contract.json",
+    "npx vitest run tests/dillon-structural-roof-surfaces.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/dillon-structural-roof-legend-correction-20260712/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/dillon-structural-framing-roof-source.json",
+    "data/agent-loops/dillon-structural-roof-legend-correction-20260712/state.json"
+  ],
+  "max_iterations": 4,
+  "max_tokens": 30000,
+  "model_tier": "balanced",
+  "brain_writeback_required": true,
+  "human_gate_required": false
+}

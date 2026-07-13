@@ -132,8 +132,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Dillon actual-drawing building model');
     expect(html).toContain('Interactive Dillon source-DWG floor-by-floor extrusion');
     expect(html).toContain('new THREE.ExtrudeGeometry');
-    expect(html).toContain('structural slope-roof footprints are now bounded on the main and upper levels');
-    expect(html).toContain('No unresolved face is flattened into the 3D model');
+    expect(html).toContain('Structural legend correction');
+    expect(html).toContain('no structural roof footprint is currently accepted from the framing sheets');
+    expect(html).toContain('No rejected or unresolved face is flattened into the 3D model');
     expect(html).toContain('NOT CODE APPROVAL');
     expect(html).toContain('function initScaleBar() { updateScaleBar(); }');
   });

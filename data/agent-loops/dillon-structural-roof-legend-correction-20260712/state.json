@@ -1,0 +1,23 @@
+{
+  "status": "local_verified",
+  "iteration": 2,
+  "truth": [
+    "The structural legend maps the solid gray swatch to HATCH AREA INDICATES RECESS FLOOR AT BATHROOM.",
+    "The structural legend maps the speckled hatch above it to HATCH AREA INDICATES SLOPE ROOF.",
+    "The 35 solid-gray drawings and 48 triangles previously reported as roof footprints are false positives and are now classified as recess floor at bathroom.",
+    "The corrected runtime accepts zero structural roof faces and promotes zero structural roof planes."
+  ],
+  "remaining": [
+    "Deploy and verify the corrected fail-closed result",
+    "Extract actual speckled slope-roof boundaries in a subsequent loop"
+  ],
+  "verification": {
+    "runtimeReceiptSha256": "5cac0259448a78ecf0cc99c57dd4474e0792bd5c9d423d4dc230036a1ccddabb",
+    "focusedTests": "41 passed",
+    "productionBuild": "passed",
+    "agenticRules": "passed",
+    "loopGuard": "passed",
+    "claim": "zero structural roof faces accepted; 48 solid-gray recess-floor triangles rejected by legend"
+  },
+  "globalGoalComplete": false
+}
