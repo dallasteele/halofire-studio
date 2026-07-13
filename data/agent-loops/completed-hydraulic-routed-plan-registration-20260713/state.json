@@ -1,21 +1,27 @@
 {
   "iteration": 1,
-  "phase": "verify",
-  "status": "ready_to_deploy",
+  "phase": "complete",
+  "status": "completed",
   "observations": [
     "The prior active-head registration is deployed at commit 46bc317d7d4fcdb808fa9e0d0cf4b570e673cec5.",
     "Local CAD gateway :18080 and editor :3002 were unavailable during preflight; they are separate from the scoped AutoSprink release surface.",
     "Promotion requires at least two completed projects and no external human-review gate.",
     "MIT Riverside and Sierra Marana now provide two sealed, source-hashed completed-project registrations covering 40 on-plan nodes, 14 inactive junctions, 38 pipes, and 31 independently recomputed scaled-length checks.",
     "All six protected Egnyte PDFs re-hashed exactly; GX10 Lean 4.13.0 verified the fail-closed promotion and residual-bound invariants.",
-    "Focused Vitest passed 23/23, bounded replay stress passed 100/100, node:test passed 20/20, full Vitest passed 1707/1707 across 180 files, the production build passed, and the agentic rulebook validated."
+    "Focused Vitest passed 23/23, bounded replay stress passed 100/100, node:test passed 20/20, full Vitest passed 1707/1707 across 180 files, the production build passed, and the agentic rulebook validated.",
+    "The VPS fast-forwarded to 7acf1cd881b71fcde32d40c805f9061e67c5f51e and halofire.service restarted active.",
+    "Live HTTPS login, authenticated admin identity, secure session-cookie flags, routed-plan evidence, combined pitched-roof calibration, visual login layout, and zero browser-console errors all passed."
   ],
   "attempts": [
     {
       "action": "GX10 Lean proof submission",
       "result": "The first submission exposed PowerShell Unicode transport replacement for <=/And glyphs; the ASCII-equivalent theorem was resubmitted and verified with return code 0."
+    },
+    {
+      "action": "VPS fast-forward",
+      "result": "The first fetch updated FETCH_HEAD without refreshing the named remote-tracking ref, so the post-restart SHA stayed old; the release gate caught this and the second merge fast-forwarded directly from verified FETCH_HEAD."
     }
   ],
   "blockers": [],
-  "next_action": "Commit and push the scoped slice, fast-forward the VPS, then verify the live login page, secure session, authenticated routed-plan evidence route, and combined pitched-roof calibration route."
+  "next_action": "Continue the parent full-stack goal with another multi-project completed-job slice for the remaining whole-building network elevation, exact as-built deflector datum, pipe-size, fabrication, projection, and compliance gates."
 }

@@ -1315,4 +1315,8 @@ User direction across 4 messages this session:
   focused Vitest 23/23, 100 bounded deterministic replays, node:test 20/20,
   full Vitest 1707/1707 across 180 files, production Vite build, and the
   workspace agentic-rule verifier.
-- Deployment and live authenticated smoke are the remaining release gates.
+- Deployed to the VPS at `7acf1cd881b71fcde32d40c805f9061e67c5f51e`.
+  The live HTTPS login, authenticated admin identity, secure session cookie,
+  routed-plan evidence API, combined pitched-roof calibration API, visual login
+  layout, and browser console all passed. The broader whole-building,
+  fabrication, projection, and compliance gates intentionally remain closed.
