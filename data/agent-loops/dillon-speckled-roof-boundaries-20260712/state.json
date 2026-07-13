@@ -1,6 +1,6 @@
 {
-  "status": "active",
-  "iteration": 2,
+  "status": "slice_complete",
+  "iteration": 3,
   "truth": [
     "The structural legend maps the speckled hatch to HATCH AREA INDICATES SLOPE ROOF.",
     "The PDFs expose the speckles on an optional-content layer named Roof-Hatch.",
@@ -11,7 +11,6 @@
     "Only one source pitch arrow lands directly on a contour, and it is on the unregistered toy sheet, so zero structural planes are promoted."
   ],
   "remaining": [
-    "Deploy the registered 2D contour evidence and verify live login, API receipt parity, and Studio rendering",
     "Resolve source-supported pitch and absolute elevation datum joins before any structural 3D plane promotion"
   ],
   "verification": {
@@ -20,7 +19,12 @@
     "productionBuild": "passed",
     "agenticRules": "passed",
     "loopGuard": "passed",
-    "localBrowser": "admin login, Studio Roof Planes action, 11/15 registered contour evidence, zero promoted structural planes, and zero browser warnings/errors passed"
+    "localBrowser": "admin login, Studio Roof Planes action, 11/15 registered contour evidence, zero promoted structural planes, and zero browser warnings/errors passed",
+    "runtimeReceiptSha256": "1312b757eb47bf806009cab414c9c7e58db334122f69beec5e2ebea1d93799ea",
+    "featureCommit": "de86656f3c2b69179efde442bc01455a860f919c",
+    "live": "VPS fast-forwarded to de86656f; halofire.service active; public health, login, and cache-busted Studio returned 200; authenticated live login, auth/me, and protected structural-roof endpoint returned 200 with receipt and count parity",
+    "artifactParity": "Studio HTML, API server, structural source JSON, sealed packet JSON, and structural engine SHA-256 match local and VPS",
+    "claim": "63,267 source Roof-Hatch vector speckle strokes; 15 tolerance-sealed contours; 11 main/upper contours registered in 2D; zero registered pitch joins and zero structural 3D planes"
   },
   "globalGoalComplete": false
 }
