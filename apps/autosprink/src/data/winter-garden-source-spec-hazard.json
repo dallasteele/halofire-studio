@@ -1,0 +1,1569 @@
+{
+  "artifactType": "halofire.winter-garden-source-spec-hazard.v1",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "generation": {
+    "answerKeyUsed": false,
+    "method": "source-building-room-identities+WG-Specs-section-21-1313",
+    "wholeBuildingDefaultHazardUsed": false
+  },
+  "sourceBuilding": {
+    "artifactType": "halofire.winter-garden-source-building-packet.v1",
+    "receiptSha256": "a71b9544ca1c31b9435aea21a9c0d6f2c05a22b27e211db6c39b2353f1f2bfeb"
+  },
+  "operationalKnowledge": {
+    "artifactType": "halofire.operational-knowledge-receipt.v2",
+    "source": "gx10-hal-brain+obsidian-vault",
+    "canonicalVault": "/opt/hal9000/apps/claudebot/hal-vault",
+    "preflightStatus": "passed",
+    "sessionId": "winter-garden-source-building-operational-knowledge-20260713",
+    "preflightQuery": "Halo Fire operations knowledge must actively constrain Winter Garden source-spec hazard and sprinkler generation across estimating, design engineering, procurement, fabrication, field installation, approvals, change control, closeout, and internal adversarial verification",
+    "recallEpisodeIds": [
+      139750,
+      139418,
+      60899,
+      129530,
+      133582,
+      136189,
+      132038,
+      136034,
+      129505,
+      129358
+    ],
+    "recalledWikiPages": [
+      "decisions/halo-forge-stream-d-sprinkler-alpha-workflow-correction-loop-design-artifact-2026.md",
+      "decisions/2026-05-15-halo-forge-stream-d-sprinkler-separate-design-issues-from-nfpa-ahj.md",
+      "decisions/halo-forge-sprinkler-catalog-engineering-gate-2026-05-13.md"
+    ],
+    "sources": [
+      "halofire-master/00_MASTER_MOC.md",
+      "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+      "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+      "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+      "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+      "halofire-master/07-08-itm-pm.md",
+      "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+      "halofire-autobid/system/autobid-index.md"
+    ],
+    "workflowGuardrails": [
+      "estimate-before-award-is-not-install-design",
+      "source-scale-and-elevation-datums-must-be-proven",
+      "commercial-hazard-and-density-come-from-project-spec-not-architectural-grid",
+      "completed-bids-are-held-out-calibration-not-generation-inputs",
+      "design-basis-requires-hazard-density-water-supply-and-field-condition-evidence",
+      "no-approved-submittal-means-no-order-fabrication-or-field-release",
+      "manufacturer-product-claims-require-approved-cut-sheets-and-responsibility-scope",
+      "field-conflicts-become-rfis-not-untracked-field-guesses",
+      "ahj-compliance-fabrication-and-manufacturer-claims-fail-closed",
+      "primary-independent-and-adversarial-verification-loops-are-internal",
+      "closeout-and-realized-job-cost-feed-the-next-estimating-loop"
+    ],
+    "applications": [
+      {
+        "id": "lifecycle-stage-authority",
+        "domain": "company-operations",
+        "source": "halofire-master/00_MASTER_MOC.md",
+        "decision": "bid-award-design-procure-fabricate-install-inspect-service-is-the-authoritative-lifecycle",
+        "control": "every-artifact-declares-its-lifecycle-stage-and-cannot-inherit-downstream-authority"
+      },
+      {
+        "id": "estimate-design-boundary",
+        "domain": "estimating",
+        "source": "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+        "decision": "estimating-geometry-is-a-pricing-seed-not-an-approved-installation-design",
+        "control": "source-building-and-layout-artifacts-keep-compliance-fabrication-and-field-release-false"
+      },
+      {
+        "id": "commercial-spec-hazard-basis",
+        "domain": "estimating-and-design",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "commercial-hazard-density-and-remote-area-come-from-csi-division-21-before-layout",
+        "control": "reject-default-hazard-or-density-when-the-project-spec-is-missing-unbound-or-contradicted"
+      },
+      {
+        "id": "design-basis-and-hydraulics",
+        "domain": "design-engineering",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "field-conditions-hazard-density-water-supply-remote-area-and-obstructions-precede-afc-release",
+        "control": "unresolved-room-ceiling-obstruction-or-water-evidence-keeps-design-and-compliance-fail-closed"
+      },
+      {
+        "id": "approved-product-procurement",
+        "domain": "procurement",
+        "source": "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+        "decision": "released-bom-approved-cut-sheets-responsibility-matrix-and-live-vendor-data-govern-the-buy",
+        "control": "no-manufacturer-exact-product-or-procurement-claim-without-project-approved-source-evidence"
+      },
+      {
+        "id": "afc-before-fabrication",
+        "domain": "fabrication-shop",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "nothing-is-cut-kitted-or-shipped-before-approved-for-construction-drawings-and-bom",
+        "control": "fabrication-ready-remains-false-until-afc-revision-bom-cut-list-and-product-approvals-join"
+      },
+      {
+        "id": "approved-set-field-rfi",
+        "domain": "field-operations",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "field-installs-the-approved-set-and-routes-conflicts-back-as-rfis",
+        "control": "unresolved-coordination-never-becomes-an-invented-install-location-or-field-release"
+      },
+      {
+        "id": "pm-change-closeout-learning",
+        "domain": "project-management-and-itm",
+        "source": "halofire-master/07-08-itm-pm.md",
+        "decision": "changes-are-priced-before-work-and-closeout-requires-asbuilts-om-test-certs-warranty-and-turnover",
+        "control": "revision-change-closeout-and-realized-cost-state-remain-explicit-and-feed-estimating-calibration"
+      },
+      {
+        "id": "internal-verification-doctrine",
+        "domain": "software-governance",
+        "source": "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+        "decision": "every-ai-feature-runs-multisignal-self-validation-and-correction-loops-inside-the-product",
+        "control": "primary-independent-and-adversarial-results-are-machine-gated-with-no-independent-review-blocker"
+      },
+      {
+        "id": "brain-db-loop-division",
+        "domain": "autobid-platform",
+        "source": "halofire-autobid/system/autobid-index.md",
+        "decision": "the-bid-db-locates-source-files-the-brain-holds-recallable-knowledge-and-deterministic-engines-own-calculations",
+        "control": "every-generated-decision-cites-source-locators-brain-provenance-and-deterministic-rule-output"
+      }
+    ],
+    "coverage": {
+      "lifecycleStages": [
+        "bid",
+        "award",
+        "design",
+        "procurement",
+        "fabrication",
+        "field-install",
+        "acceptance-itm",
+        "closeout-service"
+      ],
+      "crossCuttingDomains": [
+        "project-management",
+        "finance-job-cost",
+        "licensing-safety",
+        "codes-ahj",
+        "catalog-products",
+        "internal-verification"
+      ],
+      "sourceCount": 8,
+      "appliedDecisionCount": 10,
+      "status": "passed"
+    }
+  },
+  "criteria": {
+    "sourceBinding": {
+      "document": "WG Specs.pdf",
+      "locator": "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Bid Files/WG Specs.pdf",
+      "sha256": "2ceb110a0ab68f69a266e01d2c1274ac1a49c45f16958179cab78055a5192008",
+      "bytes": 35170629,
+      "section": "21 1313 Wet-Pipe Sprinkler Systems",
+      "pdfPages": [
+        644,
+        645,
+        646,
+        647
+      ],
+      "criteriaPage": 647,
+      "answerKey": false
+    },
+    "standardBasis": "NFPA 13 2019 or most recent edition adopted by the AHJ",
+    "systemBasis": "automatic wet-pipe system throughout heated portions; dry sprinklers preferred over and into vestibules",
+    "protectionExceptions": [
+      "areas with fire-retardant-treated wood require source confirmation before omission"
+    ],
+    "hazardRules": [
+      {
+        "id": "ordinary-hazard-group-1",
+        "matchLabels": [
+          "SERVING AREA",
+          "MECHANICAL",
+          "ELECTRICAL",
+          "JANITORIAL"
+        ],
+        "hazardClass": "Ordinary Hazard Group 1",
+        "densityGpmSqft": 0.15,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 130
+      },
+      {
+        "id": "ordinary-hazard-group-2",
+        "matchLabels": [
+          "STORAGE"
+        ],
+        "hazardClass": "Ordinary Hazard Group 2",
+        "densityGpmSqft": 0.2,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 130
+      },
+      {
+        "id": "light-hazard-all-other-source-identified-spaces",
+        "matchLabels": [
+          "*"
+        ],
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225
+      }
+    ],
+    "atticMaxCoverageSqftPerHead": 120,
+    "slopedCeilingRemoteArea": {
+      "thresholdRiseInPer12": 2,
+      "increasePct": 30
+    },
+    "hydraulicControls": {
+      "designMostRemoteArea": true,
+      "safetyAllowancePctBelowAdjustedSupplyCurve": 10,
+      "maximumVelocityFps": 20
+    }
+  },
+  "zoning": {
+    "zones": [
+      {
+        "roomId": "source-room-001",
+        "sourceLabel": "CHAPEL",
+        "sourceKind": "worship",
+        "sourceConfidence": "medium",
+        "areaSqft": 956.6002,
+        "identityGrounded": true,
+        "sourceRoomIndex": 0,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-002",
+        "sourceLabel": "ROSTRUM",
+        "sourceKind": "worship",
+        "sourceConfidence": "medium",
+        "areaSqft": 894.303,
+        "identityGrounded": true,
+        "sourceRoomIndex": 1,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-003",
+        "sourceLabel": "OVERFLOW",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 634.7972,
+        "identityGrounded": true,
+        "sourceRoomIndex": 2,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-004",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 597.1014,
+        "identityGrounded": false,
+        "sourceRoomIndex": 3,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-005",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 561.707,
+        "identityGrounded": false,
+        "sourceRoomIndex": 4,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-006",
+        "sourceLabel": "CORRIDOR",
+        "sourceKind": "corridor",
+        "sourceConfidence": "medium",
+        "areaSqft": 501.1557,
+        "identityGrounded": true,
+        "sourceRoomIndex": 5,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-007",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 435.0492,
+        "identityGrounded": false,
+        "sourceRoomIndex": 6,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-008",
+        "sourceLabel": "FOYER",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 427.2719,
+        "identityGrounded": true,
+        "sourceRoomIndex": 7,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-009",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 344.1824,
+        "identityGrounded": false,
+        "sourceRoomIndex": 8,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-010",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 340.2938,
+        "identityGrounded": false,
+        "sourceRoomIndex": 9,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-011",
+        "sourceLabel": "COUNCIL",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 336.6433,
+        "identityGrounded": true,
+        "sourceRoomIndex": 10,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-012",
+        "sourceLabel": "WAITING",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 319.1842,
+        "identityGrounded": true,
+        "sourceRoomIndex": 11,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-013",
+        "sourceLabel": "CORRIDOR",
+        "sourceKind": "corridor",
+        "sourceConfidence": "medium",
+        "areaSqft": 314.1052,
+        "identityGrounded": true,
+        "sourceRoomIndex": 12,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-014",
+        "sourceLabel": "WAITING",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 190.3836,
+        "identityGrounded": true,
+        "sourceRoomIndex": 13,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-015",
+        "sourceLabel": "SAC PREP",
+        "sourceKind": "support",
+        "sourceConfidence": "medium",
+        "areaSqft": 156.3383,
+        "identityGrounded": true,
+        "sourceRoomIndex": 14,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-016",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 151.4181,
+        "identityGrounded": false,
+        "sourceRoomIndex": 15,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-017",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 148.4818,
+        "identityGrounded": false,
+        "sourceRoomIndex": 16,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-018",
+        "sourceLabel": "BISHOP",
+        "sourceKind": "office",
+        "sourceConfidence": "medium",
+        "areaSqft": 140.7839,
+        "identityGrounded": true,
+        "sourceRoomIndex": 17,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-019",
+        "sourceLabel": "WOMEN'S",
+        "sourceKind": "restroom",
+        "sourceConfidence": "medium",
+        "areaSqft": 139.276,
+        "identityGrounded": true,
+        "sourceRoomIndex": 18,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-020",
+        "sourceLabel": "STAKE",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 138.4824,
+        "identityGrounded": true,
+        "sourceRoomIndex": 19,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-021",
+        "sourceLabel": "BISHOP",
+        "sourceKind": "office",
+        "sourceConfidence": "medium",
+        "areaSqft": 135.5461,
+        "identityGrounded": true,
+        "sourceRoomIndex": 20,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-022",
+        "sourceLabel": "PLATFORM",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 132.213,
+        "identityGrounded": true,
+        "sourceRoomIndex": 21,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-023",
+        "sourceLabel": "AREA",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 131.1814,
+        "identityGrounded": true,
+        "sourceRoomIndex": 22,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-024",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 129.991,
+        "identityGrounded": false,
+        "sourceRoomIndex": 23,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-025",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 127.2927,
+        "identityGrounded": false,
+        "sourceRoomIndex": 24,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-026",
+        "sourceLabel": "BISHOP",
+        "sourceKind": "office",
+        "sourceConfidence": "medium",
+        "areaSqft": 125.8643,
+        "identityGrounded": true,
+        "sourceRoomIndex": 25,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-027",
+        "sourceLabel": "MEN'S",
+        "sourceKind": "restroom",
+        "sourceConfidence": "medium",
+        "areaSqft": 124.5945,
+        "identityGrounded": true,
+        "sourceRoomIndex": 26,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-028",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 124.4358,
+        "identityGrounded": false,
+        "sourceRoomIndex": 27,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-029",
+        "sourceLabel": "STORAGE",
+        "sourceKind": "storage",
+        "sourceConfidence": "medium",
+        "areaSqft": 119.9123,
+        "identityGrounded": true,
+        "sourceRoomIndex": 28,
+        "status": "source-classified",
+        "hazardRuleId": "ordinary-hazard-group-2",
+        "hazardClass": "Ordinary Hazard Group 2",
+        "densityGpmSqft": 0.2,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 130,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-030",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 113.1667,
+        "identityGrounded": false,
+        "sourceRoomIndex": 29,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-031",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 110.9447,
+        "identityGrounded": false,
+        "sourceRoomIndex": 30,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-032",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 110.3892,
+        "identityGrounded": false,
+        "sourceRoomIndex": 31,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-033",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 107.2148,
+        "identityGrounded": false,
+        "sourceRoomIndex": 32,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-034",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 101.1834,
+        "identityGrounded": false,
+        "sourceRoomIndex": 33,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-035",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 76.3439,
+        "identityGrounded": false,
+        "sourceRoomIndex": 34,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-036",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 73.2489,
+        "identityGrounded": false,
+        "sourceRoomIndex": 35,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-037",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 68.1699,
+        "identityGrounded": false,
+        "sourceRoomIndex": 36,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-038",
+        "sourceLabel": "BISHOP",
+        "sourceKind": "office",
+        "sourceConfidence": "medium",
+        "areaSqft": 65.1542,
+        "identityGrounded": true,
+        "sourceRoomIndex": 37,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-039",
+        "sourceLabel": "MEMBER",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 59.4403,
+        "identityGrounded": true,
+        "sourceRoomIndex": 38,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-040",
+        "sourceLabel": "YOUNG WOMEN",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 59.2816,
+        "identityGrounded": true,
+        "sourceRoomIndex": 39,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-041",
+        "sourceLabel": "FONT",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 58.488,
+        "identityGrounded": true,
+        "sourceRoomIndex": 40,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-042",
+        "sourceLabel": "CLERK",
+        "sourceKind": "office",
+        "sourceConfidence": "medium",
+        "areaSqft": 58.488,
+        "identityGrounded": true,
+        "sourceRoomIndex": 41,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-043",
+        "sourceLabel": "CLERK",
+        "sourceKind": "office",
+        "sourceConfidence": "medium",
+        "areaSqft": 57.4563,
+        "identityGrounded": true,
+        "sourceRoomIndex": 42,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-044",
+        "sourceLabel": "CLERK",
+        "sourceKind": "office",
+        "sourceConfidence": "medium",
+        "areaSqft": 56.1072,
+        "identityGrounded": true,
+        "sourceRoomIndex": 43,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-045",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 55.7898,
+        "identityGrounded": false,
+        "sourceRoomIndex": 44,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-046",
+        "sourceLabel": "CENTER",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 55.3136,
+        "identityGrounded": true,
+        "sourceRoomIndex": 45,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-047",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 53.8058,
+        "identityGrounded": false,
+        "sourceRoomIndex": 46,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-048",
+        "sourceLabel": "CLERK",
+        "sourceKind": "office",
+        "sourceConfidence": "medium",
+        "areaSqft": 52.6948,
+        "identityGrounded": true,
+        "sourceRoomIndex": 47,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-049",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 51.9012,
+        "identityGrounded": false,
+        "sourceRoomIndex": 48,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-050",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 48.33,
+        "identityGrounded": false,
+        "sourceRoomIndex": 49,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-051",
+        "sourceLabel": "WAITING",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 44.4414,
+        "identityGrounded": true,
+        "sourceRoomIndex": 50,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-052",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 36.6641,
+        "identityGrounded": false,
+        "sourceRoomIndex": 51,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-053",
+        "sourceLabel": "FAMILY",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 36.1086,
+        "identityGrounded": true,
+        "sourceRoomIndex": 52,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-054",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 35.315,
+        "identityGrounded": false,
+        "sourceRoomIndex": 53,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-055",
+        "sourceLabel": null,
+        "sourceKind": "unknown",
+        "sourceConfidence": "low",
+        "areaSqft": 35.0769,
+        "identityGrounded": false,
+        "sourceRoomIndex": 54,
+        "status": "blocked",
+        "hazardClass": null,
+        "densityGpmSqft": null,
+        "remoteAreaSqft": null,
+        "maxCoverageSqftPerHead": null,
+        "blockingReasons": [
+          "source-room-identity-unresolved"
+        ]
+      },
+      {
+        "roomId": "source-room-056",
+        "sourceLabel": "MOTHER'S",
+        "sourceKind": "unknown",
+        "sourceConfidence": "medium",
+        "areaSqft": 33.1723,
+        "identityGrounded": true,
+        "sourceRoomIndex": 55,
+        "status": "source-classified",
+        "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+        "hazardClass": "Light Hazard",
+        "densityGpmSqft": 0.1,
+        "remoteAreaSqft": 1500,
+        "maxCoverageSqftPerHead": 225,
+        "ceilingSlopeApplication": {
+          "status": "blocked-until-room-ceiling-profile-is-registered",
+          "buildingRoofPitchRiseInPer12": 4.5,
+          "thresholdRiseInPer12": 2,
+          "buildingRoofExceedsThreshold": true,
+          "appliesToRoom": null,
+          "adjustedRemoteAreaCandidateSqft": 1950
+        },
+        "blockingReasons": [
+          "room-ceiling-profile-unresolved",
+          "obstruction-clearances-unresolved",
+          "water-supply-hydraulics-unresolved"
+        ]
+      }
+    ],
+    "counts": {
+      "totalRooms": 56,
+      "sourceClassifiedRooms": 31,
+      "unresolvedRooms": 25,
+      "byHazard": {
+        "Light Hazard": 30,
+        "Ordinary Hazard Group 2": 1
+      }
+    },
+    "buildingRoofPitchRiseInPer12": 4.5,
+    "buildingRoofExceedsSlopeAdjustmentThreshold": true
+  },
+  "unresolved": [
+    "25 traced room boundaries do not yet have a source-contained room identity and receive no default hazard",
+    "room-by-room ceiling profiles are not yet registered, so the 30-percent sloped-ceiling remote-area increase is a candidate rather than a final hydraulic area",
+    "fire-retardant-treated-wood omission areas are not mapped",
+    "vestibule dry-sprinkler locations are not mapped",
+    "mechanical-electrical-structural obstruction clearances and site water-supply hydraulics remain unresolved"
+  ],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-section-21-1313-rule-to-source-room-classification"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "recomputed-room-count-hazard-tally-and-4.5-to-12-slope-threshold-replay"
+    },
+    "adversarial": {
+      "status": "passed",
+      "rejectedCases": [
+        "missing-or-drifted-spec-hash",
+        "whole-building-default-hazard",
+        "unidentified-room-light-hazard-fallback",
+        "slope-adjustment-promoted-without-room-ceiling-profile",
+        "answer-key-generation-input",
+        "compliance-or-fabrication-ready-claim"
+      ]
+    }
+  },
+  "sourceSpecGrounded": true,
+  "partialHazardZoningGrounded": true,
+  "wholeBuildingHazardZoningComplete": false,
+  "headLayoutReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "source-spec-hazard-zoning-partial-not-sprinkler-code-compliance",
+  "receiptSha256": "cc4b9faf20604ee18cca7ec7c555f0e3b6a6126b28b4935884a2fda264d7e7b9"
+}

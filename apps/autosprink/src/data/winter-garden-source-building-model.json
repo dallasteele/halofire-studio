@@ -29,33 +29,147 @@
     "method": "A103-dimension-viewport+A151-registered-cut-walls+A121-vector-ridge-valleys+A201-A301-datums"
   },
   "operationalKnowledge": {
+    "artifactType": "halofire.operational-knowledge-receipt.v2",
     "source": "gx10-hal-brain+obsidian-vault",
+    "canonicalVault": "/opt/hal9000/apps/claudebot/hal-vault",
     "preflightStatus": "passed",
     "sessionId": "winter-garden-source-building-operational-knowledge-20260713",
+    "preflightQuery": "Halo Fire operations knowledge must actively constrain Winter Garden source-spec hazard and sprinkler generation across estimating, design engineering, procurement, fabrication, field installation, approvals, change control, closeout, and internal adversarial verification",
     "recallEpisodeIds": [
+      139750,
       139418,
-      120030,
+      60899,
+      129530,
+      133582,
+      136189,
+      132038,
+      136034,
       129505,
-      129358,
-      129549,
-      126369,
-      124864
+      129358
+    ],
+    "recalledWikiPages": [
+      "decisions/halo-forge-stream-d-sprinkler-alpha-workflow-correction-loop-design-artifact-2026.md",
+      "decisions/2026-05-15-halo-forge-stream-d-sprinkler-separate-design-issues-from-nfpa-ahj.md",
+      "decisions/halo-forge-sprinkler-catalog-engineering-gate-2026-05-13.md"
     ],
     "sources": [
-      "halofire/bid-process-knowledge.md",
+      "halofire-master/00_MASTER_MOC.md",
+      "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
       "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
-      "halofire-master/05-Fabrication-Shop/05_Fabrication_Shop.md",
-      "halofire-master/06-Field-Ops-Install/06_Field_Ops_Install.md",
+      "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+      "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+      "halofire-master/07-08-itm-pm.md",
+      "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
       "halofire-autobid/system/autobid-index.md"
     ],
     "workflowGuardrails": [
       "estimate-before-award-is-not-install-design",
       "source-scale-and-elevation-datums-must-be-proven",
+      "commercial-hazard-and-density-come-from-project-spec-not-architectural-grid",
       "completed-bids-are-held-out-calibration-not-generation-inputs",
-      "design-hands-off-to-fabrication-and-field-only-after-required-approvals",
+      "design-basis-requires-hazard-density-water-supply-and-field-condition-evidence",
+      "no-approved-submittal-means-no-order-fabrication-or-field-release",
+      "manufacturer-product-claims-require-approved-cut-sheets-and-responsibility-scope",
+      "field-conflicts-become-rfis-not-untracked-field-guesses",
       "ahj-compliance-fabrication-and-manufacturer-claims-fail-closed",
-      "primary-independent-and-adversarial-verification-loops-are-internal"
-    ]
+      "primary-independent-and-adversarial-verification-loops-are-internal",
+      "closeout-and-realized-job-cost-feed-the-next-estimating-loop"
+    ],
+    "applications": [
+      {
+        "id": "lifecycle-stage-authority",
+        "domain": "company-operations",
+        "source": "halofire-master/00_MASTER_MOC.md",
+        "decision": "bid-award-design-procure-fabricate-install-inspect-service-is-the-authoritative-lifecycle",
+        "control": "every-artifact-declares-its-lifecycle-stage-and-cannot-inherit-downstream-authority"
+      },
+      {
+        "id": "estimate-design-boundary",
+        "domain": "estimating",
+        "source": "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+        "decision": "estimating-geometry-is-a-pricing-seed-not-an-approved-installation-design",
+        "control": "source-building-and-layout-artifacts-keep-compliance-fabrication-and-field-release-false"
+      },
+      {
+        "id": "commercial-spec-hazard-basis",
+        "domain": "estimating-and-design",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "commercial-hazard-density-and-remote-area-come-from-csi-division-21-before-layout",
+        "control": "reject-default-hazard-or-density-when-the-project-spec-is-missing-unbound-or-contradicted"
+      },
+      {
+        "id": "design-basis-and-hydraulics",
+        "domain": "design-engineering",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "field-conditions-hazard-density-water-supply-remote-area-and-obstructions-precede-afc-release",
+        "control": "unresolved-room-ceiling-obstruction-or-water-evidence-keeps-design-and-compliance-fail-closed"
+      },
+      {
+        "id": "approved-product-procurement",
+        "domain": "procurement",
+        "source": "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+        "decision": "released-bom-approved-cut-sheets-responsibility-matrix-and-live-vendor-data-govern-the-buy",
+        "control": "no-manufacturer-exact-product-or-procurement-claim-without-project-approved-source-evidence"
+      },
+      {
+        "id": "afc-before-fabrication",
+        "domain": "fabrication-shop",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "nothing-is-cut-kitted-or-shipped-before-approved-for-construction-drawings-and-bom",
+        "control": "fabrication-ready-remains-false-until-afc-revision-bom-cut-list-and-product-approvals-join"
+      },
+      {
+        "id": "approved-set-field-rfi",
+        "domain": "field-operations",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "field-installs-the-approved-set-and-routes-conflicts-back-as-rfis",
+        "control": "unresolved-coordination-never-becomes-an-invented-install-location-or-field-release"
+      },
+      {
+        "id": "pm-change-closeout-learning",
+        "domain": "project-management-and-itm",
+        "source": "halofire-master/07-08-itm-pm.md",
+        "decision": "changes-are-priced-before-work-and-closeout-requires-asbuilts-om-test-certs-warranty-and-turnover",
+        "control": "revision-change-closeout-and-realized-cost-state-remain-explicit-and-feed-estimating-calibration"
+      },
+      {
+        "id": "internal-verification-doctrine",
+        "domain": "software-governance",
+        "source": "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+        "decision": "every-ai-feature-runs-multisignal-self-validation-and-correction-loops-inside-the-product",
+        "control": "primary-independent-and-adversarial-results-are-machine-gated-with-no-independent-review-blocker"
+      },
+      {
+        "id": "brain-db-loop-division",
+        "domain": "autobid-platform",
+        "source": "halofire-autobid/system/autobid-index.md",
+        "decision": "the-bid-db-locates-source-files-the-brain-holds-recallable-knowledge-and-deterministic-engines-own-calculations",
+        "control": "every-generated-decision-cites-source-locators-brain-provenance-and-deterministic-rule-output"
+      }
+    ],
+    "coverage": {
+      "lifecycleStages": [
+        "bid",
+        "award",
+        "design",
+        "procurement",
+        "fabrication",
+        "field-install",
+        "acceptance-itm",
+        "closeout-service"
+      ],
+      "crossCuttingDomains": [
+        "project-management",
+        "finance-job-cost",
+        "licensing-safety",
+        "codes-ahj",
+        "catalog-products",
+        "internal-verification"
+      ],
+      "sourceCount": 8,
+      "appliedDecisionCount": 10,
+      "status": "passed"
+    }
   },
   "model": {
     "status": "passed",
@@ -9039,5 +9153,5 @@
   "complianceReady": false,
   "fabricationReady": false,
   "claimStatus": "source-bound-floor-and-pitched-roof-geometry-not-sprinkler-code-compliance",
-  "receiptSha256": "cfe27af97237459ed71a38120df7ee570ac4fb300ef7884ce235490b2f2e55e7"
+  "receiptSha256": "a71b9544ca1c31b9435aea21a9c0d6f2c05a22b27e211db6c39b2353f1f2bfeb"
 }

@@ -1,6 +1,6 @@
 {
-  "artifactType": "halofire.formal-verification-receipt.v1",
-  "createdAt": "2026-07-13T11:42:00-07:00",
+  "artifactType": "halofire.formal-verification-receipt.v2",
+  "createdAt": "2026-07-13T12:35:00-07:00",
   "prover": {
     "name": "Lean",
     "version": "4.13.0",
@@ -8,31 +8,38 @@
     "health": "passed"
   },
   "subject": {
-    "packetReceiptSha256": "cfe27af97237459ed71a38120df7ee570ac4fb300ef7884ce235490b2f2e55e7",
-    "sourceSheetCount": 5,
+    "sourceBuildingReceiptSha256": "a71b9544ca1c31b9435aea21a9c0d6f2c05a22b27e211db6c39b2353f1f2bfeb",
+    "sourceSpecHazardReceiptSha256": "cc4b9faf20604ee18cca7ec7c555f0e3b6a6126b28b4935884a2fda264d7e7b9",
+    "operationalSourceCount": 8,
+    "appliedDecisionCount": 10,
+    "lifecycleStageCount": 8,
     "roomCount": 56,
-    "pitchedSurfaceCount": 10,
-    "verticalFeatureCount": 1,
-    "brainEpisodeCount": 7,
-    "operationalSourceCount": 5,
-    "workflowGuardrailCount": 6,
+    "sourceClassifiedRoomCount": 31,
+    "unresolvedRoomCount": 25,
+    "lightHazardRoomCount": 30,
+    "ordinaryHazardGroup2RoomCount": 1,
+    "slopedRemoteAreaCandidateSqft": 1950,
     "internalAdversarialLoopsRequired": true
   },
   "theorems": [
-    "sourceBuildingPacketReady",
-    "missingOperationalBrainFailsComplianceClosed",
-    "unresolvedCoordinationFailsComplianceClosed"
+    "operationalBrainAndSourceSpecGate"
   ],
-  "source": "def packetReady (sheets rooms pitched vertical episodes sources guardrails : Nat) (adversarial : Bool) : Bool := sheets == 5 && rooms == 56 && pitched == 10 && vertical == 1 && episodes == 7 && sources == 5 && guardrails == 6 && adversarial\n\ntheorem sourceBuildingPacketReady : packetReady 5 56 10 1 7 5 6 true = true := by native_decide\n\ntheorem missingOperationalBrainFailsComplianceClosed : packetReady 5 56 10 1 0 0 0 true = false := by native_decide\n\ntheorem unresolvedCoordinationFailsComplianceClosed : (true && false) = false := by decide",
+  "source": "def operationalReady (sources applied stages : Nat) (internalLoops : Bool) : Bool :=\n  sources == 8 && applied == 10 && stages == 8 && internalLoops\n\ndef sourceSpecPartial (total classified unresolved light oh2 : Nat) (defaulted : Bool) : Bool :=\n  total == 56 && classified == 31 && unresolved == 25 && light == 30 && oh2 == 1 && !defaulted\n\ntheorem operationalBrainAndSourceSpecGate :\n    (operationalReady 8 10 8 true &&\n     sourceSpecPartial 56 31 25 30 1 false &&\n     (1500 * 130 / 100 == 1950) &&\n     !(25 == 0)) = true :=\nby native_decide",
   "result": {
     "status": "verified",
     "returnCode": 0,
-    "durationMs": 100
+    "durationMs": 94
   },
   "claimBoundary": {
     "geometryGrounded": true,
     "operationalKnowledgeGrounded": true,
+    "sourceSpecGrounded": true,
+    "partialHazardZoningGrounded": true,
+    "wholeBuildingHazardZoningComplete": false,
+    "headLayoutReady": false,
+    "hydraulicCalculationReady": false,
     "complianceReady": false,
-    "fabricationReady": false
+    "fabricationReady": false,
+    "fieldReleaseReady": false
   }
 }

@@ -53,6 +53,7 @@ import { buildWinterGardenPitchedHydraulicModel, validateWinterGardenPitchedHydr
 import { buildDallasPitchedAtticHydraulicModel, validateCompletedPitchedHydraulicPortfolio, validateDallasPitchedAtticHydraulicRegistration, verifyDallasPitchedAtticHydraulicAdversarialLoop } from '../engine/dallas-pitched-attic-hydraulic-registration.js';
 import { buildDallasPitchedAtticBluebeamOverlay } from '../engine/dallas-pitched-attic-bluebeam-overlay.js';
 import { validateWinterGardenSourceBuildingPacket } from '../engine/winter-garden-source-building-packet.js';
+import { validateWinterGardenSourceSpecHazardPacket } from '../engine/winter-garden-source-spec-hazard.js';
 import { renderOrthogonalGableBuildingViews } from '../engine/orthogonal-gable-building-views.js';
 import { buildWinterGardenBluebeamPackage } from '../engine/winter-garden-bluebeam-package.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
@@ -111,6 +112,7 @@ const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitte
 const PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH = path.resolve(__dirname, '../data/pitched-roof-cross-project-evidence.json');
 const WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/winter-garden-cross-project-source-set.json');
 const WINTER_GARDEN_SOURCE_BUILDING_MODEL_PATH = path.resolve(__dirname, '../data/winter-garden-source-building-model.json');
+const WINTER_GARDEN_SOURCE_SPEC_HAZARD_PATH = path.resolve(__dirname, '../data/winter-garden-source-spec-hazard.json');
 const TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/tallahassee-completed-project-source-set.json');
 const NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/nashville-completed-project-source-set.json');
 const DALLAS_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/dallas-completed-project-source-set.json');
@@ -1676,6 +1678,69 @@ app.get('/api/projects/:name/source-building-model', authMiddleware, async (req,
       message: 'The sealed source-only building model could not be loaded.',
       complianceReady: false,
       fabricationReady: false,
+    });
+  }
+});
+
+app.get('/api/projects/:name/source-spec-hazard', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'LDS Meeting House - Winter Garden FL') {
+    return res.status(404).json({
+      status: 'blocked',
+      error: 'source_spec_hazard_not_found',
+      message: 'No sealed source-spec hazard packet exists for this project.',
+      complianceReady: false,
+      fabricationReady: false,
+      fieldReleaseReady: false,
+    });
+  }
+  try {
+    const sourceBuildingPacket = JSON.parse(fs.readFileSync(WINTER_GARDEN_SOURCE_BUILDING_MODEL_PATH, 'utf8'));
+    const sourceBuildingValidation = await validateWinterGardenSourceBuildingPacket(sourceBuildingPacket);
+    if (sourceBuildingValidation.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked',
+        error: 'source_building_prerequisite_failed',
+        issues: sourceBuildingValidation.issues,
+        complianceReady: false,
+        fabricationReady: false,
+        fieldReleaseReady: false,
+      });
+    }
+    const packet = JSON.parse(fs.readFileSync(WINTER_GARDEN_SOURCE_SPEC_HAZARD_PATH, 'utf8'));
+    const validation = await validateWinterGardenSourceSpecHazardPacket(packet, { sourceBuildingPacket });
+    if (validation.status !== 'passed') return res.status(422).json({ ...validation, projectName: req.params.name });
+    return res.json({
+      status: 'passed',
+      artifactType: packet.artifactType,
+      projectName: req.params.name,
+      receiptSha256: packet.receiptSha256,
+      sourceBuilding: packet.sourceBuilding,
+      operationalKnowledge: packet.operationalKnowledge,
+      criteria: validation.criteria,
+      zoning: validation.zoning,
+      counts: validation.counts,
+      internalVerification: packet.internalVerification,
+      unresolved: packet.unresolved,
+      operationalKnowledgeGrounded: validation.operationalKnowledgeGrounded,
+      sourceSpecGrounded: validation.sourceSpecGrounded,
+      partialHazardZoningGrounded: validation.partialHazardZoningGrounded,
+      wholeBuildingHazardZoningComplete: false,
+      headLayoutReady: false,
+      hydraulicCalculationReady: false,
+      complianceReady: false,
+      fabricationReady: false,
+      fieldReleaseReady: false,
+      claimStatus: validation.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Winter Garden source-spec hazard packet', { error: error.message });
+    return res.status(500).json({
+      status: 'blocked',
+      error: 'source_spec_hazard_load_failed',
+      message: 'The sealed source-spec hazard packet could not be loaded.',
+      complianceReady: false,
+      fabricationReady: false,
+      fieldReleaseReady: false,
     });
   }
 });

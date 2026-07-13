@@ -65,8 +65,10 @@ describe('GET /api/projects/:name/source-building-model', () => {
     expect(body.receiptSha256).toMatch(/^[0-9a-f]{64}$/);
     expect(body.counts).toEqual({ rooms: 56, roofSurfaces: 11, pitchedRoofSurfaces: 10, verticalFeatures: 1 });
     expect(body.operationalKnowledge.preflightStatus).toBe('passed');
-    expect(body.operationalKnowledge.sources).toContain('halofire/bid-process-knowledge.md');
+    expect(body.operationalKnowledge.sources).toContain('halofire-master/00_MASTER_MOC.md');
     expect(body.operationalKnowledge.workflowGuardrails).toContain('primary-independent-and-adversarial-verification-loops-are-internal');
+    expect(body.operationalKnowledge.applications).toHaveLength(10);
+    expect(body.operationalKnowledge.coverage.lifecycleStages).toContain('closeout-service');
     expect(body.views.topSvg).toContain('<svg');
     expect(body.views.isometricSvg).toContain('<svg');
     expect(body.geometryGrounded).toBe(true);
@@ -81,5 +83,39 @@ describe('GET /api/projects/:name/source-building-model', () => {
     });
     expect(response.status).toBe(404);
     expect((await response.json()).complianceReady).toBe(false);
+  });
+});
+
+describe('GET /api/projects/:name/source-spec-hazard', () => {
+  it('requires login', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-spec-hazard`);
+    expect(response.status).toBe(401);
+  });
+
+  it('serves the source-bound spec criteria, applied brain rules, and partial fail-closed zoning', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-spec-hazard`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.status).toBe('passed');
+    expect(body.criteria.sourceBinding).toMatchObject({
+      document: 'WG Specs.pdf',
+      sha256: '2ceb110a0ab68f69a266e01d2c1274ac1a49c45f16958179cab78055a5192008',
+      section: '21 1313 Wet-Pipe Sprinkler Systems',
+      criteriaPage: 647,
+      answerKey: false,
+    });
+    expect(body.counts).toEqual({ totalRooms: 56, sourceClassifiedRooms: 31, unresolvedRooms: 25, byHazard: { 'Light Hazard': 30, 'Ordinary Hazard Group 2': 1 } });
+    expect(body.operationalKnowledge.applications).toHaveLength(10);
+    expect(body.internalVerification).toMatchObject({ primary: { status: 'passed' }, independent: { status: 'passed' }, adversarial: { status: 'passed' } });
+    expect(body.operationalKnowledgeGrounded).toBe(true);
+    expect(body.sourceSpecGrounded).toBe(true);
+    expect(body.partialHazardZoningGrounded).toBe(true);
+    expect(body.wholeBuildingHazardZoningComplete).toBe(false);
+    expect(body.headLayoutReady).toBe(false);
+    expect(body.complianceReady).toBe(false);
+    expect(body.fabricationReady).toBe(false);
+    expect(body.fieldReleaseReady).toBe(false);
   });
 });

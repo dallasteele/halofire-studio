@@ -5,6 +5,7 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { buildOrthogonalGableBuildingModel } from '../src/engine/orthogonal-gable-building-model.js';
 import { renderOrthogonalGableBuildingViews } from '../src/engine/orthogonal-gable-building-views.js';
 import { sealWinterGardenSourceBuildingPacket } from '../src/engine/winter-garden-source-building-packet.js';
+import { buildHaloFireOperationalKnowledgeReceipt } from '../src/engine/halofire-operational-knowledge.js';
 
 const OUT_DIR = path.resolve(process.cwd(), 'out/visual-proof');
 const readJson = (name) => JSON.parse(fs.readFileSync(path.join(OUT_DIR, name), 'utf8'));
@@ -62,27 +63,16 @@ const sourcePacket = await sealWinterGardenSourceBuildingPacket({
   projectName: 'LDS Meeting House - Winter Garden FL',
   sourceBindings: [...sourceHashes.entries()].map(([sheet, sha256]) => ({ sheet, sha256 })),
   generation: { answerKeyUsed: false, roomCandidateId: selected.id, method: 'A103-dimension-viewport+A151-registered-cut-walls+A121-vector-ridge-valleys+A201-A301-datums' },
-  operationalKnowledge: {
-    source: 'gx10-hal-brain+obsidian-vault',
-    preflightStatus: 'passed',
+  operationalKnowledge: buildHaloFireOperationalKnowledgeReceipt({
     sessionId: 'winter-garden-source-building-operational-knowledge-20260713',
-    recallEpisodeIds: [139418, 120030, 129505, 129358, 129549, 126369, 124864],
-    sources: [
-      'halofire/bid-process-knowledge.md',
-      'halofire-master/03-Design-Engineering/03_Design_Engineering.md',
-      'halofire-master/05-Fabrication-Shop/05_Fabrication_Shop.md',
-      'halofire-master/06-Field-Ops-Install/06_Field_Ops_Install.md',
-      'halofire-autobid/system/autobid-index.md',
+    preflightQuery: 'Halo Fire operations knowledge must actively constrain Winter Garden source-spec hazard and sprinkler generation across estimating, design engineering, procurement, fabrication, field installation, approvals, change control, closeout, and internal adversarial verification',
+    recallEpisodeIds: [139750, 139418, 60899, 129530, 133582, 136189, 132038, 136034, 129505, 129358],
+    recalledWikiPages: [
+      'decisions/halo-forge-stream-d-sprinkler-alpha-workflow-correction-loop-design-artifact-2026.md',
+      'decisions/2026-05-15-halo-forge-stream-d-sprinkler-separate-design-issues-from-nfpa-ahj.md',
+      'decisions/halo-forge-sprinkler-catalog-engineering-gate-2026-05-13.md',
     ],
-    workflowGuardrails: [
-      'estimate-before-award-is-not-install-design',
-      'source-scale-and-elevation-datums-must-be-proven',
-      'completed-bids-are-held-out-calibration-not-generation-inputs',
-      'design-hands-off-to-fabrication-and-field-only-after-required-approvals',
-      'ahj-compliance-fabrication-and-manufacturer-claims-fail-closed',
-      'primary-independent-and-adversarial-verification-loops-are-internal',
-    ],
-  },
+  }),
   model,
   geometryGrounded: true,
   complianceReady: false,
