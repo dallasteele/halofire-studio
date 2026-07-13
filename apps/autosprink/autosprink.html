@@ -1351,6 +1351,11 @@ async function hfShowSubmittedCalibrationViews() {
     const dillonModel3dVerification = hfVerifySlopedCeilingModel3d(dillonModel3d, dillonLayout, dillonModelInput);
     if (dillonModel3dVerification.status !== 'passed') throw new Error(dillonModel3dVerification.issues.map((entry) => entry.code).join(', '));
     const dillonLayoutViews = hfRenderSlopedCeilingLayoutViews(dillonLayout, dillonParity, dillonModel3d);
+    const crossProjectResponse = await fetch('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-calibration', { credentials: 'same-origin' });
+    if (!crossProjectResponse.ok) throw new Error(`Pitched-roof cross-project evidence HTTP ${crossProjectResponse.status}`);
+    const crossProjectRoute = await crossProjectResponse.json();
+    const crossProjectEvidence = crossProjectRoute.crossProjectEvidence;
+    if (crossProjectRoute.status !== 'passed' || crossProjectEvidence?.metrics?.projectCount < 3 || crossProjectEvidence?.metrics?.pitchedProjectCount < 2) throw new Error('Pitched-roof cross-project evidence validation failed');
     const floorModelResponse = await fetch('/api/projects/Dillon%20Residence/floor-by-floor-model', { credentials: 'same-origin' });
     if (!floorModelResponse.ok) throw new Error(`Dillon floor-by-floor model HTTP ${floorModelResponse.status}`);
     const floorModel = await floorModelResponse.json();
@@ -1368,6 +1373,7 @@ async function hfShowSubmittedCalibrationViews() {
     const structuralRoof = await structuralRoofResponse.json();
     if (structuralRoof.status !== 'passed' || structuralRoof.model?.status !== 'passed') throw new Error('Dillon structural roof surface validation failed');
     window.__hfRoofGeometry.dillonSlopedModel3d = dillonModel3d;
+    window.__hfRoofGeometry.pitchedRoofCrossProjectEvidence = crossProjectEvidence;
     window.__hfRoofGeometry.dillonFloorByFloorModel = floorModel;
     window.__hfRoofGeometry.dillonCompletedBidGeometry = bidGeometry;
     window.__hfRoofGeometry.dillonVerticalGeometry = verticalGeometry;
@@ -1382,7 +1388,7 @@ async function hfShowSubmittedCalibrationViews() {
     const counts = calibration.validation.counts;
     viewer.innerHTML = `
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
-        <div><b>Completed-bid geometry calibration · Cooperative 1881 + Dillon Residence</b><div style="font:11px/1.45 var(--mono);color:#a5b4c8;margin-top:4px">Cooperative: ${counts.heads} vector head candidates · ${counts.pipeSegments} pipe segments · ${counts.hydraulicNodes} registered DA-3 nodes · <span style="color:#4ade80">${counts.pitchedRoofNodes} nodes on pitched roof planes</span><br>Dillon FP-1: ${dillonValidation.counts.vectorCandidates} of ${dillonValidation.counts.submittedScheduleHeads} scheduled head vectors detected · ${dillonValidation.counts.unresolvedHeadSymbols} unresolved. Dillon FP-2 is independently registered at 25/25 below. Code approval remains fail-closed.</div></div>
+        <div><b>Completed-bid geometry calibration · Cooperative 1881 + Dillon + Dallas + Tallahassee</b><div style="font:11px/1.45 var(--mono);color:#a5b4c8;margin-top:4px">Cooperative: ${counts.heads} vector head candidates · ${counts.pipeSegments} pipe segments · ${counts.hydraulicNodes} registered DA-3 nodes · <span style="color:#4ade80">${counts.pitchedRoofNodes} nodes on pitched roof planes</span><br>Dillon FP-1: ${dillonValidation.counts.vectorCandidates} of ${dillonValidation.counts.submittedScheduleHeads} scheduled head vectors detected · ${dillonValidation.counts.unresolvedHeadSymbols} unresolved. Cross-project gate: ${crossProjectEvidence.metrics.projectCount} completed projects, ${crossProjectEvidence.metrics.pitchedProjectCount} independent pitched cases; Dallas A-9/A-10 mean ${crossProjectEvidence.metrics.dallasPitchMeanInPer12.toFixed(4)}:12 with ${crossProjectEvidence.metrics.dallasPitchSpreadInPer12.toFixed(3)} in/12 spread and ${crossProjectEvidence.metrics.dallasSectionRiseFt.toFixed(5)} ft ridge-to-bearing rise. Code approval remains fail-closed.</div></div>
         <div style="display:flex;gap:8px"><a id="hfBluebeamFdfDownload" href="/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.fdf" download="Dillon-Residence-FP1-generated-slope-overlay.fdf" style="border:1px solid rgba(251,191,36,.55);background:linear-gradient(180deg,rgba(180,83,9,.82),rgba(69,26,3,.92));color:#fff;border-radius:10px;padding:7px 11px;text-decoration:none;box-shadow:inset 0 1px rgba(255,255,255,.18)">Overlay on Original FP-1</a><a id="hfBluebeamSlopeDownload" href="/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.pdf" download="Dillon-Residence-sloped-ceiling-calibration.pdf" style="border:1px solid rgba(125,211,252,.55);background:linear-gradient(180deg,rgba(14,116,144,.8),rgba(8,47,73,.9));color:#fff;border-radius:10px;padding:7px 11px;text-decoration:none;box-shadow:inset 0 1px rgba(255,255,255,.18)">Download Bluebeam PDF</a><button id="hfSubmittedCalibrationClose" style="border:1px solid #475569;background:#111827;color:#fff;border-radius:10px;padding:7px 11px;cursor:pointer">Close</button></div>
       </div>
       <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);gap:12px;min-height:0;overflow:auto">
@@ -11391,10 +11397,11 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'wizards.advanced-drop-connect': () => dropConnectMenu('Advanced Drop-Connect'),
     'wizards.place-hangers': hfHonestStub('hanger placement runs inside the Generate detail pass — no separate client pass.'),
     'wizards.place-sprinklers-in-ceiling-grid': hfHonestStub('ceiling-grid sprinkler placement needs a ceiling-grid element — not yet built.'),
-    // Source-bound Cooperative 1881 roof geometry. Automatic Roof Planes loads
-    // and renders the sealed A-121/A-201 reconstruction. Projection remains
-    // fail-closed until the sheet-required MEP/clearance coordination is supplied.
-    'roof-planes.automatic-roof-planes': () => hfShowSourceBoundRoof(),
+    // Automatic Roof Planes is the real evidence surface: it loads the sealed
+    // Cooperative reconstruction plus Dillon, Dallas, and Tallahassee
+    // cross-project pitched-roof calibration. Unresolved structural contours
+    // and code approval remain fail-closed inside that workflow.
+    'roof-planes.automatic-roof-planes': () => hfShowSubmittedCalibrationViews(),
     'roof-planes.elevate-elements-to-roof-planes': () => hfElevateModelToSourceBoundRoof(),
     'roof-planes.rotate-beams-to-roof-planes': hfHonestStub('needs roof-plane + beam elements — not in the client model.'),
     'roof-planes.rotate-sprinklers-to-roof-planes': () => hfShowSubmittedCalibrationViews(),

@@ -199,11 +199,16 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.parityMetrics.maxPlanErrorFt).toBeLessThanOrEqual(3);
     expect(result.model3dVerification.counts).toEqual({ surfaces: 4, heads: 2, pipes: 1, nonFlatHeadElevations: 2, hydraulicNodesJoined: 5 });
     expect(result.model3dVerification).toMatchObject({ hydraulicDatumJoined: true, protectedRegionHeadNodeMappingReady: false });
+    expect(result.crossProjectEvidence.receiptSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(result.crossProjectEvidence.metrics).toMatchObject({ projectCount: 3, pitchedProjectCount: 2, dallasPitchMeanInPer12: 8.5195, dallasSectionRiseFt: 12.84375 });
+    expect(result.crossProjectEvidence.calibrationCases).toHaveLength(2);
+    expect(result.crossProjectEvidence.calibrationCases.map((entry) => entry.id)).toEqual(['dillon-vector-3-12', 'dallas-scanned-section-steep-roof']);
     expect(result.hydraulicDatumJoin.activeNodes).toHaveLength(5);
     expect(result.complianceReady).toBe(false);
     expect(result.view.submittedTopSvg).toContain('Dillon submitted FP-1 heads registered to RCP 3:12 annotation screens');
     expect(result.view.generatedTopSvg).toContain('Generated Dillon slope-aware top view');
     expect(result.view.generatedElevationSvg).toContain('Generated Dillon 3:12 absolute project elevation view');
+    expect(result.view.generatedElevationSvg).toContain('source-bound-project-elevation');
   });
 
   it('downloads a layered two-page Bluebeam-compatible vector PDF', async () => {

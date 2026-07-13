@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import { generateSlopedCeilingLayout, renderSlopedCeilingLayoutViews, verifySlopedCeilingLayoutParity } from '../src/engine/sloped-ceiling-layout.js';
+import { buildSlopedCeilingModel3d } from '../src/engine/sloped-ceiling-model3d.js';
 
 const packet = JSON.parse(fs.readFileSync(new URL('../src/data/submitted-sloped-ceiling-calibration.dillon.json', import.meta.url), 'utf8'));
 const input = {
@@ -27,10 +28,17 @@ describe('slope-aware calibration layout', () => {
     expect(parity.metrics.recall).toBe(1);
     expect(parity.metrics.maxPlanErrorFt).toBeLessThanOrEqual(3);
     expect(layout.regions.find((region) => region.regionId === 'slope-region-east-covered').obstructionAdjustments).toHaveLength(1);
-    const views = renderSlopedCeilingLayoutViews(layout, parity);
+    const model = buildSlopedCeilingModel3d(layout, {
+      artifactType: 'halofire.sloped-ceiling-model3d-input.v1', printedScalePtPerFt: packet.printedScalePtPerFt,
+      regions: packet.slopeRegions.map((region) => ({ id: region.id, polygonSubmittedPt: region.polygonSubmittedPt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, riseIn: 3, runIn: 12, shouldProtect: region.protectionBasis === 'completed-bid-protected', elevationDatum: region.elevationDatum ? { datumPointSubmittedPt: region.elevationDatum.datumPointSubmittedPt, projectElevationFt: region.elevationDatum.projectElevationFt, slopeDirection: region.elevationDatum.slopeDirection, sourceText: region.elevationDatum.sourceText } : null })),
+      hydraulicDatumJoin: { projectDatumOffsetFt: packet.hydraulicDatumJoin.projectDatumOffsetFt, activeNodes: packet.hydraulicDatumJoin.activeNodes, protectedRegionHeadNodeMappingReady: packet.hydraulicDatumJoin.protectedRegionHeadNodeMappingReady },
+    });
+    const views = renderSlopedCeilingLayoutViews(layout, parity, model);
     expect(views.status).toBe('passed');
     expect((views.topSvg.match(/data-generated-head-id=/g) || [])).toHaveLength(2);
     expect((views.elevationSvg.match(/data-elevation-head-id=/g) || [])).toHaveLength(2);
+    expect((views.elevationSvg.match(/data-elevation-surface-id=/g) || [])).toHaveLength(1);
+    expect(views.elevationSvg).toContain('source-bound-project-elevation');
   });
 
   it('adversarially rejects a false-positive head in a completed empty 3:12 region', () => {

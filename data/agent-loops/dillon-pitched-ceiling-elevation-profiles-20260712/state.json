@@ -1,0 +1,20 @@
+{
+  "status": "verifying",
+  "iteration": 3,
+  "truth": [
+    "Four source-calibrated 3:12 ceiling regions exist; one completed-bid protected region carries two heads, one slope-following pipe, and an absolute 109-foot soffit datum.",
+    "The current model emits only a fixed two-triangle quad representation and the elevation view uses a generic line instead of the computed surface profile.",
+    "The shared Dillon closed-project archives contain the same floor, reflected-ceiling, structural, sprinkler, and hydraulic subset already in calibration; no additional architectural elevation sheet was found in that folder.",
+    "The Dallas completed-project archive contributes independent A-9 and A-10 steep trussed-roof sections, an original reflected-ceiling/sprinkler plan, and reviewed Halo Fire wet/dry attic plans.",
+    "Four independent long roof edges across Dallas A-9/A-10 produce a sealed 8.5195:12 mean with 0.076 in/12 spread; A-10 labels prove a 142.1875 ft ridge, equal 129.34375 ft bearings, and 12.84375 ft rise.",
+    "The Tallahassee completed-project archive contributes an overall roof plan, multi-level building section, and as-built sprinkler plan/cross-sectional view as a third-project elevation cross-check.",
+    "The same plane engine now replays Dillon 3:12 and Dallas 8.5195:12 cases with complete triangulation, unit normals, and source-datum elevation profiles.",
+    "Eleven registered Dillon structural slope-roof contours still have no proven pitch-plus-datum join and remain blocked from 3D promotion."
+  ],
+  "remaining": [
+    "Run full focused/static/build/rules/loop verification",
+    "Commit, push, deploy, and verify the protected live route and Studio cross-project evidence rendering"
+  ],
+  "verification": {},
+  "globalGoalComplete": false
+}

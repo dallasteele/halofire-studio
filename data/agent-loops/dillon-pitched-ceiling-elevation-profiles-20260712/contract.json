@@ -1,0 +1,51 @@
+{
+  "name": "dillon-pitched-ceiling-elevation-profiles-20260712",
+  "owner": "codex",
+  "loop_type": "closed",
+  "goal": "Strengthen the pitched-ceiling model with complete triangulation, true plane normals, and datum-aware side-elevation profiles, then require independent completed-project agreement across Dillon, Dallas, and Tallahassee while keeping unsupported geometry and code-compliance claims fail-closed.",
+  "sources_of_truth": [
+    "apps/autosprink/src/data/submitted-sloped-ceiling-calibration.dillon.json",
+    "apps/autosprink/src/engine/sloped-ceiling-model3d.js",
+    "apps/autosprink/src/engine/sloped-ceiling-layout.js",
+    "apps/autosprink/src/data/pitched-roof-cross-project-evidence.json",
+    "apps/autosprink/src/engine/pitched-roof-cross-project-evidence.js",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/main-plans/6 - MAIN LEVEL REFLECTED CEILING PLAN.pdf",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/fp1.pdf",
+    "apps/autosprink/tmp/pdfs/dallas-pitched-roof-calibration/1984-A9-cross-section.pdf",
+    "apps/autosprink/tmp/pdfs/dallas-pitched-roof-calibration/1984-A10-cross-section.pdf",
+    "apps/autosprink/tmp/pdfs/dallas-pitched-roof-calibration/reviewed-FP-1.2.pdf",
+    "apps/autosprink/tmp/pdfs/tallahassee-pitched-roof-calibration/A107-overall-roof.pdf",
+    "apps/autosprink/tmp/pdfs/tallahassee-pitched-roof-calibration/A302-building-sections.pdf",
+    "apps/autosprink/tmp/pdfs/tallahassee-pitched-roof-calibration/asbuilt-FP3.pdf"
+  ],
+  "exit_criteria": [
+    "Every calibrated ceiling polygon is completely triangulated without fabricating vertices",
+    "Every pitched surface and generated sprinkler carries a verified unit normal derived from the source pitch and direction",
+    "Every surface exposes a side-elevation profile with source datum status, station span, high and low elevations, and 3:12 rise",
+    "Rendered elevation output follows the computed source-backed profile rather than a generic decorative line",
+    "The same 3D plane engine replays Dillon 3:12 vector evidence and the independently detected Dallas A-9/A-10 steep-roof section evidence",
+    "Dallas section pitch, ridge elevation, bearing elevations, reviewed wet/dry attic plans, and Tallahassee roof/section/as-built level evidence are receipt-bound and source-substitution resistant",
+    "Adversarial triangle, normal, vertex elevation, and elevation-profile drift fail closed",
+    "Unsupported structural roof contours remain at zero 3D promotion and complianceReady remains false",
+    "Focused tests, production build, rules, loop guard, live health, login, protected API, and browser evidence pass"
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-pitched-ceiling-elevation-profiles-20260712/contract.json",
+    "npx vitest run tests/pitched-roof-cross-project-evidence.test.js tests/sloped-ceiling-model3d.test.js tests/sloped-ceiling-layout.test.js tests/bluebeam-sloped-package.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/dillon-pitched-ceiling-elevation-profiles-20260712/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/sloped-ceiling-model3d.js",
+    "apps/autosprink/src/engine/sloped-ceiling-layout.js",
+    "apps/autosprink/src/data/pitched-roof-cross-project-evidence.json",
+    "apps/autosprink/src/engine/pitched-roof-cross-project-evidence.js",
+    "data/agent-loops/dillon-pitched-ceiling-elevation-profiles-20260712/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 50000,
+  "model_tier": "balanced",
+  "brain_writeback_required": true,
+  "human_gate_required": false
+}

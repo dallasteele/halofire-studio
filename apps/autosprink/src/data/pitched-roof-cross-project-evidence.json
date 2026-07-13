@@ -1,0 +1,70 @@
+{
+  "artifactType": "halofire.pitched-roof-cross-project-evidence.v1",
+  "projects": [
+    {
+      "projectId": "dillon-residence",
+      "evidenceRole": "vector-pitched-ceiling-and-completed-bid-calibration",
+      "sources": [
+        { "sheetId": "architectural-RCP", "sha256": "ed51fe47cdbb0c95db5d3a4f64117fe2625d3c0bf4e7170c6f3dec0d38ed11ba", "kind": "reflected-ceiling-plan" },
+        { "sheetId": "submitted-FP1", "sha256": "ea09a1fe2b1e175170e980a0e0960a7e7f2bf82f949668ae1c895e163c604a63", "kind": "completed-sprinkler-plan" }
+      ],
+      "pitchObservations": [
+        { "id": "dillon-slope-3", "method": "source-vector-text", "riseIn": 3, "runIn": 12, "sourceText": "3\"/12\"" },
+        { "id": "dillon-slope-6", "method": "source-vector-text", "riseIn": 3, "runIn": 12, "sourceText": "3\"/12\"" }
+      ],
+      "datumObservations": [
+        { "id": "dillon-east-covered-soffit", "kind": "ceiling", "sourceText": "SOFFIT @ 9'-0\" (109'-0\")", "elevationFt": 109 }
+      ],
+      "completedOutput": { "surfaceCount": 4, "protectedSurfaceCount": 1, "headCount": 2, "slopeFollowingPipeCount": 1 }
+    },
+    {
+      "projectId": "dallas-temple",
+      "evidenceRole": "independent-scanned-steep-roof-section-and-reviewed-sprinkler-calibration",
+      "sources": [
+        { "sheetId": "A-9", "sha256": "d15c239fdacf5a03f2444eb4458b8185bc9982645c068838e9ed364f5dd6a8a6", "kind": "building-section" },
+        { "sheetId": "A-10", "sha256": "30187ba4990dd117f2916d30261276883c6bf80dbe08468efb375ad0ef5d28e1", "kind": "building-section" },
+        { "sheetId": "FP-3-RCP", "sha256": "485c988de578bf740028724844bc38f0a3705d2c3994efd2c3cf475952cd6cb4", "kind": "reflected-ceiling-sprinkler-plan" },
+        { "sheetId": "FP-1.2-REVIEWED", "sha256": "da7da6a82a9812f3bbf4846a1f0079709b4a86720b0ef38647bf3d8cc797d647", "kind": "reviewed-sprinkler-plan" }
+      ],
+      "pitchObservations": [
+        { "id": "a9-left-roof-edge", "method": "canny-hough-long-section-edge", "riseIn": 8.493, "runIn": 12, "sourceLinePx": [472, 1791, 1649, 958], "sourceLineLengthPx": 1441.95 },
+        { "id": "a9-right-roof-edge", "method": "canny-hough-long-section-edge", "riseIn": 8.494, "runIn": 12, "sourceLinePx": [1624, 962, 2791, 1788], "sourceLineLengthPx": 1429.74 },
+        { "id": "a10-left-roof-edge", "method": "canny-hough-long-section-edge", "riseIn": 8.522, "runIn": 12, "sourceLinePx": [882, 1507, 1672, 946], "sourceLineLengthPx": 968.93 },
+        { "id": "a10-right-roof-edge", "method": "canny-hough-long-section-edge", "riseIn": 8.569, "runIn": 12, "sourceLinePx": [1626, 958, 2448, 1545], "sourceLineLengthPx": 1010.08 }
+      ],
+      "datumObservations": [
+        { "id": "a10-ridge", "kind": "ridge", "sourceText": "ELEV. 142'-2 1/4\"", "elevationFt": 142.1875 },
+        { "id": "a10-left-bearing", "kind": "bearing-plate", "sourceText": "ELEVATION 129'-4 1/8\"", "elevationFt": 129.34375 },
+        { "id": "a10-right-bearing", "kind": "bearing-plate", "sourceText": "ELEVATION 129'-4 1/8\"", "elevationFt": 129.34375 }
+      ],
+      "completedOutput": { "surfaceCount": 2, "protectedSurfaceCount": 2, "headCount": 0, "slopeFollowingPipeCount": 0 }
+    },
+    {
+      "projectId": "tallahassee-temple",
+      "evidenceRole": "multi-level-roof-plan-section-and-as-built-sprinkler-cross-check",
+      "sources": [
+        { "sheetId": "A107", "sha256": "e820f549f293d10cdeb050c5fd53fdc67c844f7d1232ae6bb324a2f2faec2f70", "kind": "overall-roof-plan" },
+        { "sheetId": "A302", "sha256": "8d1836052731eb29172cdd4d4eff2f63ee205d3f62e8f74e689eab1b7498e521", "kind": "building-section" },
+        { "sheetId": "ASBUILT-FP3", "sha256": "42ea9845a8a5596c1914bed31b6946862e51c07086806572dfb0161a6918d01d", "kind": "as-built-sprinkler-plan-and-cross-section" }
+      ],
+      "pitchObservations": [],
+      "datumObservations": [
+        { "id": "a302-finished-floor", "kind": "floor", "sourceText": "FINISHED FLOOR 0'", "elevationFt": 0 },
+        { "id": "a302-mech-roof", "kind": "roof", "sourceText": "MECH. ROOF 35'-7\"", "elevationFt": 35.5833333333 },
+        { "id": "a302-tower-t4-roof", "kind": "roof", "sourceText": "TOWER T4 ROOF 86'-2\"", "elevationFt": 86.1666666667 },
+        { "id": "a302-dome-tos", "kind": "roof", "sourceText": "DOME TOS 104'-11\"", "elevationFt": 104.9166666667 }
+      ],
+      "completedOutput": { "surfaceCount": 0, "protectedSurfaceCount": 0, "headCount": 0, "slopeFollowingPipeCount": 0 }
+    }
+  ],
+  "acceptance": {
+    "minimumIndependentProjects": 2,
+    "minimumPitchedProjects": 2,
+    "maximumDallasSectionPitchSpreadInPer12": 0.1,
+    "dallasCalibrationRiseInPer12": 8.5195,
+    "structuralRoofPromotionRequiresPitchAndDatum": true,
+    "complianceReady": false
+  },
+  "claimStatus": "cross-project-pitched-geometry-calibration-not-code-compliance-or-approval",
+  "receiptSha256": "b10490ae88a241053c39353f7a64a85ab2d54177bf42609612fa3e01733a15a0"
+}

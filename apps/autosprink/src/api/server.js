@@ -38,6 +38,7 @@ import {
   verifySlopedCeilingLayoutParity,
 } from '../engine/sloped-ceiling-layout.js';
 import { buildSlopedCeilingModel3d, verifySlopedCeilingModel3d } from '../engine/sloped-ceiling-model3d.js';
+import { buildPitchedRoofCalibrationCases, validatePitchedRoofCrossProjectEvidence } from '../engine/pitched-roof-cross-project-evidence.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
 import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
 import { renderDillonFloorByFloorViews, validateDillonFloorByFloorModel } from '../engine/dillon-floor-by-floor-model.js';
@@ -90,6 +91,7 @@ const COOPERATIVE_1881_ROOF_ARTIFACT_PATH = path.resolve(__dirname, '../data/roo
 const COOPERATIVE_1881_PLAN_LEVELS_PATH = path.resolve(__dirname, '../data/plan-levels.cooperative-1881.json');
 const COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-fp8-calibration.cooperative-1881.json');
 const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-sloped-ceiling-calibration.dillon.json');
+const PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH = path.resolve(__dirname, '../data/pitched-roof-cross-project-evidence.json');
 const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-dwg-source-geometry.json');
 const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
 const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
@@ -1652,6 +1654,11 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
   }
   try {
     const packet = JSON.parse(fs.readFileSync(DILLON_SLOPED_CALIBRATION_PATH, 'utf8'));
+    const crossProjectPacket = JSON.parse(fs.readFileSync(PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH, 'utf8'));
+    const crossProjectValidation = await validatePitchedRoofCrossProjectEvidence(crossProjectPacket);
+    if (crossProjectValidation.status !== 'passed') return res.status(422).json({ ...crossProjectValidation, projectName: req.params.name });
+    const crossProjectCalibrationCases = buildPitchedRoofCalibrationCases(crossProjectValidation);
+    if (crossProjectCalibrationCases.status !== 'passed') return res.status(422).json({ ...crossProjectCalibrationCases, projectName: req.params.name });
     const validation = await validateSubmittedSlopedCeilingCalibration(packet);
     if (validation.status !== 'passed') return res.status(422).json({ ...validation, projectName: req.params.name });
     const view = renderSubmittedSlopedCeilingCalibration(validation);
@@ -1680,6 +1687,7 @@ app.get('/api/projects/:name/submitted-sloped-ceiling-calibration', authMiddlewa
       fullSlopeSurfaceRegistrationReady: validation.fullSlopeSurfaceRegistrationReady,
       generatedLayoutParityReady: parity.generatedLayoutParityReady,
       parityMetrics: parity.metrics, generatedHeads: layout.heads,
+      crossProjectEvidence: { receiptSha256: crossProjectPacket.receiptSha256, metrics: crossProjectValidation.metrics, calibrationCases: crossProjectCalibrationCases.cases, claimStatus: crossProjectValidation.claimStatus },
       hydraulicDatumJoin: packet.hydraulicDatumJoin, model3d, model3dVerification,
       view: { status: view.status, submittedTopSvg: view.topSvg, generatedTopSvg: layoutViews.topSvg, generatedElevationSvg: layoutViews.elevationSvg }, complianceReady: false,
       claimStatus: validation.claimStatus,

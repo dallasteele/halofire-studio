@@ -715,5 +715,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('verticalGeometry.model3d.heads.forEach');
     expect(html).toContain('verticalGeometry.model3d.pipes.forEach');
     expect(html).toContain('protected-head node identity, compliance, and approval remain fail-closed');
+    expect(html).toContain('Cooperative 1881 + Dillon + Dallas + Tallahassee');
+    expect(html).toContain('Pitched-roof cross-project evidence validation failed');
+    expect(html).toContain('dallasPitchMeanInPer12');
+    expect(html).toContain("'roof-planes.automatic-roof-planes': () => hfShowSubmittedCalibrationViews()");
   });
 });
