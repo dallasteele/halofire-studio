@@ -161,7 +161,8 @@ def main() -> None:
               and draft["adversarial"]["centerRemovedTemplateRejected"])
     draft["status"] = "passed" if passed else "blocked"
     draft["receiptSha256"] = hashlib.sha256(canonical(draft)).hexdigest()
-    args.output.write_text(json.dumps(draft, indent=2) + "\n", encoding="utf-8")
+    with args.output.open("w", encoding="utf-8", newline="\n") as output:
+        output.write(json.dumps(draft, indent=2) + "\n")
     print(json.dumps({"status": draft["status"], "primary": len(primary),
                       "independent": independent_count, "adversarial": draft["adversarial"],
                       "output": str(args.output)}))
