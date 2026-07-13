@@ -9,11 +9,36 @@
     "as_built_feedback_loop",
     "completed_output_to_fabrication",
     "manufacturer_family_trace",
+    "pitched_roof_fabrication_spatial_mapping",
     "roof_structure_coordination",
     "source_to_completed_sprinkler_layout"
   ],
   "requiredPhases": ["source_architecture", "stamped_submittal", "city_approved", "as_built", "fabrication"],
   "requiredSourceViews": ["floor_plan", "roof_plan", "reflected_ceiling_plan", "building_elevation", "building_section"],
+  "pitchedRoofFabricationSpatialMapping": {
+    "artifactType": "halofire.pitched-roof-fabrication-spatial-mapping.v1",
+    "projectId": "winter-garden-fl-meetinghouse",
+    "mappingGranularity": "fabrication-outlet-to-completed-head-bijection",
+    "sources": [
+      {"role":"roof-plan","sheet":"A121","sha256":"0fa8d19cf2a8ca421a3cad7200b410763eee701bb566ca84d37321b1b51ce921"},
+      {"role":"building-section","sheet":"A301","sha256":"719ae05138b3872c2ed8740fa4470ca457dcc0a9f8fec617cabf7969560ecc30"},
+      {"role":"permit-pipe-plan","sheet":"A002","sha256":"ac052124095f73e3529fd63906127bac9c2cf3b3f6abd45222c5125fa4195977"},
+      {"role":"permit-rcp","sheet":"A003","sha256":"93f8df04bc84ac817ecd2e222812fede93565879094c66b4d7511f783631543e"},
+      {"role":"as-built-pipe-plan","sheet":"A002","sha256":"22c8db4dde89ce0ed9ee6625b9d8f8b1918c2ecdb9baf6ff829a9c4118b5b8bb"},
+      {"role":"as-built-rcp","sheet":"A003","sha256":"13aa82f90bf7b03bc0b4728d0b631321372a48932d2a55187dad6edc947de3a0"},
+      {"role":"fabrication-listing","sheet":"LISTING-TYL","sha256":"53ff9f89d03a1672aa06788efd1d20c0a5a711e4bc97ef97f9aa83c333b03d12"}
+    ],
+    "pitch": {"riseIn":4.5,"runIn":12,"observationCount":2},
+    "mapping": {"fabricatedPieceCount":12,"mappedPlanRunCount":3,"mappedTransitionEndpointCount":3,"mappedOutletCount":15,"mappedHeadCount":15,"completedHeadCount":329,"exactBranchElevationCount":3},
+    "sourceReceiptSha256": "c746308eddaf57f1c17da5b128744c3ccbfd596240ba825335bd0f3a677d7673",
+    "fabricationPlanMappingReady": true,
+    "pitchedGeometryMappingReady": true,
+    "exactAsBuiltDeflectorElevationReady": false,
+    "fullNetworkPipeElevationReady": false,
+    "fabricationReady": false,
+    "complianceReady": false,
+    "receiptSha256": "4b7d766e9485d77972423230e48eb344bc696a4bb80deacd4a4a33cb626aed7f"
+  },
   "files": [
     {"phase":"source_architecture","view":"floor_plan","sheet":"A101","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\CAD Files\\Winter-Garden,-FL-Meetinghouse_-_Drawings\\Architectural\\A101-MAIN-FLOOR-PLAN-Rev.6.pdf","bytes":520191,"sha256":"861626b3a6838ddd340d15e20c88c55d2d7896df7d8ef45276d518e4112040fb"},
     {"phase":"source_architecture","view":"roof_plan","sheet":"A121","path":"02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\CAD Files\\Winter-Garden,-FL-Meetinghouse_-_Drawings\\Architectural\\A121-ROOF-PLAN-Rev.5.pdf","bytes":337696,"sha256":"0fa8d19cf2a8ca421a3cad7200b410763eee701bb566ca84d37321b1b51ce921"},

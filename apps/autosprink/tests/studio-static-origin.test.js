@@ -721,6 +721,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('protected-head node identity, compliance, and approval remain fail-closed');
     expect(html).toContain('Cooperative 1881 + Dillon + Dallas + Tallahassee');
     expect(html).toContain('Pitched-roof cross-project evidence validation failed');
+    expect(html).toContain('Pitched-roof fabrication spatial mapping: PROMOTED');
+    expect(html).toContain('pitched_roof_fabrication_spatial_mapping');
+    expect(html).toContain('35 fabricated dry-feed pieces across two plan runs and four pitched-attic transitions');
+    expect(html).toContain('Full-network Z, exact field deflector elevation, fabrication release, and code approval remain fail-closed');
     expect(html).toContain('dallasPitchMeanInPer12');
     expect(html).toContain("'roof-planes.automatic-roof-planes': () => hfShowSubmittedCalibrationViews()");
   });

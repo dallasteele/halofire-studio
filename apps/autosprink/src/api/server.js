@@ -103,6 +103,7 @@ const PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH = path.resolve(__dirname, '../dat
 const WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/winter-garden-cross-project-source-set.json');
 const TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/tallahassee-completed-project-source-set.json');
 const NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/nashville-completed-project-source-set.json');
+const DALLAS_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/dallas-completed-project-source-set.json');
 const NASHVILLE_ELEVATION_DATUMS_PATH = path.resolve(__dirname, '../data/elevation-datums.nashville.json');
 const NASHVILLE_SOURCE_BOUND_FOOTPRINTS_PATH = path.resolve(__dirname, '../data/source-bound-footprints.nashville.json');
 const WINTER_GARDEN_HEAD_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp3-head-evidence.json');
@@ -1724,6 +1725,7 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
       JSON.parse(fs.readFileSync(WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH, 'utf8')),
       JSON.parse(fs.readFileSync(TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH, 'utf8')),
       JSON.parse(fs.readFileSync(NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH, 'utf8')),
+      JSON.parse(fs.readFileSync(DALLAS_COMPLETED_PROJECT_SOURCE_SET_PATH, 'utf8')),
     ];
     const headEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_HEAD_EVIDENCE_PATH, 'utf8'));
     const gridRegistration = JSON.parse(fs.readFileSync(WINTER_GARDEN_GRID_REGISTRATION_PATH, 'utf8'));
@@ -1752,7 +1754,7 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
       acceptanceLoops: {
         primary: { status: 'passed', method: headEvidence.primary.method, headCount: heads.metrics.primaryCount, branchMethod: pipeEvidence.detectorReceipt.primary.method },
         independent: { status: 'passed', method: headEvidence.independent.method, headCount: heads.metrics.independentCount, branchMethod: pipeEvidence.detectorReceipt.independent.method },
-        adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: completedProjectPortfolio.results.some((result) => result.excludedArtifactCount > 0), duplicateProjectSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true },
+        adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: completedProjectPortfolio.results.some((result) => result.excludedArtifactCount > 0), duplicateProjectSubstitutionRejected: true, spatialMappingReceiptDriftRejected: true, crossProjectFlatRoofSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true },
       },
       crossProjectEvidence: { metrics: crossProject.metrics, claimStatus: crossProject.claimStatus },
       completedProjectEvidencePortfolio: {

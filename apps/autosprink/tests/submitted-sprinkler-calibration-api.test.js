@@ -245,12 +245,12 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     const result = await response.json();
     expect(result.status).toBe('passed');
     expect(result.evidenceReceipts).toMatchObject({ crossProject: expect.stringMatching(/^[0-9a-f]{64}$/), heads: expect.stringMatching(/^[0-9a-f]{64}$/), roofRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), pipeRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), ceilingElevation: expect.stringMatching(/^[0-9a-f]{64}$/), fabricationPlanMapping: expect.stringMatching(/^[0-9a-f]{64}$/) });
-    expect(result.acceptanceLoops).toMatchObject({ primary: { status: 'passed', headCount: 159 }, independent: { status: 'passed', headCount: 158 }, adversarial: { status: 'passed', centerRemovedTemplateRejected: true, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: true, duplicateProjectSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true } });
+    expect(result.acceptanceLoops).toMatchObject({ primary: { status: 'passed', headCount: 159 }, independent: { status: 'passed', headCount: 158 }, adversarial: { status: 'passed', centerRemovedTemplateRejected: true, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: true, duplicateProjectSubstitutionRejected: true, spatialMappingReceiptDriftRejected: true, crossProjectFlatRoofSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true } });
     expect(result.crossProjectEvidence.metrics).toMatchObject({ projectCount: 4, pitchedProjectCount: 3, winterGardenPitchInPer12: 4.5 });
     expect(result.completedProjectEvidencePortfolio).toMatchObject({
       status: 'passed',
-      projectCount: 3,
-      projectIds: ['nashville-tn-temple', 'tallahassee-fl-temple', 'winter-garden-fl-meetinghouse'],
+      projectCount: 4,
+      projectIds: ['dallas-tx-temple', 'nashville-tn-temple', 'tallahassee-fl-temple', 'winter-garden-fl-meetinghouse'],
       featurePromotion: {
         as_built_feedback_loop: { ready: true, projectCount: 3 },
         completed_output_to_fabrication: { ready: true, projectCount: 3 },
@@ -258,7 +258,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
         roof_structure_coordination: { ready: true, projectCount: 2 },
         multi_floor_completed_output: { ready: true, projectCount: 2 },
         source_to_completed_sprinkler_layout: { ready: true, projectCount: 2 },
-        pitched_roof_fabrication_spatial_mapping: { ready: false, projectCount: 0 },
+        pitched_roof_fabrication_spatial_mapping: { ready: true, projectCount: 2, projects: ['winter-garden-fl-meetinghouse', 'dallas-tx-temple'] },
       },
     });
     expect(result.counts).toEqual({ completedBidFp3Heads: 159, chapelHeads: 15, chapelBranches: 3, chapelArmOvers: 15, networkSegments: 23, absoluteCeilingSurfaces: 2, headElevationEnvelopes: 15, fabricationMappedHeads: 15, exactBranchRowPipes: 3 });

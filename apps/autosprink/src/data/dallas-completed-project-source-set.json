@@ -1,0 +1,46 @@
+{
+  "artifactType": "halofire.completed-project-evidence-set.v1",
+  "projectId": "dallas-tx-temple",
+  "projectName": "TCOJC Temple - Dallas TX",
+  "evidencePurpose": "Independent completed-project calibration for fabrication-to-plan mapping inside a pitched-roof attic",
+  "egnyteRoot": "Y:\\Shared\\HaloOps",
+  "verifiedAt": "2026-07-12T23:30:00-07:00",
+  "verifiedClaims": ["pitched_roof_fabrication_spatial_mapping"],
+  "requiredEvidenceRoles": ["source_coordination", "final_ahj_submission", "issued_permit", "field_output", "as_built_output", "fabrication"],
+  "files": [
+    {"evidenceRole":"source_coordination","view":"building_section","sheet":"A9","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Engineering\\CAD Files\\1982 - 1987 Construction Drawings\\Architectural\\A9.PDF","bytes":1084096,"sha256":"d9eabec2b95a0a131c78e9c76ddf8c7ce605c29bf1ce31707b8c4cfaaaccb0b3"},
+    {"evidenceRole":"source_coordination","view":"building_section","sheet":"A10","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Engineering\\CAD Files\\1982 - 1987 Construction Drawings\\Architectural\\A10.PDF","bytes":1010112,"sha256":"fb2d4ebeef1677f833cf836a267697cc485d1934813413ae30b86f232afbc069"},
+    {"evidenceRole":"source_coordination","view":"reflected_ceiling_plan","sheet":"FP3","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Engineering\\CAD Files\\1982 - 1987 Construction Drawings\\Fire Protection\\FP3.pdf","bytes":312482,"sha256":"5bd73b4331be9ce96c89dcb1e24f02194abdc65275ba7b72030a57685c99ec61"},
+    {"evidenceRole":"final_ahj_submission","view":"reviewed_combined_sprinkler_set","sheet":"FP0-FP4","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Engineering\\Submittal\\Resubmittal Sent on 6-18-21\\Revised Combined Set.pdf","bytes":6800785,"sha256":"29eab59ce166a9c1241e54c406b3a190f1330d22cbf5242eb518d11fa48f8bbf"},
+    {"evidenceRole":"issued_permit","view":"city_approval","sheet":"CITY-APPROVAL","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Engineering\\City Approved FS Drawings\\City Approval.pdf","bytes":420605,"sha256":"983306a3362912dd2acd98803e5f14156b9a5e2cbaf23e1f0a42550411036eff"},
+    {"evidenceRole":"field_output","view":"field_main_level_system_1_plan","sheet":"FP-1.2","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Field Operations\\Field Plans\\FP-1.2.pdf","bytes":33013845,"sha256":"49e16152195fd7116e16c4aa8d8d58240fb5b638e55e45e6d829b1d6c677186e"},
+    {"evidenceRole":"as_built_output","view":"as_built_pitched_attic_and_dry_feed_set","sheet":"FP-1.2,FP-1.4","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Field Operations\\Final As-Build Drawings 9-28-21\\Halo Stamped_As-Built Set.pdf","bytes":6198530,"sha256":"39ef506decf2f9a963cf5ed1ffee4b8f63998da12a8aa7e4e34c5433fd242ea7","completedLevels":["main","attic"],"visualVerification":{"pages":[3,5],"markers":["AS-BUILT SET","ROOF SLOPE : 4 / 12","NEW 4 IN FEED TO DRY SYSTEM IN THE ATTIC","ATTIC LEVEL - DRY SYSTEM - FIRE PROTECTION PLAN","103 TOTAL SPRINKLER HEADS ON THIS SHEET"]}},
+    {"evidenceRole":"fabrication","view":"sprinkcad_dry_feed_fabrication_pdf","sheet":"DRY-FEED-3000","levelId":"dry-feed","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Field Operations\\Listings Files\\DRY SYSTEM FEED FABRICATION.pdf","bytes":30524,"sha256":"3984083085d174726880adbeb318a04c2844677d712d2da92e4d9964b2e8d5e3"}
+  ],
+  "excludedArtifacts": [],
+  "fabricationInventories": [
+    {"levelId":"dry-feed","fileSha256":"3984083085d174726880adbeb318a04c2844677d712d2da92e4d9964b2e8d5e3","stockListingVersion":"fabrication-pdf","pipingRows":35,"outletRows":1,"sprinklerFamilies":[]}
+  ],
+  "pitchedRoofFabricationSpatialMapping": {
+    "artifactType": "halofire.pitched-roof-fabrication-spatial-mapping.v1",
+    "projectId": "dallas-tx-temple",
+    "mappingGranularity": "fabricated-dry-feed-runs-to-completed-pitched-attic-envelope",
+    "sources": [
+      {"role":"building-section","sheet":"A9","sha256":"d9eabec2b95a0a131c78e9c76ddf8c7ce605c29bf1ce31707b8c4cfaaaccb0b3"},
+      {"role":"building-section","sheet":"A10","sha256":"fb2d4ebeef1677f833cf836a267697cc485d1934813413ae30b86f232afbc069"},
+      {"role":"completed-plan","sheet":"FP-1.2,FP-1.4","sha256":"39ef506decf2f9a963cf5ed1ffee4b8f63998da12a8aa7e4e34c5433fd242ea7"},
+      {"role":"fabrication-listing","sheet":"DRY-FEED-3000","sha256":"3984083085d174726880adbeb318a04c2844677d712d2da92e4d9964b2e8d5e3"}
+    ],
+    "pitch": {"riseIn":4,"runIn":12,"observationCount":7},
+    "mapping": {"fabricatedPieceCount":35,"fabricatedLengthFt":311.5,"mappedPlanRunCount":2,"mappedTransitionEndpointCount":4,"mappedOutletCount":1,"mappedHeadCount":0,"completedHeadCount":103,"exactBranchElevationCount":0},
+    "pieceSequence": ["E","F.1","F.2","F.3","F.4","F.5","F.6","F.7","F.8","F.9","F.10","F.11","F.12","F.13","F.14","F.15","F.16","F.17","F.18","F.19","F.20","F.21","F.22","G","H.1","H.2","H.3","H.4","H.5","H.6","H.7","H.8","I.1","I.2","I.3"],
+    "completedPlanBindings": {"planFeedCalloutCount":2,"atticTransitionCalloutCount":4,"atticSystemVolumeGal":415},
+    "fabricationPlanMappingReady": true,
+    "pitchedGeometryMappingReady": true,
+    "exactAsBuiltDeflectorElevationReady": false,
+    "fullNetworkPipeElevationReady": false,
+    "fabricationReady": false,
+    "complianceReady": false,
+    "receiptSha256": "23f52e7ed0f1d82514f5c6d39d6ef168c0c2976c40b0a41cadb94a4704ced1b4"
+  }
+}

@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 const SHA256 = /^[0-9a-f]{64}$/;
 
 export const COMPLETED_PROJECT_CLAIMS = [
@@ -25,6 +27,85 @@ function normalizedFamilyKey(family) {
   return `${family?.manufacturer || ''}:${family?.family || ''}`.toLowerCase();
 }
 
+const PITCHED_FABRICATION_EXPECTED = Object.freeze({
+  'winter-garden-fl-meetinghouse': Object.freeze({
+    mappingGranularity: 'fabrication-outlet-to-completed-head-bijection',
+    sourceReceiptSha256: 'c746308eddaf57f1c17da5b128744c3ccbfd596240ba825335bd0f3a677d7673',
+    sourceHashes: [
+      '0fa8d19cf2a8ca421a3cad7200b410763eee701bb566ca84d37321b1b51ce921',
+      '719ae05138b3872c2ed8740fa4470ca457dcc0a9f8fec617cabf7969560ecc30',
+      'ac052124095f73e3529fd63906127bac9c2cf3b3f6abd45222c5125fa4195977',
+      '93f8df04bc84ac817ecd2e222812fede93565879094c66b4d7511f783631543e',
+      '22c8db4dde89ce0ed9ee6625b9d8f8b1918c2ecdb9baf6ff829a9c4118b5b8bb',
+      '13aa82f90bf7b03bc0b4728d0b631321372a48932d2a55187dad6edc947de3a0',
+      '53ff9f89d03a1672aa06788efd1d20c0a5a711e4bc97ef97f9aa83c333b03d12',
+    ],
+    pitch: { riseIn: 4.5, runIn: 12, observationCount: 2 },
+    mapping: { fabricatedPieceCount: 12, mappedPlanRunCount: 3, mappedTransitionEndpointCount: 3, mappedOutletCount: 15, mappedHeadCount: 15, completedHeadCount: 329, exactBranchElevationCount: 3 },
+  }),
+  'dallas-tx-temple': Object.freeze({
+    mappingGranularity: 'fabricated-dry-feed-runs-to-completed-pitched-attic-envelope',
+    sourceHashes: [
+      'd9eabec2b95a0a131c78e9c76ddf8c7ce605c29bf1ce31707b8c4cfaaaccb0b3',
+      'fb2d4ebeef1677f833cf836a267697cc485d1934813413ae30b86f232afbc069',
+      '39ef506decf2f9a963cf5ed1ffee4b8f63998da12a8aa7e4e34c5433fd242ea7',
+      '3984083085d174726880adbeb318a04c2844677d712d2da92e4d9964b2e8d5e3',
+    ],
+    pitch: { riseIn: 4, runIn: 12, observationCount: 7 },
+    mapping: { fabricatedPieceCount: 35, fabricatedLengthFt: 311.5, mappedPlanRunCount: 2, mappedTransitionEndpointCount: 4, mappedOutletCount: 1, mappedHeadCount: 0, completedHeadCount: 103, exactBranchElevationCount: 0 },
+    pieceSequence: ['E', 'F.1', 'F.2', 'F.3', 'F.4', 'F.5', 'F.6', 'F.7', 'F.8', 'F.9', 'F.10', 'F.11', 'F.12', 'F.13', 'F.14', 'F.15', 'F.16', 'F.17', 'F.18', 'F.19', 'F.20', 'F.21', 'F.22', 'G', 'H.1', 'H.2', 'H.3', 'H.4', 'H.5', 'H.6', 'H.7', 'H.8', 'I.1', 'I.2', 'I.3'],
+    completedPlanBindings: { planFeedCalloutCount: 2, atticTransitionCalloutCount: 4, atticSystemVolumeGal: 415 },
+  }),
+});
+
+function jsonSha256(value) {
+  return createHash('sha256').update(JSON.stringify(value)).digest('hex');
+}
+
+function validatePitchedRoofFabricationSpatialMapping(sourceSet, files, issues) {
+  const packet = sourceSet?.pitchedRoofFabricationSpatialMapping;
+  if (!packet) return { ready: false, metrics: null };
+  const expected = PITCHED_FABRICATION_EXPECTED[sourceSet.projectId];
+  const startIssueCount = issues.length;
+  const label = sourceSet.projectId || 'unknown';
+  if (!expected || packet.artifactType !== 'halofire.pitched-roof-fabrication-spatial-mapping.v1' || packet.projectId !== sourceSet.projectId) {
+    issues.push(`pitched_fabrication_mapping_schema_invalid:${label}`);
+    return { ready: false, metrics: null };
+  }
+  const { receiptSha256, ...draft } = packet;
+  if (!SHA256.test(receiptSha256 || '') || jsonSha256(draft) !== receiptSha256) issues.push(`pitched_fabrication_mapping_receipt_mismatch:${label}`);
+  const sourceHashes = (packet.sources || []).map((source) => source.sha256);
+  if (packet.mappingGranularity !== expected.mappingGranularity
+    || JSON.stringify(sourceHashes) !== JSON.stringify(expected.sourceHashes)
+    || (packet.sources || []).some((source) => !source.role || !source.sheet || !SHA256.test(source.sha256 || ''))) {
+    issues.push(`pitched_fabrication_mapping_source_drift:${label}`);
+  }
+  const fileHashes = new Set(files.map((file) => file.sha256));
+  if (sourceHashes.some((hash) => !fileHashes.has(hash))) issues.push(`pitched_fabrication_mapping_file_binding_missing:${label}`);
+  if (JSON.stringify(packet.pitch) !== JSON.stringify(expected.pitch)
+    || JSON.stringify(packet.mapping) !== JSON.stringify(expected.mapping)
+    || (expected.sourceReceiptSha256 && packet.sourceReceiptSha256 !== expected.sourceReceiptSha256)
+    || (expected.pieceSequence && JSON.stringify(packet.pieceSequence) !== JSON.stringify(expected.pieceSequence))
+    || (expected.completedPlanBindings && JSON.stringify(packet.completedPlanBindings) !== JSON.stringify(expected.completedPlanBindings))) {
+    issues.push(`pitched_fabrication_mapping_geometry_drift:${label}`);
+  }
+  if (packet.fabricationPlanMappingReady !== true || packet.pitchedGeometryMappingReady !== true
+    || packet.exactAsBuiltDeflectorElevationReady !== false || packet.fullNetworkPipeElevationReady !== false
+    || packet.fabricationReady !== false || packet.complianceReady !== false) {
+    issues.push(`pitched_fabrication_mapping_fail_closed_status_drift:${label}`);
+  }
+  return {
+    ready: issues.length === startIssueCount,
+    metrics: issues.length === startIssueCount ? {
+      mappingGranularity: packet.mappingGranularity,
+      ...packet.mapping,
+      pitchRiseInPer12: packet.pitch.riseIn,
+      pitchObservationCount: packet.pitch.observationCount,
+      receiptSha256,
+    } : null,
+  };
+}
+
 function validateDeclaredClaims(declaredClaims, supportedClaims, issues) {
   const declared = Array.isArray(declaredClaims) ? [...new Set(declaredClaims)] : [];
   for (const claim of declared) {
@@ -41,6 +122,7 @@ export function validateCrossProjectDesignSourceSet(sourceSet, referenceProjectI
   }
   if (!sourceSet.projectId || sourceSet.projectId === referenceProjectId) issues.push('independent_project_missing');
   const files = Array.isArray(sourceSet.files) ? sourceSet.files : [];
+  const pitchedFabrication = validatePitchedRoofFabricationSpatialMapping(sourceSet, files, issues);
   const phases = new Set(files.map((file) => file.phase));
   const views = new Set(files.filter((file) => file.phase === 'source_architecture').map((file) => file.view));
   for (const phase of sourceSet.requiredPhases || []) if (!phases.has(phase)) issues.push(`required_phase_missing:${phase}`);
@@ -74,6 +156,7 @@ export function validateCrossProjectDesignSourceSet(sourceSet, referenceProjectI
     supportedClaims.add('roof_structure_coordination');
   }
   if (fileChangedSheets.length && annotationChangedSheets.length) supportedClaims.add('as_built_feedback_loop');
+  if (pitchedFabrication.ready) supportedClaims.add('pitched_roof_fabrication_spatial_mapping');
   const verifiedClaims = validateDeclaredClaims(sourceSet.verifiedClaims, supportedClaims, issues);
   return {
     status: issues.length ? 'blocked' : 'passed',
@@ -86,6 +169,7 @@ export function validateCrossProjectDesignSourceSet(sourceSet, referenceProjectI
     verifiedClaims,
     phases: [...phases].sort(),
     sourceViews: [...views].sort(),
+    pitchedRoofFabricationSpatialMapping: pitchedFabrication.metrics,
     issues,
   };
 }
@@ -97,6 +181,7 @@ export function validateCompletedProjectEvidenceSet(sourceSet, referenceProjectI
   }
   if (!sourceSet.projectId || sourceSet.projectId === referenceProjectId) issues.push('independent_project_missing');
   const files = Array.isArray(sourceSet.files) ? sourceSet.files : [];
+  const pitchedFabrication = validatePitchedRoofFabricationSpatialMapping(sourceSet, files, issues);
   const excludedArtifacts = Array.isArray(sourceSet.excludedArtifacts) ? sourceSet.excludedArtifacts : [];
   const excludedHashes = new Set(excludedArtifacts.map((artifact) => artifact.sha256));
   const evidenceRoles = new Set(files.map((file) => file.evidenceRole));
@@ -189,6 +274,7 @@ export function validateCompletedProjectEvidenceSet(sourceSet, referenceProjectI
   if (completedLevels.size >= 2 && multiFloorVisualProof) {
     supportedClaims.add('multi_floor_completed_output');
   }
+  if (pitchedFabrication.ready) supportedClaims.add('pitched_roof_fabrication_spatial_mapping');
   const verifiedClaims = validateDeclaredClaims(sourceSet.verifiedClaims, supportedClaims, issues);
   return {
     status: issues.length ? 'blocked' : 'passed',
@@ -199,6 +285,7 @@ export function validateCompletedProjectEvidenceSet(sourceSet, referenceProjectI
     fabricationLevels: [...inventoryLevels].sort(),
     fabricationPipingRows: inventories.reduce((sum, inventory) => sum + (inventory.pipingRows || 0), 0),
     fabricationOutletRows: inventories.reduce((sum, inventory) => sum + (inventory.outletRows || 0), 0),
+    pitchedRoofFabricationSpatialMapping: pitchedFabrication.metrics,
     verifiedClaims,
     issues,
   };

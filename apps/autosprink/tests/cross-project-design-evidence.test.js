@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { createHash } from 'node:crypto';
 import tallahasseeSourceSet from '../src/data/tallahassee-completed-project-source-set.json';
 import nashvilleSourceSet from '../src/data/nashville-completed-project-source-set.json';
+import dallasSourceSet from '../src/data/dallas-completed-project-source-set.json';
 import winterGardenSourceSet from '../src/data/winter-garden-cross-project-source-set.json';
 import {
   validateCompletedProjectEvidencePortfolio,
@@ -24,6 +26,7 @@ describe('cross-project design evidence', () => {
       'as_built_feedback_loop',
       'completed_output_to_fabrication',
       'manufacturer_family_trace',
+      'pitched_roof_fabrication_spatial_mapping',
       'roof_structure_coordination',
       'source_to_completed_sprinkler_layout',
     ]);
@@ -81,18 +84,37 @@ describe('cross-project design evidence', () => {
     ]);
   });
 
-  it('promotes only claims repeated across two independent completed projects', () => {
-    const result = validateCompletedProjectEvidencePortfolio([winterGardenSourceSet, tallahasseeSourceSet, nashvilleSourceSet]);
+  it('binds Dallas dry-feed fabrication to a completed pitched-attic plan without promoting code compliance', () => {
+    const result = validateCompletedProjectEvidenceSet(dallasSourceSet);
     expect(result.status).toBe('passed');
-    expect(result.projectCount).toBe(3);
-    expect(result.projectIds).toEqual(['nashville-tn-temple', 'tallahassee-fl-temple', 'winter-garden-fl-meetinghouse']);
+    expect(result.projectId).toBe('dallas-tx-temple');
+    expect(result.fileCount).toBe(8);
+    expect(result.fabricationLevels).toEqual(['dry-feed']);
+    expect(result.fabricationPipingRows).toBe(35);
+    expect(result.fabricationOutletRows).toBe(1);
+    expect(result.verifiedClaims).toEqual(['pitched_roof_fabrication_spatial_mapping']);
+    expect(result.pitchedRoofFabricationSpatialMapping).toMatchObject({
+      fabricatedPieceCount: 35,
+      fabricatedLengthFt: 311.5,
+      mappedPlanRunCount: 2,
+      mappedTransitionEndpointCount: 4,
+      completedHeadCount: 103,
+      pitchRiseInPer12: 4,
+    });
+  });
+
+  it('promotes only claims repeated across two independent completed projects', () => {
+    const result = validateCompletedProjectEvidencePortfolio([winterGardenSourceSet, tallahasseeSourceSet, nashvilleSourceSet, dallasSourceSet]);
+    expect(result.status).toBe('passed');
+    expect(result.projectCount).toBe(4);
+    expect(result.projectIds).toEqual(['dallas-tx-temple', 'nashville-tn-temple', 'tallahassee-fl-temple', 'winter-garden-fl-meetinghouse']);
     expect(result.featurePromotion.as_built_feedback_loop).toMatchObject({ ready: true, projectCount: 3 });
     expect(result.featurePromotion.completed_output_to_fabrication).toMatchObject({ ready: true, projectCount: 3 });
     expect(result.featurePromotion.manufacturer_family_trace).toMatchObject({ ready: true, projectCount: 3 });
     expect(result.featurePromotion.roof_structure_coordination).toMatchObject({ ready: true, projectCount: 2 });
     expect(result.featurePromotion.multi_floor_completed_output).toMatchObject({ ready: true, projectCount: 2 });
     expect(result.featurePromotion.source_to_completed_sprinkler_layout).toMatchObject({ ready: true, projectCount: 2 });
-    expect(result.featurePromotion.pitched_roof_fabrication_spatial_mapping).toMatchObject({ ready: false, projectCount: 0 });
+    expect(result.featurePromotion.pitched_roof_fabrication_spatial_mapping).toMatchObject({ ready: true, projectCount: 2, projects: ['winter-garden-fl-meetinghouse', 'dallas-tx-temple'] });
   });
 
   it('rejects archive substitution, missing fabrication, manufacturer drift, and duplicate projects', () => {
@@ -124,6 +146,17 @@ describe('cross-project design evidence', () => {
     const missingPermit = structuredClone(nashvilleSourceSet);
     missingPermit.files = missingPermit.files.filter((file) => file.evidenceRole !== 'issued_permit');
     expect(validateCompletedProjectEvidenceSet(missingPermit).issues).toContain('required_evidence_role_missing:approval_basis');
+
+    const resealedDallasGeometrySubstitution = structuredClone(dallasSourceSet);
+    resealedDallasGeometrySubstitution.pitchedRoofFabricationSpatialMapping.mapping.mappedPlanRunCount = 3;
+    const { receiptSha256: ignoredReceipt, ...resealedDraft } = resealedDallasGeometrySubstitution.pitchedRoofFabricationSpatialMapping;
+    void ignoredReceipt;
+    resealedDallasGeometrySubstitution.pitchedRoofFabricationSpatialMapping.receiptSha256 = createHash('sha256').update(JSON.stringify(resealedDraft)).digest('hex');
+    expect(validateCompletedProjectEvidenceSet(resealedDallasGeometrySubstitution).issues).toContain('pitched_fabrication_mapping_geometry_drift:dallas-tx-temple');
+
+    const flatRoofSubstitution = structuredClone(dallasSourceSet);
+    flatRoofSubstitution.pitchedRoofFabricationSpatialMapping.pitch.riseIn = 0;
+    expect(validateCompletedProjectEvidenceSet(flatRoofSubstitution).issues).toContain('pitched_fabrication_mapping_receipt_mismatch:dallas-tx-temple');
 
     const duplicateProject = structuredClone(tallahasseeSourceSet);
     duplicateProject.projectId = winterGardenSourceSet.projectId;
