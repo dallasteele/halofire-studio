@@ -82,6 +82,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/projects/Dillon%20Residence/vertical-registration')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/structural-roof-surfaces')).status).toBe(401);
     expect((await request('/api/evidence/completed-hydraulic-network-vertical')).status).toBe(401);
+    expect((await request('/api/evidence/completed-active-hydraulic-plan-registration')).status).toBe(401);
     expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration')).status).toBe(401);
     expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration-bluebeam.pdf')).status).toBe(401);
   });
@@ -105,6 +106,26 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.projects[0].nodes).toHaveLength(31);
     expect(result.projects[0].pipes).toHaveLength(30);
     expect(result.projects[0].elevationViewSvg).toContain('report Z exact; X topological');
+  });
+
+  it('serves the two-project active hydraulic sprinkler plan registration', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/evidence/completed-active-hydraulic-plan-registration', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result).toMatchObject({
+      status: 'passed', projectCount: 2,
+      counts: { activeSprinklerNodes: 26, runChecks: 19 },
+      featurePromotion: { active_hydraulic_sprinkler_plan_registration: { ready: true, projectCount: 2, projects: ['mit-riverside-dugout-h', 'sierra-marana-di-mezzanine'] } },
+      fullHydraulicPlanRegistrationReady: false,
+      wholeBuildingNetworkElevationReady: false,
+      exactAsBuiltDeflectorElevationReady: false,
+      fabricationReady: false,
+      complianceReady: false,
+    });
+    expect(result.projects[0].nodes).toHaveLength(15);
+    expect(result.projects[1].nodes).toHaveLength(11);
+    expect(result.projects[0].views.planSvg).toContain('exact plan anchors');
   });
 
   it('serves registered speckled roof contours without inventing 3D planes', async () => {
@@ -267,7 +288,8 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     const result = await response.json();
     expect(result.status).toBe('passed');
     expect(result.evidenceReceipts).toMatchObject({ crossProject: expect.stringMatching(/^[0-9a-f]{64}$/), heads: expect.stringMatching(/^[0-9a-f]{64}$/), roofRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), pipeRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), ceilingElevation: expect.stringMatching(/^[0-9a-f]{64}$/), fabricationPlanMapping: expect.stringMatching(/^[0-9a-f]{64}$/) });
-    expect(result.acceptanceLoops).toMatchObject({ primary: { status: 'passed', headCount: 159 }, independent: { status: 'passed', headCount: 158 }, adversarial: { status: 'passed', centerRemovedTemplateRejected: true, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: true, duplicateProjectSubstitutionRejected: true, spatialMappingReceiptDriftRejected: true, crossProjectFlatRoofSubstitutionRejected: true, hydraulicElevationResealRejected: true, hydraulicTopologyDisconnectRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true } });
+    expect(result.acceptanceLoops).toMatchObject({ primary: { status: 'passed', headCount: 159 }, independent: { status: 'passed', headCount: 158 }, activeHydraulicPlan: { status: 'passed', projectCount: 2, activeNodeCount: 26, independentRunChecks: 19, scope: 'active-calculation-sprinklers-only' }, adversarial: { status: 'passed', centerRemovedTemplateRejected: true, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: true, duplicateProjectSubstitutionRejected: true, spatialMappingReceiptDriftRejected: true, crossProjectFlatRoofSubstitutionRejected: true, hydraulicElevationResealRejected: true, hydraulicTopologyDisconnectRejected: true, activeHydraulicPlanReceiptDriftRejected: true, duplicateActiveHydraulicProjectRejected: true, inactiveNodePromotionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true } });
+    expect(result.acceptanceLoops.activeHydraulicPlan.maximumResidualFt).toBeLessThanOrEqual(0.75);
     expect(result.crossProjectEvidence.metrics).toMatchObject({ projectCount: 4, pitchedProjectCount: 3, winterGardenPitchInPer12: 4.5 });
     expect(result.completedProjectEvidencePortfolio).toMatchObject({
       status: 'passed',
@@ -291,6 +313,14 @@ describe('AutoBid submitted sprinkler calibration API', () => {
       wholeBuildingNetworkElevationReady: false,
       exactAsBuiltDeflectorElevationReady: false,
     });
+    expect(result.completedActiveHydraulicPlanPortfolio).toMatchObject({
+      status: 'passed', projectCount: 2,
+      counts: { activeSprinklerNodes: 26, runChecks: 19 },
+      featurePromotion: { active_hydraulic_sprinkler_plan_registration: { ready: true, projectCount: 2, projects: ['mit-riverside-dugout-h', 'sierra-marana-di-mezzanine'] } },
+      fullHydraulicPlanRegistrationReady: false,
+      wholeBuildingNetworkElevationReady: false,
+      exactAsBuiltDeflectorElevationReady: false,
+    });
     expect(result.counts).toEqual({ completedBidFp3Heads: 159, chapelHeads: 15, chapelBranches: 3, chapelArmOvers: 15, networkSegments: 23, absoluteCeilingSurfaces: 2, headElevationEnvelopes: 15, fabricationMappedHeads: 15, exactBranchRowPipes: 3 });
     expect(result.headPlaneAssignments).toHaveLength(15);
     expect(result.pipeNetwork).toHaveLength(23);
@@ -307,6 +337,8 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.branchRowPipeElevationReady).toBe(true);
     expect(result.manufacturerInstallationEnvelopeReady).toBe(true);
     expect(result.hydraulicNetworkVerticalGeometryReady).toBe(true);
+    expect(result.activeHydraulicPlanRegistrationReady).toBe(true);
+    expect(result.fullHydraulicPlanRegistrationReady).toBe(false);
     expect(result.pipeSizesReady).toBe(false);
     expect(result.absoluteDeflectorDatumReady).toBe(false);
     expect(result.projectionReady).toBe(false);

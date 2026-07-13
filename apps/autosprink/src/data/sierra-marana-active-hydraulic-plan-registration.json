@@ -1,0 +1,32 @@
+{
+  "artifactType": "halofire.completed-active-hydraulic-plan-registration.v1",
+  "projectId": "sierra-marana-di-mezzanine",
+  "projectName": "Sierra Marana DI - Mezzanine",
+  "verifiedAt": "2026-07-13T04:20:00-07:00",
+  "sourceBindings": [
+    {"role":"hydraulic-calculation","path":"02-Active jobs\\03-Closed\\Sierra Builders\\Marana DI-Marana AZ\\Engineering\\Submittal\\20195-MEZZ HYDRAULICS DESERET 11.23.2020.pdf","bytes":51580,"sha256":"20950b877ab29c19c330ece6c82f5e30cb3dff2d173633af3183a73cc0a37961","physicalPages":[2,3,4]},
+    {"role":"completed-as-built-plan-set","path":"02-Active jobs\\03-Closed\\Sierra Builders\\Marana DI-Marana AZ\\Field Operations\\As Built Stamped Plan Set.pdf","bytes":5047307,"sha256":"acfed39df052ce8549a7ea62608c012755eb4c5c6593027d4e074bb85d1072e0","physicalPages":[1,2,3]},
+    {"role":"approved-plan-set","path":"02-Active jobs\\03-Closed\\Sierra Builders\\Marana DI-Marana AZ\\Engineering\\City Approved Drawings\\City Approved FS Drawings.pdf","bytes":5212594,"sha256":"680d90c13e50bad3a4ef055c1628b46e6becb898cfe8d54386e662aff8eb3351","physicalPages":[1,2,3]}
+  ],
+  "registration": {
+    "sheetId": "FP-3 MEZZANINE",
+    "physicalPageNumber": 3,
+    "coordinateSpace": "pdf-points-top-left",
+    "pageSizePt": [2592,1728],
+    "printedScale": "1/8 inch = 1 foot",
+    "printedScalePtPerFt": 9,
+    "anchorClass": "vector-sprinkler-outer-ring-center",
+    "associationMethod": "visible hydraulic-node glyph plus HASS active-node sequence; exact outer-ring center extracted from four-curve 9-point vector circle",
+    "activeNodes": [["1",662.94,645.18,9.5,5.29],["2",662.94,564.18,9.5,5.29],["3",652.86,518.34,9.5,5.29],["8",752.94,645.18,9.5,5.29],["9",752.94,564.18,9.5,5.29],["10",760.5,518.46,9.5,5.29],["13",843.42,715.38,9.5,5.29],["14",843.42,607.38,9.5,5.29],["15",859.86,518.46,9.5,5.29],["18",951.42,607.38,9.5,5.29],["19",922.14,518.46,9.5,5.29]],
+    "activeRunChecks": [["1","2",9],["2","3",5.08],["8","9",9],["9","10",5.08],["13","14",12],["14","15",9.83],["18","19",9.83]],
+    "maximumPlanToReportRunResidualFt": 0.75
+  },
+  "metrics": {"mappedActiveNodeCount":11,"minimumElevationFt":9.5,"maximumElevationFt":9.5,"distinctElevationCount":1,"runCheckCount":7},
+  "activeHydraulicPlanRegistrationReady": true,
+  "fullHydraulicPlanRegistrationReady": false,
+  "wholeBuildingNetworkElevationReady": false,
+  "exactAsBuiltDeflectorElevationReady": false,
+  "fabricationReady": false,
+  "complianceReady": false,
+  "receiptSha256": "c17c825ffdc8aaced3b354ae2bdcef1753ead5d02ae66afb1461e6c3507f17e3"
+}

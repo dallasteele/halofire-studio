@@ -1,0 +1,32 @@
+{
+  "artifactType": "halofire.completed-active-hydraulic-plan-registration.v1",
+  "projectId": "mit-riverside-dugout-h",
+  "projectName": "MIT Riverside - Dugout H",
+  "verifiedAt": "2026-07-13T04:20:00-07:00",
+  "sourceBindings": [
+    {"role":"hydraulic-calculation","path":"02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Engineering\\Submittals\\20172-DUGOUT H HYDRAULICS.pdf","bytes":51384,"sha256":"c961ffd468c0af1433e93755be4b8b388625824e259f9b52d0b61e44b6792621","physicalPages":[2,3,4,5]},
+    {"role":"completed-field-plan","path":"02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Field Operations\\Field Plans\\DUGOUT H BLDG FIELD.pdf","bytes":951202,"sha256":"dbde3554b995d9ceb16d6829d683306e9a60f2dbc9b05ab87a3c60b548c0538c","physicalPages":[1]},
+    {"role":"approved-as-built-plan-set","path":"02-Active jobs\\03-Closed\\Adolfson & Peterson\\MIT Riverside - Phoenix AZ\\Field Operations\\As Builts\\State Fire Marshal Approved Plan Set_As Builts.pdf","bytes":2495800,"sha256":"b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207","physicalPages":[1,2,3,4,5,6,7]}
+  ],
+  "registration": {
+    "sheetId": "FP-3 DUGOUT H",
+    "physicalPageNumber": 1,
+    "coordinateSpace": "pdf-points-top-left",
+    "pageSizePt": [2592,1728],
+    "printedScale": "1/8 inch = 1 foot",
+    "printedScalePtPerFt": 9,
+    "anchorClass": "vector-sprinkler-outer-ring-center",
+    "associationMethod": "visible hydraulic-node glyph plus HASS active-node sequence; exact outer-ring center extracted from four-curve 9-point vector circle",
+    "activeNodes": [["1",1719.06,985.26,12,5.6],["2",1845.06,985.26,12,5.6],["3",1971.06,985.26,12,5.6],["4",2095.26,985.26,12,5.6],["9",1714.5,1084.26,11,5.6],["10",1804.5,1084.26,11,5.6],["11",1894.62,1084.26,11,5.6],["12",1980.06,1084.26,11,5.6],["13",2052.06,1084.26,11,5.6],["14",2106.06,1084.26,11,5.6],["17",1714.5,1174.26,9,5.6],["18",1804.5,1174.26,9,5.6],["19",1894.62,1174.26,9,5.6],["20",1980.06,1174.26,9,5.6],["21",2103.18,1174.26,9,5.6]],
+    "activeRunChecks": [["1","2",14],["2","3",14],["3","4",13.83],["9","10",10],["10","11",10],["11","12",9.5],["12","13",8],["13","14",6],["17","18",10],["18","19",10],["19","20",9.5],["20","21",13.67]],
+    "maximumPlanToReportRunResidualFt": 0.04
+  },
+  "metrics": {"mappedActiveNodeCount":15,"minimumElevationFt":9,"maximumElevationFt":12,"distinctElevationCount":3,"runCheckCount":12},
+  "activeHydraulicPlanRegistrationReady": true,
+  "fullHydraulicPlanRegistrationReady": false,
+  "wholeBuildingNetworkElevationReady": false,
+  "exactAsBuiltDeflectorElevationReady": false,
+  "fabricationReady": false,
+  "complianceReady": false,
+  "receiptSha256": "f55c6805791595fde04307a89a1eb8a3d3e9ac369938eb17e6bdb8f2bd574e8f"
+}

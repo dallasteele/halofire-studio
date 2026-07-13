@@ -9,9 +9,12 @@ import { chromium } from 'playwright';
 
 const STUDIO_ROOT = path.resolve(import.meta.dirname, '..');
 const WORKSPACE_ROOT = path.resolve(STUDIO_ROOT, '../../..');
-const ENGINE_ROOT = path.join(WORKSPACE_ROOT, 'halofire-autobid', 'engine');
-const SOURCE_DB = path.join(WORKSPACE_ROOT, 'halofire-autobid', 'db', 'halofire_bids.db');
-const SOURCE_ARTIFACTS = path.join(WORKSPACE_ROOT, 'halofire-autobid', 'out', 'spatial-overlays');
+const LOCAL_AUTOBID_ROOT = path.join(WORKSPACE_ROOT, 'halofire-autobid');
+const SIBLING_AUTOBID_ROOT = path.resolve(WORKSPACE_ROOT, '..', 'halofire-autobid');
+const AUTOBID_ROOT = process.env.HALOFIRE_AUTOBID_ROOT || (fs.existsSync(LOCAL_AUTOBID_ROOT) ? LOCAL_AUTOBID_ROOT : SIBLING_AUTOBID_ROOT);
+const ENGINE_ROOT = path.join(AUTOBID_ROOT, 'engine');
+const SOURCE_DB = path.join(AUTOBID_ROOT, 'db', 'halofire_bids.db');
+const SOURCE_ARTIFACTS = path.join(AUTOBID_ROOT, 'out', 'spatial-overlays');
 const PYTHON = 'C:/Python312/python.exe';
 const ADMIN_PASSWORD = 'review-browser-admin-password';
 const ESTIMATOR_PASSWORD = 'review-browser-estimator-password';

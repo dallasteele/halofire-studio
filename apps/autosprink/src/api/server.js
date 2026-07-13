@@ -41,6 +41,7 @@ import { buildSlopedCeilingModel3d, verifySlopedCeilingModel3d } from '../engine
 import { buildPitchedRoofCalibrationCases, validatePitchedRoofCrossProjectEvidence } from '../engine/pitched-roof-cross-project-evidence.js';
 import { validateCompletedProjectEvidencePortfolio } from '../engine/cross-project-design-evidence.js';
 import { validateCompletedHydraulicNetworkVerticalPortfolio } from '../engine/completed-hydraulic-network-vertical.js';
+import { validateCompletedActiveHydraulicPlanPortfolio } from '../engine/completed-active-hydraulic-plan-registration.js';
 import { validateRasterBullseyeHeadEvidence } from '../engine/raster-bullseye-head-evidence.js';
 import { buildWinterGardenChapelPlaneAssignments, validatePiecewiseGridRegistration } from '../engine/piecewise-grid-registration.js';
 import { buildWinterGardenChapelPipeNetwork, validateFp2PipeEvidence } from '../engine/fp2-pipe-registration.js';
@@ -107,6 +108,8 @@ const NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../
 const DALLAS_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/dallas-completed-project-source-set.json');
 const MIT_RIVERSIDE_HYDRAULIC_NETWORK_VERTICAL_PATH = path.resolve(__dirname, '../data/mit-riverside-hydraulic-network-vertical.json');
 const NASHVILLE_HYDRAULIC_NETWORK_VERTICAL_PATH = path.resolve(__dirname, '../data/nashville-hydraulic-network-vertical.json');
+const MIT_RIVERSIDE_ACTIVE_HYDRAULIC_PLAN_PATH = path.resolve(__dirname, '../data/mit-riverside-active-hydraulic-plan-registration.json');
+const SIERRA_MARANA_ACTIVE_HYDRAULIC_PLAN_PATH = path.resolve(__dirname, '../data/sierra-marana-active-hydraulic-plan-registration.json');
 const NASHVILLE_ELEVATION_DATUMS_PATH = path.resolve(__dirname, '../data/elevation-datums.nashville.json');
 const NASHVILLE_SOURCE_BOUND_FOOTPRINTS_PATH = path.resolve(__dirname, '../data/source-bound-footprints.nashville.json');
 const WINTER_GARDEN_HEAD_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp3-head-evidence.json');
@@ -1727,6 +1730,13 @@ function loadCompletedHydraulicNetworkVerticalPortfolio() {
   ]);
 }
 
+function loadCompletedActiveHydraulicPlanPortfolio() {
+  return validateCompletedActiveHydraulicPlanPortfolio([
+    JSON.parse(fs.readFileSync(MIT_RIVERSIDE_ACTIVE_HYDRAULIC_PLAN_PATH, 'utf8')),
+    JSON.parse(fs.readFileSync(SIERRA_MARANA_ACTIVE_HYDRAULIC_PLAN_PATH, 'utf8')),
+  ]);
+}
+
 app.get('/api/evidence/completed-hydraulic-network-vertical', authMiddleware, (req, res) => {
   try {
     const portfolio = loadCompletedHydraulicNetworkVerticalPortfolio();
@@ -1735,6 +1745,17 @@ app.get('/api/evidence/completed-hydraulic-network-vertical', authMiddleware, (r
   } catch (error) {
     log.error('Failed to load completed hydraulic-network vertical portfolio', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'completed_hydraulic_network_vertical_load_failed', complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/completed-active-hydraulic-plan-registration', authMiddleware, (req, res) => {
+  try {
+    const portfolio = loadCompletedActiveHydraulicPlanPortfolio();
+    if (portfolio.status !== 'passed') return res.status(422).json(portfolio);
+    return res.json(portfolio);
+  } catch (error) {
+    log.error('Failed to load completed active-hydraulic plan portfolio', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'completed_active_hydraulic_plan_load_failed', complianceReady: false });
   }
 });
 
@@ -1755,6 +1776,7 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
     const fabricationMapping = JSON.parse(fs.readFileSync(WINTER_GARDEN_FABRICATION_PLAN_MAPPING_PATH, 'utf8'));
     const completedProjectPortfolio = validateCompletedProjectEvidencePortfolio(completedProjectSourceSets);
     const completedHydraulicNetworkVerticalPortfolio = loadCompletedHydraulicNetworkVerticalPortfolio();
+    const completedActiveHydraulicPlanPortfolio = loadCompletedActiveHydraulicPlanPortfolio();
     const [crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered] = await Promise.all([
       validatePitchedRoofCrossProjectEvidence(crossProjectPacket),
       validateRasterBullseyeHeadEvidence(headEvidence),
@@ -1767,7 +1789,7 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
       buildWinterGardenCeilingModel3d(ceilingEvidence, gridRegistration, headEvidence),
       buildWinterGardenFabricationRegisteredModel(fabricationMapping, ceilingEvidence, gridRegistration, headEvidence),
     ]);
-    const validations = [completedProjectPortfolio, completedHydraulicNetworkVerticalPortfolio, crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered];
+    const validations = [completedProjectPortfolio, completedHydraulicNetworkVerticalPortfolio, completedActiveHydraulicPlanPortfolio, crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered];
     if (validations.some((validation) => validation.status !== 'passed')) return res.status(422).json({ status: 'blocked', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name, issues: validations.flatMap((validation) => validation.issues || []), projectionReady: false, complianceReady: false });
     return res.json({
       status: 'passed', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name,
@@ -1776,7 +1798,8 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
       acceptanceLoops: {
         primary: { status: 'passed', method: headEvidence.primary.method, headCount: heads.metrics.primaryCount, branchMethod: pipeEvidence.detectorReceipt.primary.method },
         independent: { status: 'passed', method: headEvidence.independent.method, headCount: heads.metrics.independentCount, branchMethod: pipeEvidence.detectorReceipt.independent.method },
-        adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: completedProjectPortfolio.results.some((result) => result.excludedArtifactCount > 0), duplicateProjectSubstitutionRejected: true, spatialMappingReceiptDriftRejected: true, crossProjectFlatRoofSubstitutionRejected: true, hydraulicElevationResealRejected: true, hydraulicTopologyDisconnectRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true },
+        activeHydraulicPlan: { status: 'passed', projectCount: completedActiveHydraulicPlanPortfolio.projectCount, activeNodeCount: completedActiveHydraulicPlanPortfolio.counts.activeSprinklerNodes, independentRunChecks: completedActiveHydraulicPlanPortfolio.counts.runChecks, maximumResidualFt: Math.max(...completedActiveHydraulicPlanPortfolio.projects.map((project) => project.maxResidualFt)), scope: 'active-calculation-sprinklers-only' },
+        adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: completedProjectPortfolio.results.some((result) => result.excludedArtifactCount > 0), duplicateProjectSubstitutionRejected: true, spatialMappingReceiptDriftRejected: true, crossProjectFlatRoofSubstitutionRejected: true, hydraulicElevationResealRejected: true, hydraulicTopologyDisconnectRejected: true, activeHydraulicPlanReceiptDriftRejected: true, duplicateActiveHydraulicProjectRejected: true, inactiveNodePromotionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true },
       },
       crossProjectEvidence: { metrics: crossProject.metrics, claimStatus: crossProject.claimStatus },
       completedProjectEvidencePortfolio: {
@@ -1787,10 +1810,11 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
         projects: completedProjectPortfolio.results.map((result) => ({ projectId: result.projectId, status: result.status, verifiedClaims: result.verifiedClaims, fileCount: result.fileCount, excludedArtifactCount: result.excludedArtifactCount || 0 })),
       },
       completedHydraulicNetworkVerticalPortfolio,
+      completedActiveHydraulicPlanPortfolio,
       counts: { completedBidFp3Heads: heads.metrics.primaryCount, chapelHeads: planes.assignments.length, chapelBranches: network.branchCount, chapelArmOvers: network.headCount, networkSegments: network.segments.length, absoluteCeilingSurfaces: model3dRegistered.counts.ceilingSurfaces, headElevationEnvelopes: model3dRegistered.counts.headEnvelopes, fabricationMappedHeads: model3dRegistered.counts.fabricationMappedHeads, exactBranchRowPipes: model3dRegistered.counts.exactBranchRowPipes },
       roofPlanes: planes.roofPlanes, headPlaneAssignments: planes.assignments, pipeNetwork: network.segments,
       fabricationMappings: fabrication.mappings, model3dEnvelope: model3dRegistered, views: renderWinterGardenCeilingViews(model3dRegistered),
-      ceilingSurfaceElevationReady: true, model3dEnvelopeReady: true, fabricationPlanMappingReady: true, branchRowPipeElevationReady: true, manufacturerInstallationEnvelopeReady: true, hydraulicNetworkVerticalGeometryReady: true, pipeSizesReady: false, fullNetworkPipeElevationReady: false, absoluteDeflectorDatumReady: false, exactAsBuiltDeflectorElevationReady: false, projectionReady: false, fabricationReady: false, complianceReady: false,
+      ceilingSurfaceElevationReady: true, model3dEnvelopeReady: true, fabricationPlanMappingReady: true, branchRowPipeElevationReady: true, manufacturerInstallationEnvelopeReady: true, hydraulicNetworkVerticalGeometryReady: true, activeHydraulicPlanRegistrationReady: true, fullHydraulicPlanRegistrationReady: false, pipeSizesReady: false, fullNetworkPipeElevationReady: false, absoluteDeflectorDatumReady: false, exactAsBuiltDeflectorElevationReady: false, projectionReady: false, fabricationReady: false, complianceReady: false,
       residuals: [...network.residuals, ...model3dRegistered.residuals],
       claimStatus: 'completed-bid-pitched-roof-head-and-pipe-topology-calibration-not-code-compliance-or-fabrication',
     });

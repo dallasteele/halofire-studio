@@ -728,7 +728,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Hydraulic-network vertical geometry: PROMOTED');
     expect(html).toContain('hydraulic_network_vertical_geometry');
     expect(html).toContain('Completed hydraulic-network vertical geometry cross-project gate failed');
-    expect(html).toContain('Whole-building pipe Z, exact as-built deflector setpoints, fabrication release, and code approval remain fail-closed');
+    expect(html).toContain('active-head join below is exact');
+    expect(html).toContain('Active hydraulic sprinkler plan registration: PROMOTED');
+    expect(html).toContain('active_hydraulic_sprinkler_plan_registration');
+    expect(html).toContain('Active hydraulic sprinkler plan registration cross-project gate failed');
+    expect(html).toContain('Inactive junction coordinates, whole-building network Z, exact field deflector elevations, fabrication release, and code compliance remain fail-closed');
     expect(html).toContain('dallasPitchMeanInPer12');
     expect(html).toContain("'roof-planes.automatic-roof-planes': () => hfShowSubmittedCalibrationViews()");
   });
