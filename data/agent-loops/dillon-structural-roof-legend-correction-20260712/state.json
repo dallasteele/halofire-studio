@@ -1,5 +1,5 @@
 {
-  "status": "local_verified",
+  "status": "slice_complete",
   "iteration": 2,
   "truth": [
     "The structural legend maps the solid gray swatch to HATCH AREA INDICATES RECESS FLOOR AT BATHROOM.",
@@ -8,15 +8,17 @@
     "The corrected runtime accepts zero structural roof faces and promotes zero structural roof planes."
   ],
   "remaining": [
-    "Deploy and verify the corrected fail-closed result",
     "Extract actual speckled slope-roof boundaries in a subsequent loop"
   ],
   "verification": {
     "runtimeReceiptSha256": "5cac0259448a78ecf0cc99c57dd4474e0792bd5c9d423d4dc230036a1ccddabb",
+    "featureCommit": "7702f6ba92e403f826112abd6d1d22004bf7ec14",
     "focusedTests": "41 passed",
     "productionBuild": "passed",
     "agenticRules": "passed",
     "loopGuard": "passed",
+    "live": "VPS fast-forwarded to 7702f6ba; halofire.service active; live admin login and corrected protected API returned 200 with receipt parity",
+    "brainEpisodeId": 126026,
     "claim": "zero structural roof faces accepted; 48 solid-gray recess-floor triangles rejected by legend"
   },
   "globalGoalComplete": false
