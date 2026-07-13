@@ -1,0 +1,50 @@
+{
+  "name": "completed-hydraulic-routed-plan-registration-20260713",
+  "owner": "codex",
+  "goal": "Register inactive hydraulic junctions and routed on-plan pipe geometry against source-hashed completed-job plan and hydraulic-calculation PDFs for at least two independent projects, with deterministic primary, independent, and adversarial verification and fail-closed scope claims.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/Submittals/20172-DUGOUT H HYDRAULICS.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Field Operations/Field Plans/DUGOUT H BLDG FIELD.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Sierra Builders/Marana DI-Marana AZ/Engineering/Submittal/20195-MEZZ HYDRAULICS DESERET 11.23.2020.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Sierra Builders/Marana DI-Marana AZ/Field Operations/As Built Stamped Plan Set.pdf",
+    "apps/autosprink/src/data/mit-riverside-hydraulic-network-vertical.json",
+    "apps/autosprink/src/data/sierra-marana-active-hydraulic-plan-registration.json",
+    "apps/autosprink/src/engine/completed-active-hydraulic-plan-registration.js"
+  ],
+  "exit_criteria": [
+    "At least two independent completed projects have source-hashed plan and hydraulic-calculation registrations.",
+    "Every promoted on-plan inactive junction has an exact plan anchor and a hydraulic node identity constrained by topology and scaled run length.",
+    "Every promoted routed pipe edge has endpoints registered to the plan and a scaled plan length compared with its hydraulic report length under an explicit sealed tolerance.",
+    "Primary extraction, independent recomputation, and adversarial mutations agree; wrong hashes, missing anchors, duplicate node identities, disconnected routes, and out-of-tolerance lengths fail closed.",
+    "The API and evidence UI distinguish on-plan routed registration from off-sheet supply, whole-building elevation, as-built deflector elevation, fabrication, compliance, permit, and AHJ claims.",
+    "Focused tests, production build, full AutoSprink regression, source rehash, formal coordinate-transform proof or exact prover blocker, live VPS deploy, authenticated API smoke, login smoke, and brain writeback complete."
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/completed-hydraulic-routed-plan-registration-20260713/contract.json",
+    "cd apps/autosprink && npx vitest run tests/completed-hydraulic-routed-plan-registration.test.js tests/submitted-sprinkler-calibration-api.test.js",
+    "cd apps/autosprink && npx vitest run",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "GX10 Lean check for affine scale, route-length residual, and fail-closed promotion invariants",
+    "authenticated local and live API smoke plus login-page/browser smoke",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/brain_sync_session.py close writeback"
+  ],
+  "state_path": "data/agent-loops/completed-hydraulic-routed-plan-registration-20260713/state.json",
+  "evidence_paths": [
+    "out/agent-loops/completed-hydraulic-routed-plan-registration-20260713/loop-guard.txt",
+    "out/agent-loops/completed-hydraulic-routed-plan-registration-20260713/source-hashes.json",
+    "out/agent-loops/completed-hydraulic-routed-plan-registration-20260713/primary-registration.json",
+    "out/agent-loops/completed-hydraulic-routed-plan-registration-20260713/independent-verifier.json",
+    "out/agent-loops/completed-hydraulic-routed-plan-registration-20260713/adversarial-verifier.json",
+    "out/agent-loops/completed-hydraulic-routed-plan-registration-20260713/formal-proof.json",
+    "out/agent-loops/completed-hydraulic-routed-plan-registration-20260713/live-smoke.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 500000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

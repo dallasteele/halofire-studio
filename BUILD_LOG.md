@@ -1294,3 +1294,25 @@ User direction across 4 messages this session:
 - Next blocker: obtain a real source-backed family with verified
   dimensions and an approved source/license path before the next
   promotion attempt.
+
+### Entry 38 - Completed hydraulic routed-plan registration
+
+- Registered inactive hydraulic junctions and routed on-plan pipe geometry
+  from two independent completed projects: MIT Riverside and Sierra Marana.
+- Sealed six protected Egnyte source identities across hydraulic reports,
+  field/as-built plan sets, and approved plan sets; every SHA-256 and byte
+  count was re-verified against the mounted originals without modifying them.
+- Promoted only the calculated floor-plan branch-graph scope: 40 registered
+  nodes, 14 inactive junctions, 38 routed pipes, 31 scaled-length checks,
+  four topology-only local offsets, and three same-anchor report-vertical
+  joins. Whole-building network elevation, exact as-built deflector datum,
+  fabrication, compliance, permit, and AHJ readiness remain false.
+- Added deterministic primary, independent, and adversarial loops plus an
+  authenticated evidence API. The adversarial loop rejects source/receipt
+  drift, duplicate nodes, disconnected topology, endpoint drift, topology
+  substituted as measured length, and false full-plan promotion.
+- Verification passed: loop contract, source rehash, GX10 Lean 4.13.0 proof,
+  focused Vitest 23/23, 100 bounded deterministic replays, node:test 20/20,
+  full Vitest 1707/1707 across 180 files, production Vite build, and the
+  workspace agentic-rule verifier.
+- Deployment and live authenticated smoke are the remaining release gates.
