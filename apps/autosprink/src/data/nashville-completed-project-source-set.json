@@ -159,9 +159,9 @@
   ],
   "excludedArtifacts": [],
   "limitations": [
-    "This set proves source-plan/RCP/section presence and a completed multi-level sprinkler lifecycle; it does not yet prove automatic source-bound footprint extraction or scaled extrusion.",
+    "Automatic source-bound footprint extraction and scaled floor-by-floor extrusion are proven by the separate sealed elevation-datums.nashville.json and source-bound-footprints.nashville.json artifacts; this lifecycle set does not duplicate those receipts.",
     "A110 source text proves the printed scale is 3/16 inch equals 1 foot; an initial 1/8 inch reading was rejected before promotion.",
-    "A131 contains three tower plan views and must be split before any tower footprint can be accepted.",
+    "A131 tower demolition, annotated, and dimension views are split and independently agree through the sealed source-bound footprint artifact; the dimension view is registered into A110 plan feet by shared grid controls.",
     "The fourth AHJ submission is bound together with the issued permit, but the FP2 sheet itself is not represented as approval-stamped.",
     "This evidence is calibration data and does not assert code compliance, approval, or exact as-built deflector elevations."
   ]

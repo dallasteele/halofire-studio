@@ -1176,6 +1176,131 @@ describe('T34 — PDF graphics-state layer extraction (lineWidth + strokeColor t
     }
   });
 
+  test('paint-aware extraction annotates filled and stroked paths without changing default output', () => {
+    const ops = opList([
+      [OPS.setFillRGBColor, ['#336699']],
+      [OPS.rectangle, [0, 0, 10, 5]],
+      [OPS.fill, []],
+      [OPS.setLineWidth, [0.75]],
+      [OPS.setStrokeRGBColor, ['#112233']],
+      [OPS.moveTo, [20, 0]],
+      [OPS.lineTo, [30, 0]],
+      [OPS.stroke, []],
+    ]);
+
+    const normal = extractSegmentsFromOpList(ops, { scale: 1 });
+    expect(normal.segments[0].paintMode).toBeUndefined();
+    expect(normal.segments[0].pathId).toBeUndefined();
+    expect(normal.segments[0].fillColor).toBeUndefined();
+
+    const { segments } = extractSegmentsFromOpList(ops, {
+      scale: 1,
+      includePaintMode: true,
+    });
+    expect(segments).toHaveLength(5);
+    for (const segment of segments.slice(0, 4)) {
+      expect(segment).toMatchObject({
+        pathId: 1,
+        paintMode: 'fill',
+        fillColor: '#336699',
+      });
+    }
+    expect(segments[4]).toMatchObject({
+      pathId: 2,
+      paintMode: 'stroke',
+      lineWidth: 0.75,
+      strokeColor: '#112233',
+    });
+    expect(segments[4].fillColor).toBeUndefined();
+  });
+
+  test('paint-aware extraction restores fill color and records clipping paths', () => {
+    const ops = opList([
+      [OPS.setFillRGBColor, ['#000000']],
+      [OPS.save, []],
+      [OPS.setFillRGBColor, ['#ff0000']],
+      [OPS.rectangle, [0, 0, 4, 4]],
+      [OPS.fill, []],
+      [OPS.restore, []],
+      [OPS.rectangle, [10, 0, 4, 4]],
+      [OPS.eoClip, []],
+      [OPS.endPath, []],
+    ]);
+
+    const { segments } = extractSegmentsFromOpList(ops, {
+      scale: 1,
+      includePaintMode: true,
+    });
+    expect(segments).toHaveLength(8);
+    for (const segment of segments.slice(0, 4)) {
+      expect(segment).toMatchObject({
+        pathId: 1,
+        paintMode: 'fill',
+        fillColor: '#ff0000',
+      });
+    }
+    for (const segment of segments.slice(4)) {
+      expect(segment).toMatchObject({
+        pathId: 2,
+        paintMode: 'even-odd-clip',
+      });
+      expect(segment.fillColor).toBeUndefined();
+    }
+  });
+
+  test('paint-aware extraction decodes pdfjs v6 paint ops embedded in constructPath', () => {
+    const fillBuffer = new Float32Array([
+      0, 0, 0,
+      1, 8, 0,
+      1, 8, 6,
+      1, 0, 6,
+      4,
+    ]);
+    const strokeBuffer = new Float32Array([
+      0, 20, 0,
+      1, 28, 0,
+    ]);
+    const ops = opList([
+      [OPS.setFillRGBColor, ['#abcdef']],
+      [OPS.constructPath, [OPS.fill, [fillBuffer], new Float32Array([0, 0, 8, 6])]],
+      [OPS.constructPath, [OPS.stroke, [strokeBuffer], new Float32Array([20, 0, 28, 0])]],
+    ]);
+
+    const { segments } = extractSegmentsFromOpList(ops, {
+      scale: 1,
+      includePaintMode: true,
+    });
+    expect(segments).toHaveLength(5);
+    for (const segment of segments.slice(0, 4)) {
+      expect(segment).toMatchObject({
+        pathId: 1,
+        paintMode: 'fill',
+        fillColor: '#abcdef',
+      });
+    }
+    expect(segments[4]).toMatchObject({ pathId: 2, paintMode: 'stroke' });
+    expect(segments[4].fillColor).toBeUndefined();
+  });
+
+  test('paint-aware extraction exposes legacy paths with no terminal paint op', () => {
+    const ops = opList([
+      [OPS.moveTo, [0, 0]],
+      [OPS.lineTo, [5, 0]],
+    ]);
+    const { segments } = extractSegmentsFromOpList(ops, {
+      scale: 1,
+      includePaintMode: true,
+    });
+    expect(segments).toEqual([{
+      x1: 0,
+      y1: 0,
+      x2: 5,
+      y2: 0,
+      pathId: 1,
+      paintMode: 'unpainted',
+    }]);
+  });
+
   test('selectWallLayer degenerate inputs fall back without throwing', () => {
     expect(() => selectWallLayer([])).not.toThrow();
     const empty = selectWallLayer([]);

@@ -129,7 +129,11 @@ describe('studio static origin handling', () => {
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('/api/projects/Dillon%20Residence/floor-by-floor-model');
+    expect(html).toContain('/api/projects/LDS%20Temple%20-%20Nashville%20TN/floor-by-floor-model');
     expect(html).toContain('Dillon actual-drawing building model');
+    expect(html).toContain('Nashville actual-drawing building model');
+    expect(html).toContain('A110 gray wall-poche shell was selected by PDF paint semantics before');
+    expect(html).toContain('A301 controls Level 01 100.000 ft');
     expect(html).toContain('Interactive Dillon source-DWG floor-by-floor extrusion');
     expect(html).toContain('new THREE.ExtrudeGeometry');
     expect(html).toContain('Structural roof evidence');

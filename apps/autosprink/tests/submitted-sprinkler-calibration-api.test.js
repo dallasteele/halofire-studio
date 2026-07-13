@@ -77,6 +77,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.pdf')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/submitted-sloped-ceiling-bluebeam.fdf')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/floor-by-floor-model')).status).toBe(401);
+    expect((await request('/api/projects/LDS%20Temple%20-%20Nashville%20TN/floor-by-floor-model')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/completed-bid-geometry')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/vertical-registration')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/structural-roof-surfaces')).status).toBe(401);
@@ -142,6 +143,30 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.views.topViews).toHaveLength(3);
     expect(result.views.elevationSvg).toContain('exterior elevation sheet absent');
     expect(result.views.isometricSvg).toContain('extruded floor by floor');
+    expect(result.geometryGrounded).toBe(true);
+    expect(result.complianceReady).toBe(false);
+  });
+
+  it('serves the Nashville A110/A131.1 floor-by-floor model registered to A301 and sprinkler outputs', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/LDS%20Temple%20-%20Nashville%20TN/floor-by-floor-model', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result.status).toBe('passed');
+    expect(result.receiptSha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(result.counts).toEqual({ levels: 2, extrusionSolids: 2, independentlyRegisteredPlanViews: 5 });
+    expect(result.model.levels.map((level) => [level.sourceSheetId, level.floorElevationFt])).toEqual([
+      ['A110', 100],
+      ['A131.1', 108.78125],
+    ]);
+    expect(result.extrusion.solids).toHaveLength(2);
+    expect(result.views.isometricSvg).toContain('2 sealed extrusion solids');
+    expect(result.views.elevationSvg).toContain('A301 section-controlled stack');
+    expect(result.model.registrations.map((entry) => entry.target)).toEqual([
+      'A110 plan feet',
+      'F102 Level 02 fire-protection plan',
+      'as-built FP2 main-level grid',
+    ]);
     expect(result.geometryGrounded).toBe(true);
     expect(result.complianceReady).toBe(false);
   });

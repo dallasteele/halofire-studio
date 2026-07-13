@@ -1,0 +1,553 @@
+{
+  "artifactType": "halofire.source-bound-level-footprints.v1",
+  "projectName": "LDS Temple - Nashville TN",
+  "units": "ft",
+  "sourcePdfSha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929",
+  "scaleFtPerPoint": 0.07407407407407407,
+  "scaleBasis": "A110 uses 3/16 inch = 1 foot; A131.1 per-level derivation records 1/4 inch = 1 foot before shared-grid registration into A110 plan feet",
+  "elevationEvidenceReceiptSha256": "4002dae7e7ad1d4c126710248b6658e050788093dd9c05ed838d3e026174aa2f",
+  "levels": [
+    {
+      "level": 1,
+      "sheetId": "A110",
+      "sourceBinding": {
+        "sourcePdfSha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929",
+        "physicalPageNumber": 17,
+        "pageIndex": 16,
+        "renderedPageSha256": "7bd9b5899066145c729ec9621a74ea34c530d3b3357e7ea8b95a2dd5e637eb34",
+        "sheetId": "A110",
+        "coordinateSpace": "plan-feet",
+        "renderProfile": {
+          "renderer": "Poppler pdftoppm",
+          "rendererVersion": "26.05.0",
+          "matrixScale": 1.388889,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 100,
+      "elevationEvidenceReceiptSha256": "4002dae7e7ad1d4c126710248b6658e050788093dd9c05ed838d3e026174aa2f",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          34.222222,
+          61.289094
+        ],
+        [
+          46.958249,
+          61.289094
+        ],
+        [
+          46.958249,
+          39.278434
+        ],
+        [
+          51.203592,
+          39.278434
+        ],
+        [
+          51.203592,
+          38.389114
+        ],
+        [
+          60.755613,
+          38.389114
+        ],
+        [
+          60.755613,
+          39.278434
+        ],
+        [
+          75.260533,
+          39.278434
+        ],
+        [
+          75.260533,
+          38.389114
+        ],
+        [
+          98.256138,
+          38.389114
+        ],
+        [
+          98.256138,
+          39.278434
+        ],
+        [
+          112.761058,
+          39.278434
+        ],
+        [
+          112.761058,
+          38.389114
+        ],
+        [
+          122.313079,
+          38.389114
+        ],
+        [
+          122.313079,
+          39.278434
+        ],
+        [
+          126.558421,
+          39.278434
+        ],
+        [
+          126.558421,
+          42.391052
+        ],
+        [
+          137.879334,
+          42.391052
+        ],
+        [
+          137.879334,
+          39.278434
+        ],
+        [
+          142.124677,
+          39.278434
+        ],
+        [
+          142.124677,
+          38.389114
+        ],
+        [
+          151.676697,
+          38.389114
+        ],
+        [
+          151.676697,
+          39.278434
+        ],
+        [
+          166.535396,
+          39.278434
+        ],
+        [
+          166.535396,
+          38.389114
+        ],
+        [
+          175.733638,
+          38.389114
+        ],
+        [
+          175.733638,
+          39.278434
+        ],
+        [
+          179.978981,
+          39.278434
+        ],
+        [
+          179.978981,
+          61.289094
+        ],
+        [
+          182.809209,
+          61.289094
+        ],
+        [
+          182.809209,
+          70.626951
+        ],
+        [
+          182.101652,
+          70.626951
+        ],
+        [
+          182.101652,
+          85.523054
+        ],
+        [
+          182.809209,
+          85.523054
+        ],
+        [
+          182.809209,
+          94.638581
+        ],
+        [
+          179.978981,
+          94.638581
+        ],
+        [
+          179.978981,
+          116.649241
+        ],
+        [
+          175.733638,
+          116.649241
+        ],
+        [
+          175.733638,
+          117.538561
+        ],
+        [
+          166.889175,
+          117.538561
+        ],
+        [
+          166.889175,
+          116.649241
+        ],
+        [
+          151.676697,
+          116.649241
+        ],
+        [
+          151.676697,
+          117.538561
+        ],
+        [
+          142.124677,
+          117.538561
+        ],
+        [
+          142.124677,
+          116.649241
+        ],
+        [
+          137.879334,
+          116.649241
+        ],
+        [
+          137.879334,
+          114.648272
+        ],
+        [
+          126.558421,
+          114.648272
+        ],
+        [
+          126.558421,
+          116.649241
+        ],
+        [
+          122.313079,
+          116.649241
+        ],
+        [
+          122.313079,
+          117.538561
+        ],
+        [
+          112.761058,
+          117.538561
+        ],
+        [
+          112.761058,
+          116.649241
+        ],
+        [
+          98.256138,
+          116.649241
+        ],
+        [
+          98.256138,
+          117.538561
+        ],
+        [
+          75.260533,
+          117.538561
+        ],
+        [
+          75.260533,
+          116.649241
+        ],
+        [
+          60.755613,
+          116.649241
+        ],
+        [
+          60.755613,
+          117.538561
+        ],
+        [
+          51.203592,
+          117.538561
+        ],
+        [
+          51.203592,
+          116.649241
+        ],
+        [
+          46.958249,
+          116.649241
+        ],
+        [
+          46.958249,
+          94.638581
+        ],
+        [
+          34.929779,
+          94.638581
+        ],
+        [
+          34.929779,
+          94.193921
+        ],
+        [
+          34.222222,
+          94.193921
+        ],
+        [
+          34.222222,
+          85.523054
+        ],
+        [
+          34.929779,
+          85.523054
+        ],
+        [
+          34.929779,
+          70.626951
+        ],
+        [
+          34.222222,
+          70.626951
+        ]
+      ],
+      "areaSqft": 10839.678681,
+      "derivation": {
+        "method": "pdf-vector-paint-semantics-wall-poche",
+        "paintMode": "fill",
+        "fillColor": "#aaaaaa",
+        "sourceScaleFtPerPoint": 0.07407407407407407,
+        "segmentCount": 1721,
+        "printedBuildingAreaSqft": 10770,
+        "printedAreaResidualPct": 0.6469699535747364,
+        "selectionPolicy": "wall poche selected by PDF paint semantics before printed-area control",
+        "completedAsBuiltGridRegistration": {
+          "x": {
+            "controls": [
+              {
+                "label": "1",
+                "sourceFt": 35.44,
+                "targetFt": 64.24,
+                "deltaFt": 28.799999999999997
+              },
+              {
+                "label": "2",
+                "sourceFt": 47.44,
+                "targetFt": 76.3467,
+                "deltaFt": 28.9067
+              },
+              {
+                "label": "3",
+                "sourceFt": 124.6755,
+                "targetFt": 154.3333,
+                "deltaFt": 29.65780000000001
+              },
+              {
+                "label": "4",
+                "sourceFt": 138.4355,
+                "targetFt": 167.3733,
+                "deltaFt": 28.93780000000001
+              },
+              {
+                "label": "5",
+                "sourceFt": 178.9422,
+                "targetFt": 207.84,
+                "deltaFt": 28.89779999999999
+              },
+              {
+                "label": "4.5",
+                "sourceFt": 157.7199,
+                "targetFt": 187.04,
+                "deltaFt": 29.320099999999996
+              },
+              {
+                "label": "2.5",
+                "sourceFt": 85.9555,
+                "targetFt": 114.7733,
+                "deltaFt": 28.817800000000005
+              }
+            ],
+            "meanDeltaFt": 29.04828571428572,
+            "rmsResidualFt": 0.29642143950112576
+          },
+          "y": {
+            "controls": [
+              {
+                "label": "D",
+                "sourceFt": 39.5111,
+                "targetFt": 82.70666666666666,
+                "deltaFt": 43.195566666666664
+              },
+              {
+                "label": "C",
+                "sourceFt": 61.4755,
+                "targetFt": 104.66666666666666,
+                "deltaFt": 43.19116666666666
+              },
+              {
+                "label": "B",
+                "sourceFt": 93.5555,
+                "targetFt": 136.76,
+                "deltaFt": 43.204499999999996
+              },
+              {
+                "label": "A",
+                "sourceFt": 115.5111,
+                "targetFt": 158.72,
+                "deltaFt": 43.2089
+              },
+              {
+                "label": "B.5",
+                "sourceFt": 77.5111,
+                "targetFt": 120.72,
+                "deltaFt": 43.2089
+              }
+            ],
+            "meanDeltaFt": 43.20180666666666,
+            "rmsResidualFt": 0.007211546297433488
+          }
+        }
+      },
+      "issues": []
+    },
+    {
+      "level": 2,
+      "sheetId": "A131.1",
+      "sourceBinding": {
+        "sourcePdfSha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929",
+        "physicalPageNumber": 29,
+        "pageIndex": 28,
+        "renderedPageSha256": "d0375c1868bbfc3725258ff50fadaa6a0bd0de521759d88b05244a014a13cf17",
+        "sheetId": "A131.1",
+        "coordinateSpace": "plan-feet",
+        "renderProfile": {
+          "renderer": "Poppler pdftoppm",
+          "rendererVersion": "26.05.0",
+          "matrixScale": 1.666667,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      },
+      "elevationFt": 108.78125,
+      "elevationEvidenceReceiptSha256": "4002dae7e7ad1d4c126710248b6658e050788093dd9c05ed838d3e026174aa2f",
+      "status": "passed",
+      "polygonPlanFt": [
+        [
+          119.144367,
+          68.84423
+        ],
+        [
+          125.591827,
+          68.84423
+        ],
+        [
+          125.591827,
+          61.2896
+        ],
+        [
+          138.77652,
+          61.2896
+        ],
+        [
+          138.77652,
+          68.84423
+        ],
+        [
+          145.22398,
+          68.84423
+        ],
+        [
+          145.22398,
+          86.901637
+        ],
+        [
+          138.77652,
+          86.901637
+        ],
+        [
+          138.77652,
+          94.456267
+        ],
+        [
+          125.591827,
+          94.456267
+        ],
+        [
+          125.591827,
+          86.901637
+        ],
+        [
+          119.144367,
+          86.901637
+        ]
+      ],
+      "areaSqft": 670.141141,
+      "derivation": {
+        "method": "three-view-pdf-vector-wall-poche-consensus-plus-shared-grid-registration",
+        "paintMode": "fill",
+        "fillColor": "#aaaaaa",
+        "sourceScaleFtPerPoint": 0.05555555555555555,
+        "selectedView": "tower-base-dimension",
+        "independentViewIds": [
+          "tower-base-demolition",
+          "tower-base-annotated",
+          "tower-base-dimension"
+        ],
+        "independentViewAreaSqft": [
+          665.782525,
+          672.103601,
+          670.141152
+        ],
+        "areaSpreadPct": 0.944371,
+        "widthSpreadPct": 0.12924,
+        "heightSpreadPct": 0.001465,
+        "registration": {
+          "coordinateFrame": "A110 plan feet",
+          "colControls": [
+            "3",
+            "4"
+          ],
+          "rowControls": [
+            "B",
+            "B.5",
+            "C"
+          ],
+          "translateXFt": 30.217699999999994,
+          "translateYFt": 45.47626666666667,
+          "rmsXFt": 0.002200000000001978,
+          "rmsYFt": 0.00456386775541169
+        },
+        "level02FireProtectionPlanRegistration": {
+          "sheetId": "F102",
+          "physicalPageNumber": 93,
+          "sourceScaleFtPerPoint": 0.07407407407407407,
+          "colControls": [
+            "3",
+            "4"
+          ],
+          "rowControls": [
+            "B",
+            "B.5",
+            "C"
+          ],
+          "translateXFt": 20.195500000000003,
+          "translateYFt": 36.31183333333333,
+          "rmsXFt": 0.0021999999999948727,
+          "rmsYFt": 0.004601690510626824,
+          "role": "independent source-design grid registration control for the Level 02 sprinkler plan"
+        }
+      },
+      "issues": []
+    }
+  ],
+  "coverage": {
+    "complete": true,
+    "passedLevels": [
+      1,
+      2
+    ],
+    "blockedLevels": [],
+    "unresolved": []
+  },
+  "claimStatus": "source-bound-building-geometry-only-not-sprinkler-code-compliance",
+  "evidenceReceiptSha256": "bc813944678452a30b6d053a4608df1b2008b07d47dd36f4023b94a1e57915ef"
+}

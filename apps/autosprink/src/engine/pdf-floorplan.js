@@ -141,11 +141,13 @@ export function normalizeStrokeColorArg(arg) {
  * matrices — never fabricated and never scale-guessed.
  *
  * @param {{fnArray:number[], argsArray:any[]}} opList - from page.getOperatorList()
- * @param {{scale?:number}} [opts] - scale = feet per PDF point (default 1).
+ * @param {{scale?:number,includePaintMode?:boolean}} [opts] - scale = feet per PDF
+ * point (default 1); includePaintMode annotates path paint/clip semantics.
  * @returns {{segments:Array<{x1,y1,x2,y2}>, bbox:{minX,minY,maxX,maxY,widthFt,heightFt}, count:number}}
  */
 export function extractSegmentsFromOpList(opList, opts = {}) {
   const scale = Number.isFinite(opts.scale) ? Number(opts.scale) : 1;
+  const includePaintMode = opts.includePaintMode === true;
   const fnArray = (opList && opList.fnArray) || [];
   const argsArray = (opList && opList.argsArray) || [];
 
@@ -164,8 +166,33 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
   // and pop the whole [ctm, lineWidth, strokeColor] state, exactly like the renderer.
   let gsLineWidth = null;
   let gsStrokeColor = null;
+  let gsFillColor = null;
   const ctmStack = [];
-  const gsStack = []; // parallel stack of { lineWidth, strokeColor }
+  const gsStack = []; // parallel stack of { lineWidth, strokeColor, fillColor }
+  let pendingPathStart = null;
+  let pendingPathId = 0;
+  let pendingClipMode = null;
+  const beginPath = () => {
+    if (includePaintMode && pendingPathStart == null) {
+      pendingPathStart = segments.length;
+      pendingPathId += 1;
+    }
+  };
+  const finishPath = (paintMode) => {
+    if (includePaintMode && pendingPathStart != null) {
+      for (let index = pendingPathStart; index < segments.length; index += 1) {
+        segments[index].pathId = pendingPathId;
+        segments[index].paintMode = paintMode;
+        if (gsFillColor !== null && ['fill', 'fill-stroke'].includes(paintMode)) {
+          segments[index].fillColor = gsFillColor;
+        }
+      }
+    }
+    pendingPathStart = null;
+    pendingClipMode = null;
+    cur = null;
+    start = null;
+  };
   const applyCtm = (x, y) => [
     ctm[0] * x + ctm[2] * y + ctm[4],
     ctm[1] * x + ctm[3] * y + ctm[5],
@@ -203,11 +230,13 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
   // moveTo/lineTo/rectangle receive RAW user-space coords; map them through the CTM
   // so all stored path state is in page space.
   const moveTo = (rx, ry) => {
+    beginPath();
     const [x, y] = applyCtm(rx, ry);
     cur = [x, y];
     start = [x, y];
   };
   const lineTo = (rx, ry) => {
+    beginPath();
     const [x, y] = applyCtm(rx, ry);
     if (cur) emit(cur[0], cur[1], x, y);
     else start = [x, y];
@@ -226,6 +255,42 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
     lineTo(x + w, y + h);
     lineTo(x, y + h);
     closePath();
+  };
+
+  const applyPaintOperation = (paintOp) => {
+    switch (paintOp) {
+      case OPS.stroke:
+        finishPath('stroke');
+        return true;
+      case OPS.closeStroke:
+        closePath();
+        finishPath('stroke');
+        return true;
+      case OPS.fill:
+      case OPS.eoFill:
+        finishPath('fill');
+        return true;
+      case OPS.fillStroke:
+      case OPS.eoFillStroke:
+        finishPath('fill-stroke');
+        return true;
+      case OPS.closeFillStroke:
+      case OPS.closeEOFillStroke:
+        closePath();
+        finishPath('fill-stroke');
+        return true;
+      case OPS.clip:
+        pendingClipMode = 'clip';
+        return true;
+      case OPS.eoClip:
+        pendingClipMode = 'even-odd-clip';
+        return true;
+      case OPS.endPath:
+        finishPath(pendingClipMode || 'none');
+        return true;
+      default:
+        return false;
+    }
   };
 
   // Consume a flat DrawOPS-coded path buffer (pdfjs v6 constructPath form).
@@ -320,11 +385,14 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
         break;
       case OPS.constructPath:
         constructPathDispatch(args, walkDrawBuffer, walkLegacyConstructPath);
+        // pdfjs v6 folds the terminal paint operation into constructPath arg 0
+        // instead of emitting a separate OPS.fill/stroke/endPath entry.
+        if (Number.isFinite(args[0])) applyPaintOperation(args[0]);
         break;
       case OPS.save:
         // Push a copy of the CTM AND the graphics state (lineWidth + color).
         ctmStack.push(ctm.slice());
-        gsStack.push({ lineWidth: gsLineWidth, strokeColor: gsStrokeColor });
+        gsStack.push({ lineWidth: gsLineWidth, strokeColor: gsStrokeColor, fillColor: gsFillColor });
         break;
       case OPS.restore:
         // Pop back to the saved CTM + graphics state (defensive: ignore unbalanced).
@@ -333,6 +401,7 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
           const g = gsStack.pop();
           gsLineWidth = g.lineWidth;
           gsStrokeColor = g.strokeColor;
+          gsFillColor = g.fillColor;
         }
         break;
       case OPS.transform:
@@ -359,10 +428,34 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
         if (c !== null) gsStrokeColor = c;
         break;
       }
+      case OPS.setFillRGBColor:
+      case OPS.setFillColor:
+      case OPS.setFillColorN: {
+        const c = normalizeStrokeColorArg(args);
+        if (c !== null) gsFillColor = c;
+        break;
+      }
+      case OPS.stroke:
+      case OPS.closeStroke:
+      case OPS.fill:
+      case OPS.eoFill:
+      case OPS.fillStroke:
+      case OPS.eoFillStroke:
+      case OPS.closeFillStroke:
+      case OPS.closeEOFillStroke:
+      case OPS.clip:
+      case OPS.eoClip:
+      case OPS.endPath:
+        applyPaintOperation(fn);
+        break;
       default:
         break; // ignore text/image/other state ops
     }
   }
+
+  // Synthetic/legacy operator lists often omit an explicit paint/endPath op. Preserve
+  // their geometry while making that absence visible to paint-aware callers.
+  if (includePaintMode && pendingPathStart != null) finishPath('unpainted');
 
   const bbox = boundingBox(segments);
   return { segments, bbox, count: segments.length };

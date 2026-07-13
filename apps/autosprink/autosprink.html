@@ -1360,6 +1360,10 @@ async function hfShowSubmittedCalibrationViews() {
     if (!floorModelResponse.ok) throw new Error(`Dillon floor-by-floor model HTTP ${floorModelResponse.status}`);
     const floorModel = await floorModelResponse.json();
     if (floorModel.status !== 'passed' || floorModel.views?.status !== 'passed') throw new Error('Dillon floor-by-floor model validation failed');
+    const nashvilleFloorModelResponse = await fetch('/api/projects/LDS%20Temple%20-%20Nashville%20TN/floor-by-floor-model', { credentials: 'same-origin' });
+    if (!nashvilleFloorModelResponse.ok) throw new Error(`Nashville floor-by-floor model HTTP ${nashvilleFloorModelResponse.status}`);
+    const nashvilleFloorModel = await nashvilleFloorModelResponse.json();
+    if (nashvilleFloorModel.status !== 'passed' || nashvilleFloorModel.views?.status !== 'passed' || nashvilleFloorModel.extrusion?.status !== 'passed') throw new Error('Nashville floor-by-floor model validation failed');
     const bidGeometryResponse = await fetch('/api/projects/Dillon%20Residence/completed-bid-geometry', { credentials: 'same-origin' });
     if (!bidGeometryResponse.ok) throw new Error(`Dillon completed-bid geometry HTTP ${bidGeometryResponse.status}`);
     const bidGeometry = await bidGeometryResponse.json();
@@ -1375,6 +1379,7 @@ async function hfShowSubmittedCalibrationViews() {
     window.__hfRoofGeometry.dillonSlopedModel3d = dillonModel3d;
     window.__hfRoofGeometry.pitchedRoofCrossProjectEvidence = crossProjectEvidence;
     window.__hfRoofGeometry.dillonFloorByFloorModel = floorModel;
+    window.__hfRoofGeometry.nashvilleFloorByFloorModel = nashvilleFloorModel;
     window.__hfRoofGeometry.dillonCompletedBidGeometry = bidGeometry;
     window.__hfRoofGeometry.dillonVerticalGeometry = verticalGeometry;
     window.__hfRoofGeometry.dillonStructuralRoof = structuralRoof;
@@ -1406,6 +1411,12 @@ async function hfShowSubmittedCalibrationViews() {
         <div style="display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:10px">${floorModel.views.topViews.map((view) => `<div style="background:#fff;border-radius:10px;overflow:hidden">${view.svg}</div>`).join('')}</div>
         <div style="display:grid;grid-template-columns:minmax(300px,.9fr) minmax(420px,1.4fr);gap:10px;margin-top:10px"><div style="background:#fff;border-radius:10px;overflow:hidden">${floorModel.views.elevationSvg}</div><div id="hfDillonFloorModel3d" style="position:relative;background:#07111f;border-radius:10px;overflow:hidden;min-height:330px">${floorModel.views.isometricSvg}</div></div>
         <p style="margin:9px 2px 0;color:#cbd5e1;font:10.5px/1.45 var(--mono)">Fail-closed limits: the registered main/upper speckled contours are 2D roof evidence only. Per-face pitch joins, absolute elevation datums, toy-garage mirror resolution, coordinated penetrations, and feature-specific obstruction clearances remain unresolved. No unresolved contour is flattened or promoted into the structural 3D model.</p>
+      </section>
+      <section id="hfNashvilleFloorModelEvidence" style="background:linear-gradient(145deg,rgba(30,41,59,.94),rgba(67,20,7,.88));border:1px solid rgba(251,191,36,.38);border-radius:14px;padding:12px;box-shadow:inset 0 1px rgba(255,255,255,.12);overflow:auto">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px"><div><h3 style="margin:0;color:#fff7ed;font:650 13px var(--mono)">Nashville actual-drawing building model · A110 + A131.1 + A301</h3><p style="margin:5px 0 0;color:#fed7aa;font:11px/1.45 var(--mono)">${nashvilleFloorModel.counts.extrusionSolids} scaled extrusion solids across ${nashvilleFloorModel.counts.levels} levels, verified through ${nashvilleFloorModel.counts.independentlyRegisteredPlanViews} independent plan views. Level 01: ${nashvilleFloorModel.model.levels[0].areaSqft.toFixed(1)} sq ft at ${nashvilleFloorModel.model.levels[0].floorElevationFt.toFixed(3)} ft. Level 02/tower: ${nashvilleFloorModel.model.levels[1].areaSqft.toFixed(1)} sq ft at ${nashvilleFloorModel.model.levels[1].floorElevationFt.toFixed(5)} ft. Receipt ${nashvilleFloorModel.receiptSha256.slice(0, 16)}...</p></div><span style="white-space:nowrap;color:#fbbf24;font:10px/1.35 var(--mono)">SOURCE-GROUNDED<br>NOT CODE APPROVAL</span></div>
+        <div style="border:1px solid rgba(56,189,248,.4);background:rgba(8,47,73,.28);border-radius:10px;padding:9px;margin-bottom:10px;color:#bae6fd;font:11px/1.45 var(--mono)">A110 gray wall-poche shell was selected by PDF paint semantics before the 10,770 sq ft printed-area control (0.65% residual). A131.1 demolition, annotated, and dimension views agree within ${nashvilleFloorModel.model.levels[1].derivation.areaSpreadPct.toFixed(3)}% area spread. Shared-grid registration to A110 is ${nashvilleFloorModel.model.levels[1].derivation.registration.rmsXFt.toFixed(4)} ft RMS X / ${nashvilleFloorModel.model.levels[1].derivation.registration.rmsYFt.toFixed(4)} ft RMS Y; F102 Level 02 sprinkler-plan registration is independently sealed.</div>
+        <div style="display:grid;grid-template-columns:minmax(420px,1.35fr) minmax(320px,.9fr);gap:10px"><div style="background:#07111f;border-radius:10px;overflow:hidden">${nashvilleFloorModel.views.isometricSvg}</div><div style="background:#fff;border-radius:10px;overflow:hidden">${nashvilleFloorModel.views.elevationSvg}</div></div>
+        <p style="margin:9px 2px 0;color:#cbd5e1;font:10.5px/1.45 var(--mono)">A301 controls Level 01 100.000 ft, mezzanine 108.78125 ft, parapet 1 118.250 ft, and parapet 2 123.000 ft. A110 is also registered to the completed as-built FP2 grid. This proves scaled source geometry and vertical stacking; sprinkler code compliance, approval, and exact fabrication elevations remain separate fail-closed gates.</p>
       </section>`;
     const floorModel3dHost = viewer.querySelector('#hfDillonFloorModel3d');
     let floorModelRenderer = null;

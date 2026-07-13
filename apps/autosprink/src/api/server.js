@@ -49,6 +49,7 @@ import { buildWinterGardenBluebeamPackage } from '../engine/winter-garden-bluebe
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
 import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
 import { renderDillonFloorByFloorViews, validateDillonFloorByFloorModel } from '../engine/dillon-floor-by-floor-model.js';
+import { buildNashvilleExtrusionModel, buildNashvilleFloorByFloorModel, renderNashvilleFloorByFloorViews, validateNashvilleFloorByFloorModel } from '../engine/nashville-floor-by-floor-model.js';
 import { renderDillonCompletedBidViews, validateDillonCompletedBidGeometry } from '../engine/dillon-completed-bid-geometry.js';
 import { buildDillonVerticalModel, renderDillonVerticalElevationView, validateDillonVerticalRegistration } from '../engine/dillon-vertical-registration.js';
 import { buildDillonStructuralRoofModel, buildDillonStructuralRoofPacket, renderDillonStructuralRoofTopView, validateDillonStructuralRoofPacket } from '../engine/dillon-structural-roof-surfaces.js';
@@ -102,6 +103,8 @@ const PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH = path.resolve(__dirname, '../dat
 const WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/winter-garden-cross-project-source-set.json');
 const TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/tallahassee-completed-project-source-set.json');
 const NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/nashville-completed-project-source-set.json');
+const NASHVILLE_ELEVATION_DATUMS_PATH = path.resolve(__dirname, '../data/elevation-datums.nashville.json');
+const NASHVILLE_SOURCE_BOUND_FOOTPRINTS_PATH = path.resolve(__dirname, '../data/source-bound-footprints.nashville.json');
 const WINTER_GARDEN_HEAD_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp3-head-evidence.json');
 const WINTER_GARDEN_GRID_REGISTRATION_PATH = path.resolve(__dirname, '../data/winter-garden-grid-registration.json');
 const WINTER_GARDEN_PIPE_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp2-pipe-evidence.json');
@@ -1800,8 +1803,22 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration-bluebeam.pdf', authMi
 });
 
 app.get('/api/projects/:name/floor-by-floor-model', authMiddleware, async (req, res) => {
-  if (req.params.name !== 'Dillon Residence') return res.status(404).json({ error: 'floor_by_floor_model_not_found' });
+  if (!['Dillon Residence', 'LDS Temple - Nashville TN'].includes(req.params.name)) return res.status(404).json({ error: 'floor_by_floor_model_not_found' });
   try {
+    if (req.params.name === 'LDS Temple - Nashville TN') {
+      const footprints = JSON.parse(fs.readFileSync(NASHVILLE_SOURCE_BOUND_FOOTPRINTS_PATH, 'utf8'));
+      const elevations = JSON.parse(fs.readFileSync(NASHVILLE_ELEVATION_DATUMS_PATH, 'utf8'));
+      const model = await buildNashvilleFloorByFloorModel({ footprints, elevations });
+      const validation = await validateNashvilleFloorByFloorModel(model, { footprints, elevations });
+      if (validation.status !== 'passed') return res.status(422).json(validation);
+      const views = renderNashvilleFloorByFloorViews(validation);
+      const extrusion = buildNashvilleExtrusionModel(validation);
+      return res.json({
+        status: 'passed', artifactType: 'halofire.autobid-floor-by-floor-model.v1', projectName: req.params.name,
+        receiptSha256: model.receiptSha256, counts: validation.counts, model, extrusion, views,
+        geometryGrounded: true, complianceReady: false, approvalReady: false, claimStatus: model.claimStatus,
+      });
+    }
     const source = JSON.parse(fs.readFileSync(DILLON_DWG_SOURCE_GEOMETRY_PATH, 'utf8'));
     const model = JSON.parse(fs.readFileSync(DILLON_FLOOR_MODEL_PATH, 'utf8'));
     const validation = await validateDillonFloorByFloorModel(model, source);
@@ -1813,7 +1830,7 @@ app.get('/api/projects/:name/floor-by-floor-model', authMiddleware, async (req, 
       geometryGrounded: true, complianceReady: false, approvalReady: false, claimStatus: model.claimStatus,
     });
   } catch (error) {
-    log.error('Failed to load Dillon floor-by-floor model', { error: error.message });
+    log.error('Failed to load floor-by-floor model', { projectName: req.params.name, error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'floor_by_floor_model_load_failed', complianceReady: false });
   }
 });

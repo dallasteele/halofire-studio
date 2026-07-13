@@ -1,0 +1,110 @@
+{
+  "artifactType": "halofire.elevation-datum-packet.v1",
+  "sourceDocumentId": "nashville-tn-temple-bid-set-a301",
+  "sourceBinding": {
+    "sourcePdfSha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929",
+    "physicalPageNumber": 31,
+    "pageIndex": 30,
+    "renderedPageSha256": "fc7f09f44133040b35d525ec5903f1d4e88220a673539f4ebe99be51faa686f2",
+    "sheetId": "A301",
+    "coordinateSpace": "pdf-points",
+    "renderProfile": {
+      "renderer": "Poppler pdftoppm",
+      "rendererVersion": "26.05.0",
+      "matrixScale": 1.388889,
+      "colorspace": "rgb",
+      "alpha": false
+    }
+  },
+  "observations": [
+    {
+      "id": "level-01",
+      "kind": "floor",
+      "label": "LEVEL 01",
+      "elevationText": "100'-0\"",
+      "elevationFt": 100,
+      "sourceBinding": {
+        "sourcePdfSha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929",
+        "physicalPageNumber": 31,
+        "pageIndex": 30,
+        "renderedPageSha256": "fc7f09f44133040b35d525ec5903f1d4e88220a673539f4ebe99be51faa686f2",
+        "sheetId": "A301",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "Poppler pdftoppm",
+          "rendererVersion": "26.05.0",
+          "matrixScale": 1.388889,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "mezzanine-a",
+      "kind": "floor",
+      "label": "MEZZANINE - A",
+      "elevationText": "108'-9 3/8\"",
+      "elevationFt": 108.78125,
+      "sourceBinding": {
+        "sourcePdfSha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929",
+        "physicalPageNumber": 31,
+        "pageIndex": 30,
+        "renderedPageSha256": "fc7f09f44133040b35d525ec5903f1d4e88220a673539f4ebe99be51faa686f2",
+        "sheetId": "A301",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "Poppler pdftoppm",
+          "rendererVersion": "26.05.0",
+          "matrixScale": 1.388889,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "parapet-1",
+      "kind": "roof-point",
+      "label": "PARAPET 1",
+      "elevationText": "118'-3\"",
+      "elevationFt": 118.25,
+      "sourceBinding": {
+        "sourcePdfSha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929",
+        "physicalPageNumber": 31,
+        "pageIndex": 30,
+        "renderedPageSha256": "fc7f09f44133040b35d525ec5903f1d4e88220a673539f4ebe99be51faa686f2",
+        "sheetId": "A301",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "Poppler pdftoppm",
+          "rendererVersion": "26.05.0",
+          "matrixScale": 1.388889,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    },
+    {
+      "id": "parapet-2",
+      "kind": "roof-point",
+      "label": "PARAPET 2",
+      "elevationText": "123'-0\"",
+      "elevationFt": 123,
+      "sourceBinding": {
+        "sourcePdfSha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929",
+        "physicalPageNumber": 31,
+        "pageIndex": 30,
+        "renderedPageSha256": "fc7f09f44133040b35d525ec5903f1d4e88220a673539f4ebe99be51faa686f2",
+        "sheetId": "A301",
+        "coordinateSpace": "pdf-points",
+        "renderProfile": {
+          "renderer": "Poppler pdftoppm",
+          "rendererVersion": "26.05.0",
+          "matrixScale": 1.388889,
+          "colorspace": "rgb",
+          "alpha": false
+        }
+      }
+    }
+  ],
+  "receiptSha256": "4002dae7e7ad1d4c126710248b6658e050788093dd9c05ed838d3e026174aa2f"
+}
