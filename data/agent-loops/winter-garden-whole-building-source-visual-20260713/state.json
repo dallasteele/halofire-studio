@@ -1,8 +1,8 @@
 {
   "name": "winter-garden-whole-building-source-visual-20260713",
-  "iteration": 4,
+  "iteration": 5,
   "status": "in_progress",
-  "updatedAt": "2026-07-13T12:16:00-07:00",
+  "updatedAt": "2026-07-13T12:46:00-07:00",
   "completedStages": [
     "DISCOVER",
     "PLAN",
@@ -16,6 +16,7 @@
   },
   "brainPreflight": {
     "status": "passed",
+    "currentIterationQuery": "Halo Fire operations knowledge must actively constrain the Winter Garden source-spec hazard and sprinkler generation workflow across estimating, design engineering, fabrication, field installation, approvals, change control, and closeout; identify authoritative brain rules, known failure modes, and fail-closed gates",
     "relevantEpisodes": [
       124864,
       126369,
@@ -34,7 +35,7 @@
       "halofire-autobid/system/autobid-index.md"
     ],
     "transportNote": "The first operations recall hit a Windows cp1252 decode error in brain_sync_session.py; retry with PYTHONUTF8=1 succeeded. This must be included in postflight so future Windows runs do not misclassify an encoding failure as missing memory.",
-    "decision": "Use the recalled Halo Fire bid-to-design-to-fabrication-to-field lifecycle to shape the employee workflow; use completed bids only after source-only generation; avoid known blind roof projection and placeholder-box failures; treat current source hashes, overlays, tests, and live smokes as authoritative."
+    "decision": "Make brain knowledge executable: every relevant company source must bind an applied decision and downstream fail-closed control. Use the recalled Halo Fire bid-to-design-to-procurement-to-fabrication-to-field-to-ITM/closeout lifecycle; use completed bids only after source-only generation; spec density must govern commercial hazard; calculations remain deterministic; internal primary, independent, and adversarial loops own verification."
   },
   "sourceDiscovery": {
     "generationProject": "LDS Meeting House - Winter Garden FL",
@@ -61,16 +62,18 @@
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 139750,
+    "priorCheckpointEpisodeId": 139750,
     "priorRoomCheckpointEpisodeId": 139418,
+    "wikiDecisionPath": "decisions/halofire-operational-brain-contract-and-winter-garden-source-spec-hazard-gate.md",
+    "wikiDecisionTitle": "HaloFire operational brain contract and Winter Garden source-spec hazard gate",
     "recallVerified": true,
-    "recallScore": 1.0,
+    "recallScore": 55,
     "recallSessionId": "winter-garden-source-building-operational-knowledge-20260713",
     "utf8TransportRequiredOnWindows": true
   },
   "roofAndElevationGate": {
     "status": "passed",
-    "sourcePacketReceiptSha256": "cfe27af97237459ed71a38120df7ee570ac4fb300ef7884ce235490b2f2e55e7",
+    "sourcePacketReceiptSha256": "a71b9544ca1c31b9435aea21a9c0d6f2c05a22b27e211db6c39b2353f1f2bfeb",
     "sourceBindings": ["A103", "A121", "A151", "A201", "A301"],
     "counts": {
       "rooms": 56,
@@ -89,32 +92,68 @@
   },
   "operationalKnowledgeGate": {
     "status": "passed",
+    "artifactType": "halofire.operational-knowledge-receipt.v2",
     "sessionId": "winter-garden-source-building-operational-knowledge-20260713",
     "source": "gx10-hal-brain+obsidian-vault",
-    "recallEpisodeIds": [139418, 120030, 129505, 129358, 129549, 126369, 124864],
-    "authoritativeSourceCount": 5,
-    "workflowGuardrailCount": 6,
+    "recallEpisodeIds": [139750, 139418, 60899, 129530, 133582, 136189, 132038, 136034, 129505, 129358],
+    "recalledWikiPageCount": 3,
+    "authoritativeSourceCount": 8,
+    "appliedDecisionCount": 10,
+    "lifecycleStageCount": 8,
+    "workflowGuardrailCount": 11,
     "adversarialTests": [
       "receipt drift",
       "answer-key leakage",
       "source-sheet drift",
-      "missing fabrication knowledge",
-      "missing internal adversarial-loop doctrine",
+      "source names present but executable field-RFI decision missing",
+      "mutated approved-for-construction fabrication control",
+      "missing procurement, closeout, or internal-loop source breadth",
       "elevation and pitch drift",
       "missing steeple and roof surfaces"
     ],
     "productSurface": "/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-building-model",
     "employeeSurface": "autosprink.html#hfOperationalBrainReceipt"
   },
+  "sourceSpecHazardGate": {
+    "status": "passed-partial-fail-closed",
+    "artifactType": "halofire.winter-garden-source-spec-hazard.v1",
+    "sourceDocument": "WG Specs.pdf",
+    "sourceSha256": "2ceb110a0ab68f69a266e01d2c1274ac1a49c45f16958179cab78055a5192008",
+    "section": "21 1313 Wet-Pipe Sprinkler Systems",
+    "criteriaPage": 647,
+    "receiptSha256": "cc4b9faf20604ee18cca7ec7c555f0e3b6a6126b28b4935884a2fda264d7e7b9",
+    "counts": {
+      "totalRooms": 56,
+      "sourceClassifiedRooms": 31,
+      "lightHazardRooms": 30,
+      "ordinaryHazardGroup2Rooms": 1,
+      "unresolvedRooms": 25
+    },
+    "roofPitch": "4.5:12",
+    "slopeAdjustmentThreshold": "2:12",
+    "adjustedRemoteAreaCandidateSqft": 1950,
+    "roomCeilingApplicabilityResolved": false,
+    "internalLoops": ["primary", "independent", "adversarial"],
+    "wholeBuildingDefaultHazardUsed": false,
+    "answerKeyUsed": false,
+    "wholeBuildingHazardZoningComplete": false,
+    "headLayoutReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "productSurface": "/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-spec-hazard",
+    "employeeSurface": "autosprink.html#hfWinterGardenSourceSpecReceipt"
+  },
   "focusedVerification": {
     "status": "passed",
-    "testFiles": 10,
-    "tests": 106
+    "testFiles": 4,
+    "tests": 22
   },
   "fullVerification": {
     "status": "passed",
-    "testFiles": 191,
-    "tests": 1764,
+    "testFiles": 193,
+    "tests": 1775,
     "nativeNodeTests": 20,
     "productionBuild": "passed",
     "agenticRules": "passed",
@@ -123,25 +162,31 @@
   "formalVerification": {
     "status": "passed",
     "prover": "Lean 4.13.0",
-    "theorems": 3,
-    "durationMs": 100,
+    "theorems": 1,
+    "theorem": "operationalBrainAndSourceSpecGate",
+    "durationMs": 94,
     "receipt": "data/agent-loops/winter-garden-whole-building-source-visual-20260713/lean-proof.json"
   },
   "browserVerification": {
     "status": "passed",
     "surface": "authenticated local autosprink.html Roof Planes -> Automatic Roof Planes",
-    "viewerScrollHeightPx": 5555,
-    "viewerClientHeightPx": 604,
+    "viewerScrollHeightPx": 6851,
+    "viewerClientHeightPx": 1084,
     "winterGardenSectionReachable": true,
     "brainReceiptVisible": true,
+    "sourceSpecReceiptVisible": true,
+    "operationalSourceCount": 8,
+    "appliedDecisionCount": 10,
+    "lifecycleStageCount": 8,
     "isometricAndTopViewsVisible": true,
     "consoleErrors": 0,
-    "screenshot": "apps/autosprink/output/playwright/winter-garden-source-building-brain-receipt.png",
+    "screenshot": "apps/autosprink/output/playwright/winter-garden-operational-brain-source-spec.png",
+    "screenshotSha256": "20c7eb21cdef9dd3aaaeca9d6d8ffbb3e0316b0b9b11e8962f52b9e3e2b80b74",
     "releaseBlockerCorrected": "The fixed viewer originally clipped lower proof sections; grid auto-rows plus contained overflow now make the complete evidence stack reachable."
   },
   "deploymentVerification": {
     "status": "passed",
-    "commit": "fcb5c07ee5947767399268b713c06f99febe364c",
+    "commit": "1153f129d75ac9f77e97dff983072cf9ca33b2ff",
     "service": "halofire.service",
     "serviceState": "active",
     "publicHealthStatus": 200,
@@ -149,12 +194,16 @@
     "publicLoginBytes": 58981,
     "deprecatedLoginText": false,
     "realAdminLoginStatus": 200,
-    "authenticatedRouteStatus": 200,
-    "liveRouteReceiptSha256": "cfe27af97237459ed71a38120df7ee570ac4fb300ef7884ce235490b2f2e55e7",
+    "authenticatedSourceBuildingRouteStatus": 200,
+    "authenticatedSourceBuildingReceiptSha256": "a71b9544ca1c31b9435aea21a9c0d6f2c05a22b27e211db6c39b2353f1f2bfeb",
+    "authenticatedSourceSpecRouteStatus": 200,
+    "authenticatedSourceSpecReceiptSha256": "cc4b9faf20604ee18cca7ec7c555f0e3b6a6126b28b4935884a2fda264d7e7b9",
     "liveUiReceiptVisible": true,
+    "liveSourceSpecReceiptVisible": true,
     "liveUiConsoleErrors": 0,
-    "liveViewerScrollHeightPx": 5570,
-    "liveScreenshotSha256": "b5ef3c21a9365448c062f9b1d4e04790b4033a5b5ed5f3a756d605e38e059ad1"
+    "liveViewerScrollHeightPx": 6851,
+    "liveScreenshot": "apps/autosprink/output/playwright/winter-garden-operational-brain-source-spec-live-vps.png",
+    "liveScreenshotSha256": "20c7eb21cdef9dd3aaaeca9d6d8ffbb3e0316b0b9b11e8962f52b9e3e2b80b74"
   },
-  "nextAction": "ITERATE into source-only sprinkler generation from the sealed building and operational workflow, keep hazard and ceiling/protection basis fail-closed, then compare against held-out completed-bid evidence only after generation is sealed."
+  "nextAction": "ITERATE by source-registering the remaining room identities and room ceiling profiles, then generate source-only head placement under the applied operations/spec controls; keep obstructions, water supply, compliance, fabrication, and field release fail-closed; compare against held-out completed-bid evidence only after generation is sealed."
 }

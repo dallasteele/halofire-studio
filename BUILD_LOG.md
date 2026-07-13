@@ -1455,3 +1455,43 @@ User direction across 4 messages this session:
   unresolved. This checkpoint does not claim a generated sprinkler layout;
   the next loop iteration is source-only sprinkler generation before any
   held-out completed-bid comparison.
+
+### Entry 43 - Executable operations brain and source-spec hazard gate
+
+- Replaced the Winter Garden packet's summary-level brain receipt with an
+  executable Halo Fire operations contract. It binds eight authoritative
+  estimating, design, procurement, fabrication, field, acceptance/ITM,
+  closeout, and AutoBid sources to ten applied decisions, eight lifecycle
+  stages, eleven workflow guardrails, and internal primary, independent, and
+  adversarial verification. Missing or mutated source, decision, control,
+  lifecycle, or preflight provenance now rejects the artifact.
+- Parsed the protected `WG Specs.pdf` Section 21 1313 source and sealed its
+  SHA-256, page, criteria, and room mappings into a deterministic source-spec
+  hazard receipt. The current source-only zoning identifies 31 of 56 rooms:
+  30 Light Hazard and one Storage Ordinary Hazard Group 2. The remaining 25
+  rooms have no invented default hazard. The 4.5:12 roof records the source
+  30-percent remote-area rule as a candidate, but does not apply it room by
+  room until ceiling profiles are registered.
+- Added authenticated source-spec evidence to the employee Studio surface and
+  API. The source-building receipt is
+  `a71b9544ca1c31b9435aea21a9c0d6f2c05a22b27e211db6c39b2353f1f2bfeb`;
+  the source-spec hazard receipt is
+  `cc4b9faf20604ee18cca7ec7c555f0e3b6a6126b28b4935884a2fda264d7e7b9`.
+- Verification passed: 22 focused tests, 1,775/1,775 full Vitest tests across
+  193 files, 20/20 node-native tests, production build, agent-loop guard,
+  agentic-rule verifier, `git diff --check`, and Lean 4.13.0 theorem
+  `operationalBrainAndSourceSpecGate` in 94 ms. Adversarial tests reject source
+  drift, lifecycle/control removal, invented unresolved-room hazards, and
+  premature pitched-ceiling promotion.
+- Deployed feature commit `1153f129d75ac9f77e97dff983072cf9ca33b2ff`
+  to the VPS. Public health and the current 58,981-byte login returned 200,
+  real admin authentication succeeded, and both authenticated evidence routes
+  returned the exact local receipts. Local and live Playwright screenshots are
+  byte-identical, with zero console errors.
+- The shared brain postflight was written to
+  `decisions/halofire-operational-brain-contract-and-winter-garden-source-spec-hazard-gate.md`
+  and exact recall returned it as the top result at score 55. Whole-building
+  zoning, source-only head layout, hydraulics, compliance, fabrication, and
+  field release remain false. The next bounded lane is to source-register the
+  25 unresolved room identities and room ceiling profiles before generating
+  or promoting sprinkler placement.
