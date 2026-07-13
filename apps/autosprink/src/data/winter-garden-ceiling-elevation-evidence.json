@@ -1,0 +1,52 @@
+{
+  "artifactType": "halofire.winter-garden-ceiling-elevation-evidence.v1",
+  "projectId": "winter-garden-meetinghouse",
+  "sources": {
+    "reflectedCeilingPlan": {"sheetId": "A151", "sha256": "4a6c4b29eff18a8e964627ba41807f2f8119f8a2c8012d5900acf08e61ee8e43"},
+    "transverseSection": {"sheetId": "A301", "sha256": "719ae05138b3872c2ed8740fa4470ca457dcc0a9f8fec617cabf7969560ecc30"},
+    "coordinatedSection": {"sheetId": "A303", "sha256": "dae14221cd3b913d350e53d146c6dd1abfca8a3b6d3ca142916474ba18a66de7", "reference": "A/A303"},
+    "completedSprinklerRcp": {"sheetId": "FP3", "sha256": "93f8df04bc84ac817ecd2e222812fede93565879094c66b4d7511f783631543e"},
+    "fabricationListing": {"fileName": "WINTER GARDEN LISTING.TYL", "sha256": "53ff9f89d03a1672aa06788efd1d20c0a5a711e4bc97ef97f9aa83c333b03d12"}
+  },
+  "ceiling": {
+    "finishType": "C8",
+    "finishDescription": "GYPSUM BOARD ATTACHED, TO STRUCTURE, TEXTURED, PAINTED",
+    "floorDatumFt": 100.0,
+    "lowHeightAboveFloorFt": 15.046875,
+    "lowSourceText": "C8 15'-0 9/16\"",
+    "highHeightAboveFloorFt": 20.5625,
+    "highSourceText": "C8 20'-6 3/4\"",
+    "pitchRiseIn": 4.5,
+    "pitchRunIn": 12.0,
+    "pitchSourceText": "4 1/2\" / 1'-0\"",
+    "ridgeTargetYPx": 1316.7256830601,
+    "targetPxPerFt": 18.75,
+    "derivedHalfRunFt": 14.7083333333,
+    "derivedNorthLowYPx": 1040.9444330601,
+    "derivedSouthLowYPx": 1592.5069330601
+  },
+  "independentSectionReceipt": {
+    "method": "canny-hough-long-transverse-section-edges",
+    "observedRiseInPer12": [4.493, 4.480, 4.489, 4.506],
+    "meanRiseInPer12": 4.492,
+    "spreadInPer12": 0.026,
+    "minimumLineLengthPx": 1021.2
+  },
+  "fabricationReceipt": {
+    "parser": "parse-sprinkcad-tyl.py",
+    "format": "SprinkCad Stocklisting TYL 1.50",
+    "pipingRows": 316,
+    "outletRows": 338,
+    "pendentHalfInchOutletRows": 158,
+    "branch25PieceRows": 15,
+    "branch25HalfInchOutletRows": 26,
+    "spatialHeadMappingReady": false
+  },
+  "ceilingSurfaceElevationReady": true,
+  "absoluteDeflectorDatumReady": false,
+  "pipeElevationReady": false,
+  "model3dEnvelopeReady": true,
+  "fabricationReady": false,
+  "complianceReady": false,
+  "receiptSha256": "71655bb2ea22fb0e7ee566c6abcaddc537fbc68f8e7aea33d82b697016910fc6"
+}

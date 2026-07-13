@@ -81,6 +81,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/projects/Dillon%20Residence/vertical-registration')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/structural-roof-surfaces')).status).toBe(401);
     expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration')).status).toBe(401);
+    expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration-bluebeam.pdf')).status).toBe(401);
   });
 
   it('serves registered speckled roof contours without inventing 3D planes', async () => {
@@ -218,16 +219,38 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(response.status).toBe(200);
     const result = await response.json();
     expect(result.status).toBe('passed');
-    expect(result.evidenceReceipts).toMatchObject({ crossProject: expect.stringMatching(/^[0-9a-f]{64}$/), heads: expect.stringMatching(/^[0-9a-f]{64}$/), roofRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), pipeRegistration: expect.stringMatching(/^[0-9a-f]{64}$/) });
+    expect(result.evidenceReceipts).toMatchObject({ crossProject: expect.stringMatching(/^[0-9a-f]{64}$/), heads: expect.stringMatching(/^[0-9a-f]{64}$/), roofRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), pipeRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), ceilingElevation: expect.stringMatching(/^[0-9a-f]{64}$/) });
     expect(result.acceptanceLoops).toMatchObject({ primary: { status: 'passed', headCount: 159 }, independent: { status: 'passed', headCount: 158 }, adversarial: { status: 'passed', centerRemovedTemplateRejected: true, sourceSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true } });
     expect(result.crossProjectEvidence.metrics).toMatchObject({ projectCount: 4, pitchedProjectCount: 3, winterGardenPitchInPer12: 4.5 });
-    expect(result.counts).toEqual({ completedBidFp3Heads: 159, chapelHeads: 15, chapelBranches: 3, chapelArmOvers: 15, networkSegments: 23 });
+    expect(result.counts).toEqual({ completedBidFp3Heads: 159, chapelHeads: 15, chapelBranches: 3, chapelArmOvers: 15, networkSegments: 23, absoluteCeilingSurfaces: 2, headElevationEnvelopes: 15 });
     expect(result.headPlaneAssignments).toHaveLength(15);
     expect(result.pipeNetwork).toHaveLength(23);
+    expect(result.model3dEnvelope).toMatchObject({ status: 'passed', ceilingSurfaceElevationReady: true, absoluteDeflectorDatumReady: false, pipeElevationReady: false, model3dEnvelopeReady: true });
+    expect(result.model3dEnvelope.ceilingSurfaces).toHaveLength(2);
+    expect(result.model3dEnvelope.headEnvelopes).toHaveLength(15);
+    expect(result.views.topSvg).toContain('15 completed FP3 heads');
+    expect(result.views.elevationSvg).toContain('unresolved deflector interval');
+    expect(result.ceilingSurfaceElevationReady).toBe(true);
+    expect(result.model3dEnvelopeReady).toBe(true);
     expect(result.pipeSizesReady).toBe(false);
     expect(result.absoluteDeflectorDatumReady).toBe(false);
     expect(result.projectionReady).toBe(false);
     expect(result.complianceReady).toBe(false);
+  });
+
+  it('downloads the Winter Garden two-page Bluebeam top/elevation envelope', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration-bluebeam.pdf', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/pdf');
+    expect(response.headers.get('content-disposition')).toContain('Winter-Garden-pitched-ceiling-envelope.pdf');
+    expect(response.headers.get('x-halofire-artifact-sha256')).toMatch(/^[0-9a-f]{64}$/);
+    expect(response.headers.get('x-halofire-exact-deflector-elevation')).toBe('unresolved');
+    const buffer = Buffer.from(await response.arrayBuffer()); const raw = buffer.toString('latin1');
+    expect(buffer.subarray(0, 8).toString('ascii')).toBe('%PDF-1.7');
+    expect(raw).toContain('/Type /OCG /Name (SOURCE_CEILING_EVIDENCE)');
+    expect(raw).toContain('/Type /OCG /Name (COMPLETED_HEAD_PIPE_LAYOUT)');
+    expect(raw).toContain('/Type /OCG /Name (ELEVATION_UNCERTAINTY)');
   });
 
   it('downloads a layered two-page Bluebeam-compatible vector PDF', async () => {
