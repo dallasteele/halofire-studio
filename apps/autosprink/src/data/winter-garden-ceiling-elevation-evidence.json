@@ -40,7 +40,11 @@
     "pendentHalfInchOutletRows": 158,
     "branch25PieceRows": 15,
     "branch25HalfInchOutletRows": 26,
-    "spatialHeadMappingReady": false
+    "spatialHeadMappingReady": true,
+    "mappedPendentTakeoffRows": 15,
+    "branchRowPipeElevationReady": true,
+    "manufacturerInstallationEnvelopeReady": true,
+    "spatialMappingReceiptSha256": "c746308eddaf57f1c17da5b128744c3ccbfd596240ba825335bd0f3a677d7673"
   },
   "ceilingSurfaceElevationReady": true,
   "absoluteDeflectorDatumReady": false,
@@ -48,5 +52,5 @@
   "model3dEnvelopeReady": true,
   "fabricationReady": false,
   "complianceReady": false,
-  "receiptSha256": "71655bb2ea22fb0e7ee566c6abcaddc537fbc68f8e7aea33d82b697016910fc6"
+  "receiptSha256": "f3844b7427f28ac282e50ab50a05e9f5b4547cc69888a5e593ca784008e582cd"
 }

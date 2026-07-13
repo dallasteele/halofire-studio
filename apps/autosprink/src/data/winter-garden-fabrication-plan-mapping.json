@@ -1,0 +1,112 @@
+{
+  "artifactType": "halofire.winter-garden-fabrication-plan-mapping.v1",
+  "projectId": "winter-garden-meetinghouse",
+  "sources": {
+    "sprinklerPipePlan": {"sheetId": "FP2", "sha256": "ac052124095f73e3529fd63906127bac9c2cf3b3f6abd45222c5125fa4195977"},
+    "sprinklerRcp": {"sheetId": "FP3", "sha256": "93f8df04bc84ac817ecd2e222812fede93565879094c66b4d7511f783631543e"},
+    "fabricationListing": {"fileName": "WINTER GARDEN LISTING.TYL", "sha256": "53ff9f89d03a1672aa06788efd1d20c0a5a711e4bc97ef97f9aa83c333b03d12"},
+    "submittedSprinklerCutSheets": {"sheetId": "A007", "documentNumber": "TFP181", "revision": "APRIL 2022", "sha256": "dd2ac41e4ddcd59248102b5d6bd7e317c5a7193f4d6db1df9131ba7308adc41c", "physicalPages": [1, 2, 3, 4]}
+  },
+  "registration": {
+    "planPxPerFt": 18.75,
+    "fp2MinusFp3Px": [89.25, 10.0],
+    "maximumOutletToRegisteredHeadXResidualPx": 1.01
+  },
+  "sprinkler": {
+    "manufacturer": "Tyco",
+    "series": "RFII Royal Flush II",
+    "sin": "TY3531",
+    "orientation": "concealed pendent",
+    "nominalK": 5.6,
+    "connectionIn": 0.5,
+    "verticalAdjustmentIn": 0.5,
+    "droppedDeflectorBelowCeilingIn": [0.1875, 0.6875],
+    "coverPlateProfileDepthIn": 0.1875,
+    "fittingFaceToCeilingRangeIn": [1.75, 2.25]
+  },
+  "rows": [
+    {
+      "id": "chapel-north",
+      "plane": "chapel-north-slope",
+      "branchPlanYPx": 1081.0,
+      "completedHeadYPx": 1059.0,
+      "pipeElevationAboveFloorFt": 19.4166666667,
+      "pipeElevationSourceText": "(+19'-5\")",
+      "chains": [
+        {
+          "id": "north-left",
+          "originPlanXPx": 2870.624975,
+          "pieces": [
+            {"lineNo": "9B", "lengthFt": 20.833335, "selectedOutlets": [{"outletNo": "187", "runDimFt": 16.83333468, "sizeIn": 1.0, "orientation": "L"}], "rejectedOutsideOutlets": [{"outletNo": "184", "runDimFt": 3.58333362, "sizeIn": 1.0}]},
+            {"lineNo": "9C", "lengthFt": 21.00000168, "selectedOutlets": [{"outletNo": "190", "runDimFt": 10.0000008, "sizeIn": 1.0, "orientation": "L"}]},
+            {"lineNo": "9D", "lengthFt": 12.500001, "selectedOutlets": [{"outletNo": "193", "runDimFt": 3.00000024, "sizeIn": 1.0, "orientation": "L"}]}
+          ]
+        },
+        {
+          "id": "north-right",
+          "originPlanXPx": 3901.875,
+          "pieces": [
+            {"lineNo": "24A", "lengthFt": 20.833335, "selectedOutlets": [{"outletNo": "282", "runDimFt": 1.83333348, "sizeIn": 1.0, "orientation": "L"}, {"outletNo": "285", "runDimFt": 15.8333346, "sizeIn": 1.0, "orientation": "L"}]}
+          ]
+        }
+      ],
+      "headIds": ["wg-fp3-pendent-048", "wg-fp3-pendent-049", "wg-fp3-pendent-050", "wg-fp3-pendent-051", "wg-fp3-pendent-052"]
+    },
+    {
+      "id": "chapel-ridge",
+      "plane": "chapel-ridge",
+      "branchPlanYPx": 1343.0,
+      "completedHeadYPx": 1321.0,
+      "pipeElevationAboveFloorFt": 24.0833333333,
+      "pipeElevationSourceText": "(+24'-1\")",
+      "chains": [
+        {
+          "id": "ridge-through-main",
+          "originPlanXPx": 2839.375,
+          "pieces": [
+            {"lineNo": "25L", "lengthFt": 21.00000168, "selectedOutlets": [{"outletNo": "324", "runDimFt": 18.50000148, "sizeIn": 1.0, "orientation": "L"}], "rejectedOutsideOutlets": [{"outletNo": "321", "runDimFt": 4.25000034, "sizeIn": 1.0}]},
+            {"lineNo": "25M", "lengthFt": 20.0000016, "selectedOutlets": [{"outletNo": "327", "runDimFt": 11.50000092, "sizeIn": 1.0, "orientation": "L"}]},
+            {"lineNo": "25N", "lengthFt": 21.00000168, "selectedOutlets": [{"outletNo": "330", "runDimFt": 5.50000044, "sizeIn": 1.0, "orientation": "L"}, {"outletNo": "333", "runDimFt": 17.5000014, "sizeIn": 1.0, "orientation": "L"}], "mainTap": {"outletNo": "332", "runDimFt": 16.16666796, "sizeIn": 1.25, "orientation": "B"}},
+            {"lineNo": "25O", "lengthFt": 21.00000168, "selectedOutlets": [{"outletNo": "336", "runDimFt": 10.50000084, "sizeIn": 1.0, "orientation": "L"}]}
+          ]
+        }
+      ],
+      "headIds": ["wg-fp3-pendent-073", "wg-fp3-pendent-074", "wg-fp3-pendent-075", "wg-fp3-pendent-076", "wg-fp3-pendent-077"]
+    },
+    {
+      "id": "chapel-south",
+      "plane": "chapel-south-slope",
+      "branchPlanYPx": 1585.0,
+      "completedHeadYPx": 1584.0,
+      "pipeElevationAboveFloorFt": 19.3333333333,
+      "pipeElevationSourceText": "(+19'-4\")",
+      "chains": [
+        {
+          "id": "south-left",
+          "originPlanXPx": 2870.624975,
+          "pieces": [
+            {"lineNo": "7B", "lengthFt": 20.833335, "selectedOutlets": [{"outletNo": "153", "runDimFt": 16.83333468, "sizeIn": 1.0, "orientation": "R"}], "rejectedOutsideOutlets": [{"outletNo": "150", "runDimFt": 3.58333362, "sizeIn": 1.0}]},
+            {"lineNo": "7C", "lengthFt": 21.00000168, "selectedOutlets": [{"outletNo": "156", "runDimFt": 10.0000008, "sizeIn": 1.0, "orientation": "R"}]},
+            {"lineNo": "7D", "lengthFt": 12.500001, "selectedOutlets": [{"outletNo": "159", "runDimFt": 3.00000024, "sizeIn": 1.0, "orientation": "R"}]}
+          ]
+        },
+        {
+          "id": "south-right",
+          "originPlanXPx": 3901.875,
+          "pieces": [
+            {"lineNo": "23A", "lengthFt": 20.833335, "selectedOutlets": [{"outletNo": "277", "runDimFt": 1.83333348, "sizeIn": 1.0, "orientation": "R"}, {"outletNo": "280", "runDimFt": 15.8333346, "sizeIn": 1.0, "orientation": "R"}]}
+          ]
+        }
+      ],
+      "headIds": ["wg-fp3-pendent-105", "wg-fp3-pendent-106", "wg-fp3-pendent-107", "wg-fp3-pendent-108", "wg-fp3-pendent-109"]
+    }
+  ],
+  "fabricationPlanMappingReady": true,
+  "branchRowPipeElevationReady": true,
+  "manufacturerInstallationEnvelopeReady": true,
+  "exactAsBuiltDeflectorElevationReady": false,
+  "fullNetworkPipeElevationReady": false,
+  "fabricationReady": false,
+  "complianceReady": false,
+  "receiptSha256": "c746308eddaf57f1c17da5b128744c3ccbfd596240ba825335bd0f3a677d7673"
+}

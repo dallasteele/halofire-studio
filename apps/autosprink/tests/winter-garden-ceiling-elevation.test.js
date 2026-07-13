@@ -32,7 +32,7 @@ describe('Winter Garden coordinated side-view ceiling elevation', () => {
     expect((await validateWinterGardenCeilingElevationEvidence(await sealWinterGardenCeilingElevationEvidence(datum))).issues.map((entry) => entry.code)).toContain('WG_CEILING_COORDINATED_DATUM_DRIFT');
     const source = structuredClone(evidence); delete source.receiptSha256; source.sources.coordinatedSection.sha256 = '0'.repeat(64);
     expect((await validateWinterGardenCeilingElevationEvidence(await sealWinterGardenCeilingElevationEvidence(source))).issues.map((entry) => entry.code)).toContain('WG_CEILING_SOURCE_DRIFT');
-    const fabricated = structuredClone(evidence); delete fabricated.receiptSha256; fabricated.fabricationReceipt.spatialHeadMappingReady = true;
+    const fabricated = structuredClone(evidence); delete fabricated.receiptSha256; fabricated.fabricationReceipt.spatialHeadMappingReady = false;
     expect((await validateWinterGardenCeilingElevationEvidence(await sealWinterGardenCeilingElevationEvidence(fabricated))).issues.map((entry) => entry.code)).toContain('WG_CEILING_FABRICATION_RECEIPT_DRIFT');
   });
 });

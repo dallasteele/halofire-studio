@@ -43,6 +43,7 @@ import { validateRasterBullseyeHeadEvidence } from '../engine/raster-bullseye-he
 import { buildWinterGardenChapelPlaneAssignments, validatePiecewiseGridRegistration } from '../engine/piecewise-grid-registration.js';
 import { buildWinterGardenChapelPipeNetwork, validateFp2PipeEvidence } from '../engine/fp2-pipe-registration.js';
 import { buildWinterGardenCeilingModel3d, renderWinterGardenCeilingViews, validateWinterGardenCeilingElevationEvidence } from '../engine/winter-garden-ceiling-elevation.js';
+import { buildWinterGardenFabricationRegisteredModel, validateWinterGardenFabricationPlanMapping } from '../engine/winter-garden-fabrication-plan-mapping.js';
 import { buildWinterGardenBluebeamPackage } from '../engine/winter-garden-bluebeam-package.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
 import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
@@ -101,6 +102,7 @@ const WINTER_GARDEN_HEAD_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter
 const WINTER_GARDEN_GRID_REGISTRATION_PATH = path.resolve(__dirname, '../data/winter-garden-grid-registration.json');
 const WINTER_GARDEN_PIPE_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp2-pipe-evidence.json');
 const WINTER_GARDEN_CEILING_ELEVATION_PATH = path.resolve(__dirname, '../data/winter-garden-ceiling-elevation-evidence.json');
+const WINTER_GARDEN_FABRICATION_PLAN_MAPPING_PATH = path.resolve(__dirname, '../data/winter-garden-fabrication-plan-mapping.json');
 const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-dwg-source-geometry.json');
 const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
 const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
@@ -1715,33 +1717,36 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
     const gridRegistration = JSON.parse(fs.readFileSync(WINTER_GARDEN_GRID_REGISTRATION_PATH, 'utf8'));
     const pipeEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_PIPE_EVIDENCE_PATH, 'utf8'));
     const ceilingEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_CEILING_ELEVATION_PATH, 'utf8'));
-    const [crossProject, heads, grid, pipes, ceiling, planes, network, model3dEnvelope] = await Promise.all([
+    const fabricationMapping = JSON.parse(fs.readFileSync(WINTER_GARDEN_FABRICATION_PLAN_MAPPING_PATH, 'utf8'));
+    const [crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered] = await Promise.all([
       validatePitchedRoofCrossProjectEvidence(crossProjectPacket),
       validateRasterBullseyeHeadEvidence(headEvidence),
       validatePiecewiseGridRegistration(gridRegistration),
       validateFp2PipeEvidence(pipeEvidence),
       validateWinterGardenCeilingElevationEvidence(ceilingEvidence),
+      validateWinterGardenFabricationPlanMapping(fabricationMapping, gridRegistration, headEvidence),
       buildWinterGardenChapelPlaneAssignments(gridRegistration, headEvidence),
       buildWinterGardenChapelPipeNetwork(pipeEvidence, gridRegistration, headEvidence),
       buildWinterGardenCeilingModel3d(ceilingEvidence, gridRegistration, headEvidence),
+      buildWinterGardenFabricationRegisteredModel(fabricationMapping, ceilingEvidence, gridRegistration, headEvidence),
     ]);
-    const validations = [crossProject, heads, grid, pipes, ceiling, planes, network, model3dEnvelope];
+    const validations = [crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered];
     if (validations.some((validation) => validation.status !== 'passed')) return res.status(422).json({ status: 'blocked', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name, issues: validations.flatMap((validation) => validation.issues || []), projectionReady: false, complianceReady: false });
     return res.json({
       status: 'passed', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name,
-      evidenceReceipts: { crossProject: crossProjectPacket.receiptSha256, heads: headEvidence.receiptSha256, roofRegistration: gridRegistration.receiptSha256, pipeRegistration: pipeEvidence.receiptSha256, ceilingElevation: ceilingEvidence.receiptSha256 },
-      sourceBindings: { roofPlan: gridRegistration.source, sprinklerRcp: gridRegistration.target, sprinklerPipePlan: pipeEvidence.source },
+      evidenceReceipts: { crossProject: crossProjectPacket.receiptSha256, heads: headEvidence.receiptSha256, roofRegistration: gridRegistration.receiptSha256, pipeRegistration: pipeEvidence.receiptSha256, ceilingElevation: ceilingEvidence.receiptSha256, fabricationPlanMapping: fabricationMapping.receiptSha256 },
+      sourceBindings: { roofPlan: gridRegistration.source, sprinklerRcp: gridRegistration.target, sprinklerPipePlan: pipeEvidence.source, fabricationListing: fabricationMapping.sources.fabricationListing, submittedSprinklerCutSheets: fabricationMapping.sources.submittedSprinklerCutSheets },
       acceptanceLoops: {
         primary: { status: 'passed', method: headEvidence.primary.method, headCount: heads.metrics.primaryCount, branchMethod: pipeEvidence.detectorReceipt.primary.method },
         independent: { status: 'passed', method: headEvidence.independent.method, headCount: heads.metrics.independentCount, branchMethod: pipeEvidence.detectorReceipt.independent.method },
-        adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true },
+        adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true },
       },
       crossProjectEvidence: { metrics: crossProject.metrics, claimStatus: crossProject.claimStatus },
-      counts: { completedBidFp3Heads: heads.metrics.primaryCount, chapelHeads: planes.assignments.length, chapelBranches: network.branchCount, chapelArmOvers: network.headCount, networkSegments: network.segments.length, absoluteCeilingSurfaces: model3dEnvelope.counts.ceilingSurfaces, headElevationEnvelopes: model3dEnvelope.counts.headEnvelopes },
+      counts: { completedBidFp3Heads: heads.metrics.primaryCount, chapelHeads: planes.assignments.length, chapelBranches: network.branchCount, chapelArmOvers: network.headCount, networkSegments: network.segments.length, absoluteCeilingSurfaces: model3dRegistered.counts.ceilingSurfaces, headElevationEnvelopes: model3dRegistered.counts.headEnvelopes, fabricationMappedHeads: model3dRegistered.counts.fabricationMappedHeads, exactBranchRowPipes: model3dRegistered.counts.exactBranchRowPipes },
       roofPlanes: planes.roofPlanes, headPlaneAssignments: planes.assignments, pipeNetwork: network.segments,
-      model3dEnvelope, views: renderWinterGardenCeilingViews(model3dEnvelope),
-      ceilingSurfaceElevationReady: true, model3dEnvelopeReady: true, pipeSizesReady: false, pipeElevationReady: false, absoluteDeflectorDatumReady: false, projectionReady: false, fabricationReady: false, complianceReady: false,
-      residuals: [...network.residuals, ...model3dEnvelope.residuals],
+      fabricationMappings: fabrication.mappings, model3dEnvelope: model3dRegistered, views: renderWinterGardenCeilingViews(model3dRegistered),
+      ceilingSurfaceElevationReady: true, model3dEnvelopeReady: true, fabricationPlanMappingReady: true, branchRowPipeElevationReady: true, manufacturerInstallationEnvelopeReady: true, pipeSizesReady: false, fullNetworkPipeElevationReady: false, absoluteDeflectorDatumReady: false, exactAsBuiltDeflectorElevationReady: false, projectionReady: false, fabricationReady: false, complianceReady: false,
+      residuals: [...network.residuals, ...model3dRegistered.residuals],
       claimStatus: 'completed-bid-pitched-roof-head-and-pipe-topology-calibration-not-code-compliance-or-fabrication',
     });
   } catch (error) {
@@ -1757,17 +1762,18 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration-bluebeam.pdf', authMi
     const gridRegistration = JSON.parse(fs.readFileSync(WINTER_GARDEN_GRID_REGISTRATION_PATH, 'utf8'));
     const pipeEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_PIPE_EVIDENCE_PATH, 'utf8'));
     const ceilingEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_CEILING_ELEVATION_PATH, 'utf8'));
+    const fabricationMapping = JSON.parse(fs.readFileSync(WINTER_GARDEN_FABRICATION_PLAN_MAPPING_PATH, 'utf8'));
     const [model3dEnvelope, network] = await Promise.all([
-      buildWinterGardenCeilingModel3d(ceilingEvidence, gridRegistration, headEvidence),
+      buildWinterGardenFabricationRegisteredModel(fabricationMapping, ceilingEvidence, gridRegistration, headEvidence),
       buildWinterGardenChapelPipeNetwork(pipeEvidence, gridRegistration, headEvidence),
     ]);
-    const result = buildWinterGardenBluebeamPackage({ model3dEnvelope, pipeNetwork: network.segments, pipeRegistrationDeltaPx: pipeEvidence.registration.meanDeltaPx, evidenceReceiptSha256: ceilingEvidence.receiptSha256 });
+    const result = buildWinterGardenBluebeamPackage({ model3dEnvelope, pipeNetwork: network.segments, pipeRegistrationDeltaPx: pipeEvidence.registration.meanDeltaPx, evidenceReceiptSha256: fabricationMapping.receiptSha256 });
     if (result.status !== 'passed') return res.status(422).json(result);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${result.manifest.fileName}"`);
     res.setHeader('X-HaloFire-Artifact-SHA256', result.manifest.sha256);
     res.setHeader('X-HaloFire-Evidence-Receipt', result.manifest.evidenceReceiptSha256);
-    res.setHeader('X-HaloFire-Exact-Deflector-Elevation', 'unresolved');
+    res.setHeader('X-HaloFire-Exact-Deflector-Elevation', 'manufacturer-range-3-16-to-11-16-in-below-ceiling-as-built-setpoint-unresolved');
     res.setHeader('Cache-Control', 'private, no-store');
     return res.send(result.buffer);
   } catch (error) {

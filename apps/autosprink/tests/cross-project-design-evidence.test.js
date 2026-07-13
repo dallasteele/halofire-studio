@@ -7,7 +7,7 @@ describe('cross-project design evidence', () => {
     const result = validateCrossProjectDesignSourceSet(sourceSet);
     expect(result.status).toBe('passed');
     expect(result.projectId).toBe('winter-garden-fl-meetinghouse');
-    expect(result.fileCount).toBe(15);
+    expect(result.fileCount).toBe(16);
     expect(result.phases).toEqual(['as_built', 'city_approved', 'fabrication', 'source_architecture', 'stamped_submittal']);
     expect(result.sourceViews).toEqual(['building_elevation', 'building_section', 'coordinated_building_section', 'floor_plan', 'reflected_ceiling_plan', 'roof_plan']);
     expect(result.pairedSheets).toEqual(['A001', 'A002', 'A003']);
