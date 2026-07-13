@@ -1,10 +1,13 @@
 const REQUIRED_SOURCES = Object.freeze([
   'halofire-master/00_MASTER_MOC.md',
+  'halofire-master/COMPANY_OPERATIONS_FLOW.md',
+  'halofire-master/00-Company/00_Company_Org.md',
   'halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md',
   'halofire-master/03-Design-Engineering/03_Design_Engineering.md',
   'halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md',
   'halofire-master/05-Fabrication-Shop/05-06-fab-field.md',
   'halofire-master/07-08-itm-pm.md',
+  'halofire-master/09-Finance-Admin/09_Finance_Admin.md',
   'halofire-master/AI_AUTOMATION_OPPORTUNITIES.md',
   'halofire-autobid/system/autobid-index.md',
 ]);
@@ -21,9 +24,33 @@ const REQUIRED_GUARDRAILS = Object.freeze([
   'ahj-compliance-fabrication-and-manufacturer-claims-fail-closed',
   'primary-independent-and-adversarial-verification-loops-are-internal',
   'closeout-and-realized-job-cost-feed-the-next-estimating-loop',
+  'every-stage-has-a-department-owner-handoff-artifact-and-current-tool',
+  'preconstruction-controls-cad-flow-test-permit-wip-and-fabrication-schedule',
+  'closeout-artifacts-precede-final-billing',
 ]);
 
 const REQUIRED_APPLICATIONS = Object.freeze([
+  {
+    id: 'company-handoff-chain',
+    domain: 'company-operations',
+    source: 'halofire-master/COMPANY_OPERATIONS_FLOW.md',
+    decision: 'lead-bid-award-design-procure-fabricate-install-inspect-submit-closeout-invoice-service-is-the-current-company-flow',
+    control: 'each-stage-records-department-owner-handoff-artifact-and-current-tool-before-downstream-state-can-advance',
+  },
+  {
+    id: 'preconstruction-project-control',
+    domain: 'project-management',
+    source: 'halofire-master/COMPANY_OPERATIONS_FLOW.md',
+    decision: 'preconstruction-owns-job-setup-cad-acquisition-flow-test-permit-wip-and-fabrication-schedule-coordination',
+    control: 'design-and-fabrication-handoffs-carry-the-current-cad-flow-test-permit-revision-and-schedule-state',
+  },
+  {
+    id: 'closeout-before-final-billing',
+    domain: 'finance-and-project-closeout',
+    source: 'halofire-master/09-Finance-Admin/09_Finance_Admin.md',
+    decision: 'asbuilts-test-certificates-warranties-and-closeout-state-precede-final-billing-and-realized-job-cost-feedback',
+    control: 'final-billing-and-estimating-learning-cannot-advance-from-an-incomplete-closeout-record',
+  },
   {
     id: 'lifecycle-stage-authority',
     domain: 'company-operations',
@@ -98,9 +125,9 @@ const REQUIRED_APPLICATIONS = Object.freeze([
 
 const issue = (code, message, refs = []) => ({ severity: 'blocking', code, message, refs });
 
-export function buildHaloFireOperationalKnowledgeReceipt({ sessionId, recallEpisodeIds = [], preflightQuery, recalledWikiPages = [] } = {}) {
+export function buildHaloFireOperationalKnowledgeReceipt({ sessionId, recallEpisodeIds = [], preflightQuery, recalledWikiPages = [], companyFlowEpisodeIds = [], companyFlowPages = [] } = {}) {
   return {
-    artifactType: 'halofire.operational-knowledge-receipt.v2',
+    artifactType: 'halofire.operational-knowledge-receipt.v3',
     source: 'gx10-hal-brain+obsidian-vault',
     canonicalVault: '/opt/hal9000/apps/claudebot/hal-vault',
     preflightStatus: 'passed',
@@ -108,11 +135,16 @@ export function buildHaloFireOperationalKnowledgeReceipt({ sessionId, recallEpis
     preflightQuery,
     recallEpisodeIds: [...recallEpisodeIds],
     recalledWikiPages: [...recalledWikiPages],
+    companyFlowRecall: {
+      episodeIds: [...companyFlowEpisodeIds],
+      pages: [...companyFlowPages],
+      status: 'passed',
+    },
     sources: [...REQUIRED_SOURCES],
     workflowGuardrails: [...REQUIRED_GUARDRAILS],
     applications: REQUIRED_APPLICATIONS.map((entry) => ({ ...entry })),
     coverage: {
-      lifecycleStages: ['bid', 'award', 'design', 'procurement', 'fabrication', 'field-install', 'acceptance-itm', 'closeout-service'],
+      lifecycleStages: ['lead-qualification', 'bid', 'award', 'preconstruction', 'design', 'procurement', 'fabrication', 'field-install', 'acceptance-itm', 'closeout-service', 'billing'],
       crossCuttingDomains: ['project-management', 'finance-job-cost', 'licensing-safety', 'codes-ahj', 'catalog-products', 'internal-verification'],
       sourceCount: REQUIRED_SOURCES.length,
       appliedDecisionCount: REQUIRED_APPLICATIONS.length,
@@ -128,7 +160,9 @@ export function validateHaloFireOperationalKnowledgeReceipt(value) {
   const applications = new Map((Array.isArray(value?.applications) ? value.applications : []).map((entry) => [entry?.id, entry]));
   const recallEpisodeIds = Array.isArray(value?.recallEpisodeIds) ? value.recallEpisodeIds : [];
   const recalledWikiPages = Array.isArray(value?.recalledWikiPages) ? value.recalledWikiPages : [];
-  if (value?.artifactType !== 'halofire.operational-knowledge-receipt.v2'
+  const companyFlowEpisodeIds = Array.isArray(value?.companyFlowRecall?.episodeIds) ? value.companyFlowRecall.episodeIds : [];
+  const companyFlowPages = Array.isArray(value?.companyFlowRecall?.pages) ? value.companyFlowRecall.pages : [];
+  if (value?.artifactType !== 'halofire.operational-knowledge-receipt.v3'
     || value?.source !== 'gx10-hal-brain+obsidian-vault'
     || value?.canonicalVault !== '/opt/hal9000/apps/claudebot/hal-vault'
     || value?.preflightStatus !== 'passed'
@@ -139,7 +173,12 @@ export function validateHaloFireOperationalKnowledgeReceipt(value) {
     || recallEpisodeIds.length < 4
     || recallEpisodeIds.some((episodeId) => !Number.isInteger(episodeId) || episodeId <= 0)
     || recalledWikiPages.length < 3
-    || recalledWikiPages.some((page) => typeof page !== 'string' || !page.startsWith('decisions/'))) {
+    || recalledWikiPages.some((page) => typeof page !== 'string' || !page.startsWith('decisions/'))
+    || value?.companyFlowRecall?.status !== 'passed'
+    || companyFlowEpisodeIds.length < 3
+    || companyFlowEpisodeIds.some((episodeId) => !Number.isInteger(episodeId) || episodeId <= 0)
+    || !companyFlowPages.includes('halofire-master/COMPANY_OPERATIONS_FLOW.md')
+    || !companyFlowPages.includes('halofire-master/00-Company/00_Company_Org.md')) {
     issues.push(issue('HALOFIRE_OPERATIONAL_PREFLIGHT_INVALID', 'A passed GX10/Obsidian preflight with a durable session and recalled episodes is required.'));
   }
   for (const source of REQUIRED_SOURCES) {
@@ -156,7 +195,7 @@ export function validateHaloFireOperationalKnowledgeReceipt(value) {
     }
   }
   const stages = new Set(Array.isArray(value?.coverage?.lifecycleStages) ? value.coverage.lifecycleStages : []);
-  const requiredStages = ['bid', 'award', 'design', 'procurement', 'fabrication', 'field-install', 'acceptance-itm', 'closeout-service'];
+  const requiredStages = ['lead-qualification', 'bid', 'award', 'preconstruction', 'design', 'procurement', 'fabrication', 'field-install', 'acceptance-itm', 'closeout-service', 'billing'];
   if (value?.coverage?.status !== 'passed'
     || value?.coverage?.sourceCount !== REQUIRED_SOURCES.length
     || value?.coverage?.appliedDecisionCount !== REQUIRED_APPLICATIONS.length

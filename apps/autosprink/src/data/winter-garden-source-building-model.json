@@ -29,36 +29,53 @@
     "method": "A103-dimension-viewport+A151-registered-cut-walls+A121-vector-ridge-valleys+A201-A301-datums"
   },
   "operationalKnowledge": {
-    "artifactType": "halofire.operational-knowledge-receipt.v2",
+    "artifactType": "halofire.operational-knowledge-receipt.v3",
     "source": "gx10-hal-brain+obsidian-vault",
     "canonicalVault": "/opt/hal9000/apps/claudebot/hal-vault",
     "preflightStatus": "passed",
     "sessionId": "winter-garden-source-building-operational-knowledge-20260713",
     "preflightQuery": "Halo Fire operations knowledge must actively constrain Winter Garden source-spec hazard and sprinkler generation across estimating, design engineering, procurement, fabrication, field installation, approvals, change control, closeout, and internal adversarial verification",
     "recallEpisodeIds": [
+      140193,
+      140208,
+      139873,
+      140198,
+      140199,
       139750,
       139418,
-      60899,
-      129530,
-      133582,
-      136189,
-      132038,
-      136034,
-      129505,
-      129358
+      136034
     ],
     "recalledWikiPages": [
       "decisions/halo-forge-stream-d-sprinkler-alpha-workflow-correction-loop-design-artifact-2026.md",
       "decisions/2026-05-15-halo-forge-stream-d-sprinkler-separate-design-issues-from-nfpa-ahj.md",
       "decisions/halo-forge-sprinkler-catalog-engineering-gate-2026-05-13.md"
     ],
+    "companyFlowRecall": {
+      "episodeIds": [
+        140193,
+        140208,
+        139873,
+        140198,
+        140199
+      ],
+      "pages": [
+        "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "halofire-master/00-Company/00_Company_Org.md",
+        "halofire-master/05-Fabrication-Shop/05_Fabrication_Shop.md",
+        "halofire-master/09-Finance-Admin/09_Finance_Admin.md"
+      ],
+      "status": "passed"
+    },
     "sources": [
       "halofire-master/00_MASTER_MOC.md",
+      "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+      "halofire-master/00-Company/00_Company_Org.md",
       "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
       "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
       "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
       "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
       "halofire-master/07-08-itm-pm.md",
+      "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
       "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
       "halofire-autobid/system/autobid-index.md"
     ],
@@ -73,9 +90,33 @@
       "field-conflicts-become-rfis-not-untracked-field-guesses",
       "ahj-compliance-fabrication-and-manufacturer-claims-fail-closed",
       "primary-independent-and-adversarial-verification-loops-are-internal",
-      "closeout-and-realized-job-cost-feed-the-next-estimating-loop"
+      "closeout-and-realized-job-cost-feed-the-next-estimating-loop",
+      "every-stage-has-a-department-owner-handoff-artifact-and-current-tool",
+      "preconstruction-controls-cad-flow-test-permit-wip-and-fabrication-schedule",
+      "closeout-artifacts-precede-final-billing"
     ],
     "applications": [
+      {
+        "id": "company-handoff-chain",
+        "domain": "company-operations",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "lead-bid-award-design-procure-fabricate-install-inspect-submit-closeout-invoice-service-is-the-current-company-flow",
+        "control": "each-stage-records-department-owner-handoff-artifact-and-current-tool-before-downstream-state-can-advance"
+      },
+      {
+        "id": "preconstruction-project-control",
+        "domain": "project-management",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "preconstruction-owns-job-setup-cad-acquisition-flow-test-permit-wip-and-fabrication-schedule-coordination",
+        "control": "design-and-fabrication-handoffs-carry-the-current-cad-flow-test-permit-revision-and-schedule-state"
+      },
+      {
+        "id": "closeout-before-final-billing",
+        "domain": "finance-and-project-closeout",
+        "source": "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
+        "decision": "asbuilts-test-certificates-warranties-and-closeout-state-precede-final-billing-and-realized-job-cost-feedback",
+        "control": "final-billing-and-estimating-learning-cannot-advance-from-an-incomplete-closeout-record"
+      },
       {
         "id": "lifecycle-stage-authority",
         "domain": "company-operations",
@@ -149,14 +190,17 @@
     ],
     "coverage": {
       "lifecycleStages": [
+        "lead-qualification",
         "bid",
         "award",
+        "preconstruction",
         "design",
         "procurement",
         "fabrication",
         "field-install",
         "acceptance-itm",
-        "closeout-service"
+        "closeout-service",
+        "billing"
       ],
       "crossCuttingDomains": [
         "project-management",
@@ -166,8 +210,8 @@
         "catalog-products",
         "internal-verification"
       ],
-      "sourceCount": 8,
-      "appliedDecisionCount": 10,
+      "sourceCount": 11,
+      "appliedDecisionCount": 13,
       "status": "passed"
     }
   },
@@ -9153,5 +9197,5 @@
   "complianceReady": false,
   "fabricationReady": false,
   "claimStatus": "source-bound-floor-and-pitched-roof-geometry-not-sprinkler-code-compliance",
-  "receiptSha256": "a71b9544ca1c31b9435aea21a9c0d6f2c05a22b27e211db6c39b2353f1f2bfeb"
+  "receiptSha256": "e6451b7acea7a8cb4a48727463823c51185e0faa3eb6230b195c1a0efc43324e"
 }

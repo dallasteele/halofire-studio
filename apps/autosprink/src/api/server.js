@@ -54,6 +54,7 @@ import { buildDallasPitchedAtticHydraulicModel, validateCompletedPitchedHydrauli
 import { buildDallasPitchedAtticBluebeamOverlay } from '../engine/dallas-pitched-attic-bluebeam-overlay.js';
 import { validateWinterGardenSourceBuildingPacket } from '../engine/winter-garden-source-building-packet.js';
 import { validateWinterGardenSourceSpecHazardPacket } from '../engine/winter-garden-source-spec-hazard.js';
+import { validateWinterGardenSourceSpaceRegistry } from '../engine/winter-garden-source-space-registry.js';
 import { renderOrthogonalGableBuildingViews } from '../engine/orthogonal-gable-building-views.js';
 import { buildWinterGardenBluebeamPackage } from '../engine/winter-garden-bluebeam-package.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
@@ -113,6 +114,7 @@ const PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH = path.resolve(__dirname, '../dat
 const WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/winter-garden-cross-project-source-set.json');
 const WINTER_GARDEN_SOURCE_BUILDING_MODEL_PATH = path.resolve(__dirname, '../data/winter-garden-source-building-model.json');
 const WINTER_GARDEN_SOURCE_SPEC_HAZARD_PATH = path.resolve(__dirname, '../data/winter-garden-source-spec-hazard.json');
+const WINTER_GARDEN_SOURCE_SPACE_REGISTRY_PATH = path.resolve(__dirname, '../data/winter-garden-source-space-registry.json');
 const TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/tallahassee-completed-project-source-set.json');
 const NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/nashville-completed-project-source-set.json');
 const DALLAS_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/dallas-completed-project-source-set.json');
@@ -1741,6 +1743,43 @@ app.get('/api/projects/:name/source-spec-hazard', authMiddleware, async (req, re
       complianceReady: false,
       fabricationReady: false,
       fieldReleaseReady: false,
+    });
+  }
+});
+
+app.get('/api/projects/:name/source-space-registry', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'LDS Meeting House - Winter Garden FL') {
+    return res.status(404).json({
+      status: 'blocked', error: 'source_space_registry_not_found',
+      message: 'No sealed source room and ceiling registry exists for this project.',
+      sprinklerCandidateReady: false, complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+    });
+  }
+  try {
+    const packet = JSON.parse(fs.readFileSync(WINTER_GARDEN_SOURCE_SPACE_REGISTRY_PATH, 'utf8'));
+    const validation = await validateWinterGardenSourceSpaceRegistry(packet);
+    if (validation.status !== 'passed') return res.status(422).json({ ...validation, projectName: req.params.name });
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, projectName: req.params.name,
+      receiptSha256: packet.receiptSha256, sourceBindings: packet.sourceBindings,
+      generation: packet.generation, operationalKnowledge: packet.operationalKnowledge,
+      registrationChecks: packet.registrationChecks, wallEvidence: packet.wallEvidence,
+      ceilingEvidence: {
+        sourceSheet: packet.ceilingEvidence.sourceSheet, controls: packet.ceilingEvidence.controls,
+        heightResolved: packet.ceilingEvidence.heightResolved, slopedControls: packet.ceilingEvidence.slopedControls,
+      },
+      counts: packet.counts, spaces: packet.spaces, internalVerification: packet.internalVerification,
+      unresolved: packet.unresolved, operationalKnowledgeGrounded: validation.operationalKnowledgeGrounded,
+      sprinklerCandidateReady: false, wholeBuildingHeadLayoutReady: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Winter Garden source-space registry', { error: error.message });
+    return res.status(500).json({
+      status: 'blocked', error: 'source_space_registry_load_failed',
+      message: 'The sealed source room and ceiling registry could not be loaded.',
+      sprinklerCandidateReady: false, complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
     });
   }
 });

@@ -1,0 +1,8287 @@
+{
+  "artifactType": "halofire.winter-garden-source-space-registry.v1",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "sourceBindings": [
+    {
+      "sheet": "A101",
+      "path": "02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A101-MAIN-FLOOR-PLAN-Rev.6.pdf",
+      "sha256": "861626b3a6838ddd340d15e20c88c55d2d7896df7d8ef45276d518e4112040fb"
+    },
+    {
+      "sheet": "A103",
+      "path": "02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A103-MAIN-FLOOR-DIMENSION-PLAN-Rev.6.pdf",
+      "sha256": "bca163d23e89b86332f670f6f234f5bc5319b1a1e461de28a3fb3124120c2f89"
+    },
+    {
+      "sheet": "A151",
+      "path": "02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A151-REFLECTED-CEILING-PLAN-Rev.5.pdf",
+      "sha256": "4a6c4b29eff18a8e964627ba41807f2f8119f8a2c8012d5900acf08e61ee8e43"
+    },
+    {
+      "sheet": "A301",
+      "path": "02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A301-BUILDING-SECTIONS-Rev.5.pdf",
+      "sha256": "719ae05138b3872c2ed8740fa4470ca457dcc0a9f8fec617cabf7969560ecc30"
+    }
+  ],
+  "operationalKnowledge": {
+    "artifactType": "halofire.operational-knowledge-receipt.v3",
+    "source": "gx10-hal-brain+obsidian-vault",
+    "canonicalVault": "/opt/hal9000/apps/claudebot/hal-vault",
+    "preflightStatus": "passed",
+    "sessionId": "winter-garden-source-building-operational-knowledge-20260713",
+    "preflightQuery": "Halo Fire operations knowledge must actively constrain Winter Garden source-spec hazard and sprinkler generation across estimating, design engineering, procurement, fabrication, field installation, approvals, change control, closeout, and internal adversarial verification",
+    "recallEpisodeIds": [
+      140193,
+      140208,
+      139873,
+      140198,
+      140199,
+      139750,
+      139418,
+      136034
+    ],
+    "recalledWikiPages": [
+      "decisions/halo-forge-stream-d-sprinkler-alpha-workflow-correction-loop-design-artifact-2026.md",
+      "decisions/2026-05-15-halo-forge-stream-d-sprinkler-separate-design-issues-from-nfpa-ahj.md",
+      "decisions/halo-forge-sprinkler-catalog-engineering-gate-2026-05-13.md"
+    ],
+    "companyFlowRecall": {
+      "episodeIds": [
+        140193,
+        140208,
+        139873,
+        140198,
+        140199
+      ],
+      "pages": [
+        "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "halofire-master/00-Company/00_Company_Org.md",
+        "halofire-master/05-Fabrication-Shop/05_Fabrication_Shop.md",
+        "halofire-master/09-Finance-Admin/09_Finance_Admin.md"
+      ],
+      "status": "passed"
+    },
+    "sources": [
+      "halofire-master/00_MASTER_MOC.md",
+      "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+      "halofire-master/00-Company/00_Company_Org.md",
+      "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+      "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+      "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+      "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+      "halofire-master/07-08-itm-pm.md",
+      "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
+      "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+      "halofire-autobid/system/autobid-index.md"
+    ],
+    "workflowGuardrails": [
+      "estimate-before-award-is-not-install-design",
+      "source-scale-and-elevation-datums-must-be-proven",
+      "commercial-hazard-and-density-come-from-project-spec-not-architectural-grid",
+      "completed-bids-are-held-out-calibration-not-generation-inputs",
+      "design-basis-requires-hazard-density-water-supply-and-field-condition-evidence",
+      "no-approved-submittal-means-no-order-fabrication-or-field-release",
+      "manufacturer-product-claims-require-approved-cut-sheets-and-responsibility-scope",
+      "field-conflicts-become-rfis-not-untracked-field-guesses",
+      "ahj-compliance-fabrication-and-manufacturer-claims-fail-closed",
+      "primary-independent-and-adversarial-verification-loops-are-internal",
+      "closeout-and-realized-job-cost-feed-the-next-estimating-loop",
+      "every-stage-has-a-department-owner-handoff-artifact-and-current-tool",
+      "preconstruction-controls-cad-flow-test-permit-wip-and-fabrication-schedule",
+      "closeout-artifacts-precede-final-billing"
+    ],
+    "applications": [
+      {
+        "id": "company-handoff-chain",
+        "domain": "company-operations",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "lead-bid-award-design-procure-fabricate-install-inspect-submit-closeout-invoice-service-is-the-current-company-flow",
+        "control": "each-stage-records-department-owner-handoff-artifact-and-current-tool-before-downstream-state-can-advance"
+      },
+      {
+        "id": "preconstruction-project-control",
+        "domain": "project-management",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "preconstruction-owns-job-setup-cad-acquisition-flow-test-permit-wip-and-fabrication-schedule-coordination",
+        "control": "design-and-fabrication-handoffs-carry-the-current-cad-flow-test-permit-revision-and-schedule-state"
+      },
+      {
+        "id": "closeout-before-final-billing",
+        "domain": "finance-and-project-closeout",
+        "source": "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
+        "decision": "asbuilts-test-certificates-warranties-and-closeout-state-precede-final-billing-and-realized-job-cost-feedback",
+        "control": "final-billing-and-estimating-learning-cannot-advance-from-an-incomplete-closeout-record"
+      },
+      {
+        "id": "lifecycle-stage-authority",
+        "domain": "company-operations",
+        "source": "halofire-master/00_MASTER_MOC.md",
+        "decision": "bid-award-design-procure-fabricate-install-inspect-service-is-the-authoritative-lifecycle",
+        "control": "every-artifact-declares-its-lifecycle-stage-and-cannot-inherit-downstream-authority"
+      },
+      {
+        "id": "estimate-design-boundary",
+        "domain": "estimating",
+        "source": "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+        "decision": "estimating-geometry-is-a-pricing-seed-not-an-approved-installation-design",
+        "control": "source-building-and-layout-artifacts-keep-compliance-fabrication-and-field-release-false"
+      },
+      {
+        "id": "commercial-spec-hazard-basis",
+        "domain": "estimating-and-design",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "commercial-hazard-density-and-remote-area-come-from-csi-division-21-before-layout",
+        "control": "reject-default-hazard-or-density-when-the-project-spec-is-missing-unbound-or-contradicted"
+      },
+      {
+        "id": "design-basis-and-hydraulics",
+        "domain": "design-engineering",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "field-conditions-hazard-density-water-supply-remote-area-and-obstructions-precede-afc-release",
+        "control": "unresolved-room-ceiling-obstruction-or-water-evidence-keeps-design-and-compliance-fail-closed"
+      },
+      {
+        "id": "approved-product-procurement",
+        "domain": "procurement",
+        "source": "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+        "decision": "released-bom-approved-cut-sheets-responsibility-matrix-and-live-vendor-data-govern-the-buy",
+        "control": "no-manufacturer-exact-product-or-procurement-claim-without-project-approved-source-evidence"
+      },
+      {
+        "id": "afc-before-fabrication",
+        "domain": "fabrication-shop",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "nothing-is-cut-kitted-or-shipped-before-approved-for-construction-drawings-and-bom",
+        "control": "fabrication-ready-remains-false-until-afc-revision-bom-cut-list-and-product-approvals-join"
+      },
+      {
+        "id": "approved-set-field-rfi",
+        "domain": "field-operations",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "field-installs-the-approved-set-and-routes-conflicts-back-as-rfis",
+        "control": "unresolved-coordination-never-becomes-an-invented-install-location-or-field-release"
+      },
+      {
+        "id": "pm-change-closeout-learning",
+        "domain": "project-management-and-itm",
+        "source": "halofire-master/07-08-itm-pm.md",
+        "decision": "changes-are-priced-before-work-and-closeout-requires-asbuilts-om-test-certs-warranty-and-turnover",
+        "control": "revision-change-closeout-and-realized-cost-state-remain-explicit-and-feed-estimating-calibration"
+      },
+      {
+        "id": "internal-verification-doctrine",
+        "domain": "software-governance",
+        "source": "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+        "decision": "every-ai-feature-runs-multisignal-self-validation-and-correction-loops-inside-the-product",
+        "control": "primary-independent-and-adversarial-results-are-machine-gated-with-no-independent-review-blocker"
+      },
+      {
+        "id": "brain-db-loop-division",
+        "domain": "autobid-platform",
+        "source": "halofire-autobid/system/autobid-index.md",
+        "decision": "the-bid-db-locates-source-files-the-brain-holds-recallable-knowledge-and-deterministic-engines-own-calculations",
+        "control": "every-generated-decision-cites-source-locators-brain-provenance-and-deterministic-rule-output"
+      }
+    ],
+    "coverage": {
+      "lifecycleStages": [
+        "lead-qualification",
+        "bid",
+        "award",
+        "preconstruction",
+        "design",
+        "procurement",
+        "fabrication",
+        "field-install",
+        "acceptance-itm",
+        "closeout-service",
+        "billing"
+      ],
+      "crossCuttingDomains": [
+        "project-management",
+        "finance-job-cost",
+        "licensing-safety",
+        "codes-ahj",
+        "catalog-products",
+        "internal-verification"
+      ],
+      "sourceCount": 11,
+      "appliedDecisionCount": 13,
+      "status": "passed"
+    }
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "oldRoomLabelsUsed": false,
+    "registrationMethod": "labeled-piecewise-grid",
+    "roomIdentityMethod": "A101-number-with-stacked-name-lines",
+    "geometryMethod": "A101-all-heavier-than-baseline-source-wall-components-with-one-room-anchor",
+    "geometryParameters": {
+      "anchorBoundsPaddingFt": 12,
+      "gridN": 420,
+      "bridgeFt": 0.35,
+      "collinearBridgeFt": 1,
+      "minRoomSqft": 15,
+      "maxRoomFraction": 0.8
+    },
+    "ceilingMethod": "A151-control-tag-with-adjacent-height-inside-same-closed-component"
+  },
+  "scale": {
+    "sourceSheet": "A103",
+    "feetPerPoint": 0.1111111111111111
+  },
+  "registrationChecks": {
+    "A101toA103": {
+      "status": "passed",
+      "method": "labeled-piecewise-grid",
+      "controlResidualsPt": {
+        "columns": 0,
+        "rows": 0
+      },
+      "globalAffineMaxResidualsPt": {
+        "columns": 4.507804,
+        "rows": 0.982057
+      },
+      "globalAffineRejected": true,
+      "issues": []
+    },
+    "A151toA103": {
+      "status": "passed",
+      "method": "labeled-piecewise-grid",
+      "controlResidualsPt": {
+        "columns": 0,
+        "rows": 0
+      },
+      "globalAffineMaxResidualsPt": {
+        "columns": 0.952178,
+        "rows": 25.807629
+      },
+      "globalAffineRejected": true,
+      "issues": []
+    }
+  },
+  "wallEvidence": {
+    "sourceSheet": "A101",
+    "registeredSegmentsInAnchorBounds": 49405,
+    "structuralWallSegments": 23470,
+    "baselineLineWidth": 2,
+    "includedLineWidths": [
+      2.71803,
+      2.71833,
+      2.71893,
+      2.71893,
+      2.71923,
+      2.71984,
+      2.72181,
+      2.73017,
+      2.73032,
+      2.73383,
+      2.73383,
+      2.73398,
+      2.75431,
+      2.75477,
+      2.7554,
+      2.75555,
+      2.75819,
+      2.75866,
+      2.75928,
+      2.75944,
+      2.76693,
+      2.76709,
+      2.77085,
+      2.77101,
+      2.77384,
+      2.77431,
+      2.77494,
+      2.7751,
+      2.77841,
+      2.77872,
+      2.77904,
+      2.7792,
+      2.7792,
+      2.77951,
+      2.78046,
+      2.78252,
+      2.78268,
+      2.78284,
+      2.78458,
+      2.78664,
+      2.7868,
+      2.7868,
+      2.78807,
+      2.78823,
+      2.79014,
+      2.7903,
+      2.79078,
+      2.79078,
+      2.79094,
+      2.79094,
+      2.7911,
+      2.7911,
+      2.79141,
+      2.79812,
+      2.79828,
+      2.7986,
+      2.79876,
+      2.79892,
+      2.79924,
+      2.7994,
+      2.79956,
+      2.79989,
+      2.80037,
+      2.80037,
+      2.80053,
+      2.80213,
+      2.80744,
+      2.80905,
+      2.80954,
+      2.81099,
+      2.81552,
+      2.81601,
+      2.81714,
+      2.82218,
+      2.82365,
+      2.82414,
+      2.82577,
+      2.82757,
+      2.83281,
+      2.84055,
+      2.85414,
+      2.85648,
+      2.85764,
+      2.85781,
+      2.85998,
+      2.86132,
+      2.86149,
+      2.86199,
+      2.86216,
+      2.86216,
+      2.86249,
+      2.8635,
+      2.86854,
+      2.87782,
+      2.87816,
+      2.8785,
+      2.87901,
+      2.87935,
+      2.87969,
+      2.88003,
+      2.88037,
+      2.88071,
+      2.88105,
+      2.88139,
+      2.88156,
+      2.88956,
+      2.89092,
+      2.89315,
+      2.89469,
+      2.89709,
+      2.89726,
+      2.89761,
+      2.89812,
+      2.89881,
+      2.89984,
+      2.90104,
+      2.90242,
+      2.9038,
+      2.90535,
+      2.90708,
+      2.90864,
+      2.91002,
+      2.91019,
+      2.91123,
+      2.91158,
+      2.91297,
+      2.91418,
+      2.91523,
+      2.91592,
+      2.91644,
+      2.91679,
+      2.93324,
+      2.94171,
+      2.94561,
+      2.95593,
+      2.95844,
+      2.96184,
+      2.964,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3.38438,
+      3.45944,
+      3.49523,
+      3.4986,
+      3.50067,
+      3.62283,
+      3.62524,
+      3.62645,
+      3.70349,
+      3.70602,
+      3.70728,
+      3.73147,
+      3.73618,
+      3.73746,
+      3.79843,
+      3.79976,
+      3.80219,
+      3.80463,
+      3.81131,
+      3.81197,
+      3.81264,
+      3.81621,
+      3.8621,
+      3.87173,
+      3.89114,
+      3.94244,
+      3.95991,
+      3.96064,
+      3.96377,
+      3.96401,
+      3.96473,
+      3.96497,
+      3.96594,
+      3.96618,
+      3.96714,
+      3.96738,
+      3.96811,
+      3.96859,
+      3.97367,
+      3.97416,
+      3.97561,
+      3.97609,
+      3.97706,
+      3.97755,
+      3.97779,
+      3.97852,
+      3.97998,
+      3.98022,
+      3.98046,
+      3.98095,
+      3.98119,
+      3.98192,
+      3.98217,
+      3.98241,
+      3.98265,
+      3.98436,
+      3.98484,
+      3.98533,
+      3.9863,
+      3.98704,
+      3.98777,
+      3.98801,
+      3.98826,
+      3.98874,
+      3.98948,
+      3.98972,
+      3.98996,
+      3.99021,
+      3.99118,
+      3.99167,
+      3.99192,
+      3.99216,
+      3.99265,
+      3.9929,
+      3.99314,
+      3.99338,
+      4,
+      4,
+      4,
+      5.43514,
+      5.43605,
+      5.44362,
+      5.46033,
+      5.46766,
+      5.4913,
+      5.50769,
+      5.50862,
+      5.51545,
+      5.53386,
+      5.5417,
+      5.54673,
+      5.54768,
+      5.55587,
+      5.5584,
+      5.56504,
+      5.56536,
+      5.56916,
+      5.57328,
+      5.5736,
+      5.57614,
+      5.57614,
+      5.57773,
+      5.57837,
+      5.5806,
+      5.58155,
+      5.58187,
+      5.58187,
+      5.58219,
+      5.58283,
+      5.58283,
+      5.58315,
+      5.58347,
+      5.59721,
+      5.59721,
+      5.59753,
+      5.59785,
+      5.59977,
+      5.60073,
+      5.60105,
+      5.60426,
+      5.60555,
+      5.60555,
+      5.60651,
+      5.61843,
+      5.70695,
+      5.70828,
+      5.71162,
+      5.71429,
+      5.71529,
+      5.71529,
+      5.71562,
+      5.71696,
+      5.71997,
+      5.72298,
+      5.72398,
+      5.72398,
+      5.72432,
+      5.72499,
+      5.91805,
+      5.91836,
+      5.92235,
+      5.92266,
+      5.92666,
+      5.92799,
+      5.9285,
+      5.93282,
+      5.95294,
+      5.9576,
+      5.96913,
+      5.97163,
+      5.97601,
+      5.97914,
+      5.98353,
+      5.98385,
+      5.98699,
+      5.98824,
+      5.98856,
+      5.9917,
+      5.99265,
+      5.99989,
+      6,
+      6,
+      6.00463,
+      6.05016,
+      6.10552,
+      6.11305,
+      6.11829,
+      6.11993,
+      6.15492,
+      6.15659,
+      6.15791,
+      6.16157,
+      6.1669,
+      6.16757,
+      6.16957,
+      6.17391,
+      6.1816,
+      6.23668,
+      6.25617,
+      6.26923,
+      6.2713,
+      6.27509,
+      6.30805,
+      6.32133,
+      6.32343,
+      6.347,
+      6.38715,
+      6.41444,
+      6.42817,
+      6.43034,
+      6.46166,
+      6.46899,
+      6.48295,
+      6.4848,
+      6.50291,
+      6.58016,
+      6.58092,
+      6.59538,
+      6.59728,
+      6.62332,
+      6.63797,
+      6.65306,
+      6.655,
+      6.70348,
+      6.74789,
+      6.75588,
+      6.77111,
+      6.77352,
+      6.81642,
+      6.83111,
+      6.83193,
+      6.83438,
+      6.83971,
+      6.84997,
+      6.86564,
+      6.86605,
+      6.87764,
+      6.88178,
+      6.89676,
+      6.89759,
+      6.91348,
+      6.92985,
+      6.94081,
+      6.94208,
+      6.9425,
+      6.94546,
+      6.9552,
+      6.95689,
+      6.95944,
+      6.96199,
+      6.96411,
+      6.97603,
+      6.97817,
+      6.99442,
+      6.99657,
+      7,
+      7,
+      13,
+      19
+    ],
+    "rawComponents": 103,
+    "uniqueSingleAnchorComponents": 50,
+    "rejectedUnanchoredComponents": 53,
+    "rejectedMultiAnchorComponents": 0
+  },
+  "ceilingEvidence": {
+    "sourceSheet": "A151",
+    "controls": 61,
+    "heightResolved": 57,
+    "slopedControls": 7,
+    "controlsData": [
+      {
+        "controlId": "a151-ceiling-001",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          220.939904,
+          150.122692
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.257144,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-002",
+        "ceilingType": "C1",
+        "registeredPointFt": [
+          220.939904,
+          154.853042
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.257139,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-003",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          175.354356,
+          130.561449
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.612842,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-004",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          187.906591,
+          149.90252
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.257112,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-005",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          166.251014,
+          153.298506
+        ],
+        "heightText": "12' - 11 3/8\"",
+        "heightFt": 12.947917,
+        "heightDistanceFt": 2.165321,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-006",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          165.312789,
+          141.889743
+        ],
+        "heightText": "9' - 0 3/8\"",
+        "heightFt": 9.03125,
+        "heightDistanceFt": 2.492051,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-007",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          158.546614,
+          129.695104
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.631213,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-008",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          147.419952,
+          131.791991
+        ],
+        "heightText": "9' - 4 3/4\"",
+        "heightFt": 9.395833,
+        "heightDistanceFt": 1.631213,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-009",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          136.513279,
+          129.695104
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.636621,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-010",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          126.126627,
+          131.709219
+        ],
+        "heightText": "9' - 4 3/4\"",
+        "heightFt": 9.395833,
+        "heightDistanceFt": 1.631213,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-011",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          105.326636,
+          131.604375
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.631213,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-012",
+        "ceilingType": "C7",
+        "registeredPointFt": [
+          70.193305,
+          152.764755
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.754114,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-013",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          141.50661,
+          139.429509
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.387227,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-014",
+        "ceilingType": "C7",
+        "registeredPointFt": [
+          91.80663,
+          152.738068
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.754114,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-015",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          59.217783,
+          117.031009
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.631483,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-016",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          69.733305,
+          127.134694
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.631213,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-017",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          59.084427,
+          108.720714
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.631483,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-018",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          62.731995,
+          102.661813
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.631483,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-019",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          60.884866,
+          129.055001
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.074294,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-020",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          74.053304,
+          106.513464
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.079031,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-021",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          65.352651,
+          99.078349
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.84738,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-022",
+        "ceilingType": "C9",
+        "registeredPointFt": [
+          168.815459,
+          80.431835
+        ],
+        "heightText": "12' - 11 3/8\"",
+        "heightFt": 12.947917,
+        "heightDistanceFt": 2.237534,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-023",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          166.555831,
+          90.645113
+        ],
+        "heightText": "12' - 11 3/8\"",
+        "heightFt": 12.947917,
+        "heightDistanceFt": 2.260374,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-024",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          172.738302,
+          97.80802
+        ],
+        "heightText": "9' - 0 3/4\"",
+        "heightFt": 9.0625,
+        "heightDistanceFt": 1.849943,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-025",
+        "ceilingType": "C1",
+        "registeredPointFt": [
+          223.879906,
+          81.802282
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.41335,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-026",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          203.426574,
+          115.783913
+        ],
+        "heightText": "19' - 5 3/8\"",
+        "heightFt": 19.447917,
+        "heightDistanceFt": 1.837434,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-027",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          203.273263,
+          110.045063
+        ],
+        "heightText": "19' - 5 3/8\"",
+        "heightFt": 19.447917,
+        "heightDistanceFt": 4.995794,
+        "sloped": true,
+        "slopeDistanceFt": 1.440236,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-028",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          203.273263,
+          127.079513
+        ],
+        "heightText": null,
+        "heightFt": null,
+        "heightDistanceFt": null,
+        "sloped": true,
+        "slopeDistanceFt": 1.436494,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-029",
+        "ceilingType": "C1",
+        "registeredPointFt": [
+          191.739923,
+          131.157407
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.074225,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-030",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          139.099955,
+          96.915484
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.413344,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-031",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          151.673273,
+          116.915128
+        ],
+        "heightText": "19' - 4 5/8\"",
+        "heightFt": 19.385417,
+        "heightDistanceFt": 1.837398,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-032",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          149.43994,
+          125.341304
+        ],
+        "heightText": null,
+        "heightFt": null,
+        "heightDistanceFt": null,
+        "sloped": true,
+        "slopeDistanceFt": 1.436494,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-033",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          149.733273,
+          110.039545
+        ],
+        "heightText": null,
+        "heightFt": null,
+        "heightDistanceFt": null,
+        "sloped": true,
+        "slopeDistanceFt": 1.440211,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-034",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          125.33995,
+          115.783913
+        ],
+        "heightText": "19' - 4 5/8\"",
+        "heightFt": 19.385417,
+        "heightDistanceFt": 1.837398,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-035",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          121.626629,
+          125.424076
+        ],
+        "heightText": null,
+        "heightFt": null,
+        "heightDistanceFt": null,
+        "sloped": true,
+        "slopeDistanceFt": 1.436494,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-036",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          125.313283,
+          111.783273
+        ],
+        "heightText": "19' - 4 5/8\"",
+        "heightFt": 19.385417,
+        "heightDistanceFt": 3.421103,
+        "sloped": true,
+        "slopeDistanceFt": 1.436494,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-037",
+        "ceilingType": "C1",
+        "registeredPointFt": [
+          90.366642,
+          117.483495
+        ],
+        "heightText": "15' - 6\"",
+        "heightFt": 15.5,
+        "heightDistanceFt": 1.215904,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-038",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          76.970761,
+          129.209509
+        ],
+        "heightText": "9' - 2 1/2\"",
+        "heightFt": 9.208333,
+        "heightDistanceFt": 1.630239,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-039",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          101.91997,
+          134.826959
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.631178,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-040",
+        "ceilingType": "C1",
+        "registeredPointFt": [
+          92.999963,
+          128.563888
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.07424,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-041",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          200.526598,
+          105.691263
+        ],
+        "heightText": "9' - 4 3/4\"",
+        "heightFt": 9.395833,
+        "heightDistanceFt": 1.631178,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-042",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          157.35327,
+          102.678368
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.631178,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-043",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          148.526607,
+          105.884398
+        ],
+        "heightText": "9' - 4 3/4\"",
+        "heightFt": 9.395833,
+        "heightDistanceFt": 1.631178,
+        "sloped": true,
+        "slopeDistanceFt": 3.176648,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-044",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          135.499946,
+          102.656295
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.631178,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-045",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          118.106619,
+          105.856807
+        ],
+        "heightText": "9' - 4 3/4\"",
+        "heightFt": 9.395833,
+        "heightDistanceFt": 1.631178,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-046",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          104.193292,
+          94.388961
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.869222,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-047",
+        "ceilingType": "C7",
+        "registeredPointFt": [
+          149.713273,
+          92.819454
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.863895,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-048",
+        "ceilingType": "C7",
+        "registeredPointFt": [
+          117.739964,
+          97.210218
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.861188,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-049",
+        "ceilingType": "C7",
+        "registeredPointFt": [
+          101.066626,
+          86.150965
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.869222,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-050",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          91.293308,
+          92.765861
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.874004,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-051",
+        "ceilingType": "C7",
+        "registeredPointFt": [
+          85.279977,
+          97.210218
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.861188,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-052",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          192.466601,
+          107.087349
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.07424,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-053",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          115.279943,
+          140.962346
+        ],
+        "heightText": "10' - 0\"",
+        "heightFt": 10,
+        "heightDistanceFt": 1.936839,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-054",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          203.546585,
+          149.495536
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.754082,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-055",
+        "ceilingType": "C7",
+        "registeredPointFt": [
+          186.866592,
+          131.196033
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.628008,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-056",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          59.531194,
+          127.211948
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.079099,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-057",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          104.326636,
+          139.301394
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.849549,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-058",
+        "ceilingType": "C7",
+        "registeredPointFt": [
+          128.773282,
+          84.765205
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.869222,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-059",
+        "ceilingType": "C7",
+        "registeredPointFt": [
+          132.346614,
+          91.694003
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.869222,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-060",
+        "ceilingType": "C4",
+        "registeredPointFt": [
+          102.353304,
+          152.184291
+        ],
+        "heightText": "8' - 0 3/4\"",
+        "heightFt": 8.0625,
+        "heightDistanceFt": 1.754082,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      },
+      {
+        "controlId": "a151-ceiling-061",
+        "ceilingType": "C3",
+        "registeredPointFt": [
+          195.5266,
+          95.705816
+        ],
+        "heightText": "8' - 0\"",
+        "heightFt": 8,
+        "heightDistanceFt": 1.413355,
+        "sloped": false,
+        "slopeDistanceFt": null,
+        "sourceSheet": "A151"
+      }
+    ]
+  },
+  "spaces": [
+    {
+      "roomNumber": "101",
+      "roomName": "BISHOP",
+      "sourceAnchorFt": [
+        210.173249,
+        81.413301
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 36,
+        "areaSqft": 91.6412,
+        "polygon": [
+          [
+            206.0536,
+            79.6793
+          ],
+          [
+            211.2073,
+            79.6793
+          ],
+          [
+            211.2073,
+            77.4477
+          ],
+          [
+            214.6431,
+            77.4477
+          ],
+          [
+            214.6431,
+            89.5619
+          ],
+          [
+            206.0536,
+            89.5619
+          ],
+          [
+            206.0536,
+            88.9243
+          ],
+          [
+            206.6262,
+            88.9243
+          ],
+          [
+            206.6262,
+            87.3303
+          ],
+          [
+            206.0536,
+            87.3303
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "102",
+      "roomName": "WAITING",
+      "sourceAnchorFt": [
+        208.639916,
+        92.46663
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 13,
+        "areaSqft": 144.3988,
+        "polygon": [
+          [
+            172.8408,
+            75.535
+          ],
+          [
+            173.4134,
+            75.535
+          ],
+          [
+            173.4134,
+            75.2162
+          ],
+          [
+            173.9861,
+            75.2162
+          ],
+          [
+            173.9861,
+            83.5048
+          ],
+          [
+            175.704,
+            83.5048
+          ],
+          [
+            175.704,
+            91.4747
+          ],
+          [
+            189.4472,
+            91.4747
+          ],
+          [
+            189.4472,
+            90.8371
+          ],
+          [
+            203.1904,
+            90.8371
+          ],
+          [
+            203.1904,
+            91.4747
+          ],
+          [
+            214.6431,
+            91.4747
+          ],
+          [
+            214.6431,
+            92.7498
+          ],
+          [
+            216.361,
+            92.7498
+          ],
+          [
+            216.361,
+            93.7062
+          ],
+          [
+            215.7884,
+            93.7062
+          ],
+          [
+            215.7884,
+            94.025
+          ],
+          [
+            191.1651,
+            94.025
+          ],
+          [
+            191.1651,
+            93.7062
+          ],
+          [
+            190.5925,
+            93.7062
+          ],
+          [
+            190.5925,
+            93.3874
+          ],
+          [
+            190.0198,
+            93.3874
+          ],
+          [
+            190.0198,
+            92.7498
+          ],
+          [
+            189.4472,
+            92.7498
+          ],
+          [
+            189.4472,
+            92.431
+          ],
+          [
+            187.7293,
+            92.431
+          ],
+          [
+            187.7293,
+            92.7498
+          ],
+          [
+            187.1566,
+            92.7498
+          ],
+          [
+            187.1566,
+            93.3874
+          ],
+          [
+            186.584,
+            93.3874
+          ],
+          [
+            186.584,
+            94.025
+          ],
+          [
+            172.8408,
+            94.025
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "103",
+      "roomName": "CLERK",
+      "sourceAnchorFt": [
+        198.186587,
+        78.479969
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 54,
+        "areaSqft": 49.6542,
+        "polygon": [
+          [
+            197.4641,
+            74.8974
+          ],
+          [
+            203.1904,
+            74.8974
+          ],
+          [
+            203.1904,
+            81.5921
+          ],
+          [
+            202.6178,
+            81.5921
+          ],
+          [
+            202.6178,
+            83.186
+          ],
+          [
+            200.3272,
+            83.186
+          ],
+          [
+            200.3272,
+            83.5048
+          ],
+          [
+            199.7546,
+            83.5048
+          ],
+          [
+            199.7546,
+            84.4612
+          ],
+          [
+            197.4641,
+            84.4612
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "104",
+      "roomName": "CLERK",
+      "sourceAnchorFt": [
+        192.519923,
+        78.479969
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 53,
+        "areaSqft": 50.2019,
+        "polygon": [
+          [
+            189.4472,
+            74.8974
+          ],
+          [
+            191.1651,
+            74.8974
+          ],
+          [
+            191.1651,
+            74.5786
+          ],
+          [
+            192.3104,
+            74.5786
+          ],
+          [
+            192.3104,
+            74.8974
+          ],
+          [
+            195.1735,
+            74.8974
+          ],
+          [
+            195.1735,
+            84.4612
+          ],
+          [
+            192.883,
+            84.4612
+          ],
+          [
+            192.883,
+            83.8236
+          ],
+          [
+            192.3104,
+            83.8236
+          ],
+          [
+            192.3104,
+            83.186
+          ],
+          [
+            190.0198,
+            83.186
+          ],
+          [
+            190.0198,
+            81.5921
+          ],
+          [
+            189.4472,
+            81.5921
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "105",
+      "roomName": "BISHOP",
+      "sourceAnchorFt": [
+        181.613261,
+        81.213301
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 16,
+        "areaSqft": 120.8496,
+        "polygon": [
+          [
+            176.8492,
+            75.535
+          ],
+          [
+            183.1482,
+            75.535
+          ],
+          [
+            183.1482,
+            75.8538
+          ],
+          [
+            186.584,
+            75.8538
+          ],
+          [
+            186.584,
+            87.3303
+          ],
+          [
+            186.0114,
+            87.3303
+          ],
+          [
+            186.0114,
+            88.9243
+          ],
+          [
+            186.584,
+            88.9243
+          ],
+          [
+            186.584,
+            89.5619
+          ],
+          [
+            178.5671,
+            89.5619
+          ],
+          [
+            178.5671,
+            81.5921
+          ],
+          [
+            176.8492,
+            81.5921
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "108",
+      "roomName": "FOYER",
+      "sourceAnchorFt": [
+        167.977395,
+        86.906632
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 10,
+        "areaSqft": 173.6072,
+        "polygon": [
+          [
+            151.6533,
+            91.4747
+          ],
+          [
+            159.0976,
+            91.4747
+          ],
+          [
+            159.0976,
+            90.8371
+          ],
+          [
+            160.2428,
+            90.8371
+          ],
+          [
+            160.2428,
+            91.4747
+          ],
+          [
+            163.106,
+            91.4747
+          ],
+          [
+            163.106,
+            83.5048
+          ],
+          [
+            164.8239,
+            83.5048
+          ],
+          [
+            164.8239,
+            76.1726
+          ],
+          [
+            165.3965,
+            76.1726
+          ],
+          [
+            165.3965,
+            75.8538
+          ],
+          [
+            168.8323,
+            75.8538
+          ],
+          [
+            168.8323,
+            75.535
+          ],
+          [
+            169.405,
+            75.535
+          ],
+          [
+            169.405,
+            75.8538
+          ],
+          [
+            171.1229,
+            75.8538
+          ],
+          [
+            171.1229,
+            94.025
+          ],
+          [
+            157.9523,
+            94.025
+          ],
+          [
+            157.9523,
+            92.431
+          ],
+          [
+            155.6617,
+            92.431
+          ],
+          [
+            155.6617,
+            94.9814
+          ],
+          [
+            165.9692,
+            94.9814
+          ],
+          [
+            165.9692,
+            95.9378
+          ],
+          [
+            152.7986,
+            95.9378
+          ],
+          [
+            152.7986,
+            94.6626
+          ],
+          [
+            152.2259,
+            94.6626
+          ],
+          [
+            152.2259,
+            92.431
+          ],
+          [
+            151.6533,
+            92.431
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-022",
+          "ceilingType": "C9",
+          "registeredPointFt": [
+            168.815459,
+            80.431835
+          ],
+          "heightText": "12' - 11 3/8\"",
+          "heightFt": 12.947917,
+          "heightDistanceFt": 2.237534,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        },
+        {
+          "controlId": "a151-ceiling-023",
+          "ceilingType": "C4",
+          "registeredPointFt": [
+            166.555831,
+            90.645113
+          ],
+          "heightText": "12' - 11 3/8\"",
+          "heightFt": 12.947917,
+          "heightDistanceFt": 2.260374,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 12.947917,
+        "maximumHeightFt": 12.947917,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "109",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        155.853271,
+        80.599968
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 18,
+        "areaSqft": 109.8965,
+        "polygon": [
+          [
+            151.6533,
+            75.535
+          ],
+          [
+            156.2344,
+            75.535
+          ],
+          [
+            156.2344,
+            76.4914
+          ],
+          [
+            157.3797,
+            76.4914
+          ],
+          [
+            157.3797,
+            76.8102
+          ],
+          [
+            161.9607,
+            76.8102
+          ],
+          [
+            161.9607,
+            82.2297
+          ],
+          [
+            160.8155,
+            82.2297
+          ],
+          [
+            160.8155,
+            88.2867
+          ],
+          [
+            158.5249,
+            88.2867
+          ],
+          [
+            158.5249,
+            88.6055
+          ],
+          [
+            157.9523,
+            88.6055
+          ],
+          [
+            157.9523,
+            89.2431
+          ],
+          [
+            157.3797,
+            89.2431
+          ],
+          [
+            157.3797,
+            87.9679
+          ],
+          [
+            151.6533,
+            87.9679
+          ],
+          [
+            151.6533,
+            82.8672
+          ],
+          [
+            153.3712,
+            82.8672
+          ],
+          [
+            153.3712,
+            82.5484
+          ],
+          [
+            153.9438,
+            82.5484
+          ],
+          [
+            153.9438,
+            81.9109
+          ],
+          [
+            154.5165,
+            81.9109
+          ],
+          [
+            154.5165,
+            80.9545
+          ],
+          [
+            153.9438,
+            80.9545
+          ],
+          [
+            153.9438,
+            80.6357
+          ],
+          [
+            153.3712,
+            80.6357
+          ],
+          [
+            153.3712,
+            79.9981
+          ],
+          [
+            151.6533,
+            79.9981
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "110",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        143.868689,
+        80.253301
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 22,
+        "areaSqft": 105.1501,
+        "polygon": [
+          [
+            141.3459,
+            74.8974
+          ],
+          [
+            141.9185,
+            74.8974
+          ],
+          [
+            141.9185,
+            74.5786
+          ],
+          [
+            143.0638,
+            74.5786
+          ],
+          [
+            143.0638,
+            74.8974
+          ],
+          [
+            146.4996,
+            74.8974
+          ],
+          [
+            146.4996,
+            74.5786
+          ],
+          [
+            147.0722,
+            74.5786
+          ],
+          [
+            147.0722,
+            74.2598
+          ],
+          [
+            147.6449,
+            74.2598
+          ],
+          [
+            147.6449,
+            74.8974
+          ],
+          [
+            149.3628,
+            74.8974
+          ],
+          [
+            149.3628,
+            80.3169
+          ],
+          [
+            148.2175,
+            80.3169
+          ],
+          [
+            148.2175,
+            80.6357
+          ],
+          [
+            147.6449,
+            80.6357
+          ],
+          [
+            147.6449,
+            80.9545
+          ],
+          [
+            147.0722,
+            80.9545
+          ],
+          [
+            147.0722,
+            82.5484
+          ],
+          [
+            147.6449,
+            82.5484
+          ],
+          [
+            147.6449,
+            82.8672
+          ],
+          [
+            148.2175,
+            82.8672
+          ],
+          [
+            148.2175,
+            83.186
+          ],
+          [
+            149.3628,
+            83.186
+          ],
+          [
+            149.3628,
+            87.9679
+          ],
+          [
+            143.6364,
+            87.9679
+          ],
+          [
+            143.6364,
+            89.8807
+          ],
+          [
+            141.9185,
+            89.8807
+          ],
+          [
+            141.9185,
+            90.8371
+          ],
+          [
+            141.3459,
+            90.8371
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "111",
+      "roomName": "FIRE RISER",
+      "sourceAnchorFt": [
+        135.471798,
+        68.826639
+      ],
+      "geometry": {
+        "status": "blocked",
+        "componentIndex": null,
+        "areaSqft": null,
+        "polygon": null
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "closed-source-room-component-not-found",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "112",
+      "roomName": "SERVING AREA",
+      "sourceAnchorFt": [
+        131.739846,
+        81.959967
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 23,
+        "areaSqft": 104.6024,
+        "polygon": [
+          [
+            127.6027,
+            75.535
+          ],
+          [
+            128.1753,
+            75.535
+          ],
+          [
+            128.1753,
+            74.8974
+          ],
+          [
+            129.8932,
+            74.8974
+          ],
+          [
+            129.8932,
+            75.535
+          ],
+          [
+            130.4658,
+            75.535
+          ],
+          [
+            130.4658,
+            76.8102
+          ],
+          [
+            131.0385,
+            76.8102
+          ],
+          [
+            131.0385,
+            77.129
+          ],
+          [
+            132.7564,
+            77.129
+          ],
+          [
+            132.7564,
+            79.0417
+          ],
+          [
+            135.6195,
+            79.0417
+          ],
+          [
+            135.6195,
+            79.3605
+          ],
+          [
+            137.3374,
+            79.3605
+          ],
+          [
+            137.3374,
+            79.0417
+          ],
+          [
+            137.9101,
+            79.0417
+          ],
+          [
+            137.9101,
+            80.6357
+          ],
+          [
+            135.6195,
+            80.6357
+          ],
+          [
+            135.6195,
+            81.5921
+          ],
+          [
+            137.9101,
+            81.5921
+          ],
+          [
+            137.9101,
+            85.4176
+          ],
+          [
+            136.1922,
+            85.4176
+          ],
+          [
+            136.1922,
+            88.2867
+          ],
+          [
+            132.7564,
+            88.2867
+          ],
+          [
+            132.7564,
+            87.9679
+          ],
+          [
+            132.1837,
+            87.9679
+          ],
+          [
+            132.1837,
+            87.6491
+          ],
+          [
+            130.4658,
+            87.6491
+          ],
+          [
+            130.4658,
+            87.9679
+          ],
+          [
+            129.8932,
+            87.9679
+          ],
+          [
+            129.8932,
+            88.2867
+          ],
+          [
+            129.3206,
+            88.2867
+          ],
+          [
+            129.3206,
+            89.8807
+          ],
+          [
+            127.6027,
+            89.8807
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-058",
+          "ceilingType": "C7",
+          "registeredPointFt": [
+            128.773282,
+            84.765205
+          ],
+          "heightText": "8' - 0 3/4\"",
+          "heightFt": 8.0625,
+          "heightDistanceFt": 1.869222,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 8.0625,
+        "maximumHeightFt": 8.0625,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "113",
+      "roomName": "CORRIDOR",
+      "sourceAnchorFt": [
+        123.902748,
+        93.119963
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 42,
+        "areaSqft": 75.7592,
+        "polygon": [
+          [
+            119.0131,
+            91.4747
+          ],
+          [
+            121.8763,
+            91.4747
+          ],
+          [
+            121.8763,
+            90.1995
+          ],
+          [
+            122.4489,
+            90.1995
+          ],
+          [
+            122.4489,
+            90.8371
+          ],
+          [
+            123.5942,
+            90.8371
+          ],
+          [
+            123.5942,
+            91.4747
+          ],
+          [
+            124.1669,
+            91.4747
+          ],
+          [
+            124.1669,
+            91.7935
+          ],
+          [
+            124.7395,
+            91.7935
+          ],
+          [
+            124.7395,
+            92.1123
+          ],
+          [
+            139.0553,
+            92.1123
+          ],
+          [
+            139.0553,
+            92.7498
+          ],
+          [
+            139.628,
+            92.7498
+          ],
+          [
+            139.628,
+            93.0686
+          ],
+          [
+            143.0638,
+            93.0686
+          ],
+          [
+            143.0638,
+            92.7498
+          ],
+          [
+            143.6364,
+            92.7498
+          ],
+          [
+            143.6364,
+            91.4747
+          ],
+          [
+            145.927,
+            91.4747
+          ],
+          [
+            145.927,
+            92.1123
+          ],
+          [
+            144.2091,
+            92.1123
+          ],
+          [
+            144.2091,
+            94.9814
+          ],
+          [
+            142.4912,
+            94.9814
+          ],
+          [
+            142.4912,
+            94.3438
+          ],
+          [
+            136.7648,
+            94.3438
+          ],
+          [
+            136.7648,
+            95.9378
+          ],
+          [
+            133.9016,
+            95.9378
+          ],
+          [
+            133.9016,
+            94.3438
+          ],
+          [
+            128.1753,
+            94.3438
+          ],
+          [
+            128.1753,
+            95.9378
+          ],
+          [
+            120.1584,
+            95.9378
+          ],
+          [
+            120.1584,
+            94.025
+          ],
+          [
+            119.5858,
+            94.025
+          ],
+          [
+            119.5858,
+            92.431
+          ],
+          [
+            119.0131,
+            92.431
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "114",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        120.370722,
+        80.559968
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 67,
+        "areaSqft": 39.4313,
+        "polygon": [
+          [
+            116.15,
+            77.7665
+          ],
+          [
+            116.7226,
+            77.7665
+          ],
+          [
+            116.7226,
+            77.129
+          ],
+          [
+            119.5858,
+            77.129
+          ],
+          [
+            119.5858,
+            77.7665
+          ],
+          [
+            119.0131,
+            77.7665
+          ],
+          [
+            119.0131,
+            79.0417
+          ],
+          [
+            119.5858,
+            79.0417
+          ],
+          [
+            119.5858,
+            79.6793
+          ],
+          [
+            120.1584,
+            79.6793
+          ],
+          [
+            120.1584,
+            79.9981
+          ],
+          [
+            120.731,
+            79.9981
+          ],
+          [
+            120.731,
+            80.3169
+          ],
+          [
+            122.4489,
+            80.3169
+          ],
+          [
+            122.4489,
+            79.9981
+          ],
+          [
+            123.0216,
+            79.9981
+          ],
+          [
+            123.0216,
+            79.3605
+          ],
+          [
+            123.5942,
+            79.3605
+          ],
+          [
+            123.5942,
+            87.9679
+          ],
+          [
+            121.8763,
+            87.9679
+          ],
+          [
+            121.8763,
+            83.5048
+          ],
+          [
+            116.15,
+            83.5048
+          ],
+          [
+            116.15,
+            82.2297
+          ],
+          [
+            116.7226,
+            82.2297
+          ],
+          [
+            116.7226,
+            81.9109
+          ],
+          [
+            117.2952,
+            81.9109
+          ],
+          [
+            117.2952,
+            81.5921
+          ],
+          [
+            117.8679,
+            81.5921
+          ],
+          [
+            117.8679,
+            80.6357
+          ],
+          [
+            117.2952,
+            80.6357
+          ],
+          [
+            117.2952,
+            79.9981
+          ],
+          [
+            116.7226,
+            79.9981
+          ],
+          [
+            116.7226,
+            79.6793
+          ],
+          [
+            116.15,
+            79.6793
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "115",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        108.37329,
+        80.559968
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 63,
+        "areaSqft": 41.6219,
+        "polygon": [
+          [
+            105.2699,
+            77.4477
+          ],
+          [
+            105.8425,
+            77.4477
+          ],
+          [
+            105.8425,
+            74.8974
+          ],
+          [
+            109.851,
+            74.8974
+          ],
+          [
+            109.851,
+            76.4914
+          ],
+          [
+            106.9878,
+            76.4914
+          ],
+          [
+            106.9878,
+            78.0853
+          ],
+          [
+            107.5604,
+            78.0853
+          ],
+          [
+            107.5604,
+            79.0417
+          ],
+          [
+            109.851,
+            79.0417
+          ],
+          [
+            109.851,
+            86.0552
+          ],
+          [
+            109.2784,
+            86.0552
+          ],
+          [
+            109.2784,
+            85.4176
+          ],
+          [
+            107.5604,
+            85.4176
+          ],
+          [
+            107.5604,
+            85.7364
+          ],
+          [
+            106.9878,
+            85.7364
+          ],
+          [
+            106.9878,
+            86.374
+          ],
+          [
+            106.4152,
+            86.374
+          ],
+          [
+            106.4152,
+            87.9679
+          ],
+          [
+            105.2699,
+            87.9679
+          ],
+          [
+            105.2699,
+            82.2297
+          ],
+          [
+            105.8425,
+            82.2297
+          ],
+          [
+            105.8425,
+            81.9109
+          ],
+          [
+            106.4152,
+            81.9109
+          ],
+          [
+            106.4152,
+            80.3169
+          ],
+          [
+            105.8425,
+            80.3169
+          ],
+          [
+            105.8425,
+            79.6793
+          ],
+          [
+            105.2699,
+            79.6793
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "116",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        98.279961,
+        80.559968
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 31,
+        "areaSqft": 96.7527,
+        "polygon": [
+          [
+            94.3899,
+            74.8974
+          ],
+          [
+            94.9625,
+            74.8974
+          ],
+          [
+            94.9625,
+            74.5786
+          ],
+          [
+            96.1078,
+            74.5786
+          ],
+          [
+            96.1078,
+            74.8974
+          ],
+          [
+            97.253,
+            74.8974
+          ],
+          [
+            97.253,
+            77.129
+          ],
+          [
+            102.9794,
+            77.129
+          ],
+          [
+            102.9794,
+            77.7665
+          ],
+          [
+            103.552,
+            77.7665
+          ],
+          [
+            103.552,
+            79.6793
+          ],
+          [
+            102.4067,
+            79.6793
+          ],
+          [
+            102.4067,
+            80.3169
+          ],
+          [
+            101.8341,
+            80.3169
+          ],
+          [
+            101.8341,
+            81.9109
+          ],
+          [
+            102.4067,
+            81.9109
+          ],
+          [
+            102.4067,
+            82.2297
+          ],
+          [
+            103.552,
+            82.2297
+          ],
+          [
+            103.552,
+            87.9679
+          ],
+          [
+            96.1078,
+            87.9679
+          ],
+          [
+            96.1078,
+            88.2867
+          ],
+          [
+            94.9625,
+            88.2867
+          ],
+          [
+            94.9625,
+            87.9679
+          ],
+          [
+            94.3899,
+            87.9679
+          ],
+          [
+            94.3899,
+            82.8672
+          ],
+          [
+            96.1078,
+            82.8672
+          ],
+          [
+            96.1078,
+            82.2297
+          ],
+          [
+            96.6804,
+            82.2297
+          ],
+          [
+            96.6804,
+            80.9545
+          ],
+          [
+            96.1078,
+            80.9545
+          ],
+          [
+            96.1078,
+            80.3169
+          ],
+          [
+            95.5351,
+            80.3169
+          ],
+          [
+            95.5351,
+            79.9981
+          ],
+          [
+            94.3899,
+            79.9981
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-049",
+          "ceilingType": "C7",
+          "registeredPointFt": [
+            101.066626,
+            86.150965
+          ],
+          "heightText": "8' - 0 3/4\"",
+          "heightFt": 8.0625,
+          "heightDistanceFt": 1.869222,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 8.0625,
+        "maximumHeightFt": 8.0625,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "117",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        86.666632,
+        80.559968
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 21,
+        "areaSqft": 105.6978,
+        "polygon": [
+          [
+            82.9372,
+            76.1726
+          ],
+          [
+            90.3814,
+            76.1726
+          ],
+          [
+            90.3814,
+            75.535
+          ],
+          [
+            90.954,
+            75.535
+          ],
+          [
+            90.954,
+            74.5786
+          ],
+          [
+            91.5267,
+            74.5786
+          ],
+          [
+            91.5267,
+            74.8974
+          ],
+          [
+            92.0993,
+            74.8974
+          ],
+          [
+            92.0993,
+            79.9981
+          ],
+          [
+            90.954,
+            79.9981
+          ],
+          [
+            90.954,
+            80.3169
+          ],
+          [
+            90.3814,
+            80.3169
+          ],
+          [
+            90.3814,
+            80.6357
+          ],
+          [
+            89.8088,
+            80.6357
+          ],
+          [
+            89.8088,
+            82.2297
+          ],
+          [
+            90.3814,
+            82.2297
+          ],
+          [
+            90.3814,
+            82.8672
+          ],
+          [
+            92.0993,
+            82.8672
+          ],
+          [
+            92.0993,
+            88.2867
+          ],
+          [
+            89.2361,
+            88.2867
+          ],
+          [
+            89.2361,
+            88.6055
+          ],
+          [
+            88.6635,
+            88.6055
+          ],
+          [
+            88.6635,
+            87.9679
+          ],
+          [
+            82.9372,
+            87.9679
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "118",
+      "roomName": "FOYER",
+      "sourceAnchorFt": [
+        77.926554,
+        81.666634
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 25,
+        "areaSqft": 102.7769,
+        "polygon": [
+          [
+            73.2024,
+            91.4747
+          ],
+          [
+            75.4929,
+            91.4747
+          ],
+          [
+            75.4929,
+            75.8538
+          ],
+          [
+            76.0655,
+            75.8538
+          ],
+          [
+            76.0655,
+            75.535
+          ],
+          [
+            80.074,
+            75.535
+          ],
+          [
+            80.074,
+            75.8538
+          ],
+          [
+            80.6466,
+            75.8538
+          ],
+          [
+            80.6466,
+            76.1726
+          ],
+          [
+            81.2193,
+            76.1726
+          ],
+          [
+            81.2193,
+            88.9243
+          ],
+          [
+            76.0655,
+            88.9243
+          ],
+          [
+            76.0655,
+            91.1559
+          ],
+          [
+            81.2193,
+            91.1559
+          ],
+          [
+            81.2193,
+            91.4747
+          ],
+          [
+            83.5098,
+            91.4747
+          ],
+          [
+            83.5098,
+            92.1123
+          ],
+          [
+            82.9372,
+            92.1123
+          ],
+          [
+            82.9372,
+            93.7062
+          ],
+          [
+            82.3645,
+            93.7062
+          ],
+          [
+            82.3645,
+            95.3002
+          ],
+          [
+            81.7919,
+            95.3002
+          ],
+          [
+            81.7919,
+            94.6626
+          ],
+          [
+            77.2108,
+            94.6626
+          ],
+          [
+            77.2108,
+            93.0686
+          ],
+          [
+            76.6382,
+            93.0686
+          ],
+          [
+            76.6382,
+            92.7498
+          ],
+          [
+            73.2024,
+            92.7498
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "119",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        57.226644,
+        84.106633
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 2,
+        "areaSqft": 481.7554,
+        "polygon": [
+          [
+            42.8527,
+            83.5048
+          ],
+          [
+            43.4254,
+            83.5048
+          ],
+          [
+            43.4254,
+            78.4041
+          ],
+          [
+            43.998,
+            78.4041
+          ],
+          [
+            43.998,
+            76.4914
+          ],
+          [
+            43.4254,
+            76.4914
+          ],
+          [
+            43.4254,
+            74.8974
+          ],
+          [
+            46.8612,
+            74.8974
+          ],
+          [
+            46.8612,
+            74.5786
+          ],
+          [
+            48.0065,
+            74.5786
+          ],
+          [
+            48.0065,
+            74.8974
+          ],
+          [
+            62.895,
+            74.8974
+          ],
+          [
+            62.895,
+            74.2598
+          ],
+          [
+            63.4676,
+            74.2598
+          ],
+          [
+            63.4676,
+            74.5786
+          ],
+          [
+            64.0402,
+            74.5786
+          ],
+          [
+            64.0402,
+            74.8974
+          ],
+          [
+            65.7581,
+            74.8974
+          ],
+          [
+            65.7581,
+            76.1726
+          ],
+          [
+            69.1939,
+            76.1726
+          ],
+          [
+            69.1939,
+            76.8102
+          ],
+          [
+            68.6213,
+            76.8102
+          ],
+          [
+            68.6213,
+            77.129
+          ],
+          [
+            66.9034,
+            77.129
+          ],
+          [
+            66.9034,
+            77.7665
+          ],
+          [
+            66.3308,
+            77.7665
+          ],
+          [
+            66.3308,
+            78.4041
+          ],
+          [
+            65.7581,
+            78.4041
+          ],
+          [
+            65.7581,
+            79.6793
+          ],
+          [
+            66.3308,
+            79.6793
+          ],
+          [
+            66.3308,
+            80.3169
+          ],
+          [
+            66.9034,
+            80.3169
+          ],
+          [
+            66.9034,
+            80.9545
+          ],
+          [
+            69.1939,
+            80.9545
+          ],
+          [
+            69.1939,
+            80.6357
+          ],
+          [
+            69.7666,
+            80.6357
+          ],
+          [
+            69.7666,
+            79.9981
+          ],
+          [
+            70.3392,
+            79.9981
+          ],
+          [
+            70.3392,
+            77.7665
+          ],
+          [
+            70.9118,
+            77.7665
+          ],
+          [
+            70.9118,
+            77.129
+          ],
+          [
+            73.2024,
+            77.129
+          ],
+          [
+            73.2024,
+            79.9981
+          ],
+          [
+            71.4845,
+            79.9981
+          ],
+          [
+            71.4845,
+            80.6357
+          ],
+          [
+            70.9118,
+            80.6357
+          ],
+          [
+            70.9118,
+            80.9545
+          ],
+          [
+            70.3392,
+            80.9545
+          ],
+          [
+            70.3392,
+            81.9109
+          ],
+          [
+            70.9118,
+            81.9109
+          ],
+          [
+            70.9118,
+            82.5484
+          ],
+          [
+            71.4845,
+            82.5484
+          ],
+          [
+            71.4845,
+            82.8672
+          ],
+          [
+            73.2024,
+            82.8672
+          ],
+          [
+            73.2024,
+            86.6928
+          ],
+          [
+            70.9118,
+            86.6928
+          ],
+          [
+            70.9118,
+            92.7498
+          ],
+          [
+            62.3223,
+            92.7498
+          ],
+          [
+            62.3223,
+            92.1123
+          ],
+          [
+            60.6044,
+            92.1123
+          ],
+          [
+            60.6044,
+            92.7498
+          ],
+          [
+            56.596,
+            92.7498
+          ],
+          [
+            56.596,
+            92.1123
+          ],
+          [
+            54.3054,
+            92.1123
+          ],
+          [
+            54.3054,
+            92.7498
+          ],
+          [
+            43.4254,
+            92.7498
+          ],
+          [
+            43.4254,
+            89.8807
+          ],
+          [
+            42.8527,
+            89.8807
+          ],
+          [
+            42.8527,
+            88.2867
+          ],
+          [
+            43.4254,
+            88.2867
+          ],
+          [
+            43.4254,
+            85.0988
+          ],
+          [
+            42.8527,
+            85.0988
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "120",
+      "roomName": "FONT",
+      "sourceAnchorFt": [
+        59.999976,
+        98.568723
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 78,
+        "areaSqft": 25.7399,
+        "polygon": [
+          [
+            58.8865,
+            97.5317
+          ],
+          [
+            60.6044,
+            97.5317
+          ],
+          [
+            60.6044,
+            96.8942
+          ],
+          [
+            61.1771,
+            96.8942
+          ],
+          [
+            61.1771,
+            97.8505
+          ],
+          [
+            67.476,
+            97.8505
+          ],
+          [
+            67.476,
+            100.7197
+          ],
+          [
+            58.8865,
+            100.7197
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-021",
+          "ceilingType": "C4",
+          "registeredPointFt": [
+            65.352651,
+            99.078349
+          ],
+          "heightText": "8' - 0 3/4\"",
+          "heightFt": 8.0625,
+          "heightDistanceFt": 1.84738,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 8.0625,
+        "maximumHeightFt": 8.0625,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "121",
+      "roomName": "WOMEN'S ADA",
+      "sourceAnchorFt": [
+        58.079977,
+        104.086081
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 101,
+        "areaSqft": 16.4297,
+        "polygon": [
+          [
+            56.0233,
+            102.6324
+          ],
+          [
+            58.8865,
+            102.6324
+          ],
+          [
+            58.8865,
+            102.3137
+          ],
+          [
+            61.1771,
+            102.3137
+          ],
+          [
+            61.1771,
+            102.9512
+          ],
+          [
+            60.6044,
+            102.9512
+          ],
+          [
+            60.6044,
+            104.5452
+          ],
+          [
+            61.1771,
+            104.5452
+          ],
+          [
+            61.1771,
+            104.864
+          ],
+          [
+            61.7497,
+            104.864
+          ],
+          [
+            61.7497,
+            106.1392
+          ],
+          [
+            59.4591,
+            106.1392
+          ],
+          [
+            59.4591,
+            107.0956
+          ],
+          [
+            58.8865,
+            107.0956
+          ],
+          [
+            58.8865,
+            105.8204
+          ],
+          [
+            58.3139,
+            105.8204
+          ],
+          [
+            58.3139,
+            105.5016
+          ],
+          [
+            57.1686,
+            105.5016
+          ],
+          [
+            57.1686,
+            105.1828
+          ],
+          [
+            56.596,
+            105.1828
+          ],
+          [
+            56.596,
+            103.9076
+          ],
+          [
+            56.0233,
+            103.9076
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "122",
+      "roomName": "WOMEN'S",
+      "sourceAnchorFt": [
+        69.853305,
+        127.869451
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 39,
+        "areaSqft": 84.8868,
+        "polygon": [
+          [
+            64.0402,
+            127.4983
+          ],
+          [
+            69.7666,
+            127.4983
+          ],
+          [
+            69.7666,
+            126.2232
+          ],
+          [
+            66.9034,
+            126.2232
+          ],
+          [
+            66.9034,
+            124.6292
+          ],
+          [
+            66.3308,
+            124.6292
+          ],
+          [
+            66.3308,
+            124.3104
+          ],
+          [
+            65.1855,
+            124.3104
+          ],
+          [
+            65.1855,
+            123.6728
+          ],
+          [
+            66.3308,
+            123.6728
+          ],
+          [
+            66.3308,
+            123.0352
+          ],
+          [
+            66.9034,
+            123.0352
+          ],
+          [
+            66.9034,
+            122.0789
+          ],
+          [
+            66.3308,
+            122.0789
+          ],
+          [
+            66.3308,
+            121.7601
+          ],
+          [
+            65.1855,
+            121.7601
+          ],
+          [
+            65.1855,
+            120.4849
+          ],
+          [
+            66.3308,
+            120.4849
+          ],
+          [
+            66.3308,
+            120.1661
+          ],
+          [
+            66.9034,
+            120.1661
+          ],
+          [
+            66.9034,
+            119.5285
+          ],
+          [
+            73.2024,
+            119.5285
+          ],
+          [
+            73.2024,
+            131.6427
+          ],
+          [
+            66.9034,
+            131.6427
+          ],
+          [
+            66.9034,
+            131.0051
+          ],
+          [
+            65.1855,
+            131.0051
+          ],
+          [
+            65.1855,
+            129.4111
+          ],
+          [
+            64.6129,
+            129.4111
+          ],
+          [
+            64.6129,
+            129.0923
+          ],
+          [
+            64.0402,
+            129.0923
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "123",
+      "roomName": "MEMBER CUSTODIAL",
+      "sourceAnchorFt": [
+        58.999976,
+        111.615692
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 76,
+        "areaSqft": 28.2956,
+        "polygon": [
+          [
+            56.0233,
+            110.2835
+          ],
+          [
+            59.4591,
+            110.2835
+          ],
+          [
+            59.4591,
+            111.5587
+          ],
+          [
+            61.7497,
+            111.5587
+          ],
+          [
+            61.7497,
+            114.4278
+          ],
+          [
+            61.1771,
+            114.4278
+          ],
+          [
+            61.1771,
+            116.9782
+          ],
+          [
+            58.8865,
+            116.9782
+          ],
+          [
+            58.8865,
+            117.297
+          ],
+          [
+            57.7412,
+            117.297
+          ],
+          [
+            57.7412,
+            115.3842
+          ],
+          [
+            57.1686,
+            115.3842
+          ],
+          [
+            57.1686,
+            112.515
+          ],
+          [
+            56.0233,
+            112.515
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "124",
+      "roomName": "MEN'S",
+      "sourceAnchorFt": [
+        45.573315,
+        114.380576
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 28,
+        "areaSqft": 98.7608,
+        "polygon": [
+          [
+            42.8527,
+            105.8204
+          ],
+          [
+            43.4254,
+            105.8204
+          ],
+          [
+            43.4254,
+            105.1828
+          ],
+          [
+            44.5706,
+            105.1828
+          ],
+          [
+            44.5706,
+            103.9076
+          ],
+          [
+            46.8612,
+            103.9076
+          ],
+          [
+            46.8612,
+            103.5888
+          ],
+          [
+            47.4338,
+            103.5888
+          ],
+          [
+            47.4338,
+            102.3137
+          ],
+          [
+            52.5875,
+            102.3137
+          ],
+          [
+            52.5875,
+            104.5452
+          ],
+          [
+            53.7328,
+            104.5452
+          ],
+          [
+            53.7328,
+            106.458
+          ],
+          [
+            53.1602,
+            106.458
+          ],
+          [
+            53.1602,
+            106.7768
+          ],
+          [
+            51.4423,
+            106.7768
+          ],
+          [
+            51.4423,
+            108.6895
+          ],
+          [
+            49.1517,
+            108.6895
+          ],
+          [
+            49.1517,
+            109.0083
+          ],
+          [
+            48.5791,
+            109.0083
+          ],
+          [
+            48.5791,
+            109.9647
+          ],
+          [
+            51.4423,
+            109.9647
+          ],
+          [
+            51.4423,
+            111.8775
+          ],
+          [
+            49.7244,
+            111.8775
+          ],
+          [
+            49.7244,
+            112.8338
+          ],
+          [
+            49.1517,
+            112.8338
+          ],
+          [
+            49.1517,
+            114.7466
+          ],
+          [
+            49.7244,
+            114.7466
+          ],
+          [
+            49.7244,
+            115.3842
+          ],
+          [
+            49.1517,
+            115.3842
+          ],
+          [
+            49.1517,
+            117.297
+          ],
+          [
+            47.4338,
+            117.297
+          ],
+          [
+            47.4338,
+            118.5721
+          ],
+          [
+            43.4254,
+            118.5721
+          ],
+          [
+            43.4254,
+            117.9345
+          ],
+          [
+            43.998,
+            117.9345
+          ],
+          [
+            43.998,
+            117.6157
+          ],
+          [
+            44.5706,
+            117.6157
+          ],
+          [
+            44.5706,
+            117.297
+          ],
+          [
+            45.1433,
+            117.297
+          ],
+          [
+            45.1433,
+            115.703
+          ],
+          [
+            44.5706,
+            115.703
+          ],
+          [
+            44.5706,
+            114.7466
+          ],
+          [
+            45.1433,
+            114.7466
+          ],
+          [
+            45.1433,
+            113.1526
+          ],
+          [
+            44.5706,
+            113.1526
+          ],
+          [
+            44.5706,
+            111.8775
+          ],
+          [
+            45.1433,
+            111.8775
+          ],
+          [
+            45.1433,
+            110.2835
+          ],
+          [
+            44.5706,
+            110.2835
+          ],
+          [
+            44.5706,
+            109.9647
+          ],
+          [
+            43.4254,
+            109.9647
+          ],
+          [
+            43.4254,
+            106.458
+          ],
+          [
+            42.8527,
+            106.458
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "125",
+      "roomName": "MOTHER'S ROOM",
+      "sourceAnchorFt": [
+        45.533315,
+        126.567539
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 57,
+        "areaSqft": 48.7415,
+        "polygon": [
+          [
+            43.998,
+            124.6292
+          ],
+          [
+            49.1517,
+            124.6292
+          ],
+          [
+            49.1517,
+            124.3104
+          ],
+          [
+            50.8696,
+            124.3104
+          ],
+          [
+            50.8696,
+            124.6292
+          ],
+          [
+            56.0233,
+            124.6292
+          ],
+          [
+            56.0233,
+            129.0923
+          ],
+          [
+            54.8781,
+            129.0923
+          ],
+          [
+            54.8781,
+            129.7299
+          ],
+          [
+            54.3054,
+            129.7299
+          ],
+          [
+            54.3054,
+            131.0051
+          ],
+          [
+            53.7328,
+            131.0051
+          ],
+          [
+            53.7328,
+            127.1796
+          ],
+          [
+            47.4338,
+            127.1796
+          ],
+          [
+            47.4338,
+            131.6427
+          ],
+          [
+            45.7159,
+            131.6427
+          ],
+          [
+            45.7159,
+            131.3239
+          ],
+          [
+            45.1433,
+            131.3239
+          ],
+          [
+            45.1433,
+            130.6863
+          ],
+          [
+            44.5706,
+            130.6863
+          ],
+          [
+            44.5706,
+            126.542
+          ],
+          [
+            43.998,
+            126.542
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "127",
+      "roomName": "CORRIDOR",
+      "sourceAnchorFt": [
+        77.886624,
+        102.368095
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 56,
+        "areaSqft": 48.924,
+        "polygon": [
+          [
+            77.2108,
+            101.0385
+          ],
+          [
+            77.7835,
+            101.0385
+          ],
+          [
+            77.7835,
+            101.6761
+          ],
+          [
+            79.5014,
+            101.6761
+          ],
+          [
+            79.5014,
+            101.3573
+          ],
+          [
+            80.074,
+            101.3573
+          ],
+          [
+            80.074,
+            118.5721
+          ],
+          [
+            77.2108,
+            118.5721
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "128",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        54.719978,
+        149.493274
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 1,
+        "areaSqft": 500.5583,
+        "polygon": [
+          [
+            42.8527,
+            148.2199
+          ],
+          [
+            43.4254,
+            148.2199
+          ],
+          [
+            43.4254,
+            144.7132
+          ],
+          [
+            43.998,
+            144.7132
+          ],
+          [
+            43.998,
+            143.7568
+          ],
+          [
+            44.5706,
+            143.7568
+          ],
+          [
+            44.5706,
+            142.8004
+          ],
+          [
+            45.1433,
+            142.8004
+          ],
+          [
+            45.1433,
+            141.8441
+          ],
+          [
+            45.7159,
+            141.8441
+          ],
+          [
+            45.7159,
+            140.5689
+          ],
+          [
+            54.3054,
+            140.5689
+          ],
+          [
+            54.3054,
+            141.2065
+          ],
+          [
+            53.7328,
+            141.2065
+          ],
+          [
+            53.7328,
+            142.8004
+          ],
+          [
+            54.3054,
+            142.8004
+          ],
+          [
+            54.3054,
+            143.1192
+          ],
+          [
+            54.8781,
+            143.1192
+          ],
+          [
+            54.8781,
+            143.438
+          ],
+          [
+            56.596,
+            143.438
+          ],
+          [
+            56.596,
+            143.1192
+          ],
+          [
+            57.1686,
+            143.1192
+          ],
+          [
+            57.1686,
+            142.4817
+          ],
+          [
+            57.7412,
+            142.4817
+          ],
+          [
+            57.7412,
+            141.5253
+          ],
+          [
+            57.1686,
+            141.5253
+          ],
+          [
+            57.1686,
+            140.5689
+          ],
+          [
+            66.9034,
+            140.5689
+          ],
+          [
+            66.9034,
+            141.5253
+          ],
+          [
+            66.3308,
+            141.5253
+          ],
+          [
+            66.3308,
+            142.4817
+          ],
+          [
+            66.9034,
+            142.4817
+          ],
+          [
+            66.9034,
+            145.032
+          ],
+          [
+            67.476,
+            145.032
+          ],
+          [
+            67.476,
+            151.7267
+          ],
+          [
+            65.1855,
+            151.7267
+          ],
+          [
+            65.1855,
+            152.3643
+          ],
+          [
+            64.6129,
+            152.3643
+          ],
+          [
+            64.6129,
+            153.9582
+          ],
+          [
+            65.1855,
+            153.9582
+          ],
+          [
+            65.1855,
+            154.5958
+          ],
+          [
+            67.476,
+            154.5958
+          ],
+          [
+            67.476,
+            160.0153
+          ],
+          [
+            66.9034,
+            160.0153
+          ],
+          [
+            66.9034,
+            158.1025
+          ],
+          [
+            66.3308,
+            158.1025
+          ],
+          [
+            66.3308,
+            157.465
+          ],
+          [
+            65.7581,
+            157.465
+          ],
+          [
+            65.7581,
+            157.1462
+          ],
+          [
+            63.4676,
+            157.1462
+          ],
+          [
+            63.4676,
+            157.7837
+          ],
+          [
+            62.895,
+            157.7837
+          ],
+          [
+            62.895,
+            158.4213
+          ],
+          [
+            62.3223,
+            158.4213
+          ],
+          [
+            62.3223,
+            159.6965
+          ],
+          [
+            62.895,
+            159.6965
+          ],
+          [
+            62.895,
+            160.0153
+          ],
+          [
+            63.4676,
+            160.0153
+          ],
+          [
+            63.4676,
+            160.6529
+          ],
+          [
+            64.0402,
+            160.6529
+          ],
+          [
+            64.0402,
+            160.9717
+          ],
+          [
+            65.7581,
+            160.9717
+          ],
+          [
+            65.7581,
+            161.9281
+          ],
+          [
+            65.1855,
+            161.9281
+          ],
+          [
+            65.1855,
+            163.2032
+          ],
+          [
+            64.0402,
+            163.2032
+          ],
+          [
+            64.0402,
+            163.522
+          ],
+          [
+            62.895,
+            163.522
+          ],
+          [
+            62.895,
+            163.2032
+          ],
+          [
+            48.0065,
+            163.2032
+          ],
+          [
+            48.0065,
+            163.522
+          ],
+          [
+            46.8612,
+            163.522
+          ],
+          [
+            46.8612,
+            163.2032
+          ],
+          [
+            43.4254,
+            163.2032
+          ],
+          [
+            43.4254,
+            161.6093
+          ],
+          [
+            43.998,
+            161.6093
+          ],
+          [
+            43.998,
+            159.6965
+          ],
+          [
+            43.4254,
+            159.6965
+          ],
+          [
+            43.4254,
+            154.5958
+          ],
+          [
+            42.8527,
+            154.5958
+          ],
+          [
+            42.8527,
+            152.683
+          ],
+          [
+            43.4254,
+            152.683
+          ],
+          [
+            43.4254,
+            149.8139
+          ],
+          [
+            42.8527,
+            149.8139
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "129",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        72.546638,
+        154.746605
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 37,
+        "areaSqft": 89.9983,
+        "polygon": [
+          [
+            69.7666,
+            150.1327
+          ],
+          [
+            74.9203,
+            150.1327
+          ],
+          [
+            74.9203,
+            149.1763
+          ],
+          [
+            77.7835,
+            149.1763
+          ],
+          [
+            77.7835,
+            154.9146
+          ],
+          [
+            76.6382,
+            154.9146
+          ],
+          [
+            76.6382,
+            155.2334
+          ],
+          [
+            76.0655,
+            155.2334
+          ],
+          [
+            76.0655,
+            155.871
+          ],
+          [
+            75.4929,
+            155.871
+          ],
+          [
+            75.4929,
+            157.1462
+          ],
+          [
+            76.0655,
+            157.1462
+          ],
+          [
+            76.0655,
+            157.7837
+          ],
+          [
+            76.6382,
+            157.7837
+          ],
+          [
+            76.6382,
+            158.1025
+          ],
+          [
+            77.7835,
+            158.1025
+          ],
+          [
+            77.7835,
+            163.2032
+          ],
+          [
+            77.2108,
+            163.2032
+          ],
+          [
+            77.2108,
+            161.9281
+          ],
+          [
+            76.6382,
+            161.9281
+          ],
+          [
+            76.6382,
+            161.6093
+          ],
+          [
+            69.7666,
+            161.6093
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-012",
+          "ceilingType": "C7",
+          "registeredPointFt": [
+            70.193305,
+            152.764755
+          ],
+          "heightText": "8' - 0 3/4\"",
+          "heightFt": 8.0625,
+          "heightDistanceFt": 1.754114,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 8.0625,
+        "maximumHeightFt": 8.0625,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "130",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        84.408279,
+        154.653271
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 27,
+        "areaSqft": 101.3165,
+        "polygon": [
+          [
+            80.074,
+            149.1763
+          ],
+          [
+            82.9372,
+            149.1763
+          ],
+          [
+            82.9372,
+            148.8575
+          ],
+          [
+            83.5098,
+            148.8575
+          ],
+          [
+            83.5098,
+            147.9011
+          ],
+          [
+            84.6551,
+            147.9011
+          ],
+          [
+            84.6551,
+            150.1327
+          ],
+          [
+            88.6635,
+            150.1327
+          ],
+          [
+            88.6635,
+            161.6093
+          ],
+          [
+            82.3645,
+            161.6093
+          ],
+          [
+            82.3645,
+            161.9281
+          ],
+          [
+            81.7919,
+            161.9281
+          ],
+          [
+            81.7919,
+            163.522
+          ],
+          [
+            80.6466,
+            163.522
+          ],
+          [
+            80.6466,
+            163.2032
+          ],
+          [
+            80.074,
+            163.2032
+          ],
+          [
+            80.074,
+            158.1025
+          ],
+          [
+            81.7919,
+            158.1025
+          ],
+          [
+            81.7919,
+            157.465
+          ],
+          [
+            82.3645,
+            157.465
+          ],
+          [
+            82.3645,
+            155.5522
+          ],
+          [
+            81.7919,
+            155.5522
+          ],
+          [
+            81.7919,
+            154.9146
+          ],
+          [
+            80.074,
+            154.9146
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "131",
+      "roomName": "ROOM",
+      "sourceAnchorFt": [
+        94.226629,
+        154.679938
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 59,
+        "areaSqft": 47.4636,
+        "polygon": [
+          [
+            90.954,
+            150.1327
+          ],
+          [
+            92.672,
+            150.1327
+          ],
+          [
+            92.672,
+            153.0018
+          ],
+          [
+            97.253,
+            153.0018
+          ],
+          [
+            97.253,
+            159.0589
+          ],
+          [
+            92.672,
+            159.0589
+          ],
+          [
+            92.672,
+            161.6093
+          ],
+          [
+            90.954,
+            161.6093
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-014",
+          "ceilingType": "C7",
+          "registeredPointFt": [
+            91.80663,
+            152.738068
+          ],
+          "heightText": "8' - 0 3/4\"",
+          "heightFt": 8.0625,
+          "heightDistanceFt": 1.754114,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 8.0625,
+        "maximumHeightFt": 8.0625,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "132",
+      "roomName": "WAITING",
+      "sourceAnchorFt": [
+        106.439957,
+        148.253274
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 74,
+        "areaSqft": 29.9386,
+        "polygon": [
+          [
+            101.2615,
+            147.9011
+          ],
+          [
+            109.2784,
+            147.9011
+          ],
+          [
+            109.2784,
+            151.0891
+          ],
+          [
+            109.851,
+            151.0891
+          ],
+          [
+            109.851,
+            153.0018
+          ],
+          [
+            104.1246,
+            153.0018
+          ],
+          [
+            104.1246,
+            152.3643
+          ],
+          [
+            105.8425,
+            152.3643
+          ],
+          [
+            105.8425,
+            150.1327
+          ],
+          [
+            101.2615,
+            150.1327
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "133",
+      "roomName": "CLERK",
+      "sourceAnchorFt": [
+        104.079958,
+        156.093271
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 61,
+        "areaSqft": 44.9079,
+        "polygon": [
+          [
+            101.2615,
+            154.5958
+          ],
+          [
+            104.6973,
+            154.5958
+          ],
+          [
+            104.6973,
+            154.9146
+          ],
+          [
+            106.4152,
+            154.9146
+          ],
+          [
+            106.4152,
+            156.1898
+          ],
+          [
+            106.9878,
+            156.1898
+          ],
+          [
+            106.9878,
+            156.8274
+          ],
+          [
+            107.5604,
+            156.8274
+          ],
+          [
+            107.5604,
+            157.1462
+          ],
+          [
+            108.1331,
+            157.1462
+          ],
+          [
+            108.1331,
+            158.1025
+          ],
+          [
+            106.4152,
+            158.1025
+          ],
+          [
+            106.4152,
+            158.4213
+          ],
+          [
+            105.8425,
+            158.4213
+          ],
+          [
+            105.8425,
+            160.3341
+          ],
+          [
+            106.4152,
+            160.3341
+          ],
+          [
+            106.4152,
+            160.9717
+          ],
+          [
+            108.1331,
+            160.9717
+          ],
+          [
+            108.1331,
+            163.2032
+          ],
+          [
+            105.2699,
+            163.2032
+          ],
+          [
+            105.2699,
+            163.522
+          ],
+          [
+            104.1246,
+            163.522
+          ],
+          [
+            104.1246,
+            163.2032
+          ],
+          [
+            101.2615,
+            163.2032
+          ],
+          [
+            101.2615,
+            161.2905
+          ],
+          [
+            102.9794,
+            161.2905
+          ],
+          [
+            102.9794,
+            160.0153
+          ],
+          [
+            101.2615,
+            160.0153
+          ],
+          [
+            101.2615,
+            157.7837
+          ],
+          [
+            102.9794,
+            157.7837
+          ],
+          [
+            102.9794,
+            156.5086
+          ],
+          [
+            101.2615,
+            156.5086
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "134",
+      "roomName": "STAKE PRESIDENT",
+      "sourceAnchorFt": [
+        124.315928,
+        157.879937
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 19,
+        "areaSqft": 107.5233,
+        "polygon": [
+          [
+            117.2952,
+            156.5086
+          ],
+          [
+            117.8679,
+            156.5086
+          ],
+          [
+            117.8679,
+            156.1898
+          ],
+          [
+            118.4405,
+            156.1898
+          ],
+          [
+            118.4405,
+            154.5958
+          ],
+          [
+            120.1584,
+            154.5958
+          ],
+          [
+            120.1584,
+            153.9582
+          ],
+          [
+            123.5942,
+            153.9582
+          ],
+          [
+            123.5942,
+            155.5522
+          ],
+          [
+            124.1669,
+            155.5522
+          ],
+          [
+            124.1669,
+            156.1898
+          ],
+          [
+            126.4574,
+            156.1898
+          ],
+          [
+            126.4574,
+            155.5522
+          ],
+          [
+            127.03,
+            155.5522
+          ],
+          [
+            127.03,
+            153.9582
+          ],
+          [
+            133.329,
+            153.9582
+          ],
+          [
+            133.329,
+            162.2469
+          ],
+          [
+            117.2952,
+            162.2469
+          ],
+          [
+            117.2952,
+            160.6529
+          ],
+          [
+            123.0216,
+            160.6529
+          ],
+          [
+            123.0216,
+            158.1025
+          ],
+          [
+            117.2952,
+            158.1025
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "135",
+      "roomName": "CORRIDOR",
+      "sourceAnchorFt": [
+        128.154507,
+        142.58661
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 83,
+        "areaSqft": 23.3667,
+        "polygon": [
+          [
+            121.3037,
+            141.5253
+          ],
+          [
+            137.3374,
+            141.5253
+          ],
+          [
+            137.3374,
+            142.1629
+          ],
+          [
+            131.6111,
+            142.1629
+          ],
+          [
+            131.6111,
+            144.7132
+          ],
+          [
+            126.4574,
+            144.7132
+          ],
+          [
+            126.4574,
+            142.1629
+          ],
+          [
+            121.3037,
+            142.1629
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "136",
+      "roomName": "HIGH COUNCIL",
+      "sourceAnchorFt": [
+        147.174132,
+        155.106605
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 4,
+        "areaSqft": 290.0755,
+        "polygon": [
+          [
+            136.1922,
+            151.7267
+          ],
+          [
+            136.7648,
+            151.7267
+          ],
+          [
+            136.7648,
+            152.3643
+          ],
+          [
+            142.4912,
+            152.3643
+          ],
+          [
+            142.4912,
+            149.8139
+          ],
+          [
+            137.3374,
+            149.8139
+          ],
+          [
+            137.3374,
+            148.5387
+          ],
+          [
+            139.0553,
+            148.5387
+          ],
+          [
+            139.0553,
+            147.9011
+          ],
+          [
+            147.0722,
+            147.9011
+          ],
+          [
+            147.0722,
+            148.5387
+          ],
+          [
+            146.4996,
+            148.5387
+          ],
+          [
+            146.4996,
+            149.8139
+          ],
+          [
+            147.0722,
+            149.8139
+          ],
+          [
+            147.0722,
+            150.4515
+          ],
+          [
+            147.6449,
+            150.4515
+          ],
+          [
+            147.6449,
+            150.7703
+          ],
+          [
+            149.3628,
+            150.7703
+          ],
+          [
+            149.3628,
+            150.4515
+          ],
+          [
+            149.9354,
+            150.4515
+          ],
+          [
+            149.9354,
+            149.8139
+          ],
+          [
+            150.508,
+            149.8139
+          ],
+          [
+            150.508,
+            148.5387
+          ],
+          [
+            149.9354,
+            148.5387
+          ],
+          [
+            149.9354,
+            147.9011
+          ],
+          [
+            157.3797,
+            147.9011
+          ],
+          [
+            157.3797,
+            148.5387
+          ],
+          [
+            159.6702,
+            148.5387
+          ],
+          [
+            159.6702,
+            151.0891
+          ],
+          [
+            160.8155,
+            151.0891
+          ],
+          [
+            160.8155,
+            155.5522
+          ],
+          [
+            161.3881,
+            155.5522
+          ],
+          [
+            161.3881,
+            156.8274
+          ],
+          [
+            157.9523,
+            156.8274
+          ],
+          [
+            157.9523,
+            155.2334
+          ],
+          [
+            155.6617,
+            155.2334
+          ],
+          [
+            155.6617,
+            157.7837
+          ],
+          [
+            160.2428,
+            157.7837
+          ],
+          [
+            160.2428,
+            158.7401
+          ],
+          [
+            159.6702,
+            158.7401
+          ],
+          [
+            159.6702,
+            160.0153
+          ],
+          [
+            160.2428,
+            160.0153
+          ],
+          [
+            160.2428,
+            160.6529
+          ],
+          [
+            160.8155,
+            160.6529
+          ],
+          [
+            160.8155,
+            162.2469
+          ],
+          [
+            158.5249,
+            162.2469
+          ],
+          [
+            158.5249,
+            160.9717
+          ],
+          [
+            157.9523,
+            160.9717
+          ],
+          [
+            157.9523,
+            160.3341
+          ],
+          [
+            157.3797,
+            160.3341
+          ],
+          [
+            157.3797,
+            160.0153
+          ],
+          [
+            156.807,
+            160.0153
+          ],
+          [
+            156.807,
+            159.6965
+          ],
+          [
+            155.0891,
+            159.6965
+          ],
+          [
+            155.0891,
+            160.0153
+          ],
+          [
+            154.5165,
+            160.0153
+          ],
+          [
+            154.5165,
+            160.6529
+          ],
+          [
+            153.9438,
+            160.6529
+          ],
+          [
+            153.9438,
+            162.2469
+          ],
+          [
+            142.4912,
+            162.2469
+          ],
+          [
+            142.4912,
+            160.6529
+          ],
+          [
+            136.7648,
+            160.6529
+          ],
+          [
+            136.7648,
+            160.9717
+          ],
+          [
+            136.1922,
+            160.9717
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "138",
+      "roomName": "FOYER",
+      "sourceAnchorFt": [
+        169.182018,
+        148.093274
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 45,
+        "areaSqft": 69.1873,
+        "polygon": [
+          [
+            165.3965,
+            145.6696
+          ],
+          [
+            167.1144,
+            145.6696
+          ],
+          [
+            167.1144,
+            145.032
+          ],
+          [
+            167.6871,
+            145.032
+          ],
+          [
+            167.6871,
+            144.3944
+          ],
+          [
+            168.2597,
+            144.3944
+          ],
+          [
+            168.2597,
+            142.8004
+          ],
+          [
+            167.6871,
+            142.8004
+          ],
+          [
+            167.6871,
+            142.1629
+          ],
+          [
+            167.1144,
+            142.1629
+          ],
+          [
+            167.1144,
+            141.5253
+          ],
+          [
+            171.1229,
+            141.5253
+          ],
+          [
+            171.1229,
+            156.8274
+          ],
+          [
+            165.3965,
+            156.8274
+          ],
+          [
+            165.3965,
+            153.3206
+          ],
+          [
+            168.8323,
+            153.3206
+          ],
+          [
+            168.8323,
+            150.7703
+          ],
+          [
+            165.3965,
+            150.7703
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "139",
+      "roomName": "WAITING",
+      "sourceAnchorFt": [
+        183.57326,
+        149.773273
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 33,
+        "areaSqft": 94.7446,
+        "polygon": [
+          [
+            175.1313,
+            143.1192
+          ],
+          [
+            177.9945,
+            143.1192
+          ],
+          [
+            177.9945,
+            142.8004
+          ],
+          [
+            178.5671,
+            142.8004
+          ],
+          [
+            178.5671,
+            140.5689
+          ],
+          [
+            181.4303,
+            140.5689
+          ],
+          [
+            181.4303,
+            147.9011
+          ],
+          [
+            183.7208,
+            147.9011
+          ],
+          [
+            183.7208,
+            148.5387
+          ],
+          [
+            186.0114,
+            148.5387
+          ],
+          [
+            186.0114,
+            151.0891
+          ],
+          [
+            187.7293,
+            151.0891
+          ],
+          [
+            187.7293,
+            147.9011
+          ],
+          [
+            191.1651,
+            147.9011
+          ],
+          [
+            191.1651,
+            149.4951
+          ],
+          [
+            189.4472,
+            149.4951
+          ],
+          [
+            189.4472,
+            154.5958
+          ],
+          [
+            191.1651,
+            154.5958
+          ],
+          [
+            191.1651,
+            155.5522
+          ],
+          [
+            186.0114,
+            155.5522
+          ],
+          [
+            186.0114,
+            154.9146
+          ],
+          [
+            185.4387,
+            154.9146
+          ],
+          [
+            185.4387,
+            153.6394
+          ],
+          [
+            184.8661,
+            153.6394
+          ],
+          [
+            184.8661,
+            153.0018
+          ],
+          [
+            179.7124,
+            153.0018
+          ],
+          [
+            179.7124,
+            152.683
+          ],
+          [
+            180.285,
+            152.683
+          ],
+          [
+            180.285,
+            152.0455
+          ],
+          [
+            180.8577,
+            152.0455
+          ],
+          [
+            180.8577,
+            151.0891
+          ],
+          [
+            180.285,
+            151.0891
+          ],
+          [
+            180.285,
+            150.4515
+          ],
+          [
+            179.7124,
+            150.4515
+          ],
+          [
+            179.7124,
+            150.1327
+          ],
+          [
+            178.5671,
+            150.1327
+          ],
+          [
+            178.5671,
+            146.3072
+          ],
+          [
+            175.704,
+            146.3072
+          ],
+          [
+            175.704,
+            154.277
+          ],
+          [
+            175.1313,
+            154.277
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-004",
+          "ceilingType": "C3",
+          "registeredPointFt": [
+            187.906591,
+            149.90252
+          ],
+          "heightText": "8' - 0\"",
+          "heightFt": 8,
+          "heightDistanceFt": 1.257112,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 8,
+        "maximumHeightFt": 8,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "140",
+      "roomName": "FAMILY RR",
+      "sourceAnchorFt": [
+        181.26319,
+        158.239937
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 85,
+        "areaSqft": 22.819,
+        "polygon": [
+          [
+            176.8492,
+            160.0153
+          ],
+          [
+            179.1398,
+            160.0153
+          ],
+          [
+            179.1398,
+            158.1025
+          ],
+          [
+            181.4303,
+            158.1025
+          ],
+          [
+            181.4303,
+            157.7837
+          ],
+          [
+            182.0029,
+            157.7837
+          ],
+          [
+            182.0029,
+            158.7401
+          ],
+          [
+            182.5756,
+            158.7401
+          ],
+          [
+            182.5756,
+            159.0589
+          ],
+          [
+            183.7208,
+            159.0589
+          ],
+          [
+            183.7208,
+            159.3777
+          ],
+          [
+            184.2935,
+            159.3777
+          ],
+          [
+            184.2935,
+            160.6529
+          ],
+          [
+            184.8661,
+            160.6529
+          ],
+          [
+            184.8661,
+            161.9281
+          ],
+          [
+            183.1482,
+            161.9281
+          ],
+          [
+            183.1482,
+            162.2469
+          ],
+          [
+            182.5756,
+            162.2469
+          ],
+          [
+            182.5756,
+            162.8844
+          ],
+          [
+            182.0029,
+            162.8844
+          ],
+          [
+            182.0029,
+            162.5657
+          ],
+          [
+            181.4303,
+            162.5657
+          ],
+          [
+            181.4303,
+            162.2469
+          ],
+          [
+            178.5671,
+            162.2469
+          ],
+          [
+            178.5671,
+            160.9717
+          ],
+          [
+            177.4219,
+            160.9717
+          ],
+          [
+            177.4219,
+            160.3341
+          ],
+          [
+            176.8492,
+            160.3341
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "141",
+      "roomName": "CLERK",
+      "sourceAnchorFt": [
+        193.226589,
+        159.09327
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 62,
+        "areaSqft": 42.3521,
+        "polygon": [
+          [
+            187.1566,
+            157.7837
+          ],
+          [
+            190.0198,
+            157.7837
+          ],
+          [
+            190.0198,
+            158.7401
+          ],
+          [
+            190.5925,
+            158.7401
+          ],
+          [
+            190.5925,
+            159.3777
+          ],
+          [
+            192.883,
+            159.3777
+          ],
+          [
+            192.883,
+            159.0589
+          ],
+          [
+            193.4556,
+            159.0589
+          ],
+          [
+            193.4556,
+            157.7837
+          ],
+          [
+            194.6009,
+            157.7837
+          ],
+          [
+            194.6009,
+            158.1025
+          ],
+          [
+            195.1735,
+            158.1025
+          ],
+          [
+            195.1735,
+            158.4213
+          ],
+          [
+            197.4641,
+            158.4213
+          ],
+          [
+            197.4641,
+            160.0153
+          ],
+          [
+            198.0367,
+            160.0153
+          ],
+          [
+            198.0367,
+            162.5657
+          ],
+          [
+            189.4472,
+            162.5657
+          ],
+          [
+            189.4472,
+            162.8844
+          ],
+          [
+            188.8746,
+            162.8844
+          ],
+          [
+            188.8746,
+            163.2032
+          ],
+          [
+            188.3019,
+            163.2032
+          ],
+          [
+            188.3019,
+            162.5657
+          ],
+          [
+            187.7293,
+            162.5657
+          ],
+          [
+            187.7293,
+            162.2469
+          ],
+          [
+            187.1566,
+            162.2469
+          ],
+          [
+            187.1566,
+            161.6093
+          ],
+          [
+            188.8746,
+            161.6093
+          ],
+          [
+            188.8746,
+            160.3341
+          ],
+          [
+            187.1566,
+            160.3341
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "142",
+      "roomName": "BISHOP",
+      "sourceAnchorFt": [
+        208.079917,
+        159.09327
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 52,
+        "areaSqft": 52.575,
+        "polygon": [
+          [
+            200.3272,
+            157.7837
+          ],
+          [
+            214.6431,
+            157.7837
+          ],
+          [
+            214.6431,
+            160.9717
+          ],
+          [
+            211.2073,
+            160.9717
+          ],
+          [
+            211.2073,
+            161.2905
+          ],
+          [
+            210.6347,
+            161.2905
+          ],
+          [
+            210.6347,
+            163.2032
+          ],
+          [
+            208.9168,
+            163.2032
+          ],
+          [
+            208.9168,
+            163.522
+          ],
+          [
+            208.3441,
+            163.522
+          ],
+          [
+            208.3441,
+            162.8844
+          ],
+          [
+            207.7715,
+            162.8844
+          ],
+          [
+            207.7715,
+            162.5657
+          ],
+          [
+            200.3272,
+            162.5657
+          ],
+          [
+            200.3272,
+            161.6093
+          ],
+          [
+            205.481,
+            161.6093
+          ],
+          [
+            205.481,
+            159.3777
+          ],
+          [
+            200.3272,
+            159.3777
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "143",
+      "roomName": "BISHOP",
+      "sourceAnchorFt": [
+        206.746584,
+        144.026609
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 43,
+        "areaSqft": 71.743,
+        "polygon": [
+          [
+            200.3272,
+            144.7132
+          ],
+          [
+            205.481,
+            144.7132
+          ],
+          [
+            205.481,
+            143.1192
+          ],
+          [
+            214.0705,
+            143.1192
+          ],
+          [
+            214.0705,
+            146.9448
+          ],
+          [
+            214.6431,
+            146.9448
+          ],
+          [
+            214.6431,
+            147.9011
+          ],
+          [
+            208.9168,
+            147.9011
+          ],
+          [
+            208.9168,
+            148.8575
+          ],
+          [
+            208.3441,
+            148.8575
+          ],
+          [
+            208.3441,
+            148.5387
+          ],
+          [
+            207.7715,
+            148.5387
+          ],
+          [
+            207.7715,
+            148.2199
+          ],
+          [
+            206.0536,
+            148.2199
+          ],
+          [
+            206.0536,
+            148.8575
+          ],
+          [
+            205.481,
+            148.8575
+          ],
+          [
+            205.481,
+            150.7703
+          ],
+          [
+            203.1904,
+            150.7703
+          ],
+          [
+            203.1904,
+            150.4515
+          ],
+          [
+            201.4725,
+            150.4515
+          ],
+          [
+            201.4725,
+            148.8575
+          ],
+          [
+            200.8999,
+            148.8575
+          ],
+          [
+            200.8999,
+            148.2199
+          ],
+          [
+            200.3272,
+            148.2199
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-054",
+          "ceilingType": "C4",
+          "registeredPointFt": [
+            203.546585,
+            149.495536
+          ],
+          "heightText": "8' - 0 3/4\"",
+          "heightFt": 8.0625,
+          "heightDistanceFt": 1.754082,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 8.0625,
+        "maximumHeightFt": 8.0625,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "144",
+      "roomName": "CLERK",
+      "sourceAnchorFt": [
+        193.853256,
+        142.70661
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 66,
+        "areaSqft": 39.9789,
+        "polygon": [
+          [
+            188.3019,
+            140.5689
+          ],
+          [
+            192.883,
+            140.5689
+          ],
+          [
+            192.883,
+            141.8441
+          ],
+          [
+            194.6009,
+            141.8441
+          ],
+          [
+            194.6009,
+            140.5689
+          ],
+          [
+            198.0367,
+            140.5689
+          ],
+          [
+            198.0367,
+            143.438
+          ],
+          [
+            197.4641,
+            143.438
+          ],
+          [
+            197.4641,
+            145.032
+          ],
+          [
+            195.1735,
+            145.032
+          ],
+          [
+            195.1735,
+            145.3508
+          ],
+          [
+            194.6009,
+            145.3508
+          ],
+          [
+            194.6009,
+            146.3072
+          ],
+          [
+            193.4556,
+            146.3072
+          ],
+          [
+            193.4556,
+            144.7132
+          ],
+          [
+            192.883,
+            144.7132
+          ],
+          [
+            192.883,
+            144.0756
+          ],
+          [
+            190.5925,
+            144.0756
+          ],
+          [
+            190.5925,
+            144.7132
+          ],
+          [
+            190.0198,
+            144.7132
+          ],
+          [
+            190.0198,
+            146.3072
+          ],
+          [
+            188.3019,
+            146.3072
+          ],
+          [
+            188.3019,
+            143.438
+          ],
+          [
+            190.0198,
+            143.438
+          ],
+          [
+            190.0198,
+            142.4817
+          ],
+          [
+            188.3019,
+            142.4817
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "145",
+      "roomName": "SAC PREP",
+      "sourceAnchorFt": [
+        233.826573,
+        133.962933
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 15,
+        "areaSqft": 121.2147,
+        "polygon": [
+          [
+            225.5232,
+            121.1225
+          ],
+          [
+            229.5316,
+            121.1225
+          ],
+          [
+            229.5316,
+            129.7299
+          ],
+          [
+            230.1042,
+            129.7299
+          ],
+          [
+            230.1042,
+            130.3675
+          ],
+          [
+            230.6769,
+            130.3675
+          ],
+          [
+            230.6769,
+            132.599
+          ],
+          [
+            231.2495,
+            132.599
+          ],
+          [
+            231.2495,
+            134.5118
+          ],
+          [
+            233.54,
+            134.5118
+          ],
+          [
+            233.54,
+            132.2803
+          ],
+          [
+            234.1127,
+            132.2803
+          ],
+          [
+            234.1127,
+            133.2366
+          ],
+          [
+            236.9759,
+            133.2366
+          ],
+          [
+            236.9759,
+            138.9749
+          ],
+          [
+            231.2495,
+            138.9749
+          ],
+          [
+            231.2495,
+            139.6125
+          ],
+          [
+            230.6769,
+            139.6125
+          ],
+          [
+            230.6769,
+            139.9313
+          ],
+          [
+            225.5232,
+            139.9313
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "146",
+      "roomName": "ORGAN SPEAKER CHAMBER",
+      "sourceAnchorFt": [
+        246.706568,
+        125.654859
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 8,
+        "areaSqft": 197.5215,
+        "polygon": [
+          [
+            239.2664,
+            131.0051
+          ],
+          [
+            241.5569,
+            131.0051
+          ],
+          [
+            241.5569,
+            127.4983
+          ],
+          [
+            240.9843,
+            127.4983
+          ],
+          [
+            240.9843,
+            124.6292
+          ],
+          [
+            244.9927,
+            124.6292
+          ],
+          [
+            244.9927,
+            119.5285
+          ],
+          [
+            250.1464,
+            119.5285
+          ],
+          [
+            250.1464,
+            125.5856
+          ],
+          [
+            249.5738,
+            125.5856
+          ],
+          [
+            249.5738,
+            127.4983
+          ],
+          [
+            250.1464,
+            127.4983
+          ],
+          [
+            250.1464,
+            141.8441
+          ],
+          [
+            249.5738,
+            141.8441
+          ],
+          [
+            249.5738,
+            142.1629
+          ],
+          [
+            239.839,
+            142.1629
+          ],
+          [
+            239.839,
+            138.0185
+          ],
+          [
+            239.2664,
+            138.0185
+          ],
+          [
+            239.2664,
+            137.0622
+          ],
+          [
+            239.839,
+            137.0622
+          ],
+          [
+            239.839,
+            131.9615
+          ],
+          [
+            239.2664,
+            131.9615
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "147",
+      "roomName": "ROSTRUM",
+      "sourceAnchorFt": [
+        217.893246,
+        120.232466
+      ],
+      "geometry": {
+        "status": "blocked",
+        "componentIndex": null,
+        "areaSqft": null,
+        "polygon": null
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "closed-source-room-component-not-found",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "148",
+      "roomName": "CHAPEL",
+      "sourceAnchorFt": [
+        174.581565,
+        115.508004
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 0,
+        "areaSqft": 558.2448,
+        "polygon": [
+          [
+            173.9861,
+            101.6761
+          ],
+          [
+            176.2766,
+            101.6761
+          ],
+          [
+            176.2766,
+            101.0385
+          ],
+          [
+            183.1482,
+            101.0385
+          ],
+          [
+            183.1482,
+            99.1257
+          ],
+          [
+            187.7293,
+            99.1257
+          ],
+          [
+            187.7293,
+            101.9949
+          ],
+          [
+            189.4472,
+            101.9949
+          ],
+          [
+            189.4472,
+            99.1257
+          ],
+          [
+            195.7462,
+            99.1257
+          ],
+          [
+            195.7462,
+            102.6324
+          ],
+          [
+            194.0283,
+            102.6324
+          ],
+          [
+            194.0283,
+            105.1828
+          ],
+          [
+            199.182,
+            105.1828
+          ],
+          [
+            199.182,
+            102.6324
+          ],
+          [
+            197.4641,
+            102.6324
+          ],
+          [
+            197.4641,
+            99.1257
+          ],
+          [
+            204.9083,
+            99.1257
+          ],
+          [
+            204.9083,
+            118.5721
+          ],
+          [
+            173.9861,
+            118.5721
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-026",
+          "ceilingType": "C4",
+          "registeredPointFt": [
+            203.426574,
+            115.783913
+          ],
+          "heightText": "19' - 5 3/8\"",
+          "heightFt": 19.447917,
+          "heightDistanceFt": 1.837434,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        },
+        {
+          "controlId": "a151-ceiling-027",
+          "ceilingType": "C4",
+          "registeredPointFt": [
+            203.273263,
+            110.045063
+          ],
+          "heightText": "19' - 5 3/8\"",
+          "heightFt": 19.447917,
+          "heightDistanceFt": 4.995794,
+          "sloped": true,
+          "slopeDistanceFt": 1.440236,
+          "sourceSheet": "A151"
+        },
+        {
+          "controlId": "a151-ceiling-041",
+          "ceilingType": "C4",
+          "registeredPointFt": [
+            200.526598,
+            105.691263
+          ],
+          "heightText": "9' - 4 3/4\"",
+          "heightFt": 9.395833,
+          "heightDistanceFt": 1.631178,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        },
+        {
+          "controlId": "a151-ceiling-052",
+          "ceilingType": "C4",
+          "registeredPointFt": [
+            192.466601,
+            107.087349
+          ],
+          "heightText": "8' - 0\"",
+          "heightFt": 8,
+          "heightDistanceFt": 1.07424,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 8,
+        "maximumHeightFt": 19.447917,
+        "sloped": true
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "149",
+      "roomName": "OVERFLOW",
+      "sourceAnchorFt": [
+        149.99994,
+        115.508004
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 24,
+        "areaSqft": 104.4199,
+        "polygon": [
+          [
+            145.927,
+            109.9647
+          ],
+          [
+            158.5249,
+            109.9647
+          ],
+          [
+            158.5249,
+            118.2533
+          ],
+          [
+            145.927,
+            118.2533
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-031",
+          "ceilingType": "C3",
+          "registeredPointFt": [
+            151.673273,
+            116.915128
+          ],
+          "heightText": "19' - 4 5/8\"",
+          "heightFt": 19.385417,
+          "heightDistanceFt": 1.837398,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        },
+        {
+          "controlId": "a151-ceiling-033",
+          "ceilingType": "C3",
+          "registeredPointFt": [
+            149.733273,
+            110.039545
+          ],
+          "heightText": null,
+          "heightFt": null,
+          "heightDistanceFt": null,
+          "sloped": true,
+          "slopeDistanceFt": 1.440211,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 19.385417,
+        "maximumHeightFt": 19.385417,
+        "sloped": true
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "150",
+      "roomName": "CULTURAL CENTER",
+      "sourceAnchorFt": [
+        122.703192,
+        114.890603
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 32,
+        "areaSqft": 95.6574,
+        "polygon": [
+          [
+            116.7226,
+            109.9647
+          ],
+          [
+            129.3206,
+            109.9647
+          ],
+          [
+            129.3206,
+            116.3406
+          ],
+          [
+            127.6027,
+            116.3406
+          ],
+          [
+            127.6027,
+            116.9782
+          ],
+          [
+            127.03,
+            116.9782
+          ],
+          [
+            127.03,
+            118.2533
+          ],
+          [
+            117.8679,
+            118.2533
+          ],
+          [
+            117.8679,
+            114.109
+          ],
+          [
+            116.7226,
+            114.109
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-034",
+          "ceilingType": "C3",
+          "registeredPointFt": [
+            125.33995,
+            115.783913
+          ],
+          "heightText": "19' - 4 5/8\"",
+          "heightFt": 19.385417,
+          "heightDistanceFt": 1.837398,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        },
+        {
+          "controlId": "a151-ceiling-036",
+          "ceilingType": "C3",
+          "registeredPointFt": [
+            125.313283,
+            111.783273
+          ],
+          "heightText": "19' - 4 5/8\"",
+          "heightFt": 19.385417,
+          "heightDistanceFt": 3.421103,
+          "sloped": true,
+          "slopeDistanceFt": 1.436494,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 19.385417,
+        "maximumHeightFt": 19.385417,
+        "sloped": true
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "151",
+      "roomName": "PLATFORM",
+      "sourceAnchorFt": [
+        93.466629,
+        115.185882
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 17,
+        "areaSqft": 117.5637,
+        "polygon": [
+          [
+            85.2277,
+            111.5587
+          ],
+          [
+            85.8003,
+            111.5587
+          ],
+          [
+            85.8003,
+            111.2399
+          ],
+          [
+            86.373,
+            111.2399
+          ],
+          [
+            86.373,
+            110.6023
+          ],
+          [
+            86.9456,
+            110.6023
+          ],
+          [
+            86.9456,
+            109.3271
+          ],
+          [
+            99.5436,
+            109.3271
+          ],
+          [
+            99.5436,
+            118.5721
+          ],
+          [
+            87.5182,
+            118.5721
+          ],
+          [
+            87.5182,
+            113.4714
+          ],
+          [
+            85.2277,
+            113.4714
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-037",
+          "ceilingType": "C1",
+          "registeredPointFt": [
+            90.366642,
+            117.483495
+          ],
+          "heightText": "15' - 6\"",
+          "heightFt": 15.5,
+          "heightDistanceFt": 1.215904,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 15.5,
+        "maximumHeightFt": 15.5,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "152",
+      "roomName": "STORAGE",
+      "sourceAnchorFt": [
+        101.559959,
+        134.32532
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 91,
+        "areaSqft": 19.5331,
+        "polygon": [
+          [
+            101.2615,
+            132.2803
+          ],
+          [
+            103.552,
+            132.2803
+          ],
+          [
+            103.552,
+            133.8742
+          ],
+          [
+            104.1246,
+            133.8742
+          ],
+          [
+            104.1246,
+            134.5118
+          ],
+          [
+            104.6973,
+            134.5118
+          ],
+          [
+            104.6973,
+            136.7434
+          ],
+          [
+            104.1246,
+            136.7434
+          ],
+          [
+            104.1246,
+            138.9749
+          ],
+          [
+            101.2615,
+            138.9749
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-039",
+          "ceilingType": "C4",
+          "registeredPointFt": [
+            101.91997,
+            134.826959
+          ],
+          "heightText": "8' - 0 3/4\"",
+          "heightFt": 8.0625,
+          "heightDistanceFt": 1.631178,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 8.0625,
+        "maximumHeightFt": 8.0625,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "153",
+      "roomName": "MATERIALS CENTER",
+      "sourceAnchorFt": [
+        94.506629,
+        132.164416
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 51,
+        "areaSqft": 52.7576,
+        "polygon": [
+          [
+            92.0993,
+            130.0487
+          ],
+          [
+            98.3983,
+            130.0487
+          ],
+          [
+            98.3983,
+            138.9749
+          ],
+          [
+            96.1078,
+            138.9749
+          ],
+          [
+            96.1078,
+            139.6125
+          ],
+          [
+            94.9625,
+            139.6125
+          ],
+          [
+            94.9625,
+            139.2937
+          ],
+          [
+            94.3899,
+            139.2937
+          ],
+          [
+            94.3899,
+            137.6997
+          ],
+          [
+            93.8172,
+            137.6997
+          ],
+          [
+            93.8172,
+            137.0622
+          ],
+          [
+            93.2446,
+            137.0622
+          ],
+          [
+            93.2446,
+            136.7434
+          ],
+          [
+            92.0993,
+            136.7434
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "154",
+      "roomName": "EQUIP PLATFORM ACCESS",
+      "sourceAnchorFt": [
+        83.124329,
+        119.158725
+      ],
+      "geometry": {
+        "status": "blocked",
+        "componentIndex": null,
+        "areaSqft": null,
+        "polygon": null
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "closed-source-room-component-not-found",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "155",
+      "roomName": "RAMP",
+      "sourceAnchorFt": [
+        101.599959,
+        100.809484
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 102,
+        "areaSqft": 15.5169,
+        "polygon": [
+          [
+            101.2615,
+            100.0821
+          ],
+          [
+            104.1246,
+            100.0821
+          ],
+          [
+            104.1246,
+            101.3573
+          ],
+          [
+            104.6973,
+            101.3573
+          ],
+          [
+            104.6973,
+            101.9949
+          ],
+          [
+            104.1246,
+            101.9949
+          ],
+          [
+            104.1246,
+            102.3137
+          ],
+          [
+            103.552,
+            102.3137
+          ],
+          [
+            103.552,
+            102.9512
+          ],
+          [
+            102.9794,
+            102.9512
+          ],
+          [
+            102.9794,
+            103.9076
+          ],
+          [
+            103.552,
+            103.9076
+          ],
+          [
+            103.552,
+            104.5452
+          ],
+          [
+            104.6973,
+            104.5452
+          ],
+          [
+            104.6973,
+            105.5016
+          ],
+          [
+            104.1246,
+            105.5016
+          ],
+          [
+            104.1246,
+            105.8204
+          ],
+          [
+            101.2615,
+            105.8204
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "156",
+      "roomName": "STORAGE",
+      "sourceAnchorFt": [
+        93.666629,
+        104.555843
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 48,
+        "areaSqft": 57.3214,
+        "polygon": [
+          [
+            87.5182,
+            103.27
+          ],
+          [
+            88.0909,
+            103.27
+          ],
+          [
+            88.0909,
+            102.9512
+          ],
+          [
+            99.5436,
+            102.9512
+          ],
+          [
+            99.5436,
+            107.7331
+          ],
+          [
+            87.5182,
+            107.7331
+          ]
+        ]
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    },
+    {
+      "roomNumber": "157",
+      "roomName": "VOLLEYBALL STORAGE",
+      "sourceAnchorFt": [
+        123.249656,
+        135.572279
+      ],
+      "geometry": {
+        "status": "source-anchor-component",
+        "boundaryCompleteness": "unverified",
+        "componentIndex": 14,
+        "areaSqft": 128.3342,
+        "polygon": [
+          [
+            111.5689,
+            129.7299
+          ],
+          [
+            114.4321,
+            129.7299
+          ],
+          [
+            114.4321,
+            129.4111
+          ],
+          [
+            130.4658,
+            129.4111
+          ],
+          [
+            130.4658,
+            135.787
+          ],
+          [
+            129.8932,
+            135.787
+          ],
+          [
+            129.8932,
+            137.0622
+          ],
+          [
+            128.7479,
+            137.0622
+          ],
+          [
+            128.7479,
+            138.9749
+          ],
+          [
+            121.3037,
+            138.9749
+          ],
+          [
+            121.3037,
+            137.0622
+          ],
+          [
+            119.5858,
+            137.0622
+          ],
+          [
+            119.5858,
+            136.1058
+          ],
+          [
+            119.0131,
+            136.1058
+          ],
+          [
+            119.0131,
+            135.4682
+          ],
+          [
+            116.7226,
+            135.4682
+          ],
+          [
+            116.7226,
+            134.193
+          ],
+          [
+            116.15,
+            134.193
+          ],
+          [
+            116.15,
+            132.599
+          ],
+          [
+            115.5773,
+            132.599
+          ],
+          [
+            115.5773,
+            131.9615
+          ],
+          [
+            115.0047,
+            131.9615
+          ],
+          [
+            115.0047,
+            131.6427
+          ],
+          [
+            112.7142,
+            131.6427
+          ],
+          [
+            112.7142,
+            132.2803
+          ],
+          [
+            112.1415,
+            132.2803
+          ],
+          [
+            112.1415,
+            132.9178
+          ],
+          [
+            111.5689,
+            132.9178
+          ]
+        ]
+      },
+      "ceilingControls": [
+        {
+          "controlId": "a151-ceiling-010",
+          "ceilingType": "C4",
+          "registeredPointFt": [
+            126.126627,
+            131.709219
+          ],
+          "heightText": "9' - 4 3/4\"",
+          "heightFt": 9.395833,
+          "heightDistanceFt": 1.631213,
+          "sloped": false,
+          "slopeDistanceFt": null,
+          "sourceSheet": "A151"
+        }
+      ],
+      "ceiling": {
+        "status": "source-registered",
+        "minimumHeightFt": 9.395833,
+        "maximumHeightFt": 9.395833,
+        "sloped": false
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "source-room-boundary-completeness-not-yet-verified"
+      ]
+    },
+    {
+      "roomNumber": "159",
+      "roomName": "TECH",
+      "sourceAnchorFt": [
+        184.09326,
+        140.519944
+      ],
+      "geometry": {
+        "status": "blocked",
+        "componentIndex": null,
+        "areaSqft": null,
+        "polygon": null
+      },
+      "ceilingControls": [],
+      "ceiling": {
+        "status": "blocked",
+        "minimumHeightFt": null,
+        "maximumHeightFt": null,
+        "sloped": null
+      },
+      "sprinklerCandidateReady": false,
+      "blockingReasons": [
+        "closed-source-room-component-not-found",
+        "source-ceiling-height-not-registered-to-room"
+      ]
+    }
+  ],
+  "counts": {
+    "sourceRoomIdentities": 54,
+    "uniqueAnchorComponentRooms": 50,
+    "anchorComponentBlockedRooms": 4,
+    "ceilingRegisteredComponentRooms": 14,
+    "sprinklerCandidateReadyRooms": 0
+  },
+  "unresolved": [
+    "A101 room anchors without a unique closed source component: 111, 147, 154, 159",
+    "rooms without an A151 height control inside their unique source component remain blocked from head generation",
+    "single-anchor components are not full-room boundaries until source-wall boundary completeness passes the internal topology and visual replay",
+    "sloped-ceiling rooms require A301 section-plane assignment before a 3D sprinkler elevation can be promoted",
+    "obstruction clearance, water supply, hydraulics, AHJ compliance, fabrication, and field release remain unresolved"
+  ],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-A101-room-and-wall-plus-A151-ceiling-source-extraction"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "unique-room-number-tally-grid-control-replay-and-single-anchor-component-recount"
+    },
+    "adversarial": {
+      "status": "passed",
+      "rejectedCases": [
+        "completed-sprinkler-answer-key-as-generation-input",
+        "old-56-room-label-reuse",
+        "global-affine-registration-under-revision-drift",
+        "unanchored-component-promoted-as-room",
+        "multi-anchor-component-promoted-as-room",
+        "ceiling-height-inferred-without-adjacent-A151-control",
+        "whole-building-layout-or-compliance-claim-from-partial-registry"
+      ]
+    }
+  },
+  "sourceIdentityRegistryGrounded": true,
+  "partialSourceGeometryGrounded": true,
+  "partialSourceCeilingRegistryGrounded": true,
+  "wholeBuildingSpaceRegistryComplete": false,
+  "wholeBuildingHeadLayoutReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "source-space-and-ceiling-registry-partial-not-sprinkler-code-compliance",
+  "receiptSha256": "0635855cc57d6f6234e7596957710a538f1b84d102249937e6c110df2107c88b"
+}

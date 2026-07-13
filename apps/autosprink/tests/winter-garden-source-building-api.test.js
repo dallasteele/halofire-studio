@@ -67,7 +67,8 @@ describe('GET /api/projects/:name/source-building-model', () => {
     expect(body.operationalKnowledge.preflightStatus).toBe('passed');
     expect(body.operationalKnowledge.sources).toContain('halofire-master/00_MASTER_MOC.md');
     expect(body.operationalKnowledge.workflowGuardrails).toContain('primary-independent-and-adversarial-verification-loops-are-internal');
-    expect(body.operationalKnowledge.applications).toHaveLength(10);
+    expect(body.operationalKnowledge.applications).toHaveLength(13);
+    expect(body.operationalKnowledge.companyFlowRecall.status).toBe('passed');
     expect(body.operationalKnowledge.coverage.lifecycleStages).toContain('closeout-service');
     expect(body.views.topSvg).toContain('<svg');
     expect(body.views.isometricSvg).toContain('<svg');
@@ -107,7 +108,7 @@ describe('GET /api/projects/:name/source-spec-hazard', () => {
       answerKey: false,
     });
     expect(body.counts).toEqual({ totalRooms: 56, sourceClassifiedRooms: 31, unresolvedRooms: 25, byHazard: { 'Light Hazard': 30, 'Ordinary Hazard Group 2': 1 } });
-    expect(body.operationalKnowledge.applications).toHaveLength(10);
+    expect(body.operationalKnowledge.applications).toHaveLength(13);
     expect(body.internalVerification).toMatchObject({ primary: { status: 'passed' }, independent: { status: 'passed' }, adversarial: { status: 'passed' } });
     expect(body.operationalKnowledgeGrounded).toBe(true);
     expect(body.sourceSpecGrounded).toBe(true);
@@ -117,5 +118,29 @@ describe('GET /api/projects/:name/source-spec-hazard', () => {
     expect(body.complianceReady).toBe(false);
     expect(body.fabricationReady).toBe(false);
     expect(body.fieldReleaseReady).toBe(false);
+  });
+});
+
+describe('GET /api/projects/:name/source-space-registry', () => {
+  it('requires login', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-space-registry`);
+    expect(response.status).toBe(401);
+  });
+
+  it('serves A101 identities and A151 ceilings without promoting fragmented boundaries', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-space-registry`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.status).toBe('passed');
+    expect(body.counts).toEqual({ sourceRoomIdentities: 54, uniqueAnchorComponentRooms: 50, anchorComponentBlockedRooms: 4, ceilingRegisteredComponentRooms: 14, sprinklerCandidateReadyRooms: 0 });
+    expect(body.spaces.find((space) => space.roomNumber === '147').roomName).toBe('ROSTRUM');
+    expect(body.spaces.find((space) => space.roomNumber === '148').roomName).toBe('CHAPEL');
+    expect(body.internalVerification).toMatchObject({ primary: { status: 'passed' }, independent: { status: 'passed' }, adversarial: { status: 'passed' } });
+    expect(body.operationalKnowledge.companyFlowRecall.status).toBe('passed');
+    expect(body.sprinklerCandidateReady).toBe(false);
+    expect(body.complianceReady).toBe(false);
+    expect(body.fabricationReady).toBe(false);
   });
 });

@@ -66,11 +66,18 @@ const sourcePacket = await sealWinterGardenSourceBuildingPacket({
   operationalKnowledge: buildHaloFireOperationalKnowledgeReceipt({
     sessionId: 'winter-garden-source-building-operational-knowledge-20260713',
     preflightQuery: 'Halo Fire operations knowledge must actively constrain Winter Garden source-spec hazard and sprinkler generation across estimating, design engineering, procurement, fabrication, field installation, approvals, change control, closeout, and internal adversarial verification',
-    recallEpisodeIds: [139750, 139418, 60899, 129530, 133582, 136189, 132038, 136034, 129505, 129358],
+    recallEpisodeIds: [140193, 140208, 139873, 140198, 140199, 139750, 139418, 136034],
     recalledWikiPages: [
       'decisions/halo-forge-stream-d-sprinkler-alpha-workflow-correction-loop-design-artifact-2026.md',
       'decisions/2026-05-15-halo-forge-stream-d-sprinkler-separate-design-issues-from-nfpa-ahj.md',
       'decisions/halo-forge-sprinkler-catalog-engineering-gate-2026-05-13.md',
+    ],
+    companyFlowEpisodeIds: [140193, 140208, 139873, 140198, 140199],
+    companyFlowPages: [
+      'halofire-master/COMPANY_OPERATIONS_FLOW.md',
+      'halofire-master/00-Company/00_Company_Org.md',
+      'halofire-master/05-Fabrication-Shop/05_Fabrication_Shop.md',
+      'halofire-master/09-Finance-Admin/09_Finance_Admin.md',
     ],
   }),
   model,
