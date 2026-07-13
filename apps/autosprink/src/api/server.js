@@ -43,6 +43,7 @@ import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
 import { renderDillonFloorByFloorViews, validateDillonFloorByFloorModel } from '../engine/dillon-floor-by-floor-model.js';
 import { renderDillonCompletedBidViews, validateDillonCompletedBidGeometry } from '../engine/dillon-completed-bid-geometry.js';
 import { buildDillonVerticalModel, renderDillonVerticalElevationView, validateDillonVerticalRegistration } from '../engine/dillon-vertical-registration.js';
+import { buildDillonStructuralRoofModel, buildDillonStructuralRoofPacket, renderDillonStructuralRoofTopView, validateDillonStructuralRoofPacket } from '../engine/dillon-structural-roof-surfaces.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -93,6 +94,7 @@ const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-
 const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
 const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
 const DILLON_VERTICAL_REGISTRATION_PATH = path.resolve(__dirname, '../data/dillon-vertical-registration.json');
+const DILLON_STRUCTURAL_ROOF_SOURCE_PATH = path.resolve(__dirname, '../data/dillon-structural-framing-roof-source.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -1736,6 +1738,23 @@ app.get('/api/projects/:name/vertical-registration', authMiddleware, async (req,
   } catch (error) {
     log.error('Failed to load Dillon vertical registration', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'vertical_registration_load_failed', complianceReady: false });
+  }
+});
+
+app.get('/api/projects/:name/structural-roof-surfaces', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'Dillon Residence') return res.status(404).json({ error: 'structural_roof_surfaces_not_found' });
+  try {
+    const source = JSON.parse(fs.readFileSync(DILLON_STRUCTURAL_ROOF_SOURCE_PATH, 'utf8'));
+    const floorModel = JSON.parse(fs.readFileSync(DILLON_FLOOR_MODEL_PATH, 'utf8'));
+    const slopedCalibration = JSON.parse(fs.readFileSync(DILLON_SLOPED_CALIBRATION_PATH, 'utf8'));
+    const packet = await buildDillonStructuralRoofPacket(source, floorModel, slopedCalibration);
+    const validation = await validateDillonStructuralRoofPacket(packet, { source, floorModel, slopedCalibration });
+    if (validation.status !== 'passed') return res.status(422).json(validation);
+    const model = buildDillonStructuralRoofModel(validation); const topView = renderDillonStructuralRoofTopView(model);
+    return res.json({ status: 'passed', artifactType: 'halofire.autobid-structural-roof-surfaces.v1', projectName: req.params.name, receiptSha256: packet.receiptSha256, counts: validation.counts, sheets: packet.sheets, sourceControls: source.sheets.map((sheet) => ({ sheetId: sheet.sheetId, slopeRoofLegendText: sheet.slopeRoofLegendText, pitchControls: sheet.pitchControls, topPlateControls: sheet.topPlateControls })), model, topView, completeRoofPlanes: false, geometryGrounded: true, complianceReady: false, approvalReady: false, limitations: packet.limitations, claimStatus: packet.claimStatus });
+  } catch (error) {
+    log.error('Failed to build Dillon structural roof surfaces', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'structural_roof_surfaces_load_failed', complianceReady: false });
   }
 });
 

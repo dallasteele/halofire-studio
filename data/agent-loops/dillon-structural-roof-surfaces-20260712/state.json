@@ -1,0 +1,27 @@
+{
+  "status": "local_verified",
+  "iteration": 2,
+  "truth": [
+    "S-020, S-021, and the toy framing sheet contain 35 exact gray-filled slope-roof hatch drawings split into 48 source triangles.",
+    "S-020 and S-021 share a stable source-DWG transform: 179 and 152 matched coordinates with maximum weighted RMS 0.02246 ft.",
+    "Thirty-three main/upper face patches are registered as top-view footprints; zero are promoted to 3D because pitch direction and absolute datum are not linked per face.",
+    "Fifteen toy-garage face patches remain source-only because the two horizontal mirror candidates differ by only 0.891 percent.",
+    "The prior four calibrated 3:12 ceiling regions, including one absolute datum plane, remain the only verified pitched 3D sprinkler surfaces."
+  ],
+  "remaining": [
+    "Bind each structural face to its actual pitch direction and absolute datum from asymmetric source controls",
+    "Resolve the toy-garage horizontal mirror with an asymmetric source control",
+    "Deploy and verify the live authenticated surface",
+    "Continue the global master goal through complete pitched 3D routing, Bluebeam output, AutoBid workflow, and employee transcript parity"
+  ],
+  "verification": {
+    "runtimeReceiptSha256": "c4dfb49fddb1440d872334854a8c5838e590d46f858225be149abfa40940899b",
+    "focusedTests": "74 passed across the complete Dillon and submitted-calibration matrix",
+    "productionBuild": "passed",
+    "agenticRules": "passed",
+    "loopGuard": "passed",
+    "browser": "authenticated login redirected to workbench; Studio rendered exact roof footprint view and fail-closed counts with zero console warnings or errors",
+    "claim": "registered structural slope-roof footprints only; zero unproven structural planes promoted to 3D"
+  },
+  "globalGoalComplete": false
+}

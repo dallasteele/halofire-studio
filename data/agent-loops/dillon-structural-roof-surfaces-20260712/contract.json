@@ -1,0 +1,40 @@
+{
+  "name": "dillon-structural-roof-surfaces-20260712",
+  "owner": "codex",
+  "loop_type": "closed",
+  "goal": "Extract the Dillon structural framing sheets' actual slope-roof hatch polygons, register supported surfaces to the source DWG floor geometry, derive only source-supported roof planes and elevations, render them with the floor-by-floor model, and keep every ambiguous orientation or datum unresolved.",
+  "sources_of_truth": [
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/main-plans/Main Level Framing Plan.pdf",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/main-plans/Upper Level Framing.pdf",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/toy-plans/Toy Garage Framing Plan.pdf",
+    "apps/autosprink/src/data/dillon-dwg-source-geometry.json",
+    "apps/autosprink/src/data/dillon-floor-by-floor-model.json",
+    "apps/autosprink/src/data/dillon-completed-bid-geometry.json",
+    "apps/autosprink/src/data/dillon-vertical-registration.json"
+  ],
+  "exit_criteria": [
+    "Every promoted roof boundary is an exact vector path from a structural sheet's slope-roof hatch",
+    "Every promoted roof surface is registered to an actual source-DWG level with measured residual evidence",
+    "Slope, direction, and absolute elevation are assigned only when source controls support them",
+    "Ambiguous surfaces remain explicitly unresolved and are not flattened or guessed",
+    "Authenticated API and Studio expose source counts, residuals, resolved and unresolved surfaces, and actual 3D roof geometry",
+    "Receipt, dependency, polygon, registration, plane, and count mutations fail closed",
+    "Focused tests, build, loop guard, rules, live login, API, browser, and VPS health pass"
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-structural-roof-surfaces-20260712/contract.json",
+    "npx vitest run tests/dillon-structural-roof-surfaces.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/dillon-structural-roof-surfaces-20260712/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/dillon-structural-framing-roof-source.json",
+    "data/agent-loops/dillon-structural-roof-surfaces-20260712/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "brain_writeback_required": true,
+  "human_gate_required": false
+}

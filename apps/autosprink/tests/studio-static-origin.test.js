@@ -132,7 +132,8 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Dillon actual-drawing building model');
     expect(html).toContain('Interactive Dillon source-DWG floor-by-floor extrusion');
     expect(html).toContain('new THREE.ExtrudeGeometry');
-    expect(html).toContain('no dedicated exterior-elevation sheet was present');
+    expect(html).toContain('structural slope-roof footprints are now bounded on the main and upper levels');
+    expect(html).toContain('No unresolved face is flattened into the 3D model');
     expect(html).toContain('NOT CODE APPROVAL');
     expect(html).toContain('function initScaleBar() { updateScaleBar(); }');
   });
@@ -708,6 +709,7 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/api/projects/Dillon%20Residence/completed-bid-geometry');
     expect(html).toContain('no cross-sheet substitution');
     expect(html).toContain('/api/projects/Dillon%20Residence/vertical-registration');
+    expect(html).toContain('/api/projects/Dillon%20Residence/structural-roof-surfaces');
     expect(html).toContain('no default flat-roof height');
     expect(html).toContain('verticalGeometry.model3d.heads.forEach');
     expect(html).toContain('verticalGeometry.model3d.pipes.forEach');

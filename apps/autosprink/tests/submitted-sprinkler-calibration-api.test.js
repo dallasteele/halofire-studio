@@ -79,6 +79,21 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/projects/Dillon%20Residence/floor-by-floor-model')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/completed-bid-geometry')).status).toBe(401);
     expect((await request('/api/projects/Dillon%20Residence/vertical-registration')).status).toBe(401);
+    expect((await request('/api/projects/Dillon%20Residence/structural-roof-surfaces')).status).toBe(401);
+  });
+
+  it('serves registered structural roof footprints without inventing 3D planes', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/Dillon%20Residence/structural-roof-surfaces', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result.status).toBe('passed');
+    expect(result.counts).toMatchObject({ registeredFacePatches: 33, unresolvedToyFacePatches: 15, structurallyResolvedPlanes: 0 });
+    expect(result.model.footprints).toHaveLength(33);
+    expect(result.model.surfaces3d).toEqual([]);
+    expect(result.topView.svg).toContain('0 new planes promoted to 3D');
+    expect(result.completeRoofPlanes).toBe(false);
+    expect(result.complianceReady).toBe(false);
   });
 
   it('serves only source-supported 3D sprinkler Z and omits unresolved elements', async () => {
