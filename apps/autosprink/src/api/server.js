@@ -47,8 +47,9 @@ import { validateCompletedHydraulicSized3dPortfolio } from '../engine/completed-
 import { validateRasterBullseyeHeadEvidence } from '../engine/raster-bullseye-head-evidence.js';
 import { buildWinterGardenChapelPlaneAssignments, validatePiecewiseGridRegistration } from '../engine/piecewise-grid-registration.js';
 import { buildWinterGardenChapelPipeNetwork, validateFp2PipeEvidence } from '../engine/fp2-pipe-registration.js';
-import { buildWinterGardenCeilingModel3d, renderWinterGardenCeilingViews, validateWinterGardenCeilingElevationEvidence } from '../engine/winter-garden-ceiling-elevation.js';
+import { buildWinterGardenCeilingModel3d, validateWinterGardenCeilingElevationEvidence } from '../engine/winter-garden-ceiling-elevation.js';
 import { buildWinterGardenFabricationRegisteredModel, validateWinterGardenFabricationPlanMapping } from '../engine/winter-garden-fabrication-plan-mapping.js';
+import { buildWinterGardenPitchedHydraulicModel, validateWinterGardenPitchedHydraulicRegistration, verifyWinterGardenPitchedHydraulicAdversarialLoop } from '../engine/winter-garden-pitched-hydraulic-registration.js';
 import { buildWinterGardenBluebeamPackage } from '../engine/winter-garden-bluebeam-package.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
 import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
@@ -123,6 +124,7 @@ const WINTER_GARDEN_GRID_REGISTRATION_PATH = path.resolve(__dirname, '../data/wi
 const WINTER_GARDEN_PIPE_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp2-pipe-evidence.json');
 const WINTER_GARDEN_CEILING_ELEVATION_PATH = path.resolve(__dirname, '../data/winter-garden-ceiling-elevation-evidence.json');
 const WINTER_GARDEN_FABRICATION_PLAN_MAPPING_PATH = path.resolve(__dirname, '../data/winter-garden-fabrication-plan-mapping.json');
+const WINTER_GARDEN_PITCHED_HYDRAULIC_REGISTRATION_PATH = path.resolve(__dirname, '../data/winter-garden-pitched-hydraulic-registration.json');
 const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-dwg-source-geometry.json');
 const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
 const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
@@ -1801,6 +1803,44 @@ app.get('/api/evidence/completed-hydraulic-sized-3d-registration', authMiddlewar
   }
 });
 
+app.get('/api/evidence/winter-garden-pitched-hydraulic-registration', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(WINTER_GARDEN_PITCHED_HYDRAULIC_REGISTRATION_PATH, 'utf8'));
+    const dependencies = {
+      headEvidence: JSON.parse(fs.readFileSync(WINTER_GARDEN_HEAD_EVIDENCE_PATH, 'utf8')),
+      gridRegistration: JSON.parse(fs.readFileSync(WINTER_GARDEN_GRID_REGISTRATION_PATH, 'utf8')),
+      ceilingEvidence: JSON.parse(fs.readFileSync(WINTER_GARDEN_CEILING_ELEVATION_PATH, 'utf8')),
+      fabricationMapping: JSON.parse(fs.readFileSync(WINTER_GARDEN_FABRICATION_PLAN_MAPPING_PATH, 'utf8')),
+    };
+    const [validation, model, adversarialLoop] = await Promise.all([
+      validateWinterGardenPitchedHydraulicRegistration(packet),
+      buildWinterGardenPitchedHydraulicModel(packet, dependencies),
+      verifyWinterGardenPitchedHydraulicAdversarialLoop(packet),
+    ]);
+    if (validation.status !== 'passed' || model.status !== 'passed' || adversarialLoop.status !== 'passed') return res.status(422).json({ status: 'blocked', artifactType: packet.artifactType, issues: [...validation.issues, ...(model.issues || []), ...(adversarialLoop.status === 'passed' ? [] : [{ severity: 'blocking', code: 'WG_PITCHED_HYDRAULIC_ADVERSARIAL_LOOP_FAILED', message: 'A required mutation escaped the production validator.' }])], complianceReady: false });
+    return res.json({
+      status: 'passed', artifactType: model.artifactType, projectId: validation.projectId, projectName: validation.projectName,
+      receiptSha256: validation.receiptSha256, sourceBindings: validation.sourceBindings,
+      acceptanceLoops: {
+        primary: { status: 'passed', method: 'stamped-a008-hydraulic-table-and-fp2-row-datum-registration', operatingSprinklerCount: validation.metrics.operatingSprinklerCount },
+        independent: { status: 'passed', method: 'hydraulic-calc-plate-project-sheet-area-density-flow-hose-hazard-cross-check', sourceRole: 'independent-hydraulic-calc-plate' },
+        adversarial: adversarialLoop,
+      },
+      counts: { pitchedRows: validation.metrics.pitchedRowCount, completedChapelHeads: model.counts.headEnvelopes, fabricationMappedHeads: model.counts.fabricationMappedHeads, operatingHydraulicSprinklers: validation.metrics.operatingSprinklerCount, hydraulicInsideDiameterClasses: validation.metrics.hydraulicInsideDiameterClassCount },
+      maximumRowElevationResidualIn: validation.metrics.maximumRowElevationResidualIn,
+      hydraulicSystem: validation.hydraulicSystem, operatingSprinklers: validation.operatingSprinklers, diameterObservations: validation.diameterObservations,
+      pitchedRowJoins: validation.pitchedRowJoins, rowResiduals: validation.rowResiduals, ceilingSurfaces: model.ceilingSurfaces, headEnvelopes: model.headEnvelopes, branchPipes3d: model.branchPipes3d, views: model.views,
+      pitchedRowHydraulicDatumRegistrationReady: true, operatingSprinklerHydraulicEvidenceReady: true, hydraulicInsideDiameterReportEvidenceReady: true,
+      perHeadHydraulicIdentityReady: false, nominalPipeSizeReady: false, fullNetworkPipeElevationReady: false, exactAsBuiltDeflectorElevationReady: false, fabricationReady: false, complianceReady: false,
+      residuals: model.residuals, limitations: validation.limitations,
+      claimStatus: 'completed-stamped-pitched-row-hydraulic-evidence-not-generated-design-compliance-or-fabrication-release',
+    });
+  } catch (error) {
+    log.error('Failed to load Winter Garden pitched hydraulic registration', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'winter_garden_pitched_hydraulic_registration_load_failed', complianceReady: false });
+  }
+});
+
 app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, async (req, res) => {
   if (req.params.name !== 'LDS Meeting House - Winter Garden FL') return res.status(404).json({ error: 'pitched_roof_pipe_calibration_not_found', message: 'No source-bound pitched-roof pipe calibration exists for this project.' });
   try {
@@ -1816,11 +1856,12 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
     const pipeEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_PIPE_EVIDENCE_PATH, 'utf8'));
     const ceilingEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_CEILING_ELEVATION_PATH, 'utf8'));
     const fabricationMapping = JSON.parse(fs.readFileSync(WINTER_GARDEN_FABRICATION_PLAN_MAPPING_PATH, 'utf8'));
+    const pitchedHydraulicPacket = JSON.parse(fs.readFileSync(WINTER_GARDEN_PITCHED_HYDRAULIC_REGISTRATION_PATH, 'utf8'));
     const completedProjectPortfolio = validateCompletedProjectEvidencePortfolio(completedProjectSourceSets);
     const completedHydraulicNetworkVerticalPortfolio = loadCompletedHydraulicNetworkVerticalPortfolio();
     const completedActiveHydraulicPlanPortfolio = loadCompletedActiveHydraulicPlanPortfolio();
     const completedHydraulicRoutedPlanPortfolio = loadCompletedHydraulicRoutedPlanPortfolio();
-    const [crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered] = await Promise.all([
+    const [crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered, pitchedHydraulic, pitchedHydraulicModel, pitchedHydraulicAdversarial] = await Promise.all([
       validatePitchedRoofCrossProjectEvidence(crossProjectPacket),
       validateRasterBullseyeHeadEvidence(headEvidence),
       validatePiecewiseGridRegistration(gridRegistration),
@@ -1831,18 +1872,24 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
       buildWinterGardenChapelPipeNetwork(pipeEvidence, gridRegistration, headEvidence),
       buildWinterGardenCeilingModel3d(ceilingEvidence, gridRegistration, headEvidence),
       buildWinterGardenFabricationRegisteredModel(fabricationMapping, ceilingEvidence, gridRegistration, headEvidence),
+      validateWinterGardenPitchedHydraulicRegistration(pitchedHydraulicPacket),
+      buildWinterGardenPitchedHydraulicModel(pitchedHydraulicPacket, { fabricationMapping, ceilingEvidence, gridRegistration, headEvidence }),
+      verifyWinterGardenPitchedHydraulicAdversarialLoop(pitchedHydraulicPacket),
     ]);
-    const validations = [completedProjectPortfolio, completedHydraulicNetworkVerticalPortfolio, completedActiveHydraulicPlanPortfolio, completedHydraulicRoutedPlanPortfolio, crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered];
+    const validations = [completedProjectPortfolio, completedHydraulicNetworkVerticalPortfolio, completedActiveHydraulicPlanPortfolio, completedHydraulicRoutedPlanPortfolio, crossProject, heads, grid, pipes, ceiling, fabrication, planes, network, model3dEnvelope, model3dRegistered, pitchedHydraulic, pitchedHydraulicModel, pitchedHydraulicAdversarial];
     if (validations.some((validation) => validation.status !== 'passed')) return res.status(422).json({ status: 'blocked', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name, issues: validations.flatMap((validation) => validation.issues || []), projectionReady: false, complianceReady: false });
     return res.json({
       status: 'passed', artifactType: 'halofire.autobid-pitched-roof-pipe-calibration.v1', projectName: req.params.name,
-      evidenceReceipts: { crossProject: crossProjectPacket.receiptSha256, heads: headEvidence.receiptSha256, roofRegistration: gridRegistration.receiptSha256, pipeRegistration: pipeEvidence.receiptSha256, ceilingElevation: ceilingEvidence.receiptSha256, fabricationPlanMapping: fabricationMapping.receiptSha256 },
-      sourceBindings: { roofPlan: gridRegistration.source, sprinklerRcp: gridRegistration.target, sprinklerPipePlan: pipeEvidence.source, fabricationListing: fabricationMapping.sources.fabricationListing, submittedSprinklerCutSheets: fabricationMapping.sources.submittedSprinklerCutSheets },
+      evidenceReceipts: { crossProject: crossProjectPacket.receiptSha256, heads: headEvidence.receiptSha256, roofRegistration: gridRegistration.receiptSha256, pipeRegistration: pipeEvidence.receiptSha256, ceilingElevation: ceilingEvidence.receiptSha256, fabricationPlanMapping: fabricationMapping.receiptSha256, pitchedHydraulicRegistration: pitchedHydraulicPacket.receiptSha256 },
+      sourceBindings: { roofPlan: gridRegistration.source, sprinklerRcp: gridRegistration.target, sprinklerPipePlan: pipeEvidence.source, fabricationListing: fabricationMapping.sources.fabricationListing, submittedSprinklerCutSheets: fabricationMapping.sources.submittedSprinklerCutSheets, stampedHydraulicCalculation: pitchedHydraulic.sourceBindings.find((binding) => binding.role === 'stamped-hydraulic-calculation'), independentHydraulicCalcPlate: pitchedHydraulic.sourceBindings.find((binding) => binding.role === 'independent-hydraulic-calc-plate') },
       acceptanceLoops: {
         primary: { status: 'passed', method: headEvidence.primary.method, headCount: heads.metrics.primaryCount, branchMethod: pipeEvidence.detectorReceipt.primary.method },
         independent: { status: 'passed', method: headEvidence.independent.method, headCount: heads.metrics.independentCount, branchMethod: pipeEvidence.detectorReceipt.independent.method },
         activeHydraulicPlan: { status: 'passed', projectCount: completedActiveHydraulicPlanPortfolio.projectCount, activeNodeCount: completedActiveHydraulicPlanPortfolio.counts.activeSprinklerNodes, independentRunChecks: completedActiveHydraulicPlanPortfolio.counts.runChecks, maximumResidualFt: Math.max(...completedActiveHydraulicPlanPortfolio.projects.map((project) => project.maxResidualFt)), scope: 'active-calculation-sprinklers-only' },
         hydraulicRoutedPlan: { status: 'passed', projectCount: completedHydraulicRoutedPlanPortfolio.projectCount, registeredNodeCount: completedHydraulicRoutedPlanPortfolio.counts.registeredNodes, inactiveJunctionCount: completedHydraulicRoutedPlanPortfolio.counts.inactiveJunctions, registeredPipeCount: completedHydraulicRoutedPlanPortfolio.counts.registeredPipes, independentLengthChecks: completedHydraulicRoutedPlanPortfolio.counts.scaledLengthChecks, topologyOnlyPipeCount: completedHydraulicRoutedPlanPortfolio.counts.topologyOnlyPipes, scope: 'hydraulically-calculated-floor-plan-branch-graph-only' },
+        pitchedHydraulicPrimary: { status: 'passed', method: 'stamped-a008-hydraulic-table-and-fp2-row-datum-registration', operatingSprinklerCount: pitchedHydraulic.metrics.operatingSprinklerCount },
+        pitchedHydraulicIndependent: { status: 'passed', method: 'hydraulic-calc-plate-project-sheet-area-density-flow-hose-hazard-cross-check' },
+        pitchedHydraulicAdversarial,
         adversarial: { status: 'passed', thresholdCounts: headEvidence.adversarial.thresholdCounts, centerRemovedTemplateRejected: headEvidence.adversarial.centerRemovedTemplateRejected, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: completedProjectPortfolio.results.some((result) => result.excludedArtifactCount > 0), duplicateProjectSubstitutionRejected: true, spatialMappingReceiptDriftRejected: true, crossProjectFlatRoofSubstitutionRejected: true, hydraulicElevationResealRejected: true, hydraulicTopologyDisconnectRejected: true, activeHydraulicPlanReceiptDriftRejected: true, duplicateActiveHydraulicProjectRejected: true, inactiveNodePromotionRejected: true, verifiedInactiveJunctionPromotionAccepted: true, routedPlanReceiptDriftRejected: completedHydraulicRoutedPlanPortfolio.adversarialLoops.every((loop) => loop.receiptDriftRejected), routedPlanRouteEndpointDriftRejected: completedHydraulicRoutedPlanPortfolio.adversarialLoops.every((loop) => loop.routeEndpointDriftRejected), routedPlanTopologyAsLengthSubstitutionRejected: completedHydraulicRoutedPlanPortfolio.adversarialLoops.every((loop) => loop.topologyAsLengthSubstitutionRejected), registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true },
       },
       crossProjectEvidence: { metrics: crossProject.metrics, claimStatus: crossProject.claimStatus },
@@ -1856,11 +1903,12 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
       completedHydraulicNetworkVerticalPortfolio,
       completedActiveHydraulicPlanPortfolio,
       completedHydraulicRoutedPlanPortfolio,
-      counts: { completedBidFp3Heads: heads.metrics.primaryCount, chapelHeads: planes.assignments.length, chapelBranches: network.branchCount, chapelArmOvers: network.headCount, networkSegments: network.segments.length, absoluteCeilingSurfaces: model3dRegistered.counts.ceilingSurfaces, headElevationEnvelopes: model3dRegistered.counts.headEnvelopes, fabricationMappedHeads: model3dRegistered.counts.fabricationMappedHeads, exactBranchRowPipes: model3dRegistered.counts.exactBranchRowPipes },
+      counts: { completedBidFp3Heads: heads.metrics.primaryCount, chapelHeads: planes.assignments.length, chapelBranches: network.branchCount, chapelArmOvers: network.headCount, networkSegments: network.segments.length, absoluteCeilingSurfaces: model3dRegistered.counts.ceilingSurfaces, headElevationEnvelopes: model3dRegistered.counts.headEnvelopes, fabricationMappedHeads: model3dRegistered.counts.fabricationMappedHeads, exactBranchRowPipes: model3dRegistered.counts.exactBranchRowPipes, pitchedHydraulicRows: pitchedHydraulic.metrics.pitchedRowCount, operatingHydraulicSprinklers: pitchedHydraulic.metrics.operatingSprinklerCount, hydraulicInsideDiameterClasses: pitchedHydraulic.metrics.hydraulicInsideDiameterClassCount },
       roofPlanes: planes.roofPlanes, headPlaneAssignments: planes.assignments, pipeNetwork: network.segments,
-      fabricationMappings: fabrication.mappings, model3dEnvelope: model3dRegistered, views: renderWinterGardenCeilingViews(model3dRegistered),
-      ceilingSurfaceElevationReady: true, model3dEnvelopeReady: true, fabricationPlanMappingReady: true, branchRowPipeElevationReady: true, manufacturerInstallationEnvelopeReady: true, hydraulicNetworkVerticalGeometryReady: true, activeHydraulicPlanRegistrationReady: true, onPlanHydraulicRoutedRegistrationReady: true, fullHydraulicPlanRegistrationReady: false, pipeSizesReady: false, fullNetworkPipeElevationReady: false, absoluteDeflectorDatumReady: false, exactAsBuiltDeflectorElevationReady: false, projectionReady: false, fabricationReady: false, complianceReady: false,
-      residuals: [...network.residuals, ...model3dRegistered.residuals],
+      fabricationMappings: fabrication.mappings, model3dEnvelope: pitchedHydraulicModel, views: pitchedHydraulicModel.views,
+      pitchedHydraulicRegistration: { hydraulicSystem: pitchedHydraulic.hydraulicSystem, rowJoins: pitchedHydraulic.pitchedRowJoins, rowResiduals: pitchedHydraulic.rowResiduals, operatingSprinklers: pitchedHydraulic.operatingSprinklers, diameterObservations: pitchedHydraulic.diameterObservations },
+      ceilingSurfaceElevationReady: true, model3dEnvelopeReady: true, fabricationPlanMappingReady: true, branchRowPipeElevationReady: true, manufacturerInstallationEnvelopeReady: true, pitchedRowHydraulicDatumRegistrationReady: true, operatingSprinklerHydraulicEvidenceReady: true, hydraulicInsideDiameterReportEvidenceReady: true, hydraulicNetworkVerticalGeometryReady: true, activeHydraulicPlanRegistrationReady: true, onPlanHydraulicRoutedRegistrationReady: true, perHeadHydraulicIdentityReady: false, fullHydraulicPlanRegistrationReady: false, pipeSizesReady: false, fullNetworkPipeElevationReady: false, absoluteDeflectorDatumReady: false, exactAsBuiltDeflectorElevationReady: false, projectionReady: false, fabricationReady: false, complianceReady: false,
+      residuals: [...network.residuals, ...pitchedHydraulicModel.residuals],
       claimStatus: 'completed-bid-pitched-roof-head-and-pipe-topology-calibration-not-code-compliance-or-fabrication',
     });
   } catch (error) {

@@ -85,6 +85,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/evidence/completed-active-hydraulic-plan-registration')).status).toBe(401);
     expect((await request('/api/evidence/completed-hydraulic-routed-plan-registration')).status).toBe(401);
     expect((await request('/api/evidence/completed-hydraulic-sized-3d-registration')).status).toBe(401);
+    expect((await request('/api/evidence/winter-garden-pitched-hydraulic-registration')).status).toBe(401);
     expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration')).status).toBe(401);
     expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration-bluebeam.pdf')).status).toBe(401);
   });
@@ -166,6 +167,26 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.projects[1].diameterClasses).toEqual([1.101, 1.598]);
     expect(result.projects[0].views.sideSvg).toContain('not nominal size');
     expect(result.adversarialLoops.every((loop) => loop.status === 'passed')).toBe(true);
+  });
+
+  it('serves the completed Winter Garden pitched-row hydraulic registration', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/evidence/winter-garden-pitched-hydraulic-registration', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result).toMatchObject({
+      status: 'passed', projectId: 'winter-garden-meetinghouse',
+      counts: { pitchedRows: 3, completedChapelHeads: 15, fabricationMappedHeads: 15, operatingHydraulicSprinklers: 17, hydraulicInsideDiameterClasses: 6 },
+      acceptanceLoops: { primary: { status: 'passed' }, independent: { status: 'passed' }, adversarial: { status: 'passed' } },
+      pitchedRowHydraulicDatumRegistrationReady: true, operatingSprinklerHydraulicEvidenceReady: true, hydraulicInsideDiameterReportEvidenceReady: true,
+      perHeadHydraulicIdentityReady: false, nominalPipeSizeReady: false, fullNetworkPipeElevationReady: false,
+      exactAsBuiltDeflectorElevationReady: false, fabricationReady: false, complianceReady: false,
+    });
+    expect(result.maximumRowElevationResidualIn).toBeCloseTo(0.04, 8);
+    expect(result.operatingSprinklers).toHaveLength(17);
+    expect(result.branchPipes3d).toHaveLength(3);
+    expect(result.views.hydraulicDatumSvg).toContain('no per-head node identity');
+    expect(Object.entries(result.acceptanceLoops.adversarial).filter(([name]) => name !== 'status').every(([, rejected]) => rejected)).toBe(true);
   });
 
   it('serves registered speckled roof contours without inventing 3D planes', async () => {
@@ -327,7 +348,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(response.status).toBe(200);
     const result = await response.json();
     expect(result.status).toBe('passed');
-    expect(result.evidenceReceipts).toMatchObject({ crossProject: expect.stringMatching(/^[0-9a-f]{64}$/), heads: expect.stringMatching(/^[0-9a-f]{64}$/), roofRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), pipeRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), ceilingElevation: expect.stringMatching(/^[0-9a-f]{64}$/), fabricationPlanMapping: expect.stringMatching(/^[0-9a-f]{64}$/) });
+    expect(result.evidenceReceipts).toMatchObject({ crossProject: expect.stringMatching(/^[0-9a-f]{64}$/), heads: expect.stringMatching(/^[0-9a-f]{64}$/), roofRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), pipeRegistration: expect.stringMatching(/^[0-9a-f]{64}$/), ceilingElevation: expect.stringMatching(/^[0-9a-f]{64}$/), fabricationPlanMapping: expect.stringMatching(/^[0-9a-f]{64}$/), pitchedHydraulicRegistration: expect.stringMatching(/^[0-9a-f]{64}$/) });
     expect(result.acceptanceLoops).toMatchObject({ primary: { status: 'passed', headCount: 159 }, independent: { status: 'passed', headCount: 158 }, activeHydraulicPlan: { status: 'passed', projectCount: 2, activeNodeCount: 26, independentRunChecks: 19, scope: 'active-calculation-sprinklers-only' }, hydraulicRoutedPlan: { status: 'passed', projectCount: 2, registeredNodeCount: 40, inactiveJunctionCount: 14, registeredPipeCount: 38, independentLengthChecks: 31, topologyOnlyPipeCount: 4, scope: 'hydraulically-calculated-floor-plan-branch-graph-only' }, adversarial: { status: 'passed', centerRemovedTemplateRejected: true, sourceSubstitutionRejected: true, archiveProjectSubstitutionRejected: true, duplicateProjectSubstitutionRejected: true, spatialMappingReceiptDriftRejected: true, crossProjectFlatRoofSubstitutionRejected: true, hydraulicElevationResealRejected: true, hydraulicTopologyDisconnectRejected: true, activeHydraulicPlanReceiptDriftRejected: true, duplicateActiveHydraulicProjectRejected: true, inactiveNodePromotionRejected: true, verifiedInactiveJunctionPromotionAccepted: true, routedPlanReceiptDriftRejected: true, routedPlanRouteEndpointDriftRejected: true, routedPlanTopologyAsLengthSubstitutionRejected: true, registrationDriftRejected: true, disconnectedTopologyRejected: true, wrongOutletFamilyRejected: true, outletSequenceSubstitutionRejected: true, manufacturerCutSheetDriftRejected: true } });
     expect(result.acceptanceLoops.activeHydraulicPlan.maximumResidualFt).toBeLessThanOrEqual(0.75);
     expect(result.crossProjectEvidence.metrics).toMatchObject({ projectCount: 4, pitchedProjectCount: 3, winterGardenPitchInPer12: 4.5 });
@@ -369,7 +390,7 @@ describe('AutoBid submitted sprinkler calibration API', () => {
       wholeBuildingNetworkElevationReady: false,
       exactAsBuiltDeflectorElevationReady: false,
     });
-    expect(result.counts).toEqual({ completedBidFp3Heads: 159, chapelHeads: 15, chapelBranches: 3, chapelArmOvers: 15, networkSegments: 23, absoluteCeilingSurfaces: 2, headElevationEnvelopes: 15, fabricationMappedHeads: 15, exactBranchRowPipes: 3 });
+    expect(result.counts).toEqual({ completedBidFp3Heads: 159, chapelHeads: 15, chapelBranches: 3, chapelArmOvers: 15, networkSegments: 23, absoluteCeilingSurfaces: 2, headElevationEnvelopes: 15, fabricationMappedHeads: 15, exactBranchRowPipes: 3, pitchedHydraulicRows: 3, operatingHydraulicSprinklers: 17, hydraulicInsideDiameterClasses: 6 });
     expect(result.headPlaneAssignments).toHaveLength(15);
     expect(result.pipeNetwork).toHaveLength(23);
     expect(result.model3dEnvelope).toMatchObject({ status: 'passed', ceilingSurfaceElevationReady: true, fabricationPlanMappingReady: true, branchRowPipeElevationReady: true, manufacturerInstallationEnvelopeReady: true, exactAsBuiltDeflectorElevationReady: false, fullNetworkPipeElevationReady: false, model3dEnvelopeReady: true });
@@ -379,8 +400,17 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.model3dEnvelope.branchPipes3d).toHaveLength(3);
     expect(result.views.topSvg).toContain('15 SprinkCad 1-inch takeoffs');
     expect(result.views.elevationSvg).toContain('TFP181 3/16-11/16 in');
+    expect(result.views.hydraulicDatumSvg).toContain('no per-head node identity');
+    expect(result.pitchedHydraulicRegistration.rowJoins).toHaveLength(3);
+    expect(result.acceptanceLoops.pitchedHydraulicPrimary).toMatchObject({ status: 'passed', operatingSprinklerCount: 17 });
+    expect(result.acceptanceLoops.pitchedHydraulicIndependent.status).toBe('passed');
+    expect(result.acceptanceLoops.pitchedHydraulicAdversarial.status).toBe('passed');
     expect(result.ceilingSurfaceElevationReady).toBe(true);
     expect(result.model3dEnvelopeReady).toBe(true);
+    expect(result.pitchedRowHydraulicDatumRegistrationReady).toBe(true);
+    expect(result.operatingSprinklerHydraulicEvidenceReady).toBe(true);
+    expect(result.hydraulicInsideDiameterReportEvidenceReady).toBe(true);
+    expect(result.perHeadHydraulicIdentityReady).toBe(false);
     expect(result.fabricationPlanMappingReady).toBe(true);
     expect(result.branchRowPipeElevationReady).toBe(true);
     expect(result.manufacturerInstallationEnvelopeReady).toBe(true);

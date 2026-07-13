@@ -1,0 +1,47 @@
+{
+  "name": "winter-garden-pitched-hydraulic-registration-20260713",
+  "iteration": 1,
+  "status": "in_progress",
+  "updatedAt": "2026-07-13T09:28:00-07:00",
+  "completedStages": [
+    "DISCOVER",
+    "PLAN",
+    "EXECUTE"
+  ],
+  "nextStage": "VERIFY",
+  "sourceEvidence": {
+    "stampedHydraulicReportSha256": "29b028c1dc89bcf73462aefd11f773a5079d169146cf2ef8c9df752889cf6e95",
+    "hydraulicCalcPlateSha256": "27214965864964897431c27cd2a99be4e32374a27dc17f977d069095869f5c81",
+    "stampedFp2Sha256": "ac052124095f73e3529fd63906127bac9c2cf3b3f6abd45222c5125fa4195977",
+    "operatingSprinklerCount": 17,
+    "matchedPitchedRowElevationsFt": [
+      19.42,
+      24.08,
+      19.33
+    ],
+    "receiptSha256": "c3b95c1887ed6fb1023fb4aaa8a442ec28da4e65ceaf6a7348646406a5dfc19c"
+  },
+  "verification": {
+    "focusedTests": "22 passed",
+    "deterministicReplays": "100 primary plus adversarial replays passed",
+    "fullTests": "182 files, 1720 tests passed",
+    "nodeNativeTests": "20 passed",
+    "productionBuild": "passed",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "loopGuard": "passed",
+    "formalProof": "LEAN_PROVED: winterGardenPitchedRowRounding verified by Lean 4.13.0 in 81 ms",
+    "liveDeployment": "pending",
+    "authenticatedEvidenceSmoke": "pending"
+  },
+  "claimState": {
+    "pitchedRowHydraulicDatumRegistrationReady": true,
+    "operatingSprinklerHydraulicEvidenceReady": true,
+    "hydraulicInsideDiameterEvidenceReady": true,
+    "perHeadHydraulicIdentityReady": false,
+    "nominalPipeSizeReady": false,
+    "fullNetworkPipeElevationReady": false,
+    "exactAsBuiltDeflectorElevationReady": false,
+    "fabricationReady": false,
+    "complianceReady": false
+  }
+}

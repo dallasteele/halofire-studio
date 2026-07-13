@@ -1,0 +1,46 @@
+{
+  "name": "winter-garden-pitched-hydraulic-registration-20260713",
+  "owner": "codex",
+  "goal": "Register the completed Winter Garden stamped hydraulic calculation to the already sealed pitched chapel branch elevations, completed heads, fabrication outlets, manufacturer envelope, and 3D model without inventing per-head hydraulic identities or promoting compliance.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/Submittal/Stamped Submittal Set 12.28.2022/Sprinkler Permit Submittal/A002-FPSPlan-Meetinghouse.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/Submittal/Stamped Submittal Set 12.28.2022/Sprinkler Permit Submittal/A008-FPSHydraulicCalcs-Meetinghouse.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/Hydraulic Calc Plate.docx",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/Fabrication Listings/Revised Listings 01.30.23/WINTER GARDEN LISTING.TYL",
+    "apps/autosprink/src/data/winter-garden-fabrication-plan-mapping.json",
+    "apps/autosprink/src/data/winter-garden-ceiling-elevation-evidence.json"
+  ],
+  "exit_criteria": [
+    "immutable source hashes bind the stamped plan, stamped hydraulic report, hydraulic calc plate, and existing fabrication/3D receipts",
+    "north, ridge, and south pitched chapel branch elevations reproduce stamped hydraulic node elevations within the sealed report-rounding tolerance",
+    "17 operating sprinkler records and hydraulic inside-diameter observations are parsed as report evidence without treating inside diameter as nominal pipe size",
+    "the completed 15-head fabrication model exposes row-level hydraulic datum joins in top and elevation evidence",
+    "primary, independent, and adversarial loops reject source substitution, receipt drift, row-datum drift, fabricated node/head identity, diameter drift, and false compliance promotion",
+    "per-head hydraulic identity, nominal pipe size, full-network elevation, exact as-built deflector elevation, fabrication readiness, and compliance remain false",
+    "focused and full tests, build, rulebook check, formal result, deploy, login smoke, and authenticated live evidence smoke are recorded"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "focused engine and authenticated API tests",
+    "full autosprink Vitest suite",
+    "autosprink production build",
+    "GX10 Lean 4 proof or exact prover-unavailable record",
+    "authoritative agentic-rule check",
+    "VPS deployment with live login and authenticated evidence-route smoke",
+    "brain close writeback"
+  ],
+  "state_path": "data/agent-loops/winter-garden-pitched-hydraulic-registration-20260713/state.json",
+  "evidence_paths": [
+    "apps/autosprink/tests/winter-garden-pitched-hydraulic-registration.test.js",
+    "apps/autosprink/tests/submitted-sprinkler-calibration-api.test.js",
+    "BUILD_LOG.md"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 500000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

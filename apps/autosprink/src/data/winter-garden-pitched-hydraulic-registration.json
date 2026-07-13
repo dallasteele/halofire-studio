@@ -1,0 +1,156 @@
+{
+  "artifactType": "halofire.winter-garden-pitched-hydraulic-registration.v1",
+  "projectId": "winter-garden-meetinghouse",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "verifiedAt": "2026-07-13T16:40:00-07:00",
+  "sourceBindings": [
+    {
+      "role": "stamped-sprinkler-pipe-plan",
+      "path": "02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\Submittal\\Stamped Submittal Set 12.28.2022\\Sprinkler Permit Submittal\\A002-FPSPlan-Meetinghouse.pdf",
+      "bytes": 2653154,
+      "sha256": "ac052124095f73e3529fd63906127bac9c2cf3b3f6abd45222c5125fa4195977",
+      "physicalPages": [1]
+    },
+    {
+      "role": "stamped-hydraulic-calculation",
+      "path": "02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\Submittal\\Stamped Submittal Set 12.28.2022\\Sprinkler Permit Submittal\\A008-FPSHydraulicCalcs-Meetinghouse.pdf",
+      "bytes": 637146,
+      "sha256": "29b028c1dc89bcf73462aefd11f773a5079d169146cf2ef8c9df752889cf6e95",
+      "physicalPages": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    },
+    {
+      "role": "independent-hydraulic-calc-plate",
+      "path": "02-Active jobs\\03-Closed\\LDS Meeting House - Winter Garden FL\\Engineering\\Hydraulic Calc Plate.docx",
+      "bytes": 45230,
+      "sha256": "27214965864964897431c27cd2a99be4e32374a27dc17f977d069095869f5c81",
+      "physicalPages": [1]
+    }
+  ],
+  "upstreamReceipts": {
+    "completedHeadEvidence": "458c5af81950028f2a8eca8a0d683c438e39729280bc19113df0ece7ae8be9e7",
+    "gridRegistration": "ba64ed53695dc5b515ccbb1dd6a43efc634c3081869444f464164913ceb2ffc5",
+    "pipeEvidence": "44ecf142b388c63b14bb2b3aca89d98b612eae74a33c12e953ef9f6f84e708af",
+    "ceilingElevation": "f3844b7427f28ac282e50ab50a05e9f5b4547cc69888a5e593ca784008e582cd",
+    "fabricationPlanMapping": "c746308eddaf57f1c17da5b128744c3ccbfd596240ba825335bd0f3a677d7673"
+  },
+  "hydraulicSystem": {
+    "drawingDate": "12-21-22",
+    "sheetReference": "FP2",
+    "remoteAreaNumber": 1,
+    "systemNumber": 1,
+    "remoteAreaLocation": "First Floor",
+    "remoteAreaSizeSqFt": 1500,
+    "designDensityGpmPerSqFt": 0.1,
+    "areaPerSprinklerSqFt": 130,
+    "hazard": "LIGHT",
+    "systemType": "WET",
+    "sprinklerMake": "Tyco",
+    "sprinklerModel": "TY-FRB",
+    "sprinklerK": 5.6,
+    "flowingOutletCount": 17,
+    "hydraulicAreaFlowGpm": 444,
+    "hydraulicAreaPressurePsi": 52.4,
+    "outsideHoseAllowanceGpm": 100,
+    "pumpDischargeFlowGpm": 544,
+    "pumpDischargeRequiredPressurePsi": 63.9,
+    "availablePressurePsi": 80.5,
+    "safetyPressurePsi": 16.4,
+    "maximumWaterVelocityFps": 19.5
+  },
+  "independentCalcPlate": {
+    "projectName": "Winter Garden Stake Center",
+    "sheetReference": "FP2",
+    "plansDated": "12/22/22",
+    "remoteAreaNumber": 1,
+    "systemNumber": 1,
+    "remoteAreaLocation": "First Floor",
+    "remoteAreaSizeSqFt": 1500,
+    "designDensityGpmPerSqFt": 0.1,
+    "flowDemandAtBorGpm": 444,
+    "pressureDemandAtBorPsi": 63.2,
+    "hoseAllowanceGpm": 100,
+    "hazard": "Light",
+    "systemSafetyFactorPsi": 20.5
+  },
+  "operatingSprinklers": [
+    ["1", 19.42, 5.6, 24.2, 27.5, 25, 0.23],
+    ["2", 19.42, 5.6, 23.9, 27.4, 25, 0.23],
+    ["4", 16.33, 5.6, 22.7, 26.7, 25, 0.24],
+    ["5", 16.33, 5.6, 20.6, 25.4, 25, 0.23],
+    ["7", 16.33, 5.6, 20, 25, 25, 0.23],
+    ["8", 16.33, 5.6, 20, 25, 25, 0.23],
+    ["9", 16.33, 5.6, 20.7, 25.5, 25, 0.23],
+    ["11", 13.42, 5.6, 23.2, 27, 25, 0.21],
+    ["12", 13.42, 5.6, 21, 25.7, 25, 0.2],
+    ["14", 13.42, 5.6, 20.4, 25.3, 25, 0.19],
+    ["15", 13.42, 5.6, 20.4, 25.3, 25, 0.19],
+    ["16", 13.42, 5.6, 21.1, 25.7, 25, 0.2],
+    ["18", 9.33, 5.6, 24.4, 27.7, 25, 0.21],
+    ["19", 9.33, 5.6, 22.1, 26.4, 25, 0.2],
+    ["20", 9.33, 5.6, 21.6, 26, 25, 0.2],
+    ["22", 9.33, 5.6, 21.6, 26, 25, 0.2],
+    ["23", 9.33, 5.6, 22.3, 26.5, 25, 0.2]
+  ],
+  "diameterObservations": [
+    {"actualInsideDiameterIn": 1.38, "physicalPages": [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], "scope": "calculated branch piping"},
+    {"actualInsideDiameterIn": 2.067, "physicalPages": [7, 8, 12, 13, 14, 15, 16], "scope": "calculated cross-main piping"},
+    {"actualInsideDiameterIn": 3.068, "physicalPages": [2, 6, 7], "scope": "calculated riser piping"},
+    {"actualInsideDiameterIn": 8.071, "physicalPages": [2], "scope": "underground fittings"},
+    {"actualInsideDiameterIn": 8.249, "physicalPages": [2], "scope": "pump discharge piping"},
+    {"actualInsideDiameterIn": 8.488, "physicalPages": [2], "scope": "underground ductile iron piping"}
+  ],
+  "pitchedRowJoins": [
+    {
+      "rowId": "chapel-north",
+      "plane": "chapel-north-slope",
+      "fabricationElevationText": "(+19'-5\")",
+      "fabricationElevationAboveFloorFt": 19.4166666667,
+      "hydraulicNodeIds": ["1", "2"],
+      "hydraulicNodeKind": "operating-sprinkler",
+      "hydraulicElevationFt": 19.42,
+      "hydraulicPhysicalPage": 4,
+      "maximumRoundingResidualFt": 0.005,
+      "matchMode": "rounded-elevation-datum-only-no-spatial-node-head-identity"
+    },
+    {
+      "rowId": "chapel-ridge",
+      "plane": "chapel-ridge",
+      "fabricationElevationText": "(+24'-1\")",
+      "fabricationElevationAboveFloorFt": 24.0833333333,
+      "hydraulicNodeIds": ["38"],
+      "hydraulicNodeKind": "hydraulic-junction",
+      "hydraulicElevationFt": 24.08,
+      "hydraulicPhysicalPage": 4,
+      "maximumRoundingResidualFt": 0.005,
+      "matchMode": "rounded-elevation-datum-only-no-spatial-node-head-identity"
+    },
+    {
+      "rowId": "chapel-south",
+      "plane": "chapel-south-slope",
+      "fabricationElevationText": "(+19'-4\")",
+      "fabricationElevationAboveFloorFt": 19.3333333333,
+      "hydraulicNodeIds": ["A6"],
+      "hydraulicNodeKind": "hydraulic-junction",
+      "hydraulicElevationFt": 19.33,
+      "hydraulicPhysicalPage": 4,
+      "maximumRoundingResidualFt": 0.005,
+      "matchMode": "rounded-elevation-datum-only-no-spatial-node-head-identity"
+    }
+  ],
+  "pitchedRowHydraulicDatumRegistrationReady": true,
+  "operatingSprinklerHydraulicEvidenceReady": true,
+  "hydraulicInsideDiameterReportEvidenceReady": true,
+  "perHeadHydraulicIdentityReady": false,
+  "nominalPipeSizeReady": false,
+  "fullNetworkPipeElevationReady": false,
+  "exactAsBuiltDeflectorElevationReady": false,
+  "fabricationReady": false,
+  "complianceReady": false,
+  "limitations": [
+    "The stamped calculation proves the completed remote-area calculation, not automatic code compliance for a newly generated design.",
+    "Elevation equality registers the three pitched branch-row datums but does not spatially identify each completed chapel head with a hydraulic node.",
+    "DIA values are actual hydraulic inside diameters from the report and are not nominal fabrication sizes.",
+    "The field-adjusted TY3531 deflector setpoint and the remaining main, jog, and drop elevations are not recorded."
+  ],
+  "receiptSha256": "c3b95c1887ed6fb1023fb4aaa8a442ec28da4e65ceaf6a7348646406a5dfc19c"
+}

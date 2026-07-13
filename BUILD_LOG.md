@@ -1347,3 +1347,34 @@ User direction across 4 messages this session:
   evidence API returned 200 with both projects and all 23 edges. The rendered
   `/login` surface has no horizontal overflow, deprecated text, console warning,
   or console error at 1280 x 720.
+
+### Entry 40 - Winter Garden completed pitched-row hydraulic registration
+
+- Found and registered the completed Winter Garden stamped hydraulic calculation
+  that was absent from the earlier project source packet: A008 SHA-256
+  `29b028c1dc89bcf73462aefd11f773a5079d169146cf2ef8c9df752889cf6e95`,
+  plus the independent hydraulic calc plate SHA-256
+  `27214965864964897431c27cd2a99be4e32374a27dc17f977d069095869f5c81`.
+  Protected Egnyte originals were read and hashed in place without modification.
+- Joined the completed FP2 north, ridge, and south chapel branch elevations
+  `+19'-5"`, `+24'-1"`, and `+19'-4"` to stamped HASS node datums 19.42,
+  24.08, and 19.33 ft. Each pair differs by exactly 1/300 ft (0.04 in),
+  below the sealed 0.005-ft tolerance.
+- Bound 17 operating-sprinkler records and six actual-inside-diameter report
+  classes to the existing 15-head pitched ceiling/fabrication 3D model and
+  exposed the result through both the authenticated evidence route and the
+  existing Winter Garden pitched-roof AutoBid route.
+- Added primary, independent calc-plate, and adversarial product loops. The
+  adversarial loop rejects source/upstream receipt drift, row-datum drift,
+  fabricated node identity, inside-diameter substitution, per-head identity
+  promotion, and false compliance promotion.
+- Kept unproved claims closed: hydraulic node-to-completed-head bijection,
+  nominal pipe size, full-network elevation, exact as-built deflector elevation,
+  fabrication release, and compliance remain false.
+- Verification passed: focused Vitest 22/22, 100 deterministic primary plus
+  adversarial replays, full Vitest 1720/1720 across 182 files, node:test 20/20,
+  production Vite build, loop guard, and `AGENTIC_RULES_VERIFY ok`. GX10 Lean
+  4.13.0 verified `winterGardenPitchedRowRounding` in 81 ms with return code 0.
+- Live deployment and authenticated route smoke are pending this commit. The
+  broader master goal remains active; the existing 1881 whole-building PDF
+  footprint test still reports area over-capture and is not a completed lane.
