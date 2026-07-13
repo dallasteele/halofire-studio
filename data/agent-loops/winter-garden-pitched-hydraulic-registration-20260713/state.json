@@ -1,14 +1,16 @@
 {
   "name": "winter-garden-pitched-hydraulic-registration-20260713",
   "iteration": 1,
-  "status": "in_progress",
-  "updatedAt": "2026-07-13T09:28:00-07:00",
+  "status": "complete",
+  "updatedAt": "2026-07-13T09:32:00-07:00",
   "completedStages": [
     "DISCOVER",
     "PLAN",
-    "EXECUTE"
+    "EXECUTE",
+    "VERIFY",
+    "ITERATE"
   ],
-  "nextStage": "VERIFY",
+  "nextStage": null,
   "sourceEvidence": {
     "stampedHydraulicReportSha256": "29b028c1dc89bcf73462aefd11f773a5079d169146cf2ef8c9df752889cf6e95",
     "hydraulicCalcPlateSha256": "27214965864964897431c27cd2a99be4e32374a27dc17f977d069095869f5c81",
@@ -30,8 +32,10 @@
     "agenticRules": "AGENTIC_RULES_VERIFY ok",
     "loopGuard": "passed",
     "formalProof": "LEAN_PROVED: winterGardenPitchedRowRounding verified by Lean 4.13.0 in 81 ms",
-    "liveDeployment": "pending",
-    "authenticatedEvidenceSmoke": "pending"
+    "liveDeployment": "1e2a9cf0b44303527315a701939891aa04d59141 deployed; halofire.service active",
+    "loginSmoke": "HTTPS 200; 58981 bytes; no deprecated text; admin authentication 200",
+    "authenticatedEvidenceSmoke": "evidence and existing project routes 200; 3 pitched rows, 15 completed/mapped heads, 17 operating hydraulic sprinklers, 6 diameter classes, primary/independent/adversarial passed",
+    "brainWriteback": "episode 138985"
   },
   "claimState": {
     "pitchedRowHydraulicDatumRegistrationReady": true,
@@ -43,5 +47,6 @@
     "exactAsBuiltDeflectorElevationReady": false,
     "fabricationReady": false,
     "complianceReady": false
-  }
+  },
+  "nextAction": "Continue the active master goal with the 1881 whole-building PDF footprint over-capture and remaining full-system generation lanes; do not promote row-level hydraulic registration into per-head identity, nominal sizing, fabrication, or compliance."
 }

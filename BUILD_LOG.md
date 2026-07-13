@@ -1375,6 +1375,13 @@ User direction across 4 messages this session:
   adversarial replays, full Vitest 1720/1720 across 182 files, node:test 20/20,
   production Vite build, loop guard, and `AGENTIC_RULES_VERIFY ok`. GX10 Lean
   4.13.0 verified `winterGardenPitchedRowRounding` in 81 ms with return code 0.
-- Live deployment and authenticated route smoke are pending this commit. The
-  broader master goal remains active; the existing 1881 whole-building PDF
-  footprint test still reports area over-capture and is not a completed lane.
+- Deployed feature commit `1e2a9cf0b44303527315a701939891aa04d59141`
+  to the VPS and rebuilt/restarted `halofire.service`. Live public health,
+  `/login`, real admin authentication, the authenticated evidence route, and
+  the existing Winter Garden project route all returned 200. The evidence route
+  reported three pitched rows, 15 completed/mapped heads, 17 operating hydraulic
+  sprinklers, six inside-diameter classes, and all three product loops passed.
+  `/login` returned 58,981 bytes with no deprecated text.
+- Shared-brain writeback succeeded as episode 138985. The broader master goal
+  remains active; the existing 1881 whole-building PDF footprint test still
+  reports area over-capture and is not a completed lane.
