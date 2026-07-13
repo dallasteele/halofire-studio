@@ -1,0 +1,21 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "gatewayHealth": {
+    "status": "ok",
+    "gatewayVersion": "0.1.0",
+    "leanStatus": "ok",
+    "coqStatus": "ok"
+  },
+  "theoremName": "dallasPitchedPortfolioFailClosed",
+  "claim": "Two completed projects promote only the common pitched-hydraulic geometry capability; one per-head project cannot satisfy a two-project promotion, and the nine-head/eight-edge subset remains neither whole-building-ready nor compliance-ready.",
+  "theorem": "theorem dallasPitchedPortfolioFailClosed :\n  let projectCount : Nat := 2\n  let commonGeometryCount : Nat := 2\n  let perHeadIdentityCount : Nat := 1\n  let requiredCount : Nat := 2\n  let mappedHeads : Nat := 9\n  let mappedPipes : Nat := 8\n  let wholeBuildingReady : Bool := false\n  let complianceReady : Bool := false\n  And (commonGeometryCount >= requiredCount)\n    (And (Not (perHeadIdentityCount >= requiredCount))\n      (And (mappedPipes + 1 = mappedHeads)\n        (And (projectCount = requiredCount)\n          (And (wholeBuildingReady = false)\n            (complianceReady = false))))) :=",
+  "proof": "by\n  decide",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 66,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "dallas-pitched-attic-hydraulic-registration-20260713",
+  "owner": "codex",
+  "goal": "Register the completed Dallas pitched-attic hydraulic calculation to its reviewed and as-built sprinkler plans, then expose only claims that remain reproducible across independent completed projects without promoting code compliance from one job.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/AW Contracting/TCOJC Temple - Dallas TX/Engineering/Submittal/Resubmittal Sent on 6-18-21/REVISED ATTIC CALCULATION Reviewed.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/AW Contracting/TCOJC Temple - Dallas TX/Engineering/Submittal/Resubmittal Sent on 6-18-21/Revised Combined Set.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/AW Contracting/TCOJC Temple - Dallas TX/Field Operations/Final As-Build Drawings 9-28-21/Halo Stamped_As-Built Set.pdf",
+    "apps/autosprink/src/data/dallas-completed-project-source-set.json",
+    "apps/autosprink/src/data/pitched-roof-cross-project-evidence.json",
+    "apps/autosprink/src/data/winter-garden-pitched-hydraulic-registration.json"
+  ],
+  "exit_criteria": [
+    "immutable source hashes bind the reviewed attic calculation, reviewed plan set, completed as-built plan, and existing Dallas pitched-fabrication receipt",
+    "the hydraulic report is joined to the completed attic plan only where node identity, topology, length, elevation, diameter, and sprinkler attributes are directly reproducible",
+    "unmapped report nodes, unregistered plan objects, obstruction clearances, and exact as-built deflector elevations remain typed residuals rather than inferred facts",
+    "a cross-project promotion decision requires at least two independent completed projects with the same directly evidenced capability",
+    "primary, independent, and adversarial loops reject source substitution, duplicate-project evidence, node/topology drift, unit drift, nominal-versus-inside-diameter confusion, and false compliance promotion",
+    "focused and full tests, build, rulebook check, formal result, deploy, login smoke, and authenticated live evidence smoke are recorded"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "focused engine and authenticated API tests",
+    "deterministic primary and adversarial replay loop",
+    "full autosprink Vitest suite",
+    "autosprink production build",
+    "GX10 Lean 4 proof or exact prover-unavailable record",
+    "authoritative agentic-rule check",
+    "VPS deployment with live login and authenticated evidence-route smoke",
+    "brain close writeback"
+  ],
+  "state_path": "data/agent-loops/dallas-pitched-attic-hydraulic-registration-20260713/state.json",
+  "evidence_paths": [
+    "apps/autosprink/tests/dallas-pitched-attic-hydraulic-registration.test.js",
+    "apps/autosprink/tests/dallas-pitched-attic-bluebeam-overlay.test.js",
+    "apps/autosprink/tests/submitted-sprinkler-calibration-api.test.js",
+    "apps/autosprink/scripts/render-dallas-visual-proof.mjs",
+    "BUILD_LOG.md"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 500000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

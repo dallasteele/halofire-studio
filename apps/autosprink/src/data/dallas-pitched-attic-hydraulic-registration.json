@@ -1,0 +1,57 @@
+{
+  "artifactType": "halofire.dallas-pitched-attic-hydraulic-registration.v1",
+  "projectId": "dallas-temple-pitched-attic",
+  "projectName": "TCOJC Temple - Dallas TX",
+  "verifiedAt": "2026-07-13T12:45:00-07:00",
+  "sourceBindings": [
+    {"role":"reviewed-hydraulic-calculation","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Engineering\\Submittal\\Resubmittal Sent on 6-18-21\\REVISED ATTIC CALCULATION Reviewed.pdf","bytes":433769,"sha256":"1398effb82f6f8bdc8a2a7d40e044ab593362497f0bbf4daf15218bff9a1b88d","physicalPages":[1,2,3,4,5,6,7,8]},
+    {"role":"reviewed-sprinkler-plan-set","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Engineering\\Submittal\\Resubmittal Sent on 6-18-21\\Revised Combined Set.pdf","bytes":6800785,"sha256":"29eab59ce166a9c1241e54c406b3a190f1330d22cbf5242eb518d11fa48f8bbf","physicalPages":[5]},
+    {"role":"completed-as-built-plan-set","path":"02-Active jobs\\03-Closed\\AW Contracting\\TCOJC Temple - Dallas TX\\Field Operations\\Final As-Build Drawings 9-28-21\\Halo Stamped_As-Built Set.pdf","bytes":6198530,"sha256":"39ef506decf2f9a963cf5ed1ffee4b8f63998da12a8aa7e4e34c5433fd242ea7","physicalPages":[5]}
+  ],
+  "upstreamReceipts": {"dallasPitchedFabricationMapping":"23f52e7ed0f1d82514f5c6d39d6ef168c0c2976c40b0a41cadb94a4704ced1b4","pitchedRoofCrossProjectEvidence":"771f40cf93c9d17f5a071d59ca0ef06246df1dfe0873ab5bb51db4d5baff8090"},
+  "plan": {"sheetId":"FP-1.4","physicalPageNumber":5,"pageSizePt":[3024,2160],"printedScale":"1/8 inch = 1 foot","printedScalePtPerFt":9,"roofSlopeRiseInPer12":4,"remoteAreaNumber":5,"remoteAreaCrop":{"clipPt":[1050,650,1620,1320],"matrixScale":4,"colorspace":"gray","reviewedSampleSha256":"566e25a1cb40e1b579bbb66bfcea14d2fdac9799b0b449df7c5067494bdea6a4","asBuiltSampleSha256":"566e25a1cb40e1b579bbb66bfcea14d2fdac9799b0b449df7c5067494bdea6a4","pixelDifferenceCount":0}},
+  "hydraulicSystem": {"occupancy":"LIGHT HAZARD","systemType":"DRY SYSTEM","remoteAreaNumber":5,"operatingSprinklerCount":9,"designDensityGpmPerSqFt":0.1,"hoseAllowanceGpm":100,"systemFlowGpm":234.913,"totalDemandGpm":334.913,"requiredPressurePsi":46.453,"availableSafetyMarginPsi":10.419,"drySystemVolumeGal":415,"maximumVelocityFps":5.56},
+  "independentPlanSummary": {"operatingSprinklerCount":9,"totalDemandGpm":334.91,"requiredPressurePsi":46.45,"safetyFactorPsi":10.42,"drySystemVolumeGal":415},
+  "heads": [
+    {"nodeId":"A1","headFamily":"TYCO-TY3180-ATTIC-BB1","planPointPt":[1489,1049.25],"elevationFt":42,"kFactor":5.6,"pressurePsi":20.2,"actualFlowGpm":25.17,"designDensityGpmPerSqFt":0.1,"coverageSqFt":250,"requiredPressurePsi":20},
+    {"nodeId":"A2","headFamily":"TYCO-TY3180-ATTIC-BB1","planPointPt":[1435,1049.25],"elevationFt":42,"kFactor":5.6,"pressurePsi":20.11,"actualFlowGpm":25.11,"designDensityGpmPerSqFt":0.1,"coverageSqFt":250,"requiredPressurePsi":20},
+    {"nodeId":"A3","headFamily":"TYCO-TY3180-ATTIC-BB1","planPointPt":[1381,1049.25],"elevationFt":42,"kFactor":5.6,"pressurePsi":20.1,"actualFlowGpm":25.11,"designDensityGpmPerSqFt":0.1,"coverageSqFt":250,"requiredPressurePsi":20},
+    {"nodeId":"A4","headFamily":"TYCO-TY3180-ATTIC-BB1","planPointPt":[1327,1049.25],"elevationFt":42,"kFactor":5.6,"pressurePsi":20.04,"actualFlowGpm":25.07,"designDensityGpmPerSqFt":0.1,"coverageSqFt":250,"requiredPressurePsi":20},
+    {"nodeId":"A5","headFamily":"TYCO-TY3180-ATTIC-BB1","planPointPt":[1273,1049.25],"elevationFt":42,"kFactor":5.6,"pressurePsi":20,"actualFlowGpm":25.04,"designDensityGpmPerSqFt":0.1,"coverageSqFt":250,"requiredPressurePsi":20},
+    {"nodeId":"A6","headFamily":"TYCO-TY3180-ATTIC-BB1","planPointPt":[1219,1049.25],"elevationFt":42,"kFactor":5.6,"pressurePsi":20,"actualFlowGpm":25.04,"designDensityGpmPerSqFt":0.1,"coverageSqFt":250,"requiredPressurePsi":20},
+    {"nodeId":"A7","headFamily":"TYCO-TY3180-ATTIC-BB1","planPointPt":[1165,1049.25],"elevationFt":42,"kFactor":5.6,"pressurePsi":20.06,"actualFlowGpm":25.08,"designDensityGpmPerSqFt":0.1,"coverageSqFt":250,"requiredPressurePsi":20},
+    {"nodeId":"A8","headFamily":"TYCO-TY3183-ATTIC-SD1","planPointPt":[1364,1210.625],"elevationFt":29,"kFactor":5.6,"pressurePsi":28.02,"actualFlowGpm":29.64,"designDensityGpmPerSqFt":0.1,"coverageSqFt":250,"requiredPressurePsi":20},
+    {"nodeId":"A9","headFamily":"TYCO-TY3183-ATTIC-SD1","planPointPt":[1310,1210.625],"elevationFt":29,"kFactor":5.6,"pressurePsi":28.02,"actualFlowGpm":29.64,"designDensityGpmPerSqFt":0.1,"coverageSqFt":250,"requiredPressurePsi":20}
+  ],
+  "junctions": [{"nodeId":"701","planPointPt":[1354,1049.25],"elevationFt":42,"pressurePsi":20.12}],
+  "mappedBranchPipes": [
+    {"id":1,"fromNodeId":"A1","toNodeId":"A2","planLengthFt":6,"reportLengthFt":6,"nominalDiameterIn":2,"actualInsideDiameterIn":2.157,"planSizeText":"2 inch","matchMode":"scaled-plan-centerline-plus-hydraulic-report"},
+    {"id":2,"fromNodeId":"A2","toNodeId":"A3","planLengthFt":6,"reportLengthFt":6,"nominalDiameterIn":2,"actualInsideDiameterIn":2.157,"planSizeText":"2 inch","matchMode":"scaled-plan-centerline-plus-hydraulic-report"},
+    {"id":3,"fromNodeId":"A3","toNodeId":"701","planLengthFt":3,"reportLengthFt":3,"nominalDiameterIn":2,"actualInsideDiameterIn":2.157,"planSizeText":"2 inch","matchMode":"scaled-plan-centerline-plus-hydraulic-report"},
+    {"id":4,"fromNodeId":"701","toNodeId":"A4","planLengthFt":3,"reportLengthFt":3,"nominalDiameterIn":2,"actualInsideDiameterIn":2.157,"planSizeText":"2 inch","matchMode":"scaled-plan-centerline-plus-hydraulic-report"},
+    {"id":5,"fromNodeId":"A4","toNodeId":"A5","planLengthFt":6,"reportLengthFt":6,"nominalDiameterIn":2,"actualInsideDiameterIn":2.157,"planSizeText":"2 inch","matchMode":"scaled-plan-centerline-plus-hydraulic-report"},
+    {"id":6,"fromNodeId":"A5","toNodeId":"A6","planLengthFt":6,"reportLengthFt":6,"nominalDiameterIn":2,"actualInsideDiameterIn":2.157,"planSizeText":"2 inch","matchMode":"scaled-plan-centerline-plus-hydraulic-report"},
+    {"id":7,"fromNodeId":"A6","toNodeId":"A7","planLengthFt":6,"reportLengthFt":6,"nominalDiameterIn":2,"actualInsideDiameterIn":2.157,"planSizeText":"2 inch","matchMode":"scaled-plan-centerline-plus-hydraulic-report"},
+    {"id":8,"fromNodeId":"A8","toNodeId":"A9","planLengthFt":6,"reportLengthFt":6,"nominalDiameterIn":2,"actualInsideDiameterIn":2.157,"planSizeText":"2 inch","matchMode":"scaled-plan-centerline-plus-hydraulic-report"}
+  ],
+  "historicalReview": {"reviewedForApplicableCodesAndStandards":true,"reviewDate":"2021-06-16","role":"professional-engineer-review-of-completed-reference","generatedDesignApproval":false},
+  "activePitchedHydraulicPlanRegistrationReady": true,
+  "perHeadPitchedHydraulicIdentityReady": true,
+  "mappedPitchedBranchNominalSizeReady": true,
+  "historicalCompletedReferenceReviewReady": true,
+  "fullHydraulicPlanRegistrationReady": false,
+  "fullNetworkNominalPipeSizeReady": false,
+  "wholeBuildingNetworkElevationReady": false,
+  "exactAsBuiltDeflectorElevationReady": false,
+  "obstructionClearanceReady": false,
+  "fabricationReady": false,
+  "generatedDesignComplianceReady": false,
+  "complianceReady": false,
+  "limitations": [
+    "Only the nine operating Remote Area 5 heads, junction 701, and eight directly reproducible branch edges are spatially registered.",
+    "Hydraulic elevations are completed-design report values, not field-surveyed as-built deflector elevations.",
+    "The reviewed calculation is historical calibration evidence and does not approve a newly generated layout.",
+    "Per-head obstruction clearances and the remaining feed/cross-main network are not reproduced, so fabrication and generated-design compliance remain false."
+  ],
+  "receiptSha256": "12c7bdc2292c736b20c50b54ca23e3d37df28c168c81a0dd31feb8160738c7cd"
+}

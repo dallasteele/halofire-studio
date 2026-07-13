@@ -86,8 +86,23 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect((await request('/api/evidence/completed-hydraulic-routed-plan-registration')).status).toBe(401);
     expect((await request('/api/evidence/completed-hydraulic-sized-3d-registration')).status).toBe(401);
     expect((await request('/api/evidence/winter-garden-pitched-hydraulic-registration')).status).toBe(401);
+    expect((await request('/api/evidence/completed-pitched-hydraulic-registration')).status).toBe(401);
     expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration')).status).toBe(401);
     expect((await request('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/pitched-roof-pipe-calibration-bluebeam.pdf')).status).toBe(401);
+    expect((await request('/api/projects/TCOJC%20Temple%20-%20Dallas%20TX/completed-pitched-attic-bluebeam.fdf')).status).toBe(401);
+  });
+
+  it('serves a deterministic Bluebeam FDF overlay for the sealed Dallas FP-1.4 subset', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/projects/TCOJC%20Temple%20-%20Dallas%20TX/completed-pitched-attic-bluebeam.fdf', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('application/vnd.fdf');
+    expect(response.headers.get('x-halofire-artifact-sha256')).toMatch(/^[0-9a-f]{64}$/);
+    expect(response.headers.get('x-halofire-evidence-receipt-sha256')).toBe('12c7bdc2292c736b20c50b54ca23e3d37df28c168c81a0dd31feb8160738c7cd');
+    const raw = await response.text();
+    expect(raw.startsWith('%FDF-1.2')).toBe(true);
+    expect((raw.match(/\/Subj \(Registered operating sprinkler\)/g) || [])).toHaveLength(9);
+    expect((raw.match(/\/Subj \(Registered 2 inch pitched-attic branch\)/g) || [])).toHaveLength(8);
   });
 
   it('serves the two-project completed hydraulic-network vertical calibration', async () => {
@@ -186,6 +201,31 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.operatingSprinklers).toHaveLength(17);
     expect(result.branchPipes3d).toHaveLength(3);
     expect(result.views.hydraulicDatumSvg).toContain('no per-head node identity');
+    expect(Object.entries(result.acceptanceLoops.adversarial).filter(([name]) => name !== 'status').every(([, rejected]) => rejected)).toBe(true);
+  });
+
+  it('serves the two-project pitched-hydraulic portfolio without promoting Dallas-only claims', async () => {
+    const token = await tokenForAdmin();
+    const response = await request('/api/evidence/completed-pitched-hydraulic-registration', { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    const result = await response.json();
+    expect(result).toMatchObject({
+      status: 'passed', projectCount: 2, projectIds: ['dallas-temple-pitched-attic', 'winter-garden-meetinghouse'],
+      featurePromotion: {
+        pitched_hydraulic_geometry_registration: { ready: true, projectCount: 2 },
+        completed_pitched_hydraulic_reference: { ready: true, projectCount: 2 },
+        per_head_pitched_hydraulic_identity: { ready: false, projectCount: 1 },
+        mapped_pitched_branch_nominal_size: { ready: false, projectCount: 1 },
+        generated_pitched_design_compliance: { ready: false, projectCount: 0 },
+      },
+      acceptanceLoops: { primary: { status: 'passed' }, independent: { status: 'passed' }, adversarial: { status: 'passed' } },
+      generatedDesignComplianceReady: false, complianceReady: false,
+    });
+    expect(result.projects[0].counts).toEqual({ mappedActiveHeads: 9, mappedBranchPipes: 8, elevationClasses: 2 });
+    expect(result.projects[0].maximumPlanToReportLengthResidualFt).toBe(0);
+    expect(result.projects[0].historicalReview.reviewedForApplicableCodesAndStandards).toBe(true);
+    expect(result.projects[0].model3d.heads3d).toHaveLength(9);
+    expect(result.projects[0].views.topSvg).toContain('A9');
     expect(Object.entries(result.acceptanceLoops.adversarial).filter(([name]) => name !== 'status').every(([, rejected]) => rejected)).toBe(true);
   });
 

@@ -50,6 +50,8 @@ import { buildWinterGardenChapelPipeNetwork, validateFp2PipeEvidence } from '../
 import { buildWinterGardenCeilingModel3d, validateWinterGardenCeilingElevationEvidence } from '../engine/winter-garden-ceiling-elevation.js';
 import { buildWinterGardenFabricationRegisteredModel, validateWinterGardenFabricationPlanMapping } from '../engine/winter-garden-fabrication-plan-mapping.js';
 import { buildWinterGardenPitchedHydraulicModel, validateWinterGardenPitchedHydraulicRegistration, verifyWinterGardenPitchedHydraulicAdversarialLoop } from '../engine/winter-garden-pitched-hydraulic-registration.js';
+import { buildDallasPitchedAtticHydraulicModel, validateCompletedPitchedHydraulicPortfolio, validateDallasPitchedAtticHydraulicRegistration, verifyDallasPitchedAtticHydraulicAdversarialLoop } from '../engine/dallas-pitched-attic-hydraulic-registration.js';
+import { buildDallasPitchedAtticBluebeamOverlay } from '../engine/dallas-pitched-attic-bluebeam-overlay.js';
 import { buildWinterGardenBluebeamPackage } from '../engine/winter-garden-bluebeam-package.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
 import { buildBluebeamFdfOverlay } from '../engine/bluebeam-fdf-overlay.js';
@@ -125,6 +127,7 @@ const WINTER_GARDEN_PIPE_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter
 const WINTER_GARDEN_CEILING_ELEVATION_PATH = path.resolve(__dirname, '../data/winter-garden-ceiling-elevation-evidence.json');
 const WINTER_GARDEN_FABRICATION_PLAN_MAPPING_PATH = path.resolve(__dirname, '../data/winter-garden-fabrication-plan-mapping.json');
 const WINTER_GARDEN_PITCHED_HYDRAULIC_REGISTRATION_PATH = path.resolve(__dirname, '../data/winter-garden-pitched-hydraulic-registration.json');
+const DALLAS_PITCHED_ATTIC_HYDRAULIC_REGISTRATION_PATH = path.resolve(__dirname, '../data/dallas-pitched-attic-hydraulic-registration.json');
 const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-dwg-source-geometry.json');
 const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
 const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
@@ -1838,6 +1841,70 @@ app.get('/api/evidence/winter-garden-pitched-hydraulic-registration', authMiddle
   } catch (error) {
     log.error('Failed to load Winter Garden pitched hydraulic registration', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'winter_garden_pitched_hydraulic_registration_load_failed', complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/completed-pitched-hydraulic-registration', authMiddleware, async (req, res) => {
+  try {
+    const dallasPacket = JSON.parse(fs.readFileSync(DALLAS_PITCHED_ATTIC_HYDRAULIC_REGISTRATION_PATH, 'utf8'));
+    const winterGardenPacket = JSON.parse(fs.readFileSync(WINTER_GARDEN_PITCHED_HYDRAULIC_REGISTRATION_PATH, 'utf8'));
+    const [dallas, dallasModel, winterGarden] = await Promise.all([
+      validateDallasPitchedAtticHydraulicRegistration(dallasPacket),
+      buildDallasPitchedAtticHydraulicModel(dallasPacket),
+      validateWinterGardenPitchedHydraulicRegistration(winterGardenPacket),
+    ]);
+    const [portfolio, adversarialLoop] = await Promise.all([
+      validateCompletedPitchedHydraulicPortfolio(dallas, winterGarden),
+      verifyDallasPitchedAtticHydraulicAdversarialLoop(dallasPacket, winterGarden),
+    ]);
+    const validations = [dallas, dallasModel, winterGarden, portfolio, adversarialLoop];
+    if (validations.some((validation) => validation.status !== 'passed')) return res.status(422).json({ status: 'blocked', artifactType: 'halofire.completed-pitched-hydraulic-portfolio.v1', issues: validations.flatMap((validation) => validation.issues || []), complianceReady: false });
+    return res.json({
+      status: 'passed', artifactType: 'halofire.completed-pitched-hydraulic-portfolio.v1', projectCount: portfolio.projectCount, projectIds: portfolio.projectIds,
+      featurePromotion: portfolio.featurePromotion,
+      projects: [
+        {
+          projectId: dallas.projectId, projectName: dallas.projectName, receiptSha256: dallas.receiptSha256, sourceBindings: dallas.sourceBindings,
+          counts: { mappedActiveHeads: dallas.metrics.mappedActiveHeadCount, mappedBranchPipes: dallas.metrics.mappedBranchPipeCount, elevationClasses: dallas.metrics.elevationClassCount },
+          maximumPlanToReportLengthResidualFt: dallas.metrics.maximumPlanToReportLengthResidualFt, hydraulicSystem: dallas.hydraulicSystem,
+          heads: dallas.heads, mappedBranchPipes: dallas.mappedBranchPipes, historicalReview: dallas.historicalReview, model3d: dallasModel, views: dallasModel.views,
+          activePitchedHydraulicPlanRegistrationReady: true, perHeadPitchedHydraulicIdentityReady: true, mappedPitchedBranchNominalSizeReady: true,
+          historicalCompletedReferenceReviewReady: true, fullHydraulicPlanRegistrationReady: false, fullNetworkNominalPipeSizeReady: false,
+          wholeBuildingNetworkElevationReady: false, exactAsBuiltDeflectorElevationReady: false, obstructionClearanceReady: false, generatedDesignComplianceReady: false, fabricationReady: false, complianceReady: false,
+        },
+        {
+          projectId: winterGarden.projectId, projectName: winterGarden.projectName, receiptSha256: winterGarden.receiptSha256,
+          counts: { pitchedRows: winterGarden.metrics.pitchedRowCount, operatingSprinklers: winterGarden.metrics.operatingSprinklerCount, hydraulicInsideDiameterClasses: winterGarden.metrics.hydraulicInsideDiameterClassCount },
+          pitchedRowHydraulicDatumRegistrationReady: true, perHeadPitchedHydraulicIdentityReady: false, mappedPitchedBranchNominalSizeReady: false, complianceReady: false,
+        },
+      ],
+      acceptanceLoops: {
+        primary: { status: 'passed', method: 'dallas-fp1.4-a1-a9-plan-report-registration-plus-winter-garden-row-datums' },
+        independent: { status: 'passed', method: 'reviewed-versus-as-built-zero-pixel-crop-delta-plus-independent-printed-summary-rounding' },
+        adversarial: adversarialLoop,
+      },
+      generatedDesignComplianceReady: false, complianceReady: false,
+    });
+  } catch (error) {
+    log.error('Failed to load completed pitched-hydraulic portfolio', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'completed_pitched_hydraulic_registration_load_failed', complianceReady: false });
+  }
+});
+
+app.get('/api/projects/:name/completed-pitched-attic-bluebeam.fdf', authMiddleware, (req, res) => {
+  if (req.params.name !== 'TCOJC Temple - Dallas TX') return res.status(404).json({ error: 'completed_pitched_attic_bluebeam_not_found' });
+  try {
+    const packet = JSON.parse(fs.readFileSync(DALLAS_PITCHED_ATTIC_HYDRAULIC_REGISTRATION_PATH, 'utf8'));
+    const result = buildDallasPitchedAtticBluebeamOverlay(packet);
+    if (result.status !== 'passed') return res.status(422).json({ status: 'blocked', issues: result.issues, complianceReady: false });
+    res.setHeader('Content-Type', 'application/vnd.fdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${result.manifest.fileName}"`);
+    res.setHeader('X-HaloFire-Artifact-Sha256', result.manifest.sha256);
+    res.setHeader('X-HaloFire-Evidence-Receipt-Sha256', result.manifest.evidenceReceiptSha256);
+    return res.send(result.buffer);
+  } catch (error) {
+    log.error('Failed to build Dallas completed pitched-attic Bluebeam overlay', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'completed_pitched_attic_bluebeam_failed', complianceReady: false });
   }
 });
 

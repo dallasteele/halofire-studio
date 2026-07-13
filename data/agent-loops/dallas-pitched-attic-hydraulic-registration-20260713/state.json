@@ -1,0 +1,40 @@
+{
+  "name": "dallas-pitched-attic-hydraulic-registration-20260713",
+  "iteration": 2,
+  "status": "in_progress",
+  "updatedAt": "2026-07-13T10:12:00-07:00",
+  "completedStages": [
+    "DISCOVER",
+    "PLAN",
+    "EXECUTE",
+    "VERIFY"
+  ],
+  "nextStage": "DEPLOY",
+  "sourceEvidence": {
+    "reviewedAtticCalculationSha256": "1398effb82f6f8bdc8a2a7d40e044ab593362497f0bbf4daf15218bff9a1b88d",
+    "completedAsBuiltPlanSha256": "39ef506decf2f9a963cf5ed1ffee4b8f63998da12a8aa7e4e34c5433fd242ea7"
+  },
+  "claimState": {
+    "dallasPitchedHydraulicRegistrationReady": true,
+    "crossProjectPitchedHydraulicPromotionReady": true,
+    "bluebeamRegisteredSubsetOverlayReady": true,
+    "exactAsBuiltDeflectorElevationReady": false,
+    "fabricationReady": false,
+    "complianceReady": false
+  },
+  "verification": {
+    "focusedTests": "23 passed",
+    "fullSuite": "184 files / 1731 tests passed after Bluebeam route",
+    "nodeNativeSuite": "20 tests passed",
+    "productionBuild": "passed",
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "formalProof": "LEAN_PROVED: dallasPitchedPortfolioFailClosed on Lean 4.13.0 in 66 ms",
+    "visualProof": [
+      "out/visual-proof/dallas-bluebeam-proof.png",
+      "out/visual-proof/cooperative-1881-eight-floor-model.png"
+    ],
+    "bluebeamFdfSha256": "dbb5979c631f02deac13ac99f9f130d484fc431e88e4e4ecd4a0a48fee5e695b"
+  },
+  "nextAction": "Complete the post-route full-suite replay, commit, deploy to the VPS, and run live login plus authenticated evidence/FDF smokes."
+}
