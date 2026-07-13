@@ -12,11 +12,14 @@ export const COMPLETED_PROJECT_CLAIMS = [
 
 const REQUIRED_COMPLETED_PROJECT_ROLES = [
   'source_coordination',
-  'approved_output',
   'field_output',
   'as_built_output',
   'fabrication',
 ];
+
+function hasApprovalContract(roles) {
+  return roles.has('approved_output') || (roles.has('final_ahj_submission') && roles.has('issued_permit'));
+}
 
 function normalizedFamilyKey(family) {
   return `${family?.manufacturer || ''}:${family?.family || ''}`.toLowerCase();
@@ -102,6 +105,8 @@ export function validateCompletedProjectEvidenceSet(sourceSet, referenceProjectI
     if (!declaredRequiredRoles.has(role)) issues.push(`required_evidence_contract_drift:${role}`);
     if (!evidenceRoles.has(role)) issues.push(`required_evidence_role_missing:${role}`);
   }
+  if (!hasApprovalContract(declaredRequiredRoles)) issues.push('required_evidence_contract_drift:approval_basis');
+  if (!hasApprovalContract(evidenceRoles)) issues.push('required_evidence_role_missing:approval_basis');
   for (const file of files) {
     const label = file.sheet || file.levelId || file.view || 'unknown';
     if (!file.path || !file.evidenceRole || !file.view || !Number.isInteger(file.bytes) || file.bytes <= 0 || !SHA256.test(file.sha256 || '')) {
@@ -144,7 +149,9 @@ export function validateCompletedProjectEvidenceSet(sourceSet, referenceProjectI
 
   const asBuiltFiles = files.filter((file) => file.evidenceRole === 'as_built_output');
   const asBuiltFamilies = new Set(asBuiltFiles.flatMap((file) => file.observedManufacturerFamilies || []).map(normalizedFamilyKey));
-  const approvedHashes = new Set(files.filter((file) => file.evidenceRole === 'approved_output').map((file) => file.sha256));
+  const approvedHashes = new Set(files
+    .filter((file) => ['approved_output', 'final_ahj_submission'].includes(file.evidenceRole))
+    .map((file) => file.sha256));
   const fieldHashes = new Set(files.filter((file) => file.evidenceRole === 'field_output').map((file) => file.sha256));
   const asBuiltHashes = new Set(asBuiltFiles.map((file) => file.sha256));
   const completedLevels = new Set(asBuiltFiles.flatMap((file) => file.completedLevels || []));
@@ -156,13 +163,30 @@ export function validateCompletedProjectEvidenceSet(sourceSet, referenceProjectI
   if (files.some((file) => file.evidenceRole === 'source_coordination' && file.view === 'roof_framing') && asBuiltFiles.length) {
     supportedClaims.add('roof_structure_coordination');
   }
+  const sourceViews = new Set(files.filter((file) => file.evidenceRole === 'source_coordination').map((file) => file.view));
+  if (sourceViews.has('floor_plan') && sourceViews.has('reflected_ceiling_plan')
+    && sourceViews.has('building_section') && asBuiltFiles.length) {
+    supportedClaims.add('source_to_completed_sprinkler_layout');
+  }
   if (approvedHashes.size && fieldHashes.size && asBuiltHashes.size
     && ![...approvedHashes].some((hash) => fieldHashes.has(hash) || asBuiltHashes.has(hash))
     && ![...fieldHashes].some((hash) => asBuiltHashes.has(hash))) {
     supportedClaims.add('as_built_feedback_loop');
   }
-  if (completedLevels.size >= 3 && inventoryLevels.size >= 3
-    && [...inventoryLevels].every((levelId) => completedLevels.has(levelId))) {
+  const multiFloorVisualProof = asBuiltFiles.some((file) => {
+    const markers = (file.visualVerification?.markers || []).map((marker) => marker.toLowerCase().replace(/[^a-z0-9]+/g, ''));
+    const levels = file.completedLevels || [];
+    const levelMarkerPresent = (level) => {
+      const normalized = String(level).toLowerCase().replace(/[^a-z0-9]+/g, '');
+      const aliases = normalized === 'mezzanine' ? ['mezzanine', 'mezz'] : [normalized];
+      return markers.some((marker) => aliases.some((alias) => marker.includes(alias)));
+    };
+    return levels.length >= 2
+      && levels.every(levelMarkerPresent)
+      && markers.some((marker) => marker.includes('crosssection'))
+      && markers.some((marker) => marker.includes('3d'));
+  });
+  if (completedLevels.size >= 2 && multiFloorVisualProof) {
     supportedClaims.add('multi_floor_completed_output');
   }
   const verifiedClaims = validateDeclaredClaims(sourceSet.verifiedClaims, supportedClaims, issues);

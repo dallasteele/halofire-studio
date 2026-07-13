@@ -1,0 +1,168 @@
+{
+  "artifactType": "halofire.completed-project-evidence-set.v1",
+  "projectId": "nashville-tn-temple",
+  "projectName": "LDS Temple - Nashville TN",
+  "evidencePurpose": "Independent completed-project calibration from architectural plan, RCP, and section sources through final AHJ submission, field plan, as-built, and fabrication listing",
+  "egnyteRoot": "Y:\\Shared\\HaloOps",
+  "verifiedAt": "2026-07-12T23:35:00-07:00",
+  "verifiedClaims": [
+    "as_built_feedback_loop",
+    "completed_output_to_fabrication",
+    "manufacturer_family_trace",
+    "multi_floor_completed_output",
+    "source_to_completed_sprinkler_layout"
+  ],
+  "requiredEvidenceRoles": [
+    "source_coordination",
+    "final_ahj_submission",
+    "issued_permit",
+    "field_output",
+    "as_built_output",
+    "fabrication"
+  ],
+  "files": [
+    {
+      "evidenceRole": "source_coordination",
+      "view": "floor_plan",
+      "sheet": "A110",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\05-CAD Files\\21973 - NASHVILLE TENNESSEE TEMPLE-Sheet - A110 - OVERALL PLAN - LEVEL 01.dwg",
+      "bytes": 1157939,
+      "sha256": "15939291b13ea9728f87474e3c0046faa5ec3cb6c9e39b7f36c9a17c902c2803",
+      "printedScale": "3/16 inch = 1 foot",
+      "sourcePdfBinding": {"sha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929", "physicalPageNumber": 17}
+    },
+    {
+      "evidenceRole": "source_coordination",
+      "view": "reflected_ceiling_plan",
+      "sheet": "A111.4",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\05-CAD Files\\21973 - NASHVILLE TENNESSEE TEMPLE-Sheet - A111-4 - REFLECTED CEILING PLAN - LEVEL 01 AREA A.dwg",
+      "bytes": 1160068,
+      "sha256": "5160e94998fc3d4ee09bf249a1a5d0d8b5c021f1261ee0084e418367de21221f",
+      "sourcePdfBinding": {"sha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929", "physicalPageNumber": 22}
+    },
+    {
+      "evidenceRole": "source_coordination",
+      "view": "reflected_ceiling_plan",
+      "sheet": "A112.4",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\05-CAD Files\\21973 - NASHVILLE TENNESSEE TEMPLE-Sheet - A112-4 - REFLECTED CEILING PLAN - LEVEL 01 AREA B.dwg",
+      "bytes": 498758,
+      "sha256": "0d5fa119b93bea7524d678d7b565dd9d7a10732b4b8c7203f11107cbdf4a5dd6",
+      "sourcePdfBinding": {"sha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929", "physicalPageNumber": 26}
+    },
+    {
+      "evidenceRole": "source_coordination",
+      "view": "building_section",
+      "sheet": "A301",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\05-CAD Files\\21973 - NASHVILLE TENNESSEE TEMPLE-Sheet - A301 - BUILDING SECTIONS.dwg",
+      "bytes": 2264372,
+      "sha256": "ac2382a0c5d8fcfcaeb3d94d500a9885b1f65f3d8472b31a902c1caa7a4ca1dc",
+      "sourcePdfBinding": {"sha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929", "physicalPageNumber": 31},
+      "elevationDatumsFt": [
+        {"label": "LEVEL 01", "elevationFt": 100},
+        {"label": "MEZZANINE - A", "elevationFt": 108.78125},
+        {"label": "PARAPET 1", "elevationFt": 118.25},
+        {"label": "PARAPET 2", "elevationFt": 123}
+      ]
+    },
+    {
+      "evidenceRole": "source_coordination",
+      "view": "utility_level_plan",
+      "sheet": "A121.1",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\05-CAD Files\\21973 - NASHVILLE TENNESSEE TEMPLE-Sheet - A121-1 - ANNOTATED PLAN - UTILITY LEVEL - AREA A.dwg",
+      "bytes": 1695873,
+      "sha256": "ccb9da3a60f991a226a0653aa1a93365bcfeca3141e33ef97c820920a9193180",
+      "printedScale": "1/4 inch = 1 foot",
+      "sourcePdfBinding": {"sha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929", "physicalPageNumber": 27}
+    },
+    {
+      "evidenceRole": "source_coordination",
+      "view": "tower_plan",
+      "sheet": "A131.1",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\05-CAD Files\\21973 - NASHVILLE TENNESSEE TEMPLE-Sheet - A131-1 - PLAN - TOWER.dwg",
+      "bytes": 218652,
+      "sha256": "57bb39990afff4af77e05eb834748e2c9f265c3536a9ebf1d1c971fcf9c387de",
+      "printedScale": "1/4 inch = 1 foot",
+      "sourcePdfBinding": {"sha256": "552ca656e22f9a113aafd0eb9bc95cd70696676797078936514e611864293929", "physicalPageNumber": 29}
+    },
+    {
+      "evidenceRole": "final_ahj_submission",
+      "view": "main_and_upper_sprinkler_plan_with_isometric",
+      "sheet": "FP2-REV2",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\07-AHJ Submittals\\4th Submittal 09.05.2023\\FP2 - NASHVILLE REV 2.pdf",
+      "bytes": 20381739,
+      "sha256": "53a31d498f7af2844bb52dd9e2d94ce6267eceaf5522b7657e5d7b93afa6b00c",
+      "approvalBasis": "Fourth AHJ submission stored with the subsequently issued project permit; the sheet itself is not represented as approval-stamped"
+    },
+    {
+      "evidenceRole": "issued_permit",
+      "view": "issued_fire_sprinkler_permit",
+      "sheet": "PERMIT",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\08-AHJ Approval DWG & Permit\\LDS Temple - Nashville TN_Permit.pdf",
+      "bytes": 76026,
+      "sha256": "23a0afcb720fc1aa9c477e0c71f5bf4fce6e92c760dfd74ef90455051f1fa2b0"
+    },
+    {
+      "evidenceRole": "field_output",
+      "view": "field_main_and_upper_sprinkler_plan_with_isometric",
+      "sheet": "FP2-FIELD",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\10-Field Set\\Field Plan.pdf",
+      "bytes": 1907202,
+      "sha256": "4a792a82111588a8c80a6c3fe21867a78a8d4c3a7732be4e5736abd52bc7884a"
+    },
+    {
+      "evidenceRole": "as_built_output",
+      "view": "as_built_sprinkler_plan_section_and_rcp_set",
+      "sheet": "FP1-FP4",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\11-As-Built Set\\combinepdf (1).pdf",
+      "bytes": 9972770,
+      "sha256": "fa92c6ddbef4e1f25171e48a48e9c320e11121f0963d3931fa3f19baf7296614",
+      "completedLevels": ["main", "upper"],
+      "observedManufacturerFamilies": [
+        {"manufacturer": "Tyco", "family": "RFII"},
+        {"manufacturer": "Tyco", "family": "TY-FRB"}
+      ],
+      "visualVerification": {
+        "pages": [2, 3, 4],
+        "markers": ["AS-BUILT", "MAIN LEVEL FIRE SPRINKLER PIPING PLAN", "UPPER LEVEL FIRE SPRINKLER PIPING PLAN", "3/D-MODEL", "CROSS SECTION VIEW"]
+      }
+    },
+    {
+      "evidenceRole": "fabrication",
+      "view": "sprinkcad_stock_listing_tyl",
+      "levelId": "consolidated",
+      "sheet": "TYL-CONSOLIDATED",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\09-Listings\\TEMPLE NASHVILLE.TYL",
+      "bytes": 91824,
+      "sha256": "2b646d805ef6c6cfa8ce726a0c2b2e45f2784b665e40b3b56fcb0cc59122cc58"
+    },
+    {
+      "evidenceRole": "fabrication_document",
+      "view": "fabrication_listing_pdf",
+      "sheet": "FAB-LISTING-2023-07-24",
+      "path": "02-Active jobs\\03-Closed\\LDS Temple - Nashville TN\\2-Internal Ops\\01-Design\\09-Listings\\Nashville TN Fab Listing 7.24.2023.pdf",
+      "bytes": 828191,
+      "sha256": "ff6791088204be0d8186f6f81955c357332588cacfd5b9a5c1b0e77aeefffa46"
+    }
+  ],
+  "fabricationInventories": [
+    {
+      "levelId": "consolidated",
+      "fileSha256": "2b646d805ef6c6cfa8ce726a0c2b2e45f2784b665e40b3b56fcb0cc59122cc58",
+      "stockListingVersion": "1.50",
+      "pipingRows": 453,
+      "outletRows": 263,
+      "sprinklerFamilies": [
+        {"manufacturer": "Tyco", "family": "RFII", "partNumber": "51-794-4-155", "quantity": 133},
+        {"manufacturer": "Tyco", "family": "TY-FRB", "partNumber": "57-370-1-200", "quantity": 108}
+      ]
+    }
+  ],
+  "excludedArtifacts": [],
+  "limitations": [
+    "This set proves source-plan/RCP/section presence and a completed multi-level sprinkler lifecycle; it does not yet prove automatic source-bound footprint extraction or scaled extrusion.",
+    "A110 source text proves the printed scale is 3/16 inch equals 1 foot; an initial 1/8 inch reading was rejected before promotion.",
+    "A131 contains three tower plan views and must be split before any tower footprint can be accepted.",
+    "The fourth AHJ submission is bound together with the issued permit, but the FP2 sheet itself is not represented as approval-stamped.",
+    "This evidence is calibration data and does not assert code compliance, approval, or exact as-built deflector elevations."
+  ]
+}

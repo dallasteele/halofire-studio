@@ -224,15 +224,15 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.crossProjectEvidence.metrics).toMatchObject({ projectCount: 4, pitchedProjectCount: 3, winterGardenPitchInPer12: 4.5 });
     expect(result.completedProjectEvidencePortfolio).toMatchObject({
       status: 'passed',
-      projectCount: 2,
-      projectIds: ['tallahassee-fl-temple', 'winter-garden-fl-meetinghouse'],
+      projectCount: 3,
+      projectIds: ['nashville-tn-temple', 'tallahassee-fl-temple', 'winter-garden-fl-meetinghouse'],
       featurePromotion: {
-        as_built_feedback_loop: { ready: true, projectCount: 2 },
-        completed_output_to_fabrication: { ready: true, projectCount: 2 },
-        manufacturer_family_trace: { ready: true, projectCount: 2 },
+        as_built_feedback_loop: { ready: true, projectCount: 3 },
+        completed_output_to_fabrication: { ready: true, projectCount: 3 },
+        manufacturer_family_trace: { ready: true, projectCount: 3 },
         roof_structure_coordination: { ready: true, projectCount: 2 },
-        multi_floor_completed_output: { ready: false, projectCount: 1 },
-        source_to_completed_sprinkler_layout: { ready: false, projectCount: 1 },
+        multi_floor_completed_output: { ready: true, projectCount: 2 },
+        source_to_completed_sprinkler_layout: { ready: true, projectCount: 2 },
         pitched_roof_fabrication_spatial_mapping: { ready: false, projectCount: 0 },
       },
     });

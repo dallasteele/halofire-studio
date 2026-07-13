@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import tallahasseeSourceSet from '../src/data/tallahassee-completed-project-source-set.json';
+import nashvilleSourceSet from '../src/data/nashville-completed-project-source-set.json';
 import winterGardenSourceSet from '../src/data/winter-garden-cross-project-source-set.json';
 import {
   validateCompletedProjectEvidencePortfolio,
@@ -63,17 +64,34 @@ describe('cross-project design evidence', () => {
     ]);
   });
 
-  it('promotes only claims repeated across two independent completed projects', () => {
-    const result = validateCompletedProjectEvidencePortfolio([winterGardenSourceSet, tallahasseeSourceSet]);
+  it('binds Nashville source plans, RCPs, sections, permit-backed AHJ output, two completed levels, and consolidated fabrication', () => {
+    const result = validateCompletedProjectEvidenceSet(nashvilleSourceSet);
     expect(result.status).toBe('passed');
-    expect(result.projectCount).toBe(2);
-    expect(result.projectIds).toEqual(['tallahassee-fl-temple', 'winter-garden-fl-meetinghouse']);
-    expect(result.featurePromotion.as_built_feedback_loop.ready).toBe(true);
-    expect(result.featurePromotion.completed_output_to_fabrication.ready).toBe(true);
-    expect(result.featurePromotion.manufacturer_family_trace.ready).toBe(true);
-    expect(result.featurePromotion.roof_structure_coordination.ready).toBe(true);
-    expect(result.featurePromotion.multi_floor_completed_output).toMatchObject({ ready: false, projectCount: 1 });
-    expect(result.featurePromotion.source_to_completed_sprinkler_layout).toMatchObject({ ready: false, projectCount: 1 });
+    expect(result.projectId).toBe('nashville-tn-temple');
+    expect(result.fileCount).toBe(12);
+    expect(result.fabricationLevels).toEqual(['consolidated']);
+    expect(result.fabricationPipingRows).toBe(453);
+    expect(result.fabricationOutletRows).toBe(263);
+    expect(result.verifiedClaims).toEqual([
+      'as_built_feedback_loop',
+      'completed_output_to_fabrication',
+      'manufacturer_family_trace',
+      'multi_floor_completed_output',
+      'source_to_completed_sprinkler_layout',
+    ]);
+  });
+
+  it('promotes only claims repeated across two independent completed projects', () => {
+    const result = validateCompletedProjectEvidencePortfolio([winterGardenSourceSet, tallahasseeSourceSet, nashvilleSourceSet]);
+    expect(result.status).toBe('passed');
+    expect(result.projectCount).toBe(3);
+    expect(result.projectIds).toEqual(['nashville-tn-temple', 'tallahassee-fl-temple', 'winter-garden-fl-meetinghouse']);
+    expect(result.featurePromotion.as_built_feedback_loop).toMatchObject({ ready: true, projectCount: 3 });
+    expect(result.featurePromotion.completed_output_to_fabrication).toMatchObject({ ready: true, projectCount: 3 });
+    expect(result.featurePromotion.manufacturer_family_trace).toMatchObject({ ready: true, projectCount: 3 });
+    expect(result.featurePromotion.roof_structure_coordination).toMatchObject({ ready: true, projectCount: 2 });
+    expect(result.featurePromotion.multi_floor_completed_output).toMatchObject({ ready: true, projectCount: 2 });
+    expect(result.featurePromotion.source_to_completed_sprinkler_layout).toMatchObject({ ready: true, projectCount: 2 });
     expect(result.featurePromotion.pitched_roof_fabrication_spatial_mapping).toMatchObject({ ready: false, projectCount: 0 });
   });
 
@@ -97,6 +115,15 @@ describe('cross-project design evidence', () => {
       for (const family of inventory.sprinklerFamilies) family.manufacturer = 'Viking';
     }
     expect(validateCompletedProjectEvidenceSet(manufacturerDrift).issues).toContain('claim_evidence_missing:manufacturer_family_trace');
+
+    const missingSectionProof = structuredClone(nashvilleSourceSet);
+    const nashvilleAsBuilt = missingSectionProof.files.find((file) => file.evidenceRole === 'as_built_output');
+    nashvilleAsBuilt.visualVerification.markers = nashvilleAsBuilt.visualVerification.markers.filter((marker) => !marker.includes('CROSS SECTION'));
+    expect(validateCompletedProjectEvidenceSet(missingSectionProof).issues).toContain('claim_evidence_missing:multi_floor_completed_output');
+
+    const missingPermit = structuredClone(nashvilleSourceSet);
+    missingPermit.files = missingPermit.files.filter((file) => file.evidenceRole !== 'issued_permit');
+    expect(validateCompletedProjectEvidenceSet(missingPermit).issues).toContain('required_evidence_role_missing:approval_basis');
 
     const duplicateProject = structuredClone(tallahasseeSourceSet);
     duplicateProject.projectId = winterGardenSourceSet.projectId;

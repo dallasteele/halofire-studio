@@ -101,6 +101,7 @@ const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitte
 const PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH = path.resolve(__dirname, '../data/pitched-roof-cross-project-evidence.json');
 const WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/winter-garden-cross-project-source-set.json');
 const TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/tallahassee-completed-project-source-set.json');
+const NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/nashville-completed-project-source-set.json');
 const WINTER_GARDEN_HEAD_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp3-head-evidence.json');
 const WINTER_GARDEN_GRID_REGISTRATION_PATH = path.resolve(__dirname, '../data/winter-garden-grid-registration.json');
 const WINTER_GARDEN_PIPE_EVIDENCE_PATH = path.resolve(__dirname, '../data/winter-garden-fp2-pipe-evidence.json');
@@ -1719,6 +1720,7 @@ app.get('/api/projects/:name/pitched-roof-pipe-calibration', authMiddleware, asy
     const completedProjectSourceSets = [
       JSON.parse(fs.readFileSync(WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH, 'utf8')),
       JSON.parse(fs.readFileSync(TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH, 'utf8')),
+      JSON.parse(fs.readFileSync(NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH, 'utf8')),
     ];
     const headEvidence = JSON.parse(fs.readFileSync(WINTER_GARDEN_HEAD_EVIDENCE_PATH, 'utf8'));
     const gridRegistration = JSON.parse(fs.readFileSync(WINTER_GARDEN_GRID_REGISTRATION_PATH, 'utf8'));
