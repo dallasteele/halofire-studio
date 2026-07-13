@@ -1320,3 +1320,30 @@ User direction across 4 messages this session:
   routed-plan evidence API, combined pitched-roof calibration API, visual login
   layout, and browser console all passed. The broader whole-building,
   fabrication, projection, and compliance gates intentionally remain closed.
+
+### Entry 39 - Completed hydraulic inside-diameter 3D edge registration
+
+- Joined completed-plan vector X/Y, exact HASS endpoint Z, and HASS hydraulic
+  inside diameter across MIT Riverside and GMR Ambulance Center in Payson.
+- Registered 23 calculated edges and 26 nodes across the two independent jobs.
+  GMR promotes only HASS pipes 1, 5, and 8 because those plan routes reproduce
+  report lengths within 0.06 ft and cover both 1.101-inch and 1.598-inch HASS
+  diameter classes. Revision-conflicted GMR loop routes remain excluded.
+- Kept hydraulic diameter semantics explicit: HASS `DIA(IN)` is not a nominal
+  fabrication size. Nominal size, cut length, full hydraulic plan, whole-building
+  elevation, exact deflector elevation, fabrication, and compliance remain false.
+- Added deterministic schema/receipt validation, sheet-scale 3D routes, plan/side/end
+  evidence views, an authenticated evidence API, two-project promotion, 100 replay
+  iterations, and built-in adversarial mutations for source, receipt, XYZ, diameter,
+  route, report length, duplicate project, nominal-size substitution, and false
+  fabrication/full-plan promotion.
+- Verification passed: loop guard, focused Vitest 24/24, full Vitest 1715/1715
+  across 181 files, production Vite build, and `AGENTIC_RULES_VERIFY ok`.
+  Formal proof is explicitly blocked because
+  `GET http://127.0.0.1:8810/api/provers` returned `Unable to connect to the remote
+  server`; deterministic and adversarial gates remain the acceptance mechanism.
+- Deployed `ad963d075bc1915e1784c8228642463a226a6624` to the VPS. The service is
+  active; public health and login returned 200; authenticated login and the new
+  evidence API returned 200 with both projects and all 23 edges. The rendered
+  `/login` surface has no horizontal overflow, deprecated text, console warning,
+  or console error at 1280 x 720.
