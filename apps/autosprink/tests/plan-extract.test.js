@@ -3,6 +3,7 @@ import {
   deriveScaleFromText,
   extractGrid,
   segmentRooms,
+  isLikelyRoomLabel,
   detectStairs,
   detectStairCores,
   buildLevelPlan,
@@ -38,6 +39,11 @@ describe('deriveScaleFromText', () => {
     const r = deriveScaleFromText('2 4 6 8 10 12 14 3/16" = 1\'-0" 0 FEET SCALE');
     expect(r.feetPerUnit).toBeCloseTo(0.07407407, 6);
     expect(r.scaleText).toMatch(/^3\/16/);
+  });
+  it('does not treat a zero-padded view number adjacent to a fraction as a mixed-number scale', () => {
+    const r = deriveScaleFromText('DETAIL TITLE 05 1/8" = 1\' MAIN FLOOR PLAN');
+    expect(r.feetPerUnit).toBeCloseTo(0.1111111, 6);
+    expect(r.scaleText).toMatch(/05 1\/8/);
   });
   it('returns null when no scale notation present', () => {
     expect(deriveScaleFromText('REVISION LIST DESCRIPTION DATE')).toBeNull();
@@ -76,9 +82,59 @@ describe('segmentRooms', () => {
     const kinds = r.rooms.map((x) => x.kind).sort();
     expect(kinds).toEqual(['mech', 'stair']);
   });
+  it('does not let a nearer dimension string masquerade as the room label', () => {
+    const text = [
+      { s: '12\'-4 1/2"', xFt: 25, yFt: 50 },
+      { s: 'BISHOP', xFt: 20, yFt: 45 },
+      { s: 'MEN\'S', xFt: 75, yFt: 50 },
+    ];
+    const result = segmentRooms(walls, text, { gridN: 100, minRoomSqft: 100 });
+    expect(result.rooms.map((room) => room.kind).sort()).toEqual(['office', 'restroom']);
+    expect(result.rooms.some((room) => room.label.includes('12\''))).toBe(false);
+  });
   it('unlabeled spaces are kind unknown at low confidence', () => {
     const r = segmentRooms(walls, [], { gridN: 100, minRoomSqft: 100 });
     expect(r.rooms.every((x) => x.kind === 'unknown' && x.confidence === 'low')).toBe(true);
+  });
+  it('traces an L-shaped component instead of inflating it to its bounding rectangle', () => {
+    const lWalls = [
+      { x1: 0, y1: 0, x2: 40, y2: 0 }, { x1: 40, y1: 0, x2: 40, y2: 20 },
+      { x1: 40, y1: 20, x2: 20, y2: 20 }, { x1: 20, y1: 20, x2: 20, y2: 40 },
+      { x1: 20, y1: 40, x2: 0, y2: 40 }, { x1: 0, y1: 40, x2: 0, y2: 0 },
+    ];
+    const result = segmentRooms(lWalls, [{ s: 'LOBBY', xFt: 10, yFt: 10 }], {
+      gridN: 160, bridgeFt: 0.25, minRoomSqft: 100, maxRoomFraction: 0.9,
+    });
+    expect(result.rooms).toHaveLength(1);
+    expect(result.rooms[0].poly.length).toBeGreaterThan(4);
+    expect(result.rooms[0].areaSqft).toBeLessThan(0.85 * 40 * 40);
+    expect(result.rooms[0].kind).toBe('lobby');
+  });
+  it('can close a short collinear door gap without globally thickening the wall network', () => {
+    const doorGapWalls = [
+      { x1: 0, y1: 0, x2: 100, y2: 0 }, { x1: 100, y1: 0, x2: 100, y2: 100 },
+      { x1: 100, y1: 100, x2: 0, y2: 100 }, { x1: 0, y1: 100, x2: 0, y2: 0 },
+      { x1: 50, y1: 0, x2: 50, y2: 48 }, { x1: 50, y1: 52, x2: 50, y2: 100 },
+    ];
+    const open = segmentRooms(doorGapWalls, [], {
+      gridN: 200, bridgeFt: 0, collinearBridgeFt: 0, minRoomSqft: 100, maxRoomFraction: 0.6,
+    });
+    const closed = segmentRooms(doorGapWalls, [], {
+      gridN: 200, bridgeFt: 0, collinearBridgeFt: 5, minRoomSqft: 100, maxRoomFraction: 0.6,
+    });
+    expect(open.rooms).toHaveLength(0);
+    expect(closed.rooms).toHaveLength(2);
+  });
+});
+
+describe('isLikelyRoomLabel', () => {
+  it('keeps operational space names and rejects dimensions, grids, and ceiling tags', () => {
+    expect(isLikelyRoomLabel('SAC PREP')).toBe(true);
+    expect(isLikelyRoomLabel('RELIEF SOCIETY')).toBe(true);
+    expect(isLikelyRoomLabel('6\'-11 1/2"')).toBe(false);
+    expect(isLikelyRoomLabel('CG-23')).toBe(false);
+    expect(isLikelyRoomLabel('C3')).toBe(false);
+    expect(isLikelyRoomLabel('SLOPED')).toBe(false);
   });
 });
 

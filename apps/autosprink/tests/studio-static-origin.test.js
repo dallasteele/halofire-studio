@@ -130,6 +130,9 @@ describe('studio static origin handling', () => {
     const html = await shell.text();
     expect(html).toContain('/api/projects/Dillon%20Residence/floor-by-floor-model');
     expect(html).toContain('/api/projects/LDS%20Temple%20-%20Nashville%20TN/floor-by-floor-model');
+    expect(html).toContain('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-building-model');
+    expect(html).toContain('hfOperationalBrainReceipt');
+    expect(html).toContain('display:grid;grid-auto-rows:max-content;gap:12px;color:#e5e7eb;overflow:auto;overscroll-behavior:contain');
     expect(html).toContain('Dillon actual-drawing building model');
     expect(html).toContain('Nashville actual-drawing building model');
     expect(html).toContain('A110 gray wall-poche shell was selected by PDF paint semantics before');

@@ -1,0 +1,56 @@
+{
+  "name": "winter-garden-whole-building-source-visual-20260713",
+  "owner": "codex",
+  "goal": "Generate and visually prove one source-only, drawing-scaled Winter Garden whole-building floor model, pitched roof/elevation model, sprinkler layout, Bluebeam-compatible markup, and AutoBid packet before comparing the generated output with the held-out completed bid.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "docs/handoffs/2026-07-09-CODEX-MASTER-BUILD.md",
+    "apps/autosprink/src/data/winter-garden-cross-project-source-set.json",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A103-MAIN-FLOOR-DIMENSION-PLAN-Rev.6.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A121-ROOF-PLAN-Rev.5.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A151-REFLECTED-CEILING-PLAN-Rev.5.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A201-BUILDING-ELEVATIONS-Rev.5.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A301-BUILDING-SECTIONS-Rev.5.pdf",
+    "apps/autosprink/src/data/winter-garden-fp3-head-evidence.json"
+  ],
+  "exit_criteria": [
+    "the source-generation phase verifies immutable hashes and never reads the completed sprinkler answer key",
+    "A103 overall dimensions resolve as 201 feet 8 inches by 90 feet 8 inches and seal a crop that excludes title blocks and callout leaders",
+    "a visually inspected exterior polygon and internal wall overlay follow the real A103 drawing rather than a page or bounding-box placeholder",
+    "shared numbered and lettered grids register A103, A121, and A151 into one plan coordinate system with recorded residuals",
+    "A201 and A301 source datums drive the floor, bearing, ridge, equipment-platform, and steeple elevations used by the 3D model",
+    "generated plan, elevation, 3D, Bluebeam, and AutoBid artifacts are persisted with truthful manifests and visible proof images",
+    "only after generation finishes, primary, independent, and adversarial loops compare against the held-out completed bid and reject source, scale, axis, grid, elevation, or answer-key leakage drift",
+    "focused and full tests, build, rules, formal result, VPS deploy, login, authenticated live route, and brain postflight are recorded before the slice is called shipped"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "dimension-plan parser and clipping unit tests",
+    "source-only generation replay with answer-key access assertion",
+    "A103 floor overlay screenshot inspection",
+    "A121/A151 grid-registration overlay screenshot inspection",
+    "A201/A301 elevation and pitched-3D screenshot inspection",
+    "held-out completed-bid primary, independent, and adversarial comparison",
+    "focused and full AutoSprink tests plus production build",
+    "GX10 Lean 4 proof or exact prover-unavailable evidence",
+    "authoritative agentic-rule check",
+    "VPS deployment, login smoke, and authenticated artifact smoke",
+    "brain close writeback with confirmed episode or exact failure"
+  ],
+  "state_path": "data/agent-loops/winter-garden-whole-building-source-visual-20260713/state.json",
+  "evidence_paths": [
+    "apps/autosprink/out/visual-proof/winter-garden-a103-dimension-plan-gate.png",
+    "apps/autosprink/out/visual-proof/winter-garden-a103-dimension-plan-gate.json",
+    "apps/autosprink/out/visual-proof/winter-garden-whole-building-3d-proof.png",
+    "apps/autosprink/out/visual-proof/winter-garden-generated-bluebeam-proof.png",
+    "data/agent-loops/winter-garden-whole-building-source-visual-20260713/state.json",
+    "BUILD_LOG.md"
+  ],
+  "max_iterations": 12,
+  "max_tokens": 750000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

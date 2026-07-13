@@ -1050,7 +1050,14 @@ function parseNumberOrFraction(token) {
   // Mixed number: whole + space + fraction.
   const mixed = t.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
   if (mixed) {
-    const whole = Number(mixed[1]);
+    // PDF text extraction can concatenate a zero-padded view/detail number with
+    // the architectural scale token.  A real Winter Garden title block emitted
+    // `05 1/8" = 1'`: interpreting that as the mixed number 5 1/8 inches shrank
+    // the building by ~41x.  Zero-padded multi-digit tokens are drawing/view
+    // identifiers, not valid mixed-number scale wholes, so retain the trailing
+    // fraction.  Ordinary mixed scales such as `1 1/2" = 1'` still parse as-is.
+    const zeroPaddedViewNumber = mixed[1].length > 1 && mixed[1].startsWith('0');
+    const whole = zeroPaddedViewNumber ? 0 : Number(mixed[1]);
     const num = Number(mixed[2]);
     const den = Number(mixed[3]);
     if (den === 0) return NaN;

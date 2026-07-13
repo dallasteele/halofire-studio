@@ -39,6 +39,7 @@ import {
   parseArchitecturalScale,
   selectWallLayer,
   buildingOutlinePolygon,
+  traceFilledBoundary,
 } from './pdf-floorplan.js';
 import { buildWallRuns } from './plan-wall-runs.js';
 
@@ -56,7 +57,12 @@ const SPACE_KINDS = Object.freeze([
   { kind: 'storage', re: /\bSTOR(AGE|\.)?\b/i },
   { kind: 'lobby', re: /\bLOBBY\b|\bVESTIBULE\b|\bENTRY\b/i },
   { kind: 'corridor', re: /\bCORRIDOR\b|\bHALL(WAY)?\b/i },
-  { kind: 'restroom', re: /\bREST\s*ROOM\b|\bTOILET\b|\bW\.?C\.?\b|\bBATH\b/i },
+  { kind: 'restroom', re: /\bREST\s*ROOM\b|\bTOILET\b|\bW\.?C\.?\b|\bBATH\b|\bMEN'?S\b|\bWOMEN'?S\b|^RR$/i },
+  { kind: 'worship', re: /\bCHAPEL\b|\bROSTRUM\b|\bBAPTIS(M|TRY|MAL)\b|\bCULTURAL\s*(HALL)?\b/i },
+  { kind: 'office', re: /\bOFFICE\b|\bBISHOP\b|\bCLERK\b|\bSECRETAR(Y|IAL)\b/i },
+  { kind: 'classroom', re: /\bCLASS\s*ROOM\b|\bCLASSROOM\b|\bPRIMARY\b|\bNURSERY\b|\bSEMINARY\b/i },
+  { kind: 'kitchen', re: /\bKITCHEN\b|\bSERVING\b|\bDISH\s*WASH/i },
+  { kind: 'support', re: /\bSAC(RAMENT)?\s*PREP\b|\bCUSTOD(IAN|IAL)\b|\bJANITOR\b/i },
   { kind: 'unit', re: /\bUNIT\b|\b(STUDIO|1\s*BR|2\s*BR|3\s*BR|ONE\s*BED|TWO\s*BED)\b/i },
 ]);
 
@@ -70,6 +76,17 @@ function classifyLabel(text) {
     if (re.test(t)) return kind;
   }
   return null;
+}
+
+/** Reject dimension/grid/ceiling tokens before they can masquerade as room names. */
+export function isLikelyRoomLabel(value) {
+  const label = String(value || '').trim();
+  if (!label || label.length < 3 || label.length > 80) return false;
+  if (!/[A-Z]{2,}/i.test(label)) return false;
+  if (/\d\s*["']|\b\d+\s*\/\s*\d+\b/.test(label)) return false;
+  if (/^\d+[A-Z]?$|^[A-Z]{1,2}\d{0,2}$|^[A-Z]{1,3}-\d+$/i.test(label)) return false;
+  if (/^(ROOM|SLOPED|FLAT|HIGH|LOW|OPEN|ABOVE|BELOW|TYP|SIM|NTS|AFF|CLG|CEILING|GRID)$/i.test(label)) return false;
+  return true;
 }
 
 function normalizeSegmentsFt(segments) {
@@ -239,18 +256,19 @@ export function extractGrid(textItemsFt) {
  *  c) Every NON-exterior, NON-wall cell is interior void. Connected-component label the
  *     interior void cells (4-neighbour) -> each component is a candidate enclosed space.
  *  d) Drop components smaller than minRoomSqft (closet-scale noise / hatch gaps).
- *  e) For each kept component, compute its cell-bbox polygon (rectilinear) in feet and its
- *     area; assign the nearest text label centroid (within the component bbox, else nearest
- *     overall) and classify the kind. Unlabeled -> kind 'unknown', confidence 'low'.
+ *  e) For each kept component, trace its actual rectilinear cell boundary in feet and compute
+ *     its area; assign a text label only when its point falls in that exact component and
+ *     classify the kind. Unlabeled -> kind 'unknown', confidence 'low'.
  *
  * @param {Array<{x1,y1,x2,y2}>} wallSegments - in FEET (wall layer).
  * @param {Array<{s:string,xFt:number,yFt:number}>} textItemsFt - text items in feet for labelling.
- * @param {{gridN?:number, minRoomSqft?:number}} [opts]
+ * @param {{gridN?:number, minRoomSqft?:number, maxRoomFraction?:number, bridgeFt?:number, collinearBridgeFt?:number}} [opts]
  * @returns {{rooms:Array<{poly:Array<[number,number]>, bbox:Object, areaSqft:number, label:string|null, kind:string, confidence:string}>, gridN:number, interiorCells:number, note:string}}
  */
 export function segmentRooms(wallSegments, textItemsFt = [], opts = {}) {
   const gridN = Number.isInteger(opts.gridN) && opts.gridN > 8 ? opts.gridN : 160;
   const minRoomSqft = Number.isFinite(opts.minRoomSqft) ? Number(opts.minRoomSqft) : 40;
+  const maxRoomFraction = Number.isFinite(opts.maxRoomFraction) ? Number(opts.maxRoomFraction) : 0.45;
   const segs = Array.isArray(wallSegments) ? wallSegments : [];
   const note =
     'Best-effort geometric room segmentation: enclosed interior voids of the extracted ' +
@@ -285,11 +303,41 @@ export function segmentRooms(wallSegments, textItemsFt = [], opts = {}) {
       wall[idx(toCx(s.x1 + (s.x2 - s.x1) * f), toCy(s.y1 + (s.y2 - s.y1) * f))] = 1;
     }
   }
+  // Close only short source-wall interruptions (typically door/opening breaks) that are bounded
+  // by wall ink on the same raster row/column. Unlike dilation, this does not thicken every wall
+  // or consume narrow rooms. It is opt-in and its physical threshold is explicit in the receipt.
+  const collinearBridgeFt = Number.isFinite(opts.collinearBridgeFt) ? Math.max(0, Number(opts.collinearBridgeFt)) : 0;
+  if (collinearBridgeFt > 0) {
+    const maxGapX = Math.max(0, Math.floor(collinearBridgeFt / cw));
+    const maxGapY = Math.max(0, Math.floor(collinearBridgeFt / ch));
+    for (let cy = 0; cy < gridN; cy++) {
+      let previous = -1;
+      for (let cx = 0; cx < gridN; cx++) {
+        if (!wall[idx(cx, cy)]) continue;
+        const gap = cx - previous - 1;
+        if (previous >= 0 && gap > 0 && gap <= maxGapX) {
+          for (let fillX = previous + 1; fillX < cx; fillX++) wall[idx(fillX, cy)] = 1;
+        }
+        previous = cx;
+      }
+    }
+    for (let cx = 0; cx < gridN; cx++) {
+      let previous = -1;
+      for (let cy = 0; cy < gridN; cy++) {
+        if (!wall[idx(cx, cy)]) continue;
+        const gap = cy - previous - 1;
+        if (previous >= 0 && gap > 0 && gap <= maxGapY) {
+          for (let fillY = previous + 1; fillY < cy; fillY++) wall[idx(cx, fillY)] = 1;
+        }
+        previous = cy;
+      }
+    }
+  }
   // STAGE 1 (2026-06-19): morphological DILATION to bridge wall fragment/door gaps BEFORE the
   // exterior flood, so the flood cannot leak through small gaps and the interior segments into
   // real enclosed rooms instead of one leaked giant pocket. Dilate cells span ~bridgeFt total.
   const bridgeFt = Number.isFinite(opts.bridgeFt) ? Number(opts.bridgeFt) : 3;
-  const dilCells = Math.max(1, Math.round((bridgeFt / 2) / Math.min(cw, ch)));
+  const dilCells = bridgeFt > 0 ? Math.max(1, Math.round((bridgeFt / 2) / Math.min(cw, ch))) : 0;
   let wallD = wall;
   for (let d = 0; d < dilCells; d++) {
     const next = new Uint8Array(wallD);
@@ -341,13 +389,14 @@ export function segmentRooms(wallSegments, textItemsFt = [], opts = {}) {
   // Build rooms from kept components.
   const labels = (Array.isArray(textItemsFt) ? textItemsFt : []).map((it) => ({
     s: String(it.s || '').trim(), xFt: Number(it.xFt), yFt: Number(it.yFt),
-  })).filter((it) => it.s && Number.isFinite(it.xFt) && Number.isFinite(it.yFt));
+  })).filter((it) => isLikelyRoomLabel(it.s) && Number.isFinite(it.xFt) && Number.isFinite(it.yFt));
 
   const rooms = [];
-  for (const cells of components) {
+  for (let componentId = 0; componentId < components.length; componentId++) {
+    const cells = components[componentId];
     const areaSqft = cells.length * cellArea;
     if (areaSqft < minRoomSqft) continue;
-    if (areaSqft > 0.45 * (w * h)) continue; // STAGE 2: reject leaked >45%-footprint pseudo-room
+    if (areaSqft > maxRoomFraction * (w * h)) continue; // STAGE 2: reject leaked pseudo-room
     let cMinX = Infinity, cMinY = Infinity, cMaxX = -Infinity, cMaxY = -Infinity;
     let sumX = 0, sumY = 0;
     for (const k of cells) {
@@ -358,24 +407,26 @@ export function segmentRooms(wallSegments, textItemsFt = [], opts = {}) {
       sumX += fx; sumY += fy;
     }
     const cenX = sumX / cells.length, cenY = sumY / cells.length;
-    // Nearest label whose centroid is inside the cell bbox; else nearest by distance.
-    let best = null, bestD = Infinity, bestInside = null, bestInsideD = Infinity;
+    // Prefer a label whose point falls in the exact connected component. A bbox-only test is
+    // unsafe for L-shaped rooms because it can capture a label across the room's re-entrant wall.
+    let bestInside = null, bestInsideD = Infinity;
     for (const lab of labels) {
       const d = Math.hypot(lab.xFt - cenX, lab.yFt - cenY);
-      if (lab.xFt >= cMinX && lab.xFt <= cMaxX && lab.yFt >= cMinY && lab.yFt <= cMaxY) {
+      const labComponent = comp[idx(toCx(lab.xFt), toCy(lab.yFt))];
+      if (labComponent === componentId) {
         if (d < bestInsideD) { bestInsideD = d; bestInside = lab; }
       }
-      if (d < bestD) { bestD = d; best = lab; }
     }
-    const chosen = bestInside || (best && bestD <= Math.max(cMaxX - cMinX, cMaxY - cMinY) ? best : null);
+    const chosen = bestInside;
     const label = chosen ? chosen.s : null;
     const kind = classifyLabel(label) || 'unknown';
-    const confidence = bestInside ? 'medium' : (chosen ? 'low' : 'low');
+    const confidence = bestInside ? 'medium' : 'low';
+    const componentMask = new Uint8Array(gridN * gridN);
+    for (const k of cells) componentMask[k] = 1;
+    const traced = traceFilledBoundary(componentMask, gridN, minX, minY, cw, ch);
+    if (!Array.isArray(traced) || traced.length < 4) continue;
     rooms.push({
-      poly: [
-        [round(cMinX), round(cMinY)], [round(cMaxX), round(cMinY)],
-        [round(cMaxX), round(cMaxY)], [round(cMinX), round(cMaxY)],
-      ],
+      poly: traced.map(([x, y]) => [round(x), round(y)]),
       bbox: { minX: round(cMinX), minY: round(cMinY), maxX: round(cMaxX), maxY: round(cMaxY) },
       areaSqft: round(areaSqft),
       label,

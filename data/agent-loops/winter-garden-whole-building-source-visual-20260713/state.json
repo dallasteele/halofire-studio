@@ -1,0 +1,138 @@
+{
+  "name": "winter-garden-whole-building-source-visual-20260713",
+  "iteration": 3,
+  "status": "in_progress",
+  "updatedAt": "2026-07-13T11:27:30-07:00",
+  "completedStages": [
+    "DISCOVER",
+    "PLAN"
+  ],
+  "nextStage": "VERIFY",
+  "processCorrection": {
+    "codeBeforeLoopSlip": true,
+    "description": "The scale-parser fix and first dimension-plan extraction helpers were edited before this loop contract was validated. Work stopped, brain preflight was run, authoritative rules were reread, and this contract was added before feature expansion continued."
+  },
+  "brainPreflight": {
+    "status": "passed",
+    "relevantEpisodes": [
+      124864,
+      126369,
+      13290,
+      13836,
+      129504,
+      129358,
+      73368,
+      127101
+    ],
+    "operationalSources": [
+      "halofire-master/00-Company/00_Company_Org.md",
+      "halofire/bid-process-knowledge.md",
+      "halofire-master/05-Fabrication-Shop/05_Fabrication_Shop.md",
+      "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+      "halofire-autobid/system/autobid-index.md"
+    ],
+    "transportNote": "The first operations recall hit a Windows cp1252 decode error in brain_sync_session.py; retry with PYTHONUTF8=1 succeeded. This must be included in postflight so future Windows runs do not misclassify an encoding failure as missing memory.",
+    "decision": "Use the recalled Halo Fire bid-to-design-to-fabrication-to-field lifecycle to shape the employee workflow; use completed bids only after source-only generation; avoid known blind roof projection and placeholder-box failures; treat current source hashes, overlays, tests, and live smokes as authoritative."
+  },
+  "sourceDiscovery": {
+    "generationProject": "LDS Meeting House - Winter Garden FL",
+    "secondaryPitchedCalibrationProject": "TCOJC Temple - Dallas TX",
+    "rejectedSourceGenerationCase": "Dallas architectural floor plan is scanned/raster and has no vector path geometry; retained only as held-out pitched-attic calibration.",
+    "scaleParserDefect": "A103/A101 title text can concatenate view number 05 with 1/8 inch scale; zero-padded view number must not become a 5 1/8 inch mixed-number scale.",
+    "a103OverallDimensionsFt": [
+      201.666667,
+      90.666667
+    ],
+    "answerKeyUsedForGeneration": false
+  },
+  "visualGate": {
+    "a101Candidates": "rejected: fallback bounding box and 6/12-foot bridges captured callout leaders",
+    "a103DimensionViewport": "passed first eye gate: authored bounds land on real building exterior and exclude title block/callout fields",
+    "a103ExteriorTrace": "passed: the stepped exterior is sealed as 44 source-derived edges and independently replayed against A103 dimensions before packet promotion",
+    "roomBoundaryGate": "passed source-only eye gate: exact connected-component polygons replace unsafe bounding rectangles; A103 inclusive plus registered A151 cut walls with 0.5-foot wall dilation and 3-foot collinear door closure yields 56 visually aligned room components, 31 contained source labels, 16 recognized operational space kinds, and 10592.28 square feet enclosed interior",
+    "rejectedRoomCandidates": [
+      "A151 partition-inclusive linework includes ceiling grids and is not a room-wall source",
+      "4-foot and 6-foot collinear closure candidates remain diagnostic only because they can bridge non-door openings",
+      "nearest-label fallback rejected because it duplicated BISHOP and CLERK labels into adjacent rooms"
+    ],
+    "answerKeyUsed": false
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 139418,
+    "recallVerified": true,
+    "utf8TransportRequiredOnWindows": true
+  },
+  "roofAndElevationGate": {
+    "status": "passed",
+    "sourcePacketReceiptSha256": "cfe27af97237459ed71a38120df7ee570ac4fb300ef7884ce235490b2f2e55e7",
+    "sourceBindings": ["A103", "A121", "A151", "A201", "A301"],
+    "counts": {
+      "rooms": 56,
+      "exteriorEdges": 44,
+      "mainRoofPlanes": 2,
+      "crossGablePlanes": 8,
+      "lowRoofDatumPlanes": 1,
+      "verticalFeatures": 1
+    },
+    "pitch": "4.5:12",
+    "exactPitchReplay": true,
+    "visualProofSha256": "49dd957b98b71dc1acf11eb2aecc24627360dccbc51f3d9a41433efa7f1941bf",
+    "answerKeyUsed": false,
+    "complianceReady": false,
+    "fabricationReady": false
+  },
+  "operationalKnowledgeGate": {
+    "status": "passed",
+    "sessionId": "winter-garden-source-building-operational-knowledge-20260713",
+    "source": "gx10-hal-brain+obsidian-vault",
+    "recallEpisodeIds": [139418, 120030, 129505, 129358, 129549, 126369, 124864],
+    "authoritativeSourceCount": 5,
+    "workflowGuardrailCount": 6,
+    "adversarialTests": [
+      "receipt drift",
+      "answer-key leakage",
+      "source-sheet drift",
+      "missing fabrication knowledge",
+      "missing internal adversarial-loop doctrine",
+      "elevation and pitch drift",
+      "missing steeple and roof surfaces"
+    ],
+    "productSurface": "/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-building-model",
+    "employeeSurface": "autosprink.html#hfOperationalBrainReceipt"
+  },
+  "focusedVerification": {
+    "status": "passed",
+    "testFiles": 10,
+    "tests": 106
+  },
+  "fullVerification": {
+    "status": "passed",
+    "testFiles": 191,
+    "tests": 1764,
+    "nativeNodeTests": 20,
+    "productionBuild": "passed",
+    "agenticRules": "passed",
+    "loopContract": "passed"
+  },
+  "formalVerification": {
+    "status": "passed",
+    "prover": "Lean 4.13.0",
+    "theorems": 3,
+    "durationMs": 100,
+    "receipt": "data/agent-loops/winter-garden-whole-building-source-visual-20260713/lean-proof.json"
+  },
+  "browserVerification": {
+    "status": "passed",
+    "surface": "authenticated local autosprink.html Roof Planes -> Automatic Roof Planes",
+    "viewerScrollHeightPx": 5555,
+    "viewerClientHeightPx": 604,
+    "winterGardenSectionReachable": true,
+    "brainReceiptVisible": true,
+    "isometricAndTopViewsVisible": true,
+    "consoleErrors": 0,
+    "screenshot": "apps/autosprink/output/playwright/winter-garden-source-building-brain-receipt.png",
+    "releaseBlockerCorrected": "The fixed viewer originally clipped lower proof sections; grid auto-rows plus contained overflow now make the complete evidence stack reachable."
+  },
+  "nextAction": "Commit, push, deploy this sealed source-building and operational-brain checkpoint, verify public login plus the authenticated live route and UI, then postflight it into GX10 recall before beginning source-only sprinkler generation."
+}
