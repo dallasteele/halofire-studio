@@ -1,0 +1,83 @@
+{
+  "artifactType": "halofire.unseen-pitched-holdout.v1",
+  "projectId": "reger-flores-queen-creek-az",
+  "projectName": "Reger-Flores Residence - Queen Creek AZ",
+  "sources": [
+    {
+      "role": "architectural_permit_set",
+      "path": "1-Bid Documents/GC - Bid Plans/Building/Approved BLDG-PLAN.pdf",
+      "sha256": "62f46411f226ebb0c27ee447a8a9794454b95b4cf0c8fe5467d5c2521a4dcf5f",
+      "bytes": 31479706
+    },
+    {
+      "role": "ceiling_plan_cad",
+      "path": "2-Internal Ops/01-Design/05-CAD Files/Ceiling Plans.dwg",
+      "sha256": "62156c099f062a4bef85edcab4dbf4e262586655b1c462003e2cdeed99dea279",
+      "bytes": 697723
+    },
+    {
+      "role": "floor_plan_cad",
+      "path": "2-Internal Ops/01-Design/05-CAD Files/Floor Plans.dwg",
+      "sha256": "8f555e5f3336f219219f8049c2ddc357811cfd4331268999fbeedbcb33f4a9cb",
+      "bytes": 1213508
+    }
+  ],
+  "answerKeyDenylist": [
+    {
+      "path": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/APPROVED Reger Flores Fire Sprinkler Plan Set - QC AZ (1).PDF",
+      "sha256": "af45158d0e52a87faa78973b171245d6c772d46d5edccfad0e8410e88c8ffce9",
+      "bytes": 871000,
+      "openedBeforeSourceSeal": false
+    }
+  ],
+  "selection": {
+    "status": "source-sealed-answer-unopened",
+    "priorImplementationSearchHits": 0,
+    "rejectedBeforeAnswerOpen": [
+      { "project": "Grella Residence", "reason": "flat labeled occupied ceilings despite exterior roof forms" },
+      { "project": "Rozenfield Residence", "reason": "stepped flat ceilings; quarter-inch roof notes are drainage insulation" },
+      { "project": "MVC 2-Plex", "reason": "three-level flat parapet building" },
+      { "project": "Pit House", "reason": "nine-to-twelve roof over horizontal truss bottom chord, not a pitched occupied ceiling" },
+      { "project": "Metzger/Gesink Residence", "reason": "vault proven but source omits bottom-chord pitch or ridge height" }
+    ]
+  },
+  "sourceObservations": {
+    "layout": "FIRST FLOOR CEILINGS",
+    "zone": "source-vault-zone-01",
+    "zoneWidthFt": 18.5,
+    "zoneLengthFt": 16,
+    "pitchRiseIn": 4,
+    "pitchRunIn": 12,
+    "springElevationFt": 12.083333,
+    "peakElevationFt": 15.166667,
+    "cadEvidence": [
+      "two 12'-1 inch SPRING attributes flank one 15'-2 inch AT PEAK attribute",
+      "opposed 4 over 12 pitch symbols bind the two vault planes",
+      "8'-0 inch plus 8'-0 inch zone dimensions establish the 16-foot length",
+      "4:12 pitch and 37-inch rise independently establish a 9.25-foot half-run and 18.5-foot width"
+    ]
+  },
+  "toolchain": {
+    "dwgReader": "GNU LibreDWG dwgread 0.14",
+    "releaseDigestVerified": true,
+    "conversionMode": "offline-json-read-only"
+  },
+  "brainPreflight": {
+    "status": "passed",
+    "platformSpineAddendumApplied": true,
+    "spatialB1ThroughB7Priority": 1
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "dillonEmpiricalPriorAllowed": true,
+    "roofPlaneSubstitutionAllowed": false
+  },
+  "claims": {
+    "unseenProjectPlacementVerified": false,
+    "codeCompliance": false,
+    "fabrication": false,
+    "fieldRelease": false
+  },
+  "receiptSha256": "bb7264a9ed1707b7c301d98d7623e15ee68a5e43667f043b0a89b146d33c1bf6"
+}

@@ -1,0 +1,274 @@
+{
+  "artifactType": "halofire.reger-flores-source-only-pitched-candidate.v1",
+  "projectId": "reger-flores-queen-creek-az",
+  "projectName": "Reger-Flores Residence - Queen Creek AZ",
+  "sourceSealReceiptSha256": "bb7264a9ed1707b7c301d98d7623e15ee68a5e43667f043b0a89b146d33c1bf6",
+  "dillonPriorReceiptSha256": "20a553b24f20219e2f3d1e8022b05079dc6e22f3189c63c9684fcf3dbbf1bf26",
+  "generationMode": "fresh-sealed-source-plus-cross-project-empirical-prior-before-answer-open",
+  "geometry": {
+    "coordinateSystem": "Ceiling Plans.dwg first-floor vault-zone-local feet",
+    "floor": {
+      "id": "level-01",
+      "elevationFt": 0,
+      "sourceLayout": "FIRST FLOOR CEILINGS"
+    },
+    "room": {
+      "id": "source-vault-zone-01",
+      "name": "SOURCE VAULT ZONE 01",
+      "widthFt": 18.5,
+      "lengthFt": 16,
+      "areaSqFt": 296,
+      "polygonFt": [
+        [
+          0,
+          0
+        ],
+        [
+          18.5,
+          0
+        ],
+        [
+          18.5,
+          16
+        ],
+        [
+          0,
+          16
+        ]
+      ],
+      "identityStatus": "source-geometry-closed-room-name-not-promoted"
+    },
+    "ceiling": {
+      "kind": "source-proven-two-plane-vault",
+      "axis": "x",
+      "ridgeAxis": "y",
+      "pitch": {
+        "riseIn": 4,
+        "runIn": 12
+      },
+      "springElevationFt": 12.083333,
+      "peakElevationFt": 15.166667,
+      "halfRunFt": 9.25,
+      "riseFt": 3.083333,
+      "dimensionClosure": {
+        "pitchSymbol": "4:12",
+        "westSpring": "12'-1\"",
+        "peak": "15'-2\" @ PEAK",
+        "eastSpring": "12'-1\"",
+        "lengthDimensions": [
+          8,
+          8
+        ],
+        "halfRunCalculation": "(37 inches / 4) * 12 = 111 inches = 9.25 feet",
+        "roofPlaneUsedAsCeiling": false
+      },
+      "surfaces": [
+        {
+          "id": "vault-west-plane",
+          "polygonFt": [
+            [
+              0,
+              0
+            ],
+            [
+              9.25,
+              0
+            ],
+            [
+              9.25,
+              16
+            ],
+            [
+              0,
+              16
+            ]
+          ],
+          "downhillDirection": "negative-x"
+        },
+        {
+          "id": "vault-east-plane",
+          "polygonFt": [
+            [
+              9.25,
+              0
+            ],
+            [
+              18.5,
+              0
+            ],
+            [
+              18.5,
+              16
+            ],
+            [
+              9.25,
+              16
+            ]
+          ],
+          "downhillDirection": "positive-x"
+        }
+      ]
+    }
+  },
+  "layoutInput": {
+    "artifactType": "halofire.sloped-ceiling-layout-input.v1",
+    "printedScalePtPerFt": 1,
+    "regions": [
+      {
+        "id": "vault-west-plane",
+        "polygonSubmittedPt": [
+          [
+            0,
+            0
+          ],
+          [
+            9.25,
+            0
+          ],
+          [
+            9.25,
+            16
+          ],
+          [
+            0,
+            16
+          ]
+        ],
+        "slopeAxis": "x",
+        "downhillDirection": "negative-x",
+        "riseIn": 4,
+        "runIn": 12,
+        "shouldProtect": true,
+        "obstructions": []
+      },
+      {
+        "id": "vault-east-plane",
+        "polygonSubmittedPt": [
+          [
+            9.25,
+            0
+          ],
+          [
+            18.5,
+            0
+          ],
+          [
+            18.5,
+            16
+          ],
+          [
+            9.25,
+            16
+          ]
+        ],
+        "slopeAxis": "x",
+        "downhillDirection": "positive-x",
+        "riseIn": 4,
+        "runIn": 12,
+        "shouldProtect": true,
+        "obstructions": []
+      }
+    ],
+    "maxAcrossSlopeSpanFt": 20,
+    "maxAlongSlopeSpanFt": 12
+  },
+  "layout": {
+    "regions": [
+      {
+        "regionId": "vault-west-plane",
+        "shouldProtect": true,
+        "generatedHeadCount": 1,
+        "widthFt": 9.25,
+        "heightFt": 16,
+        "acrossCount": 1,
+        "alongCount": 1,
+        "obstructionAdjustments": []
+      },
+      {
+        "regionId": "vault-east-plane",
+        "shouldProtect": true,
+        "generatedHeadCount": 1,
+        "widthFt": 9.25,
+        "heightFt": 16,
+        "acrossCount": 1,
+        "alongCount": 1,
+        "obstructionAdjustments": []
+      }
+    ],
+    "headCount": 2
+  },
+  "heads3d": [
+    {
+      "id": "reger-source-head-01",
+      "surfaceId": "vault-west-plane",
+      "pointFt": [
+        4.625,
+        8,
+        13.625
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "reger-source-head-02",
+      "surfaceId": "vault-east-plane",
+      "pointFt": [
+        13.875,
+        8,
+        13.625
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    }
+  ],
+  "branchPipes3d": [],
+  "branchPipeTopologyReady": false,
+  "buildingModel": {
+    "levelCount": 1,
+    "levels": [
+      {
+        "id": "level-01",
+        "floorElevationFt": 0,
+        "roomIds": [
+          "source-vault-zone-01"
+        ]
+      }
+    ],
+    "modeledScope": "source-closed-first-floor-vault-zone",
+    "wholeBuildingFootprintComplete": false,
+    "floorByFloorExtrusionReady": true,
+    "twoPlaneVaultReady": true
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-two-plane-layout-replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "pitch-spring-peak-dimension-closure"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "source-prior-answer-leakage-and-false-promotion-mutations"
+    }
+  },
+  "answerKeyUsedAsGeometryInput": false,
+  "completedBidUsedAsGeometryInput": false,
+  "answerKeyOpened": false,
+  "unseenProjectPlacementVerified": false,
+  "roomEnvelopeGeometryGrounded": true,
+  "topViewReady": true,
+  "elevationViewReady": true,
+  "partialModel3dReady": true,
+  "wholeBuildingModelReady": false,
+  "wholeBuildingHeadLayoutReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "fresh-source-only-pitched-candidate-before-completed-answer-comparison-not-code-compliance-or-fabrication",
+  "receiptSha256": "b158c8f3db890e99cefa942f7e9dd1d5594367a49bf457da74de3b78c9b6dd4e"
+}
