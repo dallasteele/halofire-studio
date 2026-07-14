@@ -2,7 +2,7 @@
   "name": "winter-garden-whole-building-source-visual-20260713",
   "iteration": 7,
   "status": "in_progress",
-  "updatedAt": "2026-07-13T21:23:48-07:00",
+  "updatedAt": "2026-07-13T21:27:10-07:00",
   "completedStages": [
     "DISCOVER",
     "PLAN",
@@ -254,10 +254,32 @@
     }
   },
   "iteration7DeploymentVerification": {
-    "status": "pending"
+    "status": "passed",
+    "commit": "dac33925cf4249e444ab858deb444ec0d49491b1",
+    "service": "halofire.service",
+    "serviceState": "active",
+    "publicHealthStatus": 200,
+    "publicLoginStatus": 200,
+    "publicLoginBytes": 58981,
+    "deprecatedLoginText": false,
+    "passwordInputPresent": true,
+    "realAdminLoginStatus": "passed",
+    "authenticatedCandidateRouteStatus": 200,
+    "authenticatedCandidateReceiptSha256": "3c799740b1d0f5256116549e6ab8d66795c37592741637e079279935119aa0eb",
+    "authenticatedCandidateRooms": ["120", "143"],
+    "authenticatedProofRouteStatus": 200,
+    "authenticatedProofSha256Matches": true,
+    "authenticatedProofPngHeader": "89504e470d0a1a0a",
+    "directStaticProofStatus": 403,
+    "pitchedRoofHeadLayoutReady": false,
+    "complianceReady": false
   },
   "iteration7BrainPostflight": {
-    "status": "pending"
+    "status": "passed",
+    "episodeId": 142131,
+    "title": "Winter Garden source-only head candidates and private visual proof",
+    "source": "codex",
+    "utf8TransportRequiredOnWindows": true
   },
   "browserVerification": {
     "status": "passed",
@@ -303,5 +325,5 @@
     "liveSourceTopologyScreenshot": "apps/autosprink/output/playwright/winter-garden-source-topology-live-vps.png",
     "liveSourceTopologyScreenshotSha256": "7c931cf5cb4cf2bf43ac3a41a4c001cb8b612de88125eae23b8464c8b2f751c9"
   },
-  "nextAction": "DEPLOY iteration 7, verify login plus the authenticated candidate JSON and proof PNG live, then seal the brain postflight. After that, continue source-only generation by deriving a Winter Garden sloped ceiling plane from coordinated A151/A303 evidence or another completed project's source geometry without substituting the roof plane; compare against held-out completed-bid evidence only after the source generation packet is sealed."
+  "nextAction": "ITERATE by deriving a Winter Garden sloped ceiling plane from coordinated A151/A303 evidence or another protected completed project's source geometry without substituting the roof plane. Seal the source generation packet before held-out completed-bid comparison; keep whole-building layout, hydraulics, compliance, fabrication, and field release false. Defer final whole-system Computer Use until the system is genuinely ready."
 }
