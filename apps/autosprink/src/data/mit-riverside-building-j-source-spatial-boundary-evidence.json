@@ -1,0 +1,375 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-spatial-boundary-evidence.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "extraction": {
+    "reader": "@mlightcad/libredwg-web 0.7.7",
+    "floorDumpUnknownEntityCount": 0,
+    "roofDumpUnknownEntityCount": 0,
+    "units": "source-inches-to-structural-local-feet"
+  },
+  "sources": {
+    "architecturalFloorDwg": {
+      "path": "Engineering/CAD Files/18_434 Riverside MIT Phase 2 Floor plans.dwg",
+      "bytes": 6418563,
+      "sha256": "4310609e80ef25af2abbb164a623de1fe749fb37b04d165699acc4fc4f6297e5"
+    },
+    "structuralRoofDwg": {
+      "path": "Engineering/CAD Files/19PHX009 - OWP - Riverside MIT Phase 2-Sheet - S2-1 - ROOF FRAMING PLANS.dwg",
+      "bytes": 701676,
+      "sha256": "94ee255614f7b403de5185622018eaaad8f80ebe253592418bc7e3b6d993c9aa"
+    }
+  },
+  "coordinateFrames": {
+    "floorDwgOriginInches": {
+      "x": 13437.687842947527,
+      "y": 11469.570653433395
+    },
+    "structuralRoofDwgOriginInches": {
+      "x": 5436.932431050957,
+      "y": 11469.528544309976
+    },
+    "architecturalToStructuralPiecewiseCorrection": {
+      "sourceXFt": [
+        0,
+        15.666667,
+        17.333333,
+        30.666667,
+        39.666667,
+        45.666667,
+        61.333333,
+        76.333333
+      ],
+      "structuralXFt": [
+        0,
+        15.663824,
+        17.33348,
+        30.663824,
+        39.666667,
+        45.663824,
+        61.333333,
+        76.333333
+      ],
+      "sourceYFt": [
+        0,
+        32.166667,
+        64.833333,
+        89.166667,
+        100.166667
+      ],
+      "structuralYFt": [
+        0,
+        32.166667,
+        64.833333,
+        90.166667,
+        100.166667
+      ]
+    }
+  },
+  "floorSlabs": [
+    {
+      "id": "Slab_106",
+      "sourceLayer": "New_A-SLAB-MAJR.3D_Pen_No__2",
+      "rawVerticesInches": [
+        {
+          "x": 13441.687842947527,
+          "y": 10395.528544309009
+        },
+        {
+          "x": 13649.68784294752,
+          "y": 10395.528544309009
+        },
+        {
+          "x": 13649.68784294752,
+          "y": 10275.528544309009
+        },
+        {
+          "x": 14345.687842947524,
+          "y": 10275.528544309009
+        },
+        {
+          "x": 14345.687842947524,
+          "y": 10683.528544309009
+        },
+        {
+          "x": 14169.687842947525,
+          "y": 10683.528544309009
+        },
+        {
+          "x": 14169.687842947525,
+          "y": 11075.528540494306
+        },
+        {
+          "x": 13441.687842947527,
+          "y": 11075.528540494306
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.333273,
+          "y": 90.472887
+        },
+        {
+          "x": 17.666739,
+          "y": 90.472887
+        },
+        {
+          "x": 17.666739,
+          "y": 99.563796
+        },
+        {
+          "x": 75.666667,
+          "y": 99.563796
+        },
+        {
+          "x": 75.666667,
+          "y": 65.531051
+        },
+        {
+          "x": 60.99994,
+          "y": 65.531051
+        },
+        {
+          "x": 60.99994,
+          "y": 32.836843
+        },
+        {
+          "x": 0.333273,
+          "y": 32.836843
+        }
+      ],
+      "areaSqFt": 4389.673855
+    },
+    {
+      "id": "Slab_107",
+      "sourceLayer": "New_A-SLAB-MAJR.3D_Pen_No__2",
+      "rawVerticesInches": [
+        {
+          "x": 13434.903727606075,
+          "y": 11083.52854430901
+        },
+        {
+          "x": 14177.687842947525,
+          "y": 11083.52854430901
+        },
+        {
+          "x": 14177.687842947525,
+          "y": 11473.528544309012
+        },
+        {
+          "x": 13434.903727606075,
+          "y": 11473.528544309012
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": -0.231968,
+          "y": 32.170176
+        },
+        {
+          "x": 61.666667,
+          "y": 32.170176
+        },
+        {
+          "x": 61.666667,
+          "y": -0.329824
+        },
+        {
+          "x": -0.231968,
+          "y": -0.329824
+        }
+      ],
+      "areaSqFt": 2011.705637
+    },
+    {
+      "id": "Slab_108",
+      "sourceLayer": "New_A-SLAB-MAJR.3D_Pen_No__2",
+      "rawVerticesInches": [
+        {
+          "x": 14177.687842947525,
+          "y": 10693.326445027209
+        },
+        {
+          "x": 14355.485743665724,
+          "y": 10693.326445027209
+        },
+        {
+          "x": 14355.485743665724,
+          "y": 10947.52854430901
+        },
+        {
+          "x": 14177.687842947525,
+          "y": 10947.52854430901
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.666667,
+          "y": 64.687017
+        },
+        {
+          "x": 76.483158,
+          "y": 64.687017
+        },
+        {
+          "x": 76.483158,
+          "y": 43.503509
+        },
+        {
+          "x": 61.666667,
+          "y": 43.503509
+        }
+      ],
+      "areaSqFt": 313.865256
+    }
+  ],
+  "roofRegions": [
+    {
+      "id": "main-standing-seam",
+      "role": "standing-seam-metal-base-boundary",
+      "sourceLayer": "A-ROOF",
+      "rawVerticesInches": [
+        {
+          "x": 5420.932431109933,
+          "y": 11481.997690799793
+        },
+        {
+          "x": 6188.932431050939,
+          "y": 11481.997690799793
+        },
+        {
+          "x": 6188.932431050939,
+          "y": 10664.090356279376
+        },
+        {
+          "x": 5420.932431109933,
+          "y": 10664.090356279376
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": -1.333333,
+          "y": -1.039096
+        },
+        {
+          "x": 62.666667,
+          "y": -1.039096
+        },
+        {
+          "x": 62.666667,
+          "y": 67.119849
+        },
+        {
+          "x": -1.333333,
+          "y": 67.119849
+        }
+      ],
+      "areaSqFt": 4362.17248
+    },
+    {
+      "id": "west-lower-standing-seam",
+      "role": "standing-seam-metal-base-boundary",
+      "sourceLayer": "A-ROOF plus A-WALL shared edge",
+      "rawVerticesInches": [
+        {
+          "x": 5420.932431077034,
+          "y": 10683.528544299996
+        },
+        {
+          "x": 5640.932431050945,
+          "y": 10683.528544299996
+        },
+        {
+          "x": 5640.932431050945,
+          "y": 10255.62120977943
+        },
+        {
+          "x": 5420.932431077034,
+          "y": 10255.62120977943
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": -1.333333,
+          "y": 65.5
+        },
+        {
+          "x": 17,
+          "y": 65.5
+        },
+        {
+          "x": 17,
+          "y": 101.158945
+        },
+        {
+          "x": -1.333333,
+          "y": 101.158945
+        }
+      ],
+      "areaSqFt": 653.747313
+    },
+    {
+      "id": "membrane-base",
+      "role": "membrane-base-boundary-not-cricket-subfaces",
+      "sourceLayer": "A-WALL-inner-face",
+      "rawVerticesInches": [
+        {
+          "x": 5648.932431050943,
+          "y": 10683.528544299996
+        },
+        {
+          "x": 6344.9324319897105,
+          "y": 10683.528544299996
+        },
+        {
+          "x": 6344.9324319897105,
+          "y": 10275.528544299996
+        },
+        {
+          "x": 5648.932431050943,
+          "y": 10275.528544299996
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.666667,
+          "y": 65.5
+        },
+        {
+          "x": 75.666667,
+          "y": 65.5
+        },
+        {
+          "x": 75.666667,
+          "y": 99.5
+        },
+        {
+          "x": 17.666667,
+          "y": 99.5
+        }
+      ],
+      "areaSqFt": 1972
+    }
+  ],
+  "independentClosure": {
+    "membraneDrawingNoteSqFt": 1972,
+    "membraneExtractedSqFt": 1972,
+    "membraneWidthFt": 58,
+    "membraneDepthFt": 34
+  },
+  "claims": {
+    "exactFloorSlabPolygonsReady": true,
+    "mainStandingSeamBoundaryReady": true,
+    "westLowerStandingSeamBoundaryReady": true,
+    "membraneBaseBoundaryReady": true,
+    "cricketFaceTopologyReady": false,
+    "wholeRoofFaceTopologyReady": false,
+    "sourceProtectionPlaneReady": false,
+    "headElevationsReady": false,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "2d8b00e29e7023595adc1b33b89a76ed66ef2c0b3a9281198d1b2671499cf8a2"
+}

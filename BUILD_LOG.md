@@ -1591,3 +1591,26 @@ User direction across 4 messages this session:
   source-only reconstruction of whole roof faces and attic compartments,
   answer-exposed registration of the 77 uprights to those source faces, then a
   second genuinely fresh attic holdout before any placement claim can advance.
+
+### Entry 46 - MIT Building J exact source slab and base-roof region binding
+
+- Rehashed the protected Building J floor-plan and structural roof-framing
+  DWGs, then replayed the existing LibreDWG 0.7.7 normalized extracts with
+  zero unknown entities. Three architectural slab polylines and three base
+  roof regions now exist as separately receipted structural-local geometry.
+- Every one of the 68 piecewise-corrected head XY points resolves uniquely to
+  one slab and one base roof region. Floor counts close as 50 + 18 + 0 = 68;
+  roof counts close as 36 + 4 + 28 = 68; no head is unmatched or multiply
+  matched in either partition.
+- The membrane region independently closes as 58 ft by 34 ft = 1,972 sq ft,
+  exactly matching the architectural drawing note. The proof is intentionally
+  limited to XY base regions: membrane cricket subfaces, complete roof-face
+  topology, protection planes, head elevations, compliance, fabrication, and
+  field release remain false.
+- Verification passed 35/35 tests across seven Building J files, 18/18
+  adversarial mutations, production Vite build, loop guard, agentic rules,
+  JSON and diff checks, real-browser SVG rendering, and Lean 4.13.0 theorem
+  `mitSourceSpatialBaseRegionsCloseFailClosed` in 107 ms.
+- This consumed iteration 12 of the current pitched-placement contract. The
+  next corrective work must open a successor loop for cricket topology and
+  section/elevation constraints before any plane or Z assignment.

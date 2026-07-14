@@ -1,0 +1,1368 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-spatial-boundaries.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "structuralGridCorrectionReceiptSha256": "8b7a642c0dc682115afe482426b2bf3cf140b3eadc3561a8520fe43998ce62b4",
+  "sourceSpatialBoundaryEvidenceReceiptSha256": "2d8b00e29e7023595adc1b33b89a76ed66ef2c0b3a9281198d1b2671499cf8a2",
+  "coordinateSpace": "exact-structural-roof-local-feet",
+  "floorSlabs": [
+    {
+      "id": "Slab_106",
+      "sourceLayer": "New_A-SLAB-MAJR.3D_Pen_No__2",
+      "rawVerticesInches": [
+        {
+          "x": 13441.687842947527,
+          "y": 10395.528544309009
+        },
+        {
+          "x": 13649.68784294752,
+          "y": 10395.528544309009
+        },
+        {
+          "x": 13649.68784294752,
+          "y": 10275.528544309009
+        },
+        {
+          "x": 14345.687842947524,
+          "y": 10275.528544309009
+        },
+        {
+          "x": 14345.687842947524,
+          "y": 10683.528544309009
+        },
+        {
+          "x": 14169.687842947525,
+          "y": 10683.528544309009
+        },
+        {
+          "x": 14169.687842947525,
+          "y": 11075.528540494306
+        },
+        {
+          "x": 13441.687842947527,
+          "y": 11075.528540494306
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.333273,
+          "y": 90.472887
+        },
+        {
+          "x": 17.666739,
+          "y": 90.472887
+        },
+        {
+          "x": 17.666739,
+          "y": 99.563796
+        },
+        {
+          "x": 75.666667,
+          "y": 99.563796
+        },
+        {
+          "x": 75.666667,
+          "y": 65.531051
+        },
+        {
+          "x": 60.99994,
+          "y": 65.531051
+        },
+        {
+          "x": 60.99994,
+          "y": 32.836843
+        },
+        {
+          "x": 0.333273,
+          "y": 32.836843
+        }
+      ],
+      "areaSqFt": 4389.673855
+    },
+    {
+      "id": "Slab_107",
+      "sourceLayer": "New_A-SLAB-MAJR.3D_Pen_No__2",
+      "rawVerticesInches": [
+        {
+          "x": 13434.903727606075,
+          "y": 11083.52854430901
+        },
+        {
+          "x": 14177.687842947525,
+          "y": 11083.52854430901
+        },
+        {
+          "x": 14177.687842947525,
+          "y": 11473.528544309012
+        },
+        {
+          "x": 13434.903727606075,
+          "y": 11473.528544309012
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": -0.231968,
+          "y": 32.170176
+        },
+        {
+          "x": 61.666667,
+          "y": 32.170176
+        },
+        {
+          "x": 61.666667,
+          "y": -0.329824
+        },
+        {
+          "x": -0.231968,
+          "y": -0.329824
+        }
+      ],
+      "areaSqFt": 2011.705637
+    },
+    {
+      "id": "Slab_108",
+      "sourceLayer": "New_A-SLAB-MAJR.3D_Pen_No__2",
+      "rawVerticesInches": [
+        {
+          "x": 14177.687842947525,
+          "y": 10693.326445027209
+        },
+        {
+          "x": 14355.485743665724,
+          "y": 10693.326445027209
+        },
+        {
+          "x": 14355.485743665724,
+          "y": 10947.52854430901
+        },
+        {
+          "x": 14177.687842947525,
+          "y": 10947.52854430901
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.666667,
+          "y": 64.687017
+        },
+        {
+          "x": 76.483158,
+          "y": 64.687017
+        },
+        {
+          "x": 76.483158,
+          "y": 43.503509
+        },
+        {
+          "x": 61.666667,
+          "y": 43.503509
+        }
+      ],
+      "areaSqFt": 313.865256
+    }
+  ],
+  "roofBaseRegions": [
+    {
+      "id": "main-standing-seam",
+      "role": "standing-seam-metal-base-boundary",
+      "sourceLayer": "A-ROOF",
+      "rawVerticesInches": [
+        {
+          "x": 5420.932431109933,
+          "y": 11481.997690799793
+        },
+        {
+          "x": 6188.932431050939,
+          "y": 11481.997690799793
+        },
+        {
+          "x": 6188.932431050939,
+          "y": 10664.090356279376
+        },
+        {
+          "x": 5420.932431109933,
+          "y": 10664.090356279376
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": -1.333333,
+          "y": -1.039096
+        },
+        {
+          "x": 62.666667,
+          "y": -1.039096
+        },
+        {
+          "x": 62.666667,
+          "y": 67.119849
+        },
+        {
+          "x": -1.333333,
+          "y": 67.119849
+        }
+      ],
+      "areaSqFt": 4362.17248
+    },
+    {
+      "id": "west-lower-standing-seam",
+      "role": "standing-seam-metal-base-boundary",
+      "sourceLayer": "A-ROOF plus A-WALL shared edge",
+      "rawVerticesInches": [
+        {
+          "x": 5420.932431077034,
+          "y": 10683.528544299996
+        },
+        {
+          "x": 5640.932431050945,
+          "y": 10683.528544299996
+        },
+        {
+          "x": 5640.932431050945,
+          "y": 10255.62120977943
+        },
+        {
+          "x": 5420.932431077034,
+          "y": 10255.62120977943
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": -1.333333,
+          "y": 65.5
+        },
+        {
+          "x": 17,
+          "y": 65.5
+        },
+        {
+          "x": 17,
+          "y": 101.158945
+        },
+        {
+          "x": -1.333333,
+          "y": 101.158945
+        }
+      ],
+      "areaSqFt": 653.747313
+    },
+    {
+      "id": "membrane-base",
+      "role": "membrane-base-boundary-not-cricket-subfaces",
+      "sourceLayer": "A-WALL-inner-face",
+      "rawVerticesInches": [
+        {
+          "x": 5648.932431050943,
+          "y": 10683.528544299996
+        },
+        {
+          "x": 6344.9324319897105,
+          "y": 10683.528544299996
+        },
+        {
+          "x": 6344.9324319897105,
+          "y": 10275.528544299996
+        },
+        {
+          "x": 5648.932431050943,
+          "y": 10275.528544299996
+        }
+      ],
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.666667,
+          "y": 65.5
+        },
+        {
+          "x": 75.666667,
+          "y": 65.5
+        },
+        {
+          "x": 75.666667,
+          "y": 99.5
+        },
+        {
+          "x": 17.666667,
+          "y": 99.5
+        }
+      ],
+      "areaSqFt": 1972
+    }
+  ],
+  "headAssignments": [
+    {
+      "id": "MIT-J-U-001",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 5.53954
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-002",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 5.53954
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-003",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 5.53954
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-004",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 5.53954
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-005",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 5.53954
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-006",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 5.53954
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-007",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 16.208364
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-008",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 16.208364
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-009",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 16.208364
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-010",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 16.208364
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-011",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 16.208364
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-012",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 16.208364
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-013",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 26.877188
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-014",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 26.877188
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-015",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 26.877188
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-016",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 26.877188
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-017",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 26.877188
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-018",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 26.877188
+      },
+      "floorSlabId": "Slab_107",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-019",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 38.332839
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-020",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 38.332839
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-021",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 38.332839
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-022",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 38.332839
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-023",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 38.332839
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-024",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 38.332839
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-025",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 49.001663
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-026",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 49.001663
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-027",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 49.001663
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-028",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 49.001663
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-029",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 49.001663
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-030",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 49.001663
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-031",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 59.670487
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-032",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 59.670487
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-033",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 59.670487
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-034",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 59.670487
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-035",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 59.670487
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-036",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 59.670487
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "main-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-037",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 68.634745,
+        "y": 69.135524
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-001",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 4.319904,
+        "y": 71.537465
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-002",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 13.319314,
+        "y": 71.537465
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-003",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 37.777269,
+        "y": 71.537472
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-004",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 45.77597,
+        "y": 71.537472
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-038",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 19.70873,
+        "y": 72.259444
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-039",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 30.21425,
+        "y": 72.259444
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-040",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 49.21698,
+        "y": 72.259444
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-041",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 56.219055,
+        "y": 72.259444
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-042",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 64.220904,
+        "y": 72.259444
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-043",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 68.634745,
+        "y": 72.259444
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-005",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 4.319918,
+        "y": 84.033142
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-006",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 13.319326,
+        "y": 84.033142
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-007",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 41.297544,
+        "y": 84.227519
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-008",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 53.298247,
+        "y": 84.227519
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-009",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 65.301092,
+        "y": 84.227519
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-044",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 19.70873,
+        "y": 84.755117
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-045",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 30.21425,
+        "y": 84.755117
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-046",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 40.217881,
+        "y": 84.75512
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-047",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 50.217276,
+        "y": 84.75512
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-048",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 60.220241,
+        "y": 84.75512
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-049",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 70.221594,
+        "y": 84.75512
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-010",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 32.268264,
+        "y": 87.740191
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-050",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 40.217881,
+        "y": 94.073316
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-051",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 50.217276,
+        "y": 94.073316
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-052",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 60.220241,
+        "y": 94.073316
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-053",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 70.221594,
+        "y": 94.073316
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-011",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 23.628312,
+        "y": 95.297806
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-012",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 32.268271,
+        "y": 95.322052
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-013",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 41.297572,
+        "y": 95.443296
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-014",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 53.298274,
+        "y": 95.443296
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-015",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 65.30112,
+        "y": 95.443296
+      },
+      "floorSlabId": "Slab_106",
+      "floorMatchCount": 1,
+      "roofBaseRegionId": "membrane-base",
+      "roofMatchCount": 1,
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "zFt": null
+    }
+  ],
+  "counts": {
+    "totalHeads": 68,
+    "floorRegionCounts": {
+      "Slab_106": 50,
+      "Slab_107": 18,
+      "Slab_108": 0
+    },
+    "roofRegionCounts": {
+      "main-standing-seam": 36,
+      "west-lower-standing-seam": 4,
+      "membrane-base": 28
+    },
+    "unmatchedFloorHeads": 0,
+    "multiplyMatchedFloorHeads": 0,
+    "unmatchedRoofHeads": 0,
+    "multiplyMatchedRoofHeads": 0
+  },
+  "independentClosure": {
+    "membraneDrawingNoteSqFt": 1972,
+    "membraneExtractedSqFt": 1972,
+    "membraneWidthFt": 58,
+    "membraneDepthFt": 34
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "exact DWG polyline and line-boundary extraction in structural-local coordinates"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "58 ft by 34 ft membrane region equals the printed 1,972 square-foot roof-area note"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "dependency, polygon, area, membership, count, plane, Z, topology, compliance, fabrication, and release mutations"
+    }
+  },
+  "structuralRoofXyReady": true,
+  "exactFloorSlabPolygonsReady": true,
+  "baseRoofRegionBoundariesReady": true,
+  "allHeadsUniquelyBoundToFloorSlab": true,
+  "allHeadsUniquelyBoundToRoofBaseRegion": true,
+  "cricketFaceTopologyReady": false,
+  "wholeRoofFaceTopologyReady": false,
+  "sourceProtectionPlaneReady": false,
+  "headElevationsReady": false,
+  "sourceGeneratedPitchedPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "extract membrane cricket subfaces and source side-view elevation constraints before any roof plane, protection plane, or Z assignment",
+  "claimStatus": "68-corrected-heads-uniquely-bound-to-exact-source-slab-and-base-roof-regions-not-cricket-plane-z-compliance-fabrication-or-release",
+  "receiptSha256": "40ffa3aa8bee27ed56f356d4d3ca9487b464968992f86f7b9f1a9034ef25d257"
+}

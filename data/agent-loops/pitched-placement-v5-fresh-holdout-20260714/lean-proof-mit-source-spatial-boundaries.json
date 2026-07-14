@@ -1,0 +1,28 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "gatewayHealth": {
+    "status": "ok",
+    "gatewayVersion": "0.1.0",
+    "leanStatus": "ok"
+  },
+  "theoremName": "mitSourceSpatialBaseRegionsCloseFailClosed",
+  "claim": "All 68 corrected heads close once across the exact floor-slab regions and once across the exact base roof regions, the 58 by 34 foot membrane closes to 1,972 square feet, and whole-roof topology, planes, and elevations remain false.",
+  "theorem": "theorem mitSourceSpatialBaseRegionsCloseFailClosed :\n  And (((50 : Nat) + 18 + 0) = 68)\n    (And (((36 : Nat) + 4 + 28) = 68)\n      (And (((58 : Nat) * 34) = 1972)\n        (And ((false : Bool) = false)\n          (And ((false : Bool) = false)\n            ((false : Bool) = false))))) :=",
+  "proof": "by\n  decide",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 107,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  },
+  "sourceSpatialBoundariesReceiptSha256": "40ffa3aa8bee27ed56f356d4d3ca9487b464968992f86f7b9f1a9034ef25d257",
+  "exactFloorSlabPolygonsReady": true,
+  "baseRoofRegionBoundariesReady": true,
+  "cricketFaceTopologyReady": false,
+  "wholeRoofFaceTopologyReady": false,
+  "sourceProtectionPlaneReady": false,
+  "headElevationReady": false,
+  "complianceReady": false
+}

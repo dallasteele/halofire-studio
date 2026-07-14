@@ -1,0 +1,22 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildMitRiversideBuildingJSourceSpatialBoundaries, renderMitRiversideBuildingJSourceSpatialBoundaries, validateMitRiversideBuildingJSourceSpatialBoundaries, verifyMitRiversideBuildingJSourceSpatialBoundariesAdversarialLoop } from '../src/engine/mit-riverside-building-j-source-spatial-boundaries.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const read = (name) => JSON.parse(fs.readFileSync(path.join(root, 'src', 'data', name), 'utf8'));
+const structural = read('mit-riverside-building-j-structural-grid-correction.json');
+const evidence = read('mit-riverside-building-j-source-spatial-boundary-evidence.json');
+const dependencies = { structural, evidence };
+const packet = await buildMitRiversideBuildingJSourceSpatialBoundaries(structural, evidence);
+const validation = await validateMitRiversideBuildingJSourceSpatialBoundaries(packet, dependencies);
+const adversarial = await verifyMitRiversideBuildingJSourceSpatialBoundariesAdversarialLoop(packet, dependencies);
+if ([validation.status, adversarial.status].some((status) => status !== 'passed')) throw new Error(JSON.stringify({ validation, adversarial }, null, 2));
+fs.writeFileSync(path.join(root, 'src', 'data', 'mit-riverside-building-j-source-spatial-boundaries.json'), `${JSON.stringify(packet, null, 2)}\n`);
+const sealedProof = path.join(root, 'src', 'data', 'proofs', 'mit-riverside-building-j-source-spatial-boundaries.svg');
+fs.mkdirSync(path.dirname(sealedProof), { recursive: true });
+fs.writeFileSync(sealedProof, renderMitRiversideBuildingJSourceSpatialBoundaries(packet));
+const out = path.join(root, 'out', 'visual-proof', 'mit-riverside-building-j-source-spatial-boundaries.svg');
+fs.mkdirSync(path.dirname(out), { recursive: true });
+fs.writeFileSync(out, renderMitRiversideBuildingJSourceSpatialBoundaries(packet));
+console.log(JSON.stringify({ validation, adversarial, receiptSha256: packet.receiptSha256, counts: packet.counts, sealedProof, out }, null, 2));

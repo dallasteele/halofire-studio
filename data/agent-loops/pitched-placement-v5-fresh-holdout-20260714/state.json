@@ -1,8 +1,8 @@
 {
   "loop": "pitched-placement-v5-fresh-holdout-20260714",
-  "stage": "STRUCTURAL_GRID_PIECEWISE_CORRECTED",
-  "status": "mit-building-j-68-rcp-points-corrected-to-structural-roof-xy-planes-and-z-still-blocked",
-  "iteration": 11,
+  "stage": "EXACT_SOURCE_BASE_REGIONS_BOUND",
+  "status": "mit-building-j-68-corrected-heads-uniquely-bound-to-source-slabs-and-base-roof-regions-crickets-planes-and-z-still-blocked",
+  "iteration": 12,
   "answerKeyOpened": true,
   "answerOpenedAfterSourceCommit": "551c6081",
   "selectedProject": {
@@ -280,6 +280,33 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
+  "mitBuildingJSourceSpatialBoundaries": {
+    "artifactType": "halofire.mit-riverside-building-j-source-spatial-boundaries.v1",
+    "evidenceReceiptSha256": "2d8b00e29e7023595adc1b33b89a76ed66ef2c0b3a9281198d1b2671499cf8a2",
+    "packetReceiptSha256": "40ffa3aa8bee27ed56f356d4d3ca9487b464968992f86f7b9f1a9034ef25d257",
+    "floorDwgSha256": "4310609e80ef25af2abbb164a623de1fe749fb37b04d165699acc4fc4f6297e5",
+    "roofDwgSha256": "94ee255614f7b403de5185622018eaaad8f80ebe253592418bc7e3b6d993c9aa",
+    "reader": "@mlightcad/libredwg-web 0.7.7",
+    "unknownEntityCount": 0,
+    "floorSlabAreasSqFt": { "Slab_106": 4389.673855, "Slab_107": 2011.705637, "Slab_108": 313.865256 },
+    "floorHeadCounts": { "Slab_106": 50, "Slab_107": 18, "Slab_108": 0 },
+    "roofBaseRegionAreasSqFt": { "main-standing-seam": 4362.17248, "west-lower-standing-seam": 653.747313, "membrane-base": 1972 },
+    "roofHeadCounts": { "main-standing-seam": 36, "west-lower-standing-seam": 4, "membrane-base": 28 },
+    "unmatchedFloorHeads": 0,
+    "multiplyMatchedFloorHeads": 0,
+    "unmatchedRoofHeads": 0,
+    "multiplyMatchedRoofHeads": 0,
+    "exactFloorSlabPolygonsReady": true,
+    "baseRoofRegionBoundariesReady": true,
+    "cricketFaceTopologyReady": false,
+    "wholeRoofFaceTopologyReady": false,
+    "sourceProtectionPlaneReady": false,
+    "headElevationsReady": false,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
   "comparisonResult": {
     "status": "passed-domain-guard-failed-placement-coverage",
     "wrongDomainGuardWorked": true,
@@ -310,6 +337,8 @@
     "mitBuildingJCrossDrawingGridAuditAdversarialMutationCases": { "passed": 16, "attempted": 16 },
     "mitBuildingJStructuralGridCorrectionFocusedTests": { "passed": 30, "failed": 0, "files": 6 },
     "mitBuildingJStructuralGridCorrectionAdversarialMutationCases": { "passed": 15, "attempted": 15 },
+    "mitBuildingJSourceSpatialBoundaryFocusedTests": { "passed": 35, "failed": 0, "files": 7 },
+    "mitBuildingJSourceSpatialBoundaryAdversarialMutationCases": { "passed": 18, "attempted": 18 },
     "releaseWidthTests": { "passed": 1937, "failed": 0, "files": 230, "nodeNativePassed": 20 },
     "authenticatedApi": { "anonymousStatus": 401, "authenticatedStatus": 200, "cacheControl": "private, no-store" },
     "authenticatedStudioBrowser": {
@@ -358,6 +387,7 @@
     "mitBuildingJSourceRcpFormalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "mitSourceRcpRegistrationFailClosed", "status": "verified", "elapsedMs": 67, "returnCode": 0 },
     "mitBuildingJCrossDrawingGridAuditFormalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "mitCrossDrawingJ2ConflictFailClosed", "status": "verified", "elapsedMs": 66, "returnCode": 0 },
     "mitBuildingJStructuralGridCorrectionFormalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "mitStructuralGridPiecewiseCorrectionClosesJ2", "status": "verified", "elapsedMs": 77, "returnCode": 0 },
+    "mitBuildingJSourceSpatialBoundaryFormalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "mitSourceSpatialBaseRegionsCloseFailClosed", "status": "verified", "elapsedMs": 107, "returnCode": 0 },
     "brainPostflight": {
       "status": "passed",
       "episodeId": 145921,
@@ -367,11 +397,12 @@
     "renderedBrowserProof": [
       "output/playwright/polaris-heldout-comparison/top.png",
       "output/playwright/polaris-heldout-comparison/elevation.png",
-      "output/playwright/polaris-heldout-comparison/model3d.png"
+      "output/playwright/polaris-heldout-comparison/model3d.png",
+      "output/playwright/mit-riverside-building-j-source-spatial-boundaries.png"
     ]
   },
   "blockedClaims": [
-    "mit-building-j-exact-floor-footprint",
+    "mit-building-j-floor-slab-union-and-floor-extrusion-height",
     "mit-building-j-exact-roof-face-topology",
     "mit-building-j-source-protection-regime-zones",
     "mit-building-j-head-elevation-registration",
@@ -386,5 +417,5 @@
     "fabrication",
     "field-release"
   ],
-  "nextAction": "bind the 68 corrected structural XY points to the exact three source floor-slab polygons and independently extracted source roof boundaries; keep the membrane/cricket face topology, protection regimes, planes, and elevations blocked until each source polygon closes"
+  "nextAction": "open a successor loop to extract and close the membrane cricket subfaces plus source section/elevation constraints, then assign roof and protection planes and per-head Z only after those independent source surfaces close"
 }

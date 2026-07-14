@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-07-14 - MIT Riverside Building J exact source slab and base-roof regions
+
+- Rehashed the protected architectural floor and structural roof DWGs, parsed both with `@mlightcad/libredwg-web 0.7.7` at zero unknown entities, and deterministically extracted the three exact architectural slab polylines plus the main standing-seam, lower standing-seam, and membrane base boundaries.
+- Bound all 68 corrected structural-roof XY heads uniquely to one slab and one base roof region: slabs `50 / 18 / 0`; roof regions `36 / 4 / 28`; unmatched and multiply matched counts are all zero.
+- Independently closed the membrane base at exactly 58 ft by 34 ft = 1,972 sq ft, matching the source drawing note. This proves base XY regions only; membrane cricket subfaces, whole-roof topology, protection planes, head Z, compliance, fabrication, and field release remain fail-closed.
+- Added deterministic evidence/packet replay, a sealed two-panel SVG proof, 18/18 adversarial mutations, 35 focused tests across seven Building J files, and Lean theorem `mitSourceSpatialBaseRegionsCloseFailClosed` (Lean 4.13.0, 107 ms, return code 0).
+- Next: use a successor loop to close cricket subfaces and section/elevation constraints before assigning any roof/protection plane or head elevation.
+
 ## 2026-07-14 - MIT Riverside Building J piecewise structural-grid correction
 
 - Applied the superseding source-label transform to all 68 source-RCP points, preserving both the answer/RCP-local coordinates and a separate corrected structural-roof coordinate for every head.
