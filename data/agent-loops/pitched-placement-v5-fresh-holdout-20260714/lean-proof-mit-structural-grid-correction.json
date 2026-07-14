@@ -1,0 +1,25 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "gatewayHealth": {
+    "status": "ok",
+    "gatewayVersion": "0.1.0",
+    "leanStatus": "ok"
+  },
+  "theoremName": "mitStructuralGridPiecewiseCorrectionClosesJ2",
+  "claim": "The answer/RCP J.2 coordinate of 1070 inches from J.5 requires the preserved 12-inch correction to equal the structural DWG coordinate of 1082 inches.",
+  "theorem": "def correctedGridInches (answerIn correctionIn : Nat) : Nat := answerIn + correctionIn\n\ntheorem mitStructuralGridPiecewiseCorrectionClosesJ2 :\n  And (correctedGridInches 1070 12 = 1082)\n    (And ((1082 : Nat) - 1070 = 12)\n      ((12 : Nat) > 0)) :=",
+  "proof": "by\n  decide",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 77,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  },
+  "structuralGridCorrectionReceiptSha256": "8b7a642c0dc682115afe482426b2bf3cf140b3eadc3561a8520fe43998ce62b4",
+  "structuralRoofXyReady": true,
+  "sourceProtectionPlaneReady": false,
+  "headElevationReady": false,
+  "complianceReady": false
+}

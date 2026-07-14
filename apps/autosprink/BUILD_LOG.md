@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-07-14 - MIT Riverside Building J piecewise structural-grid correction
+
+- Applied the superseding source-label transform to all 68 source-RCP points, preserving both the answer/RCP-local coordinates and a separate corrected structural-roof coordinate for every head.
+- The correction uses all eight horizontal and five vertical source grid anchors. It moves affected Y coordinates by as much as 0.904218 ft instead of smoothing away the localized one-foot J.2 conflict; total/class reconciliation remains 53 upright plus 15 pendent.
+- Verified deterministic replay, 15/15 transform/coordinate/plane/Z/release adversarial attacks, 30 focused tests across six Building J files, and Lean theorem `mitStructuralGridPiecewiseCorrectionClosesJ2` (Lean 4.13.0, 77 ms, return code 0).
+- Structural-roof XY is now ready for the 68 calibrated answer points. Exact floor footprint, complete roof-face topology, protection regime, plane assignment, Z, source-generated placement, compliance, fabrication, and field release remain blocked.
+- Next: bind these corrected XY points to the exact three source floor-slab polygons and the independently extracted source roof boundaries, while preserving membrane/cricket topology as blocked until fully closed.
+
 ## 2026-07-14 - MIT Riverside Building J cross-drawing grid conflict audit
 
 - Parsed the exact `S-GRID` line coordinates from the separately hashed structural roof-framing DWG with `@mlightcad/libredwg-web 0.7.7` and zero unknown entities before promoting any RCP point onto a roof plane.

@@ -1,8 +1,8 @@
 {
   "loop": "pitched-placement-v5-fresh-holdout-20260714",
-  "stage": "CROSS_DRAWING_GRID_CONFLICT_AUDITED",
-  "status": "mit-building-j-rcp-xy-preserved-structural-j2-one-foot-conflict-blocks-roof-plane-assignment",
-  "iteration": 10,
+  "stage": "STRUCTURAL_GRID_PIECEWISE_CORRECTED",
+  "status": "mit-building-j-68-rcp-points-corrected-to-structural-roof-xy-planes-and-z-still-blocked",
+  "iteration": 11,
   "answerKeyOpened": true,
   "answerOpenedAfterSourceCommit": "551c6081",
   "selectedProject": {
@@ -257,6 +257,29 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
+  "mitBuildingJStructuralGridCorrection": {
+    "artifactType": "halofire.mit-riverside-building-j-structural-grid-correction.v1",
+    "sourceRcpRegistrationReceiptSha256": "a2fa02a3d06762adccc900c978d6278ee586bb749e643f7135f883d796826d6f",
+    "crossDrawingGridAuditReceiptSha256": "16cd7e436b10293bdb9351dfb6cfd26104d585d9a0ffe064dc9aba63431900ea",
+    "correctionReceiptSha256": "8b7a642c0dc682115afe482426b2bf3cf140b3eadc3561a8520fe43998ce62b4",
+    "correctionMode": "piecewise-source-rcp-grid-label-to-exact-structural-dwg-grid-lines",
+    "mappedHeadCount": 68,
+    "pendentHeadCount": 15,
+    "uprightHeadCount": 53,
+    "localizedJ2ConflictInches": 12,
+    "maximumAbsoluteCorrectionFt": 0.904218,
+    "answerRcpXyReady": true,
+    "structuralRoofXyReady": true,
+    "structuralCorrectionReady": true,
+    "exactFloorFootprintReady": false,
+    "wholeRoofFaceTopologyReady": false,
+    "sourceProtectionPlaneReady": false,
+    "headElevationsReady": false,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
   "comparisonResult": {
     "status": "passed-domain-guard-failed-placement-coverage",
     "wrongDomainGuardWorked": true,
@@ -285,6 +308,8 @@
     "mitBuildingJSourceRcpAdversarialMutationCases": { "passed": 21, "attempted": 21 },
     "mitBuildingJCrossDrawingGridAuditFocusedTests": { "passed": 5, "failed": 0, "files": 1 },
     "mitBuildingJCrossDrawingGridAuditAdversarialMutationCases": { "passed": 16, "attempted": 16 },
+    "mitBuildingJStructuralGridCorrectionFocusedTests": { "passed": 30, "failed": 0, "files": 6 },
+    "mitBuildingJStructuralGridCorrectionAdversarialMutationCases": { "passed": 15, "attempted": 15 },
     "releaseWidthTests": { "passed": 1937, "failed": 0, "files": 230, "nodeNativePassed": 20 },
     "authenticatedApi": { "anonymousStatus": 401, "authenticatedStatus": 200, "cacheControl": "private, no-store" },
     "authenticatedStudioBrowser": {
@@ -332,6 +357,7 @@
     "formalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "polarisCandidateRejected", "status": "verified", "elapsedMs": 77, "returnCode": 0 },
     "mitBuildingJSourceRcpFormalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "mitSourceRcpRegistrationFailClosed", "status": "verified", "elapsedMs": 67, "returnCode": 0 },
     "mitBuildingJCrossDrawingGridAuditFormalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "mitCrossDrawingJ2ConflictFailClosed", "status": "verified", "elapsedMs": 66, "returnCode": 0 },
+    "mitBuildingJStructuralGridCorrectionFormalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "mitStructuralGridPiecewiseCorrectionClosesJ2", "status": "verified", "elapsedMs": 77, "returnCode": 0 },
     "brainPostflight": {
       "status": "passed",
       "episodeId": 145819,
@@ -348,7 +374,6 @@
     "mit-building-j-exact-floor-footprint",
     "mit-building-j-exact-roof-face-topology",
     "mit-building-j-source-protection-regime-zones",
-    "mit-building-j-current-head-structural-roof-xy",
     "mit-building-j-head-elevation-registration",
     "mit-building-j-whole-roof-head-plane-assignment",
     "mit-building-j-pitched-head-placement",
@@ -361,5 +386,5 @@
     "fabrication",
     "field-release"
   ],
-  "nextAction": "apply and verify the piecewise J.5-through-J.1 source-label correction to all 68 RCP points, then derive exact floor-slab and roof-face polygons plus ceiling/open-structure zones before assigning any structural plane or elevation"
+  "nextAction": "bind the 68 corrected structural XY points to the exact three source floor-slab polygons and independently extracted source roof boundaries; keep the membrane/cricket face topology, protection regimes, planes, and elevations blocked until each source polygon closes"
 }
