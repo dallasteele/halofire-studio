@@ -77,9 +77,11 @@ import { buildChollaCompletedLayoutView, validateChollaCompletedLayoutRegistrati
 import { renderMidvaleHeldoutOverlaySvg, validateMidvaleHeldoutComparison, verifyMidvaleHeldoutAdversarialLoop } from '../engine/midvale-clubhouse-pitched-heldout-comparison.js';
 import { renderMosesLakeHeldoutOverlaySvg, validateMosesLakeHeldoutComparison, verifyMosesLakeHeldoutAdversarialLoop } from '../engine/moses-lake-stake-center-pitched-heldout-comparison.js';
 import { renderVivianoHeldoutOverlaySvg, validateVivianoHeldoutComparison, verifyVivianoHeldoutAdversarialLoop } from '../engine/viviano-clubhouse-pitched-heldout-comparison.js';
+import { renderWinterGardenHeldoutOverlaySvg, validateWinterGardenHeldoutComparison, verifyWinterGardenHeldoutComparisonAdversarialLoop } from '../engine/winter-garden-meetinghouse-pitched-heldout-comparison.js';
 import { validatePitchedPlacementCalibrationCorpus, verifyPitchedPlacementCalibrationAdversarialLoop } from '../engine/pitched-placement-calibration-corpus.js';
 import { validatePitchedPlacementCalibrationCorpusV2, verifyPitchedPlacementCalibrationV2AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v2.js';
 import { validatePitchedPlacementCalibrationCorpusV3, verifyPitchedPlacementCalibrationV3AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v3.js';
+import { validatePitchedPlacementCalibrationCorpusV4, verifyPitchedPlacementCalibrationV4AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v4.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -178,9 +180,12 @@ const MOSES_LAKE_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/moses-
 const MOSES_LAKE_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/moses-lake-stake-center-pitched-heldout-comparison.json');
 const VIVIANO_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/viviano-clubhouse-source-only-pitched-candidate.json');
 const VIVIANO_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/viviano-clubhouse-pitched-heldout-comparison.json');
+const WINTER_GARDEN_MEETINGHOUSE_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/winter-garden-source-only-pitched-candidate.json');
+const WINTER_GARDEN_MEETINGHOUSE_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/winter-garden-meetinghouse-pitched-heldout-comparison.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V2_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v2.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V3_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v3.json');
+const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V4_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v4.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -2532,6 +2537,74 @@ app.get('/api/evidence/pitched-placement-calibration-corpus-v3', authMiddleware,
   } catch (error) {
     log.error('Failed to load pitched placement calibration corpus revision three', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'pitched_placement_calibration_corpus_v3_load_failed', strategySelectorReadyForFreshHoldout: false, unseenProjectPlacementVerified: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/winter-garden-meetinghouse-pitched-heldout-comparison', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(WINTER_GARDEN_MEETINGHOUSE_HELDOUT_COMPARISON_PATH, 'utf8'));
+    const sourceCandidate = JSON.parse(fs.readFileSync(WINTER_GARDEN_MEETINGHOUSE_SOURCE_CANDIDATE_PATH, 'utf8'));
+    const [validation, adversarialLoop] = await Promise.all([
+      validateWinterGardenHeldoutComparison(packet, sourceCandidate),
+      verifyWinterGardenHeldoutComparisonAdversarialLoop(packet, sourceCandidate),
+    ]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop,
+        unseenProjectPlacementVerified: false, sourceProtectionZoneGeometryVerified: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, projectId: packet.projectId,
+      receiptSha256: packet.receiptSha256, sequence: packet.sequence, answerKeys: packet.answerKeys,
+      registration: packet.registration, approvedEvidence: packet.approvedEvidence,
+      sourceGeometryFinding: packet.sourceGeometryFinding, prediction: packet.prediction,
+      approved: packet.approved, comparisons: packet.comparisons, result: packet.result,
+      overlaySvg: renderWinterGardenHeldoutOverlaySvg(packet), adversarialLoop,
+      unseenProjectPlacementVerified: false, sourceProtectionZoneGeometryVerified: false,
+      topViewComparisonReady: true, elevationClassificationComparisonReady: true,
+      partialModel3dComparisonReady: true, wholeBuildingModelReady: false,
+      hydraulicCalculationReady: false, complianceReady: false, fabricationReady: false,
+      fieldReleaseReady: false, claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Winter Garden meetinghouse heldout comparison', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'winter_garden_meetinghouse_heldout_load_failed', unseenProjectPlacementVerified: false, sourceProtectionZoneGeometryVerified: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/pitched-placement-calibration-corpus-v4', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(PITCHED_PLACEMENT_CALIBRATION_CORPUS_V4_PATH, 'utf8'));
+    const dependencies = {
+      v3Corpus: JSON.parse(fs.readFileSync(PITCHED_PLACEMENT_CALIBRATION_CORPUS_V3_PATH, 'utf8')),
+      winterSourceCandidate: JSON.parse(fs.readFileSync(WINTER_GARDEN_MEETINGHOUSE_SOURCE_CANDIDATE_PATH, 'utf8')),
+      winterComparison: JSON.parse(fs.readFileSync(WINTER_GARDEN_MEETINGHOUSE_HELDOUT_COMPARISON_PATH, 'utf8')),
+    };
+    const [validation, adversarialLoop] = await Promise.all([
+      validatePitchedPlacementCalibrationCorpusV4(packet, dependencies),
+      verifyPitchedPlacementCalibrationV4AdversarialLoop(packet, dependencies),
+    ]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop,
+        strategySelectorReadyForFreshHoldout: false, unseenProjectPlacementVerified: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, receiptSha256: packet.receiptSha256,
+      mode: packet.mode, purpose: packet.purpose, sourceBindings: packet.sourceBindings,
+      trainingProjects: packet.trainingProjects, largeVaultStrategies: packet.largeVaultStrategies,
+      contrastiveLearning: packet.contrastiveLearning, failedHoldoutControls: packet.failedHoldoutControls,
+      transferPolicy: packet.transferPolicy, adversarialLoop, strategySelectorReadyForFreshHoldout: true,
+      unseenProjectPlacementVerified: false, complianceReady: false, fabricationReady: false,
+      fieldReleaseReady: false, claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load pitched placement calibration corpus revision four', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'pitched_placement_calibration_corpus_v4_load_failed', strategySelectorReadyForFreshHoldout: false, unseenProjectPlacementVerified: false, complianceReady: false });
   }
 });
 

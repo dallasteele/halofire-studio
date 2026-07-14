@@ -1,0 +1,754 @@
+{
+  "artifactType": "halofire.pitched-placement-calibration-corpus.v4",
+  "mode": "answer-exposed-five-project-topology-and-clear-span-calibration",
+  "purpose": "preserve Winter Garden count/topology/source-span failure, require source-only clear-span disambiguation, and add verified 3x3 partition-pocket evidence before another sealed holdout",
+  "sourceBindings": {
+    "v3CorpusReceiptSha256": "c9865fa6713ea4eea83f0e5afbe8587205f6d2a150f4bbc6dcc1e10f6fe32101",
+    "winterGardenSourceCandidateReceiptSha256": "a8ff34f22991c290c783ce92286ff7729b97c65575fdabfefdc2791399365bdb",
+    "winterGardenHeldoutComparisonReceiptSha256": "3b98e28a00d007835675c0cc43f79c6bdadd56daf78c733072f040b023620116"
+  },
+  "trainingProjects": [
+    {
+      "projectId": "dillon-residence",
+      "layoutFamily": "small-obstructed-single-plane",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 1,
+        "symmetricTwoPlaneVault": false,
+        "ceilingPitchRiseInPer12": 3,
+        "envelopeAreaSqFt": 309.190672,
+        "sourceObstructionPresent": true
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 2,
+        "completedAreaPerHeadSqFt": 154.595336,
+        "completedInterHeadDistanceFt": 11.579586,
+        "topology": {
+          "columns": 1,
+          "rows": 2
+        }
+      }
+    },
+    {
+      "projectId": "midvale-townhome-clubhouse-midvale-ut",
+      "layoutFamily": "large-symmetric-two-plane-vault-four-along",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 2,
+        "symmetricTwoPlaneVault": true,
+        "ceilingPitchRiseInPer12": 6,
+        "envelopeWidthFt": 29,
+        "envelopeLengthFt": 30,
+        "envelopeAreaSqFt": 870,
+        "springElevationFt": 12,
+        "ridgeElevationFt": 19.25,
+        "ridgeAxis": "y",
+        "sourceObstructionPresent": false,
+        "aspectRatio": 1.034483,
+        "alongRidgeSpanFt": 30,
+        "acrossSlopeSpanFt": 29
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 12,
+        "completedAreaPerHeadSqFt": 72.5,
+        "topology": {
+          "columns": 3,
+          "rows": 4
+        },
+        "columnStationsFt": [
+          3.999961,
+          14.5,
+          25.000043
+        ],
+        "rowStationsFt": [
+          3.825209,
+          10.061684,
+          20.18322,
+          26.419695
+        ],
+        "columnSpacingsFt": [
+          10.500039,
+          10.500043
+        ],
+        "rowSpacingsFt": [
+          6.236475,
+          10.121536,
+          6.236475
+        ],
+        "columnEdgeOffsetsFt": [
+          3.999961,
+          3.999957
+        ],
+        "rowEdgeOffsetsFt": [
+          3.825209,
+          3.580305
+        ],
+        "normalizedColumnStations": [
+          0.13793,
+          0.5,
+          0.86207
+        ],
+        "normalizedRowStations": [
+          0.127507,
+          0.335389,
+          0.672774,
+          0.880657
+        ],
+        "ridgeHeadColumnPresent": true,
+        "lowEdgeHeadColumnPerPlane": true
+      }
+    },
+    {
+      "projectId": "moses-lake-stake-center",
+      "layoutFamily": "large-symmetric-two-plane-vault-two-along",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 2,
+        "symmetricTwoPlaneVault": true,
+        "ceilingPitchRiseInPer12": 4.5,
+        "envelopeWidthFt": 37.541667,
+        "envelopeLengthFt": 25.5,
+        "envelopeAreaSqFt": 957.312508,
+        "aspectRatio": 0.679245,
+        "alongRidgeSpanFt": 25.5,
+        "acrossSlopeSpanFt": 37.541667,
+        "springElevationFt": 12.346354,
+        "ridgeElevationFt": 19.385417,
+        "ridgeAxis": "x",
+        "sourceObstructionPresent": false
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 6,
+        "completedAreaPerHeadSqFt": 159.552085,
+        "topology": {
+          "alongRidgeStations": 2,
+          "acrossSlopeStations": 3
+        },
+        "alongRidgeStationsFt": [
+          8.109996,
+          23.109996
+        ],
+        "acrossSlopeStationsFt": [
+          4.149989,
+          18.149989,
+          31.219996
+        ],
+        "alongRidgeSpacingsFt": [
+          15
+        ],
+        "acrossSlopeSpacingsFt": [
+          14,
+          13.070007
+        ],
+        "alongRidgeEdgeOffsetsFt": [
+          8.109996,
+          2.390004
+        ],
+        "acrossSlopeEdgeOffsetsFt": [
+          4.149989,
+          6.321671
+        ],
+        "normalizedAlongRidgeStations": [
+          0.318039,
+          0.906274
+        ],
+        "normalizedAcrossSlopeStations": [
+          0.110544,
+          0.483463,
+          0.831609
+        ],
+        "ridgeHeadStationPresent": true,
+        "approvedAsBuiltParity": true
+      }
+    },
+    {
+      "projectId": "viviano-clubhouse-saratoga-springs-ut",
+      "layoutFamily": "large-symmetric-two-plane-vault-three-along-four-across-obstructed-ridge",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 2,
+        "symmetricTwoPlaneVault": true,
+        "ceilingPitchRiseInPer12": 7.334,
+        "envelopeWidthFt": 30.760417,
+        "envelopeLengthFt": 42.25,
+        "envelopeAreaSqFt": 1299.627618,
+        "aspectRatio": 1.373518,
+        "alongRidgeSpanFt": 42.25,
+        "acrossSlopeSpanFt": 30.760417,
+        "springElevationFt": 17,
+        "ridgeElevationFt": 26.399871,
+        "ridgeAxis": "x",
+        "sourceObstructionPresent": true,
+        "sourceObstructionKinds": [
+          "ceiling fans shown on architectural RCP and Gym finish plan"
+        ]
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 12,
+        "completedAreaPerHeadSqFt": 108.302301,
+        "topology": {
+          "alongRidgeStations": 3,
+          "acrossSlopeStations": 4
+        },
+        "alongRidgeStationsFt": [
+          8.243185,
+          21.400593,
+          34.627444
+        ],
+        "acrossSlopeStationsFt": [
+          3.474667,
+          11.141333,
+          19.659852,
+          27.326519
+        ],
+        "alongRidgeSpacingsFt": [
+          13.157408,
+          13.226851
+        ],
+        "acrossSlopeSpacingsFt": [
+          7.666666,
+          8.518519,
+          7.666667
+        ],
+        "alongRidgeEdgeOffsetsFt": [
+          8.243185,
+          7.622556
+        ],
+        "acrossSlopeEdgeOffsetsFt": [
+          3.474667,
+          3.433898
+        ],
+        "normalizedAlongRidgeStations": [
+          0.195105,
+          0.506523,
+          0.819584
+        ],
+        "normalizedAcrossSlopeStations": [
+          0.112959,
+          0.362197,
+          0.639128,
+          0.888366
+        ],
+        "planeStationsPerPlane": 2,
+        "ridgeHeadStationPresent": false,
+        "approvedAsBuiltParity": true
+      }
+    },
+    {
+      "projectId": "lds-meetinghouse-winter-garden-fl",
+      "layoutFamily": "large-symmetric-two-plane-vault-three-along-three-across-partition-pocket",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 2,
+        "symmetricTwoPlaneVault": true,
+        "ceilingPitchRiseInPer12": 4.5,
+        "envelopeWidthFt": 38.083333,
+        "envelopeLengthFt": 25.895833,
+        "envelopeAreaSqFt": 986.199631,
+        "aspectRatio": 0.679978,
+        "alongRidgeSpanFt": 25.895833,
+        "acrossSlopeSpanFt": 38.083333,
+        "springElevationFt": 12.244792,
+        "ridgeElevationFt": 19.385417,
+        "ridgeAxis": "x",
+        "sourceObstructionPresent": true,
+        "sourceObstructionKinds": [
+          "folding basketball standard and ceiling-mounted devices shown on A151/A302"
+        ],
+        "clearSpanDisambiguated": true,
+        "movablePartitionPocketPresent": true,
+        "sourceSpanCandidateCount": 2,
+        "clearSpanEvidence": {
+          "selectedLabel": "25'-10 3/4\"",
+          "rejectedPocketInclusiveLabel": "28'-11 1/4\"",
+          "selectionMethod": "continuous occupied C3 ceiling-plane wall faces excluding the movable-partition pocket"
+        }
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 9,
+        "completedAreaPerHeadSqFt": 109.577737,
+        "topology": {
+          "alongRidgeStations": 3,
+          "acrossSlopeStations": 3
+        },
+        "alongRidgeStationsFt": [
+          2.628524,
+          12.493604,
+          22.326232
+        ],
+        "acrossSlopeStationsFt": [
+          5.895746,
+          18.420223,
+          31.996373
+        ],
+        "alongRidgeSpacingsFt": [
+          9.86508,
+          9.832628
+        ],
+        "acrossSlopeSpacingsFt": [
+          12.524477,
+          13.57615
+        ],
+        "alongRidgeEdgeOffsetsFt": [
+          2.628524,
+          3.569601
+        ],
+        "acrossSlopeEdgeOffsetsFt": [
+          5.895746,
+          6.08696
+        ],
+        "normalizedAlongRidgeStations": [
+          0.101504,
+          0.482456,
+          0.862155
+        ],
+        "normalizedAcrossSlopeStations": [
+          0.154812,
+          0.483682,
+          0.840167
+        ],
+        "planeStationsPerPlane": 1,
+        "ridgeHeadStationPresent": true,
+        "approvedAsBuiltRasterParity": true
+      }
+    }
+  ],
+  "largeVaultStrategies": [
+    {
+      "projectId": "midvale-townhome-clubhouse-midvale-ut",
+      "layoutFamily": "large-symmetric-two-plane-vault-four-along",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 2,
+        "symmetricTwoPlaneVault": true,
+        "ceilingPitchRiseInPer12": 6,
+        "envelopeWidthFt": 29,
+        "envelopeLengthFt": 30,
+        "envelopeAreaSqFt": 870,
+        "springElevationFt": 12,
+        "ridgeElevationFt": 19.25,
+        "ridgeAxis": "y",
+        "sourceObstructionPresent": false,
+        "aspectRatio": 1.034483,
+        "alongRidgeSpanFt": 30,
+        "acrossSlopeSpanFt": 29,
+        "clearSpanDisambiguated": true,
+        "movablePartitionPocketPresent": false,
+        "sourceSpanCandidateCount": 1
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 12,
+        "completedAreaPerHeadSqFt": 72.5,
+        "topology": {
+          "columns": 3,
+          "rows": 4
+        },
+        "columnStationsFt": [
+          3.999961,
+          14.5,
+          25.000043
+        ],
+        "rowStationsFt": [
+          3.825209,
+          10.061684,
+          20.18322,
+          26.419695
+        ],
+        "columnSpacingsFt": [
+          10.500039,
+          10.500043
+        ],
+        "rowSpacingsFt": [
+          6.236475,
+          10.121536,
+          6.236475
+        ],
+        "columnEdgeOffsetsFt": [
+          3.999961,
+          3.999957
+        ],
+        "rowEdgeOffsetsFt": [
+          3.825209,
+          3.580305
+        ],
+        "normalizedColumnStations": [
+          0.13793,
+          0.5,
+          0.86207
+        ],
+        "normalizedRowStations": [
+          0.127507,
+          0.335389,
+          0.672774,
+          0.880657
+        ],
+        "ridgeHeadColumnPresent": true,
+        "lowEdgeHeadColumnPerPlane": true
+      }
+    },
+    {
+      "projectId": "moses-lake-stake-center",
+      "layoutFamily": "large-symmetric-two-plane-vault-two-along",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 2,
+        "symmetricTwoPlaneVault": true,
+        "ceilingPitchRiseInPer12": 4.5,
+        "envelopeWidthFt": 37.541667,
+        "envelopeLengthFt": 25.5,
+        "envelopeAreaSqFt": 957.312508,
+        "aspectRatio": 0.679245,
+        "alongRidgeSpanFt": 25.5,
+        "acrossSlopeSpanFt": 37.541667,
+        "springElevationFt": 12.346354,
+        "ridgeElevationFt": 19.385417,
+        "ridgeAxis": "x",
+        "sourceObstructionPresent": false,
+        "clearSpanDisambiguated": true,
+        "movablePartitionPocketPresent": false,
+        "sourceSpanCandidateCount": 1
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 6,
+        "completedAreaPerHeadSqFt": 159.552085,
+        "topology": {
+          "alongRidgeStations": 2,
+          "acrossSlopeStations": 3
+        },
+        "alongRidgeStationsFt": [
+          8.109996,
+          23.109996
+        ],
+        "acrossSlopeStationsFt": [
+          4.149989,
+          18.149989,
+          31.219996
+        ],
+        "alongRidgeSpacingsFt": [
+          15
+        ],
+        "acrossSlopeSpacingsFt": [
+          14,
+          13.070007
+        ],
+        "alongRidgeEdgeOffsetsFt": [
+          8.109996,
+          2.390004
+        ],
+        "acrossSlopeEdgeOffsetsFt": [
+          4.149989,
+          6.321671
+        ],
+        "normalizedAlongRidgeStations": [
+          0.318039,
+          0.906274
+        ],
+        "normalizedAcrossSlopeStations": [
+          0.110544,
+          0.483463,
+          0.831609
+        ],
+        "ridgeHeadStationPresent": true,
+        "approvedAsBuiltParity": true
+      }
+    },
+    {
+      "projectId": "viviano-clubhouse-saratoga-springs-ut",
+      "layoutFamily": "large-symmetric-two-plane-vault-three-along-four-across-obstructed-ridge",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 2,
+        "symmetricTwoPlaneVault": true,
+        "ceilingPitchRiseInPer12": 7.334,
+        "envelopeWidthFt": 30.760417,
+        "envelopeLengthFt": 42.25,
+        "envelopeAreaSqFt": 1299.627618,
+        "aspectRatio": 1.373518,
+        "alongRidgeSpanFt": 42.25,
+        "acrossSlopeSpanFt": 30.760417,
+        "springElevationFt": 17,
+        "ridgeElevationFt": 26.399871,
+        "ridgeAxis": "x",
+        "sourceObstructionPresent": true,
+        "sourceObstructionKinds": [
+          "ceiling fans shown on architectural RCP and Gym finish plan"
+        ],
+        "clearSpanDisambiguated": true,
+        "movablePartitionPocketPresent": false,
+        "sourceSpanCandidateCount": 1
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 12,
+        "completedAreaPerHeadSqFt": 108.302301,
+        "topology": {
+          "alongRidgeStations": 3,
+          "acrossSlopeStations": 4
+        },
+        "alongRidgeStationsFt": [
+          8.243185,
+          21.400593,
+          34.627444
+        ],
+        "acrossSlopeStationsFt": [
+          3.474667,
+          11.141333,
+          19.659852,
+          27.326519
+        ],
+        "alongRidgeSpacingsFt": [
+          13.157408,
+          13.226851
+        ],
+        "acrossSlopeSpacingsFt": [
+          7.666666,
+          8.518519,
+          7.666667
+        ],
+        "alongRidgeEdgeOffsetsFt": [
+          8.243185,
+          7.622556
+        ],
+        "acrossSlopeEdgeOffsetsFt": [
+          3.474667,
+          3.433898
+        ],
+        "normalizedAlongRidgeStations": [
+          0.195105,
+          0.506523,
+          0.819584
+        ],
+        "normalizedAcrossSlopeStations": [
+          0.112959,
+          0.362197,
+          0.639128,
+          0.888366
+        ],
+        "planeStationsPerPlane": 2,
+        "ridgeHeadStationPresent": false,
+        "approvedAsBuiltParity": true
+      }
+    },
+    {
+      "projectId": "lds-meetinghouse-winter-garden-fl",
+      "layoutFamily": "large-symmetric-two-plane-vault-three-along-three-across-partition-pocket",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 2,
+        "symmetricTwoPlaneVault": true,
+        "ceilingPitchRiseInPer12": 4.5,
+        "envelopeWidthFt": 38.083333,
+        "envelopeLengthFt": 25.895833,
+        "envelopeAreaSqFt": 986.199631,
+        "aspectRatio": 0.679978,
+        "alongRidgeSpanFt": 25.895833,
+        "acrossSlopeSpanFt": 38.083333,
+        "springElevationFt": 12.244792,
+        "ridgeElevationFt": 19.385417,
+        "ridgeAxis": "x",
+        "sourceObstructionPresent": true,
+        "sourceObstructionKinds": [
+          "folding basketball standard and ceiling-mounted devices shown on A151/A302"
+        ],
+        "clearSpanDisambiguated": true,
+        "movablePartitionPocketPresent": true,
+        "sourceSpanCandidateCount": 2,
+        "clearSpanEvidence": {
+          "selectedLabel": "25'-10 3/4\"",
+          "rejectedPocketInclusiveLabel": "28'-11 1/4\"",
+          "selectionMethod": "continuous occupied C3 ceiling-plane wall faces excluding the movable-partition pocket"
+        }
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 9,
+        "completedAreaPerHeadSqFt": 109.577737,
+        "topology": {
+          "alongRidgeStations": 3,
+          "acrossSlopeStations": 3
+        },
+        "alongRidgeStationsFt": [
+          2.628524,
+          12.493604,
+          22.326232
+        ],
+        "acrossSlopeStationsFt": [
+          5.895746,
+          18.420223,
+          31.996373
+        ],
+        "alongRidgeSpacingsFt": [
+          9.86508,
+          9.832628
+        ],
+        "acrossSlopeSpacingsFt": [
+          12.524477,
+          13.57615
+        ],
+        "alongRidgeEdgeOffsetsFt": [
+          2.628524,
+          3.569601
+        ],
+        "acrossSlopeEdgeOffsetsFt": [
+          5.895746,
+          6.08696
+        ],
+        "normalizedAlongRidgeStations": [
+          0.101504,
+          0.482456,
+          0.862155
+        ],
+        "normalizedAcrossSlopeStations": [
+          0.154812,
+          0.483682,
+          0.840167
+        ],
+        "planeStationsPerPlane": 1,
+        "ridgeHeadStationPresent": true,
+        "approvedAsBuiltRasterParity": true
+      }
+    }
+  ],
+  "contrastiveLearning": {
+    "sourceOnlyFeatureKeys": [
+      "ceilingPitchRiseInPer12",
+      "envelopeLengthFt",
+      "envelopeWidthFt",
+      "aspectRatio",
+      "envelopeAreaSqFt",
+      "sourceObstructionPresent",
+      "movablePartitionPocketPresent",
+      "sourceSpanCandidateCount",
+      "occupiedProtectionPlaneCount",
+      "symmetricTwoPlaneVault",
+      "clearSpanDisambiguated"
+    ],
+    "observedNonTransfer": "Winter Garden is a near-prototype sibling of Moses Lake, yet the sealed v3 transfer undercounted six versus nine and selected a pocket-inclusive span. Similar room type and pitch did not preserve topology.",
+    "observedSourceDifferences": {
+      "mosesLake": {
+        "clearSpanLengthFt": 25.5,
+        "movablePartitionPocketPresent": false,
+        "sourceSpanCandidateCount": 1,
+        "observedTopology": "2x3-ridge"
+      },
+      "winterGarden": {
+        "clearSpanLengthFt": 25.895833,
+        "movablePartitionPocketPresent": true,
+        "sourceSpanCandidateCount": 2,
+        "observedTopology": "3x3-ridge"
+      }
+    },
+    "causalRuleClaimed": false,
+    "selectorMethod": "fail closed unless clearSpanDisambiguated is true, then nearest answer-exposed source-geometry neighbor over normalized pitch, clear length, width, aspect, area, obstruction, movable-partition-pocket, and source-span-candidate distance",
+    "forbiddenSelectorInputs": [
+      "projectName",
+      "answerKeyPath",
+      "approvedHeadCount",
+      "approvedHeadCoordinates",
+      "approvedTopology"
+    ],
+    "minimumFreshApplicationPolicy": "seal source files and all completed answers by hash, prove one unambiguous occupied protection-plane boundary, commit the v4 candidate, then open approved/as-built answers and preserve primary, independent, and adversarial results"
+  },
+  "failedHoldoutControls": [
+    {
+      "projectName": "LDS Meeting House - Winter Garden FL",
+      "receiptSha256": "9ed061afd375912ee8bf3a651275296fcab93ab556a664b832d1a95df7d2db33",
+      "failurePreserved": true,
+      "usedForTuning": false
+    },
+    {
+      "projectName": "Midvale Townhome Clubhouse - Midvale UT",
+      "receiptSha256": "c965246240266ffab46cffa7478452f6ae0da6a9ff6a97f1c989f455a72850f6",
+      "sourceOnlyPrediction": {
+        "columns": 4,
+        "rows": 2,
+        "heads": 8
+      },
+      "approvedAnswerExposed": {
+        "columns": 3,
+        "rows": 4,
+        "heads": 12
+      },
+      "failurePreserved": true,
+      "nowUsedForCalibration": true
+    },
+    {
+      "projectName": "Moses Lake Stake Center",
+      "receiptSha256": "0dc947ee96723a782fdb2c268c294f31845bdd68763b216ff3562aed3fa24a4e",
+      "sourceOnlyPrediction": {
+        "alongRidgeStations": 4,
+        "acrossSlopeStations": 3,
+        "heads": 12
+      },
+      "approvedAnswerExposed": {
+        "alongRidgeStations": 2,
+        "acrossSlopeStations": 3,
+        "heads": 6
+      },
+      "failurePreserved": true,
+      "nowUsedForCalibration": true
+    },
+    {
+      "projectName": "Viviano Clubhouse - Saratoga Springs UT",
+      "receiptSha256": "cef6dcb71e5ceb72c116c3195e23b18a9b1587b91d31209d918128f2f18f5d60",
+      "sourceOnlyPrediction": {
+        "alongRidgeStations": 4,
+        "acrossSlopeStations": 3,
+        "ridgeHeadStationPresent": true,
+        "heads": 12
+      },
+      "approvedAnswerExposed": {
+        "alongRidgeStations": 3,
+        "acrossSlopeStations": 4,
+        "ridgeHeadStationPresent": false,
+        "heads": 12
+      },
+      "failurePreserved": true,
+      "equalCountTopologyFailure": true,
+      "nowUsedForCalibration": true
+    },
+    {
+      "projectName": "LDS Meeting House - Winter Garden FL",
+      "receiptSha256": "3b98e28a00d007835675c0cc43f79c6bdadd56daf78c733072f040b023620116",
+      "sourceOnlyPrediction": {
+        "alongRidgeStations": 2,
+        "acrossSlopeStations": 3,
+        "heads": 6,
+        "spanLengthFt": 28.9375
+      },
+      "approvedAnswerExposed": {
+        "alongRidgeStations": 3,
+        "acrossSlopeStations": 3,
+        "heads": 9,
+        "clearSpanLengthFt": 25.895833
+      },
+      "failurePreserved": true,
+      "topologyFailure": true,
+      "countFailure": true,
+      "sourceSpanFailure": true,
+      "nowUsedForCalibration": true
+    }
+  ],
+  "transferPolicy": {
+    "empiricalPriorOnly": true,
+    "codeLimit": false,
+    "answerExposed": true,
+    "sourceOnlyStrategySelectionRequired": true,
+    "clearSpanDisambiguationRequired": true,
+    "causalRuleClaimed": false,
+    "obstructionClearanceTransferAllowed": false,
+    "hazardClassificationTransferAllowed": false,
+    "pipeTopologyTransferAllowed": false,
+    "unseenProjectHoldoutRequired": true
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-v3-plus-Winter-Garden clear-span and approved 3x3 station extraction"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "sealed receipt chain plus source A103 competing-span audit and byte-identical approved/as-built plan raster evidence"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "dependency, leakage, span, pocket, topology, count, failure-erasure, causal-promotion, and downstream-promotion mutations"
+    }
+  },
+  "strategySelectorReadyForFreshHoldout": true,
+  "unseenProjectPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "answer-exposed-five-project-topology-and-clear-span-calibration-not-fresh-placement-code-compliance-or-fabrication",
+  "receiptSha256": "6a37f16060e6dfc24358c83967f6ebf5b0964ddcbcf38368a72ce849ab3a4621"
+}
