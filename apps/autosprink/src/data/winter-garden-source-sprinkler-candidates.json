@@ -1,0 +1,1281 @@
+{
+  "artifactType": "halofire.winter-garden-source-sprinkler-candidates.v1",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "sourceReceipts": {
+    "topology": "e3708ffacae132eb24682e200a668293b33ccf614559b28945ecd2d2afcc46b3",
+    "registry": "0635855cc57d6f6234e7596957710a538f1b84d102249937e6c110df2107c88b",
+    "hazard": "7a7e6c6fe1c5731deca2d8cbbe6dfa18f3fc514f1f7ecd7e85cb27d3392d0ed6",
+    "building": "e6451b7acea7a8cb4a48727463823c51185e0faa3eb6230b195c1a0efc43324e"
+  },
+  "operationalKnowledge": {
+    "artifactType": "halofire.operational-knowledge-receipt.v3",
+    "source": "gx10-hal-brain+obsidian-vault",
+    "canonicalVault": "/opt/hal9000/apps/claudebot/hal-vault",
+    "preflightStatus": "passed",
+    "sessionId": "winter-garden-source-building-operational-knowledge-20260713",
+    "preflightQuery": "Halo Fire operations knowledge must actively constrain Winter Garden source-spec hazard and sprinkler generation across estimating, design engineering, procurement, fabrication, field installation, approvals, change control, closeout, and internal adversarial verification",
+    "recallEpisodeIds": [
+      140193,
+      140208,
+      139873,
+      140198,
+      140199,
+      139750,
+      139418,
+      136034
+    ],
+    "recalledWikiPages": [
+      "decisions/halo-forge-stream-d-sprinkler-alpha-workflow-correction-loop-design-artifact-2026.md",
+      "decisions/2026-05-15-halo-forge-stream-d-sprinkler-separate-design-issues-from-nfpa-ahj.md",
+      "decisions/halo-forge-sprinkler-catalog-engineering-gate-2026-05-13.md"
+    ],
+    "companyFlowRecall": {
+      "episodeIds": [
+        140193,
+        140208,
+        139873,
+        140198,
+        140199
+      ],
+      "pages": [
+        "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "halofire-master/00-Company/00_Company_Org.md",
+        "halofire-master/05-Fabrication-Shop/05_Fabrication_Shop.md",
+        "halofire-master/09-Finance-Admin/09_Finance_Admin.md"
+      ],
+      "status": "passed"
+    },
+    "sources": [
+      "halofire-master/00_MASTER_MOC.md",
+      "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+      "halofire-master/00-Company/00_Company_Org.md",
+      "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+      "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+      "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+      "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+      "halofire-master/07-08-itm-pm.md",
+      "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
+      "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+      "halofire-autobid/system/autobid-index.md"
+    ],
+    "workflowGuardrails": [
+      "estimate-before-award-is-not-install-design",
+      "source-scale-and-elevation-datums-must-be-proven",
+      "commercial-hazard-and-density-come-from-project-spec-not-architectural-grid",
+      "completed-bids-are-held-out-calibration-not-generation-inputs",
+      "design-basis-requires-hazard-density-water-supply-and-field-condition-evidence",
+      "no-approved-submittal-means-no-order-fabrication-or-field-release",
+      "manufacturer-product-claims-require-approved-cut-sheets-and-responsibility-scope",
+      "field-conflicts-become-rfis-not-untracked-field-guesses",
+      "ahj-compliance-fabrication-and-manufacturer-claims-fail-closed",
+      "primary-independent-and-adversarial-verification-loops-are-internal",
+      "closeout-and-realized-job-cost-feed-the-next-estimating-loop",
+      "every-stage-has-a-department-owner-handoff-artifact-and-current-tool",
+      "preconstruction-controls-cad-flow-test-permit-wip-and-fabrication-schedule",
+      "closeout-artifacts-precede-final-billing"
+    ],
+    "applications": [
+      {
+        "id": "company-handoff-chain",
+        "domain": "company-operations",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "lead-bid-award-design-procure-fabricate-install-inspect-submit-closeout-invoice-service-is-the-current-company-flow",
+        "control": "each-stage-records-department-owner-handoff-artifact-and-current-tool-before-downstream-state-can-advance"
+      },
+      {
+        "id": "preconstruction-project-control",
+        "domain": "project-management",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "preconstruction-owns-job-setup-cad-acquisition-flow-test-permit-wip-and-fabrication-schedule-coordination",
+        "control": "design-and-fabrication-handoffs-carry-the-current-cad-flow-test-permit-revision-and-schedule-state"
+      },
+      {
+        "id": "closeout-before-final-billing",
+        "domain": "finance-and-project-closeout",
+        "source": "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
+        "decision": "asbuilts-test-certificates-warranties-and-closeout-state-precede-final-billing-and-realized-job-cost-feedback",
+        "control": "final-billing-and-estimating-learning-cannot-advance-from-an-incomplete-closeout-record"
+      },
+      {
+        "id": "lifecycle-stage-authority",
+        "domain": "company-operations",
+        "source": "halofire-master/00_MASTER_MOC.md",
+        "decision": "bid-award-design-procure-fabricate-install-inspect-service-is-the-authoritative-lifecycle",
+        "control": "every-artifact-declares-its-lifecycle-stage-and-cannot-inherit-downstream-authority"
+      },
+      {
+        "id": "estimate-design-boundary",
+        "domain": "estimating",
+        "source": "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+        "decision": "estimating-geometry-is-a-pricing-seed-not-an-approved-installation-design",
+        "control": "source-building-and-layout-artifacts-keep-compliance-fabrication-and-field-release-false"
+      },
+      {
+        "id": "commercial-spec-hazard-basis",
+        "domain": "estimating-and-design",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "commercial-hazard-density-and-remote-area-come-from-csi-division-21-before-layout",
+        "control": "reject-default-hazard-or-density-when-the-project-spec-is-missing-unbound-or-contradicted"
+      },
+      {
+        "id": "design-basis-and-hydraulics",
+        "domain": "design-engineering",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "field-conditions-hazard-density-water-supply-remote-area-and-obstructions-precede-afc-release",
+        "control": "unresolved-room-ceiling-obstruction-or-water-evidence-keeps-design-and-compliance-fail-closed"
+      },
+      {
+        "id": "approved-product-procurement",
+        "domain": "procurement",
+        "source": "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+        "decision": "released-bom-approved-cut-sheets-responsibility-matrix-and-live-vendor-data-govern-the-buy",
+        "control": "no-manufacturer-exact-product-or-procurement-claim-without-project-approved-source-evidence"
+      },
+      {
+        "id": "afc-before-fabrication",
+        "domain": "fabrication-shop",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "nothing-is-cut-kitted-or-shipped-before-approved-for-construction-drawings-and-bom",
+        "control": "fabrication-ready-remains-false-until-afc-revision-bom-cut-list-and-product-approvals-join"
+      },
+      {
+        "id": "approved-set-field-rfi",
+        "domain": "field-operations",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "field-installs-the-approved-set-and-routes-conflicts-back-as-rfis",
+        "control": "unresolved-coordination-never-becomes-an-invented-install-location-or-field-release"
+      },
+      {
+        "id": "pm-change-closeout-learning",
+        "domain": "project-management-and-itm",
+        "source": "halofire-master/07-08-itm-pm.md",
+        "decision": "changes-are-priced-before-work-and-closeout-requires-asbuilts-om-test-certs-warranty-and-turnover",
+        "control": "revision-change-closeout-and-realized-cost-state-remain-explicit-and-feed-estimating-calibration"
+      },
+      {
+        "id": "internal-verification-doctrine",
+        "domain": "software-governance",
+        "source": "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+        "decision": "every-ai-feature-runs-multisignal-self-validation-and-correction-loops-inside-the-product",
+        "control": "primary-independent-and-adversarial-results-are-machine-gated-with-no-independent-review-blocker"
+      },
+      {
+        "id": "brain-db-loop-division",
+        "domain": "autobid-platform",
+        "source": "halofire-autobid/system/autobid-index.md",
+        "decision": "the-bid-db-locates-source-files-the-brain-holds-recallable-knowledge-and-deterministic-engines-own-calculations",
+        "control": "every-generated-decision-cites-source-locators-brain-provenance-and-deterministic-rule-output"
+      }
+    ],
+    "coverage": {
+      "lifecycleStages": [
+        "lead-qualification",
+        "bid",
+        "award",
+        "preconstruction",
+        "design",
+        "procurement",
+        "fabrication",
+        "field-install",
+        "acceptance-itm",
+        "closeout-service",
+        "billing"
+      ],
+      "crossCuttingDomains": [
+        "project-management",
+        "finance-job-cost",
+        "licensing-safety",
+        "codes-ahj",
+        "catalog-products",
+        "internal-verification"
+      ],
+      "sourceCount": 11,
+      "appliedDecisionCount": 13,
+      "status": "passed"
+    }
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "joinMethod": "unique-anchor-containment+exact-source-name+three-sheet-plan-intersection",
+    "planMethod": "deterministic-center-of-A101-A103-hazard-polygon-intersection",
+    "elevationMethod": "A151-flat-ceiling-height-plus-A301-floor-datum",
+    "slopedCeilingPolicy": "block-until-source-ceiling-plane-is-sealed"
+  },
+  "roomsAudit": [
+    {
+      "roomNumber": "101",
+      "roomName": "BISHOP",
+      "topologyZoneId": "wg-zone-021",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-026",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "102",
+      "roomName": "WAITING",
+      "topologyZoneId": "wg-zone-005",
+      "topologyIdentityCount": 2,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-012",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "103",
+      "roomName": "CLERK",
+      "topologyZoneId": "wg-zone-031",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-042",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "104",
+      "roomName": "CLERK",
+      "topologyZoneId": "wg-zone-034",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-044",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "105",
+      "roomName": "BISHOP",
+      "topologyZoneId": "wg-zone-015",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-021",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "108",
+      "roomName": "FOYER",
+      "topologyZoneId": "wg-zone-005",
+      "topologyIdentityCount": 2,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "109",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-017",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "110",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-014",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "111",
+      "roomName": "FIRE RISER",
+      "topologyZoneId": "wg-zone-043",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-room-component-missing",
+        "source-ceiling-height-not-registered",
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "112",
+      "roomName": "SERVING AREA",
+      "topologyZoneId": "wg-zone-018",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "113",
+      "roomName": "CORRIDOR",
+      "topologyZoneId": "wg-zone-002",
+      "topologyIdentityCount": 4,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-006",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "114",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-024",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "115",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-027",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "116",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-026",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "117",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-020",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "118",
+      "roomName": "FOYER",
+      "topologyZoneId": "wg-zone-002",
+      "topologyIdentityCount": 4,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-008",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "119",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-006",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "120",
+      "roomName": "FONT",
+      "topologyZoneId": "wg-zone-036",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-041",
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [
+        "wg-source-head-120-001"
+      ],
+      "status": "source-only-preliminary-candidate",
+      "blockingReasons": []
+    },
+    {
+      "roomNumber": "121",
+      "roomName": "WOMEN'S ADA",
+      "topologyZoneId": "wg-zone-040",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "122",
+      "roomName": "WOMEN'S",
+      "topologyZoneId": "wg-zone-011",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "123",
+      "roomName": "MEMBER CUSTODIAL",
+      "topologyZoneId": "wg-zone-030",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "124",
+      "roomName": "MEN'S",
+      "topologyZoneId": "wg-zone-019",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-027",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "125",
+      "roomName": "MOTHER'S ROOM",
+      "topologyZoneId": "wg-zone-044",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "127",
+      "roomName": "CORRIDOR",
+      "topologyZoneId": "wg-zone-002",
+      "topologyIdentityCount": 4,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "128",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-007",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "129",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-023",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "130",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-025",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "131",
+      "roomName": "ROOM",
+      "topologyZoneId": "wg-zone-028",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "132",
+      "roomName": "WAITING",
+      "topologyZoneId": "wg-zone-012",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-051",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "133",
+      "roomName": "CLERK",
+      "topologyZoneId": "wg-zone-037",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "134",
+      "roomName": "STAKE PRESIDENT",
+      "topologyZoneId": "wg-zone-016",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "135",
+      "roomName": "CORRIDOR",
+      "topologyZoneId": "wg-zone-002",
+      "topologyIdentityCount": 4,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-013",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "136",
+      "roomName": "HIGH COUNCIL",
+      "topologyZoneId": "wg-zone-009",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "138",
+      "roomName": "FOYER",
+      "topologyZoneId": "wg-zone-008",
+      "topologyIdentityCount": 2,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "139",
+      "roomName": "WAITING",
+      "topologyZoneId": "wg-zone-008",
+      "topologyIdentityCount": 2,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-014",
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned"
+      ]
+    },
+    {
+      "roomNumber": "140",
+      "roomName": "FAMILY RR",
+      "topologyZoneId": "wg-zone-038",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "141",
+      "roomName": "CLERK",
+      "topologyZoneId": "wg-zone-033",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-048",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "142",
+      "roomName": "BISHOP",
+      "topologyZoneId": "wg-zone-022",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-038",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "143",
+      "roomName": "BISHOP",
+      "topologyZoneId": "wg-zone-013",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-018",
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [
+        "wg-source-head-143-001"
+      ],
+      "status": "source-only-preliminary-candidate",
+      "blockingReasons": []
+    },
+    {
+      "roomNumber": "144",
+      "roomName": "CLERK",
+      "topologyZoneId": "wg-zone-032",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-043",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "145",
+      "roomName": "SAC PREP",
+      "topologyZoneId": "wg-zone-001",
+      "topologyIdentityCount": 3,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-015",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "146",
+      "roomName": "ORGAN SPEAKER CHAMBER",
+      "topologyZoneId": "wg-zone-045",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-topology-envelope-not-ready",
+        "source-ceiling-height-not-registered",
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "147",
+      "roomName": "ROSTRUM",
+      "topologyZoneId": "wg-zone-001",
+      "topologyIdentityCount": 3,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-room-component-missing",
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "148",
+      "roomName": "CHAPEL",
+      "topologyZoneId": "wg-zone-001",
+      "topologyIdentityCount": 3,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": true,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "sloped-ceiling-plane-not-source-sealed",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "149",
+      "roomName": "OVERFLOW",
+      "topologyZoneId": "wg-zone-003",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": true,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "sloped-ceiling-plane-not-source-sealed",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "150",
+      "roomName": "CULTURAL CENTER",
+      "topologyZoneId": "wg-zone-004",
+      "topologyIdentityCount": 2,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": true,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "sloped-ceiling-plane-not-source-sealed",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "151",
+      "roomName": "PLATFORM",
+      "topologyZoneId": "wg-zone-010",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "152",
+      "roomName": "STORAGE",
+      "topologyZoneId": "wg-zone-039",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "153",
+      "roomName": "MATERIALS CENTER",
+      "topologyZoneId": "wg-zone-035",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "154",
+      "roomName": "EQUIP PLATFORM ACCESS",
+      "topologyZoneId": "wg-zone-041",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-room-component-missing",
+        "source-ceiling-height-not-registered",
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "155",
+      "roomName": "RAMP",
+      "topologyZoneId": "wg-zone-029",
+      "topologyIdentityCount": 2,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-ceiling-height-not-registered",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "156",
+      "roomName": "STORAGE",
+      "topologyZoneId": "wg-zone-029",
+      "topologyIdentityCount": 2,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 1,
+      "sourceHazardRoomId": "source-room-029",
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-ceiling-height-not-registered"
+      ]
+    },
+    {
+      "roomNumber": "157",
+      "roomName": "VOLLEYBALL STORAGE",
+      "topologyZoneId": "wg-zone-004",
+      "topologyIdentityCount": 2,
+      "spatialHazardHitCount": 1,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "source-registered",
+      "slopedCeiling": false,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    },
+    {
+      "roomNumber": "159",
+      "roomName": "TECH",
+      "topologyZoneId": "wg-zone-042",
+      "topologyIdentityCount": 1,
+      "spatialHazardHitCount": 0,
+      "exactNameHazardHitCount": 0,
+      "sourceHazardRoomId": null,
+      "ceilingStatus": "blocked",
+      "slopedCeiling": null,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "source-room-component-missing",
+        "source-ceiling-height-not-registered",
+        "source-hazard-spatial-containment-not-unique",
+        "source-hazard-room-name-agreement-failed",
+        "source-hazard-classification-not-ready"
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "candidateId": "wg-source-head-120-001",
+      "roomNumber": "120",
+      "roomName": "FONT",
+      "topologyZoneId": "wg-zone-036",
+      "sourceRoomId": "source-room-041",
+      "hazardClass": "Light Hazard",
+      "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+      "maxCoverageSqftPerHead": 225,
+      "planPointFt": [
+        62.63755,
+        98.82985
+      ],
+      "modelPointFt": [
+        62.63755,
+        98.82985,
+        108.0625
+      ],
+      "ceiling": {
+        "kind": "flat-source-registered",
+        "heightAboveFloorFt": 8.0625,
+        "sourceSheet": "A151"
+      },
+      "sourceSheets": [
+        "A101",
+        "A103",
+        "A151",
+        "WG Specs"
+      ],
+      "coverageVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "status": "source-only-preliminary-candidate"
+    },
+    {
+      "candidateId": "wg-source-head-143-001",
+      "roomNumber": "143",
+      "roomName": "BISHOP",
+      "topologyZoneId": "wg-zone-013",
+      "sourceRoomId": "source-room-018",
+      "hazardClass": "Light Hazard",
+      "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+      "maxCoverageSqftPerHead": 225,
+      "planPointFt": [
+        207.528,
+        146.94475
+      ],
+      "modelPointFt": [
+        207.528,
+        146.94475,
+        108.0625
+      ],
+      "ceiling": {
+        "kind": "flat-source-registered",
+        "heightAboveFloorFt": 8.0625,
+        "sourceSheet": "A151"
+      },
+      "sourceSheets": [
+        "A101",
+        "A103",
+        "A151",
+        "WG Specs"
+      ],
+      "coverageVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "status": "source-only-preliminary-candidate"
+    }
+  ],
+  "counts": {
+    "sourceRoomIdentities": 54,
+    "candidateRooms": 2,
+    "candidateHeads": 2,
+    "blockedRooms": 52,
+    "slopedCeilingRooms": 3,
+    "slopedCeilingCandidateRooms": 0
+  },
+  "unresolved": [
+    "52 room identities do not yet pass the complete topology, semantic-hazard, and ceiling join",
+    "all three source-registered sloped-ceiling rooms remain blocked until a ceiling plane is sealed independently of the roof model",
+    "candidate coverage, wall-distance, obstruction, fixture, mechanical, electrical, structural, and manufacturer clearances are not verified",
+    "water supply, hydraulic node assignment, remote-area selection, AHJ compliance, fabrication, and field release remain unresolved"
+  ],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-four-sealed-packet-source-replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "A101-anchor-inside-source-building-room+exact-label+A103-envelope+A151-ceiling-cross-check"
+    },
+    "adversarial": {
+      "status": "passed",
+      "rejectedCases": [
+        "registry-component-index-treated-as-source-building-room-index",
+        "room-name-only-hazard-join-without-spatial-containment",
+        "spatial-hazard-join-with-source-name-disagreement",
+        "multi-identity-envelope-promoted-as-room-partition",
+        "sloped-label-promoted-without-source-ceiling-plane",
+        "roof-plane-substituted-for-ceiling-plane",
+        "unidentified-room-defaulted-to-light-hazard",
+        "completed-sprinkler-answer-key-used-for-generation",
+        "preliminary-head-candidate-promoted-to-code-compliance"
+      ]
+    }
+  },
+  "partialCandidateGeometryGrounded": true,
+  "wholeBuildingHeadLayoutReady": false,
+  "pitchedRoofHeadLayoutReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "two-source-only-preliminary-flat-head-candidates-not-code-compliance",
+  "receiptSha256": "3c799740b1d0f5256116549e6ab8d66795c37592741637e079279935119aa0eb"
+}

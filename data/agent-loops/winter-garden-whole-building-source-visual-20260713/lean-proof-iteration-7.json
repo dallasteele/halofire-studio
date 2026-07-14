@@ -1,0 +1,43 @@
+{
+  "artifactType": "halofire.formal-verification-receipt.v2",
+  "createdAt": "2026-07-13T21:23:48-07:00",
+  "prover": {
+    "name": "Lean",
+    "version": "4.13.0",
+    "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+    "health": "passed"
+  },
+  "subject": {
+    "sourceSprinklerCandidateReceiptSha256": "3c799740b1d0f5256116549e6ab8d66795c37592741637e079279935119aa0eb",
+    "sourceRoomIdentityCount": 54,
+    "candidateRoomCount": 2,
+    "candidateHeadCount": 2,
+    "blockedRoomCount": 52,
+    "slopedCeilingRoomCount": 3,
+    "slopedCeilingCandidateRoomCount": 0,
+    "answerKeyUsed": false,
+    "pitchedRoofHeadLayoutReady": false,
+    "complianceReady": false
+  },
+  "theorems": [
+    "source_candidate_partition",
+    "source_sloped_partition",
+    "unresolved_sloped_blocks_pitched_layout",
+    "preliminary_candidates_do_not_close_building"
+  ],
+  "source": "def wholeBuildingReady (blocked slopedBlocked : Nat) : Bool := blocked == 0 && slopedBlocked == 0\n\ntheorem source_candidate_partition : (2 : Nat) + 52 = 54 := by decide\ntheorem source_sloped_partition : (0 : Nat) + 3 = 3 := by decide\ntheorem unresolved_sloped_blocks_pitched_layout : wholeBuildingReady 52 3 = false := by native_decide\ntheorem preliminary_candidates_do_not_close_building : !((2 : Nat) = 54) := by decide",
+  "result": {
+    "status": "verified",
+    "returnCode": 0,
+    "durationMs": 135
+  },
+  "claimBoundary": {
+    "partialCandidateGeometryGrounded": true,
+    "wholeBuildingHeadLayoutReady": false,
+    "pitchedRoofHeadLayoutReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

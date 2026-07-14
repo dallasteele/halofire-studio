@@ -167,3 +167,51 @@ describe('GET /api/projects/:name/source-space-topology', () => {
     expect(body.complianceReady).toBe(false);
   });
 });
+
+describe('GET /api/projects/:name/source-sprinkler-candidates', () => {
+  it('requires login', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-sprinkler-candidates`);
+    expect(response.status).toBe(401);
+  });
+
+  it('serves the two source-only preliminary flat candidates and keeps pitched layout fail-closed', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-sprinkler-candidates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.status).toBe('passed');
+    expect(body.counts).toEqual({
+      sourceRoomIdentities: 54, candidateRooms: 2, candidateHeads: 2, blockedRooms: 52,
+      slopedCeilingRooms: 3, slopedCeilingCandidateRooms: 0,
+    });
+    expect(body.candidates.map((entry) => entry.roomNumber)).toEqual(['120', '143']);
+    expect(body.internalVerification).toMatchObject({ primary: { status: 'passed' }, independent: { status: 'passed' }, adversarial: { status: 'passed' } });
+    expect(body.partialCandidateGeometryGrounded).toBe(true);
+    expect(body.wholeBuildingHeadLayoutReady).toBe(false);
+    expect(body.pitchedRoofHeadLayoutReady).toBe(false);
+    expect(body.complianceReady).toBe(false);
+    expect(body.fabricationReady).toBe(false);
+  });
+});
+
+describe('GET /api/projects/:name/source-sprinkler-candidate-proof.png', () => {
+  it('keeps the client drawing proof behind login', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-sprinkler-candidate-proof.png`);
+    expect(response.status).toBe(401);
+    const staticLeak = await fetch(`${BASE}/src/data/proofs/winter-garden-source-sprinkler-candidate-proof.png`);
+    expect(staticLeak.status).toBe(403);
+  });
+
+  it('serves the receipt-bound PNG privately to an authenticated employee', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-sprinkler-candidate-proof.png`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('image/png');
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    expect([...bytes.slice(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+    expect(bytes.length).toBeGreaterThan(1_000_000);
+  });
+});

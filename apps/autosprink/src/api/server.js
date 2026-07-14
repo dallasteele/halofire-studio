@@ -56,6 +56,7 @@ import { validateWinterGardenSourceBuildingPacket } from '../engine/winter-garde
 import { validateWinterGardenSourceSpecHazardPacket } from '../engine/winter-garden-source-spec-hazard.js';
 import { validateWinterGardenSourceSpaceRegistry } from '../engine/winter-garden-source-space-registry.js';
 import { validateWinterGardenSourceSpaceTopology } from '../engine/winter-garden-source-space-topology.js';
+import { validateWinterGardenSourceSprinklerCandidates } from '../engine/winter-garden-source-sprinkler-candidates.js';
 import { renderOrthogonalGableBuildingViews } from '../engine/orthogonal-gable-building-views.js';
 import { buildWinterGardenBluebeamPackage } from '../engine/winter-garden-bluebeam-package.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
@@ -117,6 +118,9 @@ const WINTER_GARDEN_SOURCE_BUILDING_MODEL_PATH = path.resolve(__dirname, '../dat
 const WINTER_GARDEN_SOURCE_SPEC_HAZARD_PATH = path.resolve(__dirname, '../data/winter-garden-source-spec-hazard.json');
 const WINTER_GARDEN_SOURCE_SPACE_REGISTRY_PATH = path.resolve(__dirname, '../data/winter-garden-source-space-registry.json');
 const WINTER_GARDEN_SOURCE_SPACE_TOPOLOGY_PATH = path.resolve(__dirname, '../data/winter-garden-source-space-topology.json');
+const WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATES_PATH = path.resolve(__dirname, '../data/winter-garden-source-sprinkler-candidates.json');
+const WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATE_PROOF_PATH = path.resolve(__dirname, '../data/proofs/winter-garden-source-sprinkler-candidate-proof.png');
+const WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATE_PROOF_RECEIPT_PATH = path.resolve(__dirname, '../data/proofs/winter-garden-source-sprinkler-candidate-proof.json');
 const TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/tallahassee-completed-project-source-set.json');
 const NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/nashville-completed-project-source-set.json');
 const DALLAS_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/dallas-completed-project-source-set.json');
@@ -569,11 +573,12 @@ app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, max: LOGIN_RATE
 // Deny the data directories BEFORE express.static gets a chance to serve them.
 // 403 (not 404) so the denial is explicit and not mistakable for "no such file".
 // Version-agnostic prefix check (avoids Express-4 vs 5 wildcard-route syntax
-// differences): block /data, /data/..., and any other on-disk runtime dirs.
-const STATIC_DENY_PREFIXES = ['/data/', '/locks/', '/state/'];
+// differences): block /data, /src/data, their descendants, and runtime dirs.
+const STATIC_DENY_EXACT = new Set(['/data', '/src/data', '/locks', '/state']);
+const STATIC_DENY_PREFIXES = ['/data/', '/src/data/', '/locks/', '/state/'];
 app.use((req, res, next) => {
   const p = req.path;
-  if (p === '/data' || STATIC_DENY_PREFIXES.some((prefix) => p.startsWith(prefix))) {
+  if (STATIC_DENY_EXACT.has(p) || STATIC_DENY_PREFIXES.some((prefix) => p.startsWith(prefix))) {
     return res.status(403).type('text/plain').send('Forbidden');
   }
   next();
@@ -1819,6 +1824,71 @@ app.get('/api/projects/:name/source-space-topology', authMiddleware, async (req,
       wholeBuildingTopologyComplete: false, wholeBuildingHeadLayoutReady: false,
       complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
     });
+  }
+});
+
+app.get('/api/projects/:name/source-sprinkler-candidates', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'LDS Meeting House - Winter Garden FL') {
+    return res.status(404).json({
+      status: 'blocked', error: 'source_sprinkler_candidates_not_found',
+      message: 'No sealed source-only sprinkler candidate packet exists for this project.',
+      wholeBuildingHeadLayoutReady: false, pitchedRoofHeadLayoutReady: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+    });
+  }
+  try {
+    const [packet, topology, registry, hazard, building] = [
+      WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATES_PATH,
+      WINTER_GARDEN_SOURCE_SPACE_TOPOLOGY_PATH,
+      WINTER_GARDEN_SOURCE_SPACE_REGISTRY_PATH,
+      WINTER_GARDEN_SOURCE_SPEC_HAZARD_PATH,
+      WINTER_GARDEN_SOURCE_BUILDING_MODEL_PATH,
+    ].map((filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8')));
+    const validation = await validateWinterGardenSourceSprinklerCandidates(packet, { topology, registry, hazard, building });
+    if (validation.status !== 'passed') return res.status(422).json({ ...validation, projectName: req.params.name });
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, projectName: req.params.name,
+      receiptSha256: packet.receiptSha256, sourceReceipts: packet.sourceReceipts,
+      generation: packet.generation, operationalKnowledge: packet.operationalKnowledge,
+      counts: packet.counts, roomsAudit: packet.roomsAudit, candidates: packet.candidates,
+      unresolved: packet.unresolved, internalVerification: packet.internalVerification,
+      partialCandidateGeometryGrounded: true, wholeBuildingHeadLayoutReady: false,
+      pitchedRoofHeadLayoutReady: false, hydraulicCalculationReady: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Winter Garden source-only sprinkler candidates', { error: error.message });
+    return res.status(500).json({
+      status: 'blocked', error: 'source_sprinkler_candidates_load_failed',
+      message: 'The sealed source-only sprinkler candidate packet could not be loaded.',
+      wholeBuildingHeadLayoutReady: false, pitchedRoofHeadLayoutReady: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+    });
+  }
+});
+
+app.get('/api/projects/:name/source-sprinkler-candidate-proof.png', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'LDS Meeting House - Winter Garden FL') return res.status(404).json({ status: 'blocked', error: 'source_sprinkler_candidate_proof_not_found' });
+  try {
+    const packet = JSON.parse(fs.readFileSync(WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATES_PATH, 'utf8'));
+    const proof = JSON.parse(fs.readFileSync(WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATE_PROOF_RECEIPT_PATH, 'utf8'));
+    const imageBytes = fs.readFileSync(WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATE_PROOF_PATH);
+    const imageSha256 = createHash('sha256').update(imageBytes).digest('hex');
+    if (proof.candidateReceiptSha256 !== packet.receiptSha256 || proof.imageSha256 !== imageSha256
+      || proof.answerKeyUsed !== false || proof.pitchedRoofHeadLayoutReady !== false
+      || proof.complianceReady !== false || proof.fabricationReady !== false) {
+      return res.status(422).json({
+        status: 'blocked', error: 'source_sprinkler_candidate_proof_receipt_mismatch',
+        pitchedRoofHeadLayoutReady: false, complianceReady: false, fabricationReady: false,
+      });
+    }
+    res.set('Cache-Control', 'private, no-store');
+    res.set('Content-Type', 'image/png');
+    return res.send(imageBytes);
+  } catch (error) {
+    log.error('Failed to load Winter Garden source-only sprinkler candidate proof', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'source_sprinkler_candidate_proof_load_failed' });
   }
 });
 

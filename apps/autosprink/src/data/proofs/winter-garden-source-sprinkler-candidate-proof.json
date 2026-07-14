@@ -1,0 +1,36 @@
+{
+  "artifactType": "halofire.winter-garden-source-sprinkler-candidate-proof.v1",
+  "candidateReceiptSha256": "3c799740b1d0f5256116549e6ab8d66795c37592741637e079279935119aa0eb",
+  "sourceReceipts": {
+    "topology": "e3708ffacae132eb24682e200a668293b33ccf614559b28945ecd2d2afcc46b3",
+    "registry": "0635855cc57d6f6234e7596957710a538f1b84d102249937e6c110df2107c88b",
+    "hazard": "7a7e6c6fe1c5731deca2d8cbbe6dfa18f3fc514f1f7ecd7e85cb27d3392d0ed6",
+    "building": "e6451b7acea7a8cb4a48727463823c51185e0faa3eb6230b195c1a0efc43324e"
+  },
+  "sourceBindings": {
+    "A103": "bca163d23e89b86332f670f6f234f5bc5319b1a1e461de28a3fb3124120c2f89",
+    "A303": "dae14221cd3b913d350e53d146c6dd1abfca8a3b6d3ca142916474ba18a66de7"
+  },
+  "counts": {
+    "sourceRoomIdentities": 54,
+    "candidateRooms": 2,
+    "candidateHeads": 2,
+    "blockedRooms": 52,
+    "slopedCeilingRooms": 3,
+    "slopedCeilingCandidateRooms": 0
+  },
+  "candidateIds": [
+    "wg-source-head-120-001",
+    "wg-source-head-143-001"
+  ],
+  "blockedSlopedRooms": [
+    "148",
+    "149",
+    "150"
+  ],
+  "answerKeyUsed": false,
+  "pitchedRoofHeadLayoutReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "imageSha256": "474aa0d07761add43f9aaec581e4de28d506ec4372a5816d95f81959fc768cc2"
+}

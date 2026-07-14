@@ -1,8 +1,8 @@
 {
   "name": "winter-garden-whole-building-source-visual-20260713",
-  "iteration": 6,
+  "iteration": 7,
   "status": "in_progress",
-  "updatedAt": "2026-07-13T20:57:44-07:00",
+  "updatedAt": "2026-07-13T21:23:48-07:00",
   "completedStages": [
     "DISCOVER",
     "PLAN",
@@ -197,6 +197,68 @@
     "visualProof": "apps/autosprink/out/visual-proof/winter-garden-source-space-topology-proof.png",
     "visualProofSha256": "c5d6fca01864930875a9b139e035b098602754426f08b6496839cbb02ceb0957"
   },
+  "sourceSprinklerCandidateGate": {
+    "status": "passed-partial-fail-closed",
+    "artifactType": "halofire.winter-garden-source-sprinkler-candidates.v1",
+    "receiptSha256": "3c799740b1d0f5256116549e6ab8d66795c37592741637e079279935119aa0eb",
+    "sourceReceipts": {
+      "topology": "e3708ffacae132eb24682e200a668293b33ccf614559b28945ecd2d2afcc46b3",
+      "registry": "0635855cc57d6f6234e7596957710a538f1b84d102249937e6c110df2107c88b",
+      "hazard": "7a7e6c6fe1c5731deca2d8cbbe6dfa18f3fc514f1f7ecd7e85cb27d3392d0ed6",
+      "building": "e6451b7acea7a8cb4a48727463823c51185e0faa3eb6230b195c1a0efc43324e"
+    },
+    "counts": {
+      "sourceRoomIdentities": 54,
+      "candidateRooms": 2,
+      "candidateHeads": 2,
+      "blockedRooms": 52,
+      "slopedCeilingRooms": 3,
+      "slopedCeilingCandidateRooms": 0
+    },
+    "candidateRooms": ["120 FONT", "143 BISHOP"],
+    "blockedSlopedRooms": ["148 CHAPEL", "149 OVERFLOW", "150 CULTURAL CENTER"],
+    "generationJoin": "unique source-anchor containment plus exact source-room name plus single-identity A103 topology plus A151 flat ceiling plus three-sheet plan intersection",
+    "rejectedUnsafeJoin": "A101 registry component index cannot be used as the source-building hazard-room index",
+    "internalLoops": ["primary", "independent", "adversarial"],
+    "answerKeyUsed": false,
+    "partialCandidateGeometryGrounded": true,
+    "wholeBuildingHeadLayoutReady": false,
+    "pitchedRoofHeadLayoutReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "productSurface": "/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-sprinkler-candidates",
+    "protectedVisualSurface": "/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-sprinkler-candidate-proof.png",
+    "employeeSurface": "autosprink.html#hfWinterGardenSourceCandidateReceipt",
+    "visualProof": "apps/autosprink/src/data/proofs/winter-garden-source-sprinkler-candidate-proof.png",
+    "visualProofSha256": "474aa0d07761add43f9aaec581e4de28d506ec4372a5816d95f81959fc768cc2",
+    "privacyRegression": "direct /src/data proof access returns 403; authenticated API returns private no-store PNG"
+  },
+  "iteration7Verification": {
+    "status": "passed",
+    "focusedTestFiles": 3,
+    "focusedTests": 41,
+    "fullTestFiles": 196,
+    "fullTests": 1800,
+    "nativeNodeTests": 20,
+    "productionBuild": "passed",
+    "agenticRules": "passed",
+    "loopContract": "passed",
+    "formalVerification": {
+      "status": "verified",
+      "prover": "Lean 4.13.0",
+      "theorems": 4,
+      "durationMs": 135,
+      "receipt": "data/agent-loops/winter-garden-whole-building-source-visual-20260713/lean-proof-iteration-7.json"
+    }
+  },
+  "iteration7DeploymentVerification": {
+    "status": "pending"
+  },
+  "iteration7BrainPostflight": {
+    "status": "pending"
+  },
   "browserVerification": {
     "status": "passed",
     "surface": "authenticated local autosprink.html Roof Planes -> Automatic Roof Planes",
@@ -241,5 +303,5 @@
     "liveSourceTopologyScreenshot": "apps/autosprink/output/playwright/winter-garden-source-topology-live-vps.png",
     "liveSourceTopologyScreenshotSha256": "7c931cf5cb4cf2bf43ac3a41a4c001cb8b612de88125eae23b8464c8b2f751c9"
   },
-  "nextAction": "ITERATE by resolving room 146 plan topology from another protected source or preserving the explicit residual, then join the 53 topology-ready identities to ceiling and source-spec controls before any source-only head placement; keep obstructions, water supply, compliance, fabrication, and field release fail-closed; compare against held-out completed-bid evidence only after generation is sealed."
+  "nextAction": "DEPLOY iteration 7, verify login plus the authenticated candidate JSON and proof PNG live, then seal the brain postflight. After that, continue source-only generation by deriving a Winter Garden sloped ceiling plane from coordinated A151/A303 evidence or another completed project's source geometry without substituting the roof plane; compare against held-out completed-bid evidence only after the source generation packet is sealed."
 }
