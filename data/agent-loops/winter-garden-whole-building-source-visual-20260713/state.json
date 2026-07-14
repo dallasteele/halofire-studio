@@ -1,8 +1,8 @@
 {
   "name": "winter-garden-whole-building-source-visual-20260713",
-  "iteration": 8,
+  "iteration": 9,
   "status": "in_progress",
-  "updatedAt": "2026-07-13T22:01:45-07:00",
+  "updatedAt": "2026-07-13T22:05:30-07:00",
   "completedStages": [
     "DISCOVER",
     "PLAN",
@@ -471,5 +471,53 @@
     "confidence": 0.99,
     "utf8TransportRequiredOnWindows": true
   },
-  "nextAction": "ITERATE on a different completed project to calibrate source-only semantic room boundaries and multi-head spacing, then hold out an unseen pitched project. Preserve the sealed Winter Garden held-out failure; do not tune it in place. Keep whole-building layout, hydraulics, compliance, fabrication, and field release false. Defer final whole-system Computer Use until the system is genuinely ready."
+  "iteration9BrainPreflight": {
+    "status": "passed",
+    "query": "derive source-only semantic-boundary and multi-head placement priors from completed Dillon 3:12 calibration; preserve Winter Garden failed holdout; obey platform-spine addendum",
+    "relevantEpisodes": [124864, 125114, 125639, 125071, 125027],
+    "decision": "Reuse the already verified Dillon deterministic generator as the calibration source. Seal only empirical geometry priors, forbid transfer of Dillon protection labels or obstruction clearance, and require a separate unseen-project holdout before placement verification."
+  },
+  "iteration9DillonPlacementPrior": {
+    "status": "passed-calibration-prior-fail-closed",
+    "artifactType": "halofire.dillon-pitched-placement-prior.v1",
+    "receiptSha256": "20a553b24f20219e2f3d1e8022b05079dc6e22f3189c63c9684fcf3dbbf1bf26",
+    "calibrationProject": "Dillon Residence",
+    "sourceEnvelopeWidthFt": 17.037037,
+    "sourceEnvelopeAlongSlopeFt": 18.148148,
+    "completedHeadCount": 2,
+    "completedInterHeadDistanceFt": 11.579586,
+    "replayInterHeadDistanceFt": 9.074074,
+    "precision": 1,
+    "recall": 1,
+    "maxPlanErrorFt": 2.614,
+    "meanPlanErrorFt": 1.403,
+    "emptyReferenceRegionFalsePositives": 0,
+    "winterGardenUsedForTuning": false,
+    "obstructionClearanceTransferAllowed": false,
+    "protectionLabelTransferAllowed": false,
+    "unseenProjectPlacementVerified": false,
+    "complianceReady": false,
+    "productSurface": "/api/projects/Dillon%20Residence/pitched-placement-prior"
+  },
+  "iteration9FocusedVerification": {
+    "status": "passed",
+    "testFiles": 2,
+    "tests": 23,
+    "fullTestFiles": 200,
+    "fullTests": 1823,
+    "nativeNodeTests": 20,
+    "productionBuild": "passed",
+    "agentLoopGuard": "passed",
+    "jsonAndDiffIntegrity": "passed",
+    "invocationCorrection": "The first full-suite command ran from repository root and bypassed apps/autosprink/vitest.config.js, causing fixed-port server contention and false no-suite failures for Node-native tests. The authoritative rerun from apps/autosprink passed 200 files and 1823 tests serially; npm run test:node passed 20/20.",
+    "adversarialCoverage": ["prior-geometry-tamper", "source-calibration-drift", "failed-holdout-promotion"]
+  },
+  "iteration9BrainPostflight": {
+    "status": "passed",
+    "episodeId": 142267,
+    "title": "Dillon empirical pitched placement prior sealed for unseen holdout",
+    "source": "codex",
+    "confidence": 0.99
+  },
+  "nextAction": "ITERATE by locating a separate completed pitched project not used for Dillon tuning, seal its source-only input before opening its completed sprinkler answer key, and run the Dillon empirical prior as a true unseen-project holdout. Preserve the Winter Garden failure unchanged. Keep whole-building layout, hydraulics, compliance, fabrication, and field release false. Defer final whole-system Computer Use until the system is genuinely ready."
 }

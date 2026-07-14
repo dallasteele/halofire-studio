@@ -1,0 +1,95 @@
+{
+  "artifactType": "halofire.dillon-pitched-placement-prior.v1",
+  "calibrationProject": "Dillon Residence",
+  "trainingMode": "completed-bid-calibration-only",
+  "sourceBindings": {
+    "calibrationReceiptSha256": "23f00f380d5c527a73bd1d65592bf01543b50a614e14a031a15cc789d5d89c5c",
+    "sourceSha256": {
+      "submitted-FP1": "ea09a1fe2b1e175170e980a0e0960a7e7f2bf82f949668ae1c895e163c604a63",
+      "submitted-FP2": "dd4612854552928e6b9d06584b97c5434009536282813e40accd3343a480a3f6",
+      "architectural-RCP": "ed51fe47cdbb0c95db5d3a4f64117fe2625d3c0bf4e7170c6f3dec0d38ed11ba",
+      "hydraulic-RA1": "773a2c38d2c9e2a9807828c91ec5b6f5c56900f2c10c68c25473c7e1eb60e705",
+      "hydraulic-RA2": "4cecd2c732934b4f8e000d634664b6b3e10ba3a7fa85b91a462ecc90da69ffe0",
+      "hydraulic-RA3": "65ec2e6709642cddda97de90bd902cc6efd4f8a459e3d94eedc04f7d494e219c"
+    }
+  },
+  "excludedHoldout": {
+    "projectName": "LDS Meeting House - Winter Garden FL",
+    "receiptSha256": "9ed061afd375912ee8bf3a651275296fcab93ab556a664b832d1a95df7d2db33",
+    "acceptanceStatus": "failed",
+    "usedForTuning": false,
+    "mutationAllowed": false
+  },
+  "sourceEnvelopeGate": {
+    "required": [
+      "closed-source-registered-ceiling-envelope",
+      "single-room-identity",
+      "source-slope-axis",
+      "source-obstruction-geometry-when-present"
+    ],
+    "reject": [
+      "multi-room-identity-envelope",
+      "incomplete-semantic-boundary",
+      "roof-pitch-substituted-for-ceiling-pitch",
+      "missing-obstruction-evidence-promoted-as-clear"
+    ]
+  },
+  "learnedGeometry": {
+    "ceilingPitchRiseInPer12": 3,
+    "envelopeWidthFt": 17.037037,
+    "envelopeAlongSlopeFt": 18.148148,
+    "envelopeAreaSqFt": 309.190672,
+    "completedHeadCount": 2,
+    "completedAreaPerHeadSqFt": 154.595336,
+    "completedInterHeadDistanceFt": 11.579586,
+    "replayAcrossSlopeSpanFt": 20,
+    "replayAlongSlopeSpanFt": 12,
+    "replayAcrossCount": 1,
+    "replayAlongCount": 2,
+    "replayInterHeadDistanceFt": 9.074074,
+    "sourceObstructionAdjustment": {
+      "obstructionId": "east-covered-fan-1",
+      "acrossIndex": 0,
+      "fromPt": 1899,
+      "toPt": 1859.288635656688,
+      "clearanceFt": 6,
+      "alignment": "shared-branch-centerline"
+    }
+  },
+  "calibrationResult": {
+    "precision": 1,
+    "recall": 1,
+    "maxPlanErrorFt": 2.614,
+    "meanPlanErrorFt": 1.403,
+    "emptyReferenceRegionFalsePositives": 0
+  },
+  "transferPolicy": {
+    "empiricalPriorOnly": true,
+    "codeLimit": false,
+    "obstructionClearanceTransferAllowed": false,
+    "protectionLabelTransferAllowed": false,
+    "unseenProjectHoldoutRequired": true,
+    "sourceBoundaryCompleteRequired": true
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-layout-replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "sealed-source-head-membership-and-registration"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "receipt-drift-and-holdout-mutation-rejection"
+    }
+  },
+  "candidatePlacementPriorReady": true,
+  "unseenProjectPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "cross-project-empirical-placement-prior-not-code-compliance-or-design-approval",
+  "receiptSha256": "20a553b24f20219e2f3d1e8022b05079dc6e22f3189c63c9684fcf3dbbf1bf26"
+}

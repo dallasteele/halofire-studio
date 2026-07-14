@@ -60,6 +60,7 @@ import { validateWinterGardenSourceSprinklerCandidates } from '../engine/winter-
 import { validateWinterGardenSourceSlopedCeiling } from '../engine/winter-garden-source-sloped-ceiling.js';
 import { validateWinterGardenSourcePitchedCandidates } from '../engine/winter-garden-source-pitched-candidates.js';
 import { validateWinterGardenSourcePitchedHeldout } from '../engine/winter-garden-source-pitched-heldout.js';
+import { validateDillonPitchedPlacementPrior } from '../engine/dillon-pitched-placement-prior.js';
 import { renderOrthogonalGableBuildingViews } from '../engine/orthogonal-gable-building-views.js';
 import { buildWinterGardenBluebeamPackage } from '../engine/winter-garden-bluebeam-package.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
@@ -115,6 +116,7 @@ const COOPERATIVE_1881_ROOF_ARTIFACT_PATH = path.resolve(__dirname, '../data/roo
 const COOPERATIVE_1881_PLAN_LEVELS_PATH = path.resolve(__dirname, '../data/plan-levels.cooperative-1881.json');
 const COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-fp8-calibration.cooperative-1881.json');
 const DILLON_SLOPED_CALIBRATION_PATH = path.resolve(__dirname, '../data/submitted-sloped-ceiling-calibration.dillon.json');
+const DILLON_PITCHED_PLACEMENT_PRIOR_PATH = path.resolve(__dirname, '../data/dillon-pitched-placement-prior.json');
 const PITCHED_ROOF_CROSS_PROJECT_EVIDENCE_PATH = path.resolve(__dirname, '../data/pitched-roof-cross-project-evidence.json');
 const WINTER_GARDEN_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/winter-garden-cross-project-source-set.json');
 const WINTER_GARDEN_SOURCE_BUILDING_MODEL_PATH = path.resolve(__dirname, '../data/winter-garden-source-building-model.json');
@@ -1897,6 +1899,20 @@ app.get('/api/projects/:name/source-sprinkler-candidate-proof.png', authMiddlewa
   } catch (error) {
     log.error('Failed to load Winter Garden source-only sprinkler candidate proof', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'source_sprinkler_candidate_proof_load_failed' });
+  }
+});
+
+app.get('/api/projects/:name/pitched-placement-prior', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'Dillon Residence') return res.status(404).json({ status: 'blocked', error: 'pitched_placement_prior_not_found', unseenProjectPlacementVerified: false, complianceReady: false });
+  try {
+    const [packet, calibration, winterGardenHeldOut] = [DILLON_PITCHED_PLACEMENT_PRIOR_PATH, DILLON_SLOPED_CALIBRATION_PATH, WINTER_GARDEN_SOURCE_PITCHED_HELDOUT_PATH].map((filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8')));
+    const validation = await validateDillonPitchedPlacementPrior(packet, { calibration, winterGardenHeldOut });
+    if (validation.status !== 'passed') return res.status(422).json({ ...validation, projectName: req.params.name });
+    res.set('Cache-Control', 'private, no-store');
+    return res.json({ status: 'passed', projectName: req.params.name, ...packet });
+  } catch (error) {
+    log.error('Failed to load Dillon pitched placement prior', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'pitched_placement_prior_load_failed', unseenProjectPlacementVerified: false, complianceReady: false });
   }
 });
 

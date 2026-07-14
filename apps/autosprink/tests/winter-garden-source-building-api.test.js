@@ -284,3 +284,23 @@ describe('GET /api/projects/:name/source-pitched-candidate-proof.png', () => {
     expect(bytes.length).toBeGreaterThan(1_000_000);
   });
 });
+
+describe('GET /api/projects/:name/pitched-placement-prior', () => {
+  it('requires employee login', async () => {
+    const response = await fetch(`${BASE}/api/projects/Dillon%20Residence/pitched-placement-prior`);
+    expect(response.status).toBe(401);
+  });
+
+  it('serves the sealed Dillon empirical prior without promoting the unseen-project gate', async () => {
+    const response = await fetch(`${BASE}/api/projects/Dillon%20Residence/pitched-placement-prior`, { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    const body = await response.json();
+    expect(body.receiptSha256).toBe('20a553b24f20219e2f3d1e8022b05079dc6e22f3189c63c9684fcf3dbbf1bf26');
+    expect(body.calibrationResult).toEqual({ precision: 1, recall: 1, maxPlanErrorFt: 2.614, meanPlanErrorFt: 1.403, emptyReferenceRegionFalsePositives: 0 });
+    expect(body.excludedHoldout).toMatchObject({ projectName: PROJECT, acceptanceStatus: 'failed', usedForTuning: false, mutationAllowed: false });
+    expect(body.transferPolicy).toMatchObject({ empiricalPriorOnly: true, codeLimit: false, obstructionClearanceTransferAllowed: false, unseenProjectHoldoutRequired: true });
+    expect(body.unseenProjectPlacementVerified).toBe(false);
+    expect(body.complianceReady).toBe(false);
+  });
+});
