@@ -1,0 +1,112 @@
+{
+  "artifactType": "halofire.pitched-placement-calibration-corpus.v1",
+  "mode": "answer-exposed-multi-project-empirical-calibration",
+  "purpose": "separate source-observable pitched-ceiling layout families before the next sealed fresh holdout",
+  "sourceBindings": {
+    "dillonPlacementPriorReceiptSha256": "20a553b24f20219e2f3d1e8022b05079dc6e22f3189c63c9684fcf3dbbf1bf26",
+    "midvaleSourceCandidateReceiptSha256": "2c58ee909b3b27fa6a497539d4f0ec287c93624b5bbc1d7103db4cb83f7fc91d",
+    "midvaleHeldoutComparisonReceiptSha256": "c965246240266ffab46cffa7478452f6ae0da6a9ff6a97f1c989f455a72850f6"
+  },
+  "trainingProjects": [
+    {
+      "projectId": "dillon-residence",
+      "layoutFamily": "small-obstructed-single-plane",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 1,
+        "symmetricTwoPlaneVault": false,
+        "ceilingPitchRiseInPer12": 3,
+        "envelopeAreaSqFt": 309.190672,
+        "sourceObstructionPresent": true
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 2,
+        "completedAreaPerHeadSqFt": 154.595336,
+        "completedInterHeadDistanceFt": 11.579586,
+        "topology": { "columns": 1, "rows": 2 }
+      }
+    },
+    {
+      "projectId": "midvale-townhome-clubhouse-midvale-ut",
+      "layoutFamily": "large-symmetric-two-plane-vault",
+      "sourceObservableFeatures": {
+        "occupiedProtectionPlaneCount": 2,
+        "symmetricTwoPlaneVault": true,
+        "ceilingPitchRiseInPer12": 6,
+        "envelopeWidthFt": 29,
+        "envelopeLengthFt": 30,
+        "envelopeAreaSqFt": 870,
+        "springElevationFt": 12,
+        "ridgeElevationFt": 19.25,
+        "ridgeAxis": "y",
+        "sourceObstructionPresent": false
+      },
+      "answerExposedFeatures": {
+        "completedHeadCount": 12,
+        "completedAreaPerHeadSqFt": 72.5,
+        "topology": { "columns": 3, "rows": 4 },
+        "columnStationsFt": [3.999961, 14.5, 25.000043],
+        "rowStationsFt": [3.825209, 10.061684, 20.18322, 26.419695],
+        "columnSpacingsFt": [10.500039, 10.500043],
+        "rowSpacingsFt": [6.236475, 10.121536, 6.236475],
+        "columnEdgeOffsetsFt": [3.999961, 3.999957],
+        "rowEdgeOffsetsFt": [3.825209, 3.580305],
+        "normalizedColumnStations": [0.13793, 0.5, 0.86207],
+        "normalizedRowStations": [0.127507, 0.335389, 0.672774, 0.880657],
+        "ridgeHeadColumnPresent": true,
+        "lowEdgeHeadColumnPerPlane": true
+      }
+    }
+  ],
+  "contrastiveLearning": {
+    "sourceOnlyFeatureKeys": [
+      "occupiedProtectionPlaneCount",
+      "symmetricTwoPlaneVault",
+      "ceilingPitchRiseInPer12",
+      "envelopeAreaSqFt",
+      "sourceObstructionPresent"
+    ],
+    "layoutFamilyDiscriminator": "plane-count-plus-vault-symmetry-plus-zone-scale-plus-source-obstruction-presence",
+    "observedNonTransfer": "Dillon single-plane span settings produced Midvale 4-by-2 instead of approved 3-by-4.",
+    "forbiddenSelectorInputs": ["project-name", "answer-key-path", "approved-head-count", "approved-head-coordinates"],
+    "minimumFreshApplicationPolicy": "select the closest calibrated family from sealed architectural features, preserve empirical status, and compare only after committing the source-only candidate"
+  },
+  "failedHoldoutControls": [
+    {
+      "projectName": "LDS Meeting House - Winter Garden FL",
+      "receiptSha256": "9ed061afd375912ee8bf3a651275296fcab93ab556a664b832d1a95df7d2db33",
+      "failurePreserved": true,
+      "usedForTuning": false
+    },
+    {
+      "projectName": "Midvale Townhome Clubhouse - Midvale UT",
+      "receiptSha256": "c965246240266ffab46cffa7478452f6ae0da6a9ff6a97f1c989f455a72850f6",
+      "sourceOnlyPrediction": { "columns": 4, "rows": 2, "heads": 8 },
+      "approvedAnswerExposed": { "columns": 3, "rows": 4, "heads": 12 },
+      "failurePreserved": true,
+      "nowUsedForCalibration": true
+    }
+  ],
+  "transferPolicy": {
+    "empiricalPriorOnly": true,
+    "codeLimit": false,
+    "answerExposed": true,
+    "sourceOnlyFamilySelectionRequired": true,
+    "exactGeometryFamilyMatchRequired": true,
+    "obstructionClearanceTransferAllowed": false,
+    "hazardClassificationTransferAllowed": false,
+    "pipeTopologyTransferAllowed": false,
+    "unseenProjectHoldoutRequired": true
+  },
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "deterministic-two-project-feature-extraction" },
+    "independent": { "status": "passed", "method": "sealed-receipt-bindings-plus-primary-and-independent-Midvale-symbol-counts" },
+    "adversarial": { "status": "passed", "method": "dependency-drift-answer-leakage-failure-erasure-and-false-promotion-rejection" }
+  },
+  "strategySelectorReadyForFreshHoldout": true,
+  "unseenProjectPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "answer-exposed-multi-project-placement-calibration-not-fresh-placement-code-compliance-or-fabrication",
+  "receiptSha256": "06c6ed0d30d2aed8ad0031985fa7a0225931dd400c5b1ef90cad894794b6f902"
+}

@@ -75,6 +75,7 @@ import { buildSagewoodPitchedAtticCalibrationViews, validateSagewoodPitchedAttic
 import { validateChollaHeldoutComparison, verifyChollaHeldoutAdversarialLoop } from '../engine/cholla-main-house-heldout-comparison.js';
 import { buildChollaCompletedLayoutView, validateChollaCompletedLayoutRegistration, verifyChollaCompletedLayoutAdversarialLoop } from '../engine/cholla-main-house-completed-layout-registration.js';
 import { renderMidvaleHeldoutOverlaySvg, validateMidvaleHeldoutComparison, verifyMidvaleHeldoutAdversarialLoop } from '../engine/midvale-clubhouse-pitched-heldout-comparison.js';
+import { validatePitchedPlacementCalibrationCorpus, verifyPitchedPlacementCalibrationAdversarialLoop } from '../engine/pitched-placement-calibration-corpus.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -169,6 +170,7 @@ const CHOLLA_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/cholla-m
 const CHOLLA_COMPLETED_LAYOUT_REGISTRATION_PATH = path.resolve(__dirname, '../data/cholla-main-house-completed-layout-registration.json');
 const MIDVALE_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/midvale-clubhouse-source-only-pitched-candidate.json');
 const MIDVALE_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/midvale-clubhouse-pitched-heldout-comparison.json');
+const PITCHED_PLACEMENT_CALIBRATION_CORPUS_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -2353,6 +2355,40 @@ app.get('/api/evidence/midvale-clubhouse-pitched-heldout-comparison', authMiddle
   } catch (error) {
     log.error('Failed to load Midvale Clubhouse held-out comparison evidence', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'midvale_clubhouse_heldout_comparison_load_failed', unseenProjectPlacementVerified: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/pitched-placement-calibration-corpus', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(PITCHED_PLACEMENT_CALIBRATION_CORPUS_PATH, 'utf8'));
+    const dependencies = {
+      dillonPrior: JSON.parse(fs.readFileSync(DILLON_PITCHED_PLACEMENT_PRIOR_PATH, 'utf8')),
+      midvaleSourceCandidate: JSON.parse(fs.readFileSync(MIDVALE_SOURCE_CANDIDATE_PATH, 'utf8')),
+      midvaleComparison: JSON.parse(fs.readFileSync(MIDVALE_HELDOUT_COMPARISON_PATH, 'utf8')),
+    };
+    const [validation, adversarialLoop] = await Promise.all([
+      validatePitchedPlacementCalibrationCorpus(packet, dependencies),
+      verifyPitchedPlacementCalibrationAdversarialLoop(packet, dependencies),
+    ]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop,
+        strategySelectorReadyForFreshHoldout: false, unseenProjectPlacementVerified: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, receiptSha256: packet.receiptSha256,
+      mode: packet.mode, purpose: packet.purpose, sourceBindings: packet.sourceBindings,
+      trainingProjects: packet.trainingProjects, contrastiveLearning: packet.contrastiveLearning,
+      failedHoldoutControls: packet.failedHoldoutControls, transferPolicy: packet.transferPolicy,
+      adversarialLoop, strategySelectorReadyForFreshHoldout: true,
+      unseenProjectPlacementVerified: false, complianceReady: false, fabricationReady: false,
+      fieldReleaseReady: false, claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load pitched placement calibration corpus', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'pitched_placement_calibration_corpus_load_failed', strategySelectorReadyForFreshHoldout: false, unseenProjectPlacementVerified: false, complianceReady: false });
   }
 });
 
