@@ -1,0 +1,352 @@
+{
+  "artifactType": "halofire.winter-garden-source-pitched-candidates.v1",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "sourceReceipts": {
+    "topology": "e3708ffacae132eb24682e200a668293b33ccf614559b28945ecd2d2afcc46b3",
+    "registry": "0635855cc57d6f6234e7596957710a538f1b84d102249937e6c110df2107c88b",
+    "hazard": "7a7e6c6fe1c5731deca2d8cbbe6dfa18f3fc514f1f7ecd7e85cb27d3392d0ed6",
+    "ceiling": "c685cc79f813674d69fe2c044988fd07a3e204487badc20c919dfa19b871a533",
+    "building": "e6451b7acea7a8cb4a48727463823c51185e0faa3eb6230b195c1a0efc43324e"
+  },
+  "operationalKnowledge": {
+    "artifactType": "halofire.operational-knowledge-receipt.v3",
+    "source": "gx10-hal-brain+obsidian-vault",
+    "canonicalVault": "/opt/hal9000/apps/claudebot/hal-vault",
+    "preflightStatus": "passed",
+    "sessionId": "winter-garden-source-building-operational-knowledge-20260713",
+    "preflightQuery": "Halo Fire operations knowledge must actively constrain Winter Garden source-spec hazard and sprinkler generation across estimating, design engineering, procurement, fabrication, field installation, approvals, change control, closeout, and internal adversarial verification",
+    "recallEpisodeIds": [
+      140193,
+      140208,
+      139873,
+      140198,
+      140199,
+      139750,
+      139418,
+      136034
+    ],
+    "recalledWikiPages": [
+      "decisions/halo-forge-stream-d-sprinkler-alpha-workflow-correction-loop-design-artifact-2026.md",
+      "decisions/2026-05-15-halo-forge-stream-d-sprinkler-separate-design-issues-from-nfpa-ahj.md",
+      "decisions/halo-forge-sprinkler-catalog-engineering-gate-2026-05-13.md"
+    ],
+    "companyFlowRecall": {
+      "episodeIds": [
+        140193,
+        140208,
+        139873,
+        140198,
+        140199
+      ],
+      "pages": [
+        "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "halofire-master/00-Company/00_Company_Org.md",
+        "halofire-master/05-Fabrication-Shop/05_Fabrication_Shop.md",
+        "halofire-master/09-Finance-Admin/09_Finance_Admin.md"
+      ],
+      "status": "passed"
+    },
+    "sources": [
+      "halofire-master/00_MASTER_MOC.md",
+      "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+      "halofire-master/00-Company/00_Company_Org.md",
+      "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+      "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+      "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+      "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+      "halofire-master/07-08-itm-pm.md",
+      "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
+      "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+      "halofire-autobid/system/autobid-index.md"
+    ],
+    "workflowGuardrails": [
+      "estimate-before-award-is-not-install-design",
+      "source-scale-and-elevation-datums-must-be-proven",
+      "commercial-hazard-and-density-come-from-project-spec-not-architectural-grid",
+      "completed-bids-are-held-out-calibration-not-generation-inputs",
+      "design-basis-requires-hazard-density-water-supply-and-field-condition-evidence",
+      "no-approved-submittal-means-no-order-fabrication-or-field-release",
+      "manufacturer-product-claims-require-approved-cut-sheets-and-responsibility-scope",
+      "field-conflicts-become-rfis-not-untracked-field-guesses",
+      "ahj-compliance-fabrication-and-manufacturer-claims-fail-closed",
+      "primary-independent-and-adversarial-verification-loops-are-internal",
+      "closeout-and-realized-job-cost-feed-the-next-estimating-loop",
+      "every-stage-has-a-department-owner-handoff-artifact-and-current-tool",
+      "preconstruction-controls-cad-flow-test-permit-wip-and-fabrication-schedule",
+      "closeout-artifacts-precede-final-billing"
+    ],
+    "applications": [
+      {
+        "id": "company-handoff-chain",
+        "domain": "company-operations",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "lead-bid-award-design-procure-fabricate-install-inspect-submit-closeout-invoice-service-is-the-current-company-flow",
+        "control": "each-stage-records-department-owner-handoff-artifact-and-current-tool-before-downstream-state-can-advance"
+      },
+      {
+        "id": "preconstruction-project-control",
+        "domain": "project-management",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "preconstruction-owns-job-setup-cad-acquisition-flow-test-permit-wip-and-fabrication-schedule-coordination",
+        "control": "design-and-fabrication-handoffs-carry-the-current-cad-flow-test-permit-revision-and-schedule-state"
+      },
+      {
+        "id": "closeout-before-final-billing",
+        "domain": "finance-and-project-closeout",
+        "source": "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
+        "decision": "asbuilts-test-certificates-warranties-and-closeout-state-precede-final-billing-and-realized-job-cost-feedback",
+        "control": "final-billing-and-estimating-learning-cannot-advance-from-an-incomplete-closeout-record"
+      },
+      {
+        "id": "lifecycle-stage-authority",
+        "domain": "company-operations",
+        "source": "halofire-master/00_MASTER_MOC.md",
+        "decision": "bid-award-design-procure-fabricate-install-inspect-service-is-the-authoritative-lifecycle",
+        "control": "every-artifact-declares-its-lifecycle-stage-and-cannot-inherit-downstream-authority"
+      },
+      {
+        "id": "estimate-design-boundary",
+        "domain": "estimating",
+        "source": "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+        "decision": "estimating-geometry-is-a-pricing-seed-not-an-approved-installation-design",
+        "control": "source-building-and-layout-artifacts-keep-compliance-fabrication-and-field-release-false"
+      },
+      {
+        "id": "commercial-spec-hazard-basis",
+        "domain": "estimating-and-design",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "commercial-hazard-density-and-remote-area-come-from-csi-division-21-before-layout",
+        "control": "reject-default-hazard-or-density-when-the-project-spec-is-missing-unbound-or-contradicted"
+      },
+      {
+        "id": "design-basis-and-hydraulics",
+        "domain": "design-engineering",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "field-conditions-hazard-density-water-supply-remote-area-and-obstructions-precede-afc-release",
+        "control": "unresolved-room-ceiling-obstruction-or-water-evidence-keeps-design-and-compliance-fail-closed"
+      },
+      {
+        "id": "approved-product-procurement",
+        "domain": "procurement",
+        "source": "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+        "decision": "released-bom-approved-cut-sheets-responsibility-matrix-and-live-vendor-data-govern-the-buy",
+        "control": "no-manufacturer-exact-product-or-procurement-claim-without-project-approved-source-evidence"
+      },
+      {
+        "id": "afc-before-fabrication",
+        "domain": "fabrication-shop",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "nothing-is-cut-kitted-or-shipped-before-approved-for-construction-drawings-and-bom",
+        "control": "fabrication-ready-remains-false-until-afc-revision-bom-cut-list-and-product-approvals-join"
+      },
+      {
+        "id": "approved-set-field-rfi",
+        "domain": "field-operations",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "field-installs-the-approved-set-and-routes-conflicts-back-as-rfis",
+        "control": "unresolved-coordination-never-becomes-an-invented-install-location-or-field-release"
+      },
+      {
+        "id": "pm-change-closeout-learning",
+        "domain": "project-management-and-itm",
+        "source": "halofire-master/07-08-itm-pm.md",
+        "decision": "changes-are-priced-before-work-and-closeout-requires-asbuilts-om-test-certs-warranty-and-turnover",
+        "control": "revision-change-closeout-and-realized-cost-state-remain-explicit-and-feed-estimating-calibration"
+      },
+      {
+        "id": "internal-verification-doctrine",
+        "domain": "software-governance",
+        "source": "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+        "decision": "every-ai-feature-runs-multisignal-self-validation-and-correction-loops-inside-the-product",
+        "control": "primary-independent-and-adversarial-results-are-machine-gated-with-no-independent-review-blocker"
+      },
+      {
+        "id": "brain-db-loop-division",
+        "domain": "autobid-platform",
+        "source": "halofire-autobid/system/autobid-index.md",
+        "decision": "the-bid-db-locates-source-files-the-brain-holds-recallable-knowledge-and-deterministic-engines-own-calculations",
+        "control": "every-generated-decision-cites-source-locators-brain-provenance-and-deterministic-rule-output"
+      }
+    ],
+    "coverage": {
+      "lifecycleStages": [
+        "lead-qualification",
+        "bid",
+        "award",
+        "preconstruction",
+        "design",
+        "procurement",
+        "fabrication",
+        "field-install",
+        "acceptance-itm",
+        "closeout-service",
+        "billing"
+      ],
+      "crossCuttingDomains": [
+        "project-management",
+        "finance-job-cost",
+        "licensing-safety",
+        "codes-ahj",
+        "catalog-products",
+        "internal-verification"
+      ],
+      "sourceCount": 11,
+      "appliedDecisionCount": 13,
+      "status": "passed"
+    }
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "roofPlaneUsedAsCeiling": false,
+    "joinMethod": "single-identity-A103-envelope+A101-room-component+unique-source-hazard-name+A151-A301-A303-ceiling",
+    "planMethod": "deterministic-center-of-A101-A103-polygon-intersection",
+    "elevationMethod": "sealed-source-C3-profile-at-plan-y"
+  },
+  "roomsAudit": [
+    {
+      "roomNumber": "148",
+      "roomName": "CHAPEL",
+      "topologyZoneId": "wg-zone-001",
+      "topologyIdentityCount": 3,
+      "uniqueSourceHazardNameHits": 1,
+      "finishTypes": [
+        "C4"
+      ],
+      "surfaceCount": 2,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned"
+      ]
+    },
+    {
+      "roomNumber": "149",
+      "roomName": "OVERFLOW",
+      "topologyZoneId": "wg-zone-003",
+      "topologyIdentityCount": 1,
+      "uniqueSourceHazardNameHits": 1,
+      "finishTypes": [
+        "C3"
+      ],
+      "surfaceCount": 2,
+      "candidateIds": [
+        "wg-source-pitched-head-149-001"
+      ],
+      "status": "source-only-preliminary-pitched-candidate",
+      "blockingReasons": []
+    },
+    {
+      "roomNumber": "150",
+      "roomName": "CULTURAL CENTER",
+      "topologyZoneId": "wg-zone-004",
+      "topologyIdentityCount": 2,
+      "uniqueSourceHazardNameHits": 0,
+      "finishTypes": [
+        "C3"
+      ],
+      "surfaceCount": 2,
+      "candidateIds": [],
+      "status": "blocked",
+      "blockingReasons": [
+        "multi-identity-protection-envelope-not-partitioned",
+        "unique-source-hazard-name-join-failed"
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "candidateId": "wg-source-pitched-head-149-001",
+      "roomNumber": "149",
+      "roomName": "OVERFLOW",
+      "topologyZoneId": "wg-zone-003",
+      "sourceHazardRoomId": "source-room-003",
+      "hazardClass": "Light Hazard",
+      "hazardRuleId": "light-hazard-all-other-source-identified-spaces",
+      "maxCoverageSqftPerHead": 225,
+      "planPointFt": [
+        152.22595,
+        114.109
+      ],
+      "modelPointFt": [
+        152.22595,
+        114.109,
+        119.385417
+      ],
+      "ceiling": {
+        "kind": "source-sloped-finish-envelope",
+        "finishType": "C3",
+        "profileBand": "ridge-flat",
+        "elevationFt": 119.385417,
+        "pitchRiseInPer12": 2.999343,
+        "sourceReceiptSha256": "c685cc79f813674d69fe2c044988fd07a3e204487badc20c919dfa19b871a533"
+      },
+      "remoteAreaAdjustmentCandidate": {
+        "thresholdRiseInPer12": 2,
+        "sourceCeilingExceedsThreshold": true,
+        "adjustedRemoteAreaSqft": 1950,
+        "verified": false
+      },
+      "sourceSheets": [
+        "A101",
+        "A103",
+        "A151",
+        "A301",
+        "A303",
+        "WG Specs"
+      ],
+      "sourceBoundaryComplete": false,
+      "coverageVerified": false,
+      "wallDistanceVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "complianceReady": false,
+      "status": "source-only-preliminary-pitched-candidate"
+    }
+  ],
+  "counts": {
+    "slopedCeilingRooms": 3,
+    "pitchedCandidateRooms": 1,
+    "pitchedCandidateHeads": 1,
+    "blockedSlopedRooms": 2
+  },
+  "unresolved": [
+    "CHAPEL 148 and CULTURAL CENTER 150 remain blocked by multi-identity A103 topology envelopes",
+    "OVERFLOW 149 room boundary completeness, final spacing, wall distance, coverage, and obstruction coordination remain unresolved",
+    "remote-area adjustment is only a source-rule candidate until the hydraulic design and water supply are complete",
+    "mechanical, electrical, structural, manufacturer, AHJ, fabrication, and field-release gates remain fail-closed"
+  ],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-five-sealed-source-packet-replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "single-A103-identity+unique-OVERFLOW-name+C3-3:12-elevation-cross-check"
+    },
+    "adversarial": {
+      "status": "passed",
+      "rejectedCases": [
+        "CHAPEL-multi-identity-envelope-promoted",
+        "CULTURAL-CENTER-multi-identity-envelope-promoted",
+        "4.5:12-roof-plane-used-as-ceiling",
+        "completed-sprinkler-answer-key-used-for-position-or-elevation",
+        "source-name-match-accepted-when-not-unique",
+        "sloped-candidate-placed-outside-A101-A103-intersection",
+        "3:12-remote-area-candidate-promoted-as-hydraulic-verification",
+        "unverified-room-boundary-promoted-as-final-wall-distance",
+        "one-preliminary-pitched-candidate-promoted-as-whole-building-layout"
+      ]
+    }
+  },
+  "partialPitchedCandidateGeometryGrounded": true,
+  "wholeBuildingHeadLayoutReady": false,
+  "pitchedRoofHeadLayoutReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "one-source-only-preliminary-3:12-pitched-candidate-not-code-compliance",
+  "receiptSha256": "a6e7f9b5cbd0874216a52a6d4db626441877a38d2120027693ec9146fa028324"
+}

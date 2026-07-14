@@ -1,0 +1,829 @@
+{
+  "artifactType": "halofire.winter-garden-source-sloped-ceiling.v1",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "sources": {
+    "A151": {
+      "sha256": "4a6c4b29eff18a8e964627ba41807f2f8119f8a2c8012d5900acf08e61ee8e43"
+    },
+    "A301": {
+      "sha256": "719ae05138b3872c2ed8740fa4470ca457dcc0a9f8fec617cabf7969560ecc30"
+    },
+    "A303": {
+      "sha256": "dae14221cd3b913d350e53d146c6dd1abfca8a3b6d3ca142916474ba18a66de7"
+    }
+  },
+  "sourceReceipts": {
+    "registry": "0635855cc57d6f6234e7596957710a538f1b84d102249937e6c110df2107c88b",
+    "building": "e6451b7acea7a8cb4a48727463823c51185e0faa3eb6230b195c1a0efc43324e"
+  },
+  "operationalKnowledge": {
+    "artifactType": "halofire.operational-knowledge-receipt.v3",
+    "source": "gx10-hal-brain+obsidian-vault",
+    "canonicalVault": "/opt/hal9000/apps/claudebot/hal-vault",
+    "preflightStatus": "passed",
+    "sessionId": "winter-garden-source-building-operational-knowledge-20260713",
+    "preflightQuery": "Halo Fire operations knowledge must actively constrain Winter Garden source-spec hazard and sprinkler generation across estimating, design engineering, procurement, fabrication, field installation, approvals, change control, closeout, and internal adversarial verification",
+    "recallEpisodeIds": [
+      140193,
+      140208,
+      139873,
+      140198,
+      140199,
+      139750,
+      139418,
+      136034
+    ],
+    "recalledWikiPages": [
+      "decisions/halo-forge-stream-d-sprinkler-alpha-workflow-correction-loop-design-artifact-2026.md",
+      "decisions/2026-05-15-halo-forge-stream-d-sprinkler-separate-design-issues-from-nfpa-ahj.md",
+      "decisions/halo-forge-sprinkler-catalog-engineering-gate-2026-05-13.md"
+    ],
+    "companyFlowRecall": {
+      "episodeIds": [
+        140193,
+        140208,
+        139873,
+        140198,
+        140199
+      ],
+      "pages": [
+        "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "halofire-master/00-Company/00_Company_Org.md",
+        "halofire-master/05-Fabrication-Shop/05_Fabrication_Shop.md",
+        "halofire-master/09-Finance-Admin/09_Finance_Admin.md"
+      ],
+      "status": "passed"
+    },
+    "sources": [
+      "halofire-master/00_MASTER_MOC.md",
+      "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+      "halofire-master/00-Company/00_Company_Org.md",
+      "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+      "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+      "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+      "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+      "halofire-master/07-08-itm-pm.md",
+      "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
+      "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+      "halofire-autobid/system/autobid-index.md"
+    ],
+    "workflowGuardrails": [
+      "estimate-before-award-is-not-install-design",
+      "source-scale-and-elevation-datums-must-be-proven",
+      "commercial-hazard-and-density-come-from-project-spec-not-architectural-grid",
+      "completed-bids-are-held-out-calibration-not-generation-inputs",
+      "design-basis-requires-hazard-density-water-supply-and-field-condition-evidence",
+      "no-approved-submittal-means-no-order-fabrication-or-field-release",
+      "manufacturer-product-claims-require-approved-cut-sheets-and-responsibility-scope",
+      "field-conflicts-become-rfis-not-untracked-field-guesses",
+      "ahj-compliance-fabrication-and-manufacturer-claims-fail-closed",
+      "primary-independent-and-adversarial-verification-loops-are-internal",
+      "closeout-and-realized-job-cost-feed-the-next-estimating-loop",
+      "every-stage-has-a-department-owner-handoff-artifact-and-current-tool",
+      "preconstruction-controls-cad-flow-test-permit-wip-and-fabrication-schedule",
+      "closeout-artifacts-precede-final-billing"
+    ],
+    "applications": [
+      {
+        "id": "company-handoff-chain",
+        "domain": "company-operations",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "lead-bid-award-design-procure-fabricate-install-inspect-submit-closeout-invoice-service-is-the-current-company-flow",
+        "control": "each-stage-records-department-owner-handoff-artifact-and-current-tool-before-downstream-state-can-advance"
+      },
+      {
+        "id": "preconstruction-project-control",
+        "domain": "project-management",
+        "source": "halofire-master/COMPANY_OPERATIONS_FLOW.md",
+        "decision": "preconstruction-owns-job-setup-cad-acquisition-flow-test-permit-wip-and-fabrication-schedule-coordination",
+        "control": "design-and-fabrication-handoffs-carry-the-current-cad-flow-test-permit-revision-and-schedule-state"
+      },
+      {
+        "id": "closeout-before-final-billing",
+        "domain": "finance-and-project-closeout",
+        "source": "halofire-master/09-Finance-Admin/09_Finance_Admin.md",
+        "decision": "asbuilts-test-certificates-warranties-and-closeout-state-precede-final-billing-and-realized-job-cost-feedback",
+        "control": "final-billing-and-estimating-learning-cannot-advance-from-an-incomplete-closeout-record"
+      },
+      {
+        "id": "lifecycle-stage-authority",
+        "domain": "company-operations",
+        "source": "halofire-master/00_MASTER_MOC.md",
+        "decision": "bid-award-design-procure-fabricate-install-inspect-service-is-the-authoritative-lifecycle",
+        "control": "every-artifact-declares-its-lifecycle-stage-and-cannot-inherit-downstream-authority"
+      },
+      {
+        "id": "estimate-design-boundary",
+        "domain": "estimating",
+        "source": "halofire-master/02-Estimating-Bidding/02_Estimating_Bidding.md",
+        "decision": "estimating-geometry-is-a-pricing-seed-not-an-approved-installation-design",
+        "control": "source-building-and-layout-artifacts-keep-compliance-fabrication-and-field-release-false"
+      },
+      {
+        "id": "commercial-spec-hazard-basis",
+        "domain": "estimating-and-design",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "commercial-hazard-density-and-remote-area-come-from-csi-division-21-before-layout",
+        "control": "reject-default-hazard-or-density-when-the-project-spec-is-missing-unbound-or-contradicted"
+      },
+      {
+        "id": "design-basis-and-hydraulics",
+        "domain": "design-engineering",
+        "source": "halofire-master/03-Design-Engineering/03_Design_Engineering.md",
+        "decision": "field-conditions-hazard-density-water-supply-remote-area-and-obstructions-precede-afc-release",
+        "control": "unresolved-room-ceiling-obstruction-or-water-evidence-keeps-design-and-compliance-fail-closed"
+      },
+      {
+        "id": "approved-product-procurement",
+        "domain": "procurement",
+        "source": "halofire-master/04-Procurement-Vendors/04_Procurement_Vendors.md",
+        "decision": "released-bom-approved-cut-sheets-responsibility-matrix-and-live-vendor-data-govern-the-buy",
+        "control": "no-manufacturer-exact-product-or-procurement-claim-without-project-approved-source-evidence"
+      },
+      {
+        "id": "afc-before-fabrication",
+        "domain": "fabrication-shop",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "nothing-is-cut-kitted-or-shipped-before-approved-for-construction-drawings-and-bom",
+        "control": "fabrication-ready-remains-false-until-afc-revision-bom-cut-list-and-product-approvals-join"
+      },
+      {
+        "id": "approved-set-field-rfi",
+        "domain": "field-operations",
+        "source": "halofire-master/05-Fabrication-Shop/05-06-fab-field.md",
+        "decision": "field-installs-the-approved-set-and-routes-conflicts-back-as-rfis",
+        "control": "unresolved-coordination-never-becomes-an-invented-install-location-or-field-release"
+      },
+      {
+        "id": "pm-change-closeout-learning",
+        "domain": "project-management-and-itm",
+        "source": "halofire-master/07-08-itm-pm.md",
+        "decision": "changes-are-priced-before-work-and-closeout-requires-asbuilts-om-test-certs-warranty-and-turnover",
+        "control": "revision-change-closeout-and-realized-cost-state-remain-explicit-and-feed-estimating-calibration"
+      },
+      {
+        "id": "internal-verification-doctrine",
+        "domain": "software-governance",
+        "source": "halofire-master/AI_AUTOMATION_OPPORTUNITIES.md",
+        "decision": "every-ai-feature-runs-multisignal-self-validation-and-correction-loops-inside-the-product",
+        "control": "primary-independent-and-adversarial-results-are-machine-gated-with-no-independent-review-blocker"
+      },
+      {
+        "id": "brain-db-loop-division",
+        "domain": "autobid-platform",
+        "source": "halofire-autobid/system/autobid-index.md",
+        "decision": "the-bid-db-locates-source-files-the-brain-holds-recallable-knowledge-and-deterministic-engines-own-calculations",
+        "control": "every-generated-decision-cites-source-locators-brain-provenance-and-deterministic-rule-output"
+      }
+    ],
+    "coverage": {
+      "lifecycleStages": [
+        "lead-qualification",
+        "bid",
+        "award",
+        "preconstruction",
+        "design",
+        "procurement",
+        "fabrication",
+        "field-install",
+        "acceptance-itm",
+        "closeout-service",
+        "billing"
+      ],
+      "crossCuttingDomains": [
+        "project-management",
+        "finance-job-cost",
+        "licensing-safety",
+        "codes-ahj",
+        "catalog-products",
+        "internal-verification"
+      ],
+      "sourceCount": 11,
+      "appliedDecisionCount": 13,
+      "status": "passed"
+    }
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "sourceFilesReadOnly": true,
+    "method": "A301-vector-profile+A151-finish-datums+A303-longitudinal-truss-check+A103-ridge-registration"
+  },
+  "sectionEvidence": {
+    "sheetId": "A301",
+    "printedScaleText": "05 1/4\" = 1'",
+    "printedScalePtPerFt": 18,
+    "extractionMethod": "pdfjs-vector-style+section-B-window+symmetric-pair",
+    "leftVector": [
+      [
+        457.32,
+        1279.98
+      ],
+      [
+        731.46,
+        1211.46
+      ]
+    ],
+    "rightVector": [
+      [
+        918.78,
+        1211.46
+      ],
+      [
+        1192.92,
+        1279.98
+      ]
+    ],
+    "vectorStyle": {
+      "lineWidth": 0.84,
+      "strokeColor": "#4b4b4b"
+    },
+    "roofPitchRiseIn": 4.5,
+    "roofPitchRunIn": 12,
+    "ceilingPitchDerivedFromRoof": false
+  },
+  "longitudinalEvidence": {
+    "sheetId": "A303",
+    "bottomOfTrussSourceText": "BOTTOM OF TRUSS 119' - 6\"",
+    "bottomOfTrussElevationFt": 119.5,
+    "longitudinalGradientFtPerFt": 0,
+    "role": "long-axis datum and no-x-gradient check"
+  },
+  "profile": {
+    "axis": "plan-y",
+    "ridgeCenterYFt": 119.12934,
+    "plateauSouthYFt": 113.926007,
+    "plateauNorthYFt": 124.332673,
+    "southLowYFt": 98.696007,
+    "northLowYFt": 139.562673,
+    "plateauWidthFt": 10.406667,
+    "slopeRunFt": 15.23,
+    "slopeRiseFt": 3.806667,
+    "pitchRiseIn": 2.999343,
+    "pitchRunIn": 12,
+    "longitudinalGradientFtPerFt": 0
+  },
+  "finishes": [
+    {
+      "finishType": "C3",
+      "sourceControlIds": [
+        "a151-ceiling-031",
+        "a151-ceiling-034",
+        "a151-ceiling-036"
+      ],
+      "heightAboveFloorFt": 19.385417,
+      "highElevationFt": 119.385417,
+      "lowElevationFt": 115.57875,
+      "trussClearanceIn": 1.375
+    },
+    {
+      "finishType": "C4",
+      "sourceControlIds": [
+        "a151-ceiling-026",
+        "a151-ceiling-027"
+      ],
+      "heightAboveFloorFt": 19.447917,
+      "highElevationFt": 119.447917,
+      "lowElevationFt": 115.64125,
+      "trussClearanceIn": 0.625
+    }
+  ],
+  "surfaces": [
+    {
+      "surfaceId": "wg-148-south-slope",
+      "roomNumber": "148",
+      "roomName": "CHAPEL",
+      "finishType": "C4",
+      "profileBand": "south-slope",
+      "boundaryCompleteness": "unverified",
+      "planPolygonFt": [
+        [
+          173.9861,
+          113.926007
+        ],
+        [
+          173.9861,
+          101.6761
+        ],
+        [
+          176.2766,
+          101.6761
+        ],
+        [
+          176.2766,
+          101.0385
+        ],
+        [
+          183.1482,
+          101.0385
+        ],
+        [
+          183.1482,
+          99.1257
+        ],
+        [
+          187.7293,
+          99.1257
+        ],
+        [
+          187.7293,
+          101.9949
+        ],
+        [
+          189.4472,
+          101.9949
+        ],
+        [
+          189.4472,
+          99.1257
+        ],
+        [
+          195.7462,
+          99.1257
+        ],
+        [
+          195.7462,
+          102.6324
+        ],
+        [
+          194.0283,
+          102.6324
+        ],
+        [
+          194.0283,
+          105.1828
+        ],
+        [
+          199.182,
+          105.1828
+        ],
+        [
+          199.182,
+          102.6324
+        ],
+        [
+          197.4641,
+          102.6324
+        ],
+        [
+          197.4641,
+          99.1257
+        ],
+        [
+          204.9083,
+          99.1257
+        ],
+        [
+          204.9083,
+          113.926007
+        ]
+      ],
+      "verticesFt": [
+        [
+          173.9861,
+          113.926007,
+          119.447917
+        ],
+        [
+          173.9861,
+          101.6761,
+          116.386111
+        ],
+        [
+          176.2766,
+          101.6761,
+          116.386111
+        ],
+        [
+          176.2766,
+          101.0385,
+          116.226746
+        ],
+        [
+          183.1482,
+          101.0385,
+          116.226746
+        ],
+        [
+          183.1482,
+          99.1257,
+          115.748651
+        ],
+        [
+          187.7293,
+          99.1257,
+          115.748651
+        ],
+        [
+          187.7293,
+          101.9949,
+          116.465793
+        ],
+        [
+          189.4472,
+          101.9949,
+          116.465793
+        ],
+        [
+          189.4472,
+          99.1257,
+          115.748651
+        ],
+        [
+          195.7462,
+          99.1257,
+          115.748651
+        ],
+        [
+          195.7462,
+          102.6324,
+          116.625134
+        ],
+        [
+          194.0283,
+          102.6324,
+          116.625134
+        ],
+        [
+          194.0283,
+          105.1828,
+          117.262594
+        ],
+        [
+          199.182,
+          105.1828,
+          117.262594
+        ],
+        [
+          199.182,
+          102.6324,
+          116.625134
+        ],
+        [
+          197.4641,
+          102.6324,
+          116.625134
+        ],
+        [
+          197.4641,
+          99.1257,
+          115.748651
+        ],
+        [
+          204.9083,
+          99.1257,
+          115.748651
+        ],
+        [
+          204.9083,
+          113.926007,
+          119.447917
+        ]
+      ],
+      "planAreaSqft": 414.5752,
+      "status": "source-only-ceiling-surface-envelope"
+    },
+    {
+      "surfaceId": "wg-148-ridge-flat",
+      "roomNumber": "148",
+      "roomName": "CHAPEL",
+      "finishType": "C4",
+      "profileBand": "ridge-flat",
+      "boundaryCompleteness": "unverified",
+      "planPolygonFt": [
+        [
+          173.9861,
+          113.926007
+        ],
+        [
+          204.9083,
+          113.926007
+        ],
+        [
+          204.9083,
+          118.5721
+        ],
+        [
+          173.9861,
+          118.5721
+        ]
+      ],
+      "verticesFt": [
+        [
+          173.9861,
+          113.926007,
+          119.447917
+        ],
+        [
+          204.9083,
+          113.926007,
+          119.447917
+        ],
+        [
+          204.9083,
+          118.5721,
+          119.447917
+        ],
+        [
+          173.9861,
+          118.5721,
+          119.447917
+        ]
+      ],
+      "planAreaSqft": 143.6674,
+      "status": "source-only-ceiling-surface-envelope"
+    },
+    {
+      "surfaceId": "wg-149-south-slope",
+      "roomNumber": "149",
+      "roomName": "OVERFLOW",
+      "finishType": "C3",
+      "profileBand": "south-slope",
+      "boundaryCompleteness": "unverified",
+      "planPolygonFt": [
+        [
+          145.927,
+          113.926007
+        ],
+        [
+          145.927,
+          109.9647
+        ],
+        [
+          158.5249,
+          109.9647
+        ],
+        [
+          158.5249,
+          113.926007
+        ]
+      ],
+      "verticesFt": [
+        [
+          145.927,
+          113.926007,
+          119.385417
+        ],
+        [
+          145.927,
+          109.9647,
+          118.395307
+        ],
+        [
+          158.5249,
+          109.9647,
+          118.395307
+        ],
+        [
+          158.5249,
+          113.926007,
+          119.385417
+        ]
+      ],
+      "planAreaSqft": 49.9041,
+      "status": "source-only-ceiling-surface-envelope"
+    },
+    {
+      "surfaceId": "wg-149-ridge-flat",
+      "roomNumber": "149",
+      "roomName": "OVERFLOW",
+      "finishType": "C3",
+      "profileBand": "ridge-flat",
+      "boundaryCompleteness": "unverified",
+      "planPolygonFt": [
+        [
+          145.927,
+          113.926007
+        ],
+        [
+          158.5249,
+          113.926007
+        ],
+        [
+          158.5249,
+          118.2533
+        ],
+        [
+          145.927,
+          118.2533
+        ]
+      ],
+      "verticesFt": [
+        [
+          145.927,
+          113.926007,
+          119.385417
+        ],
+        [
+          158.5249,
+          113.926007,
+          119.385417
+        ],
+        [
+          158.5249,
+          118.2533,
+          119.385417
+        ],
+        [
+          145.927,
+          118.2533,
+          119.385417
+        ]
+      ],
+      "planAreaSqft": 54.5148,
+      "status": "source-only-ceiling-surface-envelope"
+    },
+    {
+      "surfaceId": "wg-150-south-slope",
+      "roomNumber": "150",
+      "roomName": "CULTURAL CENTER",
+      "finishType": "C3",
+      "profileBand": "south-slope",
+      "boundaryCompleteness": "unverified",
+      "planPolygonFt": [
+        [
+          116.7226,
+          113.926007
+        ],
+        [
+          116.7226,
+          109.9647
+        ],
+        [
+          129.3206,
+          109.9647
+        ],
+        [
+          129.3206,
+          113.926007
+        ]
+      ],
+      "verticesFt": [
+        [
+          116.7226,
+          113.926007,
+          119.385417
+        ],
+        [
+          116.7226,
+          109.9647,
+          118.395307
+        ],
+        [
+          129.3206,
+          109.9647,
+          118.395307
+        ],
+        [
+          129.3206,
+          113.926007,
+          119.385417
+        ]
+      ],
+      "planAreaSqft": 49.9045,
+      "status": "source-only-ceiling-surface-envelope"
+    },
+    {
+      "surfaceId": "wg-150-ridge-flat",
+      "roomNumber": "150",
+      "roomName": "CULTURAL CENTER",
+      "finishType": "C3",
+      "profileBand": "ridge-flat",
+      "boundaryCompleteness": "unverified",
+      "planPolygonFt": [
+        [
+          116.7226,
+          113.926007
+        ],
+        [
+          129.3206,
+          113.926007
+        ],
+        [
+          129.3206,
+          116.3406
+        ],
+        [
+          127.6027,
+          116.3406
+        ],
+        [
+          127.6027,
+          116.9782
+        ],
+        [
+          127.03,
+          116.9782
+        ],
+        [
+          127.03,
+          118.2533
+        ],
+        [
+          117.8679,
+          118.2533
+        ],
+        [
+          117.8679,
+          114.109
+        ],
+        [
+          116.7226,
+          114.109
+        ]
+      ],
+      "verticesFt": [
+        [
+          116.7226,
+          113.926007,
+          119.385417
+        ],
+        [
+          129.3206,
+          113.926007,
+          119.385417
+        ],
+        [
+          129.3206,
+          116.3406,
+          119.385417
+        ],
+        [
+          127.6027,
+          116.3406,
+          119.385417
+        ],
+        [
+          127.6027,
+          116.9782,
+          119.385417
+        ],
+        [
+          127.03,
+          116.9782,
+          119.385417
+        ],
+        [
+          127.03,
+          118.2533,
+          119.385417
+        ],
+        [
+          117.8679,
+          118.2533,
+          119.385417
+        ],
+        [
+          117.8679,
+          114.109,
+          119.385417
+        ],
+        [
+          116.7226,
+          114.109,
+          119.385417
+        ]
+      ],
+      "planAreaSqft": 45.7527,
+      "status": "source-only-ceiling-surface-envelope"
+    }
+  ],
+  "unresolved": [
+    "A101-derived room component boundaries remain marked unverified and are surface envelopes rather than released ceiling fabrication geometry",
+    "fixture, obstruction, structural, mechanical, electrical, manufacturer, and deflector-offset coordination remain unresolved",
+    "hydraulic remote area, water supply, AHJ compliance, fabrication, and field release remain unresolved"
+  ],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-A301-vector-pair-and-A151-datum-replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "3:12-vector-ratio+5/8-inch-C4-to-A303-truss-reconciliation+symmetry-check"
+    },
+    "adversarial": {
+      "status": "passed",
+      "rejectedCases": [
+        "4.5:12-roof-pitch-substituted-for-3:12-interior-ceiling",
+        "completed-sprinkler-rcp-used-to-generate-ceiling",
+        "single-sloped-label-promoted-without-section-vector",
+        "A301-longitudinal-axis-misread-as-transverse-axis",
+        "A303-longitudinal-section-used-to-invent-transverse-pitch",
+        "C3-and-C4-finish-heights-collapsed",
+        "flat-ridge-strip-discarded-as-simple-gable",
+        "unverified-room-boundary-promoted-to-fabrication",
+        "ceiling-surface-envelope-promoted-to-code-compliant-head-layout"
+      ]
+    }
+  },
+  "ceilingSurfaceEnvelopeReady": true,
+  "roomBoundaryComplete": false,
+  "pitchedSprinklerLayoutReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "source-only-3:12-sloped-ceiling-surface-envelope-not-sprinkler-compliance",
+  "receiptSha256": "c685cc79f813674d69fe2c044988fd07a3e204487badc20c919dfa19b871a533"
+}

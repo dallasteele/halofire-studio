@@ -1,0 +1,29 @@
+{
+  "artifactType": "halofire.winter-garden-source-pitched-candidate-proof.v1",
+  "candidateReceiptSha256": "a6e7f9b5cbd0874216a52a6d4db626441877a38d2120027693ec9146fa028324",
+  "ceilingReceiptSha256": "c685cc79f813674d69fe2c044988fd07a3e204487badc20c919dfa19b871a533",
+  "heldOutReceiptSha256": "9ed061afd375912ee8bf3a651275296fcab93ab556a664b832d1a95df7d2db33",
+  "heldOutAcceptanceStatus": "failed",
+  "sourceBindings": {
+    "A103": "bca163d23e89b86332f670f6f234f5bc5319b1a1e461de28a3fb3124120c2f89",
+    "A151": "4a6c4b29eff18a8e964627ba41807f2f8119f8a2c8012d5900acf08e61ee8e43",
+    "A301": "719ae05138b3872c2ed8740fa4470ca457dcc0a9f8fec617cabf7969560ecc30",
+    "A303": "dae14221cd3b913d350e53d146c6dd1abfca8a3b6d3ca142916474ba18a66de7"
+  },
+  "counts": {
+    "slopedCeilingRooms": 3,
+    "pitchedCandidateRooms": 1,
+    "pitchedCandidateHeads": 1,
+    "blockedSlopedRooms": 2
+  },
+  "candidateIds": [
+    "wg-source-pitched-head-149-001"
+  ],
+  "ceilingPitchRiseInPer12": 2.999343,
+  "roofPitchRiseInPer12": 4.5,
+  "answerKeyUsed": false,
+  "pitchedRoofHeadLayoutReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "imageSha256": "db0ad7d94272239530fbfdba508ff50676f41e7c94acea072b499e9a8c86b67e"
+}

@@ -57,6 +57,9 @@ import { validateWinterGardenSourceSpecHazardPacket } from '../engine/winter-gar
 import { validateWinterGardenSourceSpaceRegistry } from '../engine/winter-garden-source-space-registry.js';
 import { validateWinterGardenSourceSpaceTopology } from '../engine/winter-garden-source-space-topology.js';
 import { validateWinterGardenSourceSprinklerCandidates } from '../engine/winter-garden-source-sprinkler-candidates.js';
+import { validateWinterGardenSourceSlopedCeiling } from '../engine/winter-garden-source-sloped-ceiling.js';
+import { validateWinterGardenSourcePitchedCandidates } from '../engine/winter-garden-source-pitched-candidates.js';
+import { validateWinterGardenSourcePitchedHeldout } from '../engine/winter-garden-source-pitched-heldout.js';
 import { renderOrthogonalGableBuildingViews } from '../engine/orthogonal-gable-building-views.js';
 import { buildWinterGardenBluebeamPackage } from '../engine/winter-garden-bluebeam-package.js';
 import { buildBluebeamSlopedPackage } from '../engine/bluebeam-sloped-package.js';
@@ -121,6 +124,11 @@ const WINTER_GARDEN_SOURCE_SPACE_TOPOLOGY_PATH = path.resolve(__dirname, '../dat
 const WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATES_PATH = path.resolve(__dirname, '../data/winter-garden-source-sprinkler-candidates.json');
 const WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATE_PROOF_PATH = path.resolve(__dirname, '../data/proofs/winter-garden-source-sprinkler-candidate-proof.png');
 const WINTER_GARDEN_SOURCE_SPRINKLER_CANDIDATE_PROOF_RECEIPT_PATH = path.resolve(__dirname, '../data/proofs/winter-garden-source-sprinkler-candidate-proof.json');
+const WINTER_GARDEN_SOURCE_SLOPED_CEILING_PATH = path.resolve(__dirname, '../data/winter-garden-source-sloped-ceiling.json');
+const WINTER_GARDEN_SOURCE_PITCHED_CANDIDATES_PATH = path.resolve(__dirname, '../data/winter-garden-source-pitched-candidates.json');
+const WINTER_GARDEN_SOURCE_PITCHED_HELDOUT_PATH = path.resolve(__dirname, '../data/winter-garden-source-pitched-heldout.json');
+const WINTER_GARDEN_SOURCE_PITCHED_PROOF_PATH = path.resolve(__dirname, '../data/proofs/winter-garden-source-pitched-candidate-proof.png');
+const WINTER_GARDEN_SOURCE_PITCHED_PROOF_RECEIPT_PATH = path.resolve(__dirname, '../data/proofs/winter-garden-source-pitched-candidate-proof.json');
 const TALLAHASSEE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/tallahassee-completed-project-source-set.json');
 const NASHVILLE_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/nashville-completed-project-source-set.json');
 const DALLAS_COMPLETED_PROJECT_SOURCE_SET_PATH = path.resolve(__dirname, '../data/dallas-completed-project-source-set.json');
@@ -1889,6 +1897,86 @@ app.get('/api/projects/:name/source-sprinkler-candidate-proof.png', authMiddlewa
   } catch (error) {
     log.error('Failed to load Winter Garden source-only sprinkler candidate proof', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'source_sprinkler_candidate_proof_load_failed' });
+  }
+});
+
+app.get('/api/projects/:name/source-sloped-ceiling', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'LDS Meeting House - Winter Garden FL') return res.status(404).json({ status: 'blocked', error: 'source_sloped_ceiling_not_found', pitchedSprinklerLayoutReady: false, complianceReady: false });
+  try {
+    const [packet, registry, building] = [WINTER_GARDEN_SOURCE_SLOPED_CEILING_PATH, WINTER_GARDEN_SOURCE_SPACE_REGISTRY_PATH, WINTER_GARDEN_SOURCE_BUILDING_MODEL_PATH].map((filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8')));
+    const validation = await validateWinterGardenSourceSlopedCeiling(packet, { registry, building });
+    if (validation.status !== 'passed') return res.status(422).json({ ...validation, projectName: req.params.name });
+    res.set('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, projectName: req.params.name,
+      receiptSha256: packet.receiptSha256, sourceReceipts: packet.sourceReceipts, sources: packet.sources,
+      generation: packet.generation, operationalKnowledge: packet.operationalKnowledge,
+      sectionEvidence: packet.sectionEvidence, longitudinalEvidence: packet.longitudinalEvidence,
+      profile: packet.profile, finishes: packet.finishes, surfaces: packet.surfaces,
+      unresolved: packet.unresolved, internalVerification: packet.internalVerification,
+      ceilingSurfaceEnvelopeReady: true, roomBoundaryComplete: false, pitchedSprinklerLayoutReady: false,
+      hydraulicCalculationReady: false, complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Winter Garden source-only sloped ceiling', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'source_sloped_ceiling_load_failed', pitchedSprinklerLayoutReady: false, complianceReady: false, fabricationReady: false });
+  }
+});
+
+app.get('/api/projects/:name/source-pitched-candidates', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'LDS Meeting House - Winter Garden FL') return res.status(404).json({ status: 'blocked', error: 'source_pitched_candidates_not_found', pitchedRoofHeadLayoutReady: false, complianceReady: false });
+  try {
+    const [packet, topology, registry, hazard, ceiling, building, heldOut, headEvidence, registration] = [
+      WINTER_GARDEN_SOURCE_PITCHED_CANDIDATES_PATH, WINTER_GARDEN_SOURCE_SPACE_TOPOLOGY_PATH,
+      WINTER_GARDEN_SOURCE_SPACE_REGISTRY_PATH, WINTER_GARDEN_SOURCE_SPEC_HAZARD_PATH,
+      WINTER_GARDEN_SOURCE_SLOPED_CEILING_PATH, WINTER_GARDEN_SOURCE_BUILDING_MODEL_PATH,
+      WINTER_GARDEN_SOURCE_PITCHED_HELDOUT_PATH, WINTER_GARDEN_HEAD_EVIDENCE_PATH, WINTER_GARDEN_GRID_REGISTRATION_PATH,
+    ].map((filePath) => JSON.parse(fs.readFileSync(filePath, 'utf8')));
+    const [validation, heldOutValidation] = await Promise.all([
+      validateWinterGardenSourcePitchedCandidates(packet, { topology, registry, hazard, ceiling, building }),
+      validateWinterGardenSourcePitchedHeldout(heldOut, { candidates: packet, ceiling, headEvidence, registration }),
+    ]);
+    if (validation.status !== 'passed' || heldOutValidation.status !== 'passed') return res.status(422).json({ status: 'blocked', issues: [...validation.issues, ...heldOutValidation.issues], projectName: req.params.name, pitchedRoofHeadLayoutReady: false, complianceReady: false });
+    res.set('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, projectName: req.params.name,
+      receiptSha256: packet.receiptSha256, sourceReceipts: packet.sourceReceipts,
+      generation: packet.generation, operationalKnowledge: packet.operationalKnowledge,
+      counts: packet.counts, roomsAudit: packet.roomsAudit, candidates: packet.candidates,
+      heldOutComparison: { receiptSha256: heldOut.receiptSha256, metrics: heldOut.metrics, comparisons: heldOut.comparisons, findings: heldOut.findings, requiredNextLoop: heldOut.requiredNextLoop, heldOutAcceptanceStatus: heldOut.heldOutAcceptanceStatus, candidatePlacementVerified: false },
+      unresolved: packet.unresolved, internalVerification: packet.internalVerification,
+      partialPitchedCandidateGeometryGrounded: true, wholeBuildingHeadLayoutReady: false,
+      pitchedRoofHeadLayoutReady: false, hydraulicCalculationReady: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Winter Garden source-only pitched candidates', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'source_pitched_candidates_load_failed', pitchedRoofHeadLayoutReady: false, complianceReady: false, fabricationReady: false });
+  }
+});
+
+app.get('/api/projects/:name/source-pitched-candidate-proof.png', authMiddleware, async (req, res) => {
+  if (req.params.name !== 'LDS Meeting House - Winter Garden FL') return res.status(404).json({ status: 'blocked', error: 'source_pitched_candidate_proof_not_found' });
+  try {
+    const packet = JSON.parse(fs.readFileSync(WINTER_GARDEN_SOURCE_PITCHED_CANDIDATES_PATH, 'utf8'));
+    const ceiling = JSON.parse(fs.readFileSync(WINTER_GARDEN_SOURCE_SLOPED_CEILING_PATH, 'utf8'));
+    const heldOut = JSON.parse(fs.readFileSync(WINTER_GARDEN_SOURCE_PITCHED_HELDOUT_PATH, 'utf8'));
+    const proof = JSON.parse(fs.readFileSync(WINTER_GARDEN_SOURCE_PITCHED_PROOF_RECEIPT_PATH, 'utf8'));
+    const imageBytes = fs.readFileSync(WINTER_GARDEN_SOURCE_PITCHED_PROOF_PATH);
+    const imageSha256 = createHash('sha256').update(imageBytes).digest('hex');
+    if (proof.candidateReceiptSha256 !== packet.receiptSha256 || proof.ceilingReceiptSha256 !== ceiling.receiptSha256
+      || proof.heldOutReceiptSha256 !== heldOut.receiptSha256 || proof.heldOutAcceptanceStatus !== 'failed'
+      || proof.imageSha256 !== imageSha256 || proof.answerKeyUsed !== false
+      || proof.ceilingPitchRiseInPer12 < 2.99 || proof.ceilingPitchRiseInPer12 > 3.01 || proof.roofPitchRiseInPer12 !== 4.5
+      || proof.pitchedRoofHeadLayoutReady !== false || proof.complianceReady !== false || proof.fabricationReady !== false) {
+      return res.status(422).json({ status: 'blocked', error: 'source_pitched_candidate_proof_receipt_mismatch', pitchedRoofHeadLayoutReady: false, complianceReady: false, fabricationReady: false });
+    }
+    res.set('Cache-Control', 'private, no-store'); res.set('Content-Type', 'image/png'); return res.send(imageBytes);
+  } catch (error) {
+    log.error('Failed to load Winter Garden source-only pitched candidate proof', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'source_pitched_candidate_proof_load_failed' });
   }
 });
 

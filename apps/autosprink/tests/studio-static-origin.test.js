@@ -137,6 +137,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-sprinkler-candidates');
     expect(html).toContain('hfWinterGardenSourceCandidateReceipt');
     expect(html).toContain('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-sprinkler-candidate-proof.png');
+    expect(html).toContain('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-sloped-ceiling');
+    expect(html).toContain('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-pitched-candidates');
+    expect(html).toContain('/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-pitched-candidate-proof.png');
+    expect(html).toContain('hfWinterGardenSourcePitchedReceipt');
     expect(html).toContain('hfOperationalBrainReceipt');
     expect(html).toContain('display:grid;grid-auto-rows:max-content;gap:12px;color:#e5e7eb;overflow:auto;overscroll-behavior:contain');
     expect(html).toContain('Dillon actual-drawing building model');

@@ -215,3 +215,72 @@ describe('GET /api/projects/:name/source-sprinkler-candidate-proof.png', () => {
     expect(bytes.length).toBeGreaterThan(1_000_000);
   });
 });
+
+describe('GET /api/projects/:name/source-sloped-ceiling', () => {
+  it('requires login', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-sloped-ceiling`);
+    expect(response.status).toBe(401);
+  });
+
+  it('serves the sealed source-only 3:12 ceiling profile and preserves fail-closed claims', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-sloped-ceiling`, { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    const body = await response.json();
+    expect(body.status).toBe('passed');
+    expect(body.profile.pitchRiseIn).toBeCloseTo(3, 2);
+    expect(body.sectionEvidence).toMatchObject({ roofPitchRiseIn: 4.5, ceilingPitchDerivedFromRoof: false });
+    expect(body.finishes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ finishType: 'C3', highElevationFt: 119.385417, trussClearanceIn: 1.375 }),
+      expect.objectContaining({ finishType: 'C4', highElevationFt: 119.447917, trussClearanceIn: 0.625 }),
+    ]));
+    expect(body.surfaces).toHaveLength(6);
+    expect(body.ceilingSurfaceEnvelopeReady).toBe(true);
+    expect(body.pitchedSprinklerLayoutReady).toBe(false);
+    expect(body.complianceReady).toBe(false);
+  });
+});
+
+describe('GET /api/projects/:name/source-pitched-candidates', () => {
+  it('requires login', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-pitched-candidates`);
+    expect(response.status).toBe(401);
+  });
+
+  it('serves one preliminary OVERFLOW candidate and leaves the full pitched layout blocked', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-pitched-candidates`, { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    const body = await response.json();
+    expect(body.status).toBe('passed');
+    expect(body.counts).toEqual({ slopedCeilingRooms: 3, pitchedCandidateRooms: 1, pitchedCandidateHeads: 1, blockedSlopedRooms: 2 });
+    expect(body.candidates[0]).toMatchObject({ roomNumber: '149', roomName: 'OVERFLOW', ceiling: { finishType: 'C3', elevationFt: 119.385417 }, coverageVerified: false, obstructionClearanceVerified: false, complianceReady: false });
+    expect(body.heldOutComparison).toMatchObject({
+      metrics: { generatedCandidateHeads: 1, completedHeadsInsideGeneratedComponent: 0, completedHeadsInsideTopologyZone: 9 },
+      heldOutAcceptanceStatus: 'failed', candidatePlacementVerified: false,
+    });
+    expect(body.heldOutComparison.comparisons[0]).toMatchObject({ nearestCompletedHeadId: 'wg-fp3-pendent-086', nearestCompletedDistanceFt: 4.4303, exactPlanParityPassed: false });
+    expect(body.partialPitchedCandidateGeometryGrounded).toBe(true);
+    expect(body.pitchedRoofHeadLayoutReady).toBe(false);
+    expect(body.complianceReady).toBe(false);
+  });
+});
+
+describe('GET /api/projects/:name/source-pitched-candidate-proof.png', () => {
+  it('keeps the source drawing proof behind employee login and outside the static mount', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-pitched-candidate-proof.png`);
+    expect(response.status).toBe(401);
+    const staticLeak = await fetch(`${BASE}/src/data/proofs/winter-garden-source-pitched-candidate-proof.png`);
+    expect(staticLeak.status).toBe(403);
+  });
+
+  it('serves the receipt-bound visual proof privately', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-pitched-candidate-proof.png`, { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('image/png');
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    expect([...bytes.slice(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+    expect(bytes.length).toBeGreaterThan(1_000_000);
+  });
+});

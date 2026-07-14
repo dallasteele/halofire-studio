@@ -1,0 +1,77 @@
+{
+  "artifactType": "halofire.winter-garden-source-pitched-heldout.v1",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "sourceReceipts": {
+    "candidates": "a6e7f9b5cbd0874216a52a6d4db626441877a38d2120027693ec9146fa028324",
+    "ceiling": "c685cc79f813674d69fe2c044988fd07a3e204487badc20c919dfa19b871a533",
+    "headEvidence": "458c5af81950028f2a8eca8a0d683c438e39729280bc19113df0ece7ae8be9e7",
+    "registration": "ba64ed53695dc5b515ccbb1dd6a43efc634c3081869444f464164913ceb2ffc5"
+  },
+  "sequence": {
+    "sourcePacketSealedBeforeAnswerKeyOpen": true,
+    "sourceCandidateReceiptAtSeal": "a6e7f9b5cbd0874216a52a6d4db626441877a38d2120027693ec9146fa028324",
+    "sourceGenerationModifiedAfterComparison": false
+  },
+  "generation": {
+    "answerKeyUsedForSourceGeneration": false,
+    "answerKeyRole": "held-out-comparison-only",
+    "completedSheetId": "FP3",
+    "completedPdfSha256": "93f8df04bc84ac817ecd2e222812fede93565879094c66b4d7511f783631543e"
+  },
+  "metrics": {
+    "generatedCandidateHeads": 1,
+    "completedHeadsInsideGeneratedComponent": 0,
+    "completedHeadsInsideTopologyZone": 9
+  },
+  "comparisons": [
+    {
+      "candidateId": "wg-source-pitched-head-149-001",
+      "generatedPlanPointFt": [
+        152.22595,
+        114.109
+      ],
+      "nearestCompletedHeadId": "wg-fp3-pendent-086",
+      "nearestCompletedPlanPointFt": [
+        152.127707,
+        118.538178
+      ],
+      "nearestCompletedDistanceFt": 4.4303,
+      "exactPlanParityPassed": false
+    }
+  ],
+  "findings": [
+    "the sealed A101 component used by the source hypothesis contains no completed head centers",
+    "the independently supported A103 topology zone contains nine completed head centers while the sealed source hypothesis emitted one",
+    "the nearest completed center is 4.4303 feet from the source-only hypothesis and lies just outside the extracted A101 component",
+    "this is a boundary/layout-generation failure, not a ceiling-profile failure; the 3:12 ceiling packet remains independently source-sealed"
+  ],
+  "requiredNextLoop": "calibrate a source-only multi-head spacing and semantic-boundary method on a different completed project, then hold out a separate unseen pitched project; do not tune the sealed Winter Garden source packet in place",
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "receipt-bound-piecewise-grid-comparison"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "inverse-FP3-to-A121-to-A103-head-registration-and-polygon-count"
+    },
+    "adversarial": {
+      "status": "passed",
+      "rejectedCases": [
+        "completed-head-centers-fed-back-into-source-generation",
+        "one-head-count-promoted-despite-nine-head-topology-zone",
+        "nearest-head-residual-hidden",
+        "ceiling-profile-rejected-because-layout-boundary-failed"
+      ]
+    }
+  },
+  "heldOutAcceptanceStatus": "failed",
+  "headCountParityPassed": false,
+  "exactPlanParityPassed": false,
+  "candidatePlacementVerified": false,
+  "pitchedRoofHeadLayoutReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "receiptSha256": "9ed061afd375912ee8bf3a651275296fcab93ab556a664b832d1a95df7d2db33"
+}

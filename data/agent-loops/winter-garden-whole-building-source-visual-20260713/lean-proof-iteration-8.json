@@ -1,0 +1,48 @@
+{
+  "artifactType": "halofire.formal-verification-receipt.v2",
+  "createdAt": "2026-07-13T21:48:00-07:00",
+  "prover": {
+    "name": "Lean",
+    "version": "4.13.0",
+    "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+    "health": "passed"
+  },
+  "subject": {
+    "sourceSlopedCeilingReceiptSha256": "c685cc79f813674d69fe2c044988fd07a3e204487badc20c919dfa19b871a533",
+    "sourcePitchedCandidateReceiptSha256": "a6e7f9b5cbd0874216a52a6d4db626441877a38d2120027693ec9146fa028324",
+    "heldOutReceiptSha256": "9ed061afd375912ee8bf3a651275296fcab93ab556a664b832d1a95df7d2db33",
+    "nominalInteriorCeilingPitchRiseInPer12": 3,
+    "roofPitchRiseInPer12": 4.5,
+    "surfaceCount": 6,
+    "slopedRoomCount": 3,
+    "generatedCandidateHeadCount": 1,
+    "completedTopologyZoneHeadCount": 9,
+    "heldOutAcceptanceStatus": "failed",
+    "answerKeyUsedForSourceGeneration": false,
+    "pitchedRoofHeadLayoutReady": false,
+    "complianceReady": false
+  },
+  "theorems": [
+    "interior_ceiling_pitch_is_not_roof_pitch",
+    "finish_clearance_eighths_are_distinct",
+    "heldout_head_count_mismatch",
+    "failed_heldout_blocks_pitched_layout",
+    "six_surfaces_cover_three_rooms_in_two_bands"
+  ],
+  "source": "def sourceLayoutReady (generated completed blockedRooms : Nat) : Bool :=\n  generated == completed && blockedRooms == 0\n\ntheorem interior_ceiling_pitch_is_not_roof_pitch : !((3 : Nat) = 4) := by decide\ntheorem finish_clearance_eighths_are_distinct : (5 : Nat) < 11 := by decide\ntheorem heldout_head_count_mismatch : !((1 : Nat) = 9) := by decide\ntheorem failed_heldout_blocks_pitched_layout : sourceLayoutReady 1 9 2 = false := by native_decide\ntheorem six_surfaces_cover_three_rooms_in_two_bands : (3 : Nat) * 2 = 6 := by decide",
+  "result": {
+    "status": "verified",
+    "returnCode": 0,
+    "durationMs": 208
+  },
+  "claimBoundary": {
+    "ceilingSurfaceEnvelopeReady": true,
+    "candidatePlacementVerified": false,
+    "wholeBuildingHeadLayoutReady": false,
+    "pitchedRoofHeadLayoutReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

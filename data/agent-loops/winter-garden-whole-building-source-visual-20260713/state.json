@@ -1,8 +1,8 @@
 {
   "name": "winter-garden-whole-building-source-visual-20260713",
-  "iteration": 7,
+  "iteration": 8,
   "status": "in_progress",
-  "updatedAt": "2026-07-13T21:27:10-07:00",
+  "updatedAt": "2026-07-13T21:48:00-07:00",
   "completedStages": [
     "DISCOVER",
     "PLAN",
@@ -325,5 +325,111 @@
     "liveSourceTopologyScreenshot": "apps/autosprink/output/playwright/winter-garden-source-topology-live-vps.png",
     "liveSourceTopologyScreenshotSha256": "7c931cf5cb4cf2bf43ac3a41a4c001cb8b612de88125eae23b8464c8b2f751c9"
   },
-  "nextAction": "ITERATE by deriving a Winter Garden sloped ceiling plane from coordinated A151/A303 evidence or another protected completed project's source geometry without substituting the roof plane. Seal the source generation packet before held-out completed-bid comparison; keep whole-building layout, hydraulics, compliance, fabrication, and field release false. Defer final whole-system Computer Use until the system is genuinely ready."
+  "iteration8SourceSlopedCeilingGate": {
+    "status": "passed-source-envelope-fail-closed",
+    "artifactType": "halofire.winter-garden-source-sloped-ceiling.v1",
+    "receiptSha256": "c685cc79f813674d69fe2c044988fd07a3e204487badc20c919dfa19b871a533",
+    "sourceBindings": ["A151", "A301", "A303", "A103 ridge registration"],
+    "profile": {
+      "axis": "plan-y",
+      "derivedPitchRiseInPer12": 2.999343,
+      "roofPitchRiseInPer12": 4.5,
+      "plateauWidthFt": 10.406667,
+      "slopeRunFt": 15.23,
+      "slopeRiseFt": 3.806667,
+      "surfaceCount": 6
+    },
+    "finishDatums": {
+      "C4HighElevationFt": 119.447917,
+      "C4BelowTrussIn": 0.625,
+      "C3HighElevationFt": 119.385417,
+      "C3BelowTrussIn": 1.375
+    },
+    "answerKeyUsed": false,
+    "ceilingPitchDerivedFromRoof": false,
+    "internalLoops": ["primary", "independent", "adversarial"],
+    "ceilingSurfaceEnvelopeReady": true,
+    "roomBoundaryComplete": false,
+    "pitchedSprinklerLayoutReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "productSurface": "/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-sloped-ceiling"
+  },
+  "iteration8SourcePitchedCandidateGate": {
+    "status": "passed-source-hypothesis-fail-closed",
+    "artifactType": "halofire.winter-garden-source-pitched-candidates.v1",
+    "receiptSha256": "a6e7f9b5cbd0874216a52a6d4db626441877a38d2120027693ec9146fa028324",
+    "counts": {
+      "slopedCeilingRooms": 3,
+      "pitchedCandidateRooms": 1,
+      "pitchedCandidateHeads": 1,
+      "blockedSlopedRooms": 2
+    },
+    "candidateRoom": "149 OVERFLOW",
+    "blockedRooms": ["148 CHAPEL", "150 CULTURAL CENTER"],
+    "answerKeyUsed": false,
+    "internalLoops": ["primary", "independent", "adversarial"],
+    "partialPitchedCandidateGeometryGrounded": true,
+    "candidatePlacementVerified": false,
+    "pitchedRoofHeadLayoutReady": false,
+    "complianceReady": false,
+    "productSurface": "/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-pitched-candidates",
+    "protectedVisualSurface": "/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-pitched-candidate-proof.png",
+    "visualProofSha256": "db0ad7d94272239530fbfdba508ff50676f41e7c94acea072b499e9a8c86b67e"
+  },
+  "iteration8HeldOutGate": {
+    "status": "failed-acceptance-recorded-and-enforced",
+    "artifactType": "halofire.winter-garden-source-pitched-heldout.v1",
+    "receiptSha256": "9ed061afd375912ee8bf3a651275296fcab93ab556a664b832d1a95df7d2db33",
+    "sequence": "source packet sealed before completed FP3 answer key opened; source packet not modified afterward",
+    "metrics": {
+      "generatedCandidateHeads": 1,
+      "completedHeadsInsideGeneratedComponent": 0,
+      "completedHeadsInsideTopologyZone": 9,
+      "nearestCompletedDistanceFt": 4.4303
+    },
+    "heldOutAcceptanceStatus": "failed",
+    "candidatePlacementVerified": false,
+    "headCountParityPassed": false,
+    "exactPlanParityPassed": false,
+    "pitchedRoofHeadLayoutReady": false,
+    "complianceReady": false,
+    "requiredNextLoop": "calibrate source-only multi-head spacing and semantic-boundary generation on another completed project, then hold out a separate unseen pitched project"
+  },
+  "iteration8FormalVerification": {
+    "status": "verified",
+    "prover": "Lean 4.13.0",
+    "theorems": 5,
+    "durationMs": 208,
+    "receipt": "data/agent-loops/winter-garden-whole-building-source-visual-20260713/lean-proof-iteration-8.json"
+  },
+  "iteration8Verification": {
+    "status": "passed",
+    "focusedTestFiles": 5,
+    "focusedTests": 55,
+    "fullTestFiles": 199,
+    "fullTests": 1819,
+    "nativeNodeTests": 20,
+    "productionBuild": "passed",
+    "agenticRules": "passed",
+    "loopContract": "passed",
+    "visualInspection": "passed-source-proof-with-held-out-failure-visible",
+    "formalVerification": {
+      "status": "verified",
+      "prover": "Lean 4.13.0",
+      "theorems": 5,
+      "durationMs": 208,
+      "receipt": "data/agent-loops/winter-garden-whole-building-source-visual-20260713/lean-proof-iteration-8.json"
+    }
+  },
+  "iteration8BrainPostflight": {
+    "status": "passed",
+    "title": "Winter Garden source 3:12 ceiling passes; held-out placement fails 1-vs-9",
+    "wikiDecisionPath": "decisions/winter-garden-source-3-12-ceiling-passes-held-out-placement-fails-1.md",
+    "source": "codex",
+    "confidence": 0.99,
+    "utf8TransportRequiredOnWindows": true
+  },
+  "nextAction": "ITERATE on a different completed project to calibrate source-only semantic room boundaries and multi-head spacing, then hold out an unseen pitched project. Preserve the sealed Winter Garden held-out failure; do not tune it in place. Keep whole-building layout, hydraulics, compliance, fabrication, and field release false. Defer final whole-system Computer Use until the system is genuinely ready."
 }
