@@ -1,8 +1,8 @@
 {
   "loop": "pitched-placement-v5-fresh-holdout-20260714",
-  "stage": "ANSWER_GRID_AND_SCHEDULE_REGISTERED",
-  "status": "mit-building-j-approved-asbuilt-grid-and-count-calibrated-exact-heads-still-blocked",
-  "iteration": 7,
+  "stage": "EXACT_ANSWER_HEAD_XY_REGISTERED",
+  "status": "mit-building-j-approved-asbuilt-68-head-xy-extracted-z-and-planes-still-blocked",
+  "iteration": 8,
   "answerKeyOpened": true,
   "answerOpenedAfterSourceCommit": "551c6081",
   "selectedProject": {
@@ -180,6 +180,29 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
+  "mitBuildingJHeadCoordinateRegistration": {
+    "artifactType": "halofire.mit-riverside-building-j-head-coordinate-registration.v1",
+    "answerCalibrationCommit": "cd6d38f0",
+    "headEvidenceReceiptSha256": "b71b6c5c4869ac0620ba3071de657770b24e36444b1fd086b37ccb19b2f0e59c",
+    "registrationReceiptSha256": "9aaf2c5b5136f6d961505a683e3718b61f758785d5cae7d9d301e94341d9830b",
+    "approvedAsBuiltVectorSymbolsIdentical": true,
+    "approvedAsBuiltMaximumCoordinateDeltaPt": 0,
+    "candidateOuterCircleCount": 69,
+    "excludedCrossedValveCount": 1,
+    "pendentHeadCount": 15,
+    "uprightHeadCount": 53,
+    "totalHeadCount": 68,
+    "uniqueHeadIdCount": 68,
+    "allHeadsInsideStructuralEnvelope": true,
+    "exactAnswerHeadCoordinatesReady": true,
+    "headElevationsReady": false,
+    "wholeRoofHeadPlaneAssignmentReady": false,
+    "branchPipeTopologyReady": false,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
   "comparisonResult": {
     "status": "passed-domain-guard-failed-placement-coverage",
     "wrongDomainGuardWorked": true,
@@ -202,6 +225,8 @@
     "mitBuildingJSourceAdversarialMutationCases": { "passed": 16, "attempted": 16 },
     "mitBuildingJAnswerCalibrationFocusedTests": { "passed": 10, "failed": 0, "files": 2 },
     "mitBuildingJAnswerCalibrationAdversarialMutationCases": { "passed": 19, "attempted": 19 },
+    "mitBuildingJHeadCoordinateFocusedTests": { "passed": 15, "failed": 0, "files": 3 },
+    "mitBuildingJHeadCoordinateAdversarialMutationCases": { "passed": 19, "attempted": 19 },
     "releaseWidthTests": { "passed": 1937, "failed": 0, "files": 230, "nodeNativePassed": 20 },
     "authenticatedApi": { "anonymousStatus": 401, "authenticatedStatus": 200, "cacheControl": "private, no-store" },
     "authenticatedStudioBrowser": {
@@ -262,7 +287,6 @@
   "blockedClaims": [
     "mit-building-j-exact-floor-footprint",
     "mit-building-j-exact-roof-face-topology",
-    "mit-building-j-exact-head-coordinate-registration",
     "mit-building-j-head-elevation-registration",
     "mit-building-j-whole-roof-head-plane-assignment",
     "mit-building-j-pitched-head-placement",
@@ -275,5 +299,5 @@
     "fabrication",
     "field-release"
   ],
-  "nextAction": "extract all 68 Building J answer head coordinates and branch connectivity on the immutable structural grid, bind each head to source ceiling and roof planes from the sections, then return the learned topology rules to Polaris and a genuinely fresh holdout without weakening compliance or fabrication gates"
+  "nextAction": "extract Building J answer branch connectivity, bind all 68 exact XY heads to source RCP and section protection planes and elevations, then learn transferable rules and return them to Polaris and a genuinely fresh holdout without weakening compliance or fabrication gates"
 }

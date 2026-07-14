@@ -1,5 +1,14 @@
 # HaloFire Build Log
 
+## 2026-07-14 - MIT Riverside Building J exact approved/as-built head XY extraction
+
+- Parsed the approved and as-built Building J page-2 vector paths instead of tracing raster pixels. Both documents yield the same 69 outer symbol circles at zero coordinate delta.
+- Classified the CAD symbols deterministically: 15 pendent symbols contain 13 concentric circles, 53 upright symbols contain one circle, and one crossed-valve circle is excluded by its two diagonal valve strokes. The resulting 68 heads reconcile exactly to the completed schedule.
+- Transformed every head from unrotated PDF points through the sealed crop transform onto the immutable structural grid. All 68 unique heads fall inside the 76.333333 ft by 100.166667 ft source envelope.
+- Added exact top-view completed-bid XY proof with 53 upright and 15 pendent marks. Individual Z, protection-plane assignment, branch connectivity, source-generated placement, compliance, fabrication, and field release remain false; elevation and 3D proof explicitly render no invented heads.
+- Verification: approved/as-built vector replay is identical; deterministic evidence and registration receipts passed; 15 focused tests across the source, count/grid, and XY loops passed; all 19 receipt/order/count/valve/coordinate/class/Z/plane/pipe/compliance/release mutations were rejected; production build passed.
+- Next: extract branch connectivity and bind all 68 XY heads to source RCP/section protection planes and elevations before learning transferable placement rules and running a second fresh pitched-roof holdout.
+
 ## 2026-07-14 - MIT Riverside Building J completed-bid grid and schedule registration
 
 - Opened the separately hashed approved and as-built Building J sheets only after source commit `551c6081` was pushed. Raster comparison proves the two page-2 layouts are pixel-identical outside the disclosed as-built stamp mask.

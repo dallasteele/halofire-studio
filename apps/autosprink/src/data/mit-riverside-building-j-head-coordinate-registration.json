@@ -1,0 +1,1003 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-head-coordinate-registration.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "answerCalibrationCommit": "cd6d38f0",
+  "answerCalibrationReceiptSha256": "0cdc912de604731bef8e51cf860ab6c18fd021f101f25636bd10446dae058710",
+  "headCoordinateEvidenceReceiptSha256": "b71b6c5c4869ac0620ba3071de657770b24e36444b1fd086b37ccb19b2f0e59c",
+  "registrationMode": "approved-and-asbuilt-identical-vector-symbols-on-immutable-structural-grid",
+  "counts": {
+    "pendent": 15,
+    "upright": 53,
+    "total": 68
+  },
+  "excludedCrossedValveCount": 1,
+  "coordinateSystem": {
+    "axes": "local structural grid feet",
+    "widthFt": 76.333333,
+    "depthFt": 100.166667,
+    "maximumSourceGridResidualPx": 0.798381
+  },
+  "heads": [
+    {
+      "id": "MIT-J-U-001",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.240791,
+        "y": 5.53954
+      },
+      "approvedPagePointPt": {
+        "x": 313.799988,
+        "y": 962.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-002",
+      "kind": "upright",
+      "localFt": {
+        "x": 15.241941,
+        "y": 5.53954
+      },
+      "approvedPagePointPt": {
+        "x": 313.799988,
+        "y": 872.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-003",
+      "kind": "upright",
+      "localFt": {
+        "x": 25.243092,
+        "y": 5.53954
+      },
+      "approvedPagePointPt": {
+        "x": 313.799988,
+        "y": 782.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-004",
+      "kind": "upright",
+      "localFt": {
+        "x": 35.244242,
+        "y": 5.53954
+      },
+      "approvedPagePointPt": {
+        "x": 313.799988,
+        "y": 692.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-005",
+      "kind": "upright",
+      "localFt": {
+        "x": 45.245393,
+        "y": 5.53954
+      },
+      "approvedPagePointPt": {
+        "x": 313.799988,
+        "y": 602.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-006",
+      "kind": "upright",
+      "localFt": {
+        "x": 55.246544,
+        "y": 5.53954
+      },
+      "approvedPagePointPt": {
+        "x": 313.799988,
+        "y": 512.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-007",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.240791,
+        "y": 16.208364
+      },
+      "approvedPagePointPt": {
+        "x": 409.799988,
+        "y": 962.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-008",
+      "kind": "upright",
+      "localFt": {
+        "x": 15.241941,
+        "y": 16.208364
+      },
+      "approvedPagePointPt": {
+        "x": 409.799988,
+        "y": 872.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-009",
+      "kind": "upright",
+      "localFt": {
+        "x": 25.243092,
+        "y": 16.208364
+      },
+      "approvedPagePointPt": {
+        "x": 409.799988,
+        "y": 782.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-010",
+      "kind": "upright",
+      "localFt": {
+        "x": 35.244242,
+        "y": 16.208364
+      },
+      "approvedPagePointPt": {
+        "x": 409.799988,
+        "y": 692.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-011",
+      "kind": "upright",
+      "localFt": {
+        "x": 45.245393,
+        "y": 16.208364
+      },
+      "approvedPagePointPt": {
+        "x": 409.799988,
+        "y": 602.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-012",
+      "kind": "upright",
+      "localFt": {
+        "x": 55.246544,
+        "y": 16.208364
+      },
+      "approvedPagePointPt": {
+        "x": 409.799988,
+        "y": 512.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-013",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.240791,
+        "y": 26.877188
+      },
+      "approvedPagePointPt": {
+        "x": 505.799988,
+        "y": 962.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-014",
+      "kind": "upright",
+      "localFt": {
+        "x": 15.241941,
+        "y": 26.877188
+      },
+      "approvedPagePointPt": {
+        "x": 505.799988,
+        "y": 872.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-015",
+      "kind": "upright",
+      "localFt": {
+        "x": 25.243092,
+        "y": 26.877188
+      },
+      "approvedPagePointPt": {
+        "x": 505.799988,
+        "y": 782.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-016",
+      "kind": "upright",
+      "localFt": {
+        "x": 35.244242,
+        "y": 26.877188
+      },
+      "approvedPagePointPt": {
+        "x": 505.799988,
+        "y": 692.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-017",
+      "kind": "upright",
+      "localFt": {
+        "x": 45.245393,
+        "y": 26.877188
+      },
+      "approvedPagePointPt": {
+        "x": 505.799988,
+        "y": 602.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-018",
+      "kind": "upright",
+      "localFt": {
+        "x": 55.246544,
+        "y": 26.877188
+      },
+      "approvedPagePointPt": {
+        "x": 505.799988,
+        "y": 512.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-019",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.240791,
+        "y": 38.332839
+      },
+      "approvedPagePointPt": {
+        "x": 608.880005,
+        "y": 962.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-020",
+      "kind": "upright",
+      "localFt": {
+        "x": 15.241941,
+        "y": 38.332839
+      },
+      "approvedPagePointPt": {
+        "x": 608.880005,
+        "y": 872.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-021",
+      "kind": "upright",
+      "localFt": {
+        "x": 25.243092,
+        "y": 38.332839
+      },
+      "approvedPagePointPt": {
+        "x": 608.880005,
+        "y": 782.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-022",
+      "kind": "upright",
+      "localFt": {
+        "x": 35.244242,
+        "y": 38.332839
+      },
+      "approvedPagePointPt": {
+        "x": 608.880005,
+        "y": 692.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-023",
+      "kind": "upright",
+      "localFt": {
+        "x": 45.245393,
+        "y": 38.332839
+      },
+      "approvedPagePointPt": {
+        "x": 608.880005,
+        "y": 602.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-024",
+      "kind": "upright",
+      "localFt": {
+        "x": 55.246544,
+        "y": 38.332839
+      },
+      "approvedPagePointPt": {
+        "x": 608.880005,
+        "y": 512.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-025",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.240791,
+        "y": 49.001663
+      },
+      "approvedPagePointPt": {
+        "x": 704.880005,
+        "y": 962.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-026",
+      "kind": "upright",
+      "localFt": {
+        "x": 15.241941,
+        "y": 49.001663
+      },
+      "approvedPagePointPt": {
+        "x": 704.880005,
+        "y": 872.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-027",
+      "kind": "upright",
+      "localFt": {
+        "x": 25.243092,
+        "y": 49.001663
+      },
+      "approvedPagePointPt": {
+        "x": 704.880005,
+        "y": 782.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-028",
+      "kind": "upright",
+      "localFt": {
+        "x": 35.244242,
+        "y": 49.001663
+      },
+      "approvedPagePointPt": {
+        "x": 704.880005,
+        "y": 692.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-029",
+      "kind": "upright",
+      "localFt": {
+        "x": 45.245393,
+        "y": 49.001663
+      },
+      "approvedPagePointPt": {
+        "x": 704.880005,
+        "y": 602.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-030",
+      "kind": "upright",
+      "localFt": {
+        "x": 55.246544,
+        "y": 49.001663
+      },
+      "approvedPagePointPt": {
+        "x": 704.880005,
+        "y": 512.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-031",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.240791,
+        "y": 59.670487
+      },
+      "approvedPagePointPt": {
+        "x": 800.880005,
+        "y": 962.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-032",
+      "kind": "upright",
+      "localFt": {
+        "x": 15.241941,
+        "y": 59.670487
+      },
+      "approvedPagePointPt": {
+        "x": 800.880005,
+        "y": 872.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-033",
+      "kind": "upright",
+      "localFt": {
+        "x": 25.243092,
+        "y": 59.670487
+      },
+      "approvedPagePointPt": {
+        "x": 800.880005,
+        "y": 782.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-034",
+      "kind": "upright",
+      "localFt": {
+        "x": 35.244242,
+        "y": 59.670487
+      },
+      "approvedPagePointPt": {
+        "x": 800.880005,
+        "y": 692.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-035",
+      "kind": "upright",
+      "localFt": {
+        "x": 45.245393,
+        "y": 59.670487
+      },
+      "approvedPagePointPt": {
+        "x": 800.880005,
+        "y": 602.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-036",
+      "kind": "upright",
+      "localFt": {
+        "x": 55.246544,
+        "y": 59.670487
+      },
+      "approvedPagePointPt": {
+        "x": 800.880005,
+        "y": 512.519958
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-037",
+      "kind": "upright",
+      "localFt": {
+        "x": 68.634745,
+        "y": 68.965701
+      },
+      "approvedPagePointPt": {
+        "x": 884.52002,
+        "y": 392.040009
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-001",
+      "kind": "pendent",
+      "localFt": {
+        "x": 4.320688,
+        "y": 71.272828
+      },
+      "approvedPagePointPt": {
+        "x": 905.279968,
+        "y": 970.799927
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-002",
+      "kind": "pendent",
+      "localFt": {
+        "x": 13.321731,
+        "y": 71.272828
+      },
+      "approvedPagePointPt": {
+        "x": 905.279968,
+        "y": 889.799866
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-003",
+      "kind": "pendent",
+      "localFt": {
+        "x": 37.777866,
+        "y": 71.272835
+      },
+      "approvedPagePointPt": {
+        "x": 905.280029,
+        "y": 669.719971
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-004",
+      "kind": "pendent",
+      "localFt": {
+        "x": 45.778793,
+        "y": 71.272835
+      },
+      "approvedPagePointPt": {
+        "x": 905.280029,
+        "y": 597.71991
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-038",
+      "kind": "upright",
+      "localFt": {
+        "x": 19.709116,
+        "y": 71.966308
+      },
+      "approvedPagePointPt": {
+        "x": 911.52002,
+        "y": 832.320007
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-039",
+      "kind": "upright",
+      "localFt": {
+        "x": 30.216992,
+        "y": 71.966308
+      },
+      "approvedPagePointPt": {
+        "x": 911.52002,
+        "y": 737.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-040",
+      "kind": "upright",
+      "localFt": {
+        "x": 49.219178,
+        "y": 71.966308
+      },
+      "approvedPagePointPt": {
+        "x": 911.52002,
+        "y": 566.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-041",
+      "kind": "upright",
+      "localFt": {
+        "x": 56.219983,
+        "y": 71.966308
+      },
+      "approvedPagePointPt": {
+        "x": 911.52002,
+        "y": 503.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-042",
+      "kind": "upright",
+      "localFt": {
+        "x": 64.220904,
+        "y": 71.966308
+      },
+      "approvedPagePointPt": {
+        "x": 911.52002,
+        "y": 431.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-043",
+      "kind": "upright",
+      "localFt": {
+        "x": 68.634745,
+        "y": 71.966308
+      },
+      "approvedPagePointPt": {
+        "x": 911.52002,
+        "y": 392.040009
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-005",
+      "kind": "pendent",
+      "localFt": {
+        "x": 4.320702,
+        "y": 83.275255
+      },
+      "approvedPagePointPt": {
+        "x": 1013.279968,
+        "y": 970.799805
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-006",
+      "kind": "pendent",
+      "localFt": {
+        "x": 13.321744,
+        "y": 83.275255
+      },
+      "approvedPagePointPt": {
+        "x": 1013.279968,
+        "y": 889.799744
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-007",
+      "kind": "pendent",
+      "localFt": {
+        "x": 41.298317,
+        "y": 83.461959
+      },
+      "approvedPagePointPt": {
+        "x": 1014.959961,
+        "y": 638.039551
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-008",
+      "kind": "pendent",
+      "localFt": {
+        "x": 53.299705,
+        "y": 83.461959
+      },
+      "approvedPagePointPt": {
+        "x": 1014.959961,
+        "y": 530.03949
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-009",
+      "kind": "pendent",
+      "localFt": {
+        "x": 65.301092,
+        "y": 83.461959
+      },
+      "approvedPagePointPt": {
+        "x": 1014.959961,
+        "y": 422.039429
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-044",
+      "kind": "upright",
+      "localFt": {
+        "x": 19.709116,
+        "y": 83.968731
+      },
+      "approvedPagePointPt": {
+        "x": 1019.519989,
+        "y": 832.320007
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-045",
+      "kind": "upright",
+      "localFt": {
+        "x": 30.216992,
+        "y": 83.968731
+      },
+      "approvedPagePointPt": {
+        "x": 1019.519989,
+        "y": 737.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-046",
+      "kind": "upright",
+      "localFt": {
+        "x": 40.218142,
+        "y": 83.968734
+      },
+      "approvedPagePointPt": {
+        "x": 1019.52002,
+        "y": 647.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-047",
+      "kind": "upright",
+      "localFt": {
+        "x": 50.219293,
+        "y": 83.968734
+      },
+      "approvedPagePointPt": {
+        "x": 1019.52002,
+        "y": 557.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-048",
+      "kind": "upright",
+      "localFt": {
+        "x": 60.220443,
+        "y": 83.968734
+      },
+      "approvedPagePointPt": {
+        "x": 1019.52002,
+        "y": 467.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-049",
+      "kind": "upright",
+      "localFt": {
+        "x": 70.221594,
+        "y": 83.968734
+      },
+      "approvedPagePointPt": {
+        "x": 1019.52002,
+        "y": 377.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-010",
+      "kind": "pendent",
+      "localFt": {
+        "x": 32.2706,
+        "y": 86.835973
+      },
+      "approvedPagePointPt": {
+        "x": 1045.319946,
+        "y": 719.279663
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-050",
+      "kind": "upright",
+      "localFt": {
+        "x": 40.218142,
+        "y": 93.463981
+      },
+      "approvedPagePointPt": {
+        "x": 1104.959961,
+        "y": 647.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-051",
+      "kind": "upright",
+      "localFt": {
+        "x": 50.219293,
+        "y": 93.463981
+      },
+      "approvedPagePointPt": {
+        "x": 1104.959961,
+        "y": 557.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-052",
+      "kind": "upright",
+      "localFt": {
+        "x": 60.220443,
+        "y": 93.463981
+      },
+      "approvedPagePointPt": {
+        "x": 1104.959961,
+        "y": 467.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-U-053",
+      "kind": "upright",
+      "localFt": {
+        "x": 70.221594,
+        "y": 93.463981
+      },
+      "approvedPagePointPt": {
+        "x": 1104.959961,
+        "y": 377.76001
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-011",
+      "kind": "pendent",
+      "localFt": {
+        "x": 23.629577,
+        "y": 94.81092
+      },
+      "approvedPagePointPt": {
+        "x": 1117.079956,
+        "y": 797.039917
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-012",
+      "kind": "pendent",
+      "localFt": {
+        "x": 32.270607,
+        "y": 94.837591
+      },
+      "approvedPagePointPt": {
+        "x": 1117.319946,
+        "y": 719.279602
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-013",
+      "kind": "pendent",
+      "localFt": {
+        "x": 41.298345,
+        "y": 94.970959
+      },
+      "approvedPagePointPt": {
+        "x": 1118.52002,
+        "y": 638.039307
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-014",
+      "kind": "pendent",
+      "localFt": {
+        "x": 53.299732,
+        "y": 94.970959
+      },
+      "approvedPagePointPt": {
+        "x": 1118.52002,
+        "y": 530.039246
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    },
+    {
+      "id": "MIT-J-P-015",
+      "kind": "pendent",
+      "localFt": {
+        "x": 65.30112,
+        "y": 94.970959
+      },
+      "approvedPagePointPt": {
+        "x": 1118.52002,
+        "y": 422.039185
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null
+    }
+  ],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "approved page-2 vector symbol extraction and structural-grid transform"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "as-built page-2 vector extraction with zero coordinate delta and schedule reconciliation"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "receipt, commit, count, symbol class, coordinate transform, valve exclusion, Z, plane, compliance, and release mutations"
+    }
+  },
+  "exactAnswerHeadCoordinatesReady": true,
+  "approvedAsBuiltHeadCoordinateContinuityReady": true,
+  "headElevationsReady": false,
+  "wholeRoofHeadPlaneAssignmentReady": false,
+  "branchPipeTopologyReady": false,
+  "sourceGeneratedPitchedPlacementVerified": false,
+  "freshProjectPlacementVerified": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "extract answer branch connectivity, bind the 68 XY heads to source RCP/section protection planes and elevations, then learn transferable rules before a second fresh pitched-roof holdout",
+  "claimStatus": "exact-completed-bid-approved-asbuilt-head-xy-registered-not-z-plane-source-generated-compliance-fabrication-or-field-release",
+  "receiptSha256": "9aaf2c5b5136f6d961505a683e3718b61f758785d5cae7d9d301e94341d9830b"
+}

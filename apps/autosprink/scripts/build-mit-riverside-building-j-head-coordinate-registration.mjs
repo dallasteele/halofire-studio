@@ -1,0 +1,24 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildMitRiversideBuildingJHeadCoordinateRegistration, renderMitRiversideBuildingJHeadRegistrationViews, sealMitRiversideBuildingJHeadCoordinateEvidence, validateMitRiversideBuildingJHeadCoordinateEvidence, validateMitRiversideBuildingJHeadCoordinateRegistration, verifyMitRiversideBuildingJHeadRegistrationAdversarialLoop } from '../src/engine/mit-riverside-building-j-head-coordinate-registration.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const data = (name) => path.join(root, 'src', 'data', name);
+const read = (name) => JSON.parse(fs.readFileSync(data(name), 'utf8'));
+const answerCalibration = read('mit-riverside-building-j-pitched-layout-calibration.json');
+const headEvidence = await sealMitRiversideBuildingJHeadCoordinateEvidence(read('mit-riverside-building-j-head-coordinate-evidence.json'));
+const dependencies = { answerCalibration, headEvidence };
+const evidenceValidation = await validateMitRiversideBuildingJHeadCoordinateEvidence(headEvidence);
+const registration = await buildMitRiversideBuildingJHeadCoordinateRegistration(answerCalibration, headEvidence);
+const registrationValidation = await validateMitRiversideBuildingJHeadCoordinateRegistration(registration, dependencies);
+const adversarial = await verifyMitRiversideBuildingJHeadRegistrationAdversarialLoop(registration, dependencies);
+if ([evidenceValidation.status, registrationValidation.status, adversarial.status].some((status) => status !== 'passed')) throw new Error(JSON.stringify({ evidenceValidation, registrationValidation, adversarial }, null, 2));
+fs.writeFileSync(data('mit-riverside-building-j-head-coordinate-evidence.json'), `${JSON.stringify(headEvidence, null, 2)}\n`);
+fs.writeFileSync(data('mit-riverside-building-j-head-coordinate-registration.json'), `${JSON.stringify(registration, null, 2)}\n`);
+const out = path.join(root, 'out', 'visual-proof', 'mit-riverside-building-j-head-coordinates');
+fs.mkdirSync(out, { recursive: true });
+const views = renderMitRiversideBuildingJHeadRegistrationViews(registration);
+for (const [name, svg] of Object.entries({ top: views.topSvg, elevation: views.elevationSvg, model3d: views.model3dSvg })) fs.writeFileSync(path.join(out, `mit-riverside-building-j-head-coordinates-${name}.svg`), svg);
+fs.writeFileSync(path.join(out, 'mit-riverside-building-j-head-coordinates-proof.json'), `${JSON.stringify({ evidenceValidation, registrationValidation, adversarial, headEvidenceReceiptSha256: headEvidence.receiptSha256, registrationReceiptSha256: registration.receiptSha256 }, null, 2)}\n`);
+console.log(JSON.stringify({ evidenceValidation, registrationValidation, adversarial, headEvidenceReceiptSha256: headEvidence.receiptSha256, registrationReceiptSha256: registration.receiptSha256, out }, null, 2));

@@ -1,0 +1,1347 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-head-coordinate-evidence.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "answerCalibrationCommit": "cd6d38f0",
+  "answerEvidenceReceiptSha256": "1c1ac44482e7a2bba7f8356a75277da3245306eb0d23429085e737f8ff2752bc",
+  "answerDocuments": {
+    "approvedSha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+    "asBuiltSha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+    "physicalPage": 2
+  },
+  "extraction": {
+    "method": "PyMuPDF vector-path classification on immutable approved/as-built page 2",
+    "pageCoordinateSystem": "unrotated PDF points",
+    "planClipUnrotatedPt": [
+      120,
+      142,
+      1500,
+      1342
+    ],
+    "outerCircleWidthPt": 9,
+    "pendentCenteredCircleCount": 13,
+    "uprightCenteredCircleCount": 1,
+    "candidateOuterCircleCount": 69,
+    "excludedCrossedValveCount": 1,
+    "approvedAsBuiltVectorSymbolsIdentical": true,
+    "approvedAsBuiltMaximumCoordinateDeltaPt": 0
+  },
+  "counts": {
+    "pendent": 15,
+    "upright": 53,
+    "total": 68
+  },
+  "excludedSymbols": [
+    {
+      "kind": "crossed-valve",
+      "pagePointPt": {
+        "x": 867.719971,
+        "y": 345.47998
+      }
+    }
+  ],
+  "heads": [
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 313.799988,
+        "y": 962.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1517.920168,
+        "y": 775.199952
+      },
+      "localFt": {
+        "x": 5.240791,
+        "y": 5.53954
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-001"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 313.799988,
+        "y": 872.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1877.920168,
+        "y": 775.199952
+      },
+      "localFt": {
+        "x": 15.241941,
+        "y": 5.53954
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-002"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 313.799988,
+        "y": 782.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2237.920168,
+        "y": 775.199952
+      },
+      "localFt": {
+        "x": 25.243092,
+        "y": 5.53954
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-003"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 313.799988,
+        "y": 692.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2597.920168,
+        "y": 775.199952
+      },
+      "localFt": {
+        "x": 35.244242,
+        "y": 5.53954
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-004"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 313.799988,
+        "y": 602.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2957.920168,
+        "y": 775.199952
+      },
+      "localFt": {
+        "x": 45.245393,
+        "y": 5.53954
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-005"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 313.799988,
+        "y": 512.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3317.920168,
+        "y": 775.199952
+      },
+      "localFt": {
+        "x": 55.246544,
+        "y": 5.53954
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-006"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 409.799988,
+        "y": 962.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1517.920168,
+        "y": 1159.199952
+      },
+      "localFt": {
+        "x": 5.240791,
+        "y": 16.208364
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-007"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 409.799988,
+        "y": 872.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1877.920168,
+        "y": 1159.199952
+      },
+      "localFt": {
+        "x": 15.241941,
+        "y": 16.208364
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-008"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 409.799988,
+        "y": 782.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2237.920168,
+        "y": 1159.199952
+      },
+      "localFt": {
+        "x": 25.243092,
+        "y": 16.208364
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-009"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 409.799988,
+        "y": 692.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2597.920168,
+        "y": 1159.199952
+      },
+      "localFt": {
+        "x": 35.244242,
+        "y": 16.208364
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-010"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 409.799988,
+        "y": 602.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2957.920168,
+        "y": 1159.199952
+      },
+      "localFt": {
+        "x": 45.245393,
+        "y": 16.208364
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-011"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 409.799988,
+        "y": 512.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3317.920168,
+        "y": 1159.199952
+      },
+      "localFt": {
+        "x": 55.246544,
+        "y": 16.208364
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-012"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 505.799988,
+        "y": 962.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1517.920168,
+        "y": 1543.199952
+      },
+      "localFt": {
+        "x": 5.240791,
+        "y": 26.877188
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-013"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 505.799988,
+        "y": 872.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1877.920168,
+        "y": 1543.199952
+      },
+      "localFt": {
+        "x": 15.241941,
+        "y": 26.877188
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-014"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 505.799988,
+        "y": 782.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2237.920168,
+        "y": 1543.199952
+      },
+      "localFt": {
+        "x": 25.243092,
+        "y": 26.877188
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-015"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 505.799988,
+        "y": 692.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2597.920168,
+        "y": 1543.199952
+      },
+      "localFt": {
+        "x": 35.244242,
+        "y": 26.877188
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-016"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 505.799988,
+        "y": 602.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2957.920168,
+        "y": 1543.199952
+      },
+      "localFt": {
+        "x": 45.245393,
+        "y": 26.877188
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-017"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 505.799988,
+        "y": 512.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3317.920168,
+        "y": 1543.199952
+      },
+      "localFt": {
+        "x": 55.246544,
+        "y": 26.877188
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-018"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 608.880005,
+        "y": 962.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1517.920168,
+        "y": 1955.52002
+      },
+      "localFt": {
+        "x": 5.240791,
+        "y": 38.332839
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-019"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 608.880005,
+        "y": 872.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1877.920168,
+        "y": 1955.52002
+      },
+      "localFt": {
+        "x": 15.241941,
+        "y": 38.332839
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-020"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 608.880005,
+        "y": 782.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2237.920168,
+        "y": 1955.52002
+      },
+      "localFt": {
+        "x": 25.243092,
+        "y": 38.332839
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-021"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 608.880005,
+        "y": 692.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2597.920168,
+        "y": 1955.52002
+      },
+      "localFt": {
+        "x": 35.244242,
+        "y": 38.332839
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-022"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 608.880005,
+        "y": 602.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2957.920168,
+        "y": 1955.52002
+      },
+      "localFt": {
+        "x": 45.245393,
+        "y": 38.332839
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-023"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 608.880005,
+        "y": 512.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3317.920168,
+        "y": 1955.52002
+      },
+      "localFt": {
+        "x": 55.246544,
+        "y": 38.332839
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-024"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 704.880005,
+        "y": 962.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1517.920168,
+        "y": 2339.52002
+      },
+      "localFt": {
+        "x": 5.240791,
+        "y": 49.001663
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-025"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 704.880005,
+        "y": 872.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1877.920168,
+        "y": 2339.52002
+      },
+      "localFt": {
+        "x": 15.241941,
+        "y": 49.001663
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-026"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 704.880005,
+        "y": 782.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2237.920168,
+        "y": 2339.52002
+      },
+      "localFt": {
+        "x": 25.243092,
+        "y": 49.001663
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-027"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 704.880005,
+        "y": 692.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2597.920168,
+        "y": 2339.52002
+      },
+      "localFt": {
+        "x": 35.244242,
+        "y": 49.001663
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-028"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 704.880005,
+        "y": 602.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2957.920168,
+        "y": 2339.52002
+      },
+      "localFt": {
+        "x": 45.245393,
+        "y": 49.001663
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-029"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 704.880005,
+        "y": 512.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3317.920168,
+        "y": 2339.52002
+      },
+      "localFt": {
+        "x": 55.246544,
+        "y": 49.001663
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-030"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 800.880005,
+        "y": 962.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1517.920168,
+        "y": 2723.52002
+      },
+      "localFt": {
+        "x": 5.240791,
+        "y": 59.670487
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-031"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 800.880005,
+        "y": 872.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 1877.920168,
+        "y": 2723.52002
+      },
+      "localFt": {
+        "x": 15.241941,
+        "y": 59.670487
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-032"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 800.880005,
+        "y": 782.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2237.920168,
+        "y": 2723.52002
+      },
+      "localFt": {
+        "x": 25.243092,
+        "y": 59.670487
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-033"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 800.880005,
+        "y": 692.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2597.920168,
+        "y": 2723.52002
+      },
+      "localFt": {
+        "x": 35.244242,
+        "y": 59.670487
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-034"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 800.880005,
+        "y": 602.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2957.920168,
+        "y": 2723.52002
+      },
+      "localFt": {
+        "x": 45.245393,
+        "y": 59.670487
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-035"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 800.880005,
+        "y": 512.519958
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3317.920168,
+        "y": 2723.52002
+      },
+      "localFt": {
+        "x": 55.246544,
+        "y": 59.670487
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-036"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 884.52002,
+        "y": 392.040009
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3799.839964,
+        "y": 3058.08008
+      },
+      "localFt": {
+        "x": 68.634745,
+        "y": 68.965701
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-037"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 905.279968,
+        "y": 970.799927
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 1484.800292,
+        "y": 3141.119872
+      },
+      "localFt": {
+        "x": 4.320688,
+        "y": 71.272828
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-001"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 905.279968,
+        "y": 889.799866
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 1808.800536,
+        "y": 3141.119872
+      },
+      "localFt": {
+        "x": 13.321731,
+        "y": 71.272828
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-002"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 905.280029,
+        "y": 669.719971
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 2689.120116,
+        "y": 3141.120116
+      },
+      "localFt": {
+        "x": 37.777866,
+        "y": 71.272835
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-003"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 905.280029,
+        "y": 597.71991
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 2977.12036,
+        "y": 3141.120116
+      },
+      "localFt": {
+        "x": 45.778793,
+        "y": 71.272835
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-004"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 911.52002,
+        "y": 832.320007
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2038.719972,
+        "y": 3166.08008
+      },
+      "localFt": {
+        "x": 19.709116,
+        "y": 71.966308
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-038"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 911.52002,
+        "y": 737.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2416.95996,
+        "y": 3166.08008
+      },
+      "localFt": {
+        "x": 30.216992,
+        "y": 71.966308
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-039"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 911.52002,
+        "y": 566.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3100.95996,
+        "y": 3166.08008
+      },
+      "localFt": {
+        "x": 49.219178,
+        "y": 71.966308
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-040"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 911.52002,
+        "y": 503.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3352.95996,
+        "y": 3166.08008
+      },
+      "localFt": {
+        "x": 56.219983,
+        "y": 71.966308
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-041"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 911.52002,
+        "y": 431.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3640.95996,
+        "y": 3166.08008
+      },
+      "localFt": {
+        "x": 64.220904,
+        "y": 71.966308
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-042"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 911.52002,
+        "y": 392.040009
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3799.839964,
+        "y": 3166.08008
+      },
+      "localFt": {
+        "x": 68.634745,
+        "y": 71.966308
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-043"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1013.279968,
+        "y": 970.799805
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 1484.80078,
+        "y": 3573.119872
+      },
+      "localFt": {
+        "x": 4.320702,
+        "y": 83.275255
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-005"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1013.279968,
+        "y": 889.799744
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 1808.801024,
+        "y": 3573.119872
+      },
+      "localFt": {
+        "x": 13.321744,
+        "y": 83.275255
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-006"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1014.959961,
+        "y": 638.039551
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 2815.841796,
+        "y": 3579.839844
+      },
+      "localFt": {
+        "x": 41.298317,
+        "y": 83.461959
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-007"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1014.959961,
+        "y": 530.03949
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 3247.84204,
+        "y": 3579.839844
+      },
+      "localFt": {
+        "x": 53.299705,
+        "y": 83.461959
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-008"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1014.959961,
+        "y": 422.039429
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 3679.842284,
+        "y": 3579.839844
+      },
+      "localFt": {
+        "x": 65.301092,
+        "y": 83.461959
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-009"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1019.519989,
+        "y": 832.320007
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2038.719972,
+        "y": 3598.079956
+      },
+      "localFt": {
+        "x": 19.709116,
+        "y": 83.968731
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-044"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1019.519989,
+        "y": 737.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2416.95996,
+        "y": 3598.079956
+      },
+      "localFt": {
+        "x": 30.216992,
+        "y": 83.968731
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-045"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1019.52002,
+        "y": 647.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2776.95996,
+        "y": 3598.08008
+      },
+      "localFt": {
+        "x": 40.218142,
+        "y": 83.968734
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-046"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1019.52002,
+        "y": 557.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3136.95996,
+        "y": 3598.08008
+      },
+      "localFt": {
+        "x": 50.219293,
+        "y": 83.968734
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-047"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1019.52002,
+        "y": 467.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3496.95996,
+        "y": 3598.08008
+      },
+      "localFt": {
+        "x": 60.220443,
+        "y": 83.968734
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-048"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1019.52002,
+        "y": 377.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3856.95996,
+        "y": 3598.08008
+      },
+      "localFt": {
+        "x": 70.221594,
+        "y": 83.968734
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-049"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1045.319946,
+        "y": 719.279663
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 2490.881348,
+        "y": 3701.279784
+      },
+      "localFt": {
+        "x": 32.2706,
+        "y": 86.835973
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-010"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1104.959961,
+        "y": 647.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 2776.95996,
+        "y": 3939.839844
+      },
+      "localFt": {
+        "x": 40.218142,
+        "y": 93.463981
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-050"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1104.959961,
+        "y": 557.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3136.95996,
+        "y": 3939.839844
+      },
+      "localFt": {
+        "x": 50.219293,
+        "y": 93.463981
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-051"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1104.959961,
+        "y": 467.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3496.95996,
+        "y": 3939.839844
+      },
+      "localFt": {
+        "x": 60.220443,
+        "y": 93.463981
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-052"
+    },
+    {
+      "kind": "upright",
+      "pagePointPt": {
+        "x": 1104.959961,
+        "y": 377.76001
+      },
+      "centeredCircleCount": 1,
+      "cropPixel": {
+        "x": 3856.95996,
+        "y": 3939.839844
+      },
+      "localFt": {
+        "x": 70.221594,
+        "y": 93.463981
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-U-053"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1117.079956,
+        "y": 797.039917
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 2179.840332,
+        "y": 3988.319824
+      },
+      "localFt": {
+        "x": 23.629577,
+        "y": 94.81092
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-011"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1117.319946,
+        "y": 719.279602
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 2490.881592,
+        "y": 3989.279784
+      },
+      "localFt": {
+        "x": 32.270607,
+        "y": 94.837591
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-012"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1118.52002,
+        "y": 638.039307
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 2815.842772,
+        "y": 3994.08008
+      },
+      "localFt": {
+        "x": 41.298345,
+        "y": 94.970959
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-013"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1118.52002,
+        "y": 530.039246
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 3247.843016,
+        "y": 3994.08008
+      },
+      "localFt": {
+        "x": 53.299732,
+        "y": 94.970959
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-014"
+    },
+    {
+      "kind": "pendent",
+      "pagePointPt": {
+        "x": 1118.52002,
+        "y": 422.039185
+      },
+      "centeredCircleCount": 13,
+      "cropPixel": {
+        "x": 3679.84326,
+        "y": 3994.08008
+      },
+      "localFt": {
+        "x": 65.30112,
+        "y": 94.970959
+      },
+      "zFt": null,
+      "sourceProtectionPlaneId": null,
+      "id": "MIT-J-P-015"
+    }
+  ],
+  "claims": {
+    "exactAnswerHeadCoordinatesReady": true,
+    "headElevationsReady": false,
+    "wholeRoofHeadPlaneAssignmentReady": false,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "b71b6c5c4869ac0620ba3071de657770b24e36444b1fd086b37ccb19b2f0e59c"
+}
