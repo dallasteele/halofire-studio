@@ -1,0 +1,517 @@
+{
+  "artifactType": "halofire.winter-garden-pitched-heldout-comparison.v1",
+  "projectId": "lds-meetinghouse-winter-garden-fl",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "sequence": {
+    "sourceCandidateCommit": "b9cfccf6",
+    "sourceCandidateReceiptSha256": "a8ff34f22991c290c783ce92286ff7729b97c65575fdabfefdc2791399365bdb",
+    "sourceSealReceiptSha256": "6828ec8a225b9dfc0c69759493dca0f3ae35b76a5a66071e62d6cdb7f410a46a",
+    "approvedAndAsBuiltOpenedAfterSourceCommit": true,
+    "answersUsedToGenerateSourceCandidate": false
+  },
+  "answerKeys": {
+    "cityApprovedPortfolio": {
+      "sha256": "6e012d46dd20ff5808717d39898fd4b7fe54fcb0f35253ef7be6c3e5f48300f6",
+      "bytes": 6014967
+    },
+    "cityApprovedA002Attachment": {
+      "sha256": "b0d00cdb0db93d80461ad29df686fe301c2d78882e7ab2b355cccbf9ec69dd3e",
+      "bytes": 2898426
+    },
+    "asBuiltA002": {
+      "sha256": "22c8db4dde89ce0ed9ee6625b9d8f8b1918c2ecdb9baf6ff829a9c4118b5b8bb",
+      "bytes": 2888781
+    },
+    "closeoutAsBuilt": {
+      "sha256": "4b6ea3c5027894ad7ccf752c25a82c993d321e0f1f7967c80d114f737bc8c128",
+      "bytes": 7345772,
+      "pageNumber": 2
+    }
+  },
+  "registration": {
+    "sheet": "FP2 FIRE SPRINKLER PLAN",
+    "answerPageNumber": 1,
+    "closeoutPageNumber": 2,
+    "approvedPortfolioAttachment": "A002-FPSPlan-Meetinghouse.pdf.pdf",
+    "embeddedPlanRaster": {
+      "widthPx": 8023,
+      "heightPx": 3314,
+      "approvedSha256": "7fc71ee03360421e3d0421926b37a435440ea025fc475e3c1c4090e91beb2eb2",
+      "asBuiltSha256": "7fc71ee03360421e3d0421926b37a435440ea025fc475e3c1c4090e91beb2eb2",
+      "pageRectPt": [
+        59.209999,
+        198.926392,
+        2198.676758,
+        1082.659912
+      ]
+    },
+    "scopeRectImagePx": [
+      3150,
+      1054,
+      3948,
+      2249
+    ],
+    "mapping": "image x = 3150 + local x / 28.9375 * 798; image y = 2249 - local y / 38.083333 * 1195",
+    "basis": "A103 source dimensions plus the shared architectural underlay wall faces in FP2 register the sealed local Cultural Center axes; no sprinkler centers define the scope transform"
+  },
+  "approvedEvidence": {
+    "primary": {
+      "status": "passed",
+      "method": "unseeded concentric-ring detector in the source-registered room: central dark disk radius 8 px, white annulus 10-13 px, dark outer ring 15-18 px, row-band search, and 70 px non-max suppression",
+      "threshold": 2.5,
+      "detectedCount": 9,
+      "weakestTrueScore": 2.5508,
+      "strongestRejectedScore": 1.7166,
+      "heads": [
+        {
+          "id": "winter-garden-approved-cultural-head-01",
+          "imagePointPx": [
+            3231,
+            1245
+          ],
+          "localPointFt": [
+            2.937265,
+            31.996373
+          ],
+          "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+        },
+        {
+          "id": "winter-garden-approved-cultural-head-02",
+          "imagePointPx": [
+            3535,
+            1245
+          ],
+          "localPointFt": [
+            13.961075,
+            31.996373
+          ],
+          "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+        },
+        {
+          "id": "winter-garden-approved-cultural-head-03",
+          "imagePointPx": [
+            3838,
+            1245
+          ],
+          "localPointFt": [
+            24.948622,
+            31.996373
+          ],
+          "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+        },
+        {
+          "id": "winter-garden-approved-cultural-head-04",
+          "imagePointPx": [
+            3231,
+            1671
+          ],
+          "localPointFt": [
+            2.937265,
+            18.420223
+          ],
+          "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+        },
+        {
+          "id": "winter-garden-approved-cultural-head-05",
+          "imagePointPx": [
+            3535,
+            1671
+          ],
+          "localPointFt": [
+            13.961075,
+            18.420223
+          ],
+          "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+        },
+        {
+          "id": "winter-garden-approved-cultural-head-06",
+          "imagePointPx": [
+            3838,
+            1671
+          ],
+          "localPointFt": [
+            24.948622,
+            18.420223
+          ],
+          "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+        },
+        {
+          "id": "winter-garden-approved-cultural-head-07",
+          "imagePointPx": [
+            3231,
+            2064
+          ],
+          "localPointFt": [
+            2.937265,
+            5.895746
+          ],
+          "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+        },
+        {
+          "id": "winter-garden-approved-cultural-head-08",
+          "imagePointPx": [
+            3535,
+            2064
+          ],
+          "localPointFt": [
+            13.961075,
+            5.895746
+          ],
+          "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+        },
+        {
+          "id": "winter-garden-approved-cultural-head-09",
+          "imagePointPx": [
+            3838,
+            2064
+          ],
+          "localPointFt": [
+            24.948622,
+            5.895746
+          ],
+          "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+        }
+      ]
+    },
+    "independent": {
+      "status": "passed",
+      "method": "visual FP2 branch-line and drop-symbol audit",
+      "planTopology": {
+        "alongRidgeStations": 3,
+        "acrossSlopeStations": 3,
+        "headCount": 9
+      },
+      "conclusion": "three pendent drops on each of three branch lines within Cultural Center 150"
+    },
+    "answerParity": {
+      "status": "passed",
+      "method": "approved portfolio A002 attachment and as-built A002 contain byte-identical 8023 x 3314 embedded plan rasters",
+      "approvedRasterSha256": "7fc71ee03360421e3d0421926b37a435440ea025fc475e3c1c4090e91beb2eb2",
+      "asBuiltRasterSha256": "7fc71ee03360421e3d0421926b37a435440ea025fc475e3c1c4090e91beb2eb2",
+      "centersEqualApproved": true
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "answer-hash, sequence, scope, detector, topology, count, source-span ambiguity, receipt, and false-promotion mutations"
+    }
+  },
+  "sourceGeometryFinding": {
+    "status": "failed-ambiguous-protection-zone-boundary",
+    "sealedCandidateLengthFt": 28.9375,
+    "sealedDimensionLabel": "28'-11 1/4\"",
+    "competingClearSpanLabelOnA103": "25'-10 3/4\"",
+    "effect": "the blind packet selected the larger movable-partition-pocket dimension without proving it was the clear occupied protection-plane span; exact source polygon registration is not verified"
+  },
+  "prediction": {
+    "headCount": 6,
+    "topology": {
+      "alongRidgeStations": 2,
+      "acrossSlopeStations": 3
+    },
+    "registeredHeads": [
+      {
+        "id": "winter-garden-source-head-01",
+        "localPointFt": [
+          9.203254,
+          4.209884
+        ]
+      },
+      {
+        "id": "winter-garden-source-head-02",
+        "localPointFt": [
+          9.203254,
+          18.411882
+        ]
+      },
+      {
+        "id": "winter-garden-source-head-03",
+        "localPointFt": [
+          9.203254,
+          31.670442
+        ]
+      },
+      {
+        "id": "winter-garden-source-head-04",
+        "localPointFt": [
+          26.225304,
+          4.209884
+        ]
+      },
+      {
+        "id": "winter-garden-source-head-05",
+        "localPointFt": [
+          26.225304,
+          18.411882
+        ]
+      },
+      {
+        "id": "winter-garden-source-head-06",
+        "localPointFt": [
+          26.225304,
+          31.670442
+        ]
+      }
+    ]
+  },
+  "approved": {
+    "headCount": 9,
+    "topology": {
+      "alongRidgeStations": 3,
+      "acrossSlopeStations": 3
+    },
+    "heads": [
+      {
+        "id": "winter-garden-approved-cultural-head-01",
+        "imagePointPx": [
+          3231,
+          1245
+        ],
+        "localPointFt": [
+          2.937265,
+          31.996373
+        ],
+        "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+      },
+      {
+        "id": "winter-garden-approved-cultural-head-02",
+        "imagePointPx": [
+          3535,
+          1245
+        ],
+        "localPointFt": [
+          13.961075,
+          31.996373
+        ],
+        "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+      },
+      {
+        "id": "winter-garden-approved-cultural-head-03",
+        "imagePointPx": [
+          3838,
+          1245
+        ],
+        "localPointFt": [
+          24.948622,
+          31.996373
+        ],
+        "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+      },
+      {
+        "id": "winter-garden-approved-cultural-head-04",
+        "imagePointPx": [
+          3231,
+          1671
+        ],
+        "localPointFt": [
+          2.937265,
+          18.420223
+        ],
+        "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+      },
+      {
+        "id": "winter-garden-approved-cultural-head-05",
+        "imagePointPx": [
+          3535,
+          1671
+        ],
+        "localPointFt": [
+          13.961075,
+          18.420223
+        ],
+        "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+      },
+      {
+        "id": "winter-garden-approved-cultural-head-06",
+        "imagePointPx": [
+          3838,
+          1671
+        ],
+        "localPointFt": [
+          24.948622,
+          18.420223
+        ],
+        "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+      },
+      {
+        "id": "winter-garden-approved-cultural-head-07",
+        "imagePointPx": [
+          3231,
+          2064
+        ],
+        "localPointFt": [
+          2.937265,
+          5.895746
+        ],
+        "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+      },
+      {
+        "id": "winter-garden-approved-cultural-head-08",
+        "imagePointPx": [
+          3535,
+          2064
+        ],
+        "localPointFt": [
+          13.961075,
+          5.895746
+        ],
+        "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+      },
+      {
+        "id": "winter-garden-approved-cultural-head-09",
+        "imagePointPx": [
+          3838,
+          2064
+        ],
+        "localPointFt": [
+          24.948622,
+          5.895746
+        ],
+        "symbol": "pendent-drop-on-occupied-sloped-ceiling"
+      }
+    ]
+  },
+  "comparisons": [
+    {
+      "toleranceFt": 0.5,
+      "matches": [],
+      "matchedCount": 0,
+      "precision": 0,
+      "recall": 0,
+      "falsePositiveCandidateCount": 6,
+      "falseNegativeApprovedCount": 9,
+      "maxPlanErrorFt": null,
+      "meanPlanErrorFt": null,
+      "parityPassed": false
+    },
+    {
+      "toleranceFt": 1,
+      "matches": [],
+      "matchedCount": 0,
+      "precision": 0,
+      "recall": 0,
+      "falsePositiveCandidateCount": 6,
+      "falseNegativeApprovedCount": 9,
+      "maxPlanErrorFt": null,
+      "meanPlanErrorFt": null,
+      "parityPassed": false
+    },
+    {
+      "toleranceFt": 1.5,
+      "matches": [
+        {
+          "predictedId": "winter-garden-source-head-06",
+          "approvedId": "winter-garden-approved-cultural-head-03",
+          "distanceFt": 1.318
+        },
+        {
+          "predictedId": "winter-garden-source-head-05",
+          "approvedId": "winter-garden-approved-cultural-head-06",
+          "distanceFt": 1.277
+        }
+      ],
+      "matchedCount": 2,
+      "precision": 0.333333,
+      "recall": 0.222222,
+      "falsePositiveCandidateCount": 4,
+      "falseNegativeApprovedCount": 7,
+      "maxPlanErrorFt": 1.318,
+      "meanPlanErrorFt": 1.297,
+      "parityPassed": false
+    },
+    {
+      "toleranceFt": 3,
+      "matches": [
+        {
+          "predictedId": "winter-garden-source-head-06",
+          "approvedId": "winter-garden-approved-cultural-head-03",
+          "distanceFt": 1.318
+        },
+        {
+          "predictedId": "winter-garden-source-head-05",
+          "approvedId": "winter-garden-approved-cultural-head-06",
+          "distanceFt": 1.277
+        },
+        {
+          "predictedId": "winter-garden-source-head-04",
+          "approvedId": "winter-garden-approved-cultural-head-09",
+          "distanceFt": 2.115
+        }
+      ],
+      "matchedCount": 3,
+      "precision": 0.5,
+      "recall": 0.333333,
+      "falsePositiveCandidateCount": 3,
+      "falseNegativeApprovedCount": 6,
+      "maxPlanErrorFt": 2.115,
+      "meanPlanErrorFt": 1.57,
+      "parityPassed": false
+    },
+    {
+      "toleranceFt": 5,
+      "matches": [
+        {
+          "predictedId": "winter-garden-source-head-03",
+          "approvedId": "winter-garden-approved-cultural-head-02",
+          "distanceFt": 4.769
+        },
+        {
+          "predictedId": "winter-garden-source-head-06",
+          "approvedId": "winter-garden-approved-cultural-head-03",
+          "distanceFt": 1.318
+        },
+        {
+          "predictedId": "winter-garden-source-head-02",
+          "approvedId": "winter-garden-approved-cultural-head-05",
+          "distanceFt": 4.758
+        },
+        {
+          "predictedId": "winter-garden-source-head-05",
+          "approvedId": "winter-garden-approved-cultural-head-06",
+          "distanceFt": 1.277
+        },
+        {
+          "predictedId": "winter-garden-source-head-04",
+          "approvedId": "winter-garden-approved-cultural-head-09",
+          "distanceFt": 2.115
+        }
+      ],
+      "matchedCount": 5,
+      "precision": 0.833333,
+      "recall": 0.555556,
+      "falsePositiveCandidateCount": 1,
+      "falseNegativeApprovedCount": 4,
+      "maxPlanErrorFt": 4.769,
+      "meanPlanErrorFt": 2.847,
+      "parityPassed": false
+    }
+  ],
+  "result": {
+    "status": "failed",
+    "occupiedSlopedCeilingClassificationVerified": true,
+    "approvedDropsServeCulturalCenterVault": true,
+    "approvedPlanTopologyVerified": true,
+    "approvedAndAsBuiltRasterParityVerified": true,
+    "exactPlacementPatternVerified": false,
+    "sourceProtectionZoneGeometryVerified": false,
+    "countDelta": -3,
+    "failureMode": "The sealed v3 Moses Lake transfer predicts two along-ridge by three across-slope stations (six heads); the approved/as-built layout is three by three (nine heads), and the sealed source packet also chose the wrong side of an unresolved competing clear-span dimension.",
+    "correctionPolicy": "Preserve this as an answer-exposed failed holdout; add the verified 3x3 topology and explicit clear-span disambiguation feature to a v4 empirical corpus, then require another sealed completed-project holdout before placement acceptance."
+  },
+  "internalVerification": {
+    "primary": "source-registered concentric-ring raster detector",
+    "independent": "FP2 branch-line and drop-symbol topology audit",
+    "adversarial": "deterministic comparison replay and false-promotion mutation rejection"
+  },
+  "unseenProjectPlacementVerified": false,
+  "sourceOnlyClassifierVerified": true,
+  "topViewComparisonReady": true,
+  "elevationClassificationComparisonReady": true,
+  "partialModel3dComparisonReady": true,
+  "wholeBuildingModelReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "failed-fresh-heldout-placement-and-source-zone-registration-with-approved-as-built-3-by-3-Cultural-Center-evidence-not-code-compliance-or-fabrication",
+  "receiptSha256": "3b98e28a00d007835675c0cc43f79c6bdadd56daf78c733072f040b023620116"
+}
