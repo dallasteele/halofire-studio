@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import { buildSagewoodSourceOnlyCandidate, validateSagewoodSourceOnlyCandidate, validateSagewoodSourceSeal, verifySagewoodSourceCandidateAdversarialLoop } from '../src/engine/sagewood-unseen-pitched-holdout.js';
+const read = (name) => JSON.parse(fs.readFileSync(new URL(`../src/data/${name}`, import.meta.url), 'utf8')); const sourceSeal = read('sagewood-unseen-pitched-holdout.json'); const dillonPrior = read('dillon-pitched-placement-prior.json'); const candidate = read('sagewood-source-only-pitched-candidate.json'); const dependencies = { sourceSeal, dillonPrior };
+describe('Sagewood fresh unseen pitched holdout', () => {
+  it('seals four independent sources while both sprinkler answers remain unopened', async () => { expect((await validateSagewoodSourceSeal(sourceSeal)).status).toBe('passed'); expect(sourceSeal.answerKeyDenylist).toHaveLength(2); expect(sourceSeal.answerKeyDenylist.every((entry) => entry.openedBeforeSourceSeal === false)).toBe(true); });
+  it('replays a plan-and-section-closed 3:12 Main Hall without answer input', async () => { expect(await validateSagewoodSourceOnlyCandidate(candidate, dependencies)).toMatchObject({ status: 'passed', unseenProjectPlacementVerified: false, complianceReady: false }); expect(candidate.geometry.room).toMatchObject({ widthFt: 52.583333, lengthFt: 63 }); expect(candidate.geometry.ceiling).toMatchObject({ pitch: { riseIn: 3, runIn: 12 }, springElevationFt: 18, peakElevationFt: 24.572917 }); expect(candidate.heads3d).toHaveLength(24); expect(candidate.layout.regions.map((entry) => entry.generatedHeadCount)).toEqual([12, 12]); expect(candidate.answerKeyOpened).toBe(false); });
+  it('equals a fresh deterministic replay', async () => { expect(await buildSagewoodSourceOnlyCandidate(sourceSeal, dillonPrior)).toEqual(candidate); });
+  it('rejects twelve source, leakage, geometry, and false-promotion mutations', async () => { const result = await verifySagewoodSourceCandidateAdversarialLoop(candidate, dependencies); expect(result.status).toBe('passed'); expect(result.rejectedCases).toHaveLength(12); });
+});

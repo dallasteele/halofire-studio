@@ -1,0 +1,517 @@
+{
+  "artifactType": "halofire.sagewood-source-only-pitched-candidate.v1",
+  "projectId": "sagewood-ranch-south-jordan-ut",
+  "projectName": "Sagewood Ranch - South Jordan UT",
+  "sourceSealReceiptSha256": "7d7620ba91a20b899b3b7c2c6c28f8f1b08000d6bda3f28b957dea5f4e36f999",
+  "dillonPriorReceiptSha256": "20a553b24f20219e2f3d1e8022b05079dc6e22f3189c63c9684fcf3dbbf1bf26",
+  "generationMode": "fresh-sealed-source-plus-cross-project-empirical-prior-before-answer-open",
+  "geometry": {
+    "coordinateSystem": "A3.2 Main Hall local feet",
+    "floor": {
+      "id": "main-level",
+      "elevationFt": 0
+    },
+    "room": {
+      "id": "main-hall",
+      "name": "MAIN HALL",
+      "widthFt": 52.583333,
+      "lengthFt": 63,
+      "areaSqFt": 3312.75,
+      "polygonFt": [
+        [
+          0,
+          0
+        ],
+        [
+          52.583333333333336,
+          0
+        ],
+        [
+          52.583333333333336,
+          63
+        ],
+        [
+          0,
+          63
+        ]
+      ]
+    },
+    "ceiling": {
+      "kind": "source-proven-two-plane-vault",
+      "axis": "x",
+      "ridgeAxis": "y",
+      "pitch": {
+        "riseIn": 3,
+        "runIn": 12
+      },
+      "halfRunFt": 26.291667,
+      "springElevationFt": 18,
+      "peakElevationFt": 24.572917,
+      "sourceResiduals": [
+        "stair-and-local-obstruction-clearances-unresolved",
+        "no-full-span-box-beam-control-found-in-selected-section"
+      ],
+      "surfaces": [
+        {
+          "id": "main-hall-west-plane",
+          "polygonFt": [
+            [
+              0,
+              0
+            ],
+            [
+              26.291666666666668,
+              0
+            ],
+            [
+              26.291666666666668,
+              63
+            ],
+            [
+              0,
+              63
+            ]
+          ],
+          "downhillDirection": "negative-x"
+        },
+        {
+          "id": "main-hall-east-plane",
+          "polygonFt": [
+            [
+              26.291666666666668,
+              0
+            ],
+            [
+              52.583333333333336,
+              0
+            ],
+            [
+              52.583333333333336,
+              63
+            ],
+            [
+              26.291666666666668,
+              63
+            ]
+          ],
+          "downhillDirection": "positive-x"
+        }
+      ]
+    }
+  },
+  "layoutInput": {
+    "artifactType": "halofire.sloped-ceiling-layout-input.v1",
+    "printedScalePtPerFt": 1,
+    "regions": [
+      {
+        "id": "main-hall-west-plane",
+        "polygonSubmittedPt": [
+          [
+            0,
+            0
+          ],
+          [
+            26.291666666666668,
+            0
+          ],
+          [
+            26.291666666666668,
+            63
+          ],
+          [
+            0,
+            63
+          ]
+        ],
+        "slopeAxis": "x",
+        "downhillDirection": "negative-x",
+        "riseIn": 3,
+        "runIn": 12,
+        "shouldProtect": true,
+        "obstructions": [],
+        "linearObstructions": []
+      },
+      {
+        "id": "main-hall-east-plane",
+        "polygonSubmittedPt": [
+          [
+            26.291666666666668,
+            0
+          ],
+          [
+            52.583333333333336,
+            0
+          ],
+          [
+            52.583333333333336,
+            63
+          ],
+          [
+            26.291666666666668,
+            63
+          ]
+        ],
+        "slopeAxis": "x",
+        "downhillDirection": "positive-x",
+        "riseIn": 3,
+        "runIn": 12,
+        "shouldProtect": true,
+        "obstructions": [],
+        "linearObstructions": []
+      }
+    ],
+    "maxAcrossSlopeSpanFt": 20,
+    "maxAlongSlopeSpanFt": 12
+  },
+  "layout": {
+    "regions": [
+      {
+        "regionId": "main-hall-west-plane",
+        "shouldProtect": true,
+        "generatedHeadCount": 12,
+        "widthFt": 26.291666666666668,
+        "heightFt": 63,
+        "acrossCount": 4,
+        "alongCount": 3,
+        "obstructionAdjustments": []
+      },
+      {
+        "regionId": "main-hall-east-plane",
+        "shouldProtect": true,
+        "generatedHeadCount": 12,
+        "widthFt": 26.291666666666668,
+        "heightFt": 63,
+        "acrossCount": 4,
+        "alongCount": 3,
+        "obstructionAdjustments": []
+      }
+    ],
+    "headCount": 24
+  },
+  "heads3d": [
+    {
+      "id": "sagewood-source-head-01",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        4.381944,
+        7.875,
+        19.095486
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-02",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        13.145833,
+        7.875,
+        21.286458
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-03",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        21.909722,
+        7.875,
+        23.477431
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-04",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        4.381944,
+        23.625,
+        19.095486
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-05",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        13.145833,
+        23.625,
+        21.286458
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-06",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        21.909722,
+        23.625,
+        23.477431
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-07",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        4.381944,
+        39.375,
+        19.095486
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-08",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        13.145833,
+        39.375,
+        21.286458
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-09",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        21.909722,
+        39.375,
+        23.477431
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-10",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        4.381944,
+        55.125,
+        19.095486
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-11",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        13.145833,
+        55.125,
+        21.286458
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-12",
+      "surfaceId": "main-hall-west-plane",
+      "pointFt": [
+        21.909722,
+        55.125,
+        23.477431
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-13",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        30.673611,
+        7.875,
+        23.47743
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-14",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        39.4375,
+        7.875,
+        21.286458
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-15",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        48.201389,
+        7.875,
+        19.095486
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-16",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        30.673611,
+        23.625,
+        23.47743
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-17",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        39.4375,
+        23.625,
+        21.286458
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-18",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        48.201389,
+        23.625,
+        19.095486
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-19",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        30.673611,
+        39.375,
+        23.47743
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-20",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        39.4375,
+        39.375,
+        21.286458
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-21",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        48.201389,
+        39.375,
+        19.095486
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-22",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        30.673611,
+        55.125,
+        23.47743
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-23",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        39.4375,
+        55.125,
+        21.286458
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "sagewood-source-head-24",
+      "surfaceId": "main-hall-east-plane",
+      "pointFt": [
+        48.201389,
+        55.125,
+        19.095486
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    }
+  ],
+  "branchPipes3d": [],
+  "branchPipeTopologyReady": false,
+  "buildingModel": {
+    "levelCount": 1,
+    "modeledScope": "main-hall-only",
+    "floorByFloorExtrusionReady": true,
+    "wholeBuildingFootprintComplete": false
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-two-plane-layout-replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "a3.2-plan-plus-building-section-dimension-closure"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "source-prior-answer-leakage-and-false-promotion-mutations"
+    }
+  },
+  "answerKeyOpened": false,
+  "answerKeyUsedAsGeometryInput": false,
+  "unseenProjectPlacementVerified": false,
+  "roomEnvelopeGeometryGrounded": true,
+  "topViewReady": true,
+  "elevationViewReady": true,
+  "partialModel3dReady": true,
+  "wholeBuildingModelReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "fresh-source-only-main-hall-pitched-candidate-before-answer-comparison",
+  "receiptSha256": "9d8abe21c2a3759b63763c56133d08b6d058f94eb8bb346108809326a69ba41c"
+}

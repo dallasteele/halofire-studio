@@ -1,0 +1,96 @@
+{
+  "artifactType": "halofire.unseen-pitched-holdout.v1",
+  "projectId": "sagewood-ranch-south-jordan-ut",
+  "projectName": "Sagewood Ranch - South Jordan UT",
+  "sources": [
+    {
+      "role": "architectural_plan_pdf",
+      "path": "04-GC PDF Plans & Specs/Plans/Sagewood Ranch 2024-10-18.pdf",
+      "sha256": "83182f521f1d6b578c3d9062879f1e02d76ab3d7f1c04588df19e5084d20f87f",
+      "bytes": 2428236
+    },
+    {
+      "role": "main_level_cad",
+      "path": "05-CAD Files/New CADs 11-8-24/Sagewood Ranch-Floor Plan - A - MAIN LEVEL.dwg",
+      "sha256": "b45987e6cf7de62147fe96e6cf47b55656501f029a7558c699d6754e2bfb2419",
+      "bytes": 256635
+    },
+    {
+      "role": "roof_plan_cad",
+      "path": "05-CAD Files/New CADs 11-8-24/Sagewood Ranch-Floor Plan - A - ROOF PLAN.dwg",
+      "sha256": "e56b19b5a6b1aa75bc9ef68c772bbc1edccfb90e4ae4d3eaa0d7df00e912fccf",
+      "bytes": 40332
+    },
+    {
+      "role": "building_section_cad",
+      "path": "05-CAD Files/Sagewood Ranch-Section - BUILDING SECTION 01.dwg",
+      "sha256": "8ed580977f60cad745b9c6b9edf93528a35184b021f1b12aa1fd2ac4f584d279",
+      "bytes": 106583
+    }
+  ],
+  "answerKeyDenylist": [
+    {
+      "path": "11-As-Built Set/211000 Fire Sprinkler Submittal.pdf",
+      "sha256": "1d48993b4c3c22459cd43ba05b167e6e7afc985c17c24140f51e4ae5dd81831c",
+      "bytes": 12080939,
+      "openedBeforeSourceSeal": false
+    },
+    {
+      "path": "07-AHJ Submittals/R3/Stamped/F1.1.pdf",
+      "sha256": "49785c73b1d3c9b841afa3dcb916a9e5c875284deef658820e792c5199b0797c",
+      "bytes": 6810570,
+      "openedBeforeSourceSeal": false
+    }
+  ],
+  "selection": {
+    "status": "source-sealed-answer-unopened",
+    "priorImplementationSearchHits": 0,
+    "rejectedBeforeAnswerOpen": [
+      "Egbo: no dimension-closed simple pitch control",
+      "Nashville Temple: flat suspended/GWB ceilings",
+      "Farnsworth: no completed sprinkler answer in project folder"
+    ]
+  },
+  "sourceObservations": {
+    "room": "MAIN HALL",
+    "sheet": "A3.2 MAIN LEVEL FLOOR PLAN",
+    "widthFt": 52.583333,
+    "lengthFt": 63,
+    "pitchRiseIn": 3,
+    "pitchRunIn": 12,
+    "springElevationFt": 18,
+    "peakElevationFt": 24.572917,
+    "sectionDimensionMeasurementIn": 216,
+    "evidence": [
+      "A3.2 labels MAIN HALL and dimensions 52'-7 by 63'-0",
+      "BUILDING SECTION 01 labels T.O.W. @ MAIN HALL 18'-0",
+      "opposed section pitch symbols read 3 over 12",
+      "section contains no full-span box-beam label or control"
+    ]
+  },
+  "toolchain": {
+    "dwgReader": "@mlightcad/libredwg-web 0.7.7",
+    "basis": "GNU LibreDWG WebAssembly",
+    "packageManifestSha256": "0195aca13a34908881582645d8908ebc98ed3f5eebe7af15c44f6491c80700a4",
+    "unknownEntityCount": 0,
+    "conversionMode": "offline-read-only"
+  },
+  "brainPreflight": {
+    "status": "passed",
+    "platformSpineAddendumApplied": true,
+    "spatialB1ThroughB7Priority": 1
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "dillonEmpiricalPriorAllowed": true,
+    "roofPlaneSubstitutionAllowed": false
+  },
+  "claims": {
+    "unseenProjectPlacementVerified": false,
+    "codeCompliance": false,
+    "fabrication": false,
+    "fieldRelease": false
+  },
+  "receiptSha256": "7d7620ba91a20b899b3b7c2c6c28f8f1b08000d6bda3f28b957dea5f4e36f999"
+}

@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildSagewoodSourceOnlyCandidate, sealSagewoodSourceSeal, validateSagewoodSourceOnlyCandidate, validateSagewoodSourceSeal, verifySagewoodSourceCandidateAdversarialLoop } from '../src/engine/sagewood-unseen-pitched-holdout.js';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); const data = (name) => path.join(root, 'src/data', name); const read = (name) => JSON.parse(fs.readFileSync(data(name), 'utf8'));
+const sourceSeal = await sealSagewoodSourceSeal(read('sagewood-unseen-pitched-holdout.json')); const dillonPrior = read('dillon-pitched-placement-prior.json'); const dependencies = { sourceSeal, dillonPrior };
+if ((await validateSagewoodSourceSeal(sourceSeal)).status !== 'passed') throw new Error('source seal blocked');
+const candidate = await buildSagewoodSourceOnlyCandidate(sourceSeal, dillonPrior); const validation = await validateSagewoodSourceOnlyCandidate(candidate, dependencies); const adversarial = await verifySagewoodSourceCandidateAdversarialLoop(candidate, dependencies);
+if (validation.status !== 'passed' || adversarial.status !== 'passed') throw new Error(JSON.stringify({ validation, adversarial }));
+fs.writeFileSync(data('sagewood-unseen-pitched-holdout.json'), `${JSON.stringify(sourceSeal, null, 2)}\n`); fs.writeFileSync(data('sagewood-source-only-pitched-candidate.json'), `${JSON.stringify(candidate, null, 2)}\n`);
+console.log(JSON.stringify({ status: 'passed', sourceReceiptSha256: sourceSeal.receiptSha256, candidateReceiptSha256: candidate.receiptSha256, heads: candidate.heads3d.length, adversarialRejected: adversarial.rejectedCases.length }, null, 2));
