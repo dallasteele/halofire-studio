@@ -593,6 +593,10 @@ initDatabase();
 
 // ── Express App ──
 const app = express();
+// Production is reached through the host-local Nginx proxy. Trust only loopback
+// proxy hops so req.ip and express-rate-limit use the real forwarded client IP
+// without allowing a direct remote client to spoof X-Forwarded-For.
+app.set('trust proxy', 'loopback');
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   const sameOrigin = origin === `${req.protocol}://${req.get('host')}`;

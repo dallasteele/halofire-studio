@@ -7,7 +7,7 @@ import path from 'node:path';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const PORT = 3286;
 const BASE = `http://127.0.0.1:${PORT}`;
-let server; let tempDir; let token;
+let server; let tempDir; let token; let serverStderr = '';
 
 async function waitForHealth() {
   const started = Date.now();
@@ -25,6 +25,7 @@ beforeAll(async () => {
     env: { ...process.env, PORT: String(PORT), NODE_ENV: 'test', HALOFIRE_DB_PATH: path.join(tempDir, 'h.db'), JWT_SECRET: 'pitched-calibration-v5-secret-more-than-32-characters', HALOFIRE_ADMIN_USER: 'admin', HALOFIRE_ADMIN_PASSWORD: 'pitched-calibration-v5-pw', HALOFIRE_ALLOW_DEV_DEFAULTS: '0', HALOFIRE_CORS_ORIGINS: 'http://allowed.test' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
+  server.stderr.on('data', (chunk) => { serverStderr += chunk.toString(); });
   await waitForHealth();
   token = (await (await fetch(`${BASE}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'admin', password: 'pitched-calibration-v5-pw' }) })).json()).token;
 });
@@ -35,6 +36,13 @@ afterAll(async () => {
 });
 
 describe('authenticated BGC failure and pitched calibration revision five', () => {
+  it('trusts only the loopback proxy path for forwarded client rate-limit identity', async () => {
+    const response = await fetch(`${BASE}/api/health`, { headers: { 'X-Forwarded-For': '203.0.113.10' } });
+    expect(response.status).toBe(200);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(serverStderr).not.toContain('ERR_ERL_UNEXPECTED_X_FORWARDED_FOR');
+  });
+
   it('rejects anonymous access to both answer-exposed routes', async () => {
     expect((await fetch(`${BASE}/api/evidence/boys-girls-club-pitched-heldout-comparison`)).status).toBe(401);
     expect((await fetch(`${BASE}/api/evidence/pitched-placement-calibration-corpus-v5`)).status).toBe(401);
