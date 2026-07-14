@@ -274,8 +274,8 @@
     "formalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "polarisCandidateRejected", "status": "verified", "elapsedMs": 77, "returnCode": 0 },
     "brainPostflight": {
       "status": "passed",
-      "episodeId": 145311,
-      "deepRecallRank": 1,
+      "episodeId": 145819,
+      "postflightScope": "Polaris rejection through MIT Building J source seal, answer grid/count calibration, and exact approved/as-built 68-head XY extraction",
       "verificationDoctrine": ["internal-primary", "internal-independent", "adversarial"]
     },
     "renderedBrowserProof": [
