@@ -6,6 +6,7 @@
 - Bound all 68 corrected structural-roof XY heads uniquely to one slab and one base roof region: slabs `50 / 18 / 0`; roof regions `36 / 4 / 28`; unmatched and multiply matched counts are all zero.
 - Independently closed the membrane base at exactly 58 ft by 34 ft = 1,972 sq ft, matching the source drawing note. This proves base XY regions only; membrane cricket subfaces, whole-roof topology, protection planes, head Z, compliance, fabrication, and field release remain fail-closed.
 - Added deterministic evidence/packet replay, a sealed two-panel SVG proof, 18/18 adversarial mutations, 35 focused tests across seven Building J files, and Lean theorem `mitSourceSpatialBaseRegionsCloseFailClosed` (Lean 4.13.0, 107 ms, return code 0).
+- Brain postflight episode `145978` preserves the exact receipts, verification doctrine, fail-closed claims, and successor-loop action.
 - Next: use a successor loop to close cricket subfaces and section/elevation constraints before assigning any roof/protection plane or head elevation.
 
 ## 2026-07-14 - MIT Riverside Building J piecewise structural-grid correction
