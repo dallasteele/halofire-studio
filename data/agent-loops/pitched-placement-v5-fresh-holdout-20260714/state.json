@@ -360,8 +360,8 @@
     "mitBuildingJStructuralGridCorrectionFormalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "mitStructuralGridPiecewiseCorrectionClosesJ2", "status": "verified", "elapsedMs": 77, "returnCode": 0 },
     "brainPostflight": {
       "status": "passed",
-      "episodeId": 145819,
-      "postflightScope": "Polaris rejection through MIT Building J source seal, answer grid/count calibration, and exact approved/as-built 68-head XY extraction",
+      "episodeId": 145921,
+      "postflightScope": "MIT Building J source-RCP registration, exact structural-DWG J.2 conflict audit, and piecewise correction of all 68 RCP points into structural-roof XY",
       "verificationDoctrine": ["internal-primary", "internal-independent", "adversarial"]
     },
     "renderedBrowserProof": [
