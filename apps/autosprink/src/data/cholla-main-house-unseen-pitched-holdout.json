@@ -1,0 +1,50 @@
+{
+  "artifactType": "halofire.unseen-pitched-holdout.v1",
+  "projectId": "boyd-cholla-main-house-scottsdale-az",
+  "projectName": "Boyd Residence - Cholla Main House - Scottsdale AZ",
+  "sources": [
+    { "role": "architectural_bid_set", "path": "1-Bid Documents/GC - Bid Plans/Building/Boyd Residence - Main House - Bid Files.pdf", "sha256": "1e1e7b7aec077198bd724c75b6ac6b8beb4c1e2e9937f99759b68d0f31065495", "bytes": 7772211 },
+    { "role": "floor_plan_cad", "path": "2-Internal Ops/01-Design/05-CAD Files/Cholla Floor Plan.dwg", "sha256": "39db15c2207c363ee466dda9ff2fae6a75b3525e68ad3a0ae4f346129ee29993", "bytes": 155439 },
+    { "role": "roof_framing_cad", "path": "2-Internal Ops/01-Design/05-CAD Files/Cholla Roof Framing Plan.dwg", "sha256": "f71e8bd5ae7400b45c16b545a45b7bceac4c3c4a9301915910fe92dff1a787cb", "bytes": 153581 }
+  ],
+  "answerKeyDenylist": [
+    { "path": "2-Internal Ops/01-Design/07-AHJ Submittals/10-07-24-R1/5578-23-1_1-CORR-SPKL.pdf", "sha256": "bf546bcfb8b94b47fcc3ae988da6e49cb2cf0526960cfbd3ba3c3a263fdb323b", "bytes": 1305423, "openedBeforeSourceSeal": false },
+    { "path": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/5578-23-1_APPROVED-SPKL.pdf", "sha256": "aca50702f61969dd6e280a0cc6147e8f38de9b244ad345df2f34dbdaa59a9ea1", "bytes": 1032103, "openedBeforeSourceSeal": false },
+    { "path": "2-Internal Ops/04-Close-Out Docs/Boyd Residence - Scottsdale AZ_as builts.pdf", "sha256": "d000944951e8e55c4d7e413ec17928e7849eca05b6677f12a4eae1891f4d3313", "bytes": 1226254, "openedBeforeSourceSeal": false }
+  ],
+  "selection": {
+    "status": "source-sealed-answer-unopened",
+    "priorImplementationSearchHits": 0,
+    "rejectedBeforeAnswerOpen": [
+      { "project": "MVC 6-Plex", "reason": "membrane roof with tapered insulation and flat roof trusses" },
+      { "project": "MVC 2-Plex", "reason": "three-level flat parapet building" },
+      { "project": "MVC 8-Plex", "reason": "quarter-inch-per-foot membrane roof; barrel roof limited to an exterior feature" },
+      { "project": "Rozenfield Residence", "reason": "stepped flat ceilings; quarter-inch notes are roof drainage" },
+      { "project": "Boyd Residence Addition", "reason": "architecture did not prove the protected ceiling followed the roof slope" },
+      { "project": "Biffer", "reason": "no independent architectural source separate from the fire-protection CAD" },
+      { "project": "Farnsworth", "reason": "no completed sprinkler answer available" },
+      { "project": "Lubbock", "reason": "source reflected-ceiling plan already exposed sprinkler placement" },
+      { "project": "Monk Monastery", "reason": "quarter-inch-per-foot low-slope drained roof and flat ceiling/truss sections" }
+    ]
+  },
+  "sourceOnlyCandidate": {
+    "scopeId": "main-house-pitched-roof-over-occupied-level",
+    "expectedClassification": "pitched-roof-over-flat-occupied-ceiling",
+    "expectedPlacementEngineRoute": "flat-ceiling-layout",
+    "atticProtectionEstablished": false,
+    "roofPlaneSubstitutionAllowed": false
+  },
+  "sourceEvidence": [
+    { "id": "cholla-occupied-room-labels", "scopeId": "main-house-pitched-roof-over-occupied-level", "kind": "occupied-room-label", "sourceRole": "architectural-plan", "sourceSha256": "1e1e7b7aec077198bd724c75b6ac6b8beb4c1e2e9937f99759b68d0f31065495", "sheetId": "5 of 10 MAIN FLOOR PLAN", "assertion": "The plan identifies occupied bedrooms, kitchen, great room, dining, entry, bonus room, and related occupied spaces." },
+    { "id": "cholla-flat-ceiling-labels", "scopeId": "main-house-pitched-roof-over-occupied-level", "kind": "flat-ceiling-label", "sourceRole": "architectural-plan", "sourceSha256": "1e1e7b7aec077198bd724c75b6ac6b8beb4c1e2e9937f99759b68d0f31065495", "sheetId": "5 of 10 MAIN FLOOR PLAN", "assertion": "Occupied rooms carry discrete horizontal ceiling elevations including 9-foot and 10-foot CLG labels; no occupied sloped-ceiling label is present." },
+    { "id": "cholla-roof-ceiling-separation", "scopeId": "main-house-pitched-roof-over-occupied-level", "kind": "roof-ceiling-separation", "sourceRole": "architectural-roof-floor-coordination", "sourceSha256": "1e1e7b7aec077198bd724c75b6ac6b8beb4c1e2e9937f99759b68d0f31065495", "sheetId": "4 of 10 ROOF PLAN / 5 of 10 MAIN FLOOR PLAN / 7 of 10 ROOF STRUCTURAL", "assertion": "Hip roof planes sit above separately dimensioned flat occupied ceilings and a trussed roof-framing layer." },
+    { "id": "cholla-attic-label", "scopeId": "main-house-pitched-roof-over-occupied-level", "kind": "attic-label", "sourceRole": "floor-plan-cad", "sourceSha256": "39db15c2207c363ee466dda9ff2fae6a75b3525e68ad3a0ae4f346129ee29993", "sheetId": "Cholla Floor Plan.dwg", "assertion": "LibreDWG text extraction returns ATTIC: R-49 from the source floor-plan CAD." },
+    { "id": "cholla-attic-access", "scopeId": "main-house-pitched-roof-over-occupied-level", "kind": "attic-access", "sourceRole": "roof-framing-cad", "sourceSha256": "f71e8bd5ae7400b45c16b545a45b7bceac4c3c4a9301915910fe92dff1a787cb", "sheetId": "Cholla Roof Framing Plan.dwg", "assertion": "LibreDWG text extraction returns a 22 by 30 inch minimum attic-access requirement and equipment-clearance language within the attic." },
+    { "id": "cholla-roof-framing-cavity", "scopeId": "main-house-pitched-roof-over-occupied-level", "kind": "roof-framing-cavity", "sourceRole": "roof-framing-cad", "sourceSha256": "f71e8bd5ae7400b45c16b545a45b7bceac4c3c4a9301915910fe92dff1a787cb", "sheetId": "Cholla Roof Framing Plan.dwg", "assertion": "LibreDWG text extraction identifies engineered roof trusses, girder trusses, flat roof trusses, roof sheathing, ridges, hips, and valleys with zero unknown entities." }
+  ],
+  "toolchain": { "dwgReader": "@mlightcad/libredwg-web 0.7.7", "unknownEntityCount": 0, "conversionMode": "offline-read-only" },
+  "brainPreflight": { "status": "passed", "platformSpineAddendumApplied": true, "spatialB1ThroughB7Priority": 1 },
+  "generation": { "answerKeyUsed": false, "completedBidUsedForGeneration": false, "roofPlaneSubstitutionAllowed": false },
+  "claims": { "unseenProjectClassificationVerified": false, "headPlacement": false, "buildingModel": false, "codeCompliance": false, "fabrication": false, "fieldRelease": false },
+  "receiptSha256": "f77a2a15ab76762c2376edaa4d1c5d36a6b4ecd607960b50ea0b8348d3941823"
+}

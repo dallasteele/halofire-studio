@@ -21,11 +21,26 @@ describe('generic pitched protection-volume classification', () => {
     expect(result.resolvedEvidenceIds).toEqual(['room', 'slope', 'deck']);
   });
 
-  it('routes a pitched attic from explicit source protection or separated cavity evidence', async () => {
+  it('routes a pitched attic only from explicit source protection and never from cavity evidence alone', async () => {
     const explicit = await classifyPitchedProtectionVolume(await packet([observation('attic-note', 'attic-protection-note', sha('b'), 'architectural-fire-protection-note')]));
-    expect(explicit).toMatchObject({ status: 'passed', classification: 'pitched-attic', productionPlacementEligible: true });
+    expect(explicit).toMatchObject({ status: 'passed', classification: 'pitched-attic', atticProtectionEstablished: true, productionPlacementEligible: true });
     const cavity = await classifyPitchedProtectionVolume(await packet([observation('separation', 'roof-ceiling-separation'), observation('access', 'attic-access')]));
-    expect(cavity).toMatchObject({ status: 'passed', classification: 'pitched-attic', productionPlacementEligible: true });
+    expect(cavity).toMatchObject({ status: 'blocked', classification: 'unresolved', atticCavityDetected: true, atticProtectionEstablished: false, productionPlacementEligible: false });
+    expect(cavity.blockers).toContain('attic-cavity-does-not-prove-attic-protection');
+  });
+
+  it('routes a pitched roof over explicit flat occupied ceilings away from pitched placement', async () => {
+    const result = await classifyPitchedProtectionVolume(await packet([
+      observation('room', 'occupied-room-label'), observation('flat', 'flat-ceiling-label'),
+      observation('separation', 'roof-ceiling-separation'), observation('attic', 'attic-label'),
+    ]));
+    expect(result).toMatchObject({
+      status: 'passed', classification: 'pitched-roof-over-flat-occupied-ceiling',
+      placementEngineRoute: 'flat-ceiling-layout', atticCavityDetected: true,
+      atticProtectionEstablished: false, pitchedSurfacePlacementEligible: false,
+      productionPlacementEligible: false, complianceReady: false,
+    });
+    expect(result.blockers).toContain('pitched-roof-not-occupied-protection-surface');
   });
 
   it('fails closed when a sloped room does not establish whether an attic exists', async () => {
@@ -49,6 +64,6 @@ describe('generic pitched protection-volume classification', () => {
     contradiction.evidence.push(observation('separation', 'roof-ceiling-separation'));
     const result = await classifyPitchedProtectionVolume(await sealPitchedProtectionVolumeEvidence(contradiction));
     expect(result).toMatchObject({ status: 'blocked', classification: 'unresolved', productionPlacementEligible: false });
-    expect((await verifyPitchedProtectionVolumeAdversarialLoop(source))).toEqual({ status: 'passed', rejectedCases: ['drop-room', 'drop-ceiling', 'drop-deck', 'contradictory-cavity', 'answer-leak', 'completed-answer-role', 'scope-drift', 'source-hash-drift'], totalCases: 8 });
+    expect((await verifyPitchedProtectionVolumeAdversarialLoop(source))).toEqual({ status: 'passed', rejectedCases: ['drop-room', 'drop-ceiling', 'drop-deck', 'contradictory-cavity', 'answer-leak', 'completed-answer-role', 'scope-drift', 'source-hash-drift', 'cavity-only-no-protection'], totalCases: 9 });
   });
 });

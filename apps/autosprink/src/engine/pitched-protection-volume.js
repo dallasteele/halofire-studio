@@ -5,6 +5,7 @@ const MODES = new Set(['sealed-source-only', 'answer-exposed-calibration']);
 const KINDS = new Set([
   'occupied-room-label',
   'sloped-ceiling-label',
+  'flat-ceiling-label',
   'ceiling-is-roof-deck',
   'roof-ceiling-separation',
   'attic-label',
@@ -79,20 +80,30 @@ export async function classifyPitchedProtectionVolume(value) {
   const has = (kind) => byKind.has(kind);
   const roofContradiction = has('ceiling-is-roof-deck') && has('roof-ceiling-separation');
   const occupiedReady = has('occupied-room-label') && has('sloped-ceiling-label') && has('ceiling-is-roof-deck');
+  const flatOccupiedReady = has('occupied-room-label') && has('flat-ceiling-label') && has('roof-ceiling-separation');
   const explicitAtticProtection = has('attic-protection-note');
   const atticCavityReady = has('roof-ceiling-separation') && (has('attic-label') || has('attic-access') || has('roof-framing-cavity'));
-  const atticReady = explicitAtticProtection || atticCavityReady;
   let classification = 'unresolved';
   if (!roofContradiction) {
-    if (occupiedReady && atticReady) classification = 'dual-zone';
-    else if (atticReady) classification = 'pitched-attic';
+    if (flatOccupiedReady && explicitAtticProtection) classification = 'dual-zone';
+    else if (explicitAtticProtection) classification = 'pitched-attic';
+    else if (flatOccupiedReady) classification = 'pitched-roof-over-flat-occupied-ceiling';
     else if (occupiedReady) classification = 'occupied-sloped-ceiling';
   }
   const classificationRoutingReady = classification !== 'unresolved';
   const answerExposed = value.mode === 'answer-exposed-calibration';
+  const placementEngineRoute = classification === 'pitched-roof-over-flat-occupied-ceiling' ? 'flat-ceiling-layout'
+    : classification === 'occupied-sloped-ceiling' ? 'sloped-ceiling-layout'
+      : classification === 'pitched-attic' ? 'pitched-attic-layout'
+        : classification === 'dual-zone' ? 'flat-ceiling-and-pitched-attic-layouts'
+          : null;
+  const pitchedSurfacePlacementEligible = classificationRoutingReady
+    && classification !== 'pitched-roof-over-flat-occupied-ceiling' && !answerExposed;
   const blockers = [];
   if (roofContradiction) blockers.push('contradictory-roof-cavity-evidence');
+  if (atticCavityReady && !explicitAtticProtection) blockers.push('attic-cavity-does-not-prove-attic-protection');
   if (!classificationRoutingReady) blockers.push('protection-volume-unresolved');
+  if (classification === 'pitched-roof-over-flat-occupied-ceiling') blockers.push('pitched-roof-not-occupied-protection-surface', 'flat-ceiling-layout-not-generated');
   if (answerExposed) blockers.push('answer-exposed-calibration-not-fresh-production-evidence');
   blockers.push('head-type-and-temperature-selection-unresolved', 'per-head-obstruction-clearance-unresolved', 'hydraulic-calculation-unresolved');
   return {
@@ -105,11 +116,16 @@ export async function classifyPitchedProtectionVolume(value) {
     mode: value.mode,
     classification,
     classificationRoutingReady,
-    productionPlacementEligible: classificationRoutingReady && !answerExposed,
+    placementEngineRoute,
+    atticCavityDetected: atticCavityReady,
+    atticProtectionEstablished: explicitAtticProtection,
+    pitchedSurfacePlacementEligible,
+    productionPlacementEligible: pitchedSurfacePlacementEligible,
     answerExposed,
     resolvedEvidenceIds: classificationRoutingReady ? [...new Set([
       ...(byKind.get('occupied-room-label') || []),
       ...(byKind.get('sloped-ceiling-label') || []),
+      ...(byKind.get('flat-ceiling-label') || []),
       ...(byKind.get('ceiling-is-roof-deck') || []),
       ...(byKind.get('roof-ceiling-separation') || []),
       ...(byKind.get('attic-label') || []),
@@ -135,6 +151,12 @@ export async function verifyPitchedProtectionVolumeAdversarialLoop(sourcePacket)
     ['completed-answer-role', (value) => { value.evidence[0].sourceRole = 'completed-sprinkler-answer'; }],
     ['scope-drift', (value) => { value.evidence[0].scopeId = 'another-scope'; }],
     ['source-hash-drift', (value) => { value.evidence[0].sourceSha256 = 'x'.repeat(64); }],
+    ['cavity-only-no-protection', (value) => {
+      value.evidence = [
+        { ...value.evidence[0], id: 'mutated-separation', kind: 'roof-ceiling-separation' },
+        { ...value.evidence[1], id: 'mutated-attic-access', kind: 'attic-access' },
+      ];
+    }],
   ];
   const rejectedCases = [];
   for (const [name, mutate] of cases) {

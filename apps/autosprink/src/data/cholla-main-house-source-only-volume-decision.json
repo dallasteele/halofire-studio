@@ -1,0 +1,46 @@
+{
+  "artifactType": "halofire.cholla-source-only-roof-ceiling-decision.v1",
+  "projectId": "boyd-cholla-main-house-scottsdale-az",
+  "projectName": "Boyd Residence - Cholla Main House - Scottsdale AZ",
+  "sourceSealReceiptSha256": "f77a2a15ab76762c2376edaa4d1c5d36a6b4ecd607960b50ea0b8348d3941823",
+  "protectionVolumeEvidenceReceiptSha256": "c8d0ae206e7356a403a9a6e75db04926fe2b93d7351769cb9c24a1abfc1c2771",
+  "classification": "pitched-roof-over-flat-occupied-ceiling",
+  "placementEngineRoute": "flat-ceiling-layout",
+  "atticCavityDetected": true,
+  "atticProtectionEstablished": false,
+  "pitchedSurfacePlacementEligible": false,
+  "productionPlacementEligible": false,
+  "sourceOnlyPrediction": "The architectural hip roof is not the occupied sprinkler placement surface. Route occupied rooms to a flat-ceiling layout; do not place attic or pitched-surface sprinklers unless an explicit fire-protection requirement establishes that protected volume.",
+  "candidateHeads": [],
+  "candidatePipes": [],
+  "buildingModel": {
+    "levelCount": 1,
+    "floorByFloorExtrusionReady": false,
+    "exactRoofPitchReady": false,
+    "wholeBuildingGeometryReady": false
+  },
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "generic-protection-volume-classifier" },
+    "independent": { "status": "passed", "method": "architectural-floor-roof-and-roof-framing-cross-check" },
+    "adversarial": { "status": "passed", "method": "cavity-without-protection-and-roof-substitution-rejection" }
+  },
+  "answerKeyOpened": false,
+  "unseenProjectClassificationVerified": false,
+  "topViewReady": false,
+  "elevationViewReady": false,
+  "model3dReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "blockers": [
+    "attic-cavity-does-not-prove-attic-protection",
+    "pitched-roof-not-occupied-protection-surface",
+    "flat-ceiling-layout-not-generated",
+    "head-type-and-temperature-selection-unresolved",
+    "per-head-obstruction-clearance-unresolved",
+    "hydraulic-calculation-unresolved"
+  ],
+  "claimStatus": "fresh-source-only-roof-ceiling-classification-before-completed-answer-comparison-not-placement-or-code-compliance",
+  "receiptSha256": "5d28547bee67ec9dd74e06969f399494639ae0d3cc3725b5b5ef9759f1d7db3a"
+}
