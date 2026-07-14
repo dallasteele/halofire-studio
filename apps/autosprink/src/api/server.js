@@ -79,6 +79,7 @@ import { renderMosesLakeHeldoutOverlaySvg, validateMosesLakeHeldoutComparison, v
 import { renderVivianoHeldoutOverlaySvg, validateVivianoHeldoutComparison, verifyVivianoHeldoutAdversarialLoop } from '../engine/viviano-clubhouse-pitched-heldout-comparison.js';
 import { validatePitchedPlacementCalibrationCorpus, verifyPitchedPlacementCalibrationAdversarialLoop } from '../engine/pitched-placement-calibration-corpus.js';
 import { validatePitchedPlacementCalibrationCorpusV2, verifyPitchedPlacementCalibrationV2AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v2.js';
+import { validatePitchedPlacementCalibrationCorpusV3, verifyPitchedPlacementCalibrationV3AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v3.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -179,6 +180,7 @@ const VIVIANO_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/viviano-c
 const VIVIANO_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/viviano-clubhouse-pitched-heldout-comparison.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V2_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v2.json');
+const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V3_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v3.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -2496,6 +2498,40 @@ app.get('/api/evidence/pitched-placement-calibration-corpus-v2', authMiddleware,
   } catch (error) {
     log.error('Failed to load pitched placement calibration corpus revision two', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'pitched_placement_calibration_corpus_v2_load_failed', strategySelectorReadyForFreshHoldout: false, unseenProjectPlacementVerified: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/pitched-placement-calibration-corpus-v3', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(PITCHED_PLACEMENT_CALIBRATION_CORPUS_V3_PATH, 'utf8'));
+    const dependencies = {
+      v2Corpus: JSON.parse(fs.readFileSync(PITCHED_PLACEMENT_CALIBRATION_CORPUS_V2_PATH, 'utf8')),
+      vivianoSourceCandidate: JSON.parse(fs.readFileSync(VIVIANO_SOURCE_CANDIDATE_PATH, 'utf8')),
+      vivianoComparison: JSON.parse(fs.readFileSync(VIVIANO_HELDOUT_COMPARISON_PATH, 'utf8')),
+    };
+    const [validation, adversarialLoop] = await Promise.all([
+      validatePitchedPlacementCalibrationCorpusV3(packet, dependencies),
+      verifyPitchedPlacementCalibrationV3AdversarialLoop(packet, dependencies),
+    ]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop,
+        strategySelectorReadyForFreshHoldout: false, unseenProjectPlacementVerified: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, receiptSha256: packet.receiptSha256,
+      mode: packet.mode, purpose: packet.purpose, sourceBindings: packet.sourceBindings,
+      trainingProjects: packet.trainingProjects, largeVaultStrategies: packet.largeVaultStrategies,
+      contrastiveLearning: packet.contrastiveLearning, failedHoldoutControls: packet.failedHoldoutControls,
+      transferPolicy: packet.transferPolicy, adversarialLoop, strategySelectorReadyForFreshHoldout: true,
+      unseenProjectPlacementVerified: false, complianceReady: false, fabricationReady: false,
+      fieldReleaseReady: false, claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load pitched placement calibration corpus revision three', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'pitched_placement_calibration_corpus_v3_load_failed', strategySelectorReadyForFreshHoldout: false, unseenProjectPlacementVerified: false, complianceReady: false });
   }
 });
 
