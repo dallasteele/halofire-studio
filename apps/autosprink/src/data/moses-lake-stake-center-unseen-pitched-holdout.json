@@ -1,0 +1,52 @@
+{
+  "artifactType": "halofire.unseen-pitched-holdout.v1",
+  "projectId": "moses-lake-stake-center",
+  "projectName": "Moses Lake Stake Center",
+  "sources": [
+    { "role": "architectural_floor_plan", "path": "Engineering/Approved For Construction Builder Set/Meetinghouse-&-Site/A101-A606-Architectural/A101-MAIN-FLOOR-PLAN-Rev.4.pdf", "sha256": "cf846baa12470b78db992b6cb657e26672c86a1fa2390de2d0d256989ddc7ee7", "bytes": 1346905 },
+    { "role": "architectural_dimension_plan", "path": "Engineering/Approved For Construction Builder Set/Meetinghouse-&-Site/A101-A606-Architectural/A103-MAIN-FLOOR-DIMENSION-PLAN-Rev.4.pdf", "sha256": "cad0b770cdd2fbe896c334501c7e490ab50562072a4ef2b330fbf568374a562b", "bytes": 1121178 },
+    { "role": "architectural_roof_plan", "path": "Engineering/Approved For Construction Builder Set/Meetinghouse-&-Site/A101-A606-Architectural/A121-ROOF-PLAN-Rev.3.pdf", "sha256": "e26dd112b5705530f459005969d90fca277d5235a84a404eb95df09349f1ef03", "bytes": 653985 },
+    { "role": "architectural_reflected_ceiling_plan", "path": "Engineering/Approved For Construction Builder Set/Meetinghouse-&-Site/A101-A606-Architectural/A151-REFLECTED-CEILING-PLAN-Rev.3.pdf", "sha256": "626283ee00b0fea9eb3bec2142f7a6d429d10919446eb12656118b4c105f6f92", "bytes": 1179752 },
+    { "role": "architectural_building_elevations", "path": "Engineering/Approved For Construction Builder Set/Meetinghouse-&-Site/A101-A606-Architectural/A201-BUILDING-ELEVATIONS-Rev.4.pdf", "sha256": "2a0f3ec1f1b6a2761dcae5d151fd6a40fd8bda532eb41bf85837ebd022051916", "bytes": 669256 },
+    { "role": "architectural_chapel_sections", "path": "Engineering/Approved For Construction Builder Set/Meetinghouse-&-Site/A101-A606-Architectural/A301-BUILDING-SECTIONS-Rev.4.pdf", "sha256": "5597db2f57fd803006b43c947a40827a222780365829e5dfab9437ba47795697", "bytes": 1160000 },
+    { "role": "architectural_cultural_center_sections", "path": "Engineering/Approved For Construction Builder Set/Meetinghouse-&-Site/A101-A606-Architectural/A302-BUILDING-SECTIONS-Rev.4.pdf", "sha256": "a4936ba17edeefe34078abc832c1f2c0c9a5f7ba8ed0217d636d871112b62219", "bytes": 1156490 },
+    { "role": "structural_truss_elevations", "path": "Engineering/Approved For Construction Builder Set/Meetinghouse-&-Site/S101-S604-Structural/S201-TRUSS-ELEVATIONS-Rev.2.pdf", "sha256": "f2a18a740b0c574f9bf2834aa4ba62de4205b6f77875b3d00b83c872c913f17b", "bytes": 801948 }
+  ],
+  "answerKeyDenylist": [
+    { "path": "Field Operations/City Approved FS Plans/Stamped Sprinkler Site Plans LDS Stake Center Halo Fire.MARKED_UP.pdf", "sha256": "3074149cae1c4db4de8e40d7a537b2461910935bb6e5aa01ac504bb170fd52a3", "bytes": 5932127, "openedBeforeSourceCommit": false },
+    { "path": "Field Operations/As Builts/Stamped Sprinkler Site Plans LDS Stake Center Halo Fire.MARKED_UP (1).pdf", "sha256": "aa533bd4187ca59283cd3d8cc62d513acd31432ef3df2d8169a57e17fa713eab", "bytes": 5937065, "openedBeforeSourceCommit": false }
+  ],
+  "selection": {
+    "status": "source-sealed-answer-unopened",
+    "priorImplementationSearchHits": 0,
+    "rejectedBeforeAnswerOpen": [
+      { "project": "Herriman Fire Station", "reason": "fixed low and high metal roof decks over exposed structure, not an occupied pitched ceiling" },
+      { "project": "T Bar M Dining Hall", "reason": "occupied gable source exists, but only an estimate sprinkler plan was found and no approved or as-built answer authority" },
+      { "project": "AAO Youth", "reason": "completed approved sprinkler records exist, but architectural sources label flat 9-to-12-foot ceilings below the hip roof" }
+    ]
+  },
+  "sourceObservations": {
+    "culturalCenterVault": {
+      "room": "CULTURAL CENTER SC150",
+      "sourceSheets": ["A101", "A103", "A151", "A302", "S201"],
+      "planLengthFt": 25.5,
+      "planWidthFt": 37.541667,
+      "pitchRiseInPer12": 4.5,
+      "ridgeElevationFt": 19.385417,
+      "derivedSpringElevationFt": 12.346354,
+      "ceilingFinishType": "C3",
+      "sourceCeilingLabel": "SLOPED",
+      "dimensionClosure": "A103 closes 25'-6 by 37'-6 1/2; A151 labels C3 SLOPED and the 19'-4 5/8 ridge; A302 and S201 corroborate a symmetric 4 1/2:12 bottom-chord profile, deriving a 12.346354-foot spring"
+    },
+    "zoneRegistry": [
+      { "id": "cultural-center-vault-zone", "classification": "occupied-sloped-ceiling", "placementEligible": true, "reason": "A103, A151, A302, and S201 close the plan, ridge, pitch, and two ceiling planes" },
+      { "id": "chapel-vault-zone", "classification": "occupied-sloped-ceiling", "placementEligible": false, "reason": "A151 and A301 prove a pitched occupied chapel and rostrum, but it is reserved as an independent intra-project comparison zone" },
+      { "id": "flat-support-zones", "classification": "flat-occupied-ceilings", "placementEligible": false, "reason": "A151 labels the offices, corridors, toilets, and support rooms with flat C1, C2, C4, C7, and C8 ceilings" }
+    ]
+  },
+  "toolchain": { "pdfRenderer": "Poppler pdftoppm", "readOnlySourceInspection": true, "renderMode": "local-raster-sheet-and-crop-inspection" },
+  "brainPreflight": { "status": "passed", "platformSpineAddendumApplied": true, "spatialB1ThroughB7Priority": 1 },
+  "generation": { "answerKeyUsed": false, "completedBidUsedForGeneration": false, "calibrationCorpusAllowed": true, "roofPlaneSubstitutionAllowed": false },
+  "claims": { "unseenProjectPlacementVerified": false, "codeCompliance": false, "fabrication": false, "fieldRelease": false },
+  "receiptSha256": "0f0d90d0acdfde302ada885312279bd606fa2bb0328ab28695690f4e6365ce39"
+}
