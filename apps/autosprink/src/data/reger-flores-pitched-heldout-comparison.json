@@ -1,0 +1,61 @@
+{
+  "artifactType": "halofire.reger-flores-pitched-heldout-comparison.v1",
+  "projectName": "Reger-Flores Residence - Queen Creek AZ",
+  "sequence": {
+    "preAnswerCommit": "79471ecb10c2fcaea9145c755d1306f69614eb75",
+    "sourceCandidateSealedBeforeAnswerOpen": true,
+    "preAnswerCandidateReceiptSha256": "b158c8f3db890e99cefa942f7e9dd1d5594367a49bf457da74de3b78c9b6dd4e",
+    "answerOpenedAfterPreAnswerCommit": true,
+    "correctedImplementationEligibleAsFreshHoldout": false
+  },
+  "answerEvidence": {
+    "completedPdfSha256": "af45158d0e52a87faa78973b171245d6c772d46d5edccfad0e8410e88c8ffce9",
+    "page": 1,
+    "roomLabel": "LOUNGE VAULTED",
+    "render": {
+      "dpi": 120,
+      "pagePixels": [5040, 3600],
+      "cropPixels": [2850, 300, 3900, 1300],
+      "cropSha256": "3e0bf722adc2ffb5e221a29427767bdc50b331e5d33af16d8fa7c14c2cdb22e3"
+    },
+    "completedLayout": {
+      "headCount": 6,
+      "slopeColumnCount": 2,
+      "ridgeDirectionRowsPerColumn": 3,
+      "observedWestSuccessiveSpacingFt": [7.833333, 8],
+      "observedEastSuccessiveSpacingFt": [7.833333, 8]
+    }
+  },
+  "preAnswerResults": {
+    "generatedHeadCount": 2,
+    "generatedSlopeColumnCount": 2,
+    "generatedRidgeDirectionRowsPerColumn": 1,
+    "headCountParityPassed": false,
+    "slopeColumnTopologyPassed": true,
+    "ridgeDirectionRepetitionPassed": false,
+    "exactPlanPlacementPassed": false
+  },
+  "findings": [
+    "the sealed candidate correctly placed one candidate column on each independently derived 4:12 vault plane",
+    "the completed LOUNGE VAULTED layout has three ridge-direction rows per plane and six heads total",
+    "the sealed Dillon replay emitted one ridge-direction row per plane and only two heads total",
+    "the same-project correction is answer-exposed and cannot satisfy a fresh unseen-project gate"
+  ],
+  "requiredNextLoop": "calibrate-ridge-direction-repetition-then-run-another-fresh-unopened-pitched-project",
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "sealed-pre-answer-receipt-versus-completed-lounge-observation" },
+    "independent": { "status": "passed", "method": "page-one-high-resolution-room-crop-and-branch-spacing-read" },
+    "adversarial": {
+      "status": "passed",
+      "rejectedCases": ["sequence", "answer-count", "answer-columns", "hide-row-failure", "exact-placement-pass", "whole-project-pass", "compliance-pass"]
+    }
+  },
+  "heldOutAcceptanceStatus": "failed",
+  "unseenSlopeColumnTopologyVerified": true,
+  "unseenProjectPlacementVerified": false,
+  "pitchedRoofHeadLayoutReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "receiptSha256": "51a8afef5cf735d73a031bc66af86063f385960ecf816932488bfabe99b2cfd7"
+}
