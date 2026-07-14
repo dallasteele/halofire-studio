@@ -1,0 +1,193 @@
+{
+  "artifactType": "halofire.unseen-pitched-holdout.v2",
+  "projectId": "viviano-clubhouse-saratoga-springs-ut",
+  "projectName": "Viviano Clubhouse - Saratoga Springs UT",
+  "purpose": "fresh completed-project holdout for one source-closed occupied vaulted Gym bay before any Viviano sprinkler answer is opened",
+  "sources": [
+    {
+      "role": "architectural_level_1_floor_plan",
+      "locator": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/Architectural/A101-LEVEL-1-FLOOR-PLAN-Rev.4.pdf",
+      "sha256": "e79e0385f5b87c379e3aa27aa067245e18ce1da43e1d50b61ece2a002ef5a9bd",
+      "bytes": 712304
+    },
+    {
+      "role": "architectural_level_1_ceiling_plan",
+      "locator": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/Architectural/A103-LEVEL-1-CEILING-PLAN-Rev.4.pdf",
+      "sha256": "6ae44cdedc7cf8c7010217c867e057ae45e60c9e85a1b0a70946f626998f0ffe",
+      "bytes": 397166
+    },
+    {
+      "role": "architectural_roof_plan",
+      "locator": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/Architectural/A105-ROOF-PLAN-Rev.3.pdf",
+      "sha256": "8e67e129095610db99ff1128cdcacd9047127c4e827b3b94a47de04cb6503747",
+      "bytes": 1868718
+    },
+    {
+      "role": "architectural_level_1_framing_plan",
+      "locator": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/Architectural/A107-LEVEL-1-FRAMING-PLAN-BUILDING-Rev.3.pdf",
+      "sha256": "d691bbd49f5424e5007cd499b4d16870e7f3a28a79bc6c2775b6754980e64e37",
+      "bytes": 313776
+    },
+    {
+      "role": "architectural_elevations_a201",
+      "locator": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/Architectural/A201-ELEVATIONS-Rev.3.pdf",
+      "sha256": "48a9eb802c7f2eafcdb3eea6fc0b07f155dfd3d7d5d8ca669d80f48548d07fbe",
+      "bytes": 1291963
+    },
+    {
+      "role": "architectural_elevations_a202",
+      "locator": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/Architectural/A202-ELEVATIONS-Rev.3.pdf",
+      "sha256": "95c5832da9ec11a117f33e890d4ecce545700068b17d231eb30afd66f507efee",
+      "bytes": 1218784
+    },
+    {
+      "role": "architectural_building_sections",
+      "locator": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/Architectural/A301-BUILDING-SECTIONS-Rev.3.pdf",
+      "sha256": "38e0284eb265998ecdba4187c170d4afdee4339b5547b64cc30b606e7b17f376",
+      "bytes": 811607
+    },
+    {
+      "role": "architectural_gym_finish_plans",
+      "locator": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/Architectural/A404-FINISH-PLANS_GYM-Rev.4.pdf",
+      "sha256": "08be59522a7c58272afcefe48f43a550c36f46c974050ecf06d17a668b5000bd",
+      "bytes": 611257
+    }
+  ],
+  "answerKeyDenylist": [
+    {
+      "kind": "engineer-approved",
+      "locator": "2-Internal Ops/01-Design/07-ENG Submittals/Fire Sprinkler System Approved.pdf",
+      "sha256": "05d1a6e9ee901210a076c28dc919644b4e5facad88291fc21d30928627fc398c",
+      "bytes": 16280495,
+      "openedBeforeSourceCommit": false
+    },
+    {
+      "kind": "engineer-approved-original-set",
+      "locator": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/Original/Viviano Engineer Approved Set.pdf",
+      "sha256": "83279c6806beeea4568b5188e8f2f809f95a84ed81118b0dc6648d76fe8757a6",
+      "bytes": 29244030,
+      "openedBeforeSourceCommit": false
+    },
+    {
+      "kind": "ahj-approved-revised",
+      "locator": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/Revised/Approved revised 211000 Fire Sprinkler Submittal.pdf",
+      "sha256": "e3b4f12828e13c42051021b4d50e93462a8e750e97b2cdf7c8b88619f62d83f3",
+      "bytes": 7450530,
+      "openedBeforeSourceCommit": false
+    },
+    {
+      "kind": "closeout-as-built",
+      "locator": "2-Internal Ops/04-Close-Out Docs/Viviano Clubhouse FS As-Built Set.pdf",
+      "sha256": "e3b4f12828e13c42051021b4d50e93462a8e750e97b2cdf7c8b88619f62d83f3",
+      "bytes": 7450530,
+      "openedBeforeSourceCommit": false
+    }
+  ],
+  "sourceObservations": {
+    "clubhouseGymVault": {
+      "room": "CLUBHOUSE GYM 58",
+      "planLengthFt": 42.25,
+      "planWidthFt": 30.760417,
+      "areaSqFt": 1299.627618,
+      "pitchRiseInPer12": 7.334,
+      "springElevationFt": 17,
+      "ridgeElevationFt": 26.399871,
+      "sourceCeilingLabel": "VAULTED CEILING",
+      "sourceObstructionPresent": true,
+      "sourceVisibleObstructions": [
+        "ceiling fans shown on A103 and A404"
+      ],
+      "roofPitchRiseInPer12": 10,
+      "roofPlaneUsedAsCeiling": false,
+      "dimensionEvidence": {
+        "planLength": "A404 vaulted-zone boundary-to-boundary measurement at printed 1/8 inch equals 42 feet 3 inches",
+        "planWidth": "A404 Gym 1 explicit 30 feet 9 1/8 inches",
+        "spring": "A301 Clubhouse Gym section explicit 17 feet 0 inches above Level 1",
+        "ceilingPitch": "A301 vector audit averages drafted left 7.174:12 and right 7.494:12 ceiling planes to 7.334:12",
+        "exteriorRoofPitch": "A105 explicit 10 inches per 1 foot roof symbols; recorded only to prevent exterior-roof substitution"
+      }
+    },
+    "zoneRegistry": [
+      {
+        "id": "clubhouse-gym-vault-zone",
+        "classification": "occupied-vaulted-ceiling",
+        "placementEligible": true,
+        "reason": "A101, A103, A301, and A404 close the selected Gym plan bay, two occupied ceiling planes, spring, ridge, and source-visible fan condition"
+      },
+      {
+        "id": "other-vaulted-zones",
+        "classification": "occupied-vaulted-ceilings",
+        "placementEligible": false,
+        "reason": "A103 and A104 prove additional vaults, but they are reserved for later independent intra-project comparisons"
+      },
+      {
+        "id": "flat-occupied-zones",
+        "classification": "flat-occupied-ceilings",
+        "placementEligible": false,
+        "reason": "RCP sheets contain flat occupied zones outside this bounded pitched holdout"
+      }
+    ]
+  },
+  "selection": {
+    "status": "source-sealed-answer-unopened",
+    "priorImplementationSearchHits": 0,
+    "rejectedBeforeAnswerOpen": [
+      {
+        "project": "Rozenfield Residence",
+        "reason": "source sections show membrane/drainage roof and flat or stepped occupied ceilings"
+      },
+      {
+        "project": "Egbo Residence",
+        "reason": "pitched external hip roof covers flat or decorative occupied ceilings below attic trusses"
+      },
+      {
+        "project": "Pit House",
+        "reason": "complex 1/2:12 plus 9:12 open-structure geometry is outside the calibrated two-plane vault partition"
+      },
+      {
+        "project": "Grella",
+        "reason": "source sheets show flat 10-foot and 12-foot occupied ceilings"
+      },
+      {
+        "project": "Walsh Residence",
+        "reason": "completed answer exists but no independent architectural source set was found"
+      },
+      {
+        "project": "Johnson Residence",
+        "reason": "architectural source exists but no completed sprinkler answer was found"
+      }
+    ]
+  },
+  "toolchain": {
+    "pdfRenderer": "Poppler pdftoppm",
+    "pdfVectorInspector": "PyMuPDF fitz",
+    "visualInspectionCompleted": true,
+    "readOnlySourceInspection": true,
+    "answerContentRead": false,
+    "answerBytesHashedOnly": true
+  },
+  "brainPreflight": {
+    "status": "passed",
+    "platformSpineAddendumApplied": true,
+    "spatialB1ThroughB7Priority": 1,
+    "verificationLoopsRequired": true,
+    "noIndependentHumanReviewGate": true
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "roofPlaneSubstitutionAllowed": false,
+    "sourceOnlyGeometryRequired": true,
+    "blindCandidateMustBeCommittedBeforeAnswerOpen": true
+  },
+  "claims": {
+    "unseenPlacementVerified": false,
+    "wholeBuildingModelReady": false,
+    "wholeBuildingHeadLayoutReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "1defe4bf3fb75ddd0d8c6cb48b87d1208281250320cc502572b91bf67965bb93"
+}
