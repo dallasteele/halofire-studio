@@ -1,0 +1,148 @@
+{
+  "artifactType": "halofire.source-only-pitched-roof-calibration-seal.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "scope": "Building J source floor, reflected-ceiling, roof, elevation, section, and structural geometry only",
+  "sources": [
+    {
+      "role": "architectural-bid-set",
+      "path": "Bid Files/18_434 Riverside Bid Set 050820-1.pdf",
+      "bytes": 116713715,
+      "sha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c",
+      "physicalPages": [
+        104,
+        105,
+        106,
+        109,
+        110
+      ]
+    },
+    {
+      "role": "architectural-floor-plan-dwg",
+      "path": "Engineering/CAD Files/18_434 Riverside MIT Phase 2 Floor plans.dwg",
+      "bytes": 6418563,
+      "sha256": "4310609e80ef25af2abbb164a623de1fe749fb37b04d165699acc4fc4f6297e5"
+    },
+    {
+      "role": "architectural-rcp-dwg",
+      "path": "Engineering/CAD Files/18_434 Riverside MIT Phase 2 RCP.dwg",
+      "bytes": 6423002,
+      "sha256": "05cdadaa2dd74dd7d02199b7030960864cc30c99044e82de28ca7176188b5658"
+    },
+    {
+      "role": "structural-roof-framing-dwg",
+      "path": "Engineering/CAD Files/19PHX009 - OWP - Riverside MIT Phase 2-Sheet - S2-1 - ROOF FRAMING PLANS.dwg",
+      "bytes": 701676,
+      "sha256": "94ee255614f7b403de5185622018eaaad8f80ebe253592418bc7e3b6d993c9aa"
+    },
+    {
+      "role": "building-j-section-e-dwg",
+      "path": "Engineering/CAD Files/E SECTION_bldg J.dwg",
+      "bytes": 427934,
+      "sha256": "f65f41960f27c0a13c60e35b9da36e100b255d92c94c8e895cc25f6ba550a0d5"
+    },
+    {
+      "role": "building-j-section-f-dwg",
+      "path": "Engineering/CAD Files/F SECTION_bldg J.dwg",
+      "bytes": 304405,
+      "sha256": "7b155ffa696ae89fde463b3f3a318e99956fe1976e73c73bf019f3e40a7eaca7"
+    },
+    {
+      "role": "building-j-section-g-dwg",
+      "path": "Engineering/CAD Files/G SECTION_bldg J.dwg",
+      "bytes": 169299,
+      "sha256": "ad2e7bb68222eff9361a8716ad550e8540fcf2df2c90f238fe09218f36418c68"
+    },
+    {
+      "role": "building-j-section-h-dwg",
+      "path": "Engineering/CAD Files/H SECTION_bldg J.dwg",
+      "bytes": 422505,
+      "sha256": "237364c723889b982ea4c44670ad53d5b5318018f106c9ce610961eb249c4150"
+    }
+  ],
+  "answerKeyDenylist": [
+    {
+      "role": "state-fire-marshal-approved-plan",
+      "path": "Engineering/City Approved FS Plans/State Fire Marshal Approved Plan Set.pdf",
+      "bytes": 2432530,
+      "sha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+      "openedForBuildingJBeforeSourceSeal": false,
+      "knownPriorUseForOtherScope": true
+    },
+    {
+      "role": "state-fire-marshal-as-built-plan",
+      "path": "Field Operations/As Builts/State Fire Marshal Approved Plan Set_As Builts.pdf",
+      "bytes": 2495800,
+      "sha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+      "openedForBuildingJBeforeSourceSeal": false,
+      "knownPriorUseForOtherScope": true
+    }
+  ],
+  "sameProjectPriorScope": {
+    "scope": "Dugout H hydraulic and field-plan registration",
+    "answerDerivedArtifactsExist": true,
+    "buildingJCoordinatesPresent": false,
+    "denylistedArtifactPrefix": "mit-riverside-*hydraulic*"
+  },
+  "sourceObservations": {
+    "sheetBindings": {
+      "floorPlan": 104,
+      "reflectedCeilingPlan": 105,
+      "roofPlan": 106,
+      "buildingElevations": 109,
+      "buildingSections": 110,
+      "structuralRoofFraming": 84
+    },
+    "buildingEnvelope": {
+      "levelCount": 1,
+      "overallWidthFt": 76.333333,
+      "overallDepthFt": 100.166667,
+      "scaledEnvelopeReady": true,
+      "exactFootprintPolygonReady": false
+    },
+    "roof": {
+      "mainStandingSeamPlane": {
+        "riseInPer12": 1.25,
+        "lowDatumFt": 17.083333,
+        "intermediateDatumFt": 19.916667,
+        "highDatumFt": 23.333333
+      },
+      "lowerRoofPlane": {
+        "riseInPer12": 0.5,
+        "bearingDatumFt": 12
+      },
+      "cricketPlane": {
+        "riseInPer12": 0.375
+      },
+      "connectedMassCount": 2,
+      "wholeFaceTopologyReady": false,
+      "absoluteDatumSetReady": true
+    },
+    "occupiedRegime": {
+      "openSlopedDeckPresent": true,
+      "mixedCeilingRegimes": true,
+      "atticVolumePresent": false,
+      "sourceProtectionPlaneAssignmentReady": false
+    }
+  },
+  "selection": {
+    "status": "source-sealed-building-j-answer-geometry-unopened",
+    "projectCorpusKnown": true,
+    "buildingJPriorImplementationSearchHits": 0,
+    "reason": "independent CAD plus scaled floor, RCP, roof, elevations, and sections prove a connected multi-plane pitched occupied-roof case"
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "sameProjectPriorScopeArtifactsUsed": false
+  },
+  "claims": {
+    "pitchedHeadPlacementReady": false,
+    "wholeRoofModelReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "789c49ed7a91999d675a3cc6f20ca0bccc76ff22b9a72900020386af323192d8"
+}

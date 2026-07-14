@@ -1,0 +1,92 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-only-pitched-candidate.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "sourceSealReceiptSha256": "789c49ed7a91999d675a3cc6f20ca0bccc76ff22b9a72900020386af323192d8",
+  "generationMode": "sealed-building-j-floor-rcp-roof-elevation-section-and-structural-source-only",
+  "buildingModel": {
+    "coordinateSystem": "source sheet feet normalized to a local one-level envelope",
+    "levelCount": 1,
+    "levels": [
+      {
+        "id": "level-01",
+        "floorElevationFt": 0,
+        "scaledEnvelopeFt": {
+          "width": 76.333333,
+          "depth": 100.166667
+        },
+        "exactFootprintPolygonReady": false
+      }
+    ],
+    "roofPlanes": [
+      {
+        "id": "main-standing-seam",
+        "riseInPer12": 1.25,
+        "sourceDatumsFt": [
+          17.083333,
+          19.916667,
+          23.333333
+        ],
+        "absoluteDatumSetReady": true,
+        "exactFacePolygonReady": false
+      },
+      {
+        "id": "lower-connected-roof",
+        "riseInPer12": 0.5,
+        "sourceDatumsFt": [
+          12
+        ],
+        "absoluteDatumSetReady": true,
+        "exactFacePolygonReady": false
+      },
+      {
+        "id": "lower-roof-crickets",
+        "riseInPer12": 0.375,
+        "absoluteDatumSetReady": false,
+        "exactFacePolygonReady": false
+      }
+    ],
+    "connectedRoofMassCount": 2,
+    "openSlopedDeckPresent": true,
+    "mixedCeilingRegimes": true,
+    "scaledEnvelopeReady": true,
+    "sideViewDatumSetReady": true,
+    "exactFloorFootprintReady": false,
+    "wholeRoofFaceTopologyReady": false
+  },
+  "heads3d": [],
+  "branchPipes3d": [],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "source PDF floor/RCP/roof/elevation/section page binding and dimension replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "independent architectural DWG, structural roof-framing DWG, and four Building J section-DWG hash binding"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "provenance, prior-scope leakage, pitch, datum, geometry, head, and false-promotion mutations"
+    }
+  },
+  "answerKeyOpenedForBuildingJ": false,
+  "answerKeyUsedAsGeometryInput": false,
+  "sameProjectPriorScopeArtifactsUsed": false,
+  "sourceCalibrationTargetReady": true,
+  "topViewSchematicReady": true,
+  "elevationViewSchematicReady": true,
+  "partialModel3dSchematicReady": true,
+  "exactFloorFootprintReady": false,
+  "wholeRoofModelReady": false,
+  "pitchedHeadPlacementReady": false,
+  "freshProjectPlacementVerified": false,
+  "branchPipeTopologyReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "commit and push this Building J source seal, then open only the separately hashed approved/as-built sprinkler pages for Building J calibration without rewriting source geometry",
+  "claimStatus": "source-only-scaled-envelope-connected-pitched-roof-and-side-view-datums-not-exact-footprint-head-placement-compliance-or-fabrication",
+  "receiptSha256": "502542e3177767f4b494a742b236d12c5e3ea2ae775428475c781b8eb6121fda"
+}

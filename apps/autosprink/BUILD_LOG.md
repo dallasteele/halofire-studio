@@ -1,5 +1,14 @@
 # HaloFire Build Log
 
+## 2026-07-14 - MIT Riverside Building J source-only pitched-roof calibration target
+
+- Selected Building J after the sealed Polaris upright replay disproved the isolated-hip source interpretation. This follows the corpus rule: when one project cannot independently close a feature, use a different completed project with stronger source evidence.
+- Bound an independent 116.7 MB architectural bid set, floor and RCP DWGs, structural roof-framing DWG, and four Building J section DWGs. The Building J sprinkler answer remains unopened for this scope; known same-project Dugout H answer-derived artifacts are disclosed and denylisted from generation.
+- Source pages prove a one-level 76.333333 ft by 100.166667 ft envelope, connected 1.25:12 standing-seam and 0.5:12 lower roof masses, 0.375:12 crickets, exposed sloped deck, mixed ceiling regimes, and 17.083333/19.916667/23.333333 ft main-roof B.O.D. references from side views.
+- Added deterministic top, elevation, and partial-3D source proof. The proof keeps exact floor footprint, exact roof faces, sprinkler heads, compliance, fabrication, and field release false.
+- Verification: source receipt replay passed, candidate replay passed, five focused tests passed, and all 16 provenance/prior-scope/geometry/head/false-promotion mutations were rejected.
+- Next: commit and push this blind source seal before opening the separately hashed approved/as-built sprinkler pages for Building J calibration.
+
 ## 2026-07-14 - Polaris isolated-roof candidate rejected by sealed upright registration
 
 - Registered all 77 sealed Polaris attic uprights to the source geometry committed and pushed at `4ad324b1`, without allowing answer coordinates to rewrite that geometry.

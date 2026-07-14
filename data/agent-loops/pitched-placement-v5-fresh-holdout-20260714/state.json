@@ -1,8 +1,8 @@
 {
   "loop": "pitched-placement-v5-fresh-holdout-20260714",
-  "stage": "ANSWER_REGISTRATION",
-  "status": "source-roof-candidate-rejected-connected-topology-required",
-  "iteration": 5,
+  "stage": "SOURCE_CALIBRATION_TARGET",
+  "status": "polaris-candidate-rejected-mit-building-j-source-sealed",
+  "iteration": 6,
   "answerKeyOpened": true,
   "answerOpenedAfterSourceCommit": "caa5723d89d6bacad255acb35ddffa71592c3391",
   "selectedProject": {
@@ -22,6 +22,12 @@
       "project": "Polaris Academy - Mesa AZ",
       "decision": "selected-as-wrong-domain-attic-holdout",
       "reason": "source separates flat occupied ceilings from a 4:12 attic, so the occupied-vault v5 selector must reject and an attic placement regime must be learned only after the blind source commit"
+    },
+    {
+      "project": "MIT Riverside - Transportation Building J",
+      "decision": "selected-as-source-only-corrective-calibration-target",
+      "reason": "independent floor, RCP, roof, elevations, sections, structural roof framing, and section CAD prove a one-level connected multi-plane occupied pitched-roof case; known Dugout H answer artifacts are explicitly isolated",
+      "buildingJPriorImplementationSearchHits": 0
     }
   ],
   "sourceOnlyEvidence": {
@@ -124,6 +130,22 @@
     "absoluteRoofElevationReady": false,
     "complianceReady": false
   },
+  "correctiveSourceCalibrationTarget": {
+    "artifactType": "halofire.mit-riverside-building-j-source-only-pitched-candidate.v1",
+    "projectId": "mit-riverside-building-j",
+    "sourceSealReceiptSha256": "789c49ed7a91999d675a3cc6f20ca0bccc76ff22b9a72900020386af323192d8",
+    "candidateReceiptSha256": "502542e3177767f4b494a742b236d12c5e3ea2ae775428475c781b8eb6121fda",
+    "answerKeyOpenedForBuildingJ": false,
+    "sameProjectPriorScopeArtifactsUsed": false,
+    "scaledEnvelopeFt": { "width": 76.333333, "depth": 100.166667 },
+    "sourcePitchRiseInPer12": [1.25, 0.5, 0.375],
+    "sourceMainRoofDatumsFt": [17.083333, 19.916667, 23.333333],
+    "sourceCalibrationTargetReady": true,
+    "exactFloorFootprintReady": false,
+    "wholeRoofModelReady": false,
+    "pitchedHeadPlacementReady": false,
+    "complianceReady": false
+  },
   "comparisonResult": {
     "status": "passed-domain-guard-failed-placement-coverage",
     "wrongDomainGuardWorked": true,
@@ -142,6 +164,8 @@
     "sourceRoofTopologyFocusedTests": { "passed": 20, "failed": 0, "files": 4 },
     "sourceRoofTopologyAdversarialMutationCases": { "passed": 18, "attempted": 18 },
     "answerFaceRegistrationAdversarialMutationCases": { "passed": 14, "attempted": 14 },
+    "mitBuildingJSourceFocusedTests": { "passed": 5, "failed": 0, "files": 1 },
+    "mitBuildingJSourceAdversarialMutationCases": { "passed": 16, "attempted": 16 },
     "releaseWidthTests": { "passed": 1937, "failed": 0, "files": 230, "nodeNativePassed": 20 },
     "authenticatedApi": { "anonymousStatus": 401, "authenticatedStatus": 200, "cacheControl": "private, no-store" },
     "authenticatedStudioBrowser": {
@@ -200,6 +224,9 @@
     ]
   },
   "blockedClaims": [
+    "mit-building-j-exact-floor-footprint",
+    "mit-building-j-exact-roof-face-topology",
+    "mit-building-j-pitched-head-placement",
     "connected-whole-roof-face-topology",
     "absolute-roof-elevation",
     "fresh-pitched-attic-head-placement",
@@ -209,5 +236,5 @@
     "fabrication",
     "field-release"
   ],
-  "nextAction": "preserve the failed Polaris registration, replace isolated rectangular hips with source-traced connected gable/raised-mass/roof-fill/overhang domains using a clearer project where needed, then rerun the sealed 77-upright gate before selecting a fresh holdout"
+  "nextAction": "commit and push the source-only MIT Building J calibration target, then open only the separately hashed Building J approved/as-built sprinkler pages to register heads and branch geometry without rewriting the sealed source model; return the learned topology rules to Polaris and a genuinely fresh holdout"
 }

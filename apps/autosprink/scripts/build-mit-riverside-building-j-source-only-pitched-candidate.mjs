@@ -1,0 +1,22 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildMitRiversideBuildingJSourceCandidate, renderMitRiversideBuildingJSourceViews, sealMitRiversideBuildingJSource, validateMitRiversideBuildingJSource, validateMitRiversideBuildingJSourceCandidate, verifyMitRiversideBuildingJAdversarialLoop } from '../src/engine/mit-riverside-building-j-source-only-pitched-candidate.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const data = (name) => path.join(root, 'src', 'data', name);
+const read = (name) => JSON.parse(fs.readFileSync(data(name), 'utf8'));
+const sourceSeal = await sealMitRiversideBuildingJSource(read('mit-riverside-building-j-source-seal.json'));
+const candidate = await buildMitRiversideBuildingJSourceCandidate(sourceSeal);
+const sourceValidation = await validateMitRiversideBuildingJSource(sourceSeal);
+const candidateValidation = await validateMitRiversideBuildingJSourceCandidate(candidate, sourceSeal);
+const adversarial = await verifyMitRiversideBuildingJAdversarialLoop(candidate, sourceSeal);
+if ([sourceValidation.status, candidateValidation.status, adversarial.status].some((status) => status !== 'passed')) throw new Error(JSON.stringify({ sourceValidation, candidateValidation, adversarial }, null, 2));
+fs.writeFileSync(data('mit-riverside-building-j-source-seal.json'), `${JSON.stringify(sourceSeal, null, 2)}\n`);
+fs.writeFileSync(data('mit-riverside-building-j-source-only-pitched-candidate.json'), `${JSON.stringify(candidate, null, 2)}\n`);
+const out = path.join(root, 'out', 'visual-proof', 'mit-riverside-building-j-source-only');
+fs.mkdirSync(out, { recursive: true });
+const views = renderMitRiversideBuildingJSourceViews(candidate);
+for (const [name, svg] of Object.entries({ top: views.topSvg, elevation: views.elevationSvg, model3d: views.model3dSvg })) fs.writeFileSync(path.join(out, `mit-riverside-building-j-source-only-${name}.svg`), svg);
+fs.writeFileSync(path.join(out, 'mit-riverside-building-j-source-only-proof.json'), `${JSON.stringify({ sourceValidation, candidateValidation, adversarial, candidateReceiptSha256: candidate.receiptSha256 }, null, 2)}\n`);
+console.log(JSON.stringify({ sourceValidation, candidateValidation, adversarial, sourceSealReceiptSha256: sourceSeal.receiptSha256, candidateReceiptSha256: candidate.receiptSha256, out }, null, 2));
