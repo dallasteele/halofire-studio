@@ -216,7 +216,7 @@
   },
   "deploymentVerification": {
     "status": "passed",
-    "commit": "1153f129d75ac9f77e97dff983072cf9ca33b2ff",
+    "commit": "0d959a1b77e169169288d7c463f6ea5236bb0529",
     "service": "halofire.service",
     "serviceState": "active",
     "publicHealthStatus": 200,
@@ -233,7 +233,13 @@
     "liveUiConsoleErrors": 0,
     "liveViewerScrollHeightPx": 6851,
     "liveScreenshot": "apps/autosprink/output/playwright/winter-garden-operational-brain-source-spec-live-vps.png",
-    "liveScreenshotSha256": "20c7eb21cdef9dd3aaaeca9d6d8ffbb3e0316b0b9b11e8962f52b9e3e2b80b74"
+    "liveScreenshotSha256": "20c7eb21cdef9dd3aaaeca9d6d8ffbb3e0316b0b9b11e8962f52b9e3e2b80b74",
+    "authenticatedSourceTopologyRouteStatus": 200,
+    "authenticatedSourceTopologyReceiptSha256": "e3708ffacae132eb24682e200a668293b33ccf614559b28945ecd2d2afcc46b3",
+    "liveSourceTopologyReceiptVisible": true,
+    "liveSourceTopologyConsoleErrors": 0,
+    "liveSourceTopologyScreenshot": "apps/autosprink/output/playwright/winter-garden-source-topology-live-vps.png",
+    "liveSourceTopologyScreenshotSha256": "7c931cf5cb4cf2bf43ac3a41a4c001cb8b612de88125eae23b8464c8b2f751c9"
   },
   "nextAction": "ITERATE by resolving room 146 plan topology from another protected source or preserving the explicit residual, then join the 53 topology-ready identities to ceiling and source-spec controls before any source-only head placement; keep obstructions, water supply, compliance, fabrication, and field release fail-closed; compare against held-out completed-bid evidence only after generation is sealed."
 }
