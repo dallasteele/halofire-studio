@@ -85,6 +85,7 @@ import { validatePitchedPlacementCalibrationCorpusV4, verifyPitchedPlacementCali
 import { buildBoysGirlsClubSourceOnlyCandidate } from '../engine/boys-girls-club-unseen-pitched-holdout.js';
 import { renderBoysGirlsClubHeldoutComparison, validateBoysGirlsClubHeldoutComparison, verifyBoysGirlsClubComparisonAdversarialLoop } from '../engine/boys-girls-club-pitched-heldout-comparison.js';
 import { validatePitchedPlacementCalibrationCorpusV5, verifyPitchedPlacementCalibrationV5AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v5.js';
+import { renderPolarisHeldoutComparisonViews, validatePolarisAnswerEvidence, validatePolarisHeldoutComparison, verifyPolarisHeldoutComparisonAdversarialLoop } from '../engine/polaris-academy-pitched-attic-heldout-comparison.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -192,6 +193,23 @@ const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V4_PATH = path.resolve(__dirname, '..
 const BOYS_GIRLS_CLUB_SOURCE_SEAL_PATH = path.resolve(__dirname, '../data/boys-girls-club-unseen-pitched-holdout.json');
 const BOYS_GIRLS_CLUB_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/boys-girls-club-pitched-heldout-comparison.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V5_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v5.json');
+const POLARIS_SOURCE_SEAL_PATH = path.resolve(__dirname, '../data/polaris-academy-unseen-pitched-attic-holdout.json');
+const POLARIS_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/polaris-academy-source-only-pitched-attic-candidate.json');
+const POLARIS_ANSWER_EVIDENCE_PATH = path.resolve(__dirname, '../data/polaris-answer-extracted-evidence.json');
+const POLARIS_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/polaris-pitched-attic-heldout-comparison.json');
+const STUDIO_BROWSER_MODULES = new Map([
+  ['floorplans.js', path.resolve(__dirname, '../data/floorplans.js')],
+  ['evidence-gates.js', path.resolve(__dirname, '../data/evidence-gates.js')],
+  ['plan-manifest.js', path.resolve(__dirname, '../data/plan-manifest.js')],
+]);
+const STUDIO_EVIDENCE_FILES = new Map([
+  ['cutsheet-urls-fittings.json', path.resolve(__dirname, '../data/cutsheet-urls-fittings.json')],
+  ['roof-reconstruction.cooperative-1881.json', COOPERATIVE_1881_ROOF_ARTIFACT_PATH],
+  ['roof-coordination.cooperative-1881.json', path.resolve(__dirname, '../data/roof-coordination.cooperative-1881.json')],
+  ['submitted-fp8-calibration.cooperative-1881.json', COOPERATIVE_1881_SUBMITTED_CALIBRATION_PATH],
+  ['plan-levels.cooperative-1881.json', COOPERATIVE_1881_PLAN_LEVELS_PATH],
+  ['submitted-sloped-ceiling-calibration.dillon.json', DILLON_SLOPED_CALIBRATION_PATH],
+]);
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -910,6 +928,26 @@ app.get('/api/auth/me', authMiddleware, (req, res) => {
 });
 
 // ── Bids CRUD ──
+// The Studio used to import and fetch directly from /src/data. The static-data
+// deny rule correctly blocks that directory, which also made the real Studio
+// module graph fail at startup. Expose only this explicit browser-safe code and
+// evidence allowlist through authenticated, private routes; never translate a
+// caller-provided path into a filesystem path.
+app.get('/api/studio/modules/:name', authMiddleware, (req, res) => {
+  const filePath = STUDIO_BROWSER_MODULES.get(req.params.name);
+  if (!filePath) return res.status(404).json({ error: 'studio_module_not_found' });
+  res.setHeader('Cache-Control', 'private, no-store');
+  res.type('application/javascript');
+  return res.sendFile(filePath);
+});
+
+app.get('/api/studio/evidence/:name', authMiddleware, (req, res) => {
+  const filePath = STUDIO_EVIDENCE_FILES.get(req.params.name);
+  if (!filePath) return res.status(404).json({ error: 'studio_evidence_not_found' });
+  res.setHeader('Cache-Control', 'private, no-store');
+  return res.sendFile(filePath);
+});
+
 app.get('/api/bids', authMiddleware, (req, res) => {
   const { status, search, limit = 100, offset = 0 } = req.query;
   let query = 'SELECT * FROM bids WHERE 1=1';
@@ -2662,6 +2700,51 @@ app.get('/api/evidence/pitched-placement-calibration-corpus-v5', authMiddleware,
   } catch (error) {
     log.error('Failed to load pitched placement calibration corpus revision five', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'pitched_placement_calibration_corpus_v5_load_failed', strategySelectorReadyForFreshHoldout: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/polaris-academy-pitched-attic-heldout-comparison', authMiddleware, async (req, res) => {
+  try {
+    const sourceDependencies = {
+      sourceSeal: JSON.parse(fs.readFileSync(POLARIS_SOURCE_SEAL_PATH, 'utf8')),
+      v5Corpus: JSON.parse(fs.readFileSync(PITCHED_PLACEMENT_CALIBRATION_CORPUS_V5_PATH, 'utf8')),
+      v4Corpus: JSON.parse(fs.readFileSync(PITCHED_PLACEMENT_CALIBRATION_CORPUS_V4_PATH, 'utf8')),
+    };
+    const blindCandidate = JSON.parse(fs.readFileSync(POLARIS_SOURCE_CANDIDATE_PATH, 'utf8'));
+    const answerEvidence = JSON.parse(fs.readFileSync(POLARIS_ANSWER_EVIDENCE_PATH, 'utf8'));
+    const packet = JSON.parse(fs.readFileSync(POLARIS_HELDOUT_COMPARISON_PATH, 'utf8'));
+    const dependencies = { blindCandidate, answerEvidence, sourceDependencies };
+    const [answerValidation, comparisonValidation, adversarialLoop] = await Promise.all([
+      validatePolarisAnswerEvidence(answerEvidence),
+      validatePolarisHeldoutComparison(packet, dependencies),
+      verifyPolarisHeldoutComparisonAdversarialLoop(packet, dependencies),
+    ]);
+    if (answerValidation.status !== 'passed' || comparisonValidation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType,
+        issues: [...(answerValidation.issues || []), ...(comparisonValidation.issues || [])], adversarialLoop,
+        unseenProjectPlacementVerified: false, complianceReady: false,
+      });
+    }
+    const views = renderPolarisHeldoutComparisonViews(packet);
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, receiptSha256: packet.receiptSha256,
+      sourceOnlyCommit: packet.sourceOnlyCommit, sourceOnlyResult: packet.sourceOnlyResult,
+      approvedAndAsBuilt: packet.approvedAndAsBuilt, result: packet.result,
+      answerExposedCalibration: packet.answerExposedCalibration, internalVerification: packet.internalVerification,
+      views, adversarialLoop,
+      pitchedAtticCalibrationReady: true, pitchedAtticSelectorReadyForFreshHoldout: false,
+      pitchedAtticHeadLayoutReady: false, wholeRoofModelReady: false, hydraulicCalculationReady: false,
+      unseenProjectPlacementVerified: false, complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      requiredNextLoop: packet.requiredNextLoop, claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Polaris Academy pitched-attic heldout comparison', { error: error.message });
+    return res.status(500).json({
+      status: 'blocked', error: 'polaris_academy_pitched_attic_heldout_load_failed',
+      unseenProjectPlacementVerified: false, complianceReady: false,
+    });
   }
 });
 

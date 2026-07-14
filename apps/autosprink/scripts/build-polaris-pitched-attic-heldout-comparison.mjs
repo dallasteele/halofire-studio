@@ -1,0 +1,24 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildPolarisHeldoutComparison, renderPolarisHeldoutComparisonViews, validatePolarisAnswerEvidence, validatePolarisHeldoutComparison, verifyPolarisHeldoutComparisonAdversarialLoop } from '../src/engine/polaris-academy-pitched-attic-heldout-comparison.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const data = (name) => path.join(root, 'src', 'data', name);
+const read = (name) => JSON.parse(fs.readFileSync(data(name), 'utf8'));
+const blindCandidate = read('polaris-academy-source-only-pitched-attic-candidate.json');
+const answerEvidence = read('polaris-answer-extracted-evidence.json');
+const sourceSeal = read('polaris-academy-unseen-pitched-attic-holdout.json');
+const sourceDependencies = { sourceSeal, v5Corpus: read('pitched-placement-calibration-corpus-v5.json'), v4Corpus: read('pitched-placement-calibration-corpus-v4.json') };
+const dependencies = { blindCandidate, answerEvidence, sourceDependencies };
+const comparison = await buildPolarisHeldoutComparison(blindCandidate, answerEvidence, sourceDependencies);
+const evidenceValidation = await validatePolarisAnswerEvidence(answerEvidence);
+const comparisonValidation = await validatePolarisHeldoutComparison(comparison, dependencies);
+const adversarial = await verifyPolarisHeldoutComparisonAdversarialLoop(comparison, dependencies);
+if ([evidenceValidation.status, comparisonValidation.status, adversarial.status].some((status) => status !== 'passed')) throw new Error(JSON.stringify({ evidenceValidation, comparisonValidation, adversarial }, null, 2));
+fs.writeFileSync(data('polaris-pitched-attic-heldout-comparison.json'), `${JSON.stringify(comparison, null, 2)}\n`);
+const out = path.join(root, 'out', 'visual-proof', 'polaris-heldout-comparison'); fs.mkdirSync(out, { recursive: true });
+const views = renderPolarisHeldoutComparisonViews(comparison);
+for (const [name, svg] of Object.entries({ top: views.topSvg, elevation: views.elevationSvg, model3d: views.model3dSvg })) fs.writeFileSync(path.join(out, `polaris-heldout-${name}.svg`), svg);
+fs.writeFileSync(path.join(out, 'polaris-heldout-proof.json'), `${JSON.stringify({ evidenceValidation, comparisonValidation, adversarial, comparisonReceiptSha256: comparison.receiptSha256 }, null, 2)}\n`);
+console.log(JSON.stringify({ evidenceValidation, comparisonValidation, adversarial, comparisonReceiptSha256: comparison.receiptSha256, out }, null, 2));

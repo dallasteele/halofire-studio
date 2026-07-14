@@ -944,7 +944,7 @@ import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
 import { demoTimeline } from '/src/engine/demo-timeline.js';
 import { summarizeExportArtifact, buildExportProofMessage } from '/src/ui/export-proof.js';
 // HF-A1-UNDERLAY: built-in plan fixtures (same module the server uses) for the floor-plan ground underlay.
-import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '/src/data/floorplans.js';
+import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '/api/studio/modules/floorplans.js';
 // HF-B1-PDFUNDERLAY (Stream B): REAL plan-sheet PDF underlays + multi-level scaffold.
 import { loadPdfjs, renderSheetToCanvas, computeUnderlayTransform, createUnderlayMesh } from '/src/engine/pdf-underlay.js';
 import { buildBuildingLevels } from '/src/engine/building-levels.js';
@@ -953,7 +953,7 @@ import { buildBuildingLevels } from '/src/engine/building-levels.js';
 // true scale. Replaces the margin-box for Cooperative 1881.
 import { buildBuildingFromPlans, computePlanUnderlayTransform, unionFootprintCenter, planBounds } from '/src/engine/building-from-plan.js';
 import { acceptedModel3dToLevels } from '/src/engine/accepted-model3d.js';
-import { manifestForProject, sheetsForLevel } from '/src/data/plan-manifest.js';
+import { manifestForProject, sheetsForLevel } from '/api/studio/modules/plan-manifest.js';
 // HF-C1-PARTMESH (Stream C): true-scale real CAD part meshes (mm->ft, Y-up)
 // with Inspector provenance; primitives stay as flagged fallback.
 import { createPartMeshLoader } from '/src/engine/part-meshes.js';
@@ -1040,7 +1040,7 @@ import { synthesizeCeilingGrid as hfSynthCeilingGrid, centerHeadsOnTiles as hfCe
 // loader rejects `assert {type:'json'}`) and injected into the pure builder.
 import { buildCutsheetBundle as hfBuildCutsheetBundle, deriveUsedSkus as hfDeriveUsedSkus, CUTSHEETS_DISCLAIMER } from '/src/engine/cut-sheets.js';
 let hfCutsheetCatalog = null;
-fetch('/src/data/cutsheet-urls-fittings.json').then((r) => r.ok ? r.json() : null)
+fetch('/api/studio/evidence/cutsheet-urls-fittings.json', { credentials: 'same-origin' }).then((r) => r.ok ? r.json() : null)
   .then((j) => { if (Array.isArray(j)) hfCutsheetCatalog = j; })
   .catch(() => { hfCutsheetCatalog = null; });
 // NFPA-13 coverage lookup for the center-on-tile legality check — the SAME public
@@ -1282,8 +1282,8 @@ function hfRenderRoofPlaneOverlay(model) {
 async function hfLoadSourceBoundRoof() {
   if (hfRoofModel) return hfRoofModel;
   if (!hfRoofModelPromise) hfRoofModelPromise = Promise.all([
-    fetch('/src/data/roof-reconstruction.cooperative-1881.json', { credentials: 'same-origin' }),
-    fetch('/src/data/roof-coordination.cooperative-1881.json', { credentials: 'same-origin' }),
+    fetch('/api/studio/evidence/roof-reconstruction.cooperative-1881.json', { credentials: 'same-origin' }),
+    fetch('/api/studio/evidence/roof-coordination.cooperative-1881.json', { credentials: 'same-origin' }),
   ])
     .then(async ([roofResponse, coordinationResponse]) => {
       if (!roofResponse.ok) throw new Error(`roof evidence HTTP ${roofResponse.status}`);
@@ -1308,8 +1308,8 @@ async function hfLoadSubmittedCalibration() {
   if (hfSubmittedCalibration) return hfSubmittedCalibration;
   if (!hfSubmittedCalibrationPromise) hfSubmittedCalibrationPromise = Promise.all([
     hfLoadSourceBoundRoof(),
-    fetch('/src/data/submitted-fp8-calibration.cooperative-1881.json', { credentials: 'same-origin' }),
-    fetch('/src/data/plan-levels.cooperative-1881.json', { credentials: 'same-origin' }),
+    fetch('/api/studio/evidence/submitted-fp8-calibration.cooperative-1881.json', { credentials: 'same-origin' }),
+    fetch('/api/studio/evidence/plan-levels.cooperative-1881.json', { credentials: 'same-origin' }),
   ]).then(async ([roofModel, calibrationResponse, levelsResponse]) => {
     if (!calibrationResponse.ok) throw new Error(`submitted FP-8 calibration HTTP ${calibrationResponse.status}`);
     if (!levelsResponse.ok) throw new Error(`current A-108 geometry HTTP ${levelsResponse.status}`);
@@ -1333,7 +1333,7 @@ async function hfLoadSubmittedCalibration() {
 async function hfShowSubmittedCalibrationViews() {
   try {
     const calibration = await hfLoadSubmittedCalibration();
-    const dillonResponse = await fetch('/src/data/submitted-sloped-ceiling-calibration.dillon.json', { credentials: 'same-origin' });
+    const dillonResponse = await fetch('/api/studio/evidence/submitted-sloped-ceiling-calibration.dillon.json', { credentials: 'same-origin' });
     if (!dillonResponse.ok) throw new Error(`Dillon sloped-ceiling calibration HTTP ${dillonResponse.status}`);
     const dillonPacket = await dillonResponse.json();
     const dillonValidation = await hfValidateSubmittedSlopedCeilingCalibration(dillonPacket);
@@ -1454,6 +1454,17 @@ async function hfShowSubmittedCalibrationViews() {
       || winterGardenPitchedCandidates.partialPitchedCandidateGeometryGrounded !== true
       || winterGardenPitchedCandidates.pitchedRoofHeadLayoutReady !== false
       || winterGardenPitchedCandidates.complianceReady !== false) throw new Error('Winter Garden source pitched candidate validation failed');
+    const polarisHeldoutResponse = await fetch('/api/evidence/polaris-academy-pitched-attic-heldout-comparison', { credentials: 'same-origin' });
+    if (!polarisHeldoutResponse.ok) throw new Error(`Polaris held-out comparison HTTP ${polarisHeldoutResponse.status}`);
+    const polarisHeldout = await polarisHeldoutResponse.json();
+    if (polarisHeldout.status !== 'passed'
+      || polarisHeldout.sourceOnlyResult?.generatedHeadCount !== 0
+      || polarisHeldout.approvedAndAsBuilt?.totalHeadCount !== 158
+      || polarisHeldout.result?.wrongDomainGuardWorked !== true
+      || polarisHeldout.unseenProjectPlacementVerified !== false
+      || polarisHeldout.pitchedAtticSelectorReadyForFreshHoldout !== false
+      || polarisHeldout.complianceReady !== false
+      || polarisHeldout.views?.status !== 'passed') throw new Error('Polaris held-out comparison validation failed');
     const bidGeometryResponse = await fetch('/api/projects/Dillon%20Residence/completed-bid-geometry', { credentials: 'same-origin' });
     if (!bidGeometryResponse.ok) throw new Error(`Dillon completed-bid geometry HTTP ${bidGeometryResponse.status}`);
     const bidGeometry = await bidGeometryResponse.json();
@@ -1480,6 +1491,7 @@ async function hfShowSubmittedCalibrationViews() {
     window.__hfRoofGeometry.winterGardenSourceCandidates = winterGardenSourceCandidates;
     window.__hfRoofGeometry.winterGardenSourceCeiling = winterGardenSourceCeiling;
     window.__hfRoofGeometry.winterGardenPitchedCandidates = winterGardenPitchedCandidates;
+    window.__hfRoofGeometry.polarisHeldoutComparison = polarisHeldout;
     window.__hfRoofGeometry.dillonCompletedBidGeometry = bidGeometry;
     window.__hfRoofGeometry.dillonVerticalGeometry = verticalGeometry;
     window.__hfRoofGeometry.dillonStructuralRoof = structuralRoof;
@@ -1523,6 +1535,13 @@ async function hfShowSubmittedCalibrationViews() {
         <a id="hfWinterGardenSourcePitchedProof" href="/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-pitched-candidate-proof.png" target="_blank" rel="noopener" style="display:block;border:1px solid rgba(244,114,182,.42);border-radius:10px;overflow:hidden;margin-bottom:10px;background:#07111f"><img src="/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-pitched-candidate-proof.png" alt="Winter Garden A151 plan, A301 3-to-12 interior ceiling vectors, A303 longitudinal datum, and source 3D model with one preliminary OVERFLOW pitched sprinkler candidate" loading="lazy" style="display:block;width:100%;height:auto"></a>
         <div style="display:grid;grid-template-columns:repeat(2,minmax(360px,1fr));gap:10px"><div style="background:#07111f;border-radius:10px;overflow:hidden">${winterGardenSourceBuilding.views.isometricSvg}</div><div style="background:#07111f;border-radius:10px;overflow:hidden">${winterGardenSourceBuilding.views.topSvg}</div></div>
         <p style="margin:9px 2px 0;color:#cbd5e1;font:10.5px/1.45 var(--mono)">A201/A301 control the floor, wall, low-roof, bearing, ridge, 4.5:12 pitch, steeple beam, and steeple top. Completed sprinkler drawings were not used to generate this geometry. Outer vestibule drainage slopes and penetration obstruction clearances remain unresolved; compliance and fabrication release stay fail-closed.</p>
+      </section>
+      <section id="hfPolarisHeldoutComparisonEvidence" style="background:linear-gradient(145deg,rgba(8,47,73,.94),rgba(69,26,3,.72));border:1px solid rgba(251,191,36,.44);border-radius:14px;padding:12px;box-shadow:inset 0 1px rgba(255,255,255,.12);overflow:auto">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px"><div><h3 style="margin:0;color:#fff7ed;font:650 13px var(--mono)">Polaris Academy fresh pitched-attic holdout · source blind first, answer opened after commit</h3><p style="margin:5px 0 0;color:#fed7aa;font:11px/1.45 var(--mono)">Blind commit ${polarisHeldout.sourceOnlyCommit.slice(0, 12)} · zero generated heads · approved/as-built ${polarisHeldout.approvedAndAsBuilt.totalHeadCount} heads (${polarisHeldout.approvedAndAsBuilt.systems[0].count} pendents + ${polarisHeldout.approvedAndAsBuilt.systems[1].count} attic uprights) · ${polarisHeldout.approvedAndAsBuilt.pipeCount} pipes · ${polarisHeldout.approvedAndAsBuilt.fittingCount} fittings.</p></div><span style="white-space:nowrap;color:#fbbf24;font:10px/1.35 var(--mono)">DOMAIN GUARD PASSED<br>PLACEMENT FAILED</span></div>
+        <div id="hfPolarisHeldoutReceipt" style="border:1px solid rgba(244,114,182,.5);background:rgba(80,7,36,.32);border-radius:10px;padding:9px;margin-bottom:10px;color:#fce7f3;font:11px/1.5 var(--mono)"><b>Fresh-placement gate: CLOSED</b> · v5 correctly rejected the flat-ceiling-plus-attic building as outside its occupied-vault domain, but generated none of the 77 approved attic uprights or 81 below-ceiling pendents. Approved FP2 and as-built FP2 render identically; all 158 answer-exposed CAD heads register inside the exact 73-vertex architectural footprint. Primary, independent, 16-case adversarial, and Lean loops pass. This is calibration proof only—whole roof faces, fresh layout, hydraulics, code compliance, fabrication, and field release remain false.</div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(360px,1fr));gap:10px"><div style="background:#07111f;border-radius:10px;overflow:hidden">${polarisHeldout.views.topSvg}</div><div style="background:#07111f;border-radius:10px;overflow:hidden">${polarisHeldout.views.elevationSvg}</div></div>
+        <div style="background:#07111f;border-radius:10px;overflow:hidden;margin-top:10px">${polarisHeldout.views.model3dSvg}</div>
+        <p style="margin:9px 2px 0;color:#cbd5e1;font:10.5px/1.45 var(--mono)">Next internal loop: derive source-only whole roof-face and attic-compartment topology, register the 77 answer uprights to those source faces for calibration, then run a second genuinely fresh attic holdout. No independent human review gate is introduced.</p>
       </section>
       <section id="hfDillonFloorModelEvidence" style="background:linear-gradient(145deg,rgba(8,47,73,.88),rgba(30,41,59,.92));border:1px solid rgba(103,232,249,.32);border-radius:14px;padding:12px;box-shadow:inset 0 1px rgba(255,255,255,.12);overflow:auto">
         <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px"><div><h3 style="margin:0;color:#ecfeff;font:650 13px var(--mono)">Dillon actual-drawing building model · top + side/elevation + 3D extrusion</h3><p style="margin:5px 0 0;color:#bae6fd;font:11px/1.45 var(--mono)">${floorModel.counts.wallSolids} exact DWG Wall-Hatch polygons across ${floorModel.counts.levels} levels and ${floorModel.counts.sourceEntities} source entities. Main-to-upper stack: 12.5 ft; project floors 1524.5 ft / 1537.0 ft. Toy garage: 1503.0 ft in its separate local horizontal frame. Receipt ${floorModel.receiptSha256.slice(0, 16)}...</p></div><span style="white-space:nowrap;color:#fbbf24;font:10px/1.35 var(--mono)">SOURCE-GROUNDED<br>NOT CODE APPROVAL</span></div>
@@ -3589,7 +3608,7 @@ let acceptedModel3dState = null;
 
 function getPlanLevelsJson() {
   if (!planLevelsJsonPromise) {
-    planLevelsJsonPromise = fetch('/src/data/plan-levels.cooperative-1881.json')
+    planLevelsJsonPromise = fetch('/api/studio/evidence/plan-levels.cooperative-1881.json', { credentials: 'same-origin' })
       .then((r) => { if (!r.ok) throw new Error('plan-levels json HTTP ' + r.status); return r.json(); })
       .catch((e) => { planLevelsJsonPromise = null; throw e; });
   }

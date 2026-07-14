@@ -1531,3 +1531,48 @@ User direction across 4 messages this session:
   code compliance, fabrication release, or field release. The next loop opens
   the sealed completed sprinkler answer and preserves the blind comparison
   outcome without mutating this candidate.
+
+### Entry 45 - Polaris held-out answer comparison and fail-closed product evidence
+
+- Opened the sealed Polaris answers only after immutable source commit
+  `caa5723d89d6bacad255acb35ddffa71592c3391` was pushed. The selected AHJ
+  FP2 and as-built FP2 render byte-identically, while Fire Sprinkler CAD 2
+  parses with LibreDWG at zero unknown entities.
+- Registered the answer CAD to the exact sealed 73-vertex architectural
+  outline by a pure translation, matching all 73 vertices with a maximum
+  residual of `1.8e-11` inches. All 158 extracted sprinklers land inside the
+  source footprint: 81 pendents below flat ceilings and 77 attic uprights.
+  The same CAD contains 186 pipe inserts and 98 fitting inserts.
+- Preserved the actual held-out outcome instead of converting the answer into
+  a retrospective pass. The blind v5 result generated zero heads: its
+  wrong-domain guard correctly refused to treat this flat-ceiling-plus-attic
+  building as an occupied two-plane vault, but fresh attic placement coverage
+  failed by 77 heads and whole-building coverage by 158 heads.
+- Added deterministic answer-evidence and comparison receipts
+  `363afb88705ad516f1432c8b85a2f47f077154ca977e3f4dc5d31013cb142da9`
+  and `e2e9cd4ffa51ba9d90654cb5e3fabec3c045eeeccf791726830cd1b9a6ff43a2`.
+  Sixteen adversarial mutations reject commit-order drift, source-candidate
+  mutation, answer/raster/registration/tally drift, erased failure, exact
+  coordinate transfer, selector promotion, and compliance promotion.
+- Added an authenticated, private/no-store product evidence route returning
+  answer-exposed top, elevation, and 3D SVG proof. Anonymous access is denied;
+  the response keeps fresh placement, whole-roof, hydraulics, compliance,
+  fabrication, and field-release gates false.
+- Browser verification exposed and repaired a pre-existing Studio startup
+  failure: `autosprink.html` imported two legitimate browser modules from the
+  security-denied `/src/data` tree, so the real module graph stopped on 403s.
+  The Studio now uses authenticated exact allowlists for three browser-safe
+  modules and six evidence artifacts; arbitrary and direct `/src/data` access
+  remains forbidden. An authenticated Chromium smoke renders the Polaris card,
+  all three SVG views, and 474 head marks with zero console errors.
+- Focused verification passed 32/32 across the comparison, API security,
+  static-origin, and authenticated browser files. The release-width suite
+  passed 1,937/1,937 across 230 files plus 20/20 node-native tests and the
+  production build. GX10 Lean 4.13.0
+  formally verified the exact invariants that the domain guard is true,
+  placement remains false, 81 + 77 = 158, and blind zero is less than the
+  approved total in 76 ms with return code zero.
+- This is a truthful calibration checkpoint, not completion. The next loop is
+  source-only reconstruction of whole roof faces and attic compartments,
+  answer-exposed registration of the 77 uprights to those source faces, then a
+  second genuinely fresh attic holdout before any placement claim can advance.

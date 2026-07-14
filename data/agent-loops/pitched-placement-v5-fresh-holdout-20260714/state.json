@@ -1,13 +1,14 @@
 {
   "loop": "pitched-placement-v5-fresh-holdout-20260714",
-  "stage": "VERIFY",
-  "status": "source-only-candidate-ready-for-pre-answer-commit",
-  "iteration": 2,
-  "answerKeyOpened": false,
+  "stage": "COMPARE",
+  "status": "comparison-complete-correct-domain-guard-placement-unverified",
+  "iteration": 3,
+  "answerKeyOpened": true,
+  "answerOpenedAfterSourceCommit": "caa5723d89d6bacad255acb35ddffa71592c3391",
   "selectedProject": {
     "projectId": "polaris-academy-mesa-az",
     "projectName": "Polaris Academy - Mesa AZ",
-    "selectionReason": "fresh completed project with independent architectural bid/revised/DWG sources and separately sealed fire-sprinkler CAD, AHJ-approved, and as-built answers; source proves a multi-mass 4:12 attic above horizontal occupied ceilings",
+    "selectionReason": "fresh completed project with independent architectural sources and separately sealed sprinkler CAD, approved, and as-built answers; source proves a multi-mass 4:12 attic above horizontal occupied ceilings",
     "priorImplementationSearchHits": 0
   },
   "candidateDiscovery": [
@@ -20,13 +21,13 @@
     {
       "project": "Polaris Academy - Mesa AZ",
       "decision": "selected-as-wrong-domain-attic-holdout",
-      "reason": "source separates flat occupied ceilings from a 4:12 attic, so the occupied-vault v5 selector must reject and an attic placement regime must be learned only after the blind source commit",
-      "sealedAnswersRemainUnopened": true
+      "reason": "source separates flat occupied ceilings from a 4:12 attic, so the occupied-vault v5 selector must reject and an attic placement regime must be learned only after the blind source commit"
     }
   ],
   "sourceOnlyEvidence": {
     "sourceSealReceiptSha256": "0007fdb22e5242c3aacb0117b7b1e140bab413c57856c990bd1ccec88bb0312e",
     "candidateReceiptSha256": "e7f0f2850eae1f1fdcfc95007e19057d4e1d2af6ac6c4ad2e5ddd766d74874c5",
+    "preAnswerCommit": "caa5723d89d6bacad255acb35ddffa71592c3391",
     "floorFootprint": {
       "vertexCount": 73,
       "sourceUnits": "inch",
@@ -54,26 +55,63 @@
     "candidatePlacementReady": false,
     "complianceReady": false
   },
+  "answerEvidence": {
+    "answerEvidenceReceiptSha256": "363afb88705ad516f1432c8b85a2f47f077154ca977e3f4dc5d31013cb142da9",
+    "comparisonReceiptSha256": "e2e9cd4ffa51ba9d90654cb5e3fabec3c045eeeccf791726830cd1b9a6ff43a2",
+    "approvedAsBuiltRasterParity": true,
+    "totalHeadCount": 158,
+    "pendentHeadCount": 81,
+    "atticUprightHeadCount": 77,
+    "pipeCount": 186,
+    "fittingCount": 98,
+    "registeredInsideSourceFootprintCount": 158,
+    "architecturalRegistration": {
+      "matchedVertexCount": 73,
+      "maxResidualInches": 1.8e-11,
+      "libredwgUnknownEntityCount": 0
+    }
+  },
+  "comparisonResult": {
+    "status": "passed-domain-guard-failed-placement-coverage",
+    "wrongDomainGuardWorked": true,
+    "blindPlacementAttempted": false,
+    "blindGeneratedVersusAnswerHeadDelta": -158,
+    "blindGeneratedVersusAtticHeadDelta": -77,
+    "unseenProjectPlacementVerified": false,
+    "answerExposedCalibrationReady": true,
+    "pitchedAtticSelectorReadyForFreshHoldout": false
+  },
   "verification": {
-    "sourceSealValidation": "passed",
-    "candidateReplayValidation": "passed",
-    "adversarialMutationCases": { "passed": 13, "attempted": 13 },
-    "focusedTests": { "passed": 12, "failed": 0, "files": 3 },
+    "answerEvidenceValidation": "passed",
+    "comparisonReplayValidation": "passed",
+    "adversarialMutationCases": { "passed": 16, "attempted": 16 },
+    "focusedTests": { "passed": 32, "failed": 0, "files": 4 },
+    "releaseWidthTests": { "passed": 1937, "failed": 0, "files": 230, "nodeNativePassed": 20 },
+    "authenticatedApi": { "anonymousStatus": 401, "authenticatedStatus": 200, "cacheControl": "private, no-store" },
+    "authenticatedStudioBrowser": {
+      "status": "passed",
+      "moduleGraphRepair": "direct /src/data imports replaced by authenticated exact allowlists while the static data deny remains 403",
+      "renderedSvgCount": 3,
+      "renderedHeadMarks": 474,
+      "consoleErrors": 0,
+      "screenshot": "output/playwright/polaris-heldout-studio/authenticated-studio-evidence.png"
+    },
+    "formalProof": { "prover": "Lean", "version": "4.13.0", "status": "verified", "elapsedMs": 76, "returnCode": 0 },
     "renderedBrowserProof": [
-      "output/playwright/polaris-source-only/top.png",
-      "output/playwright/polaris-source-only/elevation.png",
-      "output/playwright/polaris-source-only/model3d.png"
+      "output/playwright/polaris-heldout-comparison/top.png",
+      "output/playwright/polaris-heldout-comparison/elevation.png",
+      "output/playwright/polaris-heldout-comparison/model3d.png"
     ]
   },
   "blockedClaims": [
-    "pitched-attic-head-layout",
+    "fresh-pitched-attic-head-placement",
     "whole-multi-mass-roof-model",
     "absolute-roof-elevation",
-    "branch-pipe-topology",
+    "branch-pipe-topology-transfer",
     "hydraulic-calculation",
     "code-compliance",
     "fabrication",
     "field-release"
   ],
-  "nextAction": "validate loop/rules/build, commit and push the immutable source-only candidate, then and only then open the sealed AHJ/as-built sprinkler answer and compare attic plus below-ceiling topology"
+  "nextAction": "derive source-only whole roof-face and attic-compartment topology without using head coordinates as geometry, register the 77 answer uprights to those source faces for calibration, then run a second genuinely fresh attic holdout"
 }

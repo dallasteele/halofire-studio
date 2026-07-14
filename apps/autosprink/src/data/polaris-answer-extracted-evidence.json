@@ -1,0 +1,2163 @@
+{
+  "artifactType": "halofire.polaris-answer-extracted-evidence.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "answerOpenedAfterSourceCommit": "caa5723d89d6bacad255acb35ddffa71592c3391",
+  "bindings": {
+    "fireSprinklerCadV2": {
+      "bytes": 3081423,
+      "sha256": "3b27b60d74c6058508789929ad0ca20df490c28905828b5ac096183454154c2f"
+    },
+    "approvedFp2": {
+      "bytes": 2575184,
+      "sha256": "06c502687ce21d66aee8d7c5212cb5ff2b5e31e17a7433bd22448de12ca80dd1"
+    },
+    "asBuiltSprinkler": {
+      "bytes": 4103231,
+      "sha256": "1442be77da8d08388084e6f56ee3ddfea9565f08307022449267d065a504e81a"
+    },
+    "approvedAndAsBuiltFp2RasterSha256": "9bfc1f1f01299e86ff3335ed865f7bd977504b8bd8535bbac81a5534edc01904"
+  },
+  "coordinateRegistration": {
+    "method": "answer CAD 73-vertex background outline translated onto the sealed architectural RCP-DWG outline",
+    "answerToSourceTranslationInches": [
+      2089.742556327576,
+      545.357810486682
+    ],
+    "matchedVertexCount": 73,
+    "maxResidualInches": 1.8e-11,
+    "libredwgUnknownEntityCount": 0
+  },
+  "sprinklers": [
+    {
+      "id": "polaris-answer-pendent-001",
+      "kind": "pendent",
+      "pointFt": [
+        48.083333,
+        57.25,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-002",
+      "kind": "pendent",
+      "pointFt": [
+        91.625,
+        55.416667,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-003",
+      "kind": "pendent",
+      "pointFt": [
+        167.541667,
+        31.333333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-004",
+      "kind": "pendent",
+      "pointFt": [
+        168.291667,
+        0.25,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-005",
+      "kind": "pendent",
+      "pointFt": [
+        122.958333,
+        7.75,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-006",
+      "kind": "pendent",
+      "pointFt": [
+        82.104167,
+        22,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-007",
+      "kind": "pendent",
+      "pointFt": [
+        30.414943,
+        7.228431,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-008",
+      "kind": "pendent",
+      "pointFt": [
+        6.75,
+        6.166667,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-009",
+      "kind": "pendent",
+      "pointFt": [
+        6.708333,
+        17.125,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-010",
+      "kind": "pendent",
+      "pointFt": [
+        20.666667,
+        17.166667,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-011",
+      "kind": "pendent",
+      "pointFt": [
+        6.5,
+        55.5,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-012",
+      "kind": "pendent",
+      "pointFt": [
+        46.10175,
+        30.179091,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-013",
+      "kind": "pendent",
+      "pointFt": [
+        113.728131,
+        21.333333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-014",
+      "kind": "pendent",
+      "pointFt": [
+        112.959197,
+        39.805782,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-015",
+      "kind": "pendent",
+      "pointFt": [
+        132.821905,
+        39.714423,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-016",
+      "kind": "pendent",
+      "pointFt": [
+        6.708333,
+        28.333333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-017",
+      "kind": "pendent",
+      "pointFt": [
+        16.291667,
+        30.833333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-018",
+      "kind": "pendent",
+      "pointFt": [
+        18.583333,
+        6.166667,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-019",
+      "kind": "pendent",
+      "pointFt": [
+        6.5,
+        41.5,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-020",
+      "kind": "pendent",
+      "pointFt": [
+        20.5,
+        41.5,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-021",
+      "kind": "pendent",
+      "pointFt": [
+        34.5,
+        41.5,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-022",
+      "kind": "pendent",
+      "pointFt": [
+        16.5,
+        55.5,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-023",
+      "kind": "pendent",
+      "pointFt": [
+        26.5,
+        55.5,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-024",
+      "kind": "pendent",
+      "pointFt": [
+        36.5,
+        55.5,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-025",
+      "kind": "pendent",
+      "pointFt": [
+        48.083333,
+        48.75,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-026",
+      "kind": "pendent",
+      "pointFt": [
+        62.958333,
+        48.75,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-027",
+      "kind": "pendent",
+      "pointFt": [
+        62.958333,
+        57.25,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-028",
+      "kind": "pendent",
+      "pointFt": [
+        77.791667,
+        57.25,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-029",
+      "kind": "pendent",
+      "pointFt": [
+        77.791667,
+        48.75,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-030",
+      "kind": "pendent",
+      "pointFt": [
+        104.291667,
+        55.416667,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-031",
+      "kind": "pendent",
+      "pointFt": [
+        104.291667,
+        43.25,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-032",
+      "kind": "pendent",
+      "pointFt": [
+        91.625,
+        43.25,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-033",
+      "kind": "pendent",
+      "pointFt": [
+        116.958333,
+        45.990382,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-034",
+      "kind": "pendent",
+      "pointFt": [
+        116.958333,
+        54.875,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-035",
+      "kind": "pendent",
+      "pointFt": [
+        128.75,
+        45.990382,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-036",
+      "kind": "pendent",
+      "pointFt": [
+        128.75,
+        54.875,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-037",
+      "kind": "pendent",
+      "pointFt": [
+        168.541667,
+        43.666667,
+        12
+      ],
+      "elevationLabel": "12'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-038",
+      "kind": "pendent",
+      "pointFt": [
+        141.875,
+        43.666667,
+        12
+      ],
+      "elevationLabel": "12'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-039",
+      "kind": "pendent",
+      "pointFt": [
+        155.208333,
+        43.666667,
+        12
+      ],
+      "elevationLabel": "12'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-040",
+      "kind": "pendent",
+      "pointFt": [
+        167.541667,
+        20.333333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-041",
+      "kind": "pendent",
+      "pointFt": [
+        152.541667,
+        20.333333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-042",
+      "kind": "pendent",
+      "pointFt": [
+        152.541667,
+        31.333333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-043",
+      "kind": "pendent",
+      "pointFt": [
+        168.291667,
+        9.75,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-044",
+      "kind": "pendent",
+      "pointFt": [
+        154.791667,
+        9.75,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-045",
+      "kind": "pendent",
+      "pointFt": [
+        154.791667,
+        0.25,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-046",
+      "kind": "pendent",
+      "pointFt": [
+        141.291667,
+        0.25,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-047",
+      "kind": "pendent",
+      "pointFt": [
+        141.291667,
+        9.75,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-048",
+      "kind": "pendent",
+      "pointFt": [
+        122.958333,
+        21.583333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-049",
+      "kind": "pendent",
+      "pointFt": [
+        134.791667,
+        7.75,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-050",
+      "kind": "pendent",
+      "pointFt": [
+        134.791667,
+        21.583333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-051",
+      "kind": "pendent",
+      "pointFt": [
+        93.4375,
+        22,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-052",
+      "kind": "pendent",
+      "pointFt": [
+        104.770833,
+        22,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-053",
+      "kind": "pendent",
+      "pointFt": [
+        83.9375,
+        11,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-054",
+      "kind": "pendent",
+      "pointFt": [
+        98.9375,
+        11,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-055",
+      "kind": "pendent",
+      "pointFt": [
+        72.020833,
+        9.798395,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-056",
+      "kind": "pendent",
+      "pointFt": [
+        70.520833,
+        20.131728,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-057",
+      "kind": "pendent",
+      "pointFt": [
+        70.520833,
+        30.465061,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-058",
+      "kind": "pendent",
+      "pointFt": [
+        60.520833,
+        30.465061,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-059",
+      "kind": "pendent",
+      "pointFt": [
+        60.520833,
+        20.131728,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-060",
+      "kind": "pendent",
+      "pointFt": [
+        64.020833,
+        9.798395,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-061",
+      "kind": "pendent",
+      "pointFt": [
+        52.744412,
+        13.428051,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-062",
+      "kind": "pendent",
+      "pointFt": [
+        50.843012,
+        30.951762,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-063",
+      "kind": "pendent",
+      "pointFt": [
+        46.652287,
+        23.003569,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-064",
+      "kind": "pendent",
+      "pointFt": [
+        23.705724,
+        30.436178,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-065",
+      "kind": "pendent",
+      "pointFt": [
+        14.916667,
+        17.958333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-066",
+      "kind": "pendent",
+      "pointFt": [
+        19.958333,
+        24.666667,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-067",
+      "kind": "pendent",
+      "pointFt": [
+        32.041667,
+        19.854167,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-068",
+      "kind": "pendent",
+      "pointFt": [
+        34.753364,
+        29.5,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-069",
+      "kind": "pendent",
+      "pointFt": [
+        48.416667,
+        40.140209,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-070",
+      "kind": "pendent",
+      "pointFt": [
+        63.416667,
+        40.140209,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-071",
+      "kind": "pendent",
+      "pointFt": [
+        77.416667,
+        36.890209,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-072",
+      "kind": "pendent",
+      "pointFt": [
+        87.416667,
+        36.890209,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-073",
+      "kind": "pendent",
+      "pointFt": [
+        101.416667,
+        32.41935,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-074",
+      "kind": "pendent",
+      "pointFt": [
+        115.916667,
+        32.41935,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-075",
+      "kind": "pendent",
+      "pointFt": [
+        129.916667,
+        32.41935,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-076",
+      "kind": "pendent",
+      "pointFt": [
+        122.852485,
+        39.954147,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-077",
+      "kind": "pendent",
+      "pointFt": [
+        140,
+        21.333333,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-078",
+      "kind": "pendent",
+      "pointFt": [
+        140,
+        32.41935,
+        10
+      ],
+      "elevationLabel": "10'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-001",
+      "kind": "upright",
+      "pointFt": [
+        7.333333,
+        55,
+        11.375
+      ],
+      "elevationLabel": "11'-4½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-002",
+      "kind": "upright",
+      "pointFt": [
+        7.333333,
+        42,
+        15
+      ],
+      "elevationLabel": "15'-0",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-003",
+      "kind": "upright",
+      "pointFt": [
+        20.333333,
+        42,
+        15
+      ],
+      "elevationLabel": "15'-0",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-004",
+      "kind": "upright",
+      "pointFt": [
+        20.333333,
+        55,
+        11.375
+      ],
+      "elevationLabel": "11'-4½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-005",
+      "kind": "upright",
+      "pointFt": [
+        33.333333,
+        55,
+        11.375
+      ],
+      "elevationLabel": "11'-4½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-006",
+      "kind": "upright",
+      "pointFt": [
+        33.333333,
+        42,
+        15
+      ],
+      "elevationLabel": "15'-0",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-007",
+      "kind": "upright",
+      "pointFt": [
+        168.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-008",
+      "kind": "upright",
+      "pointFt": [
+        168.311198,
+        23.166667,
+        14
+      ],
+      "elevationLabel": "14'-0",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-009",
+      "kind": "upright",
+      "pointFt": [
+        168.310342,
+        9.742966,
+        11.333333
+      ],
+      "elevationLabel": "11'-4",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-010",
+      "kind": "upright",
+      "pointFt": [
+        168.310342,
+        0.25,
+        11.333333
+      ],
+      "elevationLabel": "11'-4",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-011",
+      "kind": "upright",
+      "pointFt": [
+        168.310342,
+        45.166667,
+        17.375
+      ],
+      "elevationLabel": "17'-4½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-012",
+      "kind": "upright",
+      "pointFt": [
+        168.310342,
+        56.166667,
+        17.375
+      ],
+      "elevationLabel": "17'-4½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-013",
+      "kind": "upright",
+      "pointFt": [
+        155.310342,
+        56.166667,
+        17.416667
+      ],
+      "elevationLabel": "17'-5",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-014",
+      "kind": "upright",
+      "pointFt": [
+        155.310342,
+        45.166667,
+        17.375
+      ],
+      "elevationLabel": "17'-4½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-015",
+      "kind": "upright",
+      "pointFt": [
+        142.310342,
+        56.166667,
+        17.458333
+      ],
+      "elevationLabel": "17'-5½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-016",
+      "kind": "upright",
+      "pointFt": [
+        142.310342,
+        45.166667,
+        17.375
+      ],
+      "elevationLabel": "17'-4½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-017",
+      "kind": "upright",
+      "pointFt": [
+        154.310342,
+        0.25,
+        11.333333
+      ],
+      "elevationLabel": "11'-4",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-018",
+      "kind": "upright",
+      "pointFt": [
+        156.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-019",
+      "kind": "upright",
+      "pointFt": [
+        156.310342,
+        9.742966,
+        11.333333
+      ],
+      "elevationLabel": "11'-4",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-020",
+      "kind": "upright",
+      "pointFt": [
+        156.311198,
+        23.166667,
+        14.041667
+      ],
+      "elevationLabel": "14'-0½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-021",
+      "kind": "upright",
+      "pointFt": [
+        144.311198,
+        23.166667,
+        14.041667
+      ],
+      "elevationLabel": "14'-0½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-022",
+      "kind": "upright",
+      "pointFt": [
+        140.310342,
+        0.25,
+        11
+      ],
+      "elevationLabel": "11'-0",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-023",
+      "kind": "upright",
+      "pointFt": [
+        144.310342,
+        9.742966,
+        11.333333
+      ],
+      "elevationLabel": "11'-4",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-024",
+      "kind": "upright",
+      "pointFt": [
+        144.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-025",
+      "kind": "upright",
+      "pointFt": [
+        132.310342,
+        9.742966,
+        11.333333
+      ],
+      "elevationLabel": "11'-4",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-026",
+      "kind": "upright",
+      "pointFt": [
+        132.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-027",
+      "kind": "upright",
+      "pointFt": [
+        132.311198,
+        23.166667,
+        14.083333
+      ],
+      "elevationLabel": "14'-1",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-028",
+      "kind": "upright",
+      "pointFt": [
+        120.311198,
+        23.166667,
+        14.125
+      ],
+      "elevationLabel": "14'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-029",
+      "kind": "upright",
+      "pointFt": [
+        120.310342,
+        9.742966,
+        11
+      ],
+      "elevationLabel": "11'-0",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-030",
+      "kind": "upright",
+      "pointFt": [
+        120.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-031",
+      "kind": "upright",
+      "pointFt": [
+        108.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-032",
+      "kind": "upright",
+      "pointFt": [
+        108.311198,
+        23.166667,
+        14.166667
+      ],
+      "elevationLabel": "14'-2",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-033",
+      "kind": "upright",
+      "pointFt": [
+        96.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-034",
+      "kind": "upright",
+      "pointFt": [
+        96.311198,
+        23.166667,
+        14.166667
+      ],
+      "elevationLabel": "14'-2",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-035",
+      "kind": "upright",
+      "pointFt": [
+        84.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-036",
+      "kind": "upright",
+      "pointFt": [
+        84.311198,
+        23.166667,
+        14.208333
+      ],
+      "elevationLabel": "14'-2½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-037",
+      "kind": "upright",
+      "pointFt": [
+        72.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-038",
+      "kind": "upright",
+      "pointFt": [
+        72.311198,
+        23.166667,
+        14.25
+      ],
+      "elevationLabel": "14'-3",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-039",
+      "kind": "upright",
+      "pointFt": [
+        60.310377,
+        34.166667,
+        17.125
+      ],
+      "elevationLabel": "17'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-040",
+      "kind": "upright",
+      "pointFt": [
+        60.311198,
+        23.166667,
+        14.291667
+      ],
+      "elevationLabel": "14'-3½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-041",
+      "kind": "upright",
+      "pointFt": [
+        48.310377,
+        34.166667,
+        17.166667
+      ],
+      "elevationLabel": "17'-2",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-042",
+      "kind": "upright",
+      "pointFt": [
+        48.311198,
+        23.166667,
+        14.291667
+      ],
+      "elevationLabel": "14'-3½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-043",
+      "kind": "upright",
+      "pointFt": [
+        36.311198,
+        23.166667,
+        14.333333
+      ],
+      "elevationLabel": "14'-4",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-044",
+      "kind": "upright",
+      "pointFt": [
+        36.310377,
+        34.166667,
+        17.166667
+      ],
+      "elevationLabel": "17'-2",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-045",
+      "kind": "upright",
+      "pointFt": [
+        24.310377,
+        34.166667,
+        17.166667
+      ],
+      "elevationLabel": "17'-2",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-046",
+      "kind": "upright",
+      "pointFt": [
+        24.311198,
+        23.166667,
+        14.375
+      ],
+      "elevationLabel": "14'-4½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-047",
+      "kind": "upright",
+      "pointFt": [
+        12.310377,
+        34.166667,
+        17.166667
+      ],
+      "elevationLabel": "17'-2",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-048",
+      "kind": "upright",
+      "pointFt": [
+        12.311198,
+        23.166667,
+        14.416667
+      ],
+      "elevationLabel": "14'-5",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-049",
+      "kind": "upright",
+      "pointFt": [
+        0.310342,
+        23.166667,
+        14.125
+      ],
+      "elevationLabel": "14'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-050",
+      "kind": "upright",
+      "pointFt": [
+        0.310342,
+        34.166667,
+        16.833333
+      ],
+      "elevationLabel": "16'-10",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-051",
+      "kind": "upright",
+      "pointFt": [
+        52.310342,
+        11.166667,
+        13.666667
+      ],
+      "elevationLabel": "13'-8",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-052",
+      "kind": "upright",
+      "pointFt": [
+        64.248022,
+        11.2644,
+        13.666667
+      ],
+      "elevationLabel": "13'-8",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-053",
+      "kind": "upright",
+      "pointFt": [
+        76.310342,
+        11.166667,
+        13.666667
+      ],
+      "elevationLabel": "13'-8",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-054",
+      "kind": "upright",
+      "pointFt": [
+        88.310342,
+        11.166667,
+        13.666667
+      ],
+      "elevationLabel": "13'-8",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-055",
+      "kind": "upright",
+      "pointFt": [
+        100.310342,
+        11.166667,
+        13.666667
+      ],
+      "elevationLabel": "13'-8",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-056",
+      "kind": "upright",
+      "pointFt": [
+        31.310342,
+        14.160693,
+        14.166667
+      ],
+      "elevationLabel": "14'-2",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-057",
+      "kind": "upright",
+      "pointFt": [
+        19.310342,
+        14.16017,
+        14.208333
+      ],
+      "elevationLabel": "14'-2½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-058",
+      "kind": "upright",
+      "pointFt": [
+        7.310342,
+        14.159647,
+        14.208333
+      ],
+      "elevationLabel": "14'-2½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-059",
+      "kind": "upright",
+      "pointFt": [
+        31.310342,
+        4.166667,
+        13.666667
+      ],
+      "elevationLabel": "13'-8",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-060",
+      "kind": "upright",
+      "pointFt": [
+        7.310342,
+        4.166667,
+        13.666667
+      ],
+      "elevationLabel": "13'-8",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-061",
+      "kind": "upright",
+      "pointFt": [
+        19.310342,
+        4.166667,
+        13.666667
+      ],
+      "elevationLabel": "13'-8",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-079",
+      "kind": "pendent",
+      "pointFt": [
+        155.208333,
+        55.666667,
+        12
+      ],
+      "elevationLabel": "12'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-080",
+      "kind": "pendent",
+      "pointFt": [
+        141.875,
+        55.666667,
+        12
+      ],
+      "elevationLabel": "12'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-pendent-081",
+      "kind": "pendent",
+      "pointFt": [
+        168.541667,
+        55.666667,
+        12
+      ],
+      "elevationLabel": "12'-0",
+      "size": "½",
+      "description": "V2708, FL-QR, 5.6, (QR), White Polyester, 200°F, Pendent",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-062",
+      "kind": "upright",
+      "pointFt": [
+        130.311048,
+        56.166667,
+        11.041667
+      ],
+      "elevationLabel": "11'-0½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-063",
+      "kind": "upright",
+      "pointFt": [
+        130.310634,
+        45.166667,
+        14.708333
+      ],
+      "elevationLabel": "14'-8½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-064",
+      "kind": "upright",
+      "pointFt": [
+        118.311108,
+        56.166667,
+        11.083333
+      ],
+      "elevationLabel": "11'-1",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-065",
+      "kind": "upright",
+      "pointFt": [
+        118.310644,
+        45.166667,
+        14.75
+      ],
+      "elevationLabel": "14'-9",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-066",
+      "kind": "upright",
+      "pointFt": [
+        106.311168,
+        56.166667,
+        11.125
+      ],
+      "elevationLabel": "11'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-067",
+      "kind": "upright",
+      "pointFt": [
+        106.310654,
+        45.166667,
+        14.75
+      ],
+      "elevationLabel": "14'-9",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-068",
+      "kind": "upright",
+      "pointFt": [
+        94.310664,
+        45.166667,
+        14.75
+      ],
+      "elevationLabel": "14'-9",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-069",
+      "kind": "upright",
+      "pointFt": [
+        94.311228,
+        56.166667,
+        11.125
+      ],
+      "elevationLabel": "11'-1½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-070",
+      "kind": "upright",
+      "pointFt": [
+        82.311289,
+        56.166667,
+        11.166667
+      ],
+      "elevationLabel": "11'-2",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-071",
+      "kind": "upright",
+      "pointFt": [
+        82.310674,
+        45.166667,
+        14.791667
+      ],
+      "elevationLabel": "14'-9½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-072",
+      "kind": "upright",
+      "pointFt": [
+        70.311349,
+        56.166667,
+        11.208333
+      ],
+      "elevationLabel": "11'-2½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-073",
+      "kind": "upright",
+      "pointFt": [
+        70.310684,
+        45.166667,
+        14.791667
+      ],
+      "elevationLabel": "14'-9½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-074",
+      "kind": "upright",
+      "pointFt": [
+        58.310342,
+        56.166667,
+        10.75
+      ],
+      "elevationLabel": "10'-9",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-075",
+      "kind": "upright",
+      "pointFt": [
+        58.310695,
+        45.166667,
+        14.791667
+      ],
+      "elevationLabel": "14'-9½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-076",
+      "kind": "upright",
+      "pointFt": [
+        46.310705,
+        45.166667,
+        14.791667
+      ],
+      "elevationLabel": "14'-9½",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    },
+    {
+      "id": "polaris-answer-upright-077",
+      "kind": "upright",
+      "pointFt": [
+        46.310342,
+        56.166667,
+        10.75
+      ],
+      "elevationLabel": "10'-9",
+      "size": "1",
+      "description": "V2704, FL-QR, 5.6, (QR), Brass, 200°F, Upright, IGS",
+      "insideSourceFootprint": true
+    }
+  ],
+  "summary": {
+    "totalHeadCount": 158,
+    "headCounts": {
+      "pendent": 81,
+      "upright": 77
+    },
+    "headElevationCounts": {
+      "10'-0": 75,
+      "10'-9": 2,
+      "11'-0": 2,
+      "11'-0½": 1,
+      "11'-1": 1,
+      "11'-1½": 2,
+      "11'-2": 1,
+      "11'-2½": 1,
+      "11'-4": 6,
+      "11'-4½": 3,
+      "12'-0": 6,
+      "13'-8": 8,
+      "14'-0": 1,
+      "14'-0½": 2,
+      "14'-1": 1,
+      "14'-1½": 2,
+      "14'-2": 3,
+      "14'-2½": 3,
+      "14'-3": 1,
+      "14'-3½": 2,
+      "14'-4": 1,
+      "14'-4½": 1,
+      "14'-5": 1,
+      "14'-8½": 1,
+      "14'-9": 3,
+      "14'-9½": 4,
+      "15'-0": 3,
+      "16'-10": 1,
+      "17'-1½": 10,
+      "17'-2": 4,
+      "17'-4½": 4,
+      "17'-5": 1,
+      "17'-5½": 1
+    },
+    "insideSourceFootprintCount": 158,
+    "outsideSourceFootprintCount": 0,
+    "pipeCount": 186,
+    "pipeSizeCounts": {
+      "1\"": 152,
+      "1¼\"": 17,
+      "1½\"": 4,
+      "2\"": 3,
+      "2½\"": 1,
+      "3\"": 7,
+      "4\"": 2
+    },
+    "fittingCount": 98,
+    "fittingKindCounts": {
+      "Check": 1,
+      "Elbow": 6,
+      "Flange": 1,
+      "Flex Drop": 70,
+      "Flexible Coupling": 2,
+      "Inspectors Test & Drain": 1,
+      "Reducer/Adapter": 1,
+      "Rigid Coupling": 12,
+      "Switch/Sensor": 1,
+      "Tee": 2,
+      "Two-Way Inlet": 1
+    }
+  },
+  "answerUse": {
+    "usedToChangeBlindCandidate": false,
+    "usedForAnswerExposedCalibration": true,
+    "codeLimitClaimed": false,
+    "wholeRoofFaceTopologyProven": false,
+    "complianceReady": false,
+    "fabricationReady": false
+  },
+  "receiptSha256": "363afb88705ad516f1432c8b85a2f47f077154ca977e3f4dc5d31013cb142da9"
+}
