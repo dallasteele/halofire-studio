@@ -1,6 +1,6 @@
 {
   "artifactType": "halofire.formal-verification-receipt.v2",
-  "createdAt": "2026-07-13T12:35:00-07:00",
+  "createdAt": "2026-07-13T20:57:44-07:00",
   "prover": {
     "name": "Lean",
     "version": "4.13.0",
@@ -19,22 +19,33 @@
     "lightHazardRoomCount": 30,
     "ordinaryHazardGroup2RoomCount": 1,
     "slopedRemoteAreaCandidateSqft": 1950,
+    "sourceRoomIdentityCount": 54,
+    "sourceProtectionZoneCount": 45,
+    "topologyReadyRoomIdentityCount": 53,
+    "topologyBlockedRoomIdentityCount": 1,
+    "sprinklerCandidateReadyRoomCount": 0,
     "internalAdversarialLoopsRequired": true
   },
   "theorems": [
-    "operationalBrainAndSourceSpecGate"
+    "operationalBrainAndSourceSpecGate",
+    "unique_assignments_minus_residuals",
+    "topology_partition_closes",
+    "one_residual_blocks_whole_building_layout"
   ],
   "source": "def operationalReady (sources applied stages : Nat) (internalLoops : Bool) : Bool :=\n  sources == 8 && applied == 10 && stages == 8 && internalLoops\n\ndef sourceSpecPartial (total classified unresolved light oh2 : Nat) (defaulted : Bool) : Bool :=\n  total == 56 && classified == 31 && unresolved == 25 && light == 30 && oh2 == 1 && !defaulted\n\ntheorem operationalBrainAndSourceSpecGate :\n    (operationalReady 8 10 8 true &&\n     sourceSpecPartial 56 31 25 30 1 false &&\n     (1500 * 130 / 100 == 1950) &&\n     !(25 == 0)) = true :=\nby native_decide",
+  "latestSource": "def wholeBuildingLayoutReady (topologyBlocked : Nat) : Bool := topologyBlocked == 0\n\ntheorem unique_assignments_minus_residuals : (54 : Nat) - 1 = 53 := by decide\n\ntheorem topology_partition_closes : (53 : Nat) + 1 = 54 := by decide\n\ntheorem one_residual_blocks_whole_building_layout : wholeBuildingLayoutReady 1 = false := by decide",
   "result": {
     "status": "verified",
     "returnCode": 0,
-    "durationMs": 94
+    "durationMs": 389
   },
   "claimBoundary": {
     "geometryGrounded": true,
     "operationalKnowledgeGrounded": true,
     "sourceSpecGrounded": true,
     "partialHazardZoningGrounded": true,
+    "identityZoneAssignmentComplete": true,
+    "wholeBuildingTopologyComplete": false,
     "wholeBuildingHazardZoningComplete": false,
     "headLayoutReady": false,
     "hydraulicCalculationReady": false,

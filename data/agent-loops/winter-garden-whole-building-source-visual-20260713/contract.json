@@ -7,12 +7,15 @@
     "E:/ClaudeBot/AGENTIC_RULES.md",
     "E:/ClaudeBot/CODEX.md",
     "docs/handoffs/2026-07-09-CODEX-MASTER-BUILD.md",
+    "halofire-studio/docs/handoffs/2026-07-13-CODEX-MASTER-BUILD-ADDENDUM-01-PLATFORM-SPINE.md",
     "apps/autosprink/src/data/winter-garden-cross-project-source-set.json",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A101-MAIN-FLOOR-PLAN-Rev.6.pdf",
     "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A103-MAIN-FLOOR-DIMENSION-PLAN-Rev.6.pdf",
     "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A121-ROOF-PLAN-Rev.5.pdf",
     "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A151-REFLECTED-CEILING-PLAN-Rev.5.pdf",
     "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A201-BUILDING-ELEVATIONS-Rev.5.pdf",
     "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A301-BUILDING-SECTIONS-Rev.5.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/LDS Meeting House - Winter Garden FL/Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A303-BUILDING-SECTIONS-Rev.5.pdf",
     "apps/autosprink/src/data/winter-garden-fp3-head-evidence.json"
   ],
   "exit_criteria": [
@@ -43,6 +46,8 @@
   "evidence_paths": [
     "apps/autosprink/out/visual-proof/winter-garden-a103-dimension-plan-gate.png",
     "apps/autosprink/out/visual-proof/winter-garden-a103-dimension-plan-gate.json",
+    "apps/autosprink/out/visual-proof/winter-garden-source-space-topology-proof.png",
+    "apps/autosprink/out/visual-proof/winter-garden-source-space-topology-proof.json",
     "apps/autosprink/out/visual-proof/winter-garden-whole-building-3d-proof.png",
     "apps/autosprink/out/visual-proof/winter-garden-generated-bluebeam-proof.png",
     "data/agent-loops/winter-garden-whole-building-source-visual-20260713/state.json",

@@ -144,3 +144,26 @@ describe('GET /api/projects/:name/source-space-registry', () => {
     expect(body.fabricationReady).toBe(false);
   });
 });
+
+describe('GET /api/projects/:name/source-space-topology', () => {
+  it('requires login', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-space-topology`);
+    expect(response.status).toBe(401);
+  });
+
+  it('serves the internally verified protection envelopes without promoting the residual', async () => {
+    const response = await fetch(`${BASE}/api/projects/${encodeURIComponent(PROJECT)}/source-space-topology`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.status).toBe('passed');
+    expect(body.counts).toMatchObject({ sourceProtectionZones: 45, assignedRoomIdentities: 54, topologyReadyRoomIdentities: 53, topologyBlockedRoomIdentities: 1, sprinklerCandidateReadyRooms: 0 });
+    expect(body.unresolvedRoomNumbers).toEqual(['146']);
+    expect(body.internalVerification).toMatchObject({ primary: { status: 'passed' }, independent: { status: 'passed' }, adversarial: { status: 'passed' } });
+    expect(body.identityZoneAssignmentComplete).toBe(true);
+    expect(body.wholeBuildingTopologyComplete).toBe(false);
+    expect(body.wholeBuildingHeadLayoutReady).toBe(false);
+    expect(body.complianceReady).toBe(false);
+  });
+});

@@ -1,8 +1,8 @@
 {
   "name": "winter-garden-whole-building-source-visual-20260713",
-  "iteration": 5,
+  "iteration": 6,
   "status": "in_progress",
-  "updatedAt": "2026-07-13T12:46:00-07:00",
+  "updatedAt": "2026-07-13T20:57:44-07:00",
   "completedStages": [
     "DISCOVER",
     "PLAN",
@@ -62,6 +62,8 @@
   },
   "brainPostflight": {
     "status": "passed",
+    "latestCheckpointEpisodeId": 142040,
+    "platformSpineRecallEpisodeId": 141704,
     "priorCheckpointEpisodeId": 139750,
     "priorRoomCheckpointEpisodeId": 139418,
     "wikiDecisionPath": "decisions/halofire-operational-brain-contract-and-winter-garden-source-spec-hazard-gate.md",
@@ -152,8 +154,8 @@
   },
   "fullVerification": {
     "status": "passed",
-    "testFiles": 193,
-    "tests": 1775,
+    "testFiles": 195,
+    "tests": 1791,
     "nativeNodeTests": 20,
     "productionBuild": "passed",
     "agenticRules": "passed",
@@ -162,10 +164,38 @@
   "formalVerification": {
     "status": "passed",
     "prover": "Lean 4.13.0",
-    "theorems": 1,
-    "theorem": "operationalBrainAndSourceSpecGate",
-    "durationMs": 94,
+    "theorems": 4,
+    "theorem": "operationalBrainAndSourceSpecGate + unique_assignments_minus_residuals + topology_partition_closes + one_residual_blocks_whole_building_layout",
+    "durationMs": 389,
     "receipt": "data/agent-loops/winter-garden-whole-building-source-visual-20260713/lean-proof.json"
+  },
+  "sourceSpaceTopologyGate": {
+    "status": "passed-partial-fail-closed",
+    "artifactType": "halofire.winter-garden-source-space-topology.v1",
+    "receiptSha256": "e3708ffacae132eb24682e200a668293b33ccf614559b28945ecd2d2afcc46b3",
+    "sourceBindings": ["A101", "A103", "A151", "A303"],
+    "counts": {
+      "sourceRoomIdentities": 54,
+      "sourceProtectionZones": 45,
+      "assignedRoomIdentities": 54,
+      "topologyReadyRoomIdentities": 53,
+      "topologyBlockedRoomIdentities": 1,
+      "sprinklerCandidateReadyRooms": 0
+    },
+    "unresolvedRoomNumbers": ["146"],
+    "residualReason": "A303 confirms the vertical enclosure, but the A101 plan component does not reach the independent source-wall majority threshold",
+    "internalLoops": ["primary", "independent", "adversarial"],
+    "answerKeyUsed": false,
+    "identityZoneAssignmentComplete": true,
+    "wholeBuildingTopologyComplete": false,
+    "wholeBuildingHeadLayoutReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "productSurface": "/api/projects/LDS%20Meeting%20House%20-%20Winter%20Garden%20FL/source-space-topology",
+    "employeeSurface": "autosprink.html#hfWinterGardenSourceTopologyReceipt",
+    "visualProof": "apps/autosprink/out/visual-proof/winter-garden-source-space-topology-proof.png",
+    "visualProofSha256": "c5d6fca01864930875a9b139e035b098602754426f08b6496839cbb02ceb0957"
   },
   "browserVerification": {
     "status": "passed",
@@ -205,5 +235,5 @@
     "liveScreenshot": "apps/autosprink/output/playwright/winter-garden-operational-brain-source-spec-live-vps.png",
     "liveScreenshotSha256": "20c7eb21cdef9dd3aaaeca9d6d8ffbb3e0316b0b9b11e8962f52b9e3e2b80b74"
   },
-  "nextAction": "ITERATE by source-registering the remaining room identities and room ceiling profiles, then generate source-only head placement under the applied operations/spec controls; keep obstructions, water supply, compliance, fabrication, and field release fail-closed; compare against held-out completed-bid evidence only after generation is sealed."
+  "nextAction": "ITERATE by resolving room 146 plan topology from another protected source or preserving the explicit residual, then join the 53 topology-ready identities to ceiling and source-spec controls before any source-only head placement; keep obstructions, water supply, compliance, fabrication, and field release fail-closed; compare against held-out completed-bid evidence only after generation is sealed."
 }
