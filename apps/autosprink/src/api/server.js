@@ -75,6 +75,7 @@ import { buildSagewoodPitchedAtticCalibrationViews, validateSagewoodPitchedAttic
 import { validateChollaHeldoutComparison, verifyChollaHeldoutAdversarialLoop } from '../engine/cholla-main-house-heldout-comparison.js';
 import { buildChollaCompletedLayoutView, validateChollaCompletedLayoutRegistration, verifyChollaCompletedLayoutAdversarialLoop } from '../engine/cholla-main-house-completed-layout-registration.js';
 import { renderMidvaleHeldoutOverlaySvg, validateMidvaleHeldoutComparison, verifyMidvaleHeldoutAdversarialLoop } from '../engine/midvale-clubhouse-pitched-heldout-comparison.js';
+import { renderMosesLakeHeldoutOverlaySvg, validateMosesLakeHeldoutComparison, verifyMosesLakeHeldoutAdversarialLoop } from '../engine/moses-lake-stake-center-pitched-heldout-comparison.js';
 import { validatePitchedPlacementCalibrationCorpus, verifyPitchedPlacementCalibrationAdversarialLoop } from '../engine/pitched-placement-calibration-corpus.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
@@ -170,6 +171,8 @@ const CHOLLA_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/cholla-m
 const CHOLLA_COMPLETED_LAYOUT_REGISTRATION_PATH = path.resolve(__dirname, '../data/cholla-main-house-completed-layout-registration.json');
 const MIDVALE_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/midvale-clubhouse-source-only-pitched-candidate.json');
 const MIDVALE_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/midvale-clubhouse-pitched-heldout-comparison.json');
+const MOSES_LAKE_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/moses-lake-stake-center-source-only-pitched-candidate.json');
+const MOSES_LAKE_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/moses-lake-stake-center-pitched-heldout-comparison.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus.json');
 
 // ── Config ──
@@ -2355,6 +2358,39 @@ app.get('/api/evidence/midvale-clubhouse-pitched-heldout-comparison', authMiddle
   } catch (error) {
     log.error('Failed to load Midvale Clubhouse held-out comparison evidence', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'midvale_clubhouse_heldout_comparison_load_failed', unseenProjectPlacementVerified: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/moses-lake-stake-center-pitched-heldout-comparison', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(MOSES_LAKE_HELDOUT_COMPARISON_PATH, 'utf8'));
+    const sourceCandidate = JSON.parse(fs.readFileSync(MOSES_LAKE_SOURCE_CANDIDATE_PATH, 'utf8'));
+    const [validation, adversarialLoop] = await Promise.all([
+      validateMosesLakeHeldoutComparison(packet, sourceCandidate),
+      verifyMosesLakeHeldoutAdversarialLoop(packet, sourceCandidate),
+    ]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop,
+        sourceOnlyClassifierVerified: false, unseenProjectPlacementVerified: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, projectId: packet.projectId,
+      receiptSha256: packet.receiptSha256, sequence: packet.sequence, answerKeys: packet.answerKeys,
+      registration: packet.registration, approvedEvidence: packet.approvedEvidence,
+      prediction: packet.prediction, approved: packet.approved, comparisons: packet.comparisons,
+      result: packet.result, overlaySvg: renderMosesLakeHeldoutOverlaySvg(packet), adversarialLoop,
+      sourceOnlyClassifierVerified: true, unseenProjectPlacementVerified: false,
+      topViewComparisonReady: true, elevationClassificationComparisonReady: true,
+      partialModel3dComparisonReady: true, hydraulicCalculationReady: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Moses Lake Stake Center held-out comparison evidence', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'moses_lake_stake_center_heldout_comparison_load_failed', unseenProjectPlacementVerified: false, complianceReady: false });
   }
 });
 
