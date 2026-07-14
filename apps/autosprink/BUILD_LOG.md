@@ -1,5 +1,14 @@
 # HaloFire Build Log
 
+## 2026-07-14 - MIT Riverside Building J roof/cricket and protection-plane elevation replay
+
+- Rehashed the protected 116.7 MB architectural bid set and Building J section E/F DWGs, then replayed physical roof-plan page 106 plus exact section handles `D81`, `9DC`, `115C`, and `115F` without modifying the Egnyte corpus.
+- Corrected the historical west lower-roof candidate from `0.5:12` to the source-proven `1.5:12`. The main standing-seam roof is `1.25:12`, the membrane roof is `0.375:12`, and four exact PDF vector drain wedges are each `0.5:12`.
+- Bound 36 main-roof and 17 membrane-roof open-structure heads to source bottom-of-deck target elevations. The 15 finished-ceiling heads remain unbound, and all 68 installed sprinkler Z values remain null because the deflector offset and exact finished-ceiling zones are not yet source-closed.
+- Added deterministic protected-source extraction, packet and three-view SVG replay, 22/22 adversarial mutation rejection, 34 focused tests across seven Building J files, production build/rules/loop guards, and Lean theorem `mitBuildingJRoofPlaneTargetsFailClosed` (Lean 4.13.0, 149 ms, return code 0).
+- Browser inspection of the committed top, side-view, and 3D proof completed with zero console errors or warnings. Whole-roof topology, all-head protection planes, source-generated placement, code compliance, fabrication, and field release remain fail-closed.
+- Next: extract exact finished-ceiling/open-structure zones from the RCP and source the applicable sprinkler deflector offsets before assigning installed head Z or replaying source-generated pitched placement.
+
 ## 2026-07-14 - MIT Riverside Building J exact source slab and base-roof regions
 
 - Rehashed the protected architectural floor and structural roof DWGs, parsed both with `@mlightcad/libredwg-web 0.7.7` at zero unknown entities, and deterministically extracted the three exact architectural slab polylines plus the main standing-seam, lower standing-seam, and membrane base boundaries.

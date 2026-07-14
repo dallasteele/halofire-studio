@@ -1,0 +1,1182 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-roof-plane-elevation.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "sourceSpatialBoundariesReceiptSha256": "40ffa3aa8bee27ed56f356d4d3ca9487b464968992f86f7b9f1a9034ef25d257",
+  "sourceRoofPlaneElevationEvidenceReceiptSha256": "83cd8511a854b507e1006dea859eacda87bddf9a5894b6f03cd9ad66b7b0443a",
+  "generationMode": "protected-source-roof-plan-vectors-section-profiles-and-open-structure-protection-plane-replay",
+  "coordinateSpace": "exact-structural-roof-local-feet-with-source-side-view-elevation-feet",
+  "roofSurfaces": [
+    {
+      "id": "main-standing-seam",
+      "baseRegionId": "main-standing-seam",
+      "riseInPer12": 1.25,
+      "downhillDirection": "negative-y",
+      "sourceProfileHandle": "D81",
+      "wholeBaseFaceReady": true
+    },
+    {
+      "id": "west-lower-standing-seam",
+      "baseRegionId": "west-lower-standing-seam",
+      "riseInPer12": 1.5,
+      "downhillDirection": "positive-y",
+      "sourceProfileHandle": "9DC",
+      "wholeBaseFaceReady": true
+    },
+    {
+      "id": "membrane-base",
+      "baseRegionId": "membrane-base",
+      "riseInPer12": 0.375,
+      "downhillDirection": "positive-y",
+      "sourceProfileHandle": "115C",
+      "wholeBaseFaceReady": true
+    }
+  ],
+  "sourceCricketFaces": [
+    {
+      "id": "southwest-drain-west-wedge",
+      "sourceLayer": "A-ROOF-MAJR.3D",
+      "sourceSequence": 4206,
+      "riseInPer12": 0.5,
+      "rawPdfVerticesPt": [
+        {
+          "x": 746.870789,
+          "y": 1749.339111
+        },
+        {
+          "x": 746.870789,
+          "y": 1771.840576
+        },
+        {
+          "x": 629.870544,
+          "y": 1771.758301
+        },
+        {
+          "x": 629.90741,
+          "y": 1698.777344
+        }
+      ],
+      "registeredStructuralLocalVerticesFt": [
+        {
+          "x": 30.672075,
+          "y": 97.004401
+        },
+        {
+          "x": 30.672075,
+          "y": 99.5
+        },
+        {
+          "x": 17.666667,
+          "y": 99.5
+        },
+        {
+          "x": 17.666667,
+          "y": 91.386427
+        }
+      ]
+    },
+    {
+      "id": "southwest-drain-east-wedge",
+      "sourceLayer": "A-ROOF-MAJR.3D",
+      "sourceSequence": 4200,
+      "riseInPer12": 0.5,
+      "rawPdfVerticesPt": [
+        {
+          "x": 773.870789,
+          "y": 1771.840576
+        },
+        {
+          "x": 773.870789,
+          "y": 1749.339111
+        },
+        {
+          "x": 890.998535,
+          "y": 1698.706543
+        },
+        {
+          "x": 891.018372,
+          "y": 1747.658081
+        },
+        {
+          "x": 891.038269,
+          "y": 1771.758301
+        }
+      ],
+      "registeredStructuralLocalVerticesFt": [
+        {
+          "x": 33.672075,
+          "y": 99.5
+        },
+        {
+          "x": 33.672075,
+          "y": 97.004401
+        },
+        {
+          "x": 46.686269,
+          "y": 91.37856
+        },
+        {
+          "x": 46.688473,
+          "y": 96.81762
+        },
+        {
+          "x": 46.690684,
+          "y": 99.5
+        }
+      ]
+    },
+    {
+      "id": "southeast-drain-west-wedge",
+      "sourceLayer": "A-ROOF-MAJR.3D",
+      "sourceSequence": 4217,
+      "riseInPer12": 0.5,
+      "rawPdfVerticesPt": [
+        {
+          "x": 1007.822937,
+          "y": 1749.339111
+        },
+        {
+          "x": 1007.822937,
+          "y": 1771.840576
+        },
+        {
+          "x": 890.822754,
+          "y": 1771.758301
+        },
+        {
+          "x": 890.859619,
+          "y": 1698.777344
+        }
+      ],
+      "registeredStructuralLocalVerticesFt": [
+        {
+          "x": 59.666758,
+          "y": 97.004401
+        },
+        {
+          "x": 59.666758,
+          "y": 99.5
+        },
+        {
+          "x": 46.666738,
+          "y": 99.5
+        },
+        {
+          "x": 46.670834,
+          "y": 91.386427
+        }
+      ]
+    },
+    {
+      "id": "southeast-drain-east-wedge",
+      "sourceLayer": "A-ROOF-MAJR.3D",
+      "sourceSequence": 4211,
+      "riseInPer12": 0.5,
+      "rawPdfVerticesPt": [
+        {
+          "x": 1034.822998,
+          "y": 1771.840576
+        },
+        {
+          "x": 1034.822998,
+          "y": 1749.339111
+        },
+        {
+          "x": 1151.950684,
+          "y": 1698.706543
+        },
+        {
+          "x": 1151.967773,
+          "y": 1747.658081
+        },
+        {
+          "x": 1151.990479,
+          "y": 1771.758301
+        }
+      ],
+      "registeredStructuralLocalVerticesFt": [
+        {
+          "x": 62.666765,
+          "y": 99.5
+        },
+        {
+          "x": 62.666765,
+          "y": 97.004401
+        },
+        {
+          "x": 75.666667,
+          "y": 91.37856
+        },
+        {
+          "x": 75.666667,
+          "y": 96.81762
+        },
+        {
+          "x": 75.666667,
+          "y": 99.5
+        }
+      ]
+    }
+  ],
+  "sourceProtectionPlanes": [
+    {
+      "id": "main-open-structure-bod",
+      "baseRegionId": "main-standing-seam",
+      "axis": "y",
+      "minYFt": 0,
+      "maxYFt": 60,
+      "minZFt": 17.083333,
+      "maxZFt": 23.333333,
+      "riseInPer12": 1.25,
+      "sourceDatums": [
+        "17'-1\" B.O.D.",
+        "23'-4\" B.O.D."
+      ],
+      "headInstallationOffsetReady": false
+    },
+    {
+      "id": "membrane-open-structure-bod",
+      "baseRegionId": "membrane-base",
+      "axis": "y",
+      "minYFt": 65.5,
+      "maxYFt": 99.5,
+      "minZFt": 13.0625,
+      "maxZFt": 12,
+      "riseInPer12": -0.375,
+      "sourceDatums": [
+        "13'-0 3/4\" derived from section F handle 115C",
+        "12'-0\" B.O.D."
+      ],
+      "headInstallationOffsetReady": false
+    }
+  ],
+  "headAssignments": [
+    {
+      "id": "MIT-J-U-001",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-002",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-003",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-004",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-005",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-006",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-007",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-008",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-009",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-010",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-011",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-012",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-013",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-014",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-015",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-016",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-017",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-018",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-019",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-020",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-021",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-022",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-023",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-024",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-025",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-026",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-027",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-028",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-029",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-030",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-031",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-032",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-033",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-034",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-035",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-036",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "open-structure-main-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-037",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 68.634745,
+        "y": 69.135524
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.94889,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-001",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 4.319904,
+        "y": 71.537465
+      },
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-002",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 13.319314,
+        "y": 71.537465
+      },
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-003",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 37.777269,
+        "y": 71.537472
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-004",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 45.77597,
+        "y": 71.537472
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-038",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 19.70873,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-039",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 30.21425,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-040",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 49.21698,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-041",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 56.219055,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-042",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 64.220904,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-043",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 68.634745,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-005",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 4.319918,
+        "y": 84.033142
+      },
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-006",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 13.319326,
+        "y": 84.033142
+      },
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-007",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 41.297544,
+        "y": 84.227519
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-008",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 53.298247,
+        "y": 84.227519
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-009",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 65.301092,
+        "y": 84.227519
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-044",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 19.70873,
+        "y": 84.755117
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460778,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-045",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 30.21425,
+        "y": 84.755117
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460778,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-046",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 40.217881,
+        "y": 84.75512
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460777,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-047",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 50.217276,
+        "y": 84.75512
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460777,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-048",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 60.220241,
+        "y": 84.75512
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460777,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-049",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 70.221594,
+        "y": 84.75512
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460777,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-010",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 32.268264,
+        "y": 87.740191
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-050",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 40.217881,
+        "y": 94.073316
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.169584,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-051",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 50.217276,
+        "y": 94.073316
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.169584,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-052",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 60.220241,
+        "y": 94.073316
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.169584,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-U-053",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 70.221594,
+        "y": 94.073316
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "open-structure-membrane-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.169584,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-011",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 23.628312,
+        "y": 95.297806
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-012",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 32.268271,
+        "y": 95.322052
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-013",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 41.297572,
+        "y": 95.443296
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-014",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 53.298274,
+        "y": 95.443296
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    },
+    {
+      "id": "MIT-J-P-015",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 65.30112,
+        "y": 95.443296
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-height-unsealed",
+      "sourceProtectionPlaneId": null,
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null
+    }
+  ],
+  "counts": {
+    "totalHeads": 68,
+    "mainOpenStructure": 36,
+    "membraneOpenStructure": 17,
+    "finishedCeilingPending": 15,
+    "headInstallationZAssigned": 0
+  },
+  "correctedSourceFacts": {
+    "legacyLowerRoofPitchRiseInPer12": 0.5,
+    "westStandingSeamPitchRiseInPer12": 1.5,
+    "legacyCandidateSuperseded": true,
+    "legacySourceCandidateReceiptUsed": false
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "architectural PDF scale, pitch text, and four exact cricket-vector replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "section E/F DWG handle pitch and side-view elevation replay"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "dependency, source correction, cricket, profile, plane, assignment, Z, topology, compliance, fabrication, and release mutations"
+    }
+  },
+  "sourceCricketVectorsReady": true,
+  "sourceSideViewProfilesReady": true,
+  "baseRoofSurfacesReady": true,
+  "openStructureProtectionPlanesReady": true,
+  "openStructureTargetElevationCount": 53,
+  "allHeadProtectionPlanesReady": false,
+  "headInstallationZReady": false,
+  "headElevationsReady": false,
+  "wholeRoofFaceTopologyReady": false,
+  "sourceGeneratedPitchedPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "extract exact RCP finished-ceiling zones and installation offsets before assigning the 15 pendent protection planes or any of the 68 head installation Z values",
+  "claimStatus": "exact-source-roof-pitches-four-cricket-vectors-side-view-profiles-and-53-open-structure-target-elevations-not-head-installation-z-source-generation-compliance-fabrication-or-release",
+  "receiptSha256": "9fc9718be4ff957b36483319c629fe90478f0a5075d77b041b47ddcaa4d587fd"
+}

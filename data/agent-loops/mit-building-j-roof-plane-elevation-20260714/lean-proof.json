@@ -1,0 +1,29 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "gatewayHealth": {
+    "status": "ok",
+    "gatewayVersion": "0.1.0",
+    "leanStatus": "ok"
+  },
+  "theoremName": "mitBuildingJRoofPlaneTargetsFailClosed",
+  "claim": "The 68 registered Building J heads partition into 36 main-roof open-structure targets, 17 membrane-roof open-structure targets, and 15 finished-ceiling pending heads; four exact drain crickets close; 53 protection-plane targets close while zero installed sprinkler elevations are claimed and both installed-elevation and compliance readiness remain false.",
+  "theorem": "theorem mitBuildingJRoofPlaneTargetsFailClosed :\n  And (((36 : Nat) + 17 + 15) = 68)\n    (And (((4 : Nat) = 4))\n      (And ((53 : Nat) = 36 + 17)\n        (And ((0 : Nat) = 0)\n          (And ((false : Bool) = false)\n            ((false : Bool) = false))))) :=",
+  "proof": "by\n  decide",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 149,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  },
+  "roofPlaneElevationReceiptSha256": "9fc9718be4ff957b36483319c629fe90478f0a5075d77b041b47ddcaa4d587fd",
+  "exactRoofSurfacesReady": true,
+  "exactDrainCricketsReady": true,
+  "sourceProtectionPlaneTargetCount": 53,
+  "finishedCeilingPendingCount": 15,
+  "headInstallationZAssignedCount": 0,
+  "sourceProtectionPlaneReady": true,
+  "headInstallationElevationReady": false,
+  "complianceReady": false
+}

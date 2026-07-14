@@ -1,0 +1,54 @@
+{
+  "name": "mit-building-j-roof-plane-elevation-20260714",
+  "owner": "codex",
+  "goal": "Reconstruct MIT Riverside Building J membrane cricket subfaces and source-grounded roof/elevation planes from protected plan, elevation, and section sources; bind the 68 already-corrected XY heads to a plane and Z only where exact source geometry closes; preserve all residuals and keep compliance, fabrication, and field release fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-09-CODEX-MASTER-BUILD.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-13-CODEX-MASTER-BUILD-ADDENDUM-01-PLATFORM-SPINE.md",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-spatial-boundaries.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-only-pitched-candidate.json",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ"
+  ],
+  "exit_criteria": [
+    "protected plan, elevation, and section source files are hash-verified and remain unmodified",
+    "membrane cricket subfaces are extracted as closed non-overlapping polygons or retained as an explicit unresolved residual with exact evidence",
+    "standing-seam and membrane roof/elevation planes use source pitch, direction, and datum evidence rather than answer-derived Z",
+    "all 68 corrected XY heads receive a unique source plane and Z only if the source faces cover them without overlap or gaps",
+    "top, elevation, and 3D proof truthfully distinguish source geometry from completed-bid answer coordinates",
+    "deterministic replay, independent closure, adversarial mutation, focused regression, build, formal proof, rules verification, and browser inspection are recorded",
+    "source-generated placement, code compliance, approval, fabrication, and field release remain false unless separately proven",
+    "brain postflight records the exact commit, evidence, residuals, and next action"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "protected source path, size, and SHA-256 inventory",
+    "exact DWG/PDF plan and side-view extraction replay",
+    "polygon closure, overlap, gap, and coverage checks",
+    "plane pitch, direction, datum, and XY-to-Z replay",
+    "per-head unique plane and Z assignment checks",
+    "primary, independent, and adversarial verification loops",
+    "focused Building J regression tests",
+    "production build and syntax checks",
+    "GX10 Lean 4 proof or exact prover-unavailable evidence",
+    "authoritative agentic-rule check",
+    "real-browser top, elevation, and 3D screenshot inspection",
+    "VPS backup, hash sync, service/login/API smoke only when runtime surfaces change",
+    "brain close writeback with confirmed episode or exact failure"
+  ],
+  "state_path": "data/agent-loops/mit-building-j-roof-plane-elevation-20260714/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/mit-riverside-building-j-roof-plane-elevation-evidence.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-roof-plane-elevation",
+    "data/agent-loops/mit-building-j-roof-plane-elevation-20260714/state.json",
+    "BUILD_LOG.md"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 250000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

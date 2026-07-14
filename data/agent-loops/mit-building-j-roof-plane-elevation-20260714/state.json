@@ -1,0 +1,76 @@
+{
+  "loop": "mit-building-j-roof-plane-elevation-20260714",
+  "stage": "ITERATE",
+  "status": "verified-bounded-slice-with-explicit-ceiling-and-installation-offset-residuals",
+  "iteration": 3,
+  "projectId": "mit-riverside-building-j",
+  "priorSourceSpatialBoundariesReceiptSha256": "40ffa3aa8bee27ed56f356d4d3ca9487b464968992f86f7b9f1a9034ef25d257",
+  "platformSpineAddendum": {
+    "acknowledged": true,
+    "spatialB1ThroughB7PriorityOne": true,
+    "platformM1MixedIntoThisBranch": false
+  },
+  "verificationDoctrine": ["internal-primary", "internal-independent", "adversarial"],
+  "protectedSourceReplay": {
+    "architecturalPdfSha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c",
+    "sectionEDwgSha256": "f65f41960f27c0a13c60e35b9da36e100b255d92c94c8e895cc25f6ba550a0d5",
+    "sectionFDwgSha256": "7b155ffa696ae89fde463b3f3a318e99956fe1976e73c73bf019f3e40a7eaca7",
+    "evidenceReceiptSha256": "83cd8511a854b507e1006dea859eacda87bddf9a5894b6f03cd9ad66b7b0443a",
+    "packetReceiptSha256": "9fc9718be4ff957b36483319c629fe90478f0a5075d77b041b47ddcaa4d587fd",
+    "byteIdenticalEvidenceReplay": true
+  },
+  "sourceGeometry": {
+    "mainStandingSeamRiseInPer12": 1.25,
+    "westLowerStandingSeamRiseInPer12": 1.5,
+    "membraneRiseInPer12": 0.375,
+    "exactDrainCricketFaceCount": 4,
+    "drainCricketRiseInPer12": 0.5,
+    "legacyWestLowerPitchSuperseded": true
+  },
+  "assignmentCounts": {
+    "totalHeads": 68,
+    "mainOpenStructureTargets": 36,
+    "membraneOpenStructureTargets": 17,
+    "finishedCeilingPending": 15,
+    "headInstallationZAssigned": 0
+  },
+  "verification": {
+    "deterministicReplay": "passed",
+    "independentClosure": "passed",
+    "adversarialMutations": "22/22 rejected",
+    "focusedTests": "34/34 passed across 7 files",
+    "syntax": "passed",
+    "viteBuild": "passed",
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "gitDiffCheck": "passed",
+    "focusedOrSkippedTestMarkers": 0,
+    "lean4": {
+      "theorem": "mitBuildingJRoofPlaneTargetsFailClosed",
+      "status": "verified",
+      "version": "4.13.0",
+      "elapsedMs": 149,
+      "returncode": 0,
+      "receipt": "data/agent-loops/mit-building-j-roof-plane-elevation-20260714/lean-proof.json"
+    },
+    "browserProof": {
+      "status": "passed",
+      "consoleErrors": 0,
+      "consoleWarnings": 0,
+      "committedProof": "apps/autosprink/src/data/proofs/mit-riverside-building-j-roof-plane-elevation/index.html",
+      "screenshot": "output/playwright/mit-riverside-building-j-roof-plane-proof.png"
+    }
+  },
+  "claims": {
+    "cricketFaceTopologyReady": true,
+    "wholeRoofFaceTopologyReady": false,
+    "sourceProtectionPlaneReady": true,
+    "allHeadProtectionPlanesReady": false,
+    "headElevationsReady": false,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "nextAction": "extract exact finished-ceiling and open-structure zone boundaries from the protected RCP and source the applicable sprinkler deflector offsets; then assign installed head Z only where both the ceiling/deck target and offset close before source-generated pitched placement and a fresh holdout"
+}

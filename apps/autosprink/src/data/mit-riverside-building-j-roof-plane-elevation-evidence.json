@@ -1,0 +1,341 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-roof-plane-elevation-evidence.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "generationMode": "protected-architectural-pdf-vectors-plus-section-e-f-dwg-profiles",
+  "sources": {
+    "architecturalBidSet": {
+      "physicalPage": 106,
+      "pageIndex": 105,
+      "bytes": 116713715,
+      "sha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c"
+    },
+    "sectionE": {
+      "bytes": 427934,
+      "sha256": "f65f41960f27c0a13c60e35b9da36e100b255d92c94c8e895cc25f6ba550a0d5"
+    },
+    "sectionF": {
+      "bytes": 304405,
+      "sha256": "7b155ffa696ae89fde463b3f3a318e99956fe1976e73c73bf019f3e40a7eaca7"
+    }
+  },
+  "extraction": {
+    "pdfReader": "PyMuPDF 1.27.2.2",
+    "dwgReader": "@mlightcad/libredwg-web 0.7.7",
+    "unknownSectionEntityCount": 0
+  },
+  "planRegistration": {
+    "pdfPointsPerFoot": 9.0,
+    "scaleBar": {
+      "pdfWidthPt": 144.000183,
+      "sourceWidthFt": 16
+    },
+    "overallMainWidthDimension": {
+      "pdfWidthPt": 576.000885,
+      "sourceWidthFt": 64
+    },
+    "originPdfPt": {
+      "x": 470.822113,
+      "y": 876.2995
+    },
+    "membraneBoundaryStructuralLocalFt": {
+      "minX": 17.666667,
+      "maxX": 75.666667,
+      "minY": 65.5,
+      "maxY": 99.5
+    },
+    "boundarySnapToleranceFt": 0.02
+  },
+  "roofPlanTextFacts": {
+    "mainPitch": "1 1/4\" : 12\" SLOPE",
+    "westPitch": "1 1/2\" : 12\" SLOPE",
+    "membranePitch": "3/8\" : 12\" SLOPE",
+    "drainCricketPitchCount": 4,
+    "mainLowBod": "17'-1\" B.O.D.",
+    "mainIntermediateBod": "19'-11\" B.O.D.",
+    "mainHighBod": "23'-4\" B.O.D.",
+    "membraneSouthBod": "12'-0\" B.O.D.",
+    "membraneArea": "ROOF AREA: 1,972 SF"
+  },
+  "cricketFaces": [
+    {
+      "id": "southwest-drain-west-wedge",
+      "sourceLayer": "A-ROOF-MAJR.3D",
+      "sourceSequence": 4206,
+      "riseInPer12": 0.5,
+      "rawPdfVerticesPt": [
+        {
+          "x": 746.870789,
+          "y": 1749.339111
+        },
+        {
+          "x": 746.870789,
+          "y": 1771.840576
+        },
+        {
+          "x": 629.870544,
+          "y": 1771.758301
+        },
+        {
+          "x": 629.90741,
+          "y": 1698.777344
+        }
+      ],
+      "registeredStructuralLocalVerticesFt": [
+        {
+          "x": 30.672075,
+          "y": 97.004401
+        },
+        {
+          "x": 30.672075,
+          "y": 99.5
+        },
+        {
+          "x": 17.666667,
+          "y": 99.5
+        },
+        {
+          "x": 17.666667,
+          "y": 91.386427
+        }
+      ]
+    },
+    {
+      "id": "southwest-drain-east-wedge",
+      "sourceLayer": "A-ROOF-MAJR.3D",
+      "sourceSequence": 4200,
+      "riseInPer12": 0.5,
+      "rawPdfVerticesPt": [
+        {
+          "x": 773.870789,
+          "y": 1771.840576
+        },
+        {
+          "x": 773.870789,
+          "y": 1749.339111
+        },
+        {
+          "x": 890.998535,
+          "y": 1698.706543
+        },
+        {
+          "x": 891.018372,
+          "y": 1747.658081
+        },
+        {
+          "x": 891.038269,
+          "y": 1771.758301
+        }
+      ],
+      "registeredStructuralLocalVerticesFt": [
+        {
+          "x": 33.672075,
+          "y": 99.5
+        },
+        {
+          "x": 33.672075,
+          "y": 97.004401
+        },
+        {
+          "x": 46.686269,
+          "y": 91.37856
+        },
+        {
+          "x": 46.688473,
+          "y": 96.81762
+        },
+        {
+          "x": 46.690684,
+          "y": 99.5
+        }
+      ]
+    },
+    {
+      "id": "southeast-drain-west-wedge",
+      "sourceLayer": "A-ROOF-MAJR.3D",
+      "sourceSequence": 4217,
+      "riseInPer12": 0.5,
+      "rawPdfVerticesPt": [
+        {
+          "x": 1007.822937,
+          "y": 1749.339111
+        },
+        {
+          "x": 1007.822937,
+          "y": 1771.840576
+        },
+        {
+          "x": 890.822754,
+          "y": 1771.758301
+        },
+        {
+          "x": 890.859619,
+          "y": 1698.777344
+        }
+      ],
+      "registeredStructuralLocalVerticesFt": [
+        {
+          "x": 59.666758,
+          "y": 97.004401
+        },
+        {
+          "x": 59.666758,
+          "y": 99.5
+        },
+        {
+          "x": 46.666738,
+          "y": 99.5
+        },
+        {
+          "x": 46.670834,
+          "y": 91.386427
+        }
+      ]
+    },
+    {
+      "id": "southeast-drain-east-wedge",
+      "sourceLayer": "A-ROOF-MAJR.3D",
+      "sourceSequence": 4211,
+      "riseInPer12": 0.5,
+      "rawPdfVerticesPt": [
+        {
+          "x": 1034.822998,
+          "y": 1771.840576
+        },
+        {
+          "x": 1034.822998,
+          "y": 1749.339111
+        },
+        {
+          "x": 1151.950684,
+          "y": 1698.706543
+        },
+        {
+          "x": 1151.967773,
+          "y": 1747.658081
+        },
+        {
+          "x": 1151.990479,
+          "y": 1771.758301
+        }
+      ],
+      "registeredStructuralLocalVerticesFt": [
+        {
+          "x": 62.666765,
+          "y": 99.5
+        },
+        {
+          "x": 62.666765,
+          "y": 97.004401
+        },
+        {
+          "x": 75.666667,
+          "y": 91.37856
+        },
+        {
+          "x": 75.666667,
+          "y": 96.81762
+        },
+        {
+          "x": 75.666667,
+          "y": 99.5
+        }
+      ]
+    }
+  ],
+  "sectionProfiles": {
+    "mainStandingSeamCorroboration": {
+      "handle": "D81",
+      "blockName": "Section Element_13",
+      "sourceLayer": "New_A-ROOF-MAJR.3D",
+      "startInches": {
+        "sectionAxis": -10664.799299,
+        "elevation": 289.319466
+      },
+      "endInches": {
+        "sectionAxis": -11482.706634,
+        "elevation": 204.120785
+      },
+      "riseInPer12": 1.25
+    },
+    "westStandingSeam": {
+      "handle": "9DC",
+      "blockName": "Section Element_12",
+      "sourceLayer": "New_A-ROOF-MAJR.3D",
+      "startInches": {
+        "sectionAxis": -10683.529514,
+        "elevation": 180.000121
+      },
+      "endInches": {
+        "sectionAxis": -10395.528544,
+        "elevation": 144.0
+      },
+      "riseInPer12": -1.5
+    },
+    "membraneBottomOfDeck": {
+      "handle": "115C",
+      "blockName": "Section Element_10",
+      "sourceLayer": "New_A-ROOF-MAJR.3D",
+      "startInches": {
+        "sectionAxis": -10683.747188,
+        "elevation": 156.756833
+      },
+      "endInches": {
+        "sectionAxis": -10275.747188,
+        "elevation": 144.006833
+      },
+      "riseInPer12": -0.375
+    },
+    "membraneRoofSurface": {
+      "handle": "115F",
+      "blockName": "Section Element_10",
+      "sourceLayer": "New_A-ROOF-MAJR.3D",
+      "startInches": {
+        "sectionAxis": -10683.528544,
+        "elevation": 163.753417
+      },
+      "endInches": {
+        "sectionAxis": -10275.528544,
+        "elevation": 151.003417
+      },
+      "riseInPer12": -0.375
+    }
+  },
+  "protectionPlaneConstraints": {
+    "mainOpenStructureBod": {
+      "axis": "y",
+      "minYFt": 0,
+      "maxYFt": 60,
+      "minZFt": 17.083333,
+      "maxZFt": 23.333333,
+      "riseInPer12": 1.25
+    },
+    "membraneOpenStructureBod": {
+      "axis": "y",
+      "minYFt": 65.5,
+      "maxYFt": 99.5,
+      "minZFt": 13.0625,
+      "maxZFt": 12,
+      "riseInPer12": -0.375
+    }
+  },
+  "supersessions": [
+    {
+      "artifact": "mit-riverside-building-j-source-only-pitched-candidate.v1",
+      "field": "lower-connected-roof.riseInPer12",
+      "legacyValue": 0.5,
+      "sourceCorrectedValue": 1.5,
+      "reason": "roof-plan text and section-E handle 9DC both prove 1 1/2:12"
+    }
+  ],
+  "claims": {
+    "sourceCricketVectorsReady": true,
+    "sourceSideViewProfilesReady": true,
+    "sourceProtectionPlaneConstraintsReady": true,
+    "headInstallationZReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "83cd8511a854b507e1006dea859eacda87bddf9a5894b6f03cd9ad66b7b0443a"
+}
