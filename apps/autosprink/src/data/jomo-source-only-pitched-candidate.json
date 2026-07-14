@@ -1,0 +1,363 @@
+{
+  "artifactType": "halofire.jomo-source-only-pitched-candidate.v1",
+  "projectId": "jomo-residence-wanship-ut",
+  "projectName": "JOMO Residence - Wanship UT",
+  "sourceSealReceiptSha256": "96c51916df28c52e6f7b0e072461bd598e65cc1a6689a7c0a62a8659635e6179",
+  "dillonPriorReceiptSha256": "20a553b24f20219e2f3d1e8022b05079dc6e22f3189c63c9684fcf3dbbf1bf26",
+  "generationMode": "sealed-architectural-source-plus-cross-project-empirical-prior-before-answer-open",
+  "geometry": {
+    "coordinateSystem": "A.01 room-local feet with first-floor datum 0.00 ft",
+    "floor": {
+      "id": "level-01",
+      "elevationFt": 0,
+      "sourceSheet": "A.01",
+      "sourcePhysicalPage": 5
+    },
+    "room": {
+      "id": "great-room",
+      "name": "GREAT ROOM",
+      "areaSqFt": 788.5,
+      "widthFt": 44.125,
+      "depthFt": 17.869688,
+      "polygonFt": [
+        [
+          0,
+          0
+        ],
+        [
+          44.125,
+          0
+        ],
+        [
+          44.125,
+          17.869688
+        ],
+        [
+          0,
+          17.869688
+        ]
+      ],
+      "sourceObservations": [
+        {
+          "sheet": "A.01",
+          "physicalPage": 5,
+          "observation": "GREAT ROOM area 788.5 square feet and 44 foot 1-1/2 inch long dimension"
+        },
+        {
+          "sheet": "A.03",
+          "physicalPage": 7,
+          "observation": "GREAT ROOM CLG 16 feet with keynote 09.07 VAULTED CEILING"
+        },
+        {
+          "sheet": "A.04",
+          "physicalPage": 8,
+          "observation": "gable elevations identify 7:12 pitch"
+        },
+        {
+          "sheet": "A.05",
+          "physicalPage": 9,
+          "observation": "BUILDING SECTION A cuts the GREAT ROOM and shows two interior sloped ceiling planes meeting at the ridge"
+        }
+      ]
+    },
+    "ceiling": {
+      "kind": "source-proven-two-plane-vault",
+      "pitch": {
+        "riseIn": 7,
+        "runIn": 12
+      },
+      "axis": "y",
+      "ridgeAxis": "x",
+      "springElevationFt": 10.788008,
+      "ridgeElevationFt": 16,
+      "halfRunFt": 8.934844,
+      "riseFt": 5.211992,
+      "surfaces": [
+        {
+          "id": "great-room-south-plane",
+          "polygonFt": [
+            [
+              0,
+              0
+            ],
+            [
+              44.125,
+              0
+            ],
+            [
+              44.125,
+              8.934844
+            ],
+            [
+              0,
+              8.934844
+            ]
+          ],
+          "downhillDirection": "negative-y"
+        },
+        {
+          "id": "great-room-north-plane",
+          "polygonFt": [
+            [
+              0,
+              8.934844
+            ],
+            [
+              44.125,
+              8.934844
+            ],
+            [
+              44.125,
+              17.869688
+            ],
+            [
+              0,
+              17.869688
+            ]
+          ],
+          "downhillDirection": "positive-y"
+        }
+      ]
+    }
+  },
+  "layoutInput": {
+    "artifactType": "halofire.sloped-ceiling-layout-input.v1",
+    "printedScalePtPerFt": 1,
+    "regions": [
+      {
+        "id": "great-room-south-plane",
+        "polygonSubmittedPt": [
+          [
+            0,
+            0
+          ],
+          [
+            44.125,
+            0
+          ],
+          [
+            44.125,
+            8.934844
+          ],
+          [
+            0,
+            8.934844
+          ]
+        ],
+        "slopeAxis": "y",
+        "downhillDirection": "negative-y",
+        "riseIn": 7,
+        "runIn": 12,
+        "shouldProtect": true,
+        "obstructions": []
+      },
+      {
+        "id": "great-room-north-plane",
+        "polygonSubmittedPt": [
+          [
+            0,
+            8.934844
+          ],
+          [
+            44.125,
+            8.934844
+          ],
+          [
+            44.125,
+            17.869688
+          ],
+          [
+            0,
+            17.869688
+          ]
+        ],
+        "slopeAxis": "y",
+        "downhillDirection": "positive-y",
+        "riseIn": 7,
+        "runIn": 12,
+        "shouldProtect": true,
+        "obstructions": []
+      }
+    ],
+    "maxAcrossSlopeSpanFt": 20,
+    "maxAlongSlopeSpanFt": 12
+  },
+  "layout": {
+    "regions": [
+      {
+        "regionId": "great-room-south-plane",
+        "shouldProtect": true,
+        "generatedHeadCount": 3,
+        "widthFt": 44.125,
+        "heightFt": 8.934844,
+        "acrossCount": 3,
+        "alongCount": 1,
+        "obstructionAdjustments": []
+      },
+      {
+        "regionId": "great-room-north-plane",
+        "shouldProtect": true,
+        "generatedHeadCount": 3,
+        "widthFt": 44.125,
+        "heightFt": 8.934844,
+        "acrossCount": 3,
+        "alongCount": 1,
+        "obstructionAdjustments": []
+      }
+    ],
+    "headCount": 6
+  },
+  "heads3d": [
+    {
+      "id": "jomo-source-head-01",
+      "surfaceId": "great-room-south-plane",
+      "pointFt": [
+        7.354167,
+        4.467422,
+        13.394004
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "jomo-source-head-02",
+      "surfaceId": "great-room-south-plane",
+      "pointFt": [
+        22.0625,
+        4.467422,
+        13.394004
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "jomo-source-head-03",
+      "surfaceId": "great-room-south-plane",
+      "pointFt": [
+        36.770833,
+        4.467422,
+        13.394004
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "jomo-source-head-04",
+      "surfaceId": "great-room-north-plane",
+      "pointFt": [
+        7.354167,
+        13.402266,
+        13.394004
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "jomo-source-head-05",
+      "surfaceId": "great-room-north-plane",
+      "pointFt": [
+        22.0625,
+        13.402266,
+        13.394004
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    },
+    {
+      "id": "jomo-source-head-06",
+      "surfaceId": "great-room-north-plane",
+      "pointFt": [
+        36.770833,
+        13.402266,
+        13.394004
+      ],
+      "status": "source-only-empirical-candidate",
+      "hydraulicNodeAssigned": false,
+      "obstructionClearanceVerified": false
+    }
+  ],
+  "branchPipes3d": [
+    {
+      "id": "great-room-south-plane-candidate-branch",
+      "surfaceId": "great-room-south-plane",
+      "fromFt": [
+        7.354167,
+        4.467422,
+        13.394004
+      ],
+      "toFt": [
+        36.770833,
+        4.467422,
+        13.394004
+      ],
+      "nominalSizeIn": null,
+      "status": "candidate-topology-no-hydraulic-size"
+    },
+    {
+      "id": "great-room-north-plane-candidate-branch",
+      "surfaceId": "great-room-north-plane",
+      "fromFt": [
+        7.354167,
+        13.402266,
+        13.394004
+      ],
+      "toFt": [
+        36.770833,
+        13.402266,
+        13.394004
+      ],
+      "nominalSizeIn": null,
+      "status": "candidate-topology-no-hydraulic-size"
+    }
+  ],
+  "buildingModel": {
+    "levelCount": 1,
+    "levels": [
+      {
+        "id": "level-01",
+        "floorElevationFt": 0,
+        "roomIds": [
+          "great-room"
+        ]
+      }
+    ],
+    "modeledScope": "source-closed-great-room-envelope",
+    "wholeBuildingFootprintComplete": false,
+    "floorByFloorExtrusionReady": true,
+    "twoPlaneVaultReady": true
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-two-plane-layout-replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "area-dimension-pitch-and-ridge-recalculation"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "source-prior-answer-leakage-and-false-promotion-mutations"
+    }
+  },
+  "answerKeyUsed": false,
+  "completedBidUsedForGeneration": false,
+  "unseenProjectPlacementVerified": false,
+  "roomEnvelopeGeometryGrounded": true,
+  "topViewReady": true,
+  "elevationViewReady": true,
+  "partialModel3dReady": true,
+  "wholeBuildingModelReady": false,
+  "wholeBuildingHeadLayoutReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "unseen-source-only-pitched-candidate-before-completed-answer-comparison-not-code-compliance-or-fabrication",
+  "receiptSha256": "68364be6a6efe932b5a99eccb296d6a912bf100ad93ac9d0b48dfa895482c367"
+}

@@ -1,0 +1,145 @@
+{
+  "artifactType": "halofire.unseen-pitched-holdout.v1",
+  "projectId": "jomo-residence-wanship-ut",
+  "projectName": "JOMO Residence - Wanship UT",
+  "sealedAt": "2026-07-14T05:31:38Z",
+  "corpusRoot": "Y:\\Shared\\HaloOps\\02-Active jobs\\Bell Mountain Homes\\JOMO Residence - Wanship UT",
+  "selection": {
+    "status": "source-sealed-answer-unopened",
+    "priorImplementationSearchHits": 0,
+    "completedProjectEvidence": [
+      "design-completion-checklist-ahj-submittal",
+      "design-completion-checklist-field-set",
+      "final-ahj-approval-letter",
+      "separate-final-fp-layout"
+    ],
+    "rejectedBeforeAnswerOpen": [
+      {
+        "project": "Boyd Residence addition",
+        "reason": "architectural source did not prove that the protected ceiling follows the roof slope"
+      },
+      {
+        "project": "Lubbock Temple",
+        "reason": "architectural RCP already exposed sprinkler-head placement"
+      },
+      {
+        "project": "Nashville Temple",
+        "reason": "source RCPs and roof plan did not provide a positive pitched-ceiling case"
+      },
+      {
+        "project": "Gilbert Temple baptistry",
+        "reason": "source CAD showed a flat/coffered RCP with no slope or elevation annotation"
+      },
+      {
+        "project": "Biffer Residence",
+        "reason": "available CAD was the fire-protection drawing rather than an independent architectural source"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "role": "architectural_bid_set",
+      "path": "1-Bid Documents\\GC - Bid Plans\\Building\\JOMO ARCH (Revised07_19_23).pdf",
+      "bytes": 28402305,
+      "sha256": "ac0321e24a1defb2fc5a5a3b6868657c8123f114e625c13e86acafd21204be09"
+    },
+    {
+      "role": "first_floor_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\1. 1ST FLOOR.dwg",
+      "bytes": 1081823,
+      "sha256": "dd06096137a8ace2b89a559c118bf7dd43d3d79b9aef20e3bf837d16f5e23263"
+    },
+    {
+      "role": "reflected_ceiling_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\1. REFLECTED FLOOR PLAN.dwg",
+      "bytes": 896545,
+      "sha256": "5333242c066a43d85ec188b8e6ae3be6925bd2746f97337525eb6ebeeb012a78"
+    },
+    {
+      "role": "roof_plan_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\2. ROOF PLAN.dwg",
+      "bytes": 784102,
+      "sha256": "87e42077c3466902ba44883497ac7d7b92bd9e076446be2cf7ec7d4af7fd8db3"
+    },
+    {
+      "role": "building_section_b_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\B BUILDING SECTION B.dwg",
+      "bytes": 884269,
+      "sha256": "e96fb00dc86ce218baee19e623d56fed28cf85f8e61b762212e068d3b0d8ce56"
+    },
+    {
+      "role": "building_section_d_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\D BUILDING SECTION D.dwg",
+      "bytes": 331786,
+      "sha256": "3e19193dddf5f0e513f40a872c247c063085ddba8344a94cee1bb0549593060f"
+    },
+    {
+      "role": "building_section_e_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\E BUILDING SECTION EE.dwg",
+      "bytes": 279556,
+      "sha256": "5e74d18dd83837b1d659d38ab4df2005335b511c9dc41ca43746f2becdb3a837"
+    },
+    {
+      "role": "east_elevation_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\EAST ELEVATION.dwg",
+      "bytes": 247476,
+      "sha256": "663930577461f598fd654792c8019ec4784ed99f1bab6c3bf2f2be560928c400"
+    },
+    {
+      "role": "north_elevation_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\NORTH ELEVATION.dwg",
+      "bytes": 165846,
+      "sha256": "c37875442667ae5a04cf47ae09fea81b36f4f274eaad95c6f6752f798efa11a4"
+    },
+    {
+      "role": "south_elevation_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\SOUTH ELEVATION.dwg",
+      "bytes": 155611,
+      "sha256": "d973ef0250c00ed10c2a00c31ff3d2b89ecebf58a46c4b10d12023c84f781014"
+    },
+    {
+      "role": "west_elevation_cad",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\ACAD Files\\WEST ELEVATION.dwg",
+      "bytes": 244743,
+      "sha256": "d4a4d7db3ef3d92fbd5a55e489b2d3ed9a1192e33676a5a1f3f5b68f64222536"
+    }
+  ],
+  "answerKeyDenylist": [
+    {
+      "role": "completed_fp_layout",
+      "path": "2-Internal Ops\\01-Design\\07-AHJ Submittals\\R1\\JOMO-HALO UTAH PRV 7-24-24\\FP-1 Halo-Jomo-Utah 7-24-24 Layout1 (1).pdf",
+      "bytes": 1447182,
+      "sha256": "ad1639fb83f4dc433492c1918e9a813c898f918d430ac9643fa845cded30f67b",
+      "openedBeforeSourceSeal": false
+    }
+  ],
+  "toolchain": {
+    "dwgReader": "GNU LibreDWG 0.14 win64",
+    "releaseSha256": "1ad7e15344d20b3426c3435b078d82fb84b35062815946b2cca9c5fc9810fea8",
+    "releaseDigestVerified": true
+  },
+  "brainPreflight": {
+    "source": "gx10-hal-brain+obsidian-vault",
+    "status": "passed",
+    "query": "Iteration 10 AutoSprink unseen pitched-project holdout with source sealing before completed-answer comparison and internal primary independent adversarial loops",
+    "platformSpineAddendumApplied": true,
+    "spatialB1ThroughB7Priority": 1
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "dillonEmpiricalPriorAllowed": true,
+    "sourceGeometryInspectionReady": false,
+    "candidateGenerationReady": false
+  },
+  "claims": {
+    "unseenProjectPlacementVerified": false,
+    "wholeBuildingHeadLayoutReady": false,
+    "pitchedRoofHeadLayoutReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "96c51916df28c52e6f7b0e072461bd598e65cc1a6689a7c0a62a8659635e6179"
+}
