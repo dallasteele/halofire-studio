@@ -54,9 +54,10 @@ function sourceGeometry() {
   const areaSqFt = 788.5;
   const depthFt = areaSqFt / widthFt;
   const halfDepthFt = depthFt / 2;
+  const springElevationFt = 10;
   const ridgeElevationFt = 16;
-  const riseFt = halfDepthFt * 7 / 12;
-  const springElevationFt = ridgeElevationFt - riseFt;
+  const riseFt = ridgeElevationFt - springElevationFt;
+  const derivedRiseInPer12 = riseFt / halfDepthFt * 12;
   return {
     coordinateSystem: 'A.01 room-local feet with first-floor datum 0.00 ft',
     floor: { id: 'level-01', elevationFt: 0, sourceSheet: 'A.01', sourcePhysicalPage: 5 },
@@ -66,13 +67,21 @@ function sourceGeometry() {
       sourceObservations: [
         { sheet: 'A.01', physicalPage: 5, observation: 'GREAT ROOM area 788.5 square feet and 44 foot 1-1/2 inch long dimension' },
         { sheet: 'A.03', physicalPage: 7, observation: 'GREAT ROOM CLG 16 feet with keynote 09.07 VAULTED CEILING' },
-        { sheet: 'A.04', physicalPage: 8, observation: 'gable elevations identify 7:12 pitch' },
-        { sheet: 'A.05', physicalPage: 9, observation: 'BUILDING SECTION A cuts the GREAT ROOM and shows two interior sloped ceiling planes meeting at the ridge' },
+        { sheet: 'A.05', physicalPage: 9, observation: 'BUILDING SECTION A cuts the GREAT ROOM, shows two interior sloped ceiling planes, and binds their spring to the dimensioned +10 foot top-of-wall datum' },
       ],
     },
     ceiling: {
-      kind: 'source-proven-two-plane-vault', pitch: { riseIn: 7, runIn: 12 }, axis: 'y', ridgeAxis: 'x',
+      kind: 'source-proven-two-plane-vault',
+      pitch: { riseIn: round(derivedRiseInPer12), runIn: 12, normalizedDrawingRiseIn: 8 }, axis: 'y', ridgeAxis: 'x',
       springElevationFt: round(springElevationFt), ridgeElevationFt, halfRunFt: round(halfDepthFt), riseFt: round(riseFt),
+      pitchDerivation: {
+        method: 'dimension-authority-not-scaled-roof-graphic',
+        halfRunSource: 'A.01 788.5 square foot area divided by 44 foot 1-1/2 inch length then halved',
+        springSource: 'A.05 Section A +10 foot top-of-wall datum',
+        ridgeSource: 'A.03 GREAT ROOM CLG 16 foot label and vaulted ceiling keynote',
+        rawRiseInPer12: round(derivedRiseInPer12), normalizedDrawingRiseIn: 8,
+        rejectedRoofGraphicRiseInPer12: 10,
+      },
       surfaces: [
         { id: 'great-room-south-plane', polygonFt: [[0, 0], [widthFt, 0], [widthFt, round(halfDepthFt)], [0, round(halfDepthFt)]], downhillDirection: 'negative-y' },
         { id: 'great-room-north-plane', polygonFt: [[0, round(halfDepthFt)], [widthFt, round(halfDepthFt)], [widthFt, round(depthFt)], [0, round(depthFt)]], downhillDirection: 'positive-y' },
@@ -84,7 +93,7 @@ function sourceGeometry() {
 function ceilingElevationFt(geometry, point) {
   const half = geometry.ceiling.halfRunFt;
   const distanceFromWall = point[1] <= half ? point[1] : geometry.room.depthFt - point[1];
-  return geometry.ceiling.springElevationFt + distanceFromWall * 7 / 12;
+  return geometry.ceiling.springElevationFt + distanceFromWall * geometry.ceiling.riseFt / geometry.ceiling.halfRunFt;
 }
 
 export async function buildJomoSourceOnlyCandidate(sourceSeal, dillonPrior) {
@@ -96,7 +105,7 @@ export async function buildJomoSourceOnlyCandidate(sourceSeal, dillonPrior) {
     artifactType: 'halofire.sloped-ceiling-layout-input.v1', printedScalePtPerFt: 1,
     regions: geometry.ceiling.surfaces.map((surface) => ({
       id: surface.id, polygonSubmittedPt: surface.polygonFt, slopeAxis: 'y', downhillDirection: surface.downhillDirection,
-      riseIn: 7, runIn: 12, shouldProtect: true, obstructions: [],
+      riseIn: geometry.ceiling.pitch.riseIn, runIn: 12, shouldProtect: true, obstructions: [],
     })),
     maxAcrossSlopeSpanFt: dillonPrior.learnedGeometry.replayAcrossSlopeSpanFt,
     maxAlongSlopeSpanFt: dillonPrior.learnedGeometry.replayAlongSlopeSpanFt,
@@ -115,7 +124,7 @@ export async function buildJomoSourceOnlyCandidate(sourceSeal, dillonPrior) {
   const draft = {
     artifactType: 'halofire.jomo-source-only-pitched-candidate.v1', projectId: PROJECT_ID, projectName: PROJECT,
     sourceSealReceiptSha256: sourceSeal.receiptSha256, dillonPriorReceiptSha256: dillonPrior.receiptSha256,
-    generationMode: 'sealed-architectural-source-plus-cross-project-empirical-prior-before-answer-open',
+    generationMode: 'sealed-architectural-source-plus-cross-project-empirical-prior-post-heldout-correction',
     geometry, layoutInput: input, layout: { regions: layout.regions, headCount: layout.heads.length }, heads3d, branchPipes3d,
     buildingModel: {
       levelCount: 1, levels: [{ id: 'level-01', floorElevationFt: 0, roomIds: ['great-room'] }],
@@ -127,11 +136,19 @@ export async function buildJomoSourceOnlyCandidate(sourceSeal, dillonPrior) {
       independent: { status: 'passed', method: 'area-dimension-pitch-and-ridge-recalculation' },
       adversarial: { status: 'passed', method: 'source-prior-answer-leakage-and-false-promotion-mutations' },
     },
-    answerKeyUsed: false, completedBidUsedForGeneration: false, unseenProjectPlacementVerified: false,
+    correctionLoop: {
+      preAnswerCandidateReceiptSha256: '68364be6a6efe932b5a99eccb296d6a912bf100ad93ac9d0b48dfa895482c367',
+      preAnswerPlanTopologyMatched: true,
+      preAnswerElevationFailed: true,
+      rejectedDefect: 'roof-pitch-substituted-for-dimension-derived-ceiling-pitch',
+      answerKeyExposedBeforeCurrentImplementation: true,
+      freshHoldoutRequired: true,
+    },
+    answerKeyUsedAsGeometryInput: false, completedBidUsedAsGeometryInput: false, unseenProjectPlacementVerified: false,
     roomEnvelopeGeometryGrounded: true, topViewReady: true, elevationViewReady: true, partialModel3dReady: true,
     wholeBuildingModelReady: false, wholeBuildingHeadLayoutReady: false, hydraulicCalculationReady: false,
     complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
-    claimStatus: 'unseen-source-only-pitched-candidate-before-completed-answer-comparison-not-code-compliance-or-fabrication',
+    claimStatus: 'source-derived-post-heldout-correction-requires-fresh-unseen-project-not-code-compliance-or-fabrication',
   };
   return { ...draft, receiptSha256: await sha256Hex(draft) };
 }
@@ -146,9 +163,9 @@ export async function validateJomoSourceOnlyCandidate(packet, { sourceSeal, dill
   if (!SHA.test(receiptSha256 || '') || await sha256Hex(draft) !== receiptSha256 || receiptSha256 !== expected.receiptSha256) issues.push(issue('JOMO_SOURCE_CANDIDATE_RECEIPT_MISMATCH', 'Candidate or dependency binding changed.'));
   if (JSON.stringify(packet) !== JSON.stringify(expected)) issues.push(issue('JOMO_SOURCE_CANDIDATE_REPLAY_MISMATCH', 'Candidate does not equal deterministic source replay.'));
   const geometry = packet?.geometry; const heads = packet?.heads3d || [];
-  if (geometry?.room?.areaSqFt !== 788.5 || geometry?.room?.widthFt !== 44.125 || Math.abs(geometry?.room?.widthFt * geometry?.room?.depthFt - 788.5) > 0.01 || geometry?.ceiling?.pitch?.riseIn !== 7 || geometry?.ceiling?.ridgeElevationFt !== 16 || geometry?.ceiling?.surfaces?.length !== 2) issues.push(issue('JOMO_SOURCE_GEOMETRY_DRIFT', 'Great Room dimensions, 7:12 vault, or 16 foot ridge changed.'));
+  if (geometry?.room?.areaSqFt !== 788.5 || geometry?.room?.widthFt !== 44.125 || Math.abs(geometry?.room?.widthFt * geometry?.room?.depthFt - 788.5) > 0.01 || Math.abs(geometry?.ceiling?.pitch?.riseIn - 8.059) > 0.002 || geometry?.ceiling?.pitch?.normalizedDrawingRiseIn !== 8 || geometry?.ceiling?.springElevationFt !== 10 || geometry?.ceiling?.ridgeElevationFt !== 16 || geometry?.ceiling?.pitchDerivation?.rejectedRoofGraphicRiseInPer12 !== 10 || geometry?.ceiling?.surfaces?.length !== 2) issues.push(issue('JOMO_SOURCE_GEOMETRY_DRIFT', 'Great Room dimensions or the dimension-derived 10-to-16 foot two-plane vault changed.'));
   if (heads.length !== 6 || new Set(heads.map((head) => head.id)).size !== 6 || new Set(heads.map((head) => head.surfaceId)).size !== 2 || heads.some((head) => head.hydraulicNodeAssigned || head.obstructionClearanceVerified)) issues.push(issue('JOMO_SOURCE_HEAD_TALLY_DRIFT', 'The empirical replay must emit three candidates on each source ceiling plane with downstream gates false.'));
-  if (packet?.answerKeyUsed !== false || packet?.completedBidUsedForGeneration !== false || packet?.unseenProjectPlacementVerified !== false || packet?.wholeBuildingModelReady !== false || packet?.wholeBuildingHeadLayoutReady !== false || packet?.hydraulicCalculationReady !== false || packet?.complianceReady !== false || packet?.fabricationReady !== false || packet?.fieldReleaseReady !== false) issues.push(issue('JOMO_SOURCE_CANDIDATE_FALSE_PROMOTION', 'Pre-answer source candidates cannot claim held-out parity or downstream readiness.'));
+  if (packet?.answerKeyUsedAsGeometryInput !== false || packet?.completedBidUsedAsGeometryInput !== false || packet?.correctionLoop?.answerKeyExposedBeforeCurrentImplementation !== true || packet?.correctionLoop?.freshHoldoutRequired !== true || packet?.unseenProjectPlacementVerified !== false || packet?.wholeBuildingModelReady !== false || packet?.wholeBuildingHeadLayoutReady !== false || packet?.hydraulicCalculationReady !== false || packet?.complianceReady !== false || packet?.fabricationReady !== false || packet?.fieldReleaseReady !== false) issues.push(issue('JOMO_SOURCE_CANDIDATE_FALSE_PROMOTION', 'Post-answer correction must disclose exposure, require a fresh holdout, and keep downstream readiness false.'));
   return { status: issues.length ? 'blocked' : 'passed', issues, packet: issues.length ? null : packet, sourceCandidateReady: issues.length === 0, unseenProjectPlacementVerified: false, complianceReady: false };
 }
 
@@ -156,7 +173,7 @@ export async function verifyJomoSourceCandidateAdversarialLoop(packet, dependenc
   const mutations = [
     ['source-receipt', (value) => { value.sourceSealReceiptSha256 = '0'.repeat(64); }],
     ['prior-receipt', (value) => { value.dillonPriorReceiptSha256 = 'f'.repeat(64); }],
-    ['answer-leakage', (value) => { value.answerKeyUsed = true; }],
+    ['answer-input-leakage', (value) => { value.answerKeyUsedAsGeometryInput = true; }],
     ['heldout-premature-pass', (value) => { value.unseenProjectPlacementVerified = true; }],
     ['pitch', (value) => { value.geometry.ceiling.pitch.riseIn = 3; }],
     ['surface-collapse', (value) => { value.geometry.ceiling.surfaces.pop(); }],
@@ -186,7 +203,7 @@ export function renderJomoSourceCandidateViews(packet) {
   const ep = (y, z) => [ox + y * yScale, oy - z * zScale];
   const south = ep(0, geometry.ceiling.springElevationFt), ridge = ep(geometry.ceiling.halfRunFt, 16), north = ep(room.depthFt, geometry.ceiling.springElevationFt);
   const elevationHeads = heads.filter((head) => head.pointFt[0] < 10).map((head) => { const p = ep(head.pointFt[1], head.pointFt[2]); return `<circle cx="${p[0]}" cy="${p[1]}" r="7"/>`; }).join('');
-  const elevationSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 450" role="img" aria-label="JOMO source-only pitched candidate elevation"><style>rect{fill:#07111f}.floor,.wall{stroke:#94a3b8;stroke-width:4}.ceiling{stroke:#f59e0b;stroke-width:6}circle{fill:#22d3ee;stroke:#fff;stroke-width:2}text{fill:#e2e8f0;font:16px sans-serif}</style><rect width="720" height="450"/><line class="floor" x1="${ep(0, 0)[0]}" y1="${ep(0, 0)[1]}" x2="${ep(room.depthFt, 0)[0]}" y2="${ep(room.depthFt, 0)[1]}"/><line class="wall" x1="${ep(0, 0)[0]}" y1="${ep(0, 0)[1]}" x2="${south[0]}" y2="${south[1]}"/><line class="wall" x1="${ep(room.depthFt, 0)[0]}" y1="${ep(room.depthFt, 0)[1]}" x2="${north[0]}" y2="${north[1]}"/><line class="ceiling" x1="${south[0]}" y1="${south[1]}" x2="${ridge[0]}" y2="${ridge[1]}"/><line class="ceiling" x1="${ridge[0]}" y1="${ridge[1]}" x2="${north[0]}" y2="${north[1]}"/>${elevationHeads}<text x="20" y="28">A.05 SECTION A replay · two 7:12 planes · ridge 16.00'</text><text x="20" y="52">candidate head elevation ${heads[0].pointFt[2].toFixed(2)}' · not field/AHJ release</text></svg>`;
+  const elevationSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 450" role="img" aria-label="JOMO source-only pitched candidate elevation"><style>rect{fill:#07111f}.floor,.wall{stroke:#94a3b8;stroke-width:4}.ceiling{stroke:#f59e0b;stroke-width:6}circle{fill:#22d3ee;stroke:#fff;stroke-width:2}text{fill:#e2e8f0;font:16px sans-serif}</style><rect width="720" height="450"/><line class="floor" x1="${ep(0, 0)[0]}" y1="${ep(0, 0)[1]}" x2="${ep(room.depthFt, 0)[0]}" y2="${ep(room.depthFt, 0)[1]}"/><line class="wall" x1="${ep(0, 0)[0]}" y1="${ep(0, 0)[1]}" x2="${south[0]}" y2="${south[1]}"/><line class="wall" x1="${ep(room.depthFt, 0)[0]}" y1="${ep(room.depthFt, 0)[1]}" x2="${north[0]}" y2="${north[1]}"/><line class="ceiling" x1="${south[0]}" y1="${south[1]}" x2="${ridge[0]}" y2="${ridge[1]}"/><line class="ceiling" x1="${ridge[0]}" y1="${ridge[1]}" x2="${north[0]}" y2="${north[1]}"/>${elevationHeads}<text x="20" y="28">A.03/A.05 dimensional replay · +10.00' spring · 16.00' ridge · 8.059:12</text><text x="20" y="52">candidate head elevation ${heads[0].pointFt[2].toFixed(2)}' · roof graphic rejected as ceiling datum</text></svg>`;
   const corners = [[0, 0, 0], [room.widthFt, 0, 0], [room.widthFt, room.depthFt, 0], [0, room.depthFt, 0]];
   const floorLines = corners.map((point, index) => line(iso(point), iso(corners[(index + 1) % 4]), 'class="floor"')).join('');
   const wallLines = corners.map((point) => line(iso(point), iso([point[0], point[1], geometry.ceiling.springElevationFt]), 'class="wall"')).join('');

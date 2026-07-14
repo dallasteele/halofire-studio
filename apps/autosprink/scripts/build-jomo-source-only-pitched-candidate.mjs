@@ -32,8 +32,10 @@ const proof = {
   sourceSealReceiptSha256: sourceSeal.receiptSha256,
   dillonPriorReceiptSha256: dillonPrior.receiptSha256,
   answerKeySha256: sourceSeal.answerKeyDenylist[0].sha256,
-  answerKeyUsed: false,
-  completedBidUsedForGeneration: false,
+  answerKeyUsedAsGeometryInput: false,
+  completedBidUsedAsGeometryInput: false,
+  answerKeyExposedBeforeCurrentImplementation: true,
+  freshHoldoutRequired: true,
   internalVerification: { validation: validation.status, adversarial: adversarial.status, rejectedCases: adversarial.rejectedCases },
   counts: { sourceCeilingPlanes: candidate.geometry.ceiling.surfaces.length, candidateHeads: candidate.heads3d.length, candidateBranches: candidate.branchPipes3d.length },
   viewSha256: Object.fromEntries(Object.entries({ top: views.topSvg, elevation: views.elevationSvg, model3d: views.model3dSvg }).map(([name, value]) => [name, crypto.createHash('sha256').update(value).digest('hex')])),
@@ -45,4 +47,3 @@ const proof = {
 };
 fs.writeFileSync(path.join(outDir, 'jomo-source-only-proof.json'), `${JSON.stringify(proof, null, 2)}\n`);
 console.log(JSON.stringify({ status: 'passed', receiptSha256: candidate.receiptSha256, adversarialRejected: adversarial.rejectedCases.length, counts: proof.counts }, null, 2));
-

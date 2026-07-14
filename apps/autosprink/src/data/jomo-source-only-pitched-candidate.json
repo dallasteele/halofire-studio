@@ -4,7 +4,7 @@
   "projectName": "JOMO Residence - Wanship UT",
   "sourceSealReceiptSha256": "96c51916df28c52e6f7b0e072461bd598e65cc1a6689a7c0a62a8659635e6179",
   "dillonPriorReceiptSha256": "20a553b24f20219e2f3d1e8022b05079dc6e22f3189c63c9684fcf3dbbf1bf26",
-  "generationMode": "sealed-architectural-source-plus-cross-project-empirical-prior-before-answer-open",
+  "generationMode": "sealed-architectural-source-plus-cross-project-empirical-prior-post-heldout-correction",
   "geometry": {
     "coordinateSystem": "A.01 room-local feet with first-floor datum 0.00 ft",
     "floor": {
@@ -49,29 +49,34 @@
           "observation": "GREAT ROOM CLG 16 feet with keynote 09.07 VAULTED CEILING"
         },
         {
-          "sheet": "A.04",
-          "physicalPage": 8,
-          "observation": "gable elevations identify 7:12 pitch"
-        },
-        {
           "sheet": "A.05",
           "physicalPage": 9,
-          "observation": "BUILDING SECTION A cuts the GREAT ROOM and shows two interior sloped ceiling planes meeting at the ridge"
+          "observation": "BUILDING SECTION A cuts the GREAT ROOM, shows two interior sloped ceiling planes, and binds their spring to the dimensioned +10 foot top-of-wall datum"
         }
       ]
     },
     "ceiling": {
       "kind": "source-proven-two-plane-vault",
       "pitch": {
-        "riseIn": 7,
-        "runIn": 12
+        "riseIn": 8.058339,
+        "runIn": 12,
+        "normalizedDrawingRiseIn": 8
       },
       "axis": "y",
       "ridgeAxis": "x",
-      "springElevationFt": 10.788008,
+      "springElevationFt": 10,
       "ridgeElevationFt": 16,
       "halfRunFt": 8.934844,
-      "riseFt": 5.211992,
+      "riseFt": 6,
+      "pitchDerivation": {
+        "method": "dimension-authority-not-scaled-roof-graphic",
+        "halfRunSource": "A.01 788.5 square foot area divided by 44 foot 1-1/2 inch length then halved",
+        "springSource": "A.05 Section A +10 foot top-of-wall datum",
+        "ridgeSource": "A.03 GREAT ROOM CLG 16 foot label and vaulted ceiling keynote",
+        "rawRiseInPer12": 8.058339,
+        "normalizedDrawingRiseIn": 8,
+        "rejectedRoofGraphicRiseInPer12": 10
+      },
       "surfaces": [
         {
           "id": "great-room-south-plane",
@@ -146,7 +151,7 @@
         ],
         "slopeAxis": "y",
         "downhillDirection": "negative-y",
-        "riseIn": 7,
+        "riseIn": 8.058339,
         "runIn": 12,
         "shouldProtect": true,
         "obstructions": []
@@ -173,7 +178,7 @@
         ],
         "slopeAxis": "y",
         "downhillDirection": "positive-y",
-        "riseIn": 7,
+        "riseIn": 8.058339,
         "runIn": 12,
         "shouldProtect": true,
         "obstructions": []
@@ -214,7 +219,7 @@
       "pointFt": [
         7.354167,
         4.467422,
-        13.394004
+        13
       ],
       "status": "source-only-empirical-candidate",
       "hydraulicNodeAssigned": false,
@@ -226,7 +231,7 @@
       "pointFt": [
         22.0625,
         4.467422,
-        13.394004
+        13
       ],
       "status": "source-only-empirical-candidate",
       "hydraulicNodeAssigned": false,
@@ -238,7 +243,7 @@
       "pointFt": [
         36.770833,
         4.467422,
-        13.394004
+        13
       ],
       "status": "source-only-empirical-candidate",
       "hydraulicNodeAssigned": false,
@@ -250,7 +255,7 @@
       "pointFt": [
         7.354167,
         13.402266,
-        13.394004
+        13
       ],
       "status": "source-only-empirical-candidate",
       "hydraulicNodeAssigned": false,
@@ -262,7 +267,7 @@
       "pointFt": [
         22.0625,
         13.402266,
-        13.394004
+        13
       ],
       "status": "source-only-empirical-candidate",
       "hydraulicNodeAssigned": false,
@@ -274,7 +279,7 @@
       "pointFt": [
         36.770833,
         13.402266,
-        13.394004
+        13
       ],
       "status": "source-only-empirical-candidate",
       "hydraulicNodeAssigned": false,
@@ -288,12 +293,12 @@
       "fromFt": [
         7.354167,
         4.467422,
-        13.394004
+        13
       ],
       "toFt": [
         36.770833,
         4.467422,
-        13.394004
+        13
       ],
       "nominalSizeIn": null,
       "status": "candidate-topology-no-hydraulic-size"
@@ -304,12 +309,12 @@
       "fromFt": [
         7.354167,
         13.402266,
-        13.394004
+        13
       ],
       "toFt": [
         36.770833,
         13.402266,
-        13.394004
+        13
       ],
       "nominalSizeIn": null,
       "status": "candidate-topology-no-hydraulic-size"
@@ -345,8 +350,16 @@
       "method": "source-prior-answer-leakage-and-false-promotion-mutations"
     }
   },
-  "answerKeyUsed": false,
-  "completedBidUsedForGeneration": false,
+  "correctionLoop": {
+    "preAnswerCandidateReceiptSha256": "68364be6a6efe932b5a99eccb296d6a912bf100ad93ac9d0b48dfa895482c367",
+    "preAnswerPlanTopologyMatched": true,
+    "preAnswerElevationFailed": true,
+    "rejectedDefect": "roof-pitch-substituted-for-dimension-derived-ceiling-pitch",
+    "answerKeyExposedBeforeCurrentImplementation": true,
+    "freshHoldoutRequired": true
+  },
+  "answerKeyUsedAsGeometryInput": false,
+  "completedBidUsedAsGeometryInput": false,
   "unseenProjectPlacementVerified": false,
   "roomEnvelopeGeometryGrounded": true,
   "topViewReady": true,
@@ -358,6 +371,6 @@
   "complianceReady": false,
   "fabricationReady": false,
   "fieldReleaseReady": false,
-  "claimStatus": "unseen-source-only-pitched-candidate-before-completed-answer-comparison-not-code-compliance-or-fabrication",
-  "receiptSha256": "68364be6a6efe932b5a99eccb296d6a912bf100ad93ac9d0b48dfa895482c367"
+  "claimStatus": "source-derived-post-heldout-correction-requires-fresh-unseen-project-not-code-compliance-or-fabrication",
+  "receiptSha256": "1af01803274a7007162bb0b2127499e37ed71a74b33b0c672c9111de5d3c3eeb"
 }

@@ -1,0 +1,54 @@
+{
+  "artifactType": "halofire.jomo-pitched-heldout-comparison.v1",
+  "projectName": "JOMO Residence - Wanship UT",
+  "sequence": {
+    "preAnswerCommit": "5b1f65d2",
+    "sourceCandidateSealedBeforeAnswerOpen": true,
+    "preAnswerCandidateReceiptSha256": "68364be6a6efe932b5a99eccb296d6a912bf100ad93ac9d0b48dfa895482c367",
+    "answerExposedBeforeCorrectedImplementation": true,
+    "correctedImplementationEligibleAsFreshHoldout": false
+  },
+  "answerEvidence": {
+    "completedPdfSha256": "ad1639fb83f4dc433492c1918e9a813c898f918d430ac9643fa845cded30f67b",
+    "greatRoom": {
+      "headCount": 6,
+      "rowCount": 2,
+      "headsPerRow": 3,
+      "printedCeilingSlopeRiseIn": 8,
+      "printedCeilingSlopeRunIn": 12,
+      "printedTopOfVaultFt": 16
+    }
+  },
+  "preAnswerResults": {
+    "generatedHeadCount": 6,
+    "generatedRowCount": 2,
+    "generatedHeadsPerRow": 3,
+    "generatedPitchRiseIn": 7,
+    "headCountParityPassed": true,
+    "rowTopologyParityPassed": true,
+    "ceilingPitchParityPassed": false
+  },
+  "findings": [
+    "the pre-answer candidate matched the completed Great Room head count and two rows of three topology",
+    "the pre-answer elevation used 7:12 while the completed Great Room is labeled 8:12 with a 16 foot top of vault",
+    "the architectural dimensions independently derive approximately 8.058:12 from a 10 foot spring, 16 foot ridge, and 8.934844 foot half-run",
+    "the corrected implementation is answer-exposed and therefore cannot satisfy a fresh unseen-project gate"
+  ],
+  "requiredNextLoop": "run-the-corrected-dimension-authority-algorithm-on-a-fresh-unopened-pitched-project",
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "sealed-pre-answer-receipt-versus-completed-great-room-observation" },
+    "independent": { "status": "passed", "method": "architectural-dimension-recalculation" },
+    "adversarial": {
+      "status": "passed",
+      "rejectedCases": ["sequence", "answer-count", "answer-pitch", "hide-failed-pitch", "whole-project-pass", "compliance-pass"]
+    }
+  },
+  "heldOutAcceptanceStatus": "failed",
+  "unseenPlanTopologyVerified": true,
+  "unseenProjectPlacementVerified": false,
+  "pitchedRoofHeadLayoutReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "receiptSha256": "8ef1643df73417810ff7571446c259522bbd13c7c626133bce0bd357a89f5541"
+}
