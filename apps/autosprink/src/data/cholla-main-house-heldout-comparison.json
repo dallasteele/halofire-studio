@@ -1,0 +1,55 @@
+{
+  "artifactType": "halofire.cholla-pitched-heldout-comparison.v1",
+  "projectId": "boyd-cholla-main-house-scottsdale-az",
+  "projectName": "Boyd Residence - Cholla Main House - Scottsdale AZ",
+  "sequence": {
+    "preAnswerCommit": "05b64285baa0fe908b056e33d69f0af19f02eadc",
+    "sourceDecisionReceiptSha256": "5d28547bee67ec9dd74e06969f399494639ae0d3cc3725b5b5ef9759f1d7db3a",
+    "answerOpenedAfterPreAnswerCommit": true,
+    "approvedAndAsBuiltUsedForComparison": true,
+    "completedAnswerUsedForPreAnswerDecision": false
+  },
+  "answerSources": [
+    { "role": "approved-sprinkler-answer", "file": "5578-23-1_APPROVED-SPKL.pdf", "sha256": "aca50702f61969dd6e280a0cc6147e8f38de9b244ad345df2f34dbdaa59a9ea1", "bytes": 1032103 },
+    { "role": "as-built-sprinkler-answer", "file": "Boyd Residence - Scottsdale AZ_as builts.pdf", "sha256": "d000944951e8e55c4d7e413ec17928e7849eca05b6677f12a4eae1891f4d3313", "bytes": 1226254 }
+  ],
+  "completedObservations": {
+    "governingDesignNote": "The approved and as-built sheets state that the design follows the City of Scottsdale interpretation and application of NFPA 13D, 2022 edition.",
+    "atticProtectionNote": "Both answer sets state that sprinklers are not necessary in the attic area under the cited residential standard provision.",
+    "sprinklerSchedule": { "totalHeads": 45, "family": "residential pendent", "nominalOrificeIn": 0.5, "response": "fast-response" },
+    "occupiedPlan": "The overall sprinkler plan places pendent heads and pipe on the occupied floor plan; it does not use the architectural hip-roof planes as head-placement surfaces.",
+    "ceilingLabelsObserved": ["9 FT CLG", "10 FT CLG", "10 FT BOX CLG", "14 FT MAX CLG", "16 FT MAX CLG"],
+    "approvedAsBuiltAgreement": true
+  },
+  "checks": [
+    { "id": "roof-plane-substitution", "predicted": false, "completed": false, "status": "passed", "evidence": "Approved/as-built F0.2 is an occupied-floor sprinkler plan rather than an attic or roof-plane layout." },
+    { "id": "attic-protection", "predicted": false, "completed": false, "status": "passed", "evidence": "General note explicitly says no sprinklers are necessary in the attic area." },
+    { "id": "placement-engine-family", "predicted": "flat-ceiling-layout", "completed": "occupied-ceiling-pendent-layout-with-zone-specific-elevations", "status": "qualified-pass", "evidence": "The occupied plan uses pendent heads, while 14 FT MAX and 16 FT MAX labels require later per-zone ceiling-surface classification." }
+  ],
+  "heldOutClassificationAcceptance": { "status": "passed", "passedChecks": 3, "failedChecks": 0, "freshBeforeAnswerOpen": true },
+  "heldOutPlacementAcceptance": { "status": "not-assessed", "reason": "The pre-answer candidate intentionally contained no head coordinates or pipe topology." },
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "approved-and-as-built-text-extraction" },
+    "independent": { "status": "passed", "method": "rendered-sheet-visual-inspection" },
+    "adversarial": { "status": "passed", "method": "classification-placement-compliance-and-receipt-mutations" }
+  },
+  "unseenProjectClassificationVerified": true,
+  "unseenProjectPlacementVerified": false,
+  "answerExposedCalibration": true,
+  "topViewReady": false,
+  "elevationViewReady": false,
+  "model3dReady": false,
+  "hydraulicReplayReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "blockers": [
+    "per-zone-ceiling-surface-classification-unresolved",
+    "head-coordinate-comparison-not-performed",
+    "pipe-topology-comparison-not-performed",
+    "hydraulic-calculation-not-replayed",
+    "drawing-scaled-building-model-not-generated"
+  ],
+  "claimStatus": "fresh-heldout-roof-versus-protection-volume-classification-pass-not-placement-code-compliance-or-fabrication",
+  "receiptSha256": "d63714a8afb62a0943b00559142be7cb8b1eb5ab73cfb5825a5541eb6a459258"
+}

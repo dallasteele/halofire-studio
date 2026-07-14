@@ -72,6 +72,7 @@ import { buildDillonVerticalModel, renderDillonVerticalElevationView, validateDi
 import { buildDillonStructuralRoofModel, buildDillonStructuralRoofPacket, renderDillonStructuralRoofTopView, validateDillonStructuralRoofPacket } from '../engine/dillon-structural-roof-surfaces.js';
 import { renderRegerFloresBoxBeamCalibrationViews, validateRegerFloresBoxBeamCalibration, verifyRegerFloresBoxBeamCalibrationAdversarialLoop } from '../engine/reger-flores-box-beam-calibration.js';
 import { buildSagewoodPitchedAtticCalibrationViews, validateSagewoodPitchedAtticCalibration, verifySagewoodPitchedAtticCalibrationAdversarialLoop } from '../engine/sagewood-pitched-attic-calibration.js';
+import { validateChollaHeldoutComparison, verifyChollaHeldoutAdversarialLoop } from '../engine/cholla-main-house-heldout-comparison.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -160,6 +161,9 @@ const DILLON_VERTICAL_REGISTRATION_PATH = path.resolve(__dirname, '../data/dillo
 const DILLON_STRUCTURAL_ROOF_SOURCE_PATH = path.resolve(__dirname, '../data/dillon-structural-framing-roof-source.json');
 const REGER_FLORES_BOX_BEAM_CALIBRATION_PATH = path.resolve(__dirname, '../data/reger-flores-box-beam-calibration.json');
 const SAGEWOOD_PITCHED_ATTIC_CALIBRATION_PATH = path.resolve(__dirname, '../data/sagewood-pitched-attic-calibration.json');
+const CHOLLA_SOURCE_SEAL_PATH = path.resolve(__dirname, '../data/cholla-main-house-unseen-pitched-holdout.json');
+const CHOLLA_SOURCE_DECISION_PATH = path.resolve(__dirname, '../data/cholla-main-house-source-only-volume-decision.json');
+const CHOLLA_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/cholla-main-house-heldout-comparison.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -2241,6 +2245,40 @@ app.get('/api/evidence/sagewood-pitched-attic-calibration', authMiddleware, asyn
   } catch (error) {
     log.error('Failed to load Sagewood pitched-attic calibration evidence', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'sagewood_pitched_attic_calibration_load_failed', freshHoldoutRequired: true, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/cholla-main-house-pitched-heldout', authMiddleware, async (req, res) => {
+  try {
+    const sourceSeal = JSON.parse(fs.readFileSync(CHOLLA_SOURCE_SEAL_PATH, 'utf8'));
+    const sourceDecision = JSON.parse(fs.readFileSync(CHOLLA_SOURCE_DECISION_PATH, 'utf8'));
+    const packet = JSON.parse(fs.readFileSync(CHOLLA_HELDOUT_COMPARISON_PATH, 'utf8'));
+    const dependencies = { sourceSeal, sourceDecision };
+    const [validation, adversarialLoop] = await Promise.all([
+      validateChollaHeldoutComparison(packet, dependencies),
+      verifyChollaHeldoutAdversarialLoop(packet, dependencies),
+    ]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop,
+        unseenProjectClassificationVerified: false, unseenProjectPlacementVerified: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, projectId: packet.projectId,
+      receiptSha256: packet.receiptSha256, sequence: packet.sequence, answerSources: packet.answerSources,
+      completedObservations: packet.completedObservations, checks: packet.checks,
+      heldOutClassificationAcceptance: packet.heldOutClassificationAcceptance,
+      heldOutPlacementAcceptance: packet.heldOutPlacementAcceptance, adversarialLoop,
+      unseenProjectClassificationVerified: true, unseenProjectPlacementVerified: false,
+      answerExposedCalibration: true, topViewReady: false, elevationViewReady: false, model3dReady: false,
+      hydraulicReplayReady: false, complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      blockers: packet.blockers, claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Cholla Main House held-out evidence', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'cholla_main_house_heldout_load_failed', unseenProjectPlacementVerified: false, complianceReady: false });
   }
 });
 
