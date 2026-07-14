@@ -1,0 +1,58 @@
+{
+  "artifactType": "halofire.unseen-pitched-holdout.v3",
+  "projectId": "lds-meetinghouse-winter-garden-fl",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "purpose": "fresh completed-project holdout for one source-closed occupied Cultural Center vault before any Winter Garden sprinkler answer is opened",
+  "sources": [
+    { "role": "architectural_dimension_plan", "locator": "Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A103-MAIN-FLOOR-DIMENSION-PLAN-Rev.6.pdf", "sha256": "bca163d23e89b86332f670f6f234f5bc5319b1a1e461de28a3fb3124120c2f89", "bytes": 429687 },
+    { "role": "architectural_roof_plan", "locator": "Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A121-ROOF-PLAN-Rev.5.pdf", "sha256": "0fa8d19cf2a8ca421a3cad7200b410763eee701bb566ca84d37321b1b51ce921", "bytes": 337696 },
+    { "role": "architectural_reflected_ceiling_plan", "locator": "Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A151-REFLECTED-CEILING-PLAN-Rev.5.pdf", "sha256": "4a6c4b29eff18a8e964627ba41807f2f8119f8a2c8012d5900acf08e61ee8e43", "bytes": 777587 },
+    { "role": "architectural_building_sections", "locator": "Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Architectural/A302-BUILDING-SECTIONS-Rev.5.pdf", "sha256": "cc07fa4778271d2000a9dc3aa006b50e7aac4bfc87ad0a7aa7f3531a3118f4af", "bytes": 518193 },
+    { "role": "structural_roof_framing_plan", "locator": "Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Structural/S105-ROOF-FRAMING-PLAN-Rev.7.pdf", "sha256": "598c32666d64af92bec8235ee359eea11e8c35535bd46f951d9a7a78e505574e", "bytes": 423465 },
+    { "role": "structural_truss_elevations", "locator": "Engineering/CAD Files/Winter-Garden,-FL-Meetinghouse_-_Drawings/Structural/S201-TRUSS-ELEVATIONS-Rev.5.pdf", "sha256": "e589f03c8227bda73c37ec30f238f67406534b3ba30ecf64ca4b02d4e1db3311", "bytes": 225245 }
+  ],
+  "answerKeyDenylist": [
+    { "kind": "city-approved-main-plan", "locator": "Engineering/City Approved FS Drawings/Approved Plan - FP23000203.pdf", "sha256": "6e012d46dd20ff5808717d39898fd4b7fe54fcb0f35253ef7be6c3e5f48300f6", "bytes": 6014967, "openedBeforeSourceCommit": false },
+    { "kind": "city-approved-pump-plan", "locator": "Engineering/City Approved FS Drawings/Approved Plan - FP23000204.pdf", "sha256": "50ff94aee2d05dd7434160ded0c622515f24f700e6fc971170ee595f7c50215f", "bytes": 1113607, "openedBeforeSourceCommit": false },
+    { "kind": "field-set", "locator": "Engineering/Field Set/WINTER FP2 FIELD.pdf", "sha256": "7949abda695309093c66b31d178eeb9724a2c7cb2ef03997c73abf93a864b0b5", "bytes": 490600, "openedBeforeSourceCommit": false },
+    { "kind": "as-built-a001", "locator": "Field Operations/As Built Drawings/A001-FPSPlan-Meetinghouse.pdf", "sha256": "6561bcb77f1c6f4f636a7b0f1dc924ae2c54d9dcbb214e4d32bc3d589c9ed86c", "bytes": 1043434, "openedBeforeSourceCommit": false },
+    { "kind": "as-built-a002", "locator": "Field Operations/As Built Drawings/A002-FPSPlan-Meetinghouse.pdf", "sha256": "22c8db4dde89ce0ed9ee6625b9d8f8b1918c2ecdb9baf6ff829a9c4118b5b8bb", "bytes": 2888781, "openedBeforeSourceCommit": false },
+    { "kind": "as-built-a003", "locator": "Field Operations/As Built Drawings/A003-FPSPlan-Meetinghouse.pdf", "sha256": "13aa82f90bf7b03bc0b4728d0b631321372a48932d2a55187dad6edc947de3a0", "bytes": 1430614, "openedBeforeSourceCommit": false },
+    { "kind": "as-built-a004", "locator": "Field Operations/As Built Drawings/A004-FPSPlan-Meetinghouse.pdf", "sha256": "0f27868210a489538cfd46490108e1ac81ab9f727a126e0e8a8e3bdf53ce88e1", "bytes": 946501, "openedBeforeSourceCommit": false },
+    { "kind": "closeout-as-built", "locator": "Field Operations/Close Out Docs/LDS Meetinghouse - Winter Garden FL_As Builts.pdf", "sha256": "4b6ea3c5027894ad7ccf752c25a82c993d321e0f1f7967c80d114f737bc8c128", "bytes": 7345772, "openedBeforeSourceCommit": false }
+  ],
+  "sourceObservations": {
+    "culturalCenterVault": {
+      "room": "CULTURAL CENTER 150", "planLengthFt": 28.9375, "planWidthFt": 38.083333, "areaSqFt": 1102.036458,
+      "pitchRiseInPer12": 4.5, "springElevationFt": 12.244792, "ridgeElevationFt": 19.385417,
+      "sourceCeilingLabel": "C3 SLOPED", "sourceObstructionPresent": true,
+      "sourceVisibleObstructions": ["folding basketball standard and ceiling-mounted devices shown on A151/A302"],
+      "roofPlaneUsedAsCeiling": false,
+      "dimensionEvidence": { "planLength": "A103 explicit 28 feet 11 1/4 inches", "planWidth": "A103 explicit 38 feet 1 inch", "ridge": "A151 explicit C3 ridge height 19 feet 4 5/8 inches", "pitch": "A151/A302/S201 source family closes the 4 1/2 in 12 symmetric sloped ceiling", "spring": "19.385417 - (38.083333 / 2) * (4.5 / 12) = 12.244792 feet", "exteriorRoof": "A121 retained only to prevent exterior-roof substitution" }
+    },
+    "zoneRegistry": [
+      { "id": "cultural-center-vault-zone", "classification": "occupied-sloped-ceiling", "placementEligible": true, "reason": "A103, A151, A302, and S201 close the plan, ridge, pitch, two planes, and source-visible ceiling equipment" },
+      { "id": "overflow-vault-zone", "classification": "occupied-sloped-ceiling", "placementEligible": false, "reason": "source-proven but reserved for independent intra-project comparison" },
+      { "id": "chapel-vault-zone", "classification": "occupied-sloped-ceiling", "placementEligible": false, "reason": "source-proven but reserved for independent intra-project comparison" },
+      { "id": "attic-flat-support-and-equipment-zones", "classification": "mixed-nonselected", "placementEligible": false, "reason": "not part of this bounded occupied-vault holdout" }
+    ]
+  },
+  "selection": {
+    "status": "source-sealed-answer-unopened", "priorImplementationSearchHits": 0,
+    "rejectedBeforeAnswerOpen": [
+      { "project": "AAO Youth", "reason": "flat occupied ceilings" },
+      { "project": "Egbo Residence", "reason": "exterior pitch did not close a pitched occupied protection plane" },
+      { "project": "Ironwood Clubhouse", "reason": "flat reflected ceiling grid" },
+      { "project": "Grella Residence", "reason": "flat 10 and 12 foot occupied ceilings" },
+      { "project": "Rozenfield Residence", "reason": "low-slope membrane roof" },
+      { "project": "Elko Temple", "reason": "flat-roof source form" },
+      { "project": "Burley Temple", "reason": "flat or low-slope roof and ceiling assemblies in source sections and RCPs" },
+      { "project": "Summit Vista", "reason": "strong pitched source but not yet a completed approved/as-built answer" }
+    ]
+  },
+  "toolchain": { "pdfRenderer": "Poppler pdftoppm", "pdfVectorInspector": "PyMuPDF fitz", "visualInspectionCompleted": true, "readOnlySourceInspection": true, "answerContentRead": false, "answerBytesHashedOnly": true },
+  "brainPreflight": { "status": "passed", "platformSpineAddendumApplied": true, "spatialB1ThroughB7Priority": 1, "verificationLoopsRequired": true, "noIndependentHumanReviewGate": true },
+  "generation": { "answerKeyUsed": false, "completedBidUsedForGeneration": false, "roofPlaneSubstitutionAllowed": false, "sourceOnlyGeometryRequired": true, "blindCandidateMustBeCommittedBeforeAnswerOpen": true },
+  "claims": { "unseenPlacementVerified": false, "wholeBuildingModelReady": false, "wholeBuildingHeadLayoutReady": false, "hydraulicCalculationReady": false, "complianceReady": false, "fabricationReady": false, "fieldReleaseReady": false },
+  "receiptSha256": "6828ec8a225b9dfc0c69759493dca0f3ae35b76a5a66071e62d6cdb7f410a46a"
+}

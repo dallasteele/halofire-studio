@@ -1,0 +1,322 @@
+{
+  "artifactType": "halofire.winter-garden-source-only-pitched-candidate.v1",
+  "projectId": "lds-meetinghouse-winter-garden-fl",
+  "projectName": "LDS Meeting House - Winter Garden FL",
+  "sourceSealReceiptSha256": "6828ec8a225b9dfc0c69759493dca0f3ae35b76a5a66071e62d6cdb7f410a46a",
+  "calibrationCorpusReceiptSha256": "c9865fa6713ea4eea83f0e5afbe8587205f6d2a150f4bbc6dcc1e10f6fe32101",
+  "generationMode": "fresh-sealed-architectural-source-plus-v3-answer-exposed-nearest-neighbor-before-answer-open",
+  "familySelection": {
+    "selectedProjectId": "moses-lake-stake-center",
+    "selectedFamily": "large-symmetric-two-plane-vault-two-along",
+    "distance": 1.686099,
+    "runnerUpDistance": 3.470858,
+    "sourceOnlyInputsUsed": [
+      "ceilingPitchRiseInPer12",
+      "envelopeLengthFt",
+      "envelopeWidthFt",
+      "aspectRatio",
+      "envelopeAreaSqFt",
+      "sourceObstructionPresent",
+      "occupiedProtectionPlaneCount",
+      "symmetricTwoPlaneVault"
+    ],
+    "answerExposedPriorOnly": true,
+    "codeLimit": false,
+    "sourceOnlyFeatures": {
+      "occupiedProtectionPlaneCount": 2,
+      "symmetricTwoPlaneVault": true,
+      "ceilingPitchRiseInPer12": 4.5,
+      "envelopeLengthFt": 28.9375,
+      "envelopeWidthFt": 38.083333,
+      "aspectRatio": 0.759847,
+      "envelopeAreaSqFt": 1102.036458,
+      "sourceObstructionPresent": true
+    },
+    "forbiddenSelectorInputsUsed": [],
+    "empiricalPriorOnly": true,
+    "extrapolationWarning": true,
+    "stationTransfer": {
+      "alongRidge": "moses-lake-stake-center normalized stations",
+      "acrossSlope": "moses-lake-stake-center normalized stations",
+      "alongStationsFt": [
+        9.203254,
+        26.225304
+      ],
+      "acrossStationsFt": [
+        4.209884,
+        18.411882,
+        31.670442
+      ]
+    }
+  },
+  "geometry": {
+    "coordinateSystem": "A103 Cultural Center 150 local feet; x east-west along ridge, y south-north across slope; Level 1 datum 100 feet",
+    "floor": {
+      "id": "level-01",
+      "localElevationFt": 0,
+      "projectDatumElevationFt": 100,
+      "sourceSheets": [
+        "A103",
+        "A151"
+      ]
+    },
+    "room": {
+      "id": "cultural-center-vault-zone",
+      "name": "CULTURAL CENTER 150",
+      "lengthFt": 28.9375,
+      "widthFt": 38.083333,
+      "areaSqFt": 1102.036458,
+      "polygonFt": [
+        [
+          0,
+          0
+        ],
+        [
+          28.9375,
+          0
+        ],
+        [
+          28.9375,
+          38.083333
+        ],
+        [
+          0,
+          38.083333
+        ]
+      ],
+      "scopeStatus": "dimension-closed-source-only-occupied-vault-zone-not-whole-building"
+    },
+    "ceiling": {
+      "kind": "source-proven-occupied-symmetric-two-plane-vault",
+      "axis": "y",
+      "ridgeAxis": "x",
+      "pitch": {
+        "riseIn": 4.5,
+        "runIn": 12
+      },
+      "springElevationFt": 12.244792,
+      "ridgeElevationFt": 19.385417,
+      "halfRunFt": 19.041667,
+      "riseFt": 7.140625,
+      "dimensionClosure": {
+        "sourceSheets": [
+          "A103",
+          "A151",
+          "A302",
+          "S201"
+        ],
+        "planLengthLabel": "28'-11 1/4\"",
+        "planWidthLabel": "38'-1\"",
+        "ridgeLabel": "19'-4 5/8\"",
+        "ceilingLabel": "C3 SLOPED",
+        "pitchSymbol": "4 1/2\":1'-0\"",
+        "derivedSpringCalculation": "19.385417 - (38.083333 / 2) * (4.5 / 12) = 12.244792 feet",
+        "roofPlaneUsedAsCeiling": false,
+        "trussBottomChordCorroborationOnly": true
+      },
+      "surfaces": [
+        {
+          "id": "cultural-center-south-plane",
+          "polygonFt": [
+            [
+              0,
+              0
+            ],
+            [
+              28.9375,
+              0
+            ],
+            [
+              28.9375,
+              19.041667
+            ],
+            [
+              0,
+              19.041667
+            ]
+          ],
+          "downhillDirection": "negative-y"
+        },
+        {
+          "id": "cultural-center-north-plane",
+          "polygonFt": [
+            [
+              0,
+              19.041667
+            ],
+            [
+              28.9375,
+              19.041667
+            ],
+            [
+              28.9375,
+              38.083333
+            ],
+            [
+              0,
+              38.083333
+            ]
+          ],
+          "downhillDirection": "positive-y"
+        }
+      ],
+      "sourceVisibleObstructions": [
+        "folding basketball standard and ceiling-mounted devices shown on A151/A302"
+      ]
+    },
+    "zoneRegistry": [
+      {
+        "id": "cultural-center-vault-zone",
+        "classification": "occupied-sloped-ceiling",
+        "placementEligible": true,
+        "reason": "A103, A151, A302, and S201 close the plan, ridge, pitch, two planes, and source-visible ceiling equipment"
+      },
+      {
+        "id": "overflow-vault-zone",
+        "classification": "occupied-sloped-ceiling",
+        "placementEligible": false,
+        "reason": "source-proven but reserved for independent intra-project comparison"
+      },
+      {
+        "id": "chapel-vault-zone",
+        "classification": "occupied-sloped-ceiling",
+        "placementEligible": false,
+        "reason": "source-proven but reserved for independent intra-project comparison"
+      },
+      {
+        "id": "attic-flat-support-and-equipment-zones",
+        "classification": "mixed-nonselected",
+        "placementEligible": false,
+        "reason": "not part of this bounded occupied-vault holdout"
+      }
+    ]
+  },
+  "layout": {
+    "topology": {
+      "alongRidgeStations": 2,
+      "acrossSlopeStations": 3
+    },
+    "headCount": 6,
+    "heads3d": [
+      {
+        "id": "winter-garden-source-head-01",
+        "surfaceId": "cultural-center-south-plane",
+        "pointFt": [
+          9.203254,
+          4.209884,
+          13.823498
+        ],
+        "status": "blind-source-only-v3-answer-exposed-neighbor-extrapolation-candidate",
+        "hydraulicNodeAssigned": false,
+        "obstructionClearanceVerified": false
+      },
+      {
+        "id": "winter-garden-source-head-02",
+        "surfaceId": "cultural-center-south-plane",
+        "pointFt": [
+          9.203254,
+          18.411882,
+          19.149248
+        ],
+        "status": "blind-source-only-v3-answer-exposed-neighbor-extrapolation-candidate",
+        "hydraulicNodeAssigned": false,
+        "obstructionClearanceVerified": false
+      },
+      {
+        "id": "winter-garden-source-head-03",
+        "surfaceId": "cultural-center-north-plane",
+        "pointFt": [
+          9.203254,
+          31.670442,
+          14.649626
+        ],
+        "status": "blind-source-only-v3-answer-exposed-neighbor-extrapolation-candidate",
+        "hydraulicNodeAssigned": false,
+        "obstructionClearanceVerified": false
+      },
+      {
+        "id": "winter-garden-source-head-04",
+        "surfaceId": "cultural-center-south-plane",
+        "pointFt": [
+          26.225304,
+          4.209884,
+          13.823498
+        ],
+        "status": "blind-source-only-v3-answer-exposed-neighbor-extrapolation-candidate",
+        "hydraulicNodeAssigned": false,
+        "obstructionClearanceVerified": false
+      },
+      {
+        "id": "winter-garden-source-head-05",
+        "surfaceId": "cultural-center-south-plane",
+        "pointFt": [
+          26.225304,
+          18.411882,
+          19.149248
+        ],
+        "status": "blind-source-only-v3-answer-exposed-neighbor-extrapolation-candidate",
+        "hydraulicNodeAssigned": false,
+        "obstructionClearanceVerified": false
+      },
+      {
+        "id": "winter-garden-source-head-06",
+        "surfaceId": "cultural-center-north-plane",
+        "pointFt": [
+          26.225304,
+          31.670442,
+          14.649626
+        ],
+        "status": "blind-source-only-v3-answer-exposed-neighbor-extrapolation-candidate",
+        "hydraulicNodeAssigned": false,
+        "obstructionClearanceVerified": false
+      }
+    ]
+  },
+  "branchPipes3d": [],
+  "branchPipeTopologyReady": false,
+  "buildingModel": {
+    "levelCount": 1,
+    "modeledScope": "source-closed Cultural Center 150 occupied vault",
+    "partialZoneExtrusionReady": true,
+    "floorByFloorExtrusionReady": false,
+    "twoPlaneVaultReady": true,
+    "wholeBuildingFootprintComplete": false,
+    "unresolvedZones": [
+      "Overflow 149",
+      "Chapel 148",
+      "attic and equipment platforms",
+      "flat support rooms",
+      "whole-building roof massing"
+    ]
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-v3-source-feature-selection-and-normalized-station-transfer"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "A103-A151-A302-S201-plan-RCP-section-truss-vector-raster-closure"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "source-calibration-selector-answer-roof-obstruction-zone-topology-and-false-promotion mutations"
+    }
+  },
+  "answerKeyUsedAsGeometryInput": false,
+  "completedBidUsedAsGeometryInput": false,
+  "answerKeyOpened": false,
+  "unseenProjectPlacementVerified": false,
+  "roomEnvelopeGeometryGrounded": true,
+  "topViewReady": true,
+  "elevationViewReady": true,
+  "partialModel3dReady": true,
+  "wholeBuildingModelReady": false,
+  "wholeBuildingHeadLayoutReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "fresh-blind-source-only-Winter-Garden-Cultural-Center-vault-candidate-with-explicit-v3-extrapolation-before-AHJ-approved-or-as-built-answer-comparison-not-code-compliance-or-fabrication",
+  "receiptSha256": "a8ff34f22991c290c783ce92286ff7729b97c65575fdabfefdc2791399365bdb"
+}
