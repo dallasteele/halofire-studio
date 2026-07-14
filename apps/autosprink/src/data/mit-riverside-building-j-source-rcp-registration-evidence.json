@@ -1,0 +1,1247 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-rcp-registration-evidence.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "headCoordinateCommit": "6ae5c486",
+  "sourceSealReceiptSha256": "789c49ed7a91999d675a3cc6f20ca0bccc76ff22b9a72900020386af323192d8",
+  "headCoordinateEvidenceReceiptSha256": "b71b6c5c4869ac0620ba3071de657770b24e36444b1fd086b37ccb19b2f0e59c",
+  "sourceDocument": {
+    "role": "architectural-bid-set",
+    "path": "Bid Files/18_434 Riverside Bid Set 050820-1.pdf",
+    "bytes": 116713715,
+    "sha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c",
+    "pageCount": 150,
+    "rcpPhysicalPage": 105
+  },
+  "registration": {
+    "method": "source RCP grid-label word bounds piecewise-mapped to sealed structural grid labels",
+    "sourceRcpClipPt": [
+      220,
+      660,
+      1270,
+      2040
+    ],
+    "x": {
+      "labels": [
+        "J.A",
+        "J.B",
+        "J.C",
+        "J.D",
+        "J.E",
+        "J.F",
+        "J.G",
+        "J.H"
+      ],
+      "structuralFeet": [
+        0,
+        15.666667,
+        17.333333,
+        30.666667,
+        39.666667,
+        45.666667,
+        61.333333,
+        76.333333
+      ],
+      "sourceRcpPdfPoints": [
+        470.822342,
+        592.857697,
+        626.822632,
+        746.7966,
+        827.82019,
+        861.569153,
+        1022.821594,
+        1157.819519
+      ]
+    },
+    "y": {
+      "labels": [
+        "J.5",
+        "J.4",
+        "J.3",
+        "J.2",
+        "J.1"
+      ],
+      "structuralFeet": [
+        0,
+        32.166667,
+        64.833333,
+        89.166667,
+        100.166667
+      ],
+      "sourceRcpPdfPoints": [
+        876.28183,
+        1165.784607,
+        1459.783142,
+        1678.745667,
+        1777.785583
+      ]
+    },
+    "repeatedTopBottomXLabels": [
+      "J.A",
+      "J.C",
+      "J.E",
+      "J.G",
+      "J.H"
+    ],
+    "maximumRepeatedLabelResidualPt": 0,
+    "globalLinearScaleClaimed": false,
+    "piecewiseGridLabelMappingRequired": true,
+    "architecturalStructuralWidthDiscrepancyInches": 4
+  },
+  "sourceRcpObservations": {
+    "openToStructureLabel": "O.T.S.",
+    "openToStructureLabelCount": 11,
+    "openToStructureLabelCentersPt": [
+      {
+        "x": 864.726318,
+        "y": 1187.389954
+      },
+      {
+        "x": 642.209106,
+        "y": 1336.733459
+      },
+      {
+        "x": 911.279785,
+        "y": 1336.733459
+      },
+      {
+        "x": 1090.690491,
+        "y": 1474.095032
+      },
+      {
+        "x": 726.239441,
+        "y": 1486.947327
+      },
+      {
+        "x": 957.691467,
+        "y": 1486.947327
+      },
+      {
+        "x": 1041.208923,
+        "y": 1484.4953
+      },
+      {
+        "x": 1089.103088,
+        "y": 1516.878357
+      },
+      {
+        "x": 675.859253,
+        "y": 1559.871521
+      },
+      {
+        "x": 742.008667,
+        "y": 1585.953064
+      },
+      {
+        "x": 1004.993347,
+        "y": 1594.071594
+      }
+    ],
+    "fixtureAndCeilingLayoutPresent": true,
+    "ceilingHeightIndicatorsPresent": true,
+    "individualProtectionRegimesAssigned": false
+  },
+  "heads": [
+    {
+      "id": "MIT-J-U-001",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 5.240791,
+        "y": 5.53954
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 511.645434,
+        "y": 926.138168
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-002",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 15.241941,
+        "y": 5.53954
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 589.549298,
+        "y": 926.138168
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-003",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.243092,
+        "y": 5.53954
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 697.995016,
+        "y": 926.138168
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-004",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 35.244242,
+        "y": 5.53954
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 788.006773,
+        "y": 926.138168
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-005",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 45.245393,
+        "y": 5.53954
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 859.19956,
+        "y": 926.138168
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-006",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 55.246544,
+        "y": 5.53954
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 960.172043,
+        "y": 926.138168
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-007",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 5.240791,
+        "y": 16.208364
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 511.645434,
+        "y": 1022.158504
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-008",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 15.241941,
+        "y": 16.208364
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 589.549298,
+        "y": 1022.158504
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-009",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.243092,
+        "y": 16.208364
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 697.995016,
+        "y": 1022.158504
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-010",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 35.244242,
+        "y": 16.208364
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 788.006773,
+        "y": 1022.158504
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-011",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 45.245393,
+        "y": 16.208364
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 859.19956,
+        "y": 1022.158504
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-012",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 55.246544,
+        "y": 16.208364
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 960.172043,
+        "y": 1022.158504
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-013",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 5.240791,
+        "y": 26.877188
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 511.645434,
+        "y": 1118.17884
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-014",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 15.241941,
+        "y": 26.877188
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 589.549298,
+        "y": 1118.17884
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-015",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.243092,
+        "y": 26.877188
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 697.995016,
+        "y": 1118.17884
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-016",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 35.244242,
+        "y": 26.877188
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 788.006773,
+        "y": 1118.17884
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-017",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 45.245393,
+        "y": 26.877188
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 859.19956,
+        "y": 1118.17884
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-018",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 55.246544,
+        "y": 26.877188
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 960.172043,
+        "y": 1118.17884
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-019",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 5.240791,
+        "y": 38.332839
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 511.645434,
+        "y": 1221.27988
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-020",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 15.241941,
+        "y": 38.332839
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 589.549298,
+        "y": 1221.27988
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-021",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.243092,
+        "y": 38.332839
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 697.995016,
+        "y": 1221.27988
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-022",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 35.244242,
+        "y": 38.332839
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 788.006773,
+        "y": 1221.27988
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-023",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 45.245393,
+        "y": 38.332839
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 859.19956,
+        "y": 1221.27988
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-024",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 55.246544,
+        "y": 38.332839
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 960.172043,
+        "y": 1221.27988
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-025",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 5.240791,
+        "y": 49.001663
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 511.645434,
+        "y": 1317.298819
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-026",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 15.241941,
+        "y": 49.001663
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 589.549298,
+        "y": 1317.298819
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-027",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.243092,
+        "y": 49.001663
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 697.995016,
+        "y": 1317.298819
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-028",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 35.244242,
+        "y": 49.001663
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 788.006773,
+        "y": 1317.298819
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-029",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 45.245393,
+        "y": 49.001663
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 859.19956,
+        "y": 1317.298819
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-030",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 55.246544,
+        "y": 49.001663
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 960.172043,
+        "y": 1317.298819
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-031",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 5.240791,
+        "y": 59.670487
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 511.645434,
+        "y": 1413.317759
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-032",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 15.241941,
+        "y": 59.670487
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 589.549298,
+        "y": 1413.317759
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-033",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.243092,
+        "y": 59.670487
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 697.995016,
+        "y": 1413.317759
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-034",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 35.244242,
+        "y": 59.670487
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 788.006773,
+        "y": 1413.317759
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-035",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 45.245393,
+        "y": 59.670487
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 859.19956,
+        "y": 1413.317759
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-036",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 55.246544,
+        "y": 59.670487
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 960.172043,
+        "y": 1413.317759
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-037",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 68.634745,
+        "y": 68.965701
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 1088.533292,
+        "y": 1496.968089
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-001",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 4.320688,
+        "y": 71.272828
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 504.4783,
+        "y": 1517.728678
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-002",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 13.321731,
+        "y": 71.272828
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 574.59184,
+        "y": 1517.728678
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-003",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 37.777866,
+        "y": 71.272835
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 810.81603,
+        "y": 1517.728741
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-004",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 45.778793,
+        "y": 71.272835
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 862.723233,
+        "y": 1517.728741
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-038",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 19.709116,
+        "y": 71.966308
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 648.200039,
+        "y": 1523.96893
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-039",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 30.216992,
+        "y": 71.966308
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 742.750403,
+        "y": 1523.96893
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-040",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 49.219178,
+        "y": 71.966308
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 898.134116,
+        "y": 1523.96893
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-041",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 56.219983,
+        "y": 71.966308
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 970.191368,
+        "y": 1523.96893
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-042",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 64.220904,
+        "y": 71.966308
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 1048.809334,
+        "y": 1523.96893
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-043",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 68.634745,
+        "y": 71.966308
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 1088.533292,
+        "y": 1523.96893
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-005",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 4.320702,
+        "y": 83.275255
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 504.47841,
+        "y": 1625.732034
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-006",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 13.321744,
+        "y": 83.275255
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 574.591941,
+        "y": 1625.732034
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-007",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 41.298317,
+        "y": 83.461959
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 836.997939,
+        "y": 1627.412082
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-008",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 53.299705,
+        "y": 83.461959
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 940.133795,
+        "y": 1627.412082
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-009",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 65.301092,
+        "y": 83.461959
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 1058.530876,
+        "y": 1627.412082
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-044",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 19.709116,
+        "y": 83.968731
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 648.200039,
+        "y": 1631.972249
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-045",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 30.216992,
+        "y": 83.968731
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 742.750403,
+        "y": 1631.972249
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-046",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 40.218142,
+        "y": 83.968734
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 830.922142,
+        "y": 1631.972276
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-047",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 50.219293,
+        "y": 83.968734
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 908.42801,
+        "y": 1631.972276
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-048",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 60.220443,
+        "y": 83.968734
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 1011.366941,
+        "y": 1631.972276
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-049",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 70.221594,
+        "y": 83.968734
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 1102.814713,
+        "y": 1631.972276
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-010",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 32.2706,
+        "y": 86.835973
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 761.236201,
+        "y": 1657.773011
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-050",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 40.218142,
+        "y": 93.463981
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 830.922142,
+        "y": 1717.437087
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-051",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 50.219293,
+        "y": 93.463981
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 908.42801,
+        "y": 1717.437087
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-052",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 60.220443,
+        "y": 93.463981
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 1011.366941,
+        "y": 1717.437087
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-U-053",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 70.221594,
+        "y": 93.463981
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 1102.814713,
+        "y": 1717.437087
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-011",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 23.629577,
+        "y": 94.81092
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 683.476532,
+        "y": 1729.564425
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-012",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 32.270607,
+        "y": 94.837591
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 761.236264,
+        "y": 1729.804561
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-013",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 41.298345,
+        "y": 94.970959
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 836.998097,
+        "y": 1731.005357
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-014",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 53.299732,
+        "y": 94.970959
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 940.134073,
+        "y": 1731.005357
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    },
+    {
+      "id": "MIT-J-P-015",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 65.30112,
+        "y": 94.970959
+      },
+      "sourceRcpPdfPointPt": {
+        "x": 1058.531128,
+        "y": 1731.005357
+      },
+      "sourceProtectionRegime": null,
+      "sourceProtectionPlaneId": null,
+      "ceilingHeightFt": null,
+      "zFt": null
+    }
+  ],
+  "claims": {
+    "sourceRcpGridRegistrationReady": true,
+    "headSourceRcpXyRegistrationReady": true,
+    "sourceProtectionRegimeReady": false,
+    "sourceProtectionPlaneReady": false,
+    "headElevationsReady": false,
+    "wholeRoofHeadPlaneAssignmentReady": false,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "be320b6a30e7a7b3e97653adf077c5fe8586036ab25be580d388f592803c6117"
+}

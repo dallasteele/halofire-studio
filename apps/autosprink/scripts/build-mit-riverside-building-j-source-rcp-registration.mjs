@@ -1,0 +1,24 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildMitRiversideBuildingJSourceRcpRegistration, renderMitRiversideBuildingJSourceRcpViews, sealMitRiversideBuildingJSourceRcpEvidence, validateMitRiversideBuildingJSourceRcpEvidence, validateMitRiversideBuildingJSourceRcpRegistration, verifyMitRiversideBuildingJSourceRcpAdversarialLoop } from '../src/engine/mit-riverside-building-j-source-rcp-registration.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const data = (name) => path.join(root, 'src', 'data', name);
+const read = (name) => JSON.parse(fs.readFileSync(data(name), 'utf8'));
+const headRegistration = read('mit-riverside-building-j-head-coordinate-registration.json');
+const sourceRcpEvidence = await sealMitRiversideBuildingJSourceRcpEvidence(read('mit-riverside-building-j-source-rcp-registration-evidence.json'));
+const dependencies = { headRegistration, sourceRcpEvidence };
+const evidenceValidation = await validateMitRiversideBuildingJSourceRcpEvidence(sourceRcpEvidence);
+const registration = await buildMitRiversideBuildingJSourceRcpRegistration(headRegistration, sourceRcpEvidence);
+const registrationValidation = await validateMitRiversideBuildingJSourceRcpRegistration(registration, dependencies);
+const adversarial = await verifyMitRiversideBuildingJSourceRcpAdversarialLoop(registration, dependencies);
+if ([evidenceValidation.status, registrationValidation.status, adversarial.status].some((status) => status !== 'passed')) throw new Error(JSON.stringify({ evidenceValidation, registrationValidation, adversarial }, null, 2));
+fs.writeFileSync(data('mit-riverside-building-j-source-rcp-registration-evidence.json'), `${JSON.stringify(sourceRcpEvidence, null, 2)}\n`);
+fs.writeFileSync(data('mit-riverside-building-j-source-rcp-registration.json'), `${JSON.stringify(registration, null, 2)}\n`);
+const out = path.join(root, 'out', 'visual-proof', 'mit-riverside-building-j-source-rcp');
+fs.mkdirSync(out, { recursive: true });
+const views = renderMitRiversideBuildingJSourceRcpViews(registration);
+for (const [name, svg] of Object.entries({ top: views.topSvg, elevation: views.elevationSvg, model3d: views.model3dSvg })) fs.writeFileSync(path.join(out, `mit-riverside-building-j-source-rcp-${name}.svg`), svg);
+fs.writeFileSync(path.join(out, 'mit-riverside-building-j-source-rcp-proof.json'), `${JSON.stringify({ evidenceValidation, registrationValidation, adversarial, evidenceReceiptSha256: sourceRcpEvidence.receiptSha256, registrationReceiptSha256: registration.receiptSha256 }, null, 2)}\n`);
+console.log(JSON.stringify({ evidenceValidation, registrationValidation, adversarial, evidenceReceiptSha256: sourceRcpEvidence.receiptSha256, registrationReceiptSha256: registration.receiptSha256, out }, null, 2));

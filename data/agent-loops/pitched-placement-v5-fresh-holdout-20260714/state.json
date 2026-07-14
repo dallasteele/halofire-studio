@@ -1,8 +1,8 @@
 {
   "loop": "pitched-placement-v5-fresh-holdout-20260714",
-  "stage": "EXACT_ANSWER_HEAD_XY_REGISTERED",
-  "status": "mit-building-j-approved-asbuilt-68-head-xy-extracted-z-and-planes-still-blocked",
-  "iteration": 8,
+  "stage": "SOURCE_RCP_GRID_REGISTERED",
+  "status": "mit-building-j-68-head-xy-mapped-to-source-rcp-regime-plane-and-z-still-blocked",
+  "iteration": 9,
   "answerKeyOpened": true,
   "answerOpenedAfterSourceCommit": "551c6081",
   "selectedProject": {
@@ -203,6 +203,33 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
+  "mitBuildingJSourceRcpRegistration": {
+    "artifactType": "halofire.mit-riverside-building-j-source-rcp-registration.v1",
+    "headCoordinateCommit": "6ae5c486",
+    "sourceRcpEvidenceReceiptSha256": "be320b6a30e7a7b3e97653adf077c5fe8586036ab25be580d388f592803c6117",
+    "registrationReceiptSha256": "a2fa02a3d06762adccc900c978d6278ee586bb749e643f7135f883d796826d6f",
+    "sourceDocumentPhysicalPage": 105,
+    "xGridLabelCount": 8,
+    "yGridLabelCount": 5,
+    "openToStructureLabelCount": 11,
+    "maximumRepeatedLabelResidualPt": 0,
+    "piecewiseGridLabelMappingRequired": true,
+    "architecturalStructuralWidthDiscrepancyInches": 4,
+    "mappedHeadCount": 68,
+    "uprightHeadCount": 53,
+    "pendentHeadCount": 15,
+    "sourceRcpXyRegistrationReady": true,
+    "sourceProtectionRegimeReady": false,
+    "sourceProtectionPlaneAssignmentReady": false,
+    "headElevationRegistrationReady": false,
+    "visualProof": "output/visual-proof/mit-riverside-building-j-source-rcp-overlay.png",
+    "elevationProofRefused": true,
+    "model3dProofRefused": true,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
   "comparisonResult": {
     "status": "passed-domain-guard-failed-placement-coverage",
     "wrongDomainGuardWorked": true,
@@ -227,6 +254,8 @@
     "mitBuildingJAnswerCalibrationAdversarialMutationCases": { "passed": 19, "attempted": 19 },
     "mitBuildingJHeadCoordinateFocusedTests": { "passed": 15, "failed": 0, "files": 3 },
     "mitBuildingJHeadCoordinateAdversarialMutationCases": { "passed": 19, "attempted": 19 },
+    "mitBuildingJSourceRcpFocusedTests": { "passed": 20, "failed": 0, "files": 4 },
+    "mitBuildingJSourceRcpAdversarialMutationCases": { "passed": 21, "attempted": 21 },
     "releaseWidthTests": { "passed": 1937, "failed": 0, "files": 230, "nodeNativePassed": 20 },
     "authenticatedApi": { "anonymousStatus": 401, "authenticatedStatus": 200, "cacheControl": "private, no-store" },
     "authenticatedStudioBrowser": {
@@ -272,6 +301,7 @@
       }
     },
     "formalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "polarisCandidateRejected", "status": "verified", "elapsedMs": 77, "returnCode": 0 },
+    "mitBuildingJSourceRcpFormalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "mitSourceRcpRegistrationFailClosed", "status": "verified", "elapsedMs": 67, "returnCode": 0 },
     "brainPostflight": {
       "status": "passed",
       "episodeId": 145819,
@@ -287,6 +317,7 @@
   "blockedClaims": [
     "mit-building-j-exact-floor-footprint",
     "mit-building-j-exact-roof-face-topology",
+    "mit-building-j-source-protection-regime-zones",
     "mit-building-j-head-elevation-registration",
     "mit-building-j-whole-roof-head-plane-assignment",
     "mit-building-j-pitched-head-placement",
@@ -299,5 +330,5 @@
     "fabrication",
     "field-release"
   ],
-  "nextAction": "extract Building J answer branch connectivity, bind all 68 exact XY heads to source RCP and section protection planes and elevations, then learn transferable rules and return them to Polaris and a genuinely fresh holdout without weakening compliance or fabrication gates"
+  "nextAction": "derive exact source-only Building J ceiling and open-structure zone boundaries plus exact floor footprint and roof faces from architectural, structural, elevation, and section drawings; then assign all 68 registered XY heads to proven planes and elevations before extracting answer branch connectivity or attempting a fresh holdout"
 }

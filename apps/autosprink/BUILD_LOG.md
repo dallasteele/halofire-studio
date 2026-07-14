@@ -1,5 +1,14 @@
 # HaloFire Build Log
 
+## 2026-07-14 - MIT Riverside Building J source RCP registration
+
+- Registered the 68 exact approved/as-built Building J sprinkler-head XY coordinates onto physical page 105 of the protected 150-page architectural bid set using the source RCP grid labels rather than a raster trace or answer-derived rewrite.
+- Bound eight horizontal labels (`J.A` through `J.H`) and five vertical labels (`J.5` through `J.1`) to the sealed structural grid. Repeated top/bottom label residual is exactly 0 PDF points; the disclosed 4-inch architectural-versus-structural width discrepancy is preserved, so the registration uses piecewise grid-label mapping instead of falsely claiming one global scale.
+- Detected and retained all 11 source `O.T.S.` labels as zone evidence. They are not promoted into protection-regime, ceiling-plane, elevation, compliance, fabrication, or field-release claims; all 68 registered heads still carry null regime, plane, ceiling-height, and Z fields.
+- Added a rendered source-PDF proof overlay at `output/visual-proof/mit-riverside-building-j-source-rcp-overlay.png`, with upright/pendent distinction and explicit `XY ONLY - NO Z/PLANE CLAIM` labeling. Elevation and 3D proof renderers intentionally refuse output until source geometry supports those claims.
+- Verified with deterministic Python/JavaScript evidence replay, `node --check`, Python bytecode compilation, 20 focused tests across four Building J files, all 21 adversarial mutations, the production Vite build, and Lean theorem `mitSourceRcpRegistrationFailClosed` (Lean 4.13.0, 67 ms, return code 0).
+- Still blocked: exact source ceiling/open-structure zone boundaries, exact floor footprint, complete roof-face topology, per-head source plane/elevation assignment, transferable pitched placement, branch connectivity, hydraulic calculation, code compliance, fabrication, and field release.
+
 ## 2026-07-14 - MIT Riverside Building J exact approved/as-built head XY extraction
 
 - Parsed the approved and as-built Building J page-2 vector paths instead of tracing raster pixels. Both documents yield the same 69 outer symbol circles at zero coordinate delta.

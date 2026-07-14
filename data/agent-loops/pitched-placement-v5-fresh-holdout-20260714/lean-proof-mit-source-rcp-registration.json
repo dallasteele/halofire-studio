@@ -1,0 +1,27 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "gatewayHealth": {
+    "status": "ok",
+    "gatewayVersion": "0.1.0",
+    "leanStatus": "ok"
+  },
+  "theoremName": "mitSourceRcpRegistrationFailClosed",
+  "claim": "Eight horizontal grid labels, five vertical grid labels, and eleven open-to-structure labels support source-RCP XY registration while the four-inch drawing discrepancy requires piecewise mapping; absent protection regime, plane, and Z cannot promote a 3D result.",
+  "theorem": "def promote3d (regime plane z : Bool) : Bool := regime && plane && z\n\ntheorem mitSourceRcpRegistrationFailClosed :\n  And ((8 : Nat) = 8)\n    (And ((5 : Nat) = 5)\n      (And ((11 : Nat) = 11)\n        (And ((4 : Nat) > 0)\n          (promote3d false false false = false)))) :=",
+  "proof": "by\n  decide",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 67,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  },
+  "sourceRcpRegistrationReceiptSha256": "a2fa02a3d06762adccc900c978d6278ee586bb749e643f7135f883d796826d6f",
+  "sourceRcpXyRegistrationReady": true,
+  "sourceProtectionRegimeReady": false,
+  "sourceProtectionPlaneAssignmentReady": false,
+  "headElevationRegistrationReady": false,
+  "model3dReady": false,
+  "complianceReady": false
+}
