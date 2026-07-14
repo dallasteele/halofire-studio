@@ -121,6 +121,12 @@
       }
     },
     "formalProof": { "prover": "Lean", "version": "4.13.0", "status": "verified", "elapsedMs": 76, "returnCode": 0 },
+    "brainPostflight": {
+      "status": "passed",
+      "episodeId": 145311,
+      "deepRecallRank": 1,
+      "verificationDoctrine": ["internal-primary", "internal-independent", "adversarial"]
+    },
     "renderedBrowserProof": [
       "output/playwright/polaris-heldout-comparison/top.png",
       "output/playwright/polaris-heldout-comparison/elevation.png",

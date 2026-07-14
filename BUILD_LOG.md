@@ -1581,6 +1581,10 @@ User direction across 4 messages this session:
   Studio HTML all returned 200. A production Chromium run rendered all three
   SVG views and 474 head marks with zero console errors, page errors, or failed
   responses.
+- Brain postflight persisted the deployed facts and exact next loop as episode
+  `145311`; an immediate deep recall returned that episode first. The brain
+  record explicitly preserves the internal primary, independent, and
+  adversarial verification doctrine without adding a human-review blocker.
 - This is a truthful calibration checkpoint, not completion. The next loop is
   source-only reconstruction of whole roof faces and attic compartments,
   answer-exposed registration of the 77 uprights to those source faces, then a
