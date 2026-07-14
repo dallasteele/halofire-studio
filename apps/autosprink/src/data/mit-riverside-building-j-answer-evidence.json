@@ -1,0 +1,146 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-answer-evidence.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "answerOpenedAfterSourceCommit": "551c6081",
+  "sourceCommitPushedBeforeAnswerOpen": true,
+  "sourceSealReceiptSha256": "789c49ed7a91999d675a3cc6f20ca0bccc76ff22b9a72900020386af323192d8",
+  "sourceCandidateReceiptSha256": "502542e3177767f4b494a742b236d12c5e3ea2ae775428475c781b8eb6121fda",
+  "answerDocuments": [
+    {
+      "role": "state-fire-marshal-approved-plan",
+      "path": "Engineering/City Approved FS Plans/State Fire Marshal Approved Plan Set.pdf",
+      "bytes": 2432530,
+      "sha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+      "pageCount": 7,
+      "buildingJPhysicalPage": 2
+    },
+    {
+      "role": "state-fire-marshal-as-built-plan",
+      "path": "Field Operations/As Builts/State Fire Marshal Approved Plan Set_As Builts.pdf",
+      "bytes": 2495800,
+      "sha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+      "pageCount": 7,
+      "buildingJPhysicalPage": 2
+    }
+  ],
+  "approvedAsBuiltComparison": {
+    "renderedPageWidthPx": 5184,
+    "renderedPageHeightPx": 3456,
+    "differenceThresholdRgb": 15,
+    "differentPixelCount": 9872,
+    "differentPixelRatio": 0.0005510188042981253,
+    "differenceBoundingBoxPx": [
+      72,
+      3232,
+      449,
+      3440
+    ],
+    "declaredAsBuiltStampMaskPx": [
+      60,
+      3220,
+      460,
+      3450
+    ],
+    "differentPixelsOutsideStampMask": 0,
+    "maxChannelDifferenceOutsideStampMask": 0,
+    "buildingJLayoutIdenticalOutsideStamp": true
+  },
+  "gridRegistration": {
+    "basis": "approved page 2 cyan Building J grid fitted to sealed structural roof-framing dimensions",
+    "governingSource": "structural-roof-framing-dwg",
+    "x": {
+      "labels": [
+        "J.A",
+        "J.B",
+        "J.C",
+        "J.D",
+        "J.E",
+        "J.F",
+        "J.G",
+        "J.H"
+      ],
+      "pixels": [
+        1329,
+        1893,
+        1954,
+        2433,
+        2757,
+        2973,
+        3537,
+        4077
+      ],
+      "sourceFeet": [
+        0,
+        15.666667,
+        17.333333,
+        30.666667,
+        39.666667,
+        45.666667,
+        61.333333,
+        76.333333
+      ],
+      "feetPerPixel": 0.027780973797536804,
+      "interceptFeet": -36.928509664140215,
+      "pixelsPerFoot": 35.99585843490716,
+      "maxResidualPx": 0.798381
+    },
+    "y": {
+      "labels": [
+        "J.5",
+        "J.4",
+        "J.3",
+        "J.2",
+        "J.1"
+      ],
+      "pixels": [
+        576,
+        1733,
+        2910,
+        3785,
+        4181
+      ],
+      "sourceFeet": [
+        0,
+        32.166667,
+        64.833333,
+        89.166667,
+        100.166667
+      ],
+      "feetPerPixel": 0.027783395349058156,
+      "interceptFeet": -15.998146868799669,
+      "pixelsPerFoot": 35.99272109965133,
+      "maxResidualPx": 0.655077
+    },
+    "maximumAcceptedResidualPx": 1,
+    "architecturalStructuralDiscrepancy": {
+      "axis": "x",
+      "architecturalFloorOverallFt": 76.666667,
+      "structuralRoofOverallFt": 76.333333,
+      "differenceInches": 4,
+      "resolution": "structural roof-framing dimensions govern roof and answer-grid registration; discrepancy remains disclosed and may not be erased"
+    }
+  },
+  "sprinklerSchedule": {
+    "physicalPage": 2,
+    "pendentCount": 15,
+    "uprightCount": 53,
+    "totalCount": 68
+  },
+  "answerObservations": {
+    "pitchedRoofBuildingPlanPresent": true,
+    "buildingSectionWithSprinklersAndPipePresent": true,
+    "branchLineTopologyVisible": true,
+    "remoteAreaVisible": true,
+    "exactHeadCoordinatesExtracted": false,
+    "headElevationsExtracted": false,
+    "wholeRoofPlaneAssignmentsExtracted": false
+  },
+  "claims": {
+    "sourceGeneratedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "1c1ac44482e7a2bba7f8356a75277da3245306eb0d23429085e737f8ff2752bc"
+}

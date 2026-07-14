@@ -1,14 +1,14 @@
 {
   "loop": "pitched-placement-v5-fresh-holdout-20260714",
-  "stage": "SOURCE_CALIBRATION_TARGET",
-  "status": "polaris-candidate-rejected-mit-building-j-source-sealed",
-  "iteration": 6,
+  "stage": "ANSWER_GRID_AND_SCHEDULE_REGISTERED",
+  "status": "mit-building-j-approved-asbuilt-grid-and-count-calibrated-exact-heads-still-blocked",
+  "iteration": 7,
   "answerKeyOpened": true,
-  "answerOpenedAfterSourceCommit": "caa5723d89d6bacad255acb35ddffa71592c3391",
+  "answerOpenedAfterSourceCommit": "551c6081",
   "selectedProject": {
-    "projectId": "polaris-academy-mesa-az",
-    "projectName": "Polaris Academy - Mesa AZ",
-    "selectionReason": "fresh completed project with independent architectural sources and separately sealed sprinkler CAD, approved, and as-built answers; source proves a multi-mass 4:12 attic above horizontal occupied ceilings",
+    "projectId": "mit-riverside-building-j",
+    "projectName": "MIT Riverside - Transportation Building J",
+    "selectionReason": "corrective calibration target with independent floor, RCP, roof, structural roof framing, elevations, section CAD, and separately hashed approved/as-built answers for a connected occupied pitched-roof building",
     "priorImplementationSearchHits": 0
   },
   "candidateDiscovery": [
@@ -146,6 +146,40 @@
     "pitchedHeadPlacementReady": false,
     "complianceReady": false
   },
+  "mitBuildingJAnswerCalibration": {
+    "artifactType": "halofire.mit-riverside-building-j-pitched-layout-calibration.v1",
+    "sourceCommit": "551c6081",
+    "sourceCommittedAndPushedBeforeAnswerOpen": true,
+    "answerEvidenceReceiptSha256": "1c1ac44482e7a2bba7f8356a75277da3245306eb0d23429085e737f8ff2752bc",
+    "calibrationReceiptSha256": "0cdc912de604731bef8e51cf860ab6c18fd021f101f25636bd10446dae058710",
+    "approvedAsBuiltLayoutIdenticalOutsideStamp": true,
+    "registeredGrid": {
+      "governingSource": "structural-roof-framing-dwg",
+      "xPixelsPerFoot": 35.99585843490716,
+      "yPixelsPerFoot": 35.99272109965133,
+      "xMaxResidualPx": 0.798381,
+      "yMaxResidualPx": 0.655077
+    },
+    "sourceDiscrepancy": {
+      "architecturalFloorOverallFt": 76.666667,
+      "structuralRoofOverallFt": 76.333333,
+      "differenceInches": 4,
+      "governingResolution": "structural roof-framing grid governs roof and approved-answer registration; discrepancy remains disclosed"
+    },
+    "sprinklerSchedule": {
+      "pendentCount": 15,
+      "uprightCount": 53,
+      "totalCount": 68
+    },
+    "answerRegistrationReady": true,
+    "exactHeadCoordinateRegistrationReady": false,
+    "headElevationRegistrationReady": false,
+    "wholeRoofHeadPlaneAssignmentReady": false,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
   "comparisonResult": {
     "status": "passed-domain-guard-failed-placement-coverage",
     "wrongDomainGuardWorked": true,
@@ -166,6 +200,8 @@
     "answerFaceRegistrationAdversarialMutationCases": { "passed": 14, "attempted": 14 },
     "mitBuildingJSourceFocusedTests": { "passed": 5, "failed": 0, "files": 1 },
     "mitBuildingJSourceAdversarialMutationCases": { "passed": 16, "attempted": 16 },
+    "mitBuildingJAnswerCalibrationFocusedTests": { "passed": 10, "failed": 0, "files": 2 },
+    "mitBuildingJAnswerCalibrationAdversarialMutationCases": { "passed": 19, "attempted": 19 },
     "releaseWidthTests": { "passed": 1937, "failed": 0, "files": 230, "nodeNativePassed": 20 },
     "authenticatedApi": { "anonymousStatus": 401, "authenticatedStatus": 200, "cacheControl": "private, no-store" },
     "authenticatedStudioBrowser": {
@@ -226,6 +262,9 @@
   "blockedClaims": [
     "mit-building-j-exact-floor-footprint",
     "mit-building-j-exact-roof-face-topology",
+    "mit-building-j-exact-head-coordinate-registration",
+    "mit-building-j-head-elevation-registration",
+    "mit-building-j-whole-roof-head-plane-assignment",
     "mit-building-j-pitched-head-placement",
     "connected-whole-roof-face-topology",
     "absolute-roof-elevation",
@@ -236,5 +275,5 @@
     "fabrication",
     "field-release"
   ],
-  "nextAction": "commit and push the source-only MIT Building J calibration target, then open only the separately hashed Building J approved/as-built sprinkler pages to register heads and branch geometry without rewriting the sealed source model; return the learned topology rules to Polaris and a genuinely fresh holdout"
+  "nextAction": "extract all 68 Building J answer head coordinates and branch connectivity on the immutable structural grid, bind each head to source ceiling and roof planes from the sections, then return the learned topology rules to Polaris and a genuinely fresh holdout without weakening compliance or fabrication gates"
 }

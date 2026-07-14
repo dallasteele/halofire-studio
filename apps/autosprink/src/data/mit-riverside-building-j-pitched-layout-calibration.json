@@ -1,0 +1,76 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-pitched-layout-calibration.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "sourceCommit": "551c6081",
+  "sourceSealReceiptSha256": "789c49ed7a91999d675a3cc6f20ca0bccc76ff22b9a72900020386af323192d8",
+  "sourceCandidateReceiptSha256": "502542e3177767f4b494a742b236d12c5e3ea2ae775428475c781b8eb6121fda",
+  "answerEvidenceReceiptSha256": "1c1ac44482e7a2bba7f8356a75277da3245306eb0d23429085e737f8ff2752bc",
+  "calibrationMode": "answer-exposed-registration-after-immutable-source-commit",
+  "registeredGrid": {
+    "governingSource": "structural-roof-framing-dwg",
+    "xAxisCount": 8,
+    "yAxisCount": 5,
+    "xPixelsPerFoot": 35.99585843490716,
+    "yPixelsPerFoot": 35.99272109965133,
+    "xMaxResidualPx": 0.798381,
+    "yMaxResidualPx": 0.655077,
+    "maximumAcceptedResidualPx": 1,
+    "sourceEnvelopeFt": {
+      "width": 76.333333,
+      "depth": 100.166667
+    }
+  },
+  "sourceDiscrepancy": {
+    "axis": "x",
+    "architecturalFloorOverallFt": 76.666667,
+    "structuralRoofOverallFt": 76.333333,
+    "differenceInches": 4,
+    "resolution": "structural roof-framing dimensions govern roof and answer-grid registration; discrepancy remains disclosed and may not be erased"
+  },
+  "registeredAnswer": {
+    "physicalPage": 2,
+    "approvedAsBuiltLayoutIdenticalOutsideStamp": true,
+    "pendentCount": 15,
+    "uprightCount": 53,
+    "totalCount": 68,
+    "pitchedRoofBuildingPlanPresent": true,
+    "buildingSectionWithSprinklersAndPipePresent": true,
+    "branchLineTopologyVisible": true,
+    "remoteAreaVisible": true
+  },
+  "headCoordinates": [],
+  "headElevations": [],
+  "roofPlaneAssignments": [],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "approved page 2 grid and sprinkler schedule registration"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "structural roof-framing dimensions plus as-built page 2 identity outside stamp"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "answer swap, source-order, grid, count, source-discrepancy, exact-coordinate, compliance, and fabrication mutations"
+    }
+  },
+  "answerRegistrationReady": true,
+  "sourceAnswerGridAlignmentReady": true,
+  "scheduleCountRegistrationReady": true,
+  "completedBidPitchedLayoutEvidenceReady": true,
+  "approvedAsBuiltLayoutContinuityReady": true,
+  "exactHeadCoordinateRegistrationReady": false,
+  "headElevationRegistrationReady": false,
+  "wholeRoofHeadPlaneAssignmentReady": false,
+  "sourceGeneratedPitchedPlacementVerified": false,
+  "freshProjectPlacementVerified": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "extract all 68 answer head coordinates and branch connectivity on the immutable structural grid, bind heads to source ceiling/roof planes from sections, then replay a second fresh pitched-roof holdout",
+  "claimStatus": "completed-bid-pitched-layout-grid-and-count-registered-not-exact-head-coordinates-elevations-source-generated-compliance-fabrication-or-field-release",
+  "receiptSha256": "0cdc912de604731bef8e51cf860ab6c18fd021f101f25636bd10446dae058710"
+}

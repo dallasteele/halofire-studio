@@ -1,0 +1,25 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildMitRiversideBuildingJPitchedLayoutCalibration, renderMitRiversideBuildingJCalibrationViews, sealMitRiversideBuildingJAnswerEvidence, validateMitRiversideBuildingJAnswerEvidence, validateMitRiversideBuildingJPitchedLayoutCalibration, verifyMitRiversideBuildingJCalibrationAdversarialLoop } from '../src/engine/mit-riverside-building-j-pitched-layout-calibration.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const data = (name) => path.join(root, 'src', 'data', name);
+const read = (name) => JSON.parse(fs.readFileSync(data(name), 'utf8'));
+const sourceSeal = read('mit-riverside-building-j-source-seal.json');
+const sourceCandidate = read('mit-riverside-building-j-source-only-pitched-candidate.json');
+const answerEvidence = await sealMitRiversideBuildingJAnswerEvidence(read('mit-riverside-building-j-answer-evidence.json'));
+const dependencies = { sourceSeal, sourceCandidate, answerEvidence };
+const answerValidation = await validateMitRiversideBuildingJAnswerEvidence(answerEvidence);
+const calibration = await buildMitRiversideBuildingJPitchedLayoutCalibration(sourceCandidate, sourceSeal, answerEvidence);
+const calibrationValidation = await validateMitRiversideBuildingJPitchedLayoutCalibration(calibration, dependencies);
+const adversarial = await verifyMitRiversideBuildingJCalibrationAdversarialLoop(calibration, dependencies);
+if ([answerValidation.status, calibrationValidation.status, adversarial.status].some((status) => status !== 'passed')) throw new Error(JSON.stringify({ answerValidation, calibrationValidation, adversarial }, null, 2));
+fs.writeFileSync(data('mit-riverside-building-j-answer-evidence.json'), `${JSON.stringify(answerEvidence, null, 2)}\n`);
+fs.writeFileSync(data('mit-riverside-building-j-pitched-layout-calibration.json'), `${JSON.stringify(calibration, null, 2)}\n`);
+const out = path.join(root, 'out', 'visual-proof', 'mit-riverside-building-j-calibration');
+fs.mkdirSync(out, { recursive: true });
+const views = renderMitRiversideBuildingJCalibrationViews(calibration);
+for (const [name, svg] of Object.entries({ top: views.topSvg, elevation: views.elevationSvg, model3d: views.model3dSvg })) fs.writeFileSync(path.join(out, `mit-riverside-building-j-calibration-${name}.svg`), svg);
+fs.writeFileSync(path.join(out, 'mit-riverside-building-j-calibration-proof.json'), `${JSON.stringify({ answerValidation, calibrationValidation, adversarial, answerEvidenceReceiptSha256: answerEvidence.receiptSha256, calibrationReceiptSha256: calibration.receiptSha256 }, null, 2)}\n`);
+console.log(JSON.stringify({ answerValidation, calibrationValidation, adversarial, answerEvidenceReceiptSha256: answerEvidence.receiptSha256, calibrationReceiptSha256: calibration.receiptSha256, out }, null, 2));

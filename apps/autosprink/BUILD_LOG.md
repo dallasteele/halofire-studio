@@ -1,5 +1,15 @@
 # HaloFire Build Log
 
+## 2026-07-14 - MIT Riverside Building J completed-bid grid and schedule registration
+
+- Opened the separately hashed approved and as-built Building J sheets only after source commit `551c6081` was pushed. Raster comparison proves the two page-2 layouts are pixel-identical outside the disclosed as-built stamp mask.
+- Registered the approved cyan grid to the sealed structural roof-framing grid at 35.995858 px/ft horizontally and 35.992721 px/ft vertically. Maximum residuals are 0.798381 px and 0.655077 px, respectively.
+- Preserved a real four-inch source conflict: the architectural floor sheet reports 76 ft 8 in while the structural roof grid and approved sprinkler sheet register at 76 ft 4 in. Structural roof dimensions govern this roof/layout calibration; the discrepancy remains explicit and adversarially protected.
+- Bound the completed-bid schedule as 15 pendent plus 53 upright equals 68 sprinklers. The approved plan visibly contains a pitched-roof sprinkler plan, branch lines, a remote area, and a sprinkler/pipe section.
+- Kept exact head coordinates, head elevations, whole-roof protection-plane assignments, source-generated placement, hydraulics, compliance, fabrication, and field release false. The rendered proof uses count glyphs only and labels them as non-coordinate evidence.
+- Verification: deterministic answer and calibration receipts passed; ten focused source/calibration tests passed; all 19 source-order/answer/grid/count/discrepancy/coordinate/elevation/compliance/release mutations were rejected.
+- Next: extract all 68 answer head coordinates and branch connectivity on the immutable structural grid, assign heads to source ceiling/roof planes from the source sections, then replay a second genuinely fresh pitched-roof holdout.
+
 ## 2026-07-14 - MIT Riverside Building J source-only pitched-roof calibration target
 
 - Selected Building J after the sealed Polaris upright replay disproved the isolated-hip source interpretation. This follows the corpus rule: when one project cannot independently close a feature, use a different completed project with stronger source evidence.
