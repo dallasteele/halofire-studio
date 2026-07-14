@@ -1,0 +1,82 @@
+{
+  "artifactType": "halofire.sagewood-pitched-heldout-comparison.v1",
+  "projectName": "Sagewood Ranch - South Jordan UT",
+  "sequence": {
+    "preAnswerCommit": "1858f3f1276ff0273cdcf1f11d92ee63aef17879",
+    "sourceSealReceiptSha256": "7d7620ba91a20b899b3b7c2c6c28f8f1b08000d6bda3f28b957dea5f4e36f999",
+    "preAnswerCandidateReceiptSha256": "9d8abe21c2a3759b63763c56133d08b6d058f94eb8bb346108809326a69ba41c",
+    "sourceCandidateSealedBeforeAnswerOpen": true,
+    "answerOpenedAfterPreAnswerCommit": true,
+    "correctedImplementationEligibleAsFreshHoldout": false
+  },
+  "answerEvidence": {
+    "completedPdfSha256": "1d48993b4c3c22459cd43ba05b167e6e7afc985c17c24140f51e4ae5dd81831c",
+    "physicalPage": 4,
+    "sheetId": "F1.2",
+    "render": {
+      "renderer": "PyMuPDF",
+      "pagePixels": [3456, 2593],
+      "pageSha256": "7913a4a3a2ae76f0364e8591db36e535a3edbad30b4fc92bc3043c7e4c5763d6",
+      "cropPixels": [2400, 2160],
+      "cropSha256": "db9fd91a6c5001ce21200735a2cf12c24b111fca970c74e2f65ed110814f5c5d"
+    },
+    "completedProtection": {
+      "regionLabel": "MAIN HALL / ATTIC RA",
+      "protectedVolume": "pitched-attic",
+      "headType": "upright",
+      "observedHeadCount": 30,
+      "observedColumnCount": 5,
+      "observedRowsPerColumn": 6,
+      "elevationCalloutsObserved": true,
+      "automaticHighPointVentObserved": true,
+      "lowPointDrainObserved": true
+    },
+    "hydraulicTable": {
+      "system": "ATTIC RA",
+      "occupancyClassification": "Light Hazard",
+      "densityGpmPerSqFt": 0.1,
+      "applicableAreaSqFt": 1500,
+      "actualAreaSqFt": 1669,
+      "flowingHeadCount": 17,
+      "kFactor": 5.6,
+      "totalWaterGpm": 419.19,
+      "requiredPressurePsi": 69.45
+    }
+  },
+  "preAnswerResults": {
+    "assumedProtectedVolume": "occupied-sloped-ceiling",
+    "protectionVolumeClassifierPresent": false,
+    "generatedHeadCount": 24,
+    "generatedColumnCount": 6,
+    "generatedRowsPerColumn": 4,
+    "protectedVolumeParityPassed": false,
+    "headCountParityPassed": false,
+    "columnTopologyParityPassed": false,
+    "rowTopologyParityPassed": false,
+    "exactPlanPlacementPassed": false
+  },
+  "findings": [
+    "the sealed source-only candidate projected heads onto the occupied Main Hall two-plane ceiling surface",
+    "the completed F1.2 design protects a pitched attic volume with upright sprinklers and per-head elevation controls",
+    "the pre-answer candidate generated 24 heads in six columns by four rows while the completed attic region shows 30 heads in five columns by six rows",
+    "protected-volume classification must precede placement because occupied sloped ceilings and pitched attics require different geometry, head type, elevations, and topology",
+    "any Sagewood correction after this comparison is answer-exposed and cannot satisfy the fresh unseen-project gate"
+  ],
+  "requiredNextLoop": "classify-protected-volume-before-placement-calibrate-pitched-attic-layout-then-run-another-fresh-unopened-pitched-project",
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "sealed-pre-answer-receipt-versus-completed-F1.2-protection-observation" },
+    "independent": { "status": "passed", "method": "full-page-and-main-hall-crop-hash-plus-hydraulic-table-cross-check" },
+    "adversarial": {
+      "status": "passed",
+      "rejectedCases": ["sequence", "answer-hash", "crop-hash", "answer-count", "answer-columns", "answer-rows", "hide-classification-failure", "whole-project-pass", "compliance-pass"]
+    }
+  },
+  "heldOutAcceptanceStatus": "failed",
+  "unseenProtectionVolumeVerified": false,
+  "unseenProjectPlacementVerified": false,
+  "pitchedRoofHeadLayoutReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "receiptSha256": "f100c0cb01b3d07ae1db6c39141175dd590a192422fdf8c8bfc108e7700f7241"
+}
