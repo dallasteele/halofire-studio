@@ -74,6 +74,7 @@ import { renderRegerFloresBoxBeamCalibrationViews, validateRegerFloresBoxBeamCal
 import { buildSagewoodPitchedAtticCalibrationViews, validateSagewoodPitchedAtticCalibration, verifySagewoodPitchedAtticCalibrationAdversarialLoop } from '../engine/sagewood-pitched-attic-calibration.js';
 import { validateChollaHeldoutComparison, verifyChollaHeldoutAdversarialLoop } from '../engine/cholla-main-house-heldout-comparison.js';
 import { buildChollaCompletedLayoutView, validateChollaCompletedLayoutRegistration, verifyChollaCompletedLayoutAdversarialLoop } from '../engine/cholla-main-house-completed-layout-registration.js';
+import { renderMidvaleHeldoutOverlaySvg, validateMidvaleHeldoutComparison, verifyMidvaleHeldoutAdversarialLoop } from '../engine/midvale-clubhouse-pitched-heldout-comparison.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -166,6 +167,8 @@ const CHOLLA_SOURCE_SEAL_PATH = path.resolve(__dirname, '../data/cholla-main-hou
 const CHOLLA_SOURCE_DECISION_PATH = path.resolve(__dirname, '../data/cholla-main-house-source-only-volume-decision.json');
 const CHOLLA_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/cholla-main-house-heldout-comparison.json');
 const CHOLLA_COMPLETED_LAYOUT_REGISTRATION_PATH = path.resolve(__dirname, '../data/cholla-main-house-completed-layout-registration.json');
+const MIDVALE_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/midvale-clubhouse-source-only-pitched-candidate.json');
+const MIDVALE_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/midvale-clubhouse-pitched-heldout-comparison.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -2317,6 +2320,39 @@ app.get('/api/evidence/cholla-main-house-completed-layout-registration', authMid
   } catch (error) {
     log.error('Failed to load Cholla Main House completed-layout registration evidence', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'cholla_main_house_completed_layout_registration_load_failed', unseenProjectPlacementVerified: false, exactDeflectorElevationReady: false, model3dReady: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/midvale-clubhouse-pitched-heldout-comparison', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(MIDVALE_HELDOUT_COMPARISON_PATH, 'utf8'));
+    const sourceCandidate = JSON.parse(fs.readFileSync(MIDVALE_SOURCE_CANDIDATE_PATH, 'utf8'));
+    const [validation, adversarialLoop] = await Promise.all([
+      validateMidvaleHeldoutComparison(packet, sourceCandidate),
+      verifyMidvaleHeldoutAdversarialLoop(packet, sourceCandidate),
+    ]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop,
+        sourceOnlyClassifierVerified: false, unseenProjectPlacementVerified: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, projectId: packet.projectId,
+      receiptSha256: packet.receiptSha256, sequence: packet.sequence, answerKey: packet.answerKey,
+      registration: packet.registration, approvedEvidence: packet.approvedEvidence,
+      prediction: packet.prediction, approved: packet.approved, comparisons: packet.comparisons,
+      result: packet.result, overlaySvg: renderMidvaleHeldoutOverlaySvg(packet), adversarialLoop,
+      sourceOnlyClassifierVerified: true, unseenProjectPlacementVerified: false,
+      topViewComparisonReady: true, elevationClassificationComparisonReady: true,
+      partialModel3dComparisonReady: true, hydraulicCalculationReady: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Midvale Clubhouse held-out comparison evidence', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'midvale_clubhouse_heldout_comparison_load_failed', unseenProjectPlacementVerified: false, complianceReady: false });
   }
 });
 
