@@ -1,0 +1,78 @@
+{
+  "artifactType": "halofire.boys-girls-club-pitched-heldout-comparison.v1",
+  "projectId": "boys-girls-club-community-center-brigham-city-ut",
+  "projectName": "Boys & Girls Club Community Center - Brigham City UT",
+  "comparedAt": "2026-07-14T23:59:00Z",
+  "sourceSealReceiptSha256": "7eba5e834823f6d64a2ac395c0ccb1820810d416d7e2f9860bf61e192e644a63",
+  "blindCandidateReceiptSha256": "908819388b44ed015ca93ee0b15e8bd94f7c4e72f72eaa4503d6db649a6fac54",
+  "answerBindings": {
+    "ahjApproved": {
+      "sha256": "799fba69311eb3aa285d6b96cb346aed184b3093d73777737597d23df60a0a18",
+      "bytes": 5313661,
+      "sheet": "FP 1.0",
+      "physicalPage": 3
+    },
+    "asBuilt": {
+      "sha256": "6f20b0ad824aaae6a8a71fac46e5faf89e5904eef0ad762cf98b8d0ed186b252",
+      "bytes": 14918460,
+      "sheet": "FP 1.0",
+      "physicalPage": 3
+    }
+  },
+  "registration": {
+    "status": "passed",
+    "method": "shared architectural grids 2 through 6 and A through H plus the reproduced A301 transverse section",
+    "sourceEnvelope": { "lengthFt": 104, "widthFt": 89.5, "pitchRiseInPer12": 2, "springElevationFt": 25, "ridgeElevationFt": 32.458333 },
+    "approvedAndAsBuiltUseSameGymEnvelope": true
+  },
+  "blindPrediction": {
+    "layoutFamily": "large-symmetric-two-plane-vault-three-along-four-across-obstructed-ridge",
+    "alongRidgeStations": 3,
+    "acrossSlopeStations": 4,
+    "headCount": 12,
+    "selectorDistance": 30.887227,
+    "outOfEnvelope": true,
+    "candidatePlacementReady": false
+  },
+  "approved": {
+    "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+    "headCount": 64,
+    "topology": { "alongRidgeStations": 8, "acrossSlopeStations": 8, "headsPerBranch": 8, "branchCount": 8 },
+    "countEvidence": "FP 1.0 sprinkler legend lists 64 guarded uprights and the gym plan closes as eight guarded heads on each of eight branch lines",
+    "hydraulicEvidence": { "occupancy": "Light Hazard", "densityGpmPerSqFt": 0.1, "remoteAreaActualSqFt": 1630 }
+  },
+  "asBuilt": {
+    "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+    "headCount": 64,
+    "topology": { "alongRidgeStations": 8, "acrossSlopeStations": 8, "headsPerBranch": 8, "branchCount": 8 },
+    "countEvidence": "as-built FP 1.0 preserves the 64 guarded-upright legend and labels eight branch lines with eight gym heads each",
+    "approvedGymTopologyPreserved": true
+  },
+  "result": {
+    "status": "failed",
+    "headCountDelta": -52,
+    "predictedToAsBuiltRatio": 0.1875,
+    "alongRidgeStationDelta": -5,
+    "acrossSlopeStationDelta": -4,
+    "topologyMatched": false,
+    "countMatched": false,
+    "sourceProtectionZoneGeometryVerified": true,
+    "v4OutOfEnvelopePromotionGuardWorked": true,
+    "v4TopologyGeneralizationVerified": false
+  },
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "blind receipt replay followed by registered FP 1.0 legend and plan topology comparison" },
+    "independent": { "status": "passed", "method": "AHJ-approved to as-built 64-head 8-by-8 parity plus A101-A301 grid and datum closure" },
+    "adversarial": { "status": "passed", "method": "receipt-answer-registration-count-topology-guard-failure-erasure and downstream-promotion mutations" }
+  },
+  "candidatePlacementVerified": false,
+  "unseenProjectPlacementVerified": false,
+  "pitchedRoofHeadLayoutReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "build v5 with a hard calibrated-domain gate and an answer-exposed large-high-bay 8-by-8 regime then test another fresh sealed pitched project",
+  "claimStatus": "failed-fresh-heldout-topology-comparison-with-working-out-of-envelope-promotion-guard-not-code-compliance-or-fabrication",
+  "receiptSha256": "37fee9c38560e2a98507844e390658c865f4cc9c24d277c7859d5c9f544b6b57"
+}
