@@ -1,0 +1,396 @@
+{
+  "artifactType": "halofire.polaris-source-only-pitched-attic-candidate.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "projectName": "Polaris Academy - Mesa AZ",
+  "sourceSealReceiptSha256": "0007fdb22e5242c3aacb0117b7b1e140bab413c57856c990bd1ccec88bb0312e",
+  "v5CorpusReceiptSha256": "eff4a856d825707acb6a9c3135daa1d28e68246f5f11ade3bd88ba30284fe687",
+  "generationMode": "sealed-architectural-source-only-wrong-domain-guard-before-answer-open",
+  "sourceObservableFeatures": {
+    "clearSpanDisambiguated": true,
+    "occupiedProtectionPlaneCount": 0,
+    "symmetricTwoPlaneVault": false,
+    "atticProtectionVolumePresent": true
+  },
+  "selectorGuard": {
+    "status": "passed",
+    "rejectionCode": "PITCHED_SELECTOR_V5_UNCALIBRATED_GEOMETRY"
+  },
+  "buildingModel": {
+    "coordinateSystem": "architectural RCP DWG inches normalized to local feet",
+    "levelCount": 1,
+    "levels": [
+      {
+        "id": "level-01",
+        "floorElevationFt": 0,
+        "exactSourceFootprint": true,
+        "footprintPolygonFt": [
+          [
+            1.083333,
+            5.333333
+          ],
+          [
+            38.291667,
+            5.333333
+          ],
+          [
+            38.291667,
+            8.583333
+          ],
+          [
+            38.958333,
+            8.583333
+          ],
+          [
+            38.958333,
+            11.25
+          ],
+          [
+            38.291667,
+            11.25
+          ],
+          [
+            38.291667,
+            18.916667
+          ],
+          [
+            42.357531,
+            22.982531
+          ],
+          [
+            46.375,
+            18.965061
+          ],
+          [
+            46.375,
+            13.131728
+          ],
+          [
+            60.125,
+            13.131728
+          ],
+          [
+            60.125,
+            8.048395
+          ],
+          [
+            64.458333,
+            8.048395
+          ],
+          [
+            64.458333,
+            8.923395
+          ],
+          [
+            64.458333,
+            9.131728
+          ],
+          [
+            90.125,
+            9.131728
+          ],
+          [
+            90.125,
+            8.048395
+          ],
+          [
+            94.458333,
+            8.048395
+          ],
+          [
+            94.458333,
+            13.131728
+          ],
+          [
+            108.208333,
+            13.131728
+          ],
+          [
+            108.208333,
+            18.965061
+          ],
+          [
+            112.225803,
+            22.982531
+          ],
+          [
+            116.291667,
+            18.916667
+          ],
+          [
+            116.291667,
+            11.25
+          ],
+          [
+            115.625,
+            11.25
+          ],
+          [
+            115.625,
+            8.583333
+          ],
+          [
+            116.291667,
+            8.583333
+          ],
+          [
+            116.291667,
+            5.333333
+          ],
+          [
+            134.958333,
+            5.333333
+          ],
+          [
+            134.958333,
+            0
+          ],
+          [
+            176.958333,
+            0
+          ],
+          [
+            176.958333,
+            40
+          ],
+          [
+            178.041667,
+            40
+          ],
+          [
+            178.041667,
+            44.25
+          ],
+          [
+            176.958333,
+            44.25
+          ],
+          [
+            176.958333,
+            64.5
+          ],
+          [
+            178.041667,
+            64.5
+          ],
+          [
+            178.041667,
+            68.75
+          ],
+          [
+            173.791667,
+            68.75
+          ],
+          [
+            173.791667,
+            67.666667
+          ],
+          [
+            139.875,
+            67.666667
+          ],
+          [
+            139.875,
+            68.75
+          ],
+          [
+            135.625,
+            68.75
+          ],
+          [
+            135.625,
+            67.666667
+          ],
+          [
+            126.041667,
+            67.666667
+          ],
+          [
+            126.041667,
+            68.75
+          ],
+          [
+            121.791667,
+            68.75
+          ],
+          [
+            121.791667,
+            67.666667
+          ],
+          [
+            102.708333,
+            67.666667
+          ],
+          [
+            102.708333,
+            68.75
+          ],
+          [
+            98.458333,
+            68.75
+          ],
+          [
+            98.458333,
+            67.666667
+          ],
+          [
+            79.375,
+            67.666667
+          ],
+          [
+            79.375,
+            68.75
+          ],
+          [
+            75.125,
+            68.75
+          ],
+          [
+            75.125,
+            67.666667
+          ],
+          [
+            56.041667,
+            67.666667
+          ],
+          [
+            56.041667,
+            68.75
+          ],
+          [
+            51.791667,
+            68.75
+          ],
+          [
+            51.791667,
+            67.666667
+          ],
+          [
+            42.5,
+            67.666667
+          ],
+          [
+            42.5,
+            68.75
+          ],
+          [
+            38.25,
+            68.75
+          ],
+          [
+            38.25,
+            67.666667
+          ],
+          [
+            4.25,
+            67.666667
+          ],
+          [
+            4.25,
+            68.75
+          ],
+          [
+            0,
+            68.75
+          ],
+          [
+            0,
+            64.5
+          ],
+          [
+            1.083333,
+            64.5
+          ],
+          [
+            1.083333,
+            44.083333
+          ],
+          [
+            0,
+            44.083333
+          ],
+          [
+            0,
+            39.833333
+          ],
+          [
+            1.083333,
+            39.833333
+          ]
+        ],
+        "footprintAreaSqFt": 10655.197497
+      }
+    ],
+    "boundsFt": {
+      "minX": 0,
+      "minY": 0,
+      "maxX": 178.041667,
+      "maxY": 68.75,
+      "width": 178.041667,
+      "depth": 68.75
+    },
+    "permitBuildingAreaSqFt": 10129,
+    "exteriorOutlineAreaSqFt": 10655.197497,
+    "ceilingReferences": [
+      {
+        "id": "default-flat-ceiling",
+        "elevationFt": 9,
+        "kind": "horizontal"
+      },
+      {
+        "id": "stem-room-high-ceiling",
+        "elevationFt": 12,
+        "kind": "horizontal"
+      }
+    ],
+    "pitchedAtticSection": {
+      "pitch": {
+        "riseIn": 4,
+        "runIn": 12
+      },
+      "spanFt": 68.75,
+      "relativeEaveElevationFt": 0,
+      "relativeRidgeElevationFt": 11.458333,
+      "absoluteDatumReady": false,
+      "representativeSectionOnly": true
+    },
+    "floorByFloorFootprintExtrusionReady": true,
+    "occupiedCeilingSeparationReady": true,
+    "pitchedAtticSectionReady": true,
+    "wholeRoofFaceTopologyReady": false
+  },
+  "heads3d": [],
+  "branchPipes3d": [],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic 73-vertex DWG outline replay and 4:12 relative-section closure"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "revised permit area, floor plan, RCP, room schedule, original sections, and roof-framing cross-check"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "source-answer-domain-footprint-pitch-head-and-false-promotion mutations"
+    }
+  },
+  "answerKeyOpened": false,
+  "answerKeyUsedAsGeometryInput": false,
+  "completedBidUsedAsGeometryInput": false,
+  "sourceBuildingModelReady": true,
+  "topViewReady": true,
+  "elevationViewReady": true,
+  "partialModel3dReady": true,
+  "pitchedAtticHeadLayoutReady": false,
+  "candidatePlacementReady": false,
+  "unseenProjectPlacementVerified": false,
+  "wholeRoofModelReady": false,
+  "branchPipeTopologyReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "commit and push this source-only wrong-domain guard, then open the sealed approved and as-built sprinkler sets to learn the attic and below-ceiling topology without changing this prediction",
+  "claimStatus": "fresh-source-only-scaled-floor-extrusion-and-relative-4-12-attic-section-not-attic-placement-code-compliance-or-fabrication",
+  "receiptSha256": "e7f0f2850eae1f1fdcfc95007e19057d4e1d2af6ac6c4ad2e5ddd766d74874c5"
+}

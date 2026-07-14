@@ -1,0 +1,22 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildPolarisSourceOnlyAtticCandidate, renderPolarisSourceCandidateViews, sealPolarisSourceSeal, validatePolarisSourceOnlyAtticCandidate, validatePolarisSourceSeal, verifyPolarisSourceCandidateAdversarialLoop } from '../src/engine/polaris-academy-source-only-attic-holdout.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const data = (name) => path.join(root, 'src', 'data', name);
+const read = (name) => JSON.parse(fs.readFileSync(data(name), 'utf8'));
+const sourceSeal = await sealPolarisSourceSeal(read('polaris-academy-unseen-pitched-attic-holdout.json'));
+const dependencies = { sourceSeal, v5Corpus: read('pitched-placement-calibration-corpus-v5.json'), v4Corpus: read('pitched-placement-calibration-corpus-v4.json') };
+const candidate = await buildPolarisSourceOnlyAtticCandidate(sourceSeal, dependencies.v5Corpus, dependencies.v4Corpus);
+const sourceValidation = await validatePolarisSourceSeal(sourceSeal);
+const candidateValidation = await validatePolarisSourceOnlyAtticCandidate(candidate, dependencies);
+const adversarial = await verifyPolarisSourceCandidateAdversarialLoop(candidate, dependencies);
+if ([sourceValidation.status, candidateValidation.status, adversarial.status].some((status) => status !== 'passed')) throw new Error(JSON.stringify({ sourceValidation, candidateValidation, adversarial }, null, 2));
+fs.writeFileSync(data('polaris-academy-unseen-pitched-attic-holdout.json'), `${JSON.stringify(sourceSeal, null, 2)}\n`);
+fs.writeFileSync(data('polaris-academy-source-only-pitched-attic-candidate.json'), `${JSON.stringify(candidate, null, 2)}\n`);
+const out = path.join(root, 'out', 'visual-proof', 'polaris-source-only'); fs.mkdirSync(out, { recursive: true });
+const views = renderPolarisSourceCandidateViews(candidate);
+for (const [name, svg] of Object.entries({ top: views.topSvg, elevation: views.elevationSvg, model3d: views.model3dSvg })) fs.writeFileSync(path.join(out, `polaris-source-only-${name}.svg`), svg);
+fs.writeFileSync(path.join(out, 'polaris-source-only-proof.json'), `${JSON.stringify({ sourceValidation, candidateValidation, adversarial, candidateReceiptSha256: candidate.receiptSha256 }, null, 2)}\n`);
+console.log(JSON.stringify({ sourceValidation, candidateValidation, adversarial, candidateReceiptSha256: candidate.receiptSha256, out }, null, 2));

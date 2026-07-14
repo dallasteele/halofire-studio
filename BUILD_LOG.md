@@ -1495,3 +1495,39 @@ User direction across 4 messages this session:
   field release remain false. The next bounded lane is to source-register the
   25 unresolved room identities and room ceiling profiles before generating
   or promoting sprinkler placement.
+
+### Entry 44 - Polaris blind source model and pitched-attic domain guard
+
+- Selected a genuinely fresh completed project only after sealing four
+  independent architectural sources and five untouched sprinkler answer
+  artifacts by path, byte count, and SHA-256. New Hope was first rejected
+  without answer exposure because its 20.772066-foot 3:12 vault falls below
+  the v5 calibrated width domain.
+- Replayed the Polaris architectural RCP DWG with LibreDWG at zero unknown
+  entities. Its closed 73-vertex exterior outline is normalized from inches
+  to a 178.041667 by 68.75-foot one-story footprint and deterministically
+  extruded to the highest source-scheduled 12-foot ceiling reference. The
+  exterior outline is 10,655.197497 square feet versus the permit's 10,129
+  square feet; both values remain visible instead of being forced to agree.
+- Source sheets separate horizontal 9- and 12-foot occupied ceilings from a
+  multi-mass 4:12 hip/gable attic. The occupied-vault v5 selector correctly
+  rejects this as `PITCHED_SELECTOR_V5_UNCALIBRATED_GEOMETRY`; zero attic
+  heads are fabricated. A relative 68.75-foot section closes to an
+  11.458333-foot 4:12 rise, while absolute roof datum and whole face topology
+  remain blocked.
+- Generated truthful top, elevation, and isometric source-model proof. The
+  source receipt is
+  `0007fdb22e5242c3aacb0117b7b1e140bab413c57856c990bd1ccec88bb0312e`;
+  the blind candidate receipt is
+  `e7f0f2850eae1f1fdcfc95007e19057d4e1d2af6ac6c4ad2e5ddd766d74874c5`.
+- Pre-answer verification passed: 12 focused tests across the new candidate,
+  v5 selector, and prior failed holdout; all 13 provenance, leakage,
+  geometry, domain, fabricated-head, and false-promotion attacks; production
+  build; agent-loop guard; agentic-rule verifier; and rendered Chromium
+  inspection. The approved/as-built/CAD answers remain unopened until this
+  immutable source-only checkpoint is committed and pushed.
+- This checkpoint proves one scaled floor extrusion and a relative pitched
+  attic section, not an attic sprinkler layout, whole roof, hydraulic result,
+  code compliance, fabrication release, or field release. The next loop opens
+  the sealed completed sprinkler answer and preserves the blind comparison
+  outcome without mutating this candidate.

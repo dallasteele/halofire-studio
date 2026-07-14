@@ -1,0 +1,444 @@
+{
+  "artifactType": "halofire.unseen-pitched-attic-holdout.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "projectName": "Polaris Academy - Mesa AZ",
+  "sealedAt": "2026-07-14T00:00:00Z",
+  "corpusRoot": "Y:\\Shared\\HaloOps\\02-Active jobs\\CRE Options\\Polaris Academy - Mesa AZ",
+  "selection": {
+    "status": "source-sealed-answers-unopened",
+    "priorImplementationSearchHits": 0,
+    "completedProjectEvidence": [
+      "separate-ahj-approved-sprinkler-plan",
+      "separate-as-built-sprinkler-plan",
+      "separate-fire-sprinkler-cad"
+    ],
+    "rejectedBeforeAnswerOpen": [
+      {
+        "project": "New Hope Crisis Center",
+        "reason": "bounded 3:12 occupied vault is only 20.772066 feet across and correctly fails the v5 minimum-width domain gate"
+      },
+      {
+        "project": "Los Angeles Temple",
+        "reason": "available packet did not close independent architecture against a completed sprinkler answer"
+      },
+      {
+        "project": "St Louis Temple",
+        "reason": "approved sprinkler set had no independent source packet"
+      },
+      {
+        "project": "Houston Temple",
+        "reason": "available schedule and approval request did not close pitched source geometry"
+      },
+      {
+        "project": "Gilbert Temple",
+        "reason": "RCP-only source did not close dimensioned pitched sections"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "role": "architectural_bid_set",
+      "path": "1-Bid Documents\\GC - Bid Plans\\Building\\1440 S CLEARVIEW - NEW CONSTRUCTION PLANS.pdf",
+      "bytes": 34531967,
+      "sha256": "ae19ff5c7cc3904f6d3e5b83a04e5e244f833099a3f445a0e9b1aaf7c5b98e51"
+    },
+    {
+      "role": "architectural_revised_set",
+      "path": "2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Polaris Academy - Mesa AZ_Revised PDF Set.pdf",
+      "bytes": 8905916,
+      "sha256": "01d24826b23cfea709946f3ca858fb5f9be15f8b09945feceae334b51b5c9c00"
+    },
+    {
+      "role": "architectural_floor_plan_dwg",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\A2.1.dwg",
+      "bytes": 250860,
+      "sha256": "087f8dd020d9e40ba42114e01b96a8b6ab52a47cadd7ef59dededa39bb6c35d1"
+    },
+    {
+      "role": "architectural_rcp_dwg",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\RCP.dwg",
+      "bytes": 328371,
+      "sha256": "50235966afaac2bd59a3540d35c0c6fdb36e7c659b724fdb74cd1c9433e13202"
+    }
+  ],
+  "answerKeyDenylist": [
+    {
+      "role": "fire_sprinkler_cad_v1",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\Polaris Academy Fire Sprinkler CAD.DWG",
+      "bytes": 3080323,
+      "sha256": "173a2dcbe9b706b1074feabbe3590c29ff1a063e020bf36a5eff2751ee3f3693",
+      "openedBeforeSourceSeal": false
+    },
+    {
+      "role": "fire_sprinkler_cad_v2",
+      "path": "2-Internal Ops\\01-Design\\05-CAD Files\\Polaris Academy Fire Sprinkler CAD 2.DWG",
+      "bytes": 3081423,
+      "sha256": "3b27b60d74c6058508789929ad0ca20df490c28905828b5ac096183454154c2f",
+      "openedBeforeSourceSeal": false
+    },
+    {
+      "role": "ahj_approved_plan",
+      "path": "2-Internal Ops\\01-Design\\08-AHJ Approval DWG & Permit\\PMT23-16385A - Polaris Academy - Mesa AZ_Plan Sheets - Approved.pdf",
+      "bytes": 27120731,
+      "sha256": "149f0924dfaa7423545dc46cb0af21456bb31ee6d450a1d4fe7d68cb8bdbe787",
+      "openedBeforeSourceSeal": false
+    },
+    {
+      "role": "as_built_plan_primary",
+      "path": "2-Internal Ops\\01-Design\\11-As-Built Set\\Polaris Academy As Built Set.pdf",
+      "bytes": 20718771,
+      "sha256": "136680d1df37926700825f6124f42de7b3cafe706f52b4c7c3b260e3ee3291eb",
+      "openedBeforeSourceSeal": false
+    },
+    {
+      "role": "as_built_plan_secondary",
+      "path": "2-Internal Ops\\01-Design\\11-As-Built Set\\Polaris Academy-Mesa AZ_As Built Set.pdf",
+      "bytes": 29330532,
+      "sha256": "bfb9bf34461ed667abfb14d01fff34fa2bae378eb2e9b53b446db525d2244123",
+      "openedBeforeSourceSeal": false
+    }
+  ],
+  "sourceObservations": {
+    "permitSummary": {
+      "source": "architectural revised set physical page 1",
+      "buildingAreaSqFt": 10129,
+      "storyCount": 1
+    },
+    "occupiedCeilings": {
+      "source": "architectural revised set physical pages 4 and 6",
+      "defaultHeightFt": 9,
+      "highestScheduledHeightFt": 12,
+      "pitchedOccupiedProtectionPlaneCount": 0,
+      "evidence": "room finish schedule and RCP show horizontal GYP, acoustic tile, and exposed acoustic-tile ceilings; no occupied pitched ceiling is shown"
+    },
+    "pitchedAttic": {
+      "source": "architectural bid set physical pages 9, 10, and 15",
+      "pitchRiseInPer12": 4,
+      "topology": "multi-mass hip-and-gable attic above horizontal occupied ceilings",
+      "absoluteRoofDatumReady": false,
+      "wholeRoofFaceTopologyReady": false
+    },
+    "floorFootprint": {
+      "source": "architectural RCP DWG A-SITE-BLDG-OTLN closed 73-vertex polyline",
+      "sourceUnits": "inch",
+      "libredwgUnknownEntityCount": 0,
+      "verticesInches": [
+        [
+          0,
+          0
+        ],
+        [
+          446.5,
+          0
+        ],
+        [
+          446.5,
+          39
+        ],
+        [
+          454.5,
+          39
+        ],
+        [
+          454.5,
+          71
+        ],
+        [
+          446.5,
+          71
+        ],
+        [
+          446.5,
+          163
+        ],
+        [
+          495.2903679018718,
+          211.79036790187178
+        ],
+        [
+          543.5,
+          163.5807358037435
+        ],
+        [
+          543.5,
+          93.5807358037435
+        ],
+        [
+          708.5,
+          93.58073580374351
+        ],
+        [
+          708.5,
+          32.58073580374349
+        ],
+        [
+          760.5,
+          32.58073580374349
+        ],
+        [
+          760.5,
+          43.080735803743494
+        ],
+        [
+          760.5,
+          45.58073580374344
+        ],
+        [
+          1068.5,
+          45.58073580374344
+        ],
+        [
+          1068.5,
+          32.580735803743494
+        ],
+        [
+          1120.5,
+          32.580735803743494
+        ],
+        [
+          1120.5,
+          93.5807358037435
+        ],
+        [
+          1285.5,
+          93.5807358037435
+        ],
+        [
+          1285.5,
+          163.5807358037435
+        ],
+        [
+          1333.7096320981282,
+          211.7903679018717
+        ],
+        [
+          1382.5,
+          163
+        ],
+        [
+          1382.5,
+          71
+        ],
+        [
+          1374.5,
+          71
+        ],
+        [
+          1374.5,
+          39
+        ],
+        [
+          1382.5,
+          39
+        ],
+        [
+          1382.5,
+          0
+        ],
+        [
+          1606.5,
+          0
+        ],
+        [
+          1606.5,
+          -64
+        ],
+        [
+          2110.5,
+          -64
+        ],
+        [
+          2110.5,
+          416
+        ],
+        [
+          2123.5,
+          416
+        ],
+        [
+          2123.5,
+          467
+        ],
+        [
+          2110.5,
+          467
+        ],
+        [
+          2110.5,
+          710
+        ],
+        [
+          2123.5,
+          710
+        ],
+        [
+          2123.5,
+          761
+        ],
+        [
+          2072.5,
+          761
+        ],
+        [
+          2072.5,
+          748
+        ],
+        [
+          1665.5,
+          748
+        ],
+        [
+          1665.5,
+          761
+        ],
+        [
+          1614.5,
+          761
+        ],
+        [
+          1614.5,
+          748
+        ],
+        [
+          1499.5,
+          748
+        ],
+        [
+          1499.5,
+          761
+        ],
+        [
+          1448.5,
+          761
+        ],
+        [
+          1448.5,
+          748
+        ],
+        [
+          1219.5,
+          748
+        ],
+        [
+          1219.5,
+          761
+        ],
+        [
+          1168.5,
+          761
+        ],
+        [
+          1168.5,
+          748
+        ],
+        [
+          939.5,
+          748
+        ],
+        [
+          939.5,
+          761
+        ],
+        [
+          888.5,
+          761
+        ],
+        [
+          888.5,
+          748
+        ],
+        [
+          659.5,
+          748
+        ],
+        [
+          659.5,
+          761
+        ],
+        [
+          608.5,
+          761
+        ],
+        [
+          608.5,
+          748
+        ],
+        [
+          497,
+          748
+        ],
+        [
+          497,
+          761
+        ],
+        [
+          446,
+          761
+        ],
+        [
+          446,
+          748
+        ],
+        [
+          38,
+          748
+        ],
+        [
+          38,
+          761
+        ],
+        [
+          -13,
+          761
+        ],
+        [
+          -13,
+          710
+        ],
+        [
+          0,
+          710
+        ],
+        [
+          0,
+          465
+        ],
+        [
+          -13,
+          465
+        ],
+        [
+          -13,
+          414
+        ],
+        [
+          0,
+          414
+        ]
+      ],
+      "closedAreaSqFt": 10655.197439,
+      "permitAreaDifferencePercent": 5.194959
+    }
+  },
+  "brainPreflight": {
+    "source": "gx10-hal-brain+obsidian-vault",
+    "status": "passed",
+    "platformSpineAddendumApplied": true,
+    "spatialB1ThroughB7Priority": 1
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "v5OccupiedVaultSelectorAllowed": true,
+    "atticPlacementTransferAllowed": false
+  },
+  "claims": {
+    "pitchedAtticHeadLayoutReady": false,
+    "wholeRoofModelReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "0007fdb22e5242c3aacb0117b7b1e140bab413c57856c990bd1ccec88bb0312e"
+}

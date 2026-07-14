@@ -1,0 +1,52 @@
+{
+  "name": "pitched-placement-v5-fresh-holdout-20260714",
+  "owner": "codex",
+  "goal": "Select one genuinely fresh completed pitched-roof Halo Fire project, seal a source-only top/elevation/3D sprinkler candidate through the v5 domain gate before answer exposure, then compare it with the untouched approved or as-built sprinkler package and preserve the blind pass or failure without answer-key leakage.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-09-CODEX-MASTER-BUILD.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-13-CODEX-MASTER-BUILD-ADDENDUM-01-PLATFORM-SPINE.md",
+    "apps/autosprink/src/data/pitched-placement-calibration-corpus-v5.json",
+    "Y:/Shared/HaloOps/02-Active jobs"
+  ],
+  "exit_criteria": [
+    "the selected project is absent from every prior pitched holdout, calibration, comparison, and brain record",
+    "the source package alone proves a pitched occupied or attic protection surface with printed scale, span, pitch, and elevation datum sufficient for top, elevation, and 3D reconstruction",
+    "all approved, stamped, submitted, install, and as-built sprinkler answer files remain unopened through source packet generation",
+    "the source-only packet binds immutable source hashes, records the v5 feature vector and domain decision, and emits truthful top, elevation, and partial 3D proof",
+    "source-only tests and adversarial answer-leakage checks pass before a dedicated pre-answer commit is pushed",
+    "only after the pre-answer push, the sealed answer is opened and compared for topology, placement regime, protection surface, and visible obstructions",
+    "the comparison preserves a blind pass or failure without modifying the source-only candidate and keeps compliance, approval, fabrication, and field release fail-closed",
+    "focused regression, build, formal result, rules verification, browser proof, live deployment when runtime code changes, login smoke, and brain postflight are recorded"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source and answer path/hash inventory without answer content access",
+    "rendered source plan/section/elevation visual inspection",
+    "source-only generation replay and answer-path leakage attack",
+    "v5 numeric-domain and nearest-distance adversarial checks",
+    "pre-answer commit and remote push proof",
+    "post-seal approved/as-built rendered comparison",
+    "primary, independent deterministic replay, and adversarial mutation checks",
+    "focused tests and production build",
+    "GX10 Lean 4 proof or exact prover-unavailable evidence",
+    "authoritative agentic-rule check",
+    "authenticated local browser visual inspection",
+    "VPS backup, hash-verified sync, service/login/API smoke when runtime code changes",
+    "brain close writeback with confirmed episode or exact failure"
+  ],
+  "state_path": "data/agent-loops/pitched-placement-v5-fresh-holdout-20260714/state.json",
+  "evidence_paths": [
+    "apps/autosprink/out/visual-proof/polaris-source-only",
+    "data/agent-loops/pitched-placement-v5-fresh-holdout-20260714/state.json",
+    "BUILD_LOG.md"
+  ],
+  "max_iterations": 12,
+  "max_tokens": 500000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

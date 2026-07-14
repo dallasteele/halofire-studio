@@ -1,0 +1,79 @@
+{
+  "loop": "pitched-placement-v5-fresh-holdout-20260714",
+  "stage": "VERIFY",
+  "status": "source-only-candidate-ready-for-pre-answer-commit",
+  "iteration": 2,
+  "answerKeyOpened": false,
+  "selectedProject": {
+    "projectId": "polaris-academy-mesa-az",
+    "projectName": "Polaris Academy - Mesa AZ",
+    "selectionReason": "fresh completed project with independent architectural bid/revised/DWG sources and separately sealed fire-sprinkler CAD, AHJ-approved, and as-built answers; source proves a multi-mass 4:12 attic above horizontal occupied ceilings",
+    "priorImplementationSearchHits": 0
+  },
+  "candidateDiscovery": [
+    {
+      "project": "New Hope Crisis Center - Brigham City UT",
+      "decision": "rejected-before-answer-open",
+      "reason": "the source-closed 3:12 occupied vault main rectangle is 40.730469 by 20.772066 feet, below the v5 calibrated envelopeWidthFt minimum of 29 feet",
+      "sealedAnswersRemainUnopened": true
+    },
+    {
+      "project": "Polaris Academy - Mesa AZ",
+      "decision": "selected-as-wrong-domain-attic-holdout",
+      "reason": "source separates flat occupied ceilings from a 4:12 attic, so the occupied-vault v5 selector must reject and an attic placement regime must be learned only after the blind source commit",
+      "sealedAnswersRemainUnopened": true
+    }
+  ],
+  "sourceOnlyEvidence": {
+    "sourceSealReceiptSha256": "0007fdb22e5242c3aacb0117b7b1e140bab413c57856c990bd1ccec88bb0312e",
+    "candidateReceiptSha256": "e7f0f2850eae1f1fdcfc95007e19057d4e1d2af6ac6c4ad2e5ddd766d74874c5",
+    "floorFootprint": {
+      "vertexCount": 73,
+      "sourceUnits": "inch",
+      "outputUnits": "ft",
+      "boundsFt": { "width": 178.041667, "depth": 68.75 },
+      "exteriorOutlineAreaSqFt": 10655.197497,
+      "permitBuildingAreaSqFt": 10129,
+      "levelCount": 1,
+      "floorByFloorFootprintExtrusionReady": true
+    },
+    "pitchedAtticSection": {
+      "pitchRiseInPer12": 4,
+      "relativeSpanFt": 68.75,
+      "relativeRiseFt": 11.458333,
+      "absoluteDatumReady": false,
+      "wholeRoofFaceTopologyReady": false
+    },
+    "v5Decision": {
+      "status": "passed",
+      "rejectionCode": "PITCHED_SELECTOR_V5_UNCALIBRATED_GEOMETRY",
+      "pitchedOccupiedProtectionPlaneCount": 0,
+      "atticProtectionVolumePresent": true
+    },
+    "generatedHeadCount": 0,
+    "candidatePlacementReady": false,
+    "complianceReady": false
+  },
+  "verification": {
+    "sourceSealValidation": "passed",
+    "candidateReplayValidation": "passed",
+    "adversarialMutationCases": { "passed": 13, "attempted": 13 },
+    "focusedTests": { "passed": 12, "failed": 0, "files": 3 },
+    "renderedBrowserProof": [
+      "output/playwright/polaris-source-only/top.png",
+      "output/playwright/polaris-source-only/elevation.png",
+      "output/playwright/polaris-source-only/model3d.png"
+    ]
+  },
+  "blockedClaims": [
+    "pitched-attic-head-layout",
+    "whole-multi-mass-roof-model",
+    "absolute-roof-elevation",
+    "branch-pipe-topology",
+    "hydraulic-calculation",
+    "code-compliance",
+    "fabrication",
+    "field-release"
+  ],
+  "nextAction": "validate loop/rules/build, commit and push the immutable source-only candidate, then and only then open the sealed AHJ/as-built sprinkler answer and compare attic plus below-ceiling topology"
+}
