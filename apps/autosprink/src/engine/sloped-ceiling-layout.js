@@ -2,11 +2,16 @@ import { z } from 'zod';
 
 const Point = z.tuple([z.number().finite(), z.number().finite()]);
 const Obstruction = z.object({ id: z.string(), kind: z.literal('ceiling-fan'), centerSubmittedPt: Point, clearanceFt: z.number().positive(), preferredSide: z.enum(['negative-x', 'positive-x', 'negative-y', 'positive-y']) }).strict();
+const LinearObstruction = z.object({
+  id: z.string().min(1), kind: z.literal('box-beam'), axis: z.enum(['x', 'y']),
+  stationSubmittedPt: z.number().finite(), widthIn: z.number().positive(), spansRegion: z.literal(true),
+  partitionProtectionRegion: z.literal(true),
+}).strict();
 const Region = z.object({
   id: z.string().min(1), polygonSubmittedPt: z.array(Point).min(4),
   slopeAxis: z.enum(['x', 'y']), downhillDirection: z.enum(['positive-x', 'negative-x', 'positive-y', 'negative-y']),
   riseIn: z.number().positive(), runIn: z.number().positive(), shouldProtect: z.boolean(),
-  obstructions: z.array(Obstruction),
+  obstructions: z.array(Obstruction), linearObstructions: z.array(LinearObstruction).optional().default([]),
 }).strict();
 const Input = z.object({
   artifactType: z.literal('halofire.sloped-ceiling-layout-input.v1'),
@@ -20,6 +25,10 @@ const bounds = (polygon) => ({
   minY: Math.min(...polygon.map((point) => point[1])), maxY: Math.max(...polygon.map((point) => point[1])),
 });
 const distance = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const intervals = (min, max, stations) => {
+  const breaks = [min, ...stations.filter((value) => value > min && value < max).sort((a, b) => a - b), max];
+  return breaks.slice(0, -1).map((start, index) => [start, breaks[index + 1]]);
+};
 
 export function generateSlopedCeilingLayout(inputValue) {
   const parsed = Input.safeParse(inputValue);
@@ -35,23 +44,45 @@ export function generateSlopedCeilingLayout(inputValue) {
       regions.push({ regionId: region.id, shouldProtect: false, generatedHeadCount: 0, widthFt, heightFt });
       continue;
     }
+    if (region.linearObstructions.length && region.obstructions.length) return { status: 'blocked', issues: [issue('SLOPED_LAYOUT_MIXED_OBSTRUCTION_PARTITION_UNSUPPORTED', `Region ${region.id} combines point-clearance and linear-partition obstructions.`)] };
+    const linearKeys = region.linearObstructions.map((entry) => `${entry.axis}:${entry.stationSubmittedPt}`);
+    const invalidLinear = region.linearObstructions.find((entry) => {
+      const [min, max] = entry.axis === 'x' ? [box.minY, box.maxY] : [box.minX, box.maxX];
+      const halfWidthPt = entry.widthIn / 24 * input.printedScalePtPerFt;
+      return entry.stationSubmittedPt - halfWidthPt <= min || entry.stationSubmittedPt + halfWidthPt >= max;
+    });
+    if (new Set(linearKeys).size !== linearKeys.length || invalidLinear) return { status: 'blocked', issues: [issue('SLOPED_LAYOUT_LINEAR_OBSTRUCTION_INVALID', `Region ${region.id} has duplicate or out-of-bounds linear obstruction partitions.`)] };
     const acrossFt = region.slopeAxis === 'y' ? widthFt : heightFt;
     const alongFt = region.slopeAxis === 'y' ? heightFt : widthFt;
-    const acrossCount = Math.max(1, Math.ceil(acrossFt / input.maxAcrossSlopeSpanFt));
-    const alongCount = Math.max(1, Math.ceil(alongFt / input.maxAlongSlopeSpanFt));
     const regionHeads = [];
-    for (let acrossIndex = 0; acrossIndex < acrossCount; acrossIndex += 1) {
-      for (let alongIndex = 0; alongIndex < alongCount; alongIndex += 1) {
-        const acrossFraction = (acrossIndex + 0.5) / acrossCount;
-        const alongFraction = (alongIndex + 0.5) / alongCount;
-        const xFraction = region.slopeAxis === 'y' ? acrossFraction : alongFraction;
-        const yFraction = region.slopeAxis === 'y' ? alongFraction : acrossFraction;
-        const pointPt = [box.minX + xFraction * (box.maxX - box.minX), box.minY + yFraction * (box.maxY - box.minY)];
-        const downhillFraction = region.downhillDirection.startsWith('positive-') ? alongFraction : 1 - alongFraction;
-        const relativeElevationFt = (1 - downhillFraction) * alongFt * region.riseIn / region.runIn;
-        regionHeads.push({ id: `${region.id}-generated-${heads.length + regionHeads.length + 1}`, regionId: region.id, pointPt, relativeElevationFt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, acrossIndex });
+    const xIntervals = intervals(box.minX, box.maxX, region.linearObstructions.filter((entry) => entry.axis === 'y').map((entry) => entry.stationSubmittedPt));
+    const yIntervals = intervals(box.minY, box.maxY, region.linearObstructions.filter((entry) => entry.axis === 'x').map((entry) => entry.stationSubmittedPt));
+    const cells = xIntervals.flatMap((xRange, xIndex) => yIntervals.map((yRange, yIndex) => ({ id: `${region.id}-cell-${xIndex + 1}-${yIndex + 1}`, xRange, yRange })));
+    const cellTallies = [];
+    for (const [cellIndex, cell] of cells.entries()) {
+      const cellWidthFt = (cell.xRange[1] - cell.xRange[0]) / input.printedScalePtPerFt;
+      const cellHeightFt = (cell.yRange[1] - cell.yRange[0]) / input.printedScalePtPerFt;
+      const cellAcrossFt = region.slopeAxis === 'y' ? cellWidthFt : cellHeightFt;
+      const cellAlongFt = region.slopeAxis === 'y' ? cellHeightFt : cellWidthFt;
+      const cellAcrossCount = Math.max(1, Math.ceil(cellAcrossFt / input.maxAcrossSlopeSpanFt));
+      const cellAlongCount = Math.max(1, Math.ceil(cellAlongFt / input.maxAlongSlopeSpanFt));
+      cellTallies.push({ cellId: cell.id, widthFt: cellWidthFt, heightFt: cellHeightFt, acrossCount: cellAcrossCount, alongCount: cellAlongCount, generatedHeadCount: cellAcrossCount * cellAlongCount });
+      for (let acrossIndex = 0; acrossIndex < cellAcrossCount; acrossIndex += 1) {
+        for (let alongIndex = 0; alongIndex < cellAlongCount; alongIndex += 1) {
+          const acrossFraction = (acrossIndex + 0.5) / cellAcrossCount;
+          const alongFraction = (alongIndex + 0.5) / cellAlongCount;
+          const xFraction = region.slopeAxis === 'y' ? acrossFraction : alongFraction;
+          const yFraction = region.slopeAxis === 'y' ? alongFraction : acrossFraction;
+          const pointPt = [cell.xRange[0] + xFraction * (cell.xRange[1] - cell.xRange[0]), cell.yRange[0] + yFraction * (cell.yRange[1] - cell.yRange[0])];
+          const globalAlongFraction = region.slopeAxis === 'y' ? (pointPt[1] - box.minY) / (box.maxY - box.minY) : (pointPt[0] - box.minX) / (box.maxX - box.minX);
+          const downhillFraction = region.downhillDirection.startsWith('positive-') ? globalAlongFraction : 1 - globalAlongFraction;
+          const relativeElevationFt = (1 - downhillFraction) * alongFt * region.riseIn / region.runIn;
+          regionHeads.push({ id: `${region.id}-generated-${heads.length + regionHeads.length + 1}`, regionId: region.id, pointPt, relativeElevationFt, slopeAxis: region.slopeAxis, downhillDirection: region.downhillDirection, acrossIndex: cellIndex * 1000 + acrossIndex, ...(region.linearObstructions.length ? { partitionCellId: cell.id } : {}) });
+        }
       }
     }
+    const acrossCount = region.linearObstructions.length ? Math.max(...cellTallies.map((entry) => entry.acrossCount)) * (region.slopeAxis === 'x' ? yIntervals.length : xIntervals.length) : cellTallies[0].acrossCount;
+    const alongCount = region.linearObstructions.length ? Math.max(...cellTallies.map((entry) => entry.alongCount)) * (region.slopeAxis === 'x' ? xIntervals.length : yIntervals.length) : cellTallies[0].alongCount;
     const obstructionAdjustments = [];
     for (const obstruction of region.obstructions) {
       const clearancePt = obstruction.clearanceFt * input.printedScalePtPerFt;
@@ -68,7 +99,8 @@ export function generateSlopedCeilingLayout(inputValue) {
       }
     }
     heads.push(...regionHeads.map(({ acrossIndex: _acrossIndex, ...head }) => head));
-    regions.push({ regionId: region.id, shouldProtect: true, generatedHeadCount: acrossCount * alongCount, widthFt, heightFt, acrossCount, alongCount, obstructionAdjustments });
+    const regionResult = { regionId: region.id, shouldProtect: true, generatedHeadCount: regionHeads.length, widthFt, heightFt, acrossCount, alongCount, obstructionAdjustments };
+    regions.push(region.linearObstructions.length ? { ...regionResult, linearObstructionPartitions: region.linearObstructions.map((entry) => ({ id: entry.id, kind: entry.kind, axis: entry.axis, stationSubmittedPt: entry.stationSubmittedPt, widthIn: entry.widthIn })), partitionCells: cellTallies } : regionResult);
   }
   return { status: 'passed', artifactType: 'halofire.sloped-ceiling-layout.v1', heads, regions, issues: [], complianceReady: false, claimStatus: 'calibration-candidate-not-code-compliance-or-approval' };
 }

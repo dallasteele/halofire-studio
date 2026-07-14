@@ -48,4 +48,24 @@ describe('slope-aware calibration layout', () => {
     expect(parity.status).toBe('blocked');
     expect(parity.falsePositiveEmptyRegions).toContain('slope-region-west-covered');
   });
+
+  it('partitions a two-plane vault into source-proven box-beam bays', () => {
+    const beamLines = [8, 16].map((stationSubmittedPt, index) => ({ id: `box-beam-${index + 1}`, kind: 'box-beam', axis: 'x', stationSubmittedPt, widthIn: 8, spansRegion: true, partitionProtectionRegion: true }));
+    const regions = [
+      { id: 'west', polygonSubmittedPt: [[0, 0], [9.25, 0], [9.25, 24], [0, 24]], slopeAxis: 'x', downhillDirection: 'negative-x', riseIn: 4, runIn: 12, shouldProtect: true, obstructions: [], linearObstructions: beamLines },
+      { id: 'east', polygonSubmittedPt: [[9.25, 0], [18.5, 0], [18.5, 24], [9.25, 24]], slopeAxis: 'x', downhillDirection: 'positive-x', riseIn: 4, runIn: 12, shouldProtect: true, obstructions: [], linearObstructions: beamLines },
+    ];
+    const layout = generateSlopedCeilingLayout({ artifactType: 'halofire.sloped-ceiling-layout-input.v1', printedScalePtPerFt: 1, regions, maxAcrossSlopeSpanFt: 20, maxAlongSlopeSpanFt: 12 });
+    expect(layout.status).toBe('passed'); expect(layout.heads).toHaveLength(6);
+    expect(layout.regions.map((region) => region.generatedHeadCount)).toEqual([3, 3]);
+    expect(layout.regions.every((region) => region.partitionCells.length === 3 && region.linearObstructionPartitions.length === 2)).toBe(true);
+    expect(layout.heads.map((head) => head.pointPt[1])).toEqual([4, 12, 20, 4, 12, 20]);
+  });
+
+  it('fails closed on duplicate linear obstruction stations', () => {
+    const beam = { id: 'box-beam-1', kind: 'box-beam', axis: 'x', stationSubmittedPt: 8, widthIn: 8, spansRegion: true, partitionProtectionRegion: true };
+    const region = { id: 'vault', polygonSubmittedPt: [[0, 0], [9.25, 0], [9.25, 24], [0, 24]], slopeAxis: 'x', downhillDirection: 'negative-x', riseIn: 4, runIn: 12, shouldProtect: true, obstructions: [], linearObstructions: [beam, { ...beam, id: 'box-beam-duplicate' }] };
+    const layout = generateSlopedCeilingLayout({ artifactType: 'halofire.sloped-ceiling-layout-input.v1', printedScalePtPerFt: 1, regions: [region], maxAcrossSlopeSpanFt: 20, maxAlongSlopeSpanFt: 12 });
+    expect(layout.status).toBe('blocked'); expect(layout.issues[0].code).toBe('SLOPED_LAYOUT_LINEAR_OBSTRUCTION_INVALID');
+  });
 });

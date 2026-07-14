@@ -1,0 +1,64 @@
+{
+  "artifactType": "halofire.reger-flores-box-beam-calibration.v1",
+  "projectName": "Reger-Flores Residence - Queen Creek AZ",
+  "sequence": {
+    "failedFreshComparisonReceiptSha256": "51a8afef5cf735d73a031bc66af86063f385960ecf816932488bfabe99b2cfd7",
+    "answerExposedBeforeThisCorrection": true,
+    "eligibleAsFreshHoldout": false
+  },
+  "sourceEvidence": {
+    "ceilingCadSha256": "62156c099f062a4bef85edcab4dbf4e262586655b1c462003e2cdeed99dea279",
+    "completedPdfSha256": "af45158d0e52a87faa78973b171245d6c772d46d5edccfad0e8410e88c8ffce9",
+    "correctedVaultLengthFt": 24,
+    "rejectedPriorVaultLengthFt": 16,
+    "dimensionEntities": [
+      { "libreDwgObjectIndex": 8716, "text": "8'-0\"", "spanSubmittedIn": [1623.639383, 1719.639383] },
+      { "libreDwgObjectIndex": 8725, "text": "8'-0\"", "spanSubmittedIn": [1527.639383, 1623.639383] },
+      { "libreDwgObjectIndex": 8734, "text": "8'-0\"", "spanSubmittedIn": [1431.639383, 1527.639383] }
+    ],
+    "beamLabels": [
+      { "libreDwgObjectIndex": 7304, "text": "8\" X 8\" BOX BEAMS" },
+      { "libreDwgObjectIndex": 7305, "text": "8\" X 8\" BOX BEAMS" },
+      { "libreDwgObjectIndex": 7306, "text": "8\" X 8\" BOX BEAMS" }
+    ]
+  },
+  "geometry": {
+    "widthFt": 18.5,
+    "lengthFt": 24,
+    "halfRunFt": 9.25,
+    "pitch": { "riseIn": 4, "runIn": 12 },
+    "springElevationFt": 12.083333,
+    "peakElevationFt": 15.166667,
+    "beamStationsFt": [8, 16],
+    "beamWidthIn": 8
+  },
+  "layoutControls": {
+    "maxAcrossSlopeSpanFt": 20,
+    "maxAlongSlopeSpanFt": 12,
+    "beamPolicy": "full-span-box-beams-partition-each-vault-plane-into-protection-cells"
+  },
+  "answerEvidence": {
+    "roomLabel": "LOUNGE VAULTED",
+    "headCount": 6,
+    "slopeColumnCount": 2,
+    "ridgeDirectionRowsPerColumn": 3
+  },
+  "calibrationResult": {
+    "status": "passed",
+    "generatedHeadCount": 6,
+    "generatedSlopeColumnCount": 2,
+    "generatedRidgeDirectionRowsPerColumn": 3,
+    "topologyParityPassed": true,
+    "exactPlanPlacementClaimed": false
+  },
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "beam-partitioned-deterministic-layout-replay" },
+    "independent": { "status": "passed", "method": "three-consecutive-eight-foot-source-dimension-entities" },
+    "adversarial": { "status": "passed", "rejectedCases": ["length", "beam-remove", "beam-shift", "answer-count", "sequence", "fresh-pass", "compliance-pass"] }
+  },
+  "unseenProjectPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "receiptSha256": "23017a6f95199247e1a70b2bc24292d198e93de314132454bdbfc63230cb6021"
+}
