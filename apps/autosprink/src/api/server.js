@@ -82,6 +82,9 @@ import { validatePitchedPlacementCalibrationCorpus, verifyPitchedPlacementCalibr
 import { validatePitchedPlacementCalibrationCorpusV2, verifyPitchedPlacementCalibrationV2AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v2.js';
 import { validatePitchedPlacementCalibrationCorpusV3, verifyPitchedPlacementCalibrationV3AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v3.js';
 import { validatePitchedPlacementCalibrationCorpusV4, verifyPitchedPlacementCalibrationV4AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v4.js';
+import { buildBoysGirlsClubSourceOnlyCandidate } from '../engine/boys-girls-club-unseen-pitched-holdout.js';
+import { renderBoysGirlsClubHeldoutComparison, validateBoysGirlsClubHeldoutComparison, verifyBoysGirlsClubComparisonAdversarialLoop } from '../engine/boys-girls-club-pitched-heldout-comparison.js';
+import { validatePitchedPlacementCalibrationCorpusV5, verifyPitchedPlacementCalibrationV5AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v5.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -186,6 +189,9 @@ const PITCHED_PLACEMENT_CALIBRATION_CORPUS_PATH = path.resolve(__dirname, '../da
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V2_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v2.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V3_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v3.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V4_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v4.json');
+const BOYS_GIRLS_CLUB_SOURCE_SEAL_PATH = path.resolve(__dirname, '../data/boys-girls-club-unseen-pitched-holdout.json');
+const BOYS_GIRLS_CLUB_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/boys-girls-club-pitched-heldout-comparison.json');
+const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V5_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v5.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -2605,6 +2611,53 @@ app.get('/api/evidence/pitched-placement-calibration-corpus-v4', authMiddleware,
   } catch (error) {
     log.error('Failed to load pitched placement calibration corpus revision four', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'pitched_placement_calibration_corpus_v4_load_failed', strategySelectorReadyForFreshHoldout: false, unseenProjectPlacementVerified: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/boys-girls-club-pitched-heldout-comparison', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(BOYS_GIRLS_CLUB_HELDOUT_COMPARISON_PATH, 'utf8'));
+    const [validation, adversarialLoop] = await Promise.all([validateBoysGirlsClubHeldoutComparison(packet), verifyBoysGirlsClubComparisonAdversarialLoop(packet)]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') return res.status(422).json({ status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop, candidatePlacementVerified: false, complianceReady: false });
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, receiptSha256: packet.receiptSha256,
+      registration: packet.registration, blindPrediction: packet.blindPrediction, approved: packet.approved, asBuilt: packet.asBuilt,
+      result: packet.result, comparisonSvg: renderBoysGirlsClubHeldoutComparison(packet).svg, adversarialLoop,
+      candidatePlacementVerified: false, unseenProjectPlacementVerified: false, pitchedRoofHeadLayoutReady: false,
+      hydraulicCalculationReady: false, complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      requiredNextLoop: packet.requiredNextLoop, claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Boys and Girls Club heldout comparison', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'boys_girls_club_heldout_load_failed', candidatePlacementVerified: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/pitched-placement-calibration-corpus-v5', authMiddleware, async (req, res) => {
+  try {
+    const v4Corpus = JSON.parse(fs.readFileSync(PITCHED_PLACEMENT_CALIBRATION_CORPUS_V4_PATH, 'utf8'));
+    const sourceSeal = JSON.parse(fs.readFileSync(BOYS_GIRLS_CLUB_SOURCE_SEAL_PATH, 'utf8'));
+    const bgcComparison = JSON.parse(fs.readFileSync(BOYS_GIRLS_CLUB_HELDOUT_COMPARISON_PATH, 'utf8'));
+    const packet = JSON.parse(fs.readFileSync(PITCHED_PLACEMENT_CALIBRATION_CORPUS_V5_PATH, 'utf8'));
+    const bgcCandidate = await buildBoysGirlsClubSourceOnlyCandidate(sourceSeal, v4Corpus);
+    const dependencies = { v4Corpus, bgcCandidate, bgcComparison };
+    const [validation, adversarialLoop] = await Promise.all([validatePitchedPlacementCalibrationCorpusV5(packet, dependencies), verifyPitchedPlacementCalibrationV5AdversarialLoop(packet, dependencies)]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') return res.status(422).json({ status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop, strategySelectorReadyForFreshHoldout: false, complianceReady: false });
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, receiptSha256: packet.receiptSha256,
+      mode: packet.mode, purpose: packet.purpose, sourceBindings: packet.sourceBindings,
+      trainingProjectCount: packet.trainingProjectCount, largeVaultStrategyCount: packet.largeVaultStrategyCount,
+      newTrainingProject: packet.newTrainingProject, calibratedDomain: packet.calibratedDomain,
+      failedHoldoutControl: packet.failedHoldoutControl, transferPolicy: packet.transferPolicy, adversarialLoop,
+      strategySelectorReadyForFreshHoldout: true, unseenProjectPlacementVerified: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+      requiredNextLoop: packet.requiredNextLoop, claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load pitched placement calibration corpus revision five', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'pitched_placement_calibration_corpus_v5_load_failed', strategySelectorReadyForFreshHoldout: false, complianceReady: false });
   }
 });
 

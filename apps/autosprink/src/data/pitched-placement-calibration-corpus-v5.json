@@ -1,0 +1,113 @@
+{
+  "artifactType": "halofire.pitched-placement-calibration-corpus.v5",
+  "mode": "answer-exposed-six-project-topology-calibration-with-explicit-domain-gate",
+  "purpose": "preserve the BGC 3x4-versus-8x8 failure, add the large-high-bay regime, and prohibit the unbounded nearest-neighbor extrapolation v4 exposed",
+  "sourceBindings": {
+    "v4CorpusReceiptSha256": "6a37f16060e6dfc24358c83967f6ebf5b0964ddcbcf38368a72ce849ab3a4621",
+    "bgcBlindCandidateReceiptSha256": "908819388b44ed015ca93ee0b15e8bd94f7c4e72f72eaa4503d6db649a6fac54",
+    "bgcHeldoutComparisonReceiptSha256": "37fee9c38560e2a98507844e390658c865f4cc9c24d277c7859d5c9f544b6b57"
+  },
+  "trainingProjectCount": 6,
+  "largeVaultStrategyCount": 5,
+  "newTrainingProject": {
+    "projectId": "boys-girls-club-community-center-brigham-city-ut",
+    "layoutFamily": "large-high-bay-exposed-two-plane-eight-along-eight-across-guarded-uprights",
+    "sourceObservableFeatures": {
+      "clearSpanDisambiguated": true,
+      "occupiedProtectionPlaneCount": 2,
+      "symmetricTwoPlaneVault": true,
+      "ceilingPitchRiseInPer12": 2,
+      "envelopeLengthFt": 104,
+      "envelopeWidthFt": 89.5,
+      "aspectRatio": 1.162011,
+      "envelopeAreaSqFt": 9308,
+      "sourceObstructionPresent": true,
+      "movablePartitionPocketPresent": false,
+      "sourceSpanCandidateCount": 1,
+      "alongRidgeSpanFt": 104,
+      "acrossSlopeSpanFt": 89.5,
+      "springElevationFt": 25,
+      "ridgeElevationFt": 32.458333,
+      "ridgeAxis": "x",
+      "sourceObstructionKinds": ["center ceiling fan", "retractable basketball standards", "lighting and air devices"]
+    },
+    "answerExposedFeatures": {
+      "completedHeadCount": 64,
+      "completedAreaPerHeadSqFt": 145.4375,
+      "topology": { "alongRidgeStations": 8, "acrossSlopeStations": 8 },
+      "headsPerBranch": 8,
+      "branchCount": 8,
+      "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+      "approvedAsBuiltTopologyParity": true,
+      "exactStationCoordinatesReady": false
+    }
+  },
+  "calibratedDomain": {
+    "numericBounds": {
+      "ceilingPitchRiseInPer12": { "min": 2, "max": 7.334 },
+      "envelopeLengthFt": { "min": 25.5, "max": 104 },
+      "envelopeWidthFt": { "min": 29, "max": 89.5 },
+      "aspectRatio": { "min": 0.679245, "max": 1.373518 },
+      "envelopeAreaSqFt": { "min": 870, "max": 9308 }
+    },
+    "normalizationRanges": {
+      "ceilingPitchRiseInPer12": 5.334,
+      "envelopeLengthFt": 78.5,
+      "envelopeWidthFt": 60.5,
+      "aspectRatio": 1,
+      "envelopeAreaSqFt": 8438,
+      "sourceObstructionPresent": 1,
+      "movablePartitionPocketPresent": 1,
+      "sourceSpanCandidateCount": 1
+    },
+    "leaveOneOutNearest": [
+      { "projectId": "midvale-townhome-clubhouse-midvale-ut", "nearestProjectId": "moses-lake-stake-center", "distance": 0.84531 },
+      { "projectId": "moses-lake-stake-center", "nearestProjectId": "midvale-townhome-clubhouse-midvale-ut", "distance": 0.84531 },
+      { "projectId": "viviano-clubhouse-saratoga-springs-ut", "nearestProjectId": "midvale-townhome-clubhouse-midvale-ut", "distance": 1.825193 },
+      { "projectId": "lds-meetinghouse-winter-garden-fl", "nearestProjectId": "moses-lake-stake-center", "distance": 3.018152 },
+      { "projectId": "boys-girls-club-community-center-brigham-city-ut", "nearestProjectId": "viviano-clubhouse-saratoga-springs-ut", "distance": 3.918118 }
+    ],
+    "maxLeaveOneOutNearestDistance": 3.918118,
+    "policy": "require every numeric source feature inside observed min-max bounds and nearest distance no greater than the worst observed leave-one-out neighbor",
+    "causalRuleClaimed": false,
+    "codeLimit": false
+  },
+  "failedHoldoutControl": {
+    "projectName": "Boys & Girls Club Community Center - Brigham City UT",
+    "receiptSha256": "37fee9c38560e2a98507844e390658c865f4cc9c24d277c7859d5c9f544b6b57",
+    "sourceOnlyPrediction": { "alongRidgeStations": 3, "acrossSlopeStations": 4, "heads": 12, "selectorDistance": 30.887227 },
+    "approvedAndAsBuilt": { "alongRidgeStations": 8, "acrossSlopeStations": 8, "heads": 64 },
+    "failurePreserved": true,
+    "countFailure": true,
+    "topologyFailure": true,
+    "v4OutOfEnvelopePromotionGuardWorked": true,
+    "nowUsedForCalibration": true
+  },
+  "transferPolicy": {
+    "empiricalPriorOnly": true,
+    "answerExposed": true,
+    "sourceOnlyStrategySelectionRequired": true,
+    "clearSpanDisambiguationRequired": true,
+    "calibratedDomainRequired": true,
+    "causalRuleClaimed": false,
+    "codeLimit": false,
+    "exactCoordinateTransferAllowed": false,
+    "obstructionClearanceTransferAllowed": false,
+    "hazardClassificationTransferAllowed": false,
+    "pipeTopologyTransferAllowed": false,
+    "unseenProjectHoldoutRequired": true
+  },
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "deterministic v4 plus BGC answer-exposed 8x8 topology replay" },
+    "independent": { "status": "passed", "method": "six-project feature-bound and leave-one-out distance recomputation" },
+    "adversarial": { "status": "passed", "method": "dependency-domain-leakage-failure-erasure-causal and downstream-promotion mutations" }
+  },
+  "strategySelectorReadyForFreshHoldout": true,
+  "unseenProjectPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "run another fresh source-sealed pitched project through v5 then compare approved or as-built answers",
+  "claimStatus": "answer-exposed-six-project-topology-and-domain-calibration-not-fresh-placement-code-compliance-or-fabrication",
+  "receiptSha256": "eff4a856d825707acb6a9c3135daa1d28e68246f5f11ade3bd88ba30284fe687"
+}
