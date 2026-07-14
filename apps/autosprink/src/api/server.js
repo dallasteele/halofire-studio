@@ -71,6 +71,7 @@ import { renderDillonCompletedBidViews, validateDillonCompletedBidGeometry } fro
 import { buildDillonVerticalModel, renderDillonVerticalElevationView, validateDillonVerticalRegistration } from '../engine/dillon-vertical-registration.js';
 import { buildDillonStructuralRoofModel, buildDillonStructuralRoofPacket, renderDillonStructuralRoofTopView, validateDillonStructuralRoofPacket } from '../engine/dillon-structural-roof-surfaces.js';
 import { renderRegerFloresBoxBeamCalibrationViews, validateRegerFloresBoxBeamCalibration, verifyRegerFloresBoxBeamCalibrationAdversarialLoop } from '../engine/reger-flores-box-beam-calibration.js';
+import { buildSagewoodPitchedAtticCalibrationViews, validateSagewoodPitchedAtticCalibration, verifySagewoodPitchedAtticCalibrationAdversarialLoop } from '../engine/sagewood-pitched-attic-calibration.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -158,6 +159,7 @@ const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dill
 const DILLON_VERTICAL_REGISTRATION_PATH = path.resolve(__dirname, '../data/dillon-vertical-registration.json');
 const DILLON_STRUCTURAL_ROOF_SOURCE_PATH = path.resolve(__dirname, '../data/dillon-structural-framing-roof-source.json');
 const REGER_FLORES_BOX_BEAM_CALIBRATION_PATH = path.resolve(__dirname, '../data/reger-flores-box-beam-calibration.json');
+const SAGEWOOD_PITCHED_ATTIC_CALIBRATION_PATH = path.resolve(__dirname, '../data/sagewood-pitched-attic-calibration.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -2208,6 +2210,37 @@ app.get('/api/evidence/reger-flores-box-beam-calibration', authMiddleware, async
   } catch (error) {
     log.error('Failed to load Reger-Flores box-beam calibration evidence', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'reger_flores_box_beam_calibration_load_failed', freshHoldoutRequired: true, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/sagewood-pitched-attic-calibration', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(SAGEWOOD_PITCHED_ATTIC_CALIBRATION_PATH, 'utf8'));
+    const [validation, adversarialLoop] = await Promise.all([
+      validateSagewoodPitchedAtticCalibration(packet),
+      verifySagewoodPitchedAtticCalibrationAdversarialLoop(packet),
+    ]);
+    const views = buildSagewoodPitchedAtticCalibrationViews(packet);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop,
+        freshHoldoutRequired: true, unseenProjectPlacementVerified: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: 'halofire.sagewood-pitched-attic-evidence.v1',
+      projectId: packet.projectId, scopeId: packet.scopeId, receiptSha256: packet.receiptSha256,
+      dependencyReceipts: packet.dependencyReceipts, protectionVolume: packet.protectionVolume,
+      sourceEnvelopeControls: packet.sourceEnvelopeControls, answerExposedTopology: packet.answerExposedTopology,
+      layout: packet.layout, heads3d: packet.heads3d, branchPipes3d: packet.branchPipes3d, views, adversarialLoop,
+      claimStatus: packet.claimStatus, freshHoldoutRequired: true, unseenProtectionVolumeVerified: false,
+      unseenProjectPlacementVerified: false, exactDeflectorElevationReady: false, branchPipeTopologyReady: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false,
+    });
+  } catch (error) {
+    log.error('Failed to load Sagewood pitched-attic calibration evidence', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'sagewood_pitched_attic_calibration_load_failed', freshHoldoutRequired: true, complianceReady: false });
   }
 });
 

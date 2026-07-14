@@ -1,0 +1,33 @@
+{
+  "artifactType": "halofire.pitched-protection-volume-evidence.v1",
+  "projectId": "sagewood-ranch-south-jordan-ut",
+  "scopeId": "main-hall-pitched-envelope",
+  "mode": "answer-exposed-calibration",
+  "sequence": {
+    "answerKeyOpened": true,
+    "completedBidUsedForDecision": true,
+    "preAnswerCommit": "1858f3f1276ff0273cdcf1f11d92ee63aef17879",
+    "correctedImplementationEligibleAsFreshHoldout": false
+  },
+  "evidence": [
+    {
+      "id": "sagewood-main-hall-room-label",
+      "scopeId": "main-hall-pitched-envelope",
+      "kind": "occupied-room-label",
+      "sourceRole": "architectural-plan",
+      "sourceSha256": "83182f521f1d6b578c3d9062879f1e02d76ab3d7f1c04588df19e5084d20f87f",
+      "sheetId": "A3.2",
+      "assertion": "The plan identifies the scoped 52-foot-7-inch by 63-foot room as MAIN HALL."
+    },
+    {
+      "id": "sagewood-completed-attic-ra-note",
+      "scopeId": "main-hall-pitched-envelope",
+      "kind": "attic-protection-note",
+      "sourceRole": "completed-sprinkler-answer",
+      "sourceSha256": "1d48993b4c3c22459cd43ba05b167e6e7afc985c17c24140f51e4ae5dd81831c",
+      "sheetId": "F1.2 / physical page 4",
+      "assertion": "The completed hydraulic table identifies the reviewed protection system as ATTIC RA."
+    }
+  ],
+  "receiptSha256": "2d2502c76475e831a656237264439f22b8a6466296c52a43e1c7c02bb7fa6f8a"
+}

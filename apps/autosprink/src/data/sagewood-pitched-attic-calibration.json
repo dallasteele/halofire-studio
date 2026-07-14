@@ -1,0 +1,414 @@
+{
+  "artifactType": "halofire.sagewood-pitched-attic-calibration.v1",
+  "projectId": "sagewood-ranch-south-jordan-ut",
+  "scopeId": "main-hall-pitched-envelope",
+  "dependencyReceipts": {
+    "sourceCandidateReceiptSha256": "9d8abe21c2a3759b63763c56133d08b6d058f94eb8bb346108809326a69ba41c",
+    "classificationEvidenceReceiptSha256": "2d2502c76475e831a656237264439f22b8a6466296c52a43e1c7c02bb7fa6f8a",
+    "failedHeldoutComparisonReceiptSha256": "f100c0cb01b3d07ae1db6c39141175dd590a192422fdf8c8bfc108e7700f7241"
+  },
+  "sequence": {
+    "preAnswerCommit": "1858f3f1276ff0273cdcf1f11d92ee63aef17879",
+    "failedComparisonCommittedBeforeCorrection": true,
+    "answerExposed": true,
+    "correctedImplementationEligibleAsFreshHoldout": false
+  },
+  "protectionVolume": {
+    "classification": "pitched-attic",
+    "classificationRoutingReady": true,
+    "productionPlacementEligible": false
+  },
+  "sourceEnvelopeControls": {
+    "roomWidthFt": 52.583333,
+    "roomLengthFt": 63,
+    "pitchRiseIn": 3,
+    "pitchRunIn": 12,
+    "springElevationFt": 18,
+    "peakElevationFt": 24.572917
+  },
+  "answerExposedTopology": {
+    "columnCount": 5,
+    "rowsPerColumn": 6,
+    "headCount": 30,
+    "headTypeObserved": "upright",
+    "exactPlanCoordinatesObserved": false,
+    "exactDeflectorElevationsObserved": false
+  },
+  "layout": {
+    "method": "answer-exposed-five-by-six-topology-on-source-derived-main-hall-envelope",
+    "nominalCrossSlopeSpacingFt": 10.516667,
+    "nominalLongitudinalSpacingFt": 10.5,
+    "exactPlacementReady": false
+  },
+  "heads3d": [
+    {
+      "id": "sagewood-attic-c1-r1",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 1,
+      "rowIndex": 1,
+      "xFt": 5.258333,
+      "yFt": 5.25,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c1-r2",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 1,
+      "rowIndex": 2,
+      "xFt": 5.258333,
+      "yFt": 15.75,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c1-r3",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 1,
+      "rowIndex": 3,
+      "xFt": 5.258333,
+      "yFt": 26.25,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c1-r4",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 1,
+      "rowIndex": 4,
+      "xFt": 5.258333,
+      "yFt": 36.75,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c1-r5",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 1,
+      "rowIndex": 5,
+      "xFt": 5.258333,
+      "yFt": 47.25,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c1-r6",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 1,
+      "rowIndex": 6,
+      "xFt": 5.258333,
+      "yFt": 57.75,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c2-r1",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 2,
+      "rowIndex": 1,
+      "xFt": 15.775,
+      "yFt": 5.25,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c2-r2",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 2,
+      "rowIndex": 2,
+      "xFt": 15.775,
+      "yFt": 15.75,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c2-r3",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 2,
+      "rowIndex": 3,
+      "xFt": 15.775,
+      "yFt": 26.25,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c2-r4",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 2,
+      "rowIndex": 4,
+      "xFt": 15.775,
+      "yFt": 36.75,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c2-r5",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 2,
+      "rowIndex": 5,
+      "xFt": 15.775,
+      "yFt": 47.25,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c2-r6",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 2,
+      "rowIndex": 6,
+      "xFt": 15.775,
+      "yFt": 57.75,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c3-r1",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 3,
+      "rowIndex": 1,
+      "xFt": 26.291667,
+      "yFt": 5.25,
+      "roofEnvelopeElevationFt": 24.572917,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c3-r2",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 3,
+      "rowIndex": 2,
+      "xFt": 26.291667,
+      "yFt": 15.75,
+      "roofEnvelopeElevationFt": 24.572917,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c3-r3",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 3,
+      "rowIndex": 3,
+      "xFt": 26.291667,
+      "yFt": 26.25,
+      "roofEnvelopeElevationFt": 24.572917,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c3-r4",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 3,
+      "rowIndex": 4,
+      "xFt": 26.291667,
+      "yFt": 36.75,
+      "roofEnvelopeElevationFt": 24.572917,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c3-r5",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 3,
+      "rowIndex": 5,
+      "xFt": 26.291667,
+      "yFt": 47.25,
+      "roofEnvelopeElevationFt": 24.572917,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c3-r6",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 3,
+      "rowIndex": 6,
+      "xFt": 26.291667,
+      "yFt": 57.75,
+      "roofEnvelopeElevationFt": 24.572917,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c4-r1",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 4,
+      "rowIndex": 1,
+      "xFt": 36.808333,
+      "yFt": 5.25,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c4-r2",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 4,
+      "rowIndex": 2,
+      "xFt": 36.808333,
+      "yFt": 15.75,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c4-r3",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 4,
+      "rowIndex": 3,
+      "xFt": 36.808333,
+      "yFt": 26.25,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c4-r4",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 4,
+      "rowIndex": 4,
+      "xFt": 36.808333,
+      "yFt": 36.75,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c4-r5",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 4,
+      "rowIndex": 5,
+      "xFt": 36.808333,
+      "yFt": 47.25,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c4-r6",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 4,
+      "rowIndex": 6,
+      "xFt": 36.808333,
+      "yFt": 57.75,
+      "roofEnvelopeElevationFt": 21.94375,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c5-r1",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 5,
+      "rowIndex": 1,
+      "xFt": 47.325,
+      "yFt": 5.25,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c5-r2",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 5,
+      "rowIndex": 2,
+      "xFt": 47.325,
+      "yFt": 15.75,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c5-r3",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 5,
+      "rowIndex": 3,
+      "xFt": 47.325,
+      "yFt": 26.25,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c5-r4",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 5,
+      "rowIndex": 4,
+      "xFt": 47.325,
+      "yFt": 36.75,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c5-r5",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 5,
+      "rowIndex": 5,
+      "xFt": 47.325,
+      "yFt": 47.25,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    },
+    {
+      "id": "sagewood-attic-c5-r6",
+      "headFamily": "upright-answer-observed-type-not-production-selected",
+      "columnIndex": 5,
+      "rowIndex": 6,
+      "xFt": 47.325,
+      "yFt": 57.75,
+      "roofEnvelopeElevationFt": 19.314583,
+      "deflectorElevationFt": null,
+      "elevationStatus": "source-roof-envelope-control-only-deflector-unresolved"
+    }
+  ],
+  "branchPipes3d": [],
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic-source-envelope-plus-completed-topology-replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "five-by-six-count-and-3:12-envelope-elevation-closure"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "dependency-topology-elevation-and-false-promotion-mutations",
+      "rejectedCases": [
+        "source-receipt",
+        "classification-receipt",
+        "classification",
+        "columns",
+        "head",
+        "deflector",
+        "fresh-pass",
+        "compliance-pass"
+      ]
+    }
+  },
+  "answerExposedTopologyCalibrationReady": true,
+  "freshHoldoutRequired": true,
+  "unseenProtectionVolumeVerified": false,
+  "unseenProjectPlacementVerified": false,
+  "exactDeflectorElevationReady": false,
+  "branchPipeTopologyReady": false,
+  "obstructionClearanceReady": false,
+  "hydraulicCalculationReady": false,
+  "wholeBuildingModelReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "answer-exposed-pitched-attic-topology-calibration-not-fresh-placement-compliance-or-fabrication",
+  "receiptSha256": "5add0230ecb84ee0f5c8835f4bbc424cdc4be802e81d30c0347c8d1fc8ce81ff"
+}
