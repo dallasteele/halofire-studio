@@ -1,0 +1,91 @@
+{
+  "artifactType": "halofire.unseen-pitched-holdout.v1",
+  "projectId": "midvale-townhome-clubhouse-midvale-ut",
+  "projectName": "Midvale Townhome Clubhouse - Midvale UT",
+  "sources": [
+    {
+      "role": "architectural_asi8_set",
+      "path": "1-Bid Documents/GC - Bid Plans/Building/MIDVALE CLUBHOUSE  - ASI 08 - Combined Set.pdf",
+      "sha256": "8c69d500ed59ec7c60d96c57b1ad63495eec3a2820aa5f7f72e0293ceb1be387",
+      "bytes": 65283673
+    },
+    {
+      "role": "architectural_floor_plan",
+      "path": "1-Bid Documents/sprinkler estimate pages/A102 Overall Floor Plan_MIDVALE CLUBHOUSE.pdf",
+      "sha256": "64f193c64d6206c251efe5e45c27cbb1a68c50021caa57842263cca7dbd521d9",
+      "bytes": 2390486
+    },
+    {
+      "role": "architectural_sections",
+      "path": "1-Bid Documents/sprinkler estimate pages/Section Views_ A301_MIDVALE CLUBHOUSE.pdf",
+      "sha256": "fc0bdcb314013c3901f6009e6c4f4d13d3515c90c45873babb6fb11abb10edeb",
+      "bytes": 1270411
+    },
+    {
+      "role": "structural_roof_framing",
+      "path": "1-Bid Documents/sprinkler estimate pages/S300 roof framing plan_MIDVALE CLUBHOUSE.pdf",
+      "sha256": "da2d82d0cfbca94fe50e158443f8ca836b46df819662a438b3fb3078055fbc54",
+      "bytes": 1676368
+    }
+  ],
+  "answerKeyDenylist": [
+    {
+      "path": "2-Internal Ops/03-Approved Docs/AHJ/Midvale Townhomes Clubhouse - Stamped Fire Sprinkler Shop Drawings.pdf",
+      "sha256": "043920f7514e7bb250a8eb20502f3f3ae7738b6d6f771dc4604580e2595f9e9a",
+      "bytes": 12644865,
+      "openedBeforeSourceSeal": false
+    }
+  ],
+  "selection": {
+    "status": "source-sealed-answer-unopened",
+    "priorImplementationSearchHits": 0,
+    "rejectedBeforeAnswerOpen": [
+      { "project": "Rozenfield Residence", "reason": "low-slope roof over flat occupied gypsum ceilings" },
+      { "project": "Farnsworth Residence", "reason": "architectural source exists but no completed sprinkler answer was found" },
+      { "project": "Cholla Guest House", "reason": "same broader site as completed Cholla calibration, so not an independent project holdout" }
+    ]
+  },
+  "sourceObservations": {
+    "clubroomVault": {
+      "room": "CLUBROOM 115",
+      "sourceSheets": ["A102", "A111", "A301", "A403"],
+      "riserRun": "6:12",
+      "springElevationFt": 12,
+      "peakElevationFt": 19.25,
+      "derivedWidthFt": 29,
+      "planWidthFt": 29.0625,
+      "planLengthFt": 30,
+      "planWidthResidualIn": 0.75,
+      "dimensionClosure": "two 6:12 planes rise 7.25 feet from 12-foot springs to a 19.25-foot ridge, deriving a 29-foot vault width that agrees with the 29-foot 0.75-inch plan width"
+    },
+    "zoneRegistry": [
+      { "id": "clubroom-vault-zone", "classification": "occupied-sloped-ceiling", "placementEligible": true, "reason": "A111, A301, and A403 close pitch, springs, ridge, width, and length" },
+      { "id": "community-work-room-sloped-zone", "classification": "occupied-sloped-ceiling", "placementEligible": false, "reason": "A111 and A400 prove sloped C1 planes, but source-only boundary/elevation reconciliation is not yet closed" },
+      { "id": "gym-sloped-zone", "classification": "occupied-sloped-ceiling", "placementEligible": false, "reason": "A111 proves sloped C1 planes, but exact spring and ridge elevations are not closed in the selected source subset" },
+      { "id": "flat-admin-spa-support-zones", "classification": "flat-occupied-ceilings", "placementEligible": false, "reason": "A111 labels flat C1, C2, C3, and S1 ceilings; pitched roof forms are not substituted" }
+    ]
+  },
+  "toolchain": {
+    "pdfReader": "PyMuPDF 1.27.2.2",
+    "readOnlySourceInspection": true,
+    "renderMode": "local-vector-and-raster-inspection"
+  },
+  "brainPreflight": {
+    "status": "passed",
+    "platformSpineAddendumApplied": true,
+    "spatialB1ThroughB7Priority": 1
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "dillonEmpiricalPriorAllowed": true,
+    "roofPlaneSubstitutionAllowed": false
+  },
+  "claims": {
+    "unseenProjectPlacementVerified": false,
+    "codeCompliance": false,
+    "fabrication": false,
+    "fieldRelease": false
+  },
+  "receiptSha256": "6949ffacb0e1228f635087b4e901d0484e73d920c465414d1b3221ff6350e932"
+}
