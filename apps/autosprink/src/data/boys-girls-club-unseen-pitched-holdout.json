@@ -1,0 +1,93 @@
+{
+  "artifactType": "halofire.unseen-pitched-holdout.v1",
+  "projectId": "boys-girls-club-community-center-brigham-city-ut",
+  "projectName": "Boys & Girls Club Community Center - Brigham City UT",
+  "sealedAt": "2026-07-14T23:45:00Z",
+  "corpusRoot": "Y:\\Shared\\HaloOps\\02-Active jobs\\Eckman\\Boys & Girls Club Community Center - Brigham City UT",
+  "selection": {
+    "status": "source-sealed-answers-unopened",
+    "priorImplementationSearchHits": 0,
+    "completedProjectEvidence": [
+      "separate-ahj-approved-sprinkler-plan",
+      "separate-install-plan",
+      "separate-as-built-plan"
+    ],
+    "rejectedBeforeAnswerOpen": [
+      { "project": "MVC 2-Plex", "reason": "curved barrel ceiling is outside the symmetric two-plane v4 domain" },
+      { "project": "JOMO Residence", "reason": "prior held-out answer was already exposed and its elevation failure is preserved" },
+      { "project": "Tallahassee Temple", "reason": "occupied ceilings are flat, stepped, or coffered below a flat mechanical roof" },
+      { "project": "Martinez Residence", "reason": "hipped exterior roof is separated from horizontal occupied ceilings" },
+      { "project": "Boyd Residence", "reason": "addition source does not close an occupied two-plane protection surface" }
+    ]
+  },
+  "sources": [
+    {
+      "role": "architectural_permit_set",
+      "path": "1-Bid Documents\\GC - Bid Plans\\Building\\Boys and Girls Club Community Center Permit Set.pdf",
+      "bytes": 18178437,
+      "sha256": "f220c7841dfd1ca7fc0b8eaf8f440d0b63a1541b8228c7c006e4c44a88180b20"
+    }
+  ],
+  "answerKeyDenylist": [
+    {
+      "role": "ahj_approved_plan",
+      "path": "2-Internal Ops\\01-Design\\08-AHJ Approval DWG & Permit\\Brigham City\\BGC CC - Brigham City UT_app plans.pdf",
+      "bytes": 5313661,
+      "sha256": "799fba69311eb3aa285d6b96cb346aed184b3093d73777737597d23df60a0a18",
+      "openedBeforeSourceSeal": false
+    },
+    {
+      "role": "as_built_plan",
+      "path": "2-Internal Ops\\01-Design\\11-As-Built Set\\BGC_INSTALL PLAN.pdf",
+      "bytes": 14918460,
+      "sha256": "6f20b0ad824aaae6a8a71fac46e5faf89e5904eef0ad762cf98b8d0ed186b252",
+      "openedBeforeSourceSeal": false
+    }
+  ],
+  "sourceObservations": {
+    "floorPlan": {
+      "sheet": "A101",
+      "physicalPage": 10,
+      "gymAlongRidgeLengthFt": 104,
+      "evidence": "grid 2 through grid 6 is four dimensioned 26 foot bays"
+    },
+    "reflectedCeilingPlan": {
+      "sheet": "A104",
+      "physicalPage": 11,
+      "protectedVolume": "GYMNASIUM 106 exposed PEMB roof underside",
+      "sourceObstructionKinds": ["center ceiling fan", "retractable basketball standards", "lighting and air devices"]
+    },
+    "buildingSection": {
+      "sheet": "A301",
+      "physicalPage": 15,
+      "pitchRiseInPer12": 2,
+      "eaveElevationFt": 125,
+      "ridgeElevationFt": 132.458333,
+      "finishedFloorElevationFt": 100,
+      "clearAcrossSlopeSpanFt": 89.5,
+      "evidence": "2:12 symbol plus dimensioned ridge and eave datums close the symmetric two-plane span"
+    }
+  },
+  "brainPreflight": {
+    "source": "gx10-hal-brain+obsidian-vault",
+    "status": "passed",
+    "platformSpineAddendumApplied": true,
+    "spatialB1ThroughB7Priority": 1
+  },
+  "generation": {
+    "answerKeyUsed": false,
+    "completedBidUsedForGeneration": false,
+    "v4EmpiricalPriorAllowed": true,
+    "candidateGenerationReady": true
+  },
+  "claims": {
+    "unseenProjectPlacementVerified": false,
+    "wholeBuildingHeadLayoutReady": false,
+    "pitchedRoofHeadLayoutReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "7eba5e834823f6d64a2ac395c0ccb1820810d416d7e2f9860bf61e192e644a63"
+}
