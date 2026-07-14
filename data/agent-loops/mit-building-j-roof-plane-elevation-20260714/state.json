@@ -61,6 +61,13 @@
       "screenshot": "output/playwright/mit-riverside-building-j-roof-plane-proof.png"
     }
   },
+  "postflight": {
+    "featureCommit": "0a9ccb8a",
+    "featurePush": "origin/codex/halofire-live-n1n8-full",
+    "brainEpisodeId": 146113,
+    "brainWriteback": "confirmed",
+    "vpsDeployment": "not-applicable-no-runtime-surface-changed"
+  },
   "claims": {
     "cricketFaceTopologyReady": true,
     "wholeRoofFaceTopologyReady": false,
