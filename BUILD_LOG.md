@@ -1572,6 +1572,15 @@ User direction across 4 messages this session:
   formally verified the exact invariants that the domain guard is true,
   placement remains false, 81 + 77 = 158, and blind zero is less than the
   approved total in 76 ms with return code zero.
+- Deployed feature commit `f635641adae6fd3626691df9bf5b6e66e44714e6`
+  to the VPS after saving the replaced production files under
+  `.deploy-backups/20260714T185632Z-polaris/`; all eight deployed-file hashes
+  match the local release. `halofire.service` restarted active, public health
+  and the 58,477-byte login returned 200, and a real admin sign-in, identity
+  check, protected Studio module, Polaris evidence route, and authenticated
+  Studio HTML all returned 200. A production Chromium run rendered all three
+  SVG views and 474 head marks with zero console errors, page errors, or failed
+  responses.
 - This is a truthful calibration checkpoint, not completion. The next loop is
   source-only reconstruction of whole roof faces and attic compartments,
   answer-exposed registration of the 77 uprights to those source faces, then a

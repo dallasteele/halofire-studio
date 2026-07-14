@@ -96,6 +96,30 @@
       "consoleErrors": 0,
       "screenshot": "output/playwright/polaris-heldout-studio/authenticated-studio-evidence.png"
     },
+    "liveDeployment": {
+      "status": "passed",
+      "featureCommit": "f635641adae6fd3626691df9bf5b6e66e44714e6",
+      "backup": ".deploy-backups/20260714T185632Z-polaris/",
+      "deployedFileHashMatches": 8,
+      "service": "halofire.service active",
+      "publicHealthHttp": 200,
+      "publicLoginHttp": 200,
+      "publicLoginBytes": 58477,
+      "adminLoginHttp": 200,
+      "authenticatedIdentityHttp": 200,
+      "authenticatedStudioModuleHttp": 200,
+      "authenticatedEvidenceHttp": 200,
+      "authenticatedStudioHtmlHttp": 200,
+      "liveBrowser": {
+        "navigationHttp": 200,
+        "renderedSvgCount": 3,
+        "renderedHeadMarks": 474,
+        "consoleErrors": 0,
+        "pageErrors": 0,
+        "failedResponses": 0,
+        "screenshot": "output/playwright/polaris-heldout-live/authenticated-studio-evidence.png"
+      }
+    },
     "formalProof": { "prover": "Lean", "version": "4.13.0", "status": "verified", "elapsedMs": 76, "returnCode": 0 },
     "renderedBrowserProof": [
       "output/playwright/polaris-heldout-comparison/top.png",
