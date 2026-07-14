@@ -1580,7 +1580,9 @@ User direction across 4 messages this session:
   check, protected Studio module, Polaris evidence route, and authenticated
   Studio HTML all returned 200. A production Chromium run rendered all three
   SVG views and 474 head marks with zero console errors, page errors, or failed
-  responses.
+  responses. A separate public-login Chromium run rendered the current Secure
+  Portal form and Sign in action with no deprecated text, console errors, or
+  page errors.
 - Brain postflight persisted the deployed facts and exact next loop as episode
   `145311`; an immediate deep recall returned that episode first. The brain
   record explicitly preserves the internal primary, independent, and

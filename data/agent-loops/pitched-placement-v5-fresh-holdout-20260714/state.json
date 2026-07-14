@@ -110,6 +110,16 @@
       "authenticatedStudioModuleHttp": 200,
       "authenticatedEvidenceHttp": 200,
       "authenticatedStudioHtmlHttp": 200,
+      "publicLoginBrowser": {
+        "http": 200,
+        "title": "Halo Fire - Secure Client Access",
+        "formMode": "Sign in to continue.",
+        "submitText": "Sign in",
+        "deprecatedTextCount": 0,
+        "consoleErrors": 0,
+        "pageErrors": 0,
+        "screenshot": "output/playwright/polaris-heldout-live/public-login.png"
+      },
       "liveBrowser": {
         "navigationHttp": 200,
         "renderedSvgCount": 3,
