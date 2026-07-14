@@ -14,7 +14,7 @@ describe('MIT Riverside Building J exact completed-bid head XY registration', ()
     expect(headEvidence.counts).toEqual({ pendent: 15, upright: 53, total: 68 });
   });
 
-  it('registers every head inside the immutable 76 ft 4 in by 100 ft 2 in structural grid', async () => {
+  it('registers every head inside the 76 ft 4 in by 100 ft 2 in answer/RCP-local envelope', async () => {
     const packet = await buildMitRiversideBuildingJHeadCoordinateRegistration(answerCalibration, headEvidence);
     expect(await validateMitRiversideBuildingJHeadCoordinateRegistration(packet, dependencies)).toMatchObject({ status: 'passed', exactAnswerHeadCoordinatesReady: true, headElevationsReady: false, sourceGeneratedPitchedPlacementVerified: false, complianceReady: false });
     expect(packet.heads).toHaveLength(68);

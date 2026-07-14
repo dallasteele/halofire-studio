@@ -1,0 +1,107 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-cross-drawing-grid-audit.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "auditAfterCommit": "7123f09b",
+  "evidenceReceiptSha256": "6ecbe1a45546c75309f20fd12224f2022d95ff5b1b8f465d70235ebd847779c6",
+  "conflict": {
+    "localizedConflictAxis": "y",
+    "localizedConflictLabel": "J.2",
+    "localizedConflictInches": 12,
+    "structuralJ3ToJ2Ft": 25.333334,
+    "answerRcpJ3ToJ2Ft": 24.333334,
+    "structuralJ2ToJ1Ft": 10,
+    "answerRcpJ2ToJ1Ft": 11,
+    "oldClaimedGlobalYResidualPx": 0.655077,
+    "actualStructuralGlobalYResidualPx": 23.487062,
+    "piecewiseLabelCorrectionRequired": true,
+    "priorGlobalStructuralAlignmentSuperseded": true
+  },
+  "correctionContract": {
+    "mode": "piecewise-grid-label-transform-from-answer-rcp-to-structural-roof-dwg",
+    "labels": {
+      "x": [
+        "J.A",
+        "J.B",
+        "J.C",
+        "J.D",
+        "J.E",
+        "J.F",
+        "J.G",
+        "J.H"
+      ],
+      "y": [
+        "J.5",
+        "J.4",
+        "J.3",
+        "J.2",
+        "J.1"
+      ]
+    },
+    "answerRcpLocalFeet": {
+      "x": [
+        0,
+        15.666667,
+        17.333333,
+        30.666667,
+        39.666667,
+        45.666667,
+        61.333333,
+        76.333333
+      ],
+      "y": [
+        0,
+        32.166667,
+        64.833333,
+        89.166667,
+        100.166667
+      ]
+    },
+    "structuralDwgLocalFeet": {
+      "x": [
+        0,
+        15.663824,
+        17.33348,
+        30.663824,
+        39.666667,
+        45.663824,
+        61.333333,
+        76.333333
+      ],
+      "y": [
+        0,
+        32.166667,
+        64.833333,
+        90.166667,
+        100.166667
+      ]
+    },
+    "correctionBuilt": false
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "exact structural DWG S-GRID line-coordinate extraction"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "answer/RCP grid interval replay against structural J.5 through J.1 intervals"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "source, coordinate, label, residual, correction, plane, Z, compliance, and release mutations"
+    }
+  },
+  "answerRcpXyStillReady": true,
+  "currentHeadStructuralRoofXyReady": false,
+  "structuralCorrectionReady": false,
+  "headPlaneAssignmentReady": false,
+  "headElevationReady": false,
+  "sourceGeneratedPitchedPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "apply and verify the piecewise J.5-J.1 label transform to all 68 source-RCP points before assigning any structural roof face or elevation",
+  "claimStatus": "answer-and-source-rcp-xy-preserved-structural-roof-xy-superseded-by-localized-j2-conflict-pending-piecewise-correction",
+  "receiptSha256": "16cd7e436b10293bdb9351dfb6cfd26104d585d9a0ffe064dc9aba63431900ea"
+}

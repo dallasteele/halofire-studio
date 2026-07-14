@@ -1,0 +1,122 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-cross-drawing-grid-audit-evidence.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "auditAfterCommit": "7123f09b",
+  "architecturalRcpSourceSha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c",
+  "structuralRoofDwg": {
+    "path": "Engineering/CAD Files/19PHX009 - OWP - Riverside MIT Phase 2-Sheet - S2-1 - ROOF FRAMING PLANS.dwg",
+    "bytes": 701676,
+    "sha256": "94ee255614f7b403de5185622018eaaad8f80ebe253592418bc7e3b6d993c9aa",
+    "reader": "@mlightcad/libredwg-web 0.7.7",
+    "unknownEntityCount": 0
+  },
+  "labels": {
+    "x": [
+      "J.A",
+      "J.B",
+      "J.C",
+      "J.D",
+      "J.E",
+      "J.F",
+      "J.G",
+      "J.H"
+    ],
+    "y": [
+      "J.5",
+      "J.4",
+      "J.3",
+      "J.2",
+      "J.1"
+    ]
+  },
+  "answerRcpLocalFeet": {
+    "x": [
+      0,
+      15.666667,
+      17.333333,
+      30.666667,
+      39.666667,
+      45.666667,
+      61.333333,
+      76.333333
+    ],
+    "y": [
+      0,
+      32.166667,
+      64.833333,
+      89.166667,
+      100.166667
+    ]
+  },
+  "structuralDwgGridLinesInches": {
+    "x": [
+      5436.932431,
+      5624.898316,
+      5644.934185,
+      5804.898316,
+      5912.932431,
+      5984.898316,
+      6172.932431,
+      6352.932431
+    ],
+    "y": [
+      11469.528544,
+      11083.528544,
+      10691.528544,
+      10387.528543,
+      10267.528543
+    ]
+  },
+  "structuralDwgLocalFeet": {
+    "x": [
+      0,
+      15.663824,
+      17.33348,
+      30.663824,
+      39.666667,
+      45.663824,
+      61.333333,
+      76.333333
+    ],
+    "y": [
+      0,
+      32.166667,
+      64.833333,
+      90.166667,
+      100.166667
+    ]
+  },
+  "answerGridPixels": {
+    "y": [
+      576,
+      1733,
+      2910,
+      3785,
+      4181
+    ]
+  },
+  "audit": {
+    "localizedConflictAxis": "y",
+    "localizedConflictLabel": "J.2",
+    "localizedConflictInches": 12,
+    "structuralJ3ToJ2Ft": 25.333334,
+    "answerRcpJ3ToJ2Ft": 24.333334,
+    "structuralJ2ToJ1Ft": 10,
+    "answerRcpJ2ToJ1Ft": 11,
+    "oldClaimedGlobalYResidualPx": 0.655077,
+    "actualStructuralGlobalYResidualPx": 23.487062,
+    "piecewiseLabelCorrectionRequired": true,
+    "priorGlobalStructuralAlignmentSuperseded": true
+  },
+  "claims": {
+    "answerRcpXyStillReady": true,
+    "currentHeadStructuralRoofXyReady": false,
+    "headPlaneAssignmentReady": false,
+    "headElevationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "6ecbe1a45546c75309f20fd12224f2022d95ff5b1b8f465d70235ebd847779c6"
+}

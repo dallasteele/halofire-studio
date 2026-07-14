@@ -1,0 +1,25 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "gatewayHealth": {
+    "status": "ok",
+    "gatewayVersion": "0.1.0",
+    "leanStatus": "ok"
+  },
+  "theoremName": "mitCrossDrawingJ2ConflictFailClosed",
+  "claim": "The structural J.3-to-J.2 interval is 304 inches while the answer/RCP interval is 292 inches, and the adjacent J.2-to-J.1 intervals differ by the same 12 inches in the opposite direction; the grids therefore cannot be globally aligned.",
+  "theorem": "def sameGridInterval (structuralIn answerIn : Nat) : Bool := structuralIn == answerIn\n\ntheorem mitCrossDrawingJ2ConflictFailClosed :\n  And ((304 : Nat) - 292 = 12)\n    (And ((132 : Nat) - 120 = 12)\n      (sameGridInterval 304 292 = false)) :=",
+  "proof": "by\n  decide",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 66,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  },
+  "gridAuditReceiptSha256": "16cd7e436b10293bdb9351dfb6cfd26104d585d9a0ffe064dc9aba63431900ea",
+  "currentHeadStructuralRoofXyReady": false,
+  "headPlaneAssignmentReady": false,
+  "headElevationReady": false,
+  "complianceReady": false
+}

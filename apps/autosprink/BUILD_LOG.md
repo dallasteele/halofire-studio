@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-07-14 - MIT Riverside Building J cross-drawing grid conflict audit
+
+- Parsed the exact `S-GRID` line coordinates from the separately hashed structural roof-framing DWG with `@mlightcad/libredwg-web 0.7.7` and zero unknown entities before promoting any RCP point onto a roof plane.
+- Found a localized source conflict the earlier global fit concealed: structural J.3-to-J.2 is 25 ft 4 in and J.2-to-J.1 is 10 ft, while the approved/answer and architectural RCP grid is 24 ft 4 in and 11 ft. J.2 therefore differs by exactly 12 inches even though J.5, J.4, J.3, and J.1 close.
+- Superseded the historical 0.655-pixel global structural-alignment claim. Fitting the actual structural coordinates to the approved grid yields a 23.487-pixel maximum residual, so the 68 RCP XY points remain valid only in answer/RCP-local space until a piecewise grid-label correction is built and verified.
+- Added a deterministic audit receipt, explicit correction contract, visual discrepancy proof, 16 adversarial conflict-erasure/false-promotion attacks, and Lean theorem `mitCrossDrawingJ2ConflictFailClosed` (Lean 4.13.0, 66 ms, return code 0). Structural roof XY, plane assignment, Z, compliance, fabrication, and field release remain fail-closed.
+- Next: apply the source-label piecewise correction to all 68 RCP points, then verify exact floor-slab and roof-face polygons from the source DWGs before assigning any head elevation.
+
 ## 2026-07-14 - MIT Riverside Building J source RCP registration
 
 - Registered the 68 exact approved/as-built Building J sprinkler-head XY coordinates onto physical page 105 of the protected 150-page architectural bid set using the source RCP grid labels rather than a raster trace or answer-derived rewrite.

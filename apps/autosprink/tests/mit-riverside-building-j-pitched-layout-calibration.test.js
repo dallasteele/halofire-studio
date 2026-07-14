@@ -15,7 +15,7 @@ describe('MIT Riverside Building J completed-bid pitched layout calibration', ()
     expect(answerEvidence.approvedAsBuiltComparison).toMatchObject({ differentPixelsOutsideStampMask: 0, maxChannelDifferenceOutsideStampMask: 0, buildingJLayoutIdenticalOutsideStamp: true });
   });
 
-  it('registers the answer grid to structural source within one pixel while preserving the four-inch source conflict', async () => {
+  it('replays the historical answer-grid fit while the superseding cross-drawing audit governs structural use', async () => {
     const packet = await buildMitRiversideBuildingJPitchedLayoutCalibration(sourceCandidate, sourceSeal, answerEvidence);
     expect(await validateMitRiversideBuildingJPitchedLayoutCalibration(packet, dependencies)).toMatchObject({ status: 'passed', answerRegistrationReady: true, exactHeadCoordinatesReady: false, sourceGeneratedPitchedPlacementVerified: false, complianceReady: false });
     expect(packet.registeredGrid).toMatchObject({ governingSource: 'structural-roof-framing-dwg', xAxisCount: 8, yAxisCount: 5, xMaxResidualPx: 0.798381, yMaxResidualPx: 0.655077 });
@@ -35,7 +35,7 @@ describe('MIT Riverside Building J completed-bid pitched layout calibration', ()
     const packet = await buildMitRiversideBuildingJPitchedLayoutCalibration(sourceCandidate, sourceSeal, answerEvidence);
     const views = renderMitRiversideBuildingJCalibrationViews(packet);
     expect(views.topSvg).toContain('53 upright + 15 pendent = 68');
-    expect(views.topSvg).toContain('not extracted head coordinates');
+    expect(views.topSvg).toContain('J.2 differs by 12 in');
     expect(views.elevationSvg).toContain("17'-1, 19'-11, 23'-4");
     expect(views.model3dSvg).toContain('No 3D heads shown');
     expect(views.complianceReady).toBe(false);
