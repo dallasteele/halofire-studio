@@ -1,0 +1,5689 @@
+{
+  "artifactType": "halofire.polaris-source-roof-attic-topology.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "projectName": "Polaris Academy - Mesa AZ",
+  "generationMode": "sealed-architectural-and-structural-source-only-before-roof-answer-registration",
+  "blindCandidateReceiptSha256": "e7f0f2850eae1f1fdcfc95007e19057d4e1d2af6ac6c4ad2e5ddd766d74874c5",
+  "sourceBindings": {
+    "sourcePdf": {
+      "role": "architectural_bid_set",
+      "sha256": "ae19ff5c7cc3904f6d3e5b83a04e5e244f833099a3f445a0e9b1aaf7c5b98e51",
+      "bytes": 34531967
+    },
+    "renderedPages": [
+      {
+        "physicalPage": 9,
+        "sheet": "A4",
+        "role": "building-sections",
+        "sha256": "c8a96664ab08847442b8c1fdf69b5071da8aa7ef8fe08276ca50bafc18a62c9a",
+        "bytes": 4526701
+      },
+      {
+        "physicalPage": 10,
+        "sheet": "A5",
+        "role": "building-sections-and-attic-vent-plan",
+        "sha256": "b3c40b235283702b0db4592090fc3b89fca5a0283cd72aa4ea6fe635d61c8ab4",
+        "bytes": 4835361
+      },
+      {
+        "physicalPage": 15,
+        "sheet": "S4",
+        "role": "roof-framing-plan",
+        "sha256": "7911b0a7b596b16eb65c71a97cfb5883f3f5a8deb21c62fb30a48066bfc5a008",
+        "bytes": 5380543
+      }
+    ],
+    "render": {
+      "dpi": 160,
+      "widthPx": 2887,
+      "heightPx": 1934,
+      "pageRotationDeg": 0
+    },
+    "planRegistration": {
+      "equation": {
+        "xFt": "(xPx - 360) / 10",
+        "yFt": "(1000 - yPx) / 10"
+      },
+      "originPx": [
+        360,
+        1000
+      ],
+      "pixelsPerFoot": 10,
+      "method": "manual structural-line anchors independently matched to the exact architectural RCP-DWG outline",
+      "anchors": [
+        {
+          "id": "northwest",
+          "pointFt": [
+            0,
+            68.75
+          ],
+          "observedPx": [
+            360,
+            313
+          ]
+        },
+        {
+          "id": "northwest-run",
+          "pointFt": [
+            42.5,
+            68.75
+          ],
+          "observedPx": [
+            785,
+            313
+          ]
+        },
+        {
+          "id": "northeast",
+          "pointFt": [
+            178.041667,
+            68.75
+          ],
+          "observedPx": [
+            2140,
+            313
+          ]
+        },
+        {
+          "id": "east-step",
+          "pointFt": [
+            178.041667,
+            40
+          ],
+          "observedPx": [
+            2140,
+            600
+          ]
+        },
+        {
+          "id": "southeast-extension",
+          "pointFt": [
+            176.958333,
+            0
+          ],
+          "observedPx": [
+            2130,
+            1000
+          ]
+        },
+        {
+          "id": "south-extension-west",
+          "pointFt": [
+            134.958333,
+            0
+          ],
+          "observedPx": [
+            1710,
+            1000
+          ]
+        },
+        {
+          "id": "west-entry-apex",
+          "pointFt": [
+            42.357531,
+            22.982531
+          ],
+          "observedPx": [
+            784,
+            770
+          ]
+        },
+        {
+          "id": "east-entry-apex",
+          "pointFt": [
+            112.225803,
+            22.982531
+          ],
+          "observedPx": [
+            1482,
+            770
+          ]
+        },
+        {
+          "id": "southwest-run",
+          "pointFt": [
+            38.291667,
+            5.333333
+          ],
+          "observedPx": [
+            743,
+            947
+          ]
+        },
+        {
+          "id": "west-step",
+          "pointFt": [
+            0,
+            39.833333
+          ],
+          "observedPx": [
+            360,
+            602
+          ]
+        }
+      ]
+    },
+    "pitch": {
+      "riseIn": 4,
+      "runIn": 12,
+      "refs": [
+        "A4 physical page 9",
+        "A5 physical page 10",
+        "S4 physical page 15"
+      ]
+    },
+    "elevationDatums": {
+      "floorElevationFt": 0,
+      "lowerRoofBearingElevationFt": 10,
+      "upperEntryRoofBearingElevationFt": 17,
+      "refs": [
+        "A4 physical page 9 building sections",
+        "A5 physical page 10 17-foot entry section"
+      ]
+    },
+    "roofMasses": [
+      {
+        "id": "west-north",
+        "kind": "lower-hip",
+        "boundsFt": [
+          0,
+          39,
+          48,
+          69.3
+        ],
+        "tracePx": [
+          360,
+          307,
+          840,
+          610
+        ],
+        "eaveElevationFt": 10
+      },
+      {
+        "id": "west-south",
+        "kind": "lower-hip",
+        "boundsFt": [
+          0,
+          5,
+          48,
+          39
+        ],
+        "tracePx": [
+          360,
+          610,
+          840,
+          950
+        ],
+        "eaveElevationFt": 10
+      },
+      {
+        "id": "main-long",
+        "kind": "lower-hip",
+        "boundsFt": [
+          48,
+          5,
+          130,
+          69.3
+        ],
+        "tracePx": [
+          840,
+          307,
+          1660,
+          950
+        ],
+        "eaveElevationFt": 10
+      },
+      {
+        "id": "east-north",
+        "kind": "lower-hip",
+        "boundsFt": [
+          128,
+          39,
+          178,
+          69.3
+        ],
+        "tracePx": [
+          1640,
+          307,
+          2140,
+          610
+        ],
+        "eaveElevationFt": 10
+      },
+      {
+        "id": "east-south",
+        "kind": "lower-hip",
+        "boundsFt": [
+          112,
+          0,
+          178,
+          39
+        ],
+        "tracePx": [
+          1480,
+          610,
+          2140,
+          1000
+        ],
+        "eaveElevationFt": 10
+      },
+      {
+        "id": "west-entry-upper",
+        "kind": "upper-hip",
+        "boundsFt": [
+          38.291667,
+          13.131728,
+          46.375,
+          22.982531
+        ],
+        "tracePx": [
+          743,
+          770,
+          824,
+          869
+        ],
+        "eaveElevationFt": 17
+      },
+      {
+        "id": "east-entry-upper",
+        "kind": "upper-hip",
+        "boundsFt": [
+          108.208333,
+          13.131728,
+          116.291667,
+          22.982531
+        ],
+        "tracePx": [
+          1442,
+          770,
+          1523,
+          869
+        ],
+        "eaveElevationFt": 17
+      }
+    ],
+    "draftStops": [
+      {
+        "id": "draft-stop-west",
+        "xFt": 52,
+        "xPx": 880,
+        "sourceLabel": "DRAFT STOP SEE NOTE 1"
+      },
+      {
+        "id": "draft-stop-east",
+        "xFt": 106.6,
+        "xPx": 1426,
+        "sourceLabel": "DRAFT STOP SEE NOTE 1"
+      }
+    ]
+  },
+  "planRegistration": {
+    "equation": {
+      "xFt": "(xPx - 360) / 10",
+      "yFt": "(1000 - yPx) / 10"
+    },
+    "originPx": [
+      360,
+      1000
+    ],
+    "pixelsPerFoot": 10,
+    "method": "manual structural-line anchors independently matched to the exact architectural RCP-DWG outline",
+    "anchors": [
+      {
+        "id": "northwest",
+        "pointFt": [
+          0,
+          68.75
+        ],
+        "observedPx": [
+          360,
+          313
+        ],
+        "predictedPx": [
+          360,
+          312.5
+        ],
+        "residualPx": 0.5
+      },
+      {
+        "id": "northwest-run",
+        "pointFt": [
+          42.5,
+          68.75
+        ],
+        "observedPx": [
+          785,
+          313
+        ],
+        "predictedPx": [
+          785,
+          312.5
+        ],
+        "residualPx": 0.5
+      },
+      {
+        "id": "northeast",
+        "pointFt": [
+          178.041667,
+          68.75
+        ],
+        "observedPx": [
+          2140,
+          313
+        ],
+        "predictedPx": [
+          2140.417,
+          312.5
+        ],
+        "residualPx": 0.651
+      },
+      {
+        "id": "east-step",
+        "pointFt": [
+          178.041667,
+          40
+        ],
+        "observedPx": [
+          2140,
+          600
+        ],
+        "predictedPx": [
+          2140.417,
+          600
+        ],
+        "residualPx": 0.417
+      },
+      {
+        "id": "southeast-extension",
+        "pointFt": [
+          176.958333,
+          0
+        ],
+        "observedPx": [
+          2130,
+          1000
+        ],
+        "predictedPx": [
+          2129.583,
+          1000
+        ],
+        "residualPx": 0.417
+      },
+      {
+        "id": "south-extension-west",
+        "pointFt": [
+          134.958333,
+          0
+        ],
+        "observedPx": [
+          1710,
+          1000
+        ],
+        "predictedPx": [
+          1709.583,
+          1000
+        ],
+        "residualPx": 0.417
+      },
+      {
+        "id": "west-entry-apex",
+        "pointFt": [
+          42.357531,
+          22.982531
+        ],
+        "observedPx": [
+          784,
+          770
+        ],
+        "predictedPx": [
+          783.575,
+          770.175
+        ],
+        "residualPx": 0.459
+      },
+      {
+        "id": "east-entry-apex",
+        "pointFt": [
+          112.225803,
+          22.982531
+        ],
+        "observedPx": [
+          1482,
+          770
+        ],
+        "predictedPx": [
+          1482.258,
+          770.175
+        ],
+        "residualPx": 0.312
+      },
+      {
+        "id": "southwest-run",
+        "pointFt": [
+          38.291667,
+          5.333333
+        ],
+        "observedPx": [
+          743,
+          947
+        ],
+        "predictedPx": [
+          742.917,
+          946.667
+        ],
+        "residualPx": 0.344
+      },
+      {
+        "id": "west-step",
+        "pointFt": [
+          0,
+          39.833333
+        ],
+        "observedPx": [
+          360,
+          602
+        ],
+        "predictedPx": [
+          360,
+          601.667
+        ],
+        "residualPx": 0.333
+      }
+    ],
+    "maxResidualPx": 0.651,
+    "maxResidualFt": 0.0651
+  },
+  "buildingExtrusion": {
+    "levelCount": 1,
+    "floorElevationFt": 0,
+    "exactFootprintPolygonFt": [
+      [
+        1.083333,
+        5.333333
+      ],
+      [
+        38.291667,
+        5.333333
+      ],
+      [
+        38.291667,
+        8.583333
+      ],
+      [
+        38.958333,
+        8.583333
+      ],
+      [
+        38.958333,
+        11.25
+      ],
+      [
+        38.291667,
+        11.25
+      ],
+      [
+        38.291667,
+        18.916667
+      ],
+      [
+        42.357531,
+        22.982531
+      ],
+      [
+        46.375,
+        18.965061
+      ],
+      [
+        46.375,
+        13.131728
+      ],
+      [
+        60.125,
+        13.131728
+      ],
+      [
+        60.125,
+        8.048395
+      ],
+      [
+        64.458333,
+        8.048395
+      ],
+      [
+        64.458333,
+        8.923395
+      ],
+      [
+        64.458333,
+        9.131728
+      ],
+      [
+        90.125,
+        9.131728
+      ],
+      [
+        90.125,
+        8.048395
+      ],
+      [
+        94.458333,
+        8.048395
+      ],
+      [
+        94.458333,
+        13.131728
+      ],
+      [
+        108.208333,
+        13.131728
+      ],
+      [
+        108.208333,
+        18.965061
+      ],
+      [
+        112.225803,
+        22.982531
+      ],
+      [
+        116.291667,
+        18.916667
+      ],
+      [
+        116.291667,
+        11.25
+      ],
+      [
+        115.625,
+        11.25
+      ],
+      [
+        115.625,
+        8.583333
+      ],
+      [
+        116.291667,
+        8.583333
+      ],
+      [
+        116.291667,
+        5.333333
+      ],
+      [
+        134.958333,
+        5.333333
+      ],
+      [
+        134.958333,
+        0
+      ],
+      [
+        176.958333,
+        0
+      ],
+      [
+        176.958333,
+        40
+      ],
+      [
+        178.041667,
+        40
+      ],
+      [
+        178.041667,
+        44.25
+      ],
+      [
+        176.958333,
+        44.25
+      ],
+      [
+        176.958333,
+        64.5
+      ],
+      [
+        178.041667,
+        64.5
+      ],
+      [
+        178.041667,
+        68.75
+      ],
+      [
+        173.791667,
+        68.75
+      ],
+      [
+        173.791667,
+        67.666667
+      ],
+      [
+        139.875,
+        67.666667
+      ],
+      [
+        139.875,
+        68.75
+      ],
+      [
+        135.625,
+        68.75
+      ],
+      [
+        135.625,
+        67.666667
+      ],
+      [
+        126.041667,
+        67.666667
+      ],
+      [
+        126.041667,
+        68.75
+      ],
+      [
+        121.791667,
+        68.75
+      ],
+      [
+        121.791667,
+        67.666667
+      ],
+      [
+        102.708333,
+        67.666667
+      ],
+      [
+        102.708333,
+        68.75
+      ],
+      [
+        98.458333,
+        68.75
+      ],
+      [
+        98.458333,
+        67.666667
+      ],
+      [
+        79.375,
+        67.666667
+      ],
+      [
+        79.375,
+        68.75
+      ],
+      [
+        75.125,
+        68.75
+      ],
+      [
+        75.125,
+        67.666667
+      ],
+      [
+        56.041667,
+        67.666667
+      ],
+      [
+        56.041667,
+        68.75
+      ],
+      [
+        51.791667,
+        68.75
+      ],
+      [
+        51.791667,
+        67.666667
+      ],
+      [
+        42.5,
+        67.666667
+      ],
+      [
+        42.5,
+        68.75
+      ],
+      [
+        38.25,
+        68.75
+      ],
+      [
+        38.25,
+        67.666667
+      ],
+      [
+        4.25,
+        67.666667
+      ],
+      [
+        4.25,
+        68.75
+      ],
+      [
+        0,
+        68.75
+      ],
+      [
+        0,
+        64.5
+      ],
+      [
+        1.083333,
+        64.5
+      ],
+      [
+        1.083333,
+        44.083333
+      ],
+      [
+        0,
+        44.083333
+      ],
+      [
+        0,
+        39.833333
+      ],
+      [
+        1.083333,
+        39.833333
+      ]
+    ],
+    "footprintAreaSqFt": 10655.197497,
+    "occupiedCeilingReferences": [
+      {
+        "id": "default-flat-ceiling",
+        "elevationFt": 9,
+        "kind": "horizontal"
+      },
+      {
+        "id": "stem-room-high-ceiling",
+        "elevationFt": 12,
+        "kind": "horizontal"
+      }
+    ],
+    "lowerRoofBearingElevationFt": 10,
+    "upperEntryRoofBearingElevationFt": 17,
+    "sideViewsUsed": [
+      "A4 physical page 9 building sections",
+      "A5 physical page 10 building sections"
+    ]
+  },
+  "roofModel": {
+    "pitch": {
+      "riseIn": 4,
+      "runIn": 12,
+      "refs": [
+        "A4 physical page 9",
+        "A5 physical page 10",
+        "S4 physical page 15"
+      ]
+    },
+    "massCount": 7,
+    "faceCount": 28,
+    "masses": [
+      {
+        "id": "west-north",
+        "kind": "lower-hip",
+        "boundsFt": [
+          0,
+          39,
+          48,
+          69.3
+        ],
+        "tracePx": [
+          360,
+          307,
+          840,
+          610
+        ],
+        "eaveElevationFt": 10,
+        "ridgeElevationFt": 15.05,
+        "faces": [
+          {
+            "id": "west-north-west",
+            "massId": "west-north",
+            "massKind": "lower-hip",
+            "side": "west",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                0,
+                39
+              ],
+              [
+                0,
+                39
+              ],
+              [
+                15.15,
+                54.15
+              ],
+              [
+                0,
+                69.3
+              ],
+              [
+                0,
+                69.3
+              ]
+            ],
+            "verticesFt": [
+              [
+                0,
+                39,
+                10
+              ],
+              [
+                0,
+                39,
+                10
+              ],
+              [
+                15.15,
+                54.15,
+                15.05
+              ],
+              [
+                0,
+                69.3,
+                10
+              ],
+              [
+                0,
+                69.3,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0.333333,
+                "y": 0,
+                "constant": 10
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-north west face"
+          },
+          {
+            "id": "west-north-east",
+            "massId": "west-north",
+            "massKind": "lower-hip",
+            "side": "east",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                48,
+                39
+              ],
+              [
+                48,
+                39
+              ],
+              [
+                48,
+                69.3
+              ],
+              [
+                48,
+                69.3
+              ],
+              [
+                32.85,
+                54.15
+              ]
+            ],
+            "verticesFt": [
+              [
+                48,
+                39,
+                10
+              ],
+              [
+                48,
+                39,
+                10
+              ],
+              [
+                48,
+                69.3,
+                10
+              ],
+              [
+                48,
+                69.3,
+                10
+              ],
+              [
+                32.85,
+                54.15,
+                15.05
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": -0.333333,
+                "y": 0,
+                "constant": 26
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-north east face"
+          },
+          {
+            "id": "west-north-south",
+            "massId": "west-north",
+            "massKind": "lower-hip",
+            "side": "south",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                0,
+                39
+              ],
+              [
+                48,
+                39
+              ],
+              [
+                48,
+                39
+              ],
+              [
+                32.85,
+                54.15
+              ],
+              [
+                15.15,
+                54.15
+              ],
+              [
+                0,
+                39
+              ]
+            ],
+            "verticesFt": [
+              [
+                0,
+                39,
+                10
+              ],
+              [
+                48,
+                39,
+                10
+              ],
+              [
+                48,
+                39,
+                10
+              ],
+              [
+                32.85,
+                54.15,
+                15.05
+              ],
+              [
+                15.15,
+                54.15,
+                15.05
+              ],
+              [
+                0,
+                39,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": 0.333333,
+                "constant": -3
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-north south face"
+          },
+          {
+            "id": "west-north-north",
+            "massId": "west-north",
+            "massKind": "lower-hip",
+            "side": "north",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                48,
+                69.3
+              ],
+              [
+                48,
+                69.3
+              ],
+              [
+                0,
+                69.3
+              ],
+              [
+                0,
+                69.3
+              ],
+              [
+                15.15,
+                54.15
+              ],
+              [
+                32.85,
+                54.15
+              ]
+            ],
+            "verticesFt": [
+              [
+                48,
+                69.3,
+                10
+              ],
+              [
+                48,
+                69.3,
+                10
+              ],
+              [
+                0,
+                69.3,
+                10
+              ],
+              [
+                0,
+                69.3,
+                10
+              ],
+              [
+                15.15,
+                54.15,
+                15.05
+              ],
+              [
+                32.85,
+                54.15,
+                15.05
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": -0.333333,
+                "constant": 33.1
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-north north face"
+          }
+        ]
+      },
+      {
+        "id": "west-south",
+        "kind": "lower-hip",
+        "boundsFt": [
+          0,
+          5,
+          48,
+          39
+        ],
+        "tracePx": [
+          360,
+          610,
+          840,
+          950
+        ],
+        "eaveElevationFt": 10,
+        "ridgeElevationFt": 15.666667,
+        "faces": [
+          {
+            "id": "west-south-west",
+            "massId": "west-south",
+            "massKind": "lower-hip",
+            "side": "west",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                0,
+                5
+              ],
+              [
+                0,
+                5
+              ],
+              [
+                17,
+                22
+              ],
+              [
+                0,
+                39
+              ],
+              [
+                0,
+                39
+              ]
+            ],
+            "verticesFt": [
+              [
+                0,
+                5,
+                10
+              ],
+              [
+                0,
+                5,
+                10
+              ],
+              [
+                17,
+                22,
+                15.666667
+              ],
+              [
+                0,
+                39,
+                10
+              ],
+              [
+                0,
+                39,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0.333333,
+                "y": 0,
+                "constant": 10
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-south west face"
+          },
+          {
+            "id": "west-south-east",
+            "massId": "west-south",
+            "massKind": "lower-hip",
+            "side": "east",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                48,
+                5
+              ],
+              [
+                48,
+                5
+              ],
+              [
+                48,
+                39
+              ],
+              [
+                48,
+                39
+              ],
+              [
+                31,
+                22
+              ]
+            ],
+            "verticesFt": [
+              [
+                48,
+                5,
+                10
+              ],
+              [
+                48,
+                5,
+                10
+              ],
+              [
+                48,
+                39,
+                10
+              ],
+              [
+                48,
+                39,
+                10
+              ],
+              [
+                31,
+                22,
+                15.666667
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": -0.333333,
+                "y": 0,
+                "constant": 26
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-south east face"
+          },
+          {
+            "id": "west-south-south",
+            "massId": "west-south",
+            "massKind": "lower-hip",
+            "side": "south",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                0,
+                5
+              ],
+              [
+                48,
+                5
+              ],
+              [
+                48,
+                5
+              ],
+              [
+                31,
+                22
+              ],
+              [
+                17,
+                22
+              ],
+              [
+                0,
+                5
+              ]
+            ],
+            "verticesFt": [
+              [
+                0,
+                5,
+                10
+              ],
+              [
+                48,
+                5,
+                10
+              ],
+              [
+                48,
+                5,
+                10
+              ],
+              [
+                31,
+                22,
+                15.666667
+              ],
+              [
+                17,
+                22,
+                15.666667
+              ],
+              [
+                0,
+                5,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": 0.333333,
+                "constant": 8.333333
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-south south face"
+          },
+          {
+            "id": "west-south-north",
+            "massId": "west-south",
+            "massKind": "lower-hip",
+            "side": "north",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                48,
+                39
+              ],
+              [
+                48,
+                39
+              ],
+              [
+                0,
+                39
+              ],
+              [
+                0,
+                39
+              ],
+              [
+                17,
+                22
+              ],
+              [
+                31,
+                22
+              ]
+            ],
+            "verticesFt": [
+              [
+                48,
+                39,
+                10
+              ],
+              [
+                48,
+                39,
+                10
+              ],
+              [
+                0,
+                39,
+                10
+              ],
+              [
+                0,
+                39,
+                10
+              ],
+              [
+                17,
+                22,
+                15.666667
+              ],
+              [
+                31,
+                22,
+                15.666667
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": -0.333333,
+                "constant": 23
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-south north face"
+          }
+        ]
+      },
+      {
+        "id": "main-long",
+        "kind": "lower-hip",
+        "boundsFt": [
+          48,
+          5,
+          130,
+          69.3
+        ],
+        "tracePx": [
+          840,
+          307,
+          1660,
+          950
+        ],
+        "eaveElevationFt": 10,
+        "ridgeElevationFt": 20.716667,
+        "faces": [
+          {
+            "id": "main-long-west",
+            "massId": "main-long",
+            "massKind": "lower-hip",
+            "side": "west",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                48,
+                5
+              ],
+              [
+                48,
+                5
+              ],
+              [
+                80.15,
+                37.15
+              ],
+              [
+                48,
+                69.3
+              ],
+              [
+                48,
+                69.3
+              ]
+            ],
+            "verticesFt": [
+              [
+                48,
+                5,
+                10
+              ],
+              [
+                48,
+                5,
+                10
+              ],
+              [
+                80.15,
+                37.15,
+                20.716667
+              ],
+              [
+                48,
+                69.3,
+                10
+              ],
+              [
+                48,
+                69.3,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0.333333,
+                "y": 0,
+                "constant": -6
+              }
+            },
+            "sourceRef": "S4 physical page 15 main-long west face"
+          },
+          {
+            "id": "main-long-east",
+            "massId": "main-long",
+            "massKind": "lower-hip",
+            "side": "east",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                130,
+                5
+              ],
+              [
+                130,
+                5
+              ],
+              [
+                130,
+                69.3
+              ],
+              [
+                130,
+                69.3
+              ],
+              [
+                97.85,
+                37.15
+              ]
+            ],
+            "verticesFt": [
+              [
+                130,
+                5,
+                10
+              ],
+              [
+                130,
+                5,
+                10
+              ],
+              [
+                130,
+                69.3,
+                10
+              ],
+              [
+                130,
+                69.3,
+                10
+              ],
+              [
+                97.85,
+                37.15,
+                20.716667
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": -0.333333,
+                "y": 0,
+                "constant": 53.333333
+              }
+            },
+            "sourceRef": "S4 physical page 15 main-long east face"
+          },
+          {
+            "id": "main-long-south",
+            "massId": "main-long",
+            "massKind": "lower-hip",
+            "side": "south",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                48,
+                5
+              ],
+              [
+                130,
+                5
+              ],
+              [
+                130,
+                5
+              ],
+              [
+                97.85,
+                37.15
+              ],
+              [
+                80.15,
+                37.15
+              ],
+              [
+                48,
+                5
+              ]
+            ],
+            "verticesFt": [
+              [
+                48,
+                5,
+                10
+              ],
+              [
+                130,
+                5,
+                10
+              ],
+              [
+                130,
+                5,
+                10
+              ],
+              [
+                97.85,
+                37.15,
+                20.716667
+              ],
+              [
+                80.15,
+                37.15,
+                20.716667
+              ],
+              [
+                48,
+                5,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": 0.333333,
+                "constant": 8.333333
+              }
+            },
+            "sourceRef": "S4 physical page 15 main-long south face"
+          },
+          {
+            "id": "main-long-north",
+            "massId": "main-long",
+            "massKind": "lower-hip",
+            "side": "north",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                130,
+                69.3
+              ],
+              [
+                130,
+                69.3
+              ],
+              [
+                48,
+                69.3
+              ],
+              [
+                48,
+                69.3
+              ],
+              [
+                80.15,
+                37.15
+              ],
+              [
+                97.85,
+                37.15
+              ]
+            ],
+            "verticesFt": [
+              [
+                130,
+                69.3,
+                10
+              ],
+              [
+                130,
+                69.3,
+                10
+              ],
+              [
+                48,
+                69.3,
+                10
+              ],
+              [
+                48,
+                69.3,
+                10
+              ],
+              [
+                80.15,
+                37.15,
+                20.716667
+              ],
+              [
+                97.85,
+                37.15,
+                20.716667
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": -0.333333,
+                "constant": 33.1
+              }
+            },
+            "sourceRef": "S4 physical page 15 main-long north face"
+          }
+        ]
+      },
+      {
+        "id": "east-north",
+        "kind": "lower-hip",
+        "boundsFt": [
+          128,
+          39,
+          178,
+          69.3
+        ],
+        "tracePx": [
+          1640,
+          307,
+          2140,
+          610
+        ],
+        "eaveElevationFt": 10,
+        "ridgeElevationFt": 15.05,
+        "faces": [
+          {
+            "id": "east-north-west",
+            "massId": "east-north",
+            "massKind": "lower-hip",
+            "side": "west",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                128,
+                39
+              ],
+              [
+                128,
+                39
+              ],
+              [
+                143.15,
+                54.15
+              ],
+              [
+                128,
+                69.3
+              ],
+              [
+                128,
+                69.3
+              ]
+            ],
+            "verticesFt": [
+              [
+                128,
+                39,
+                10
+              ],
+              [
+                128,
+                39,
+                10
+              ],
+              [
+                143.15,
+                54.15,
+                15.05
+              ],
+              [
+                128,
+                69.3,
+                10
+              ],
+              [
+                128,
+                69.3,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0.333333,
+                "y": 0,
+                "constant": -32.666667
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-north west face"
+          },
+          {
+            "id": "east-north-east",
+            "massId": "east-north",
+            "massKind": "lower-hip",
+            "side": "east",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                178,
+                39
+              ],
+              [
+                178,
+                39
+              ],
+              [
+                178,
+                69.3
+              ],
+              [
+                178,
+                69.3
+              ],
+              [
+                162.85,
+                54.15
+              ]
+            ],
+            "verticesFt": [
+              [
+                178,
+                39,
+                10
+              ],
+              [
+                178,
+                39,
+                10
+              ],
+              [
+                178,
+                69.3,
+                10
+              ],
+              [
+                178,
+                69.3,
+                10
+              ],
+              [
+                162.85,
+                54.15,
+                15.05
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": -0.333333,
+                "y": 0,
+                "constant": 69.333333
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-north east face"
+          },
+          {
+            "id": "east-north-south",
+            "massId": "east-north",
+            "massKind": "lower-hip",
+            "side": "south",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                128,
+                39
+              ],
+              [
+                178,
+                39
+              ],
+              [
+                178,
+                39
+              ],
+              [
+                162.85,
+                54.15
+              ],
+              [
+                143.15,
+                54.15
+              ],
+              [
+                128,
+                39
+              ]
+            ],
+            "verticesFt": [
+              [
+                128,
+                39,
+                10
+              ],
+              [
+                178,
+                39,
+                10
+              ],
+              [
+                178,
+                39,
+                10
+              ],
+              [
+                162.85,
+                54.15,
+                15.05
+              ],
+              [
+                143.15,
+                54.15,
+                15.05
+              ],
+              [
+                128,
+                39,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": 0.333333,
+                "constant": -3
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-north south face"
+          },
+          {
+            "id": "east-north-north",
+            "massId": "east-north",
+            "massKind": "lower-hip",
+            "side": "north",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                178,
+                69.3
+              ],
+              [
+                178,
+                69.3
+              ],
+              [
+                128,
+                69.3
+              ],
+              [
+                128,
+                69.3
+              ],
+              [
+                143.15,
+                54.15
+              ],
+              [
+                162.85,
+                54.15
+              ]
+            ],
+            "verticesFt": [
+              [
+                178,
+                69.3,
+                10
+              ],
+              [
+                178,
+                69.3,
+                10
+              ],
+              [
+                128,
+                69.3,
+                10
+              ],
+              [
+                128,
+                69.3,
+                10
+              ],
+              [
+                143.15,
+                54.15,
+                15.05
+              ],
+              [
+                162.85,
+                54.15,
+                15.05
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": -0.333333,
+                "constant": 33.1
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-north north face"
+          }
+        ]
+      },
+      {
+        "id": "east-south",
+        "kind": "lower-hip",
+        "boundsFt": [
+          112,
+          0,
+          178,
+          39
+        ],
+        "tracePx": [
+          1480,
+          610,
+          2140,
+          1000
+        ],
+        "eaveElevationFt": 10,
+        "ridgeElevationFt": 16.5,
+        "faces": [
+          {
+            "id": "east-south-west",
+            "massId": "east-south",
+            "massKind": "lower-hip",
+            "side": "west",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                112,
+                0
+              ],
+              [
+                112,
+                0
+              ],
+              [
+                131.5,
+                19.5
+              ],
+              [
+                112,
+                39
+              ],
+              [
+                112,
+                39
+              ]
+            ],
+            "verticesFt": [
+              [
+                112,
+                0,
+                10
+              ],
+              [
+                112,
+                0,
+                10
+              ],
+              [
+                131.5,
+                19.5,
+                16.5
+              ],
+              [
+                112,
+                39,
+                10
+              ],
+              [
+                112,
+                39,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0.333333,
+                "y": 0,
+                "constant": -27.333333
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-south west face"
+          },
+          {
+            "id": "east-south-east",
+            "massId": "east-south",
+            "massKind": "lower-hip",
+            "side": "east",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                178,
+                0
+              ],
+              [
+                178,
+                0
+              ],
+              [
+                178,
+                39
+              ],
+              [
+                178,
+                39
+              ],
+              [
+                158.5,
+                19.5
+              ]
+            ],
+            "verticesFt": [
+              [
+                178,
+                0,
+                10
+              ],
+              [
+                178,
+                0,
+                10
+              ],
+              [
+                178,
+                39,
+                10
+              ],
+              [
+                178,
+                39,
+                10
+              ],
+              [
+                158.5,
+                19.5,
+                16.5
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": -0.333333,
+                "y": 0,
+                "constant": 69.333333
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-south east face"
+          },
+          {
+            "id": "east-south-south",
+            "massId": "east-south",
+            "massKind": "lower-hip",
+            "side": "south",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                112,
+                0
+              ],
+              [
+                178,
+                0
+              ],
+              [
+                178,
+                0
+              ],
+              [
+                158.5,
+                19.5
+              ],
+              [
+                131.5,
+                19.5
+              ],
+              [
+                112,
+                0
+              ]
+            ],
+            "verticesFt": [
+              [
+                112,
+                0,
+                10
+              ],
+              [
+                178,
+                0,
+                10
+              ],
+              [
+                178,
+                0,
+                10
+              ],
+              [
+                158.5,
+                19.5,
+                16.5
+              ],
+              [
+                131.5,
+                19.5,
+                16.5
+              ],
+              [
+                112,
+                0,
+                10
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": 0.333333,
+                "constant": 10
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-south south face"
+          },
+          {
+            "id": "east-south-north",
+            "massId": "east-south",
+            "massKind": "lower-hip",
+            "side": "north",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                178,
+                39
+              ],
+              [
+                178,
+                39
+              ],
+              [
+                112,
+                39
+              ],
+              [
+                112,
+                39
+              ],
+              [
+                131.5,
+                19.5
+              ],
+              [
+                158.5,
+                19.5
+              ]
+            ],
+            "verticesFt": [
+              [
+                178,
+                39,
+                10
+              ],
+              [
+                178,
+                39,
+                10
+              ],
+              [
+                112,
+                39,
+                10
+              ],
+              [
+                112,
+                39,
+                10
+              ],
+              [
+                131.5,
+                19.5,
+                16.5
+              ],
+              [
+                158.5,
+                19.5,
+                16.5
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": -0.333333,
+                "constant": 23
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-south north face"
+          }
+        ]
+      },
+      {
+        "id": "west-entry-upper",
+        "kind": "upper-hip",
+        "boundsFt": [
+          38.291667,
+          13.131728,
+          46.375,
+          22.982531
+        ],
+        "tracePx": [
+          743,
+          770,
+          824,
+          869
+        ],
+        "eaveElevationFt": 17,
+        "ridgeElevationFt": 18.347222,
+        "faces": [
+          {
+            "id": "west-entry-upper-west",
+            "massId": "west-entry-upper",
+            "massKind": "upper-hip",
+            "side": "west",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                38.291667,
+                13.131728
+              ],
+              [
+                38.291667,
+                13.131728
+              ],
+              [
+                42.333333,
+                17.173395
+              ],
+              [
+                42.333333,
+                18.940864
+              ],
+              [
+                38.291667,
+                22.982531
+              ],
+              [
+                38.291667,
+                22.982531
+              ]
+            ],
+            "verticesFt": [
+              [
+                38.291667,
+                13.131728,
+                17
+              ],
+              [
+                38.291667,
+                13.131728,
+                17
+              ],
+              [
+                42.333333,
+                17.173395,
+                18.347222
+              ],
+              [
+                42.333333,
+                18.940864,
+                18.347222
+              ],
+              [
+                38.291667,
+                22.982531,
+                17
+              ],
+              [
+                38.291667,
+                22.982531,
+                17
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0.333333,
+                "y": 0,
+                "constant": 4.236111
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-entry-upper west face"
+          },
+          {
+            "id": "west-entry-upper-east",
+            "massId": "west-entry-upper",
+            "massKind": "upper-hip",
+            "side": "east",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                46.375,
+                13.131728
+              ],
+              [
+                46.375,
+                13.131728
+              ],
+              [
+                46.375,
+                22.982531
+              ],
+              [
+                46.375,
+                22.982531
+              ],
+              [
+                42.333333,
+                18.940864
+              ],
+              [
+                42.333333,
+                17.173395
+              ]
+            ],
+            "verticesFt": [
+              [
+                46.375,
+                13.131728,
+                17
+              ],
+              [
+                46.375,
+                13.131728,
+                17
+              ],
+              [
+                46.375,
+                22.982531,
+                17
+              ],
+              [
+                46.375,
+                22.982531,
+                17
+              ],
+              [
+                42.333333,
+                18.940864,
+                18.347222
+              ],
+              [
+                42.333333,
+                17.173395,
+                18.347222
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": -0.333333,
+                "y": 0,
+                "constant": 32.458333
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-entry-upper east face"
+          },
+          {
+            "id": "west-entry-upper-south",
+            "massId": "west-entry-upper",
+            "massKind": "upper-hip",
+            "side": "south",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                38.291667,
+                13.131728
+              ],
+              [
+                46.375,
+                13.131728
+              ],
+              [
+                46.375,
+                13.131728
+              ],
+              [
+                42.333333,
+                17.173395
+              ],
+              [
+                38.291667,
+                13.131728
+              ]
+            ],
+            "verticesFt": [
+              [
+                38.291667,
+                13.131728,
+                17
+              ],
+              [
+                46.375,
+                13.131728,
+                17
+              ],
+              [
+                46.375,
+                13.131728,
+                17
+              ],
+              [
+                42.333333,
+                17.173395,
+                18.347222
+              ],
+              [
+                38.291667,
+                13.131728,
+                17
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": 0.333333,
+                "constant": 12.622757
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-entry-upper south face"
+          },
+          {
+            "id": "west-entry-upper-north",
+            "massId": "west-entry-upper",
+            "massKind": "upper-hip",
+            "side": "north",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                46.375,
+                22.982531
+              ],
+              [
+                46.375,
+                22.982531
+              ],
+              [
+                38.291667,
+                22.982531
+              ],
+              [
+                38.291667,
+                22.982531
+              ],
+              [
+                42.333333,
+                18.940864
+              ]
+            ],
+            "verticesFt": [
+              [
+                46.375,
+                22.982531,
+                17
+              ],
+              [
+                46.375,
+                22.982531,
+                17
+              ],
+              [
+                38.291667,
+                22.982531,
+                17
+              ],
+              [
+                38.291667,
+                22.982531,
+                17
+              ],
+              [
+                42.333333,
+                18.940864,
+                18.347222
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": -0.333333,
+                "constant": 24.660844
+              }
+            },
+            "sourceRef": "S4 physical page 15 west-entry-upper north face"
+          }
+        ]
+      },
+      {
+        "id": "east-entry-upper",
+        "kind": "upper-hip",
+        "boundsFt": [
+          108.208333,
+          13.131728,
+          116.291667,
+          22.982531
+        ],
+        "tracePx": [
+          1442,
+          770,
+          1523,
+          869
+        ],
+        "eaveElevationFt": 17,
+        "ridgeElevationFt": 18.347222,
+        "faces": [
+          {
+            "id": "east-entry-upper-west",
+            "massId": "east-entry-upper",
+            "massKind": "upper-hip",
+            "side": "west",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                108.208333,
+                13.131728
+              ],
+              [
+                108.208333,
+                13.131728
+              ],
+              [
+                112.25,
+                17.173395
+              ],
+              [
+                112.25,
+                18.940864
+              ],
+              [
+                108.208333,
+                22.982531
+              ],
+              [
+                108.208333,
+                22.982531
+              ]
+            ],
+            "verticesFt": [
+              [
+                108.208333,
+                13.131728,
+                17
+              ],
+              [
+                108.208333,
+                13.131728,
+                17
+              ],
+              [
+                112.25,
+                17.173395,
+                18.347222
+              ],
+              [
+                112.25,
+                18.940864,
+                18.347222
+              ],
+              [
+                108.208333,
+                22.982531,
+                17
+              ],
+              [
+                108.208333,
+                22.982531,
+                17
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0.333333,
+                "y": 0,
+                "constant": -19.069444
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-entry-upper west face"
+          },
+          {
+            "id": "east-entry-upper-east",
+            "massId": "east-entry-upper",
+            "massKind": "upper-hip",
+            "side": "east",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                116.291667,
+                13.131728
+              ],
+              [
+                116.291667,
+                13.131728
+              ],
+              [
+                116.291667,
+                22.982531
+              ],
+              [
+                116.291667,
+                22.982531
+              ],
+              [
+                112.25,
+                18.940864
+              ],
+              [
+                112.25,
+                17.173395
+              ]
+            ],
+            "verticesFt": [
+              [
+                116.291667,
+                13.131728,
+                17
+              ],
+              [
+                116.291667,
+                13.131728,
+                17
+              ],
+              [
+                116.291667,
+                22.982531,
+                17
+              ],
+              [
+                116.291667,
+                22.982531,
+                17
+              ],
+              [
+                112.25,
+                18.940864,
+                18.347222
+              ],
+              [
+                112.25,
+                17.173395,
+                18.347222
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": -0.333333,
+                "y": 0,
+                "constant": 55.763889
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-entry-upper east face"
+          },
+          {
+            "id": "east-entry-upper-south",
+            "massId": "east-entry-upper",
+            "massKind": "upper-hip",
+            "side": "south",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                108.208333,
+                13.131728
+              ],
+              [
+                116.291667,
+                13.131728
+              ],
+              [
+                116.291667,
+                13.131728
+              ],
+              [
+                112.25,
+                17.173395
+              ],
+              [
+                108.208333,
+                13.131728
+              ]
+            ],
+            "verticesFt": [
+              [
+                108.208333,
+                13.131728,
+                17
+              ],
+              [
+                116.291667,
+                13.131728,
+                17
+              ],
+              [
+                116.291667,
+                13.131728,
+                17
+              ],
+              [
+                112.25,
+                17.173395,
+                18.347222
+              ],
+              [
+                108.208333,
+                13.131728,
+                17
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": 0.333333,
+                "constant": 12.622757
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-entry-upper south face"
+          },
+          {
+            "id": "east-entry-upper-north",
+            "massId": "east-entry-upper",
+            "massKind": "upper-hip",
+            "side": "north",
+            "pitch": {
+              "riseIn": 4,
+              "runIn": 12,
+              "refs": [
+                "A4 physical page 9",
+                "A5 physical page 10",
+                "S4 physical page 15"
+              ]
+            },
+            "planPolygonFt": [
+              [
+                116.291667,
+                22.982531
+              ],
+              [
+                116.291667,
+                22.982531
+              ],
+              [
+                108.208333,
+                22.982531
+              ],
+              [
+                108.208333,
+                22.982531
+              ],
+              [
+                112.25,
+                18.940864
+              ]
+            ],
+            "verticesFt": [
+              [
+                116.291667,
+                22.982531,
+                17
+              ],
+              [
+                116.291667,
+                22.982531,
+                17
+              ],
+              [
+                108.208333,
+                22.982531,
+                17
+              ],
+              [
+                108.208333,
+                22.982531,
+                17
+              ],
+              [
+                112.25,
+                18.940864,
+                18.347222
+              ]
+            ],
+            "plane": {
+              "zEquals": {
+                "x": 0,
+                "y": -0.333333,
+                "constant": 24.660844
+              }
+            },
+            "sourceRef": "S4 physical page 15 east-entry-upper north face"
+          }
+        ]
+      }
+    ],
+    "faces": [
+      {
+        "id": "west-north-west",
+        "massId": "west-north",
+        "massKind": "lower-hip",
+        "side": "west",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            0,
+            39
+          ],
+          [
+            0,
+            39
+          ],
+          [
+            15.15,
+            54.15
+          ],
+          [
+            0,
+            69.3
+          ],
+          [
+            0,
+            69.3
+          ]
+        ],
+        "verticesFt": [
+          [
+            0,
+            39,
+            10
+          ],
+          [
+            0,
+            39,
+            10
+          ],
+          [
+            15.15,
+            54.15,
+            15.05
+          ],
+          [
+            0,
+            69.3,
+            10
+          ],
+          [
+            0,
+            69.3,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0.333333,
+            "y": 0,
+            "constant": 10
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-north west face"
+      },
+      {
+        "id": "west-north-east",
+        "massId": "west-north",
+        "massKind": "lower-hip",
+        "side": "east",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            48,
+            39
+          ],
+          [
+            48,
+            39
+          ],
+          [
+            48,
+            69.3
+          ],
+          [
+            48,
+            69.3
+          ],
+          [
+            32.85,
+            54.15
+          ]
+        ],
+        "verticesFt": [
+          [
+            48,
+            39,
+            10
+          ],
+          [
+            48,
+            39,
+            10
+          ],
+          [
+            48,
+            69.3,
+            10
+          ],
+          [
+            48,
+            69.3,
+            10
+          ],
+          [
+            32.85,
+            54.15,
+            15.05
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": -0.333333,
+            "y": 0,
+            "constant": 26
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-north east face"
+      },
+      {
+        "id": "west-north-south",
+        "massId": "west-north",
+        "massKind": "lower-hip",
+        "side": "south",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            0,
+            39
+          ],
+          [
+            48,
+            39
+          ],
+          [
+            48,
+            39
+          ],
+          [
+            32.85,
+            54.15
+          ],
+          [
+            15.15,
+            54.15
+          ],
+          [
+            0,
+            39
+          ]
+        ],
+        "verticesFt": [
+          [
+            0,
+            39,
+            10
+          ],
+          [
+            48,
+            39,
+            10
+          ],
+          [
+            48,
+            39,
+            10
+          ],
+          [
+            32.85,
+            54.15,
+            15.05
+          ],
+          [
+            15.15,
+            54.15,
+            15.05
+          ],
+          [
+            0,
+            39,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": 0.333333,
+            "constant": -3
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-north south face"
+      },
+      {
+        "id": "west-north-north",
+        "massId": "west-north",
+        "massKind": "lower-hip",
+        "side": "north",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            48,
+            69.3
+          ],
+          [
+            48,
+            69.3
+          ],
+          [
+            0,
+            69.3
+          ],
+          [
+            0,
+            69.3
+          ],
+          [
+            15.15,
+            54.15
+          ],
+          [
+            32.85,
+            54.15
+          ]
+        ],
+        "verticesFt": [
+          [
+            48,
+            69.3,
+            10
+          ],
+          [
+            48,
+            69.3,
+            10
+          ],
+          [
+            0,
+            69.3,
+            10
+          ],
+          [
+            0,
+            69.3,
+            10
+          ],
+          [
+            15.15,
+            54.15,
+            15.05
+          ],
+          [
+            32.85,
+            54.15,
+            15.05
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": -0.333333,
+            "constant": 33.1
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-north north face"
+      },
+      {
+        "id": "west-south-west",
+        "massId": "west-south",
+        "massKind": "lower-hip",
+        "side": "west",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            0,
+            5
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            17,
+            22
+          ],
+          [
+            0,
+            39
+          ],
+          [
+            0,
+            39
+          ]
+        ],
+        "verticesFt": [
+          [
+            0,
+            5,
+            10
+          ],
+          [
+            0,
+            5,
+            10
+          ],
+          [
+            17,
+            22,
+            15.666667
+          ],
+          [
+            0,
+            39,
+            10
+          ],
+          [
+            0,
+            39,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0.333333,
+            "y": 0,
+            "constant": 10
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-south west face"
+      },
+      {
+        "id": "west-south-east",
+        "massId": "west-south",
+        "massKind": "lower-hip",
+        "side": "east",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            48,
+            5
+          ],
+          [
+            48,
+            5
+          ],
+          [
+            48,
+            39
+          ],
+          [
+            48,
+            39
+          ],
+          [
+            31,
+            22
+          ]
+        ],
+        "verticesFt": [
+          [
+            48,
+            5,
+            10
+          ],
+          [
+            48,
+            5,
+            10
+          ],
+          [
+            48,
+            39,
+            10
+          ],
+          [
+            48,
+            39,
+            10
+          ],
+          [
+            31,
+            22,
+            15.666667
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": -0.333333,
+            "y": 0,
+            "constant": 26
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-south east face"
+      },
+      {
+        "id": "west-south-south",
+        "massId": "west-south",
+        "massKind": "lower-hip",
+        "side": "south",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            0,
+            5
+          ],
+          [
+            48,
+            5
+          ],
+          [
+            48,
+            5
+          ],
+          [
+            31,
+            22
+          ],
+          [
+            17,
+            22
+          ],
+          [
+            0,
+            5
+          ]
+        ],
+        "verticesFt": [
+          [
+            0,
+            5,
+            10
+          ],
+          [
+            48,
+            5,
+            10
+          ],
+          [
+            48,
+            5,
+            10
+          ],
+          [
+            31,
+            22,
+            15.666667
+          ],
+          [
+            17,
+            22,
+            15.666667
+          ],
+          [
+            0,
+            5,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": 0.333333,
+            "constant": 8.333333
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-south south face"
+      },
+      {
+        "id": "west-south-north",
+        "massId": "west-south",
+        "massKind": "lower-hip",
+        "side": "north",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            48,
+            39
+          ],
+          [
+            48,
+            39
+          ],
+          [
+            0,
+            39
+          ],
+          [
+            0,
+            39
+          ],
+          [
+            17,
+            22
+          ],
+          [
+            31,
+            22
+          ]
+        ],
+        "verticesFt": [
+          [
+            48,
+            39,
+            10
+          ],
+          [
+            48,
+            39,
+            10
+          ],
+          [
+            0,
+            39,
+            10
+          ],
+          [
+            0,
+            39,
+            10
+          ],
+          [
+            17,
+            22,
+            15.666667
+          ],
+          [
+            31,
+            22,
+            15.666667
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": -0.333333,
+            "constant": 23
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-south north face"
+      },
+      {
+        "id": "main-long-west",
+        "massId": "main-long",
+        "massKind": "lower-hip",
+        "side": "west",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            48,
+            5
+          ],
+          [
+            48,
+            5
+          ],
+          [
+            80.15,
+            37.15
+          ],
+          [
+            48,
+            69.3
+          ],
+          [
+            48,
+            69.3
+          ]
+        ],
+        "verticesFt": [
+          [
+            48,
+            5,
+            10
+          ],
+          [
+            48,
+            5,
+            10
+          ],
+          [
+            80.15,
+            37.15,
+            20.716667
+          ],
+          [
+            48,
+            69.3,
+            10
+          ],
+          [
+            48,
+            69.3,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0.333333,
+            "y": 0,
+            "constant": -6
+          }
+        },
+        "sourceRef": "S4 physical page 15 main-long west face"
+      },
+      {
+        "id": "main-long-east",
+        "massId": "main-long",
+        "massKind": "lower-hip",
+        "side": "east",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            130,
+            5
+          ],
+          [
+            130,
+            5
+          ],
+          [
+            130,
+            69.3
+          ],
+          [
+            130,
+            69.3
+          ],
+          [
+            97.85,
+            37.15
+          ]
+        ],
+        "verticesFt": [
+          [
+            130,
+            5,
+            10
+          ],
+          [
+            130,
+            5,
+            10
+          ],
+          [
+            130,
+            69.3,
+            10
+          ],
+          [
+            130,
+            69.3,
+            10
+          ],
+          [
+            97.85,
+            37.15,
+            20.716667
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": -0.333333,
+            "y": 0,
+            "constant": 53.333333
+          }
+        },
+        "sourceRef": "S4 physical page 15 main-long east face"
+      },
+      {
+        "id": "main-long-south",
+        "massId": "main-long",
+        "massKind": "lower-hip",
+        "side": "south",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            48,
+            5
+          ],
+          [
+            130,
+            5
+          ],
+          [
+            130,
+            5
+          ],
+          [
+            97.85,
+            37.15
+          ],
+          [
+            80.15,
+            37.15
+          ],
+          [
+            48,
+            5
+          ]
+        ],
+        "verticesFt": [
+          [
+            48,
+            5,
+            10
+          ],
+          [
+            130,
+            5,
+            10
+          ],
+          [
+            130,
+            5,
+            10
+          ],
+          [
+            97.85,
+            37.15,
+            20.716667
+          ],
+          [
+            80.15,
+            37.15,
+            20.716667
+          ],
+          [
+            48,
+            5,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": 0.333333,
+            "constant": 8.333333
+          }
+        },
+        "sourceRef": "S4 physical page 15 main-long south face"
+      },
+      {
+        "id": "main-long-north",
+        "massId": "main-long",
+        "massKind": "lower-hip",
+        "side": "north",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            130,
+            69.3
+          ],
+          [
+            130,
+            69.3
+          ],
+          [
+            48,
+            69.3
+          ],
+          [
+            48,
+            69.3
+          ],
+          [
+            80.15,
+            37.15
+          ],
+          [
+            97.85,
+            37.15
+          ]
+        ],
+        "verticesFt": [
+          [
+            130,
+            69.3,
+            10
+          ],
+          [
+            130,
+            69.3,
+            10
+          ],
+          [
+            48,
+            69.3,
+            10
+          ],
+          [
+            48,
+            69.3,
+            10
+          ],
+          [
+            80.15,
+            37.15,
+            20.716667
+          ],
+          [
+            97.85,
+            37.15,
+            20.716667
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": -0.333333,
+            "constant": 33.1
+          }
+        },
+        "sourceRef": "S4 physical page 15 main-long north face"
+      },
+      {
+        "id": "east-north-west",
+        "massId": "east-north",
+        "massKind": "lower-hip",
+        "side": "west",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            128,
+            39
+          ],
+          [
+            128,
+            39
+          ],
+          [
+            143.15,
+            54.15
+          ],
+          [
+            128,
+            69.3
+          ],
+          [
+            128,
+            69.3
+          ]
+        ],
+        "verticesFt": [
+          [
+            128,
+            39,
+            10
+          ],
+          [
+            128,
+            39,
+            10
+          ],
+          [
+            143.15,
+            54.15,
+            15.05
+          ],
+          [
+            128,
+            69.3,
+            10
+          ],
+          [
+            128,
+            69.3,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0.333333,
+            "y": 0,
+            "constant": -32.666667
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-north west face"
+      },
+      {
+        "id": "east-north-east",
+        "massId": "east-north",
+        "massKind": "lower-hip",
+        "side": "east",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            178,
+            39
+          ],
+          [
+            178,
+            39
+          ],
+          [
+            178,
+            69.3
+          ],
+          [
+            178,
+            69.3
+          ],
+          [
+            162.85,
+            54.15
+          ]
+        ],
+        "verticesFt": [
+          [
+            178,
+            39,
+            10
+          ],
+          [
+            178,
+            39,
+            10
+          ],
+          [
+            178,
+            69.3,
+            10
+          ],
+          [
+            178,
+            69.3,
+            10
+          ],
+          [
+            162.85,
+            54.15,
+            15.05
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": -0.333333,
+            "y": 0,
+            "constant": 69.333333
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-north east face"
+      },
+      {
+        "id": "east-north-south",
+        "massId": "east-north",
+        "massKind": "lower-hip",
+        "side": "south",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            128,
+            39
+          ],
+          [
+            178,
+            39
+          ],
+          [
+            178,
+            39
+          ],
+          [
+            162.85,
+            54.15
+          ],
+          [
+            143.15,
+            54.15
+          ],
+          [
+            128,
+            39
+          ]
+        ],
+        "verticesFt": [
+          [
+            128,
+            39,
+            10
+          ],
+          [
+            178,
+            39,
+            10
+          ],
+          [
+            178,
+            39,
+            10
+          ],
+          [
+            162.85,
+            54.15,
+            15.05
+          ],
+          [
+            143.15,
+            54.15,
+            15.05
+          ],
+          [
+            128,
+            39,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": 0.333333,
+            "constant": -3
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-north south face"
+      },
+      {
+        "id": "east-north-north",
+        "massId": "east-north",
+        "massKind": "lower-hip",
+        "side": "north",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            178,
+            69.3
+          ],
+          [
+            178,
+            69.3
+          ],
+          [
+            128,
+            69.3
+          ],
+          [
+            128,
+            69.3
+          ],
+          [
+            143.15,
+            54.15
+          ],
+          [
+            162.85,
+            54.15
+          ]
+        ],
+        "verticesFt": [
+          [
+            178,
+            69.3,
+            10
+          ],
+          [
+            178,
+            69.3,
+            10
+          ],
+          [
+            128,
+            69.3,
+            10
+          ],
+          [
+            128,
+            69.3,
+            10
+          ],
+          [
+            143.15,
+            54.15,
+            15.05
+          ],
+          [
+            162.85,
+            54.15,
+            15.05
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": -0.333333,
+            "constant": 33.1
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-north north face"
+      },
+      {
+        "id": "east-south-west",
+        "massId": "east-south",
+        "massKind": "lower-hip",
+        "side": "west",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            112,
+            0
+          ],
+          [
+            112,
+            0
+          ],
+          [
+            131.5,
+            19.5
+          ],
+          [
+            112,
+            39
+          ],
+          [
+            112,
+            39
+          ]
+        ],
+        "verticesFt": [
+          [
+            112,
+            0,
+            10
+          ],
+          [
+            112,
+            0,
+            10
+          ],
+          [
+            131.5,
+            19.5,
+            16.5
+          ],
+          [
+            112,
+            39,
+            10
+          ],
+          [
+            112,
+            39,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0.333333,
+            "y": 0,
+            "constant": -27.333333
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-south west face"
+      },
+      {
+        "id": "east-south-east",
+        "massId": "east-south",
+        "massKind": "lower-hip",
+        "side": "east",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            178,
+            0
+          ],
+          [
+            178,
+            0
+          ],
+          [
+            178,
+            39
+          ],
+          [
+            178,
+            39
+          ],
+          [
+            158.5,
+            19.5
+          ]
+        ],
+        "verticesFt": [
+          [
+            178,
+            0,
+            10
+          ],
+          [
+            178,
+            0,
+            10
+          ],
+          [
+            178,
+            39,
+            10
+          ],
+          [
+            178,
+            39,
+            10
+          ],
+          [
+            158.5,
+            19.5,
+            16.5
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": -0.333333,
+            "y": 0,
+            "constant": 69.333333
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-south east face"
+      },
+      {
+        "id": "east-south-south",
+        "massId": "east-south",
+        "massKind": "lower-hip",
+        "side": "south",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            112,
+            0
+          ],
+          [
+            178,
+            0
+          ],
+          [
+            178,
+            0
+          ],
+          [
+            158.5,
+            19.5
+          ],
+          [
+            131.5,
+            19.5
+          ],
+          [
+            112,
+            0
+          ]
+        ],
+        "verticesFt": [
+          [
+            112,
+            0,
+            10
+          ],
+          [
+            178,
+            0,
+            10
+          ],
+          [
+            178,
+            0,
+            10
+          ],
+          [
+            158.5,
+            19.5,
+            16.5
+          ],
+          [
+            131.5,
+            19.5,
+            16.5
+          ],
+          [
+            112,
+            0,
+            10
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": 0.333333,
+            "constant": 10
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-south south face"
+      },
+      {
+        "id": "east-south-north",
+        "massId": "east-south",
+        "massKind": "lower-hip",
+        "side": "north",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            178,
+            39
+          ],
+          [
+            178,
+            39
+          ],
+          [
+            112,
+            39
+          ],
+          [
+            112,
+            39
+          ],
+          [
+            131.5,
+            19.5
+          ],
+          [
+            158.5,
+            19.5
+          ]
+        ],
+        "verticesFt": [
+          [
+            178,
+            39,
+            10
+          ],
+          [
+            178,
+            39,
+            10
+          ],
+          [
+            112,
+            39,
+            10
+          ],
+          [
+            112,
+            39,
+            10
+          ],
+          [
+            131.5,
+            19.5,
+            16.5
+          ],
+          [
+            158.5,
+            19.5,
+            16.5
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": -0.333333,
+            "constant": 23
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-south north face"
+      },
+      {
+        "id": "west-entry-upper-west",
+        "massId": "west-entry-upper",
+        "massKind": "upper-hip",
+        "side": "west",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            38.291667,
+            13.131728
+          ],
+          [
+            38.291667,
+            13.131728
+          ],
+          [
+            42.333333,
+            17.173395
+          ],
+          [
+            42.333333,
+            18.940864
+          ],
+          [
+            38.291667,
+            22.982531
+          ],
+          [
+            38.291667,
+            22.982531
+          ]
+        ],
+        "verticesFt": [
+          [
+            38.291667,
+            13.131728,
+            17
+          ],
+          [
+            38.291667,
+            13.131728,
+            17
+          ],
+          [
+            42.333333,
+            17.173395,
+            18.347222
+          ],
+          [
+            42.333333,
+            18.940864,
+            18.347222
+          ],
+          [
+            38.291667,
+            22.982531,
+            17
+          ],
+          [
+            38.291667,
+            22.982531,
+            17
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0.333333,
+            "y": 0,
+            "constant": 4.236111
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-entry-upper west face"
+      },
+      {
+        "id": "west-entry-upper-east",
+        "massId": "west-entry-upper",
+        "massKind": "upper-hip",
+        "side": "east",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            46.375,
+            13.131728
+          ],
+          [
+            46.375,
+            13.131728
+          ],
+          [
+            46.375,
+            22.982531
+          ],
+          [
+            46.375,
+            22.982531
+          ],
+          [
+            42.333333,
+            18.940864
+          ],
+          [
+            42.333333,
+            17.173395
+          ]
+        ],
+        "verticesFt": [
+          [
+            46.375,
+            13.131728,
+            17
+          ],
+          [
+            46.375,
+            13.131728,
+            17
+          ],
+          [
+            46.375,
+            22.982531,
+            17
+          ],
+          [
+            46.375,
+            22.982531,
+            17
+          ],
+          [
+            42.333333,
+            18.940864,
+            18.347222
+          ],
+          [
+            42.333333,
+            17.173395,
+            18.347222
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": -0.333333,
+            "y": 0,
+            "constant": 32.458333
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-entry-upper east face"
+      },
+      {
+        "id": "west-entry-upper-south",
+        "massId": "west-entry-upper",
+        "massKind": "upper-hip",
+        "side": "south",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            38.291667,
+            13.131728
+          ],
+          [
+            46.375,
+            13.131728
+          ],
+          [
+            46.375,
+            13.131728
+          ],
+          [
+            42.333333,
+            17.173395
+          ],
+          [
+            38.291667,
+            13.131728
+          ]
+        ],
+        "verticesFt": [
+          [
+            38.291667,
+            13.131728,
+            17
+          ],
+          [
+            46.375,
+            13.131728,
+            17
+          ],
+          [
+            46.375,
+            13.131728,
+            17
+          ],
+          [
+            42.333333,
+            17.173395,
+            18.347222
+          ],
+          [
+            38.291667,
+            13.131728,
+            17
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": 0.333333,
+            "constant": 12.622757
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-entry-upper south face"
+      },
+      {
+        "id": "west-entry-upper-north",
+        "massId": "west-entry-upper",
+        "massKind": "upper-hip",
+        "side": "north",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            46.375,
+            22.982531
+          ],
+          [
+            46.375,
+            22.982531
+          ],
+          [
+            38.291667,
+            22.982531
+          ],
+          [
+            38.291667,
+            22.982531
+          ],
+          [
+            42.333333,
+            18.940864
+          ]
+        ],
+        "verticesFt": [
+          [
+            46.375,
+            22.982531,
+            17
+          ],
+          [
+            46.375,
+            22.982531,
+            17
+          ],
+          [
+            38.291667,
+            22.982531,
+            17
+          ],
+          [
+            38.291667,
+            22.982531,
+            17
+          ],
+          [
+            42.333333,
+            18.940864,
+            18.347222
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": -0.333333,
+            "constant": 24.660844
+          }
+        },
+        "sourceRef": "S4 physical page 15 west-entry-upper north face"
+      },
+      {
+        "id": "east-entry-upper-west",
+        "massId": "east-entry-upper",
+        "massKind": "upper-hip",
+        "side": "west",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            108.208333,
+            13.131728
+          ],
+          [
+            108.208333,
+            13.131728
+          ],
+          [
+            112.25,
+            17.173395
+          ],
+          [
+            112.25,
+            18.940864
+          ],
+          [
+            108.208333,
+            22.982531
+          ],
+          [
+            108.208333,
+            22.982531
+          ]
+        ],
+        "verticesFt": [
+          [
+            108.208333,
+            13.131728,
+            17
+          ],
+          [
+            108.208333,
+            13.131728,
+            17
+          ],
+          [
+            112.25,
+            17.173395,
+            18.347222
+          ],
+          [
+            112.25,
+            18.940864,
+            18.347222
+          ],
+          [
+            108.208333,
+            22.982531,
+            17
+          ],
+          [
+            108.208333,
+            22.982531,
+            17
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0.333333,
+            "y": 0,
+            "constant": -19.069444
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-entry-upper west face"
+      },
+      {
+        "id": "east-entry-upper-east",
+        "massId": "east-entry-upper",
+        "massKind": "upper-hip",
+        "side": "east",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            116.291667,
+            13.131728
+          ],
+          [
+            116.291667,
+            13.131728
+          ],
+          [
+            116.291667,
+            22.982531
+          ],
+          [
+            116.291667,
+            22.982531
+          ],
+          [
+            112.25,
+            18.940864
+          ],
+          [
+            112.25,
+            17.173395
+          ]
+        ],
+        "verticesFt": [
+          [
+            116.291667,
+            13.131728,
+            17
+          ],
+          [
+            116.291667,
+            13.131728,
+            17
+          ],
+          [
+            116.291667,
+            22.982531,
+            17
+          ],
+          [
+            116.291667,
+            22.982531,
+            17
+          ],
+          [
+            112.25,
+            18.940864,
+            18.347222
+          ],
+          [
+            112.25,
+            17.173395,
+            18.347222
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": -0.333333,
+            "y": 0,
+            "constant": 55.763889
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-entry-upper east face"
+      },
+      {
+        "id": "east-entry-upper-south",
+        "massId": "east-entry-upper",
+        "massKind": "upper-hip",
+        "side": "south",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            108.208333,
+            13.131728
+          ],
+          [
+            116.291667,
+            13.131728
+          ],
+          [
+            116.291667,
+            13.131728
+          ],
+          [
+            112.25,
+            17.173395
+          ],
+          [
+            108.208333,
+            13.131728
+          ]
+        ],
+        "verticesFt": [
+          [
+            108.208333,
+            13.131728,
+            17
+          ],
+          [
+            116.291667,
+            13.131728,
+            17
+          ],
+          [
+            116.291667,
+            13.131728,
+            17
+          ],
+          [
+            112.25,
+            17.173395,
+            18.347222
+          ],
+          [
+            108.208333,
+            13.131728,
+            17
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": 0.333333,
+            "constant": 12.622757
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-entry-upper south face"
+      },
+      {
+        "id": "east-entry-upper-north",
+        "massId": "east-entry-upper",
+        "massKind": "upper-hip",
+        "side": "north",
+        "pitch": {
+          "riseIn": 4,
+          "runIn": 12,
+          "refs": [
+            "A4 physical page 9",
+            "A5 physical page 10",
+            "S4 physical page 15"
+          ]
+        },
+        "planPolygonFt": [
+          [
+            116.291667,
+            22.982531
+          ],
+          [
+            116.291667,
+            22.982531
+          ],
+          [
+            108.208333,
+            22.982531
+          ],
+          [
+            108.208333,
+            22.982531
+          ],
+          [
+            112.25,
+            18.940864
+          ]
+        ],
+        "verticesFt": [
+          [
+            116.291667,
+            22.982531,
+            17
+          ],
+          [
+            116.291667,
+            22.982531,
+            17
+          ],
+          [
+            108.208333,
+            22.982531,
+            17
+          ],
+          [
+            108.208333,
+            22.982531,
+            17
+          ],
+          [
+            112.25,
+            18.940864,
+            18.347222
+          ]
+        ],
+        "plane": {
+          "zEquals": {
+            "x": 0,
+            "y": -0.333333,
+            "constant": 24.660844
+          }
+        },
+        "sourceRef": "S4 physical page 15 east-entry-upper north face"
+      }
+    ],
+    "envelopeRule": "highest source-traced valid hip face at each plan coordinate; upper-entry faces supersede lower faces inside their source footprint",
+    "coverage": {
+      "sampleStepFt": 0.5,
+      "insideSamples": 42629,
+      "coveredSamples": 42629,
+      "coverageRatio": 1,
+      "maxNeighborJumpFt": 0.166739,
+      "expectedPerStepPitchChangeFt": 0.166667
+    },
+    "continuousAtHalfFootResolution": true,
+    "allFacesFourInTwelve": true
+  },
+  "atticModel": {
+    "draftStops": [
+      {
+        "id": "draft-stop-west",
+        "xFt": 52,
+        "xPx": 880,
+        "sourceLabel": "DRAFT STOP SEE NOTE 1"
+      },
+      {
+        "id": "draft-stop-east",
+        "xFt": 106.6,
+        "xPx": 1426,
+        "sourceLabel": "DRAFT STOP SEE NOTE 1"
+      }
+    ],
+    "compartmentCount": 3,
+    "compartments": [
+      {
+        "id": "attic-west",
+        "minX": null,
+        "maxX": 52,
+        "sourceBoundaryIds": [
+          "building-west",
+          "draft-stop-west"
+        ],
+        "planPolygonFt": [
+          [
+            1.083333,
+            5.333333
+          ],
+          [
+            38.291667,
+            5.333333
+          ],
+          [
+            38.291667,
+            8.583333
+          ],
+          [
+            38.958333,
+            8.583333
+          ],
+          [
+            38.958333,
+            11.25
+          ],
+          [
+            38.291667,
+            11.25
+          ],
+          [
+            38.291667,
+            18.916667
+          ],
+          [
+            42.357531,
+            22.982531
+          ],
+          [
+            46.375,
+            18.965061
+          ],
+          [
+            46.375,
+            13.131728
+          ],
+          [
+            52,
+            13.131728
+          ],
+          [
+            52,
+            68.75
+          ],
+          [
+            51.791667,
+            68.75
+          ],
+          [
+            51.791667,
+            67.666667
+          ],
+          [
+            42.5,
+            67.666667
+          ],
+          [
+            42.5,
+            68.75
+          ],
+          [
+            38.25,
+            68.75
+          ],
+          [
+            38.25,
+            67.666667
+          ],
+          [
+            4.25,
+            67.666667
+          ],
+          [
+            4.25,
+            68.75
+          ],
+          [
+            0,
+            68.75
+          ],
+          [
+            0,
+            64.5
+          ],
+          [
+            1.083333,
+            64.5
+          ],
+          [
+            1.083333,
+            44.083333
+          ],
+          [
+            0,
+            44.083333
+          ],
+          [
+            0,
+            39.833333
+          ],
+          [
+            1.083333,
+            39.833333
+          ]
+        ],
+        "areaSqFt": 3022.85747
+      },
+      {
+        "id": "attic-central",
+        "minX": 52,
+        "maxX": 106.6,
+        "sourceBoundaryIds": [
+          "draft-stop-west",
+          "draft-stop-east"
+        ],
+        "planPolygonFt": [
+          [
+            52,
+            13.131728
+          ],
+          [
+            60.125,
+            13.131728
+          ],
+          [
+            60.125,
+            8.048395
+          ],
+          [
+            64.458333,
+            8.048395
+          ],
+          [
+            64.458333,
+            8.923395
+          ],
+          [
+            64.458333,
+            9.131728
+          ],
+          [
+            90.125,
+            9.131728
+          ],
+          [
+            90.125,
+            8.048395
+          ],
+          [
+            94.458333,
+            8.048395
+          ],
+          [
+            94.458333,
+            13.131728
+          ],
+          [
+            106.6,
+            13.131728
+          ],
+          [
+            106.6,
+            67.666667
+          ],
+          [
+            102.708333,
+            67.666667
+          ],
+          [
+            102.708333,
+            68.75
+          ],
+          [
+            98.458333,
+            68.75
+          ],
+          [
+            98.458333,
+            67.666667
+          ],
+          [
+            79.375,
+            67.666667
+          ],
+          [
+            79.375,
+            68.75
+          ],
+          [
+            75.125,
+            68.75
+          ],
+          [
+            75.125,
+            67.666667
+          ],
+          [
+            56.041667,
+            67.666667
+          ],
+          [
+            56.041667,
+            68.75
+          ],
+          [
+            52,
+            68.75
+          ]
+        ],
+        "areaSqFt": 3137.916688
+      },
+      {
+        "id": "attic-east",
+        "minX": 106.6,
+        "maxX": null,
+        "sourceBoundaryIds": [
+          "draft-stop-east",
+          "building-east"
+        ],
+        "planPolygonFt": [
+          [
+            106.6,
+            13.131728
+          ],
+          [
+            108.208333,
+            13.131728
+          ],
+          [
+            108.208333,
+            18.965061
+          ],
+          [
+            112.225803,
+            22.982531
+          ],
+          [
+            116.291667,
+            18.916667
+          ],
+          [
+            116.291667,
+            11.25
+          ],
+          [
+            115.625,
+            11.25
+          ],
+          [
+            115.625,
+            8.583333
+          ],
+          [
+            116.291667,
+            8.583333
+          ],
+          [
+            116.291667,
+            5.333333
+          ],
+          [
+            134.958333,
+            5.333333
+          ],
+          [
+            134.958333,
+            0
+          ],
+          [
+            176.958333,
+            0
+          ],
+          [
+            176.958333,
+            40
+          ],
+          [
+            178.041667,
+            40
+          ],
+          [
+            178.041667,
+            44.25
+          ],
+          [
+            176.958333,
+            44.25
+          ],
+          [
+            176.958333,
+            64.5
+          ],
+          [
+            178.041667,
+            64.5
+          ],
+          [
+            178.041667,
+            68.75
+          ],
+          [
+            173.791667,
+            68.75
+          ],
+          [
+            173.791667,
+            67.666667
+          ],
+          [
+            139.875,
+            67.666667
+          ],
+          [
+            139.875,
+            68.75
+          ],
+          [
+            135.625,
+            68.75
+          ],
+          [
+            135.625,
+            67.666667
+          ],
+          [
+            126.041667,
+            67.666667
+          ],
+          [
+            126.041667,
+            68.75
+          ],
+          [
+            121.791667,
+            68.75
+          ],
+          [
+            121.791667,
+            67.666667
+          ],
+          [
+            106.6,
+            67.666667
+          ]
+        ],
+        "areaSqFt": 4494.423338
+      }
+    ],
+    "compartmentAreaSqFt": 10655.197496,
+    "exactFootprintAreaSqFt": 10655.197497,
+    "areaClosureResidualSqFt": 0.000001
+  },
+  "sourceOnlyHeads3d": [],
+  "sourceOnlyPipes3d": [],
+  "answerKeyUsedForGeometry": false,
+  "completedBidUsedForGeometry": false,
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "S4 160-DPI structural-line trace registered to exact RCP-DWG footprint and replayed into explicit hip faces"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "A4/A5 sections and A3 elevations cross-check 4:12 lower and upper roof masses plus vertical bearing order"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "receipt, source, registration, mass, face, pitch, compartment, coverage, answer-leakage, and false-promotion attacks"
+    }
+  },
+  "floorByFloorExtrusionReady": true,
+  "roofPlanRegistrationReady": true,
+  "wholeRoofFaceTopologyReady": true,
+  "atticCompartmentTopologyReady": true,
+  "absoluteRoofElevationReady": true,
+  "wholeRoofModelReady": true,
+  "sourceOnlyAtticPlacementReady": false,
+  "pitchedAtticHeadLayoutReady": false,
+  "freshProjectPlacementVerified": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "blockedClaims": [
+    "source-only attic sprinkler placement",
+    "fresh-project attic placement",
+    "hydraulics",
+    "code compliance",
+    "fabrication",
+    "field release"
+  ],
+  "requiredNextLoop": "commit and push this source-only roof and compartment topology, then register the already sealed Polaris attic answer uprights to these immutable source faces for calibration before selecting another fresh attic holdout",
+  "claimStatus": "source-registered-scaled-floor-roof-face-and-attic-compartment-model-not-sprinkler-placement-code-compliance-or-fabrication",
+  "receiptSha256": "c10bb97d1fc89e1e6e21f9f9eeea9b79c18a4698404e3d9e8395bb10a94af4d4"
+}

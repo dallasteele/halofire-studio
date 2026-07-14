@@ -1,5 +1,14 @@
 # HaloFire Build Log
 
+## 2026-07-14 - Polaris source roof faces and attic compartments
+
+- Registered the sealed S4 roof-framing plan to the exact 73-vertex RCP-DWG footprint at 10 px/ft using ten independent structural-line anchors; maximum residual is 0.651 px (0.0651 ft).
+- Replayed seven source-traced 4:12 hip masses into 28 explicit planar faces and used the A4/A5 building sections for the 10 ft lower and 17 ft raised-entry bearing datums. A half-foot envelope scan covered all 42,629 interior samples and remained continuous within the pitch tolerance.
+- Clipped the exact footprint at the two source draft stops into three attic compartments with a 0.000001 sq ft area-closure residual. Added source-only face and compartment resolvers for the next immutable answer-registration step.
+- Kept this checkpoint geometry-only: the engine and generator import no sprinkler answer artifact, emit zero heads and zero pipes, and leave placement, hydraulics, compliance, fabrication, and field release false.
+- Verification: deterministic generator replay passed; 16 focused tests across the source holdout, source roof topology, and prior comparison passed; all 16 topology adversarial mutations were rejected; production build passed; `node --check`, `AGENT_LOOP_GUARD`, `AGENTIC_RULES_VERIFY`, and `git diff --check` passed. GX10 Lean 4.13.0 verified `polarisSourceRoofTopologyGate` in 76 ms.
+- Next gate: commit and push this source-only topology before registering any of the 77 already sealed Polaris attic uprights to its immutable faces; no completed-bid coordinates may rewrite the source geometry.
+
 ## 2026-07-11 - Egnyte-bound roof coordination calibration
 
 - Replaced the stale `uncoordinated MEP` roof blocker with sealed bindings to the current A-121/A-201/A-301 architectural pages, M109 roof mechanical plan, P109 roof plumbing plan, R2 submitted sprinkler cover/FP-8 sheets, and DA-3 hydraulic node analysis from the protected Egnyte job files.

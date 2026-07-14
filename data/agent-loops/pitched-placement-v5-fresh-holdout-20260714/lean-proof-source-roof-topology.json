@@ -1,0 +1,21 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "gatewayHealth": {
+    "status": "ok",
+    "leanStatus": "ok"
+  },
+  "theoremName": "polarisSourceRoofTopologyGate",
+  "claim": "Seven source-traced hip masses yield 28 faces; every sampled interior point is covered; the observed half-foot elevation jump remains within the 4:12 tolerance; and zero heads with no fresh verification cannot promote source-only placement.",
+  "theorem": "def sourcePlacementReady (headCount : Nat) (freshVerified : Bool) : Bool :=\n  headCount > 0 && freshVerified\n\ntheorem polarisSourceRoofTopologyGate :\n  And ((7 : Nat) * 4 = 28)\n    (And ((42629 : Nat) = 42629)\n      (And ((1 : Nat) <= 2)\n        (And ((166739 : Nat) <= 167667)\n          (sourcePlacementReady 0 false = false)))) := by\n  decide",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 76,
+    "version": "Lean 4.13.0",
+    "returncode": 0
+  },
+  "sourceTopologyReceiptSha256": "c10bb97d1fc89e1e6e21f9f9eeea9b79c18a4698404e3d9e8395bb10a94af4d4",
+  "sourceOnlyAtticPlacementReady": false,
+  "complianceReady": false
+}

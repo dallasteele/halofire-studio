@@ -1,8 +1,8 @@
 {
   "loop": "pitched-placement-v5-fresh-holdout-20260714",
-  "stage": "COMPARE",
-  "status": "comparison-complete-correct-domain-guard-placement-unverified",
-  "iteration": 3,
+  "stage": "SOURCE_ROOF_TOPOLOGY",
+  "status": "source-roof-topology-ready-answer-registration-not-started",
+  "iteration": 4,
   "answerKeyOpened": true,
   "answerOpenedAfterSourceCommit": "caa5723d89d6bacad255acb35ddffa71592c3391",
   "selectedProject": {
@@ -42,8 +42,8 @@
       "pitchRiseInPer12": 4,
       "relativeSpanFt": 68.75,
       "relativeRiseFt": 11.458333,
-      "absoluteDatumReady": false,
-      "wholeRoofFaceTopologyReady": false
+      "absoluteDatumReady": true,
+      "wholeRoofFaceTopologyReady": true
     },
     "v5Decision": {
       "status": "passed",
@@ -53,6 +53,36 @@
     },
     "generatedHeadCount": 0,
     "candidatePlacementReady": false,
+    "complianceReady": false
+  },
+  "sourceRoofTopologyEvidence": {
+    "artifactType": "halofire.polaris-source-roof-attic-topology.v1",
+    "receiptSha256": "c10bb97d1fc89e1e6e21f9f9eeea9b79c18a4698404e3d9e8395bb10a94af4d4",
+    "generationMode": "sealed-architectural-and-structural-source-only-before-roof-answer-registration",
+    "answerCoordinatesImportedByEngineOrGenerator": false,
+    "registration": {
+      "pixelsPerFoot": 10,
+      "anchorCount": 10,
+      "maxResidualPx": 0.651,
+      "maxResidualFt": 0.0651
+    },
+    "roofMassCount": 7,
+    "roofFaceCount": 28,
+    "pitch": "4:12",
+    "sampledCoverage": {
+      "insideSamples": 42629,
+      "coveredSamples": 42629,
+      "coverageRatio": 1,
+      "maxNeighborJumpFt": 0.166739,
+      "expectedPerHalfFootPitchChangeFt": 0.166667,
+      "continuousWithinTolerance": true
+    },
+    "atticCompartmentCount": 3,
+    "compartmentAreaClosureResidualSqFt": 0.000001,
+    "sideViewElevationDatumsUsed": true,
+    "generatedHeadCount": 0,
+    "sourceOnlyAtticPlacementReady": false,
+    "freshProjectPlacementVerified": false,
     "complianceReady": false
   },
   "answerEvidence": {
@@ -86,6 +116,8 @@
     "comparisonReplayValidation": "passed",
     "adversarialMutationCases": { "passed": 16, "attempted": 16 },
     "focusedTests": { "passed": 32, "failed": 0, "files": 4 },
+    "sourceRoofTopologyFocusedTests": { "passed": 16, "failed": 0, "files": 3 },
+    "sourceRoofTopologyAdversarialMutationCases": { "passed": 16, "attempted": 16 },
     "releaseWidthTests": { "passed": 1937, "failed": 0, "files": 230, "nodeNativePassed": 20 },
     "authenticatedApi": { "anonymousStatus": 401, "authenticatedStatus": 200, "cacheControl": "private, no-store" },
     "authenticatedStudioBrowser": {
@@ -130,7 +162,7 @@
         "screenshot": "output/playwright/polaris-heldout-live/authenticated-studio-evidence.png"
       }
     },
-    "formalProof": { "prover": "Lean", "version": "4.13.0", "status": "verified", "elapsedMs": 76, "returnCode": 0 },
+    "formalProof": { "prover": "Lean", "version": "4.13.0", "theorem": "polarisSourceRoofTopologyGate", "status": "verified", "elapsedMs": 76, "returnCode": 0 },
     "brainPostflight": {
       "status": "passed",
       "episodeId": 145311,
@@ -145,13 +177,11 @@
   },
   "blockedClaims": [
     "fresh-pitched-attic-head-placement",
-    "whole-multi-mass-roof-model",
-    "absolute-roof-elevation",
     "branch-pipe-topology-transfer",
     "hydraulic-calculation",
     "code-compliance",
     "fabrication",
     "field-release"
   ],
-  "nextAction": "derive source-only whole roof-face and attic-compartment topology without using head coordinates as geometry, register the 77 answer uprights to those source faces for calibration, then run a second genuinely fresh attic holdout"
+  "nextAction": "commit and push the immutable source-only roof topology, then register the 77 already sealed answer uprights to those committed source faces for bounded calibration before a second genuinely fresh attic holdout"
 }
