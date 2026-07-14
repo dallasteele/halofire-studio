@@ -1,0 +1,1054 @@
+{
+  "artifactType": "halofire.cholla-main-house-completed-layout-registration.v1",
+  "projectId": "boyd-cholla-main-house-scottsdale-az",
+  "sequence": {
+    "answerExposed": true,
+    "freshBeforeAnswerOpen": false,
+    "correctedImplementationEligibleAsFreshHoldout": false
+  },
+  "dependencyReceipts": {
+    "sourceSealReceiptSha256": "f77a2a15ab76762c2376edaa4d1c5d36a6b4ecd607960b50ea0b8348d3941823",
+    "sourceDecisionReceiptSha256": "5d28547bee67ec9dd74e06969f399494639ae0d3cc3725b5b5ef9759f1d7db3a",
+    "heldoutComparisonReceiptSha256": "d63714a8afb62a0943b00559142be7cb8b1eb5ab73cfb5825a5541eb6a459258"
+  },
+  "answerSources": [
+    {
+      "role": "approved-sprinkler-answer",
+      "file": "5578-23-1_APPROVED-SPKL.pdf",
+      "sha256": "aca50702f61969dd6e280a0cc6147e8f38de9b244ad345df2f34dbdaa59a9ea1",
+      "bytes": 1032103,
+      "page": 2
+    },
+    {
+      "role": "as-built-sprinkler-answer",
+      "file": "Boyd Residence - Scottsdale AZ_as builts.pdf",
+      "sha256": "d000944951e8e55c4d7e413ec17928e7849eca05b6677f12a4eae1891f4d3313",
+      "bytes": 1226254,
+      "page": 2
+    }
+  ],
+  "coordinateSystem": {
+    "unit": "pdf-point",
+    "origin": "page-top-left",
+    "pageWidthPt": 3456,
+    "pageHeightPt": 2592.23999,
+    "publishedScale": "1/4 inch = 1 foot",
+    "pointsPerFoot": 18,
+    "buildingDatumTransform": null,
+    "buildingRegistrationReady": false
+  },
+  "headExtraction": {
+    "primary": {
+      "method": "black-filled-core-rectangle",
+      "widthPt": [
+        4.3,
+        4.7
+      ],
+      "heightPt": [
+        4.3,
+        4.7
+      ],
+      "detected": 45
+    },
+    "independent": {
+      "method": "white-halo-path",
+      "widthPt": [
+        8.85,
+        9.15
+      ],
+      "heightPt": [
+        8.85,
+        9.15
+      ],
+      "minimumPathItems": 50,
+      "detected": 45,
+      "maximumCenterResidualPt": 0.017782
+    },
+    "thresholdStability": {
+      "4.2-4.8": 45,
+      "4.3-4.7": 45,
+      "4.4-4.6": 45
+    },
+    "approvedAsBuiltMaximumResidualPt": 0,
+    "scheduleCrossCheck": {
+      "scheduledHeads": 45,
+      "extractedHeads": 45,
+      "family": "residential pendent",
+      "status": "passed"
+    }
+  },
+  "heads": [
+    {
+      "id": "cholla-f02-head-01",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1057.099,
+      "yPt": 1580.681,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-02",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1287.409,
+      "yPt": 1580.681,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-03",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1036.836,
+      "yPt": 1354.824,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-04",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1213.929,
+      "yPt": 1399.836,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-05",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1069.103,
+      "yPt": 1053.152,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-06",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1187.666,
+      "yPt": 1872.586,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-07",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1371.024,
+      "yPt": 1872.586,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-08",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 993.313,
+      "yPt": 1908.605,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-09",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1015.955,
+      "yPt": 1823.06,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-10",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1293.472,
+      "yPt": 1291.778,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-11",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1176.41,
+      "yPt": 1157.469,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-12",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1252.2,
+      "yPt": 462.772,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-13",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1333.385,
+      "yPt": 869.304,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-14",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1292.242,
+      "yPt": 689.209,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-15",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1302.476,
+      "yPt": 1053.149,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-16",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1027.081,
+      "yPt": 770.252,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-17",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1583.385,
+      "yPt": 1048.816,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-18",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1583.391,
+      "yPt": 798.872,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-19",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1418.788,
+      "yPt": 1291.791,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-20",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1302.476,
+      "yPt": 1193.486,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-21",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 986.559,
+      "yPt": 553.399,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-22",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1816.149,
+      "yPt": 747.886,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-23",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1789.137,
+      "yPt": 923.101,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-24",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1996.25,
+      "yPt": 954.44,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-25",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2178.593,
+      "yPt": 954.439,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-26",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1996.247,
+      "yPt": 645.277,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-27",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2248.38,
+      "yPt": 645.29,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-28",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1933.213,
+      "yPt": 1040.994,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-29",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2453.768,
+      "yPt": 516.479,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-30",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2594.032,
+      "yPt": 624.536,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-31",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2477.796,
+      "yPt": 669.559,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-32",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2571.52,
+      "yPt": 696.57,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-33",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2398.882,
+      "yPt": 633.54,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-34",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2547.373,
+      "yPt": 1065.755,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-35",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2409.716,
+      "yPt": 1065.755,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-36",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2294.904,
+      "yPt": 1208.708,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-37",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2490.429,
+      "yPt": 1208.708,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-38",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2356.802,
+      "yPt": 1842.419,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-39",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2559.004,
+      "yPt": 1842.419,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-40",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2356.802,
+      "yPt": 1494.247,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-41",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2559.004,
+      "yPt": 1494.247,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-42",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 2453.238,
+      "yPt": 813.623,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-43",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1766.285,
+      "yPt": 1224.853,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-44",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1084.861,
+      "yPt": 462.772,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    },
+    {
+      "id": "cholla-f02-head-45",
+      "family": "residential-pendent-answer-observed",
+      "xPt": 1364.764,
+      "yPt": 1152.216,
+      "zFt": null,
+      "ceilingZoneId": null,
+      "elevationStatus": "ceiling-surface-and-zone-boundary-unresolved"
+    }
+  ],
+  "pipeVectorEvidence": {
+    "method": "paired-red-filled-orthogonal-rectangles-seeded-from-extracted-heads",
+    "rawCandidates": 182,
+    "averagedCandidates": 133,
+    "headConnectedSegments": [
+      [
+        [
+          2427.776,
+          1842.418
+        ],
+        [
+          2554.605,
+          1842.418
+        ]
+      ],
+      [
+        [
+          2361.2,
+          1842.418
+        ],
+        [
+          2422.375,
+          1842.418
+        ]
+      ],
+      [
+        [
+          2361.202,
+          1494.234
+        ],
+        [
+          2422.375,
+          1494.234
+        ]
+      ],
+      [
+        [
+          2427.776,
+          1494.234
+        ],
+        [
+          2554.58,
+          1494.234
+        ]
+      ],
+      [
+        [
+          2428.522,
+          1208.708
+        ],
+        [
+          2486.031,
+          1208.708
+        ]
+      ],
+      [
+        [
+          2343.375,
+          1065.757
+        ],
+        [
+          2405.292,
+          1065.757
+        ]
+      ],
+      [
+        [
+          2414.116,
+          1065.757
+        ],
+        [
+          2542.949,
+          1065.757
+        ]
+      ],
+      [
+        [
+          2294.904,
+          1129.126
+        ],
+        [
+          2294.904,
+          1204.321
+        ]
+      ],
+      [
+        [
+          2453.707,
+          520.868
+        ],
+        [
+          2453.707,
+          533.685
+        ]
+      ],
+      [
+        [
+          2594.032,
+          628.945
+        ],
+        [
+          2594.032,
+          654.107
+        ]
+      ],
+      [
+        [
+          2477.796,
+          659.814
+        ],
+        [
+          2477.796,
+          665.16
+        ]
+      ],
+      [
+        [
+          2571.52,
+          659.814
+        ],
+        [
+          2571.52,
+          692.175
+        ]
+      ],
+      [
+        [
+          2398.882,
+          637.934
+        ],
+        [
+          2398.882,
+          653.234
+        ]
+      ],
+      [
+        [
+          2183.016,
+          954.441
+        ],
+        [
+          2337.746,
+          954.441
+        ]
+      ],
+      [
+        [
+          2252.779,
+          645.277
+        ],
+        [
+          2337.746,
+          645.277
+        ]
+      ],
+      [
+        [
+          2000.683,
+          645.277
+        ],
+        [
+          2243.98,
+          645.277
+        ]
+      ],
+      [
+        [
+          2000.669,
+          954.441
+        ],
+        [
+          2174.199,
+          954.441
+        ]
+      ],
+      [
+        [
+          2343.375,
+          813.623
+        ],
+        [
+          2448.844,
+          813.623
+        ]
+      ],
+      [
+        [
+          1806.975,
+          747.874
+        ],
+        [
+          1811.755,
+          747.874
+        ]
+      ],
+      [
+        [
+          1793.53,
+          923.092
+        ],
+        [
+          1801.723,
+          923.092
+        ]
+      ],
+      [
+        [
+          1933.213,
+          1045.386
+        ],
+        [
+          1933.213,
+          1078.069
+        ]
+      ],
+      [
+        [
+          1766.286,
+          1084.962
+        ],
+        [
+          1766.286,
+          1220.458
+        ]
+      ],
+      [
+        [
+          1583.397,
+          1053.214
+        ],
+        [
+          1583.397,
+          1079.332
+        ]
+      ],
+      [
+        [
+          986.559,
+          557.767
+        ],
+        [
+          986.559,
+          646.52
+        ]
+      ],
+      [
+        [
+          1252.2,
+          467.153
+        ],
+        [
+          1252.2,
+          645.596
+        ]
+      ],
+      [
+        [
+          1270.175,
+          689.209
+        ],
+        [
+          1287.82,
+          689.209
+        ]
+      ],
+      [
+        [
+          1084.861,
+          467.153
+        ],
+        [
+          1084.861,
+          645.596
+        ]
+      ],
+      [
+        [
+          1270.175,
+          869.304
+        ],
+        [
+          1328.956,
+          869.304
+        ]
+      ],
+      [
+        [
+          1073.497,
+          1053.152
+        ],
+        [
+          1264.029,
+          1053.152
+        ]
+      ],
+      [
+        [
+          1269.429,
+          1053.152
+        ],
+        [
+          1298.054,
+          1053.152
+        ]
+      ],
+      [
+        [
+          1180.832,
+          1157.457
+        ],
+        [
+          1263.282,
+          1157.457
+        ]
+      ],
+      [
+        [
+          1270.175,
+          1193.476
+        ],
+        [
+          1298.054,
+          1193.476
+        ]
+      ],
+      [
+        [
+          1297.866,
+          1291.778
+        ],
+        [
+          1414.39,
+          1291.778
+        ]
+      ],
+      [
+        [
+          1270.175,
+          1291.778
+        ],
+        [
+          1289.085,
+          1291.778
+        ]
+      ],
+      [
+        [
+          1041.234,
+          1354.812
+        ],
+        [
+          1263.282,
+          1354.812
+        ]
+      ],
+      [
+        [
+          1218.366,
+          1399.836
+        ],
+        [
+          1263.282,
+          1399.836
+        ]
+      ],
+      [
+        [
+          1061.477,
+          1580.681
+        ],
+        [
+          1264.029,
+          1580.681
+        ]
+      ],
+      [
+        [
+          1269.429,
+          1580.681
+        ],
+        [
+          1283.028,
+          1580.681
+        ]
+      ],
+      [
+        [
+          1192.046,
+          1872.586
+        ],
+        [
+          1264.029,
+          1872.586
+        ]
+      ],
+      [
+        [
+          1269.429,
+          1872.586
+        ],
+        [
+          1366.583,
+          1872.586
+        ]
+      ],
+      [
+        [
+          997.711,
+          1908.605
+        ],
+        [
+          1264.206,
+          1908.605
+        ]
+      ],
+      [
+        [
+          1020.345,
+          1823.06
+        ],
+        [
+          1263.282,
+          1823.06
+        ]
+      ],
+      [
+        [
+          1027.08,
+          652.489
+        ],
+        [
+          1027.08,
+          765.865
+        ]
+      ],
+      [
+        [
+          1583.397,
+          803.247
+        ],
+        [
+          1583.397,
+          1044.424
+        ]
+      ],
+      [
+        [
+          1364.759,
+          1084.962
+        ],
+        [
+          1364.759,
+          1147.821
+        ]
+      ],
+      [
+        [
+          956.967,
+          1908.605
+        ],
+        [
+          988.913,
+          1908.605
+        ]
+      ]
+    ],
+    "coveredHeadCount": 45,
+    "maximumHeadToSegmentDistancePt": 4.441,
+    "completeNetworkTopologyReady": false,
+    "limitation": "These segments prove head-adjacent pipe registration only; fittings, continuations, diameters, riser connectivity, and fabrication topology are not reconstructed."
+  },
+  "ceilingEvidence": {
+    "sourceDwgKnownLabels": [
+      {
+        "text": "10' CLG",
+        "count": 6
+      },
+      {
+        "text": "9' CLG",
+        "count": 2
+      }
+    ],
+    "completedAnswerAddedMaximumLabels": [
+      {
+        "id": "great-room-16-max",
+        "text": "16' MAX CLG",
+        "bboxPt": [
+          1460.87,
+          830.83,
+          1519.06,
+          842.44
+        ],
+        "heightStatus": "maximum-only-surface-shape-unresolved"
+      },
+      {
+        "id": "breakfast-14-max",
+        "text": "14' MAX CLG",
+        "bboxPt": [
+          1925.8,
+          714.64,
+          1983.99,
+          726.25
+        ],
+        "heightStatus": "maximum-only-surface-shape-unresolved"
+      },
+      {
+        "id": "kitchen-14-max",
+        "text": "14' MAX CLG",
+        "bboxPt": [
+          2176.04,
+          782.92,
+          2234.23,
+          794.53
+        ],
+        "heightStatus": "maximum-only-surface-shape-unresolved"
+      }
+    ],
+    "exactZoneBoundariesReady": false,
+    "exactCeilingSurfaceReady": false,
+    "exactDeflectorElevationReady": false,
+    "limitation": "MAX labels are scalar upper controls, not enough to infer pitch, spring line, orientation, polygon boundaries, or each head elevation."
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "45-black-core-vectors-plus-schedule-cross-check"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "45-white-halo-vectors-plus-approved-as-built-coordinate-identity"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "receipt-coordinate-count-pipe-zone-and-false-promotion-mutations",
+      "rejectedCases": [
+        "source-receipt",
+        "answer-identity",
+        "head-count",
+        "head-coordinate",
+        "independent-count",
+        "pipe-coverage",
+        "pipe-topology",
+        "ceiling-surface",
+        "deflector-elevation",
+        "fresh-placement",
+        "model3d",
+        "compliance"
+      ]
+    }
+  },
+  "answerExposedTopViewCalibrationReady": true,
+  "topViewReady": true,
+  "topViewScope": "completed-answer-pdf-coordinate-registration-only",
+  "freshHoldoutRequired": true,
+  "unseenProjectPlacementVerified": false,
+  "exactDeflectorElevationReady": false,
+  "elevationViewReady": false,
+  "wholeBuildingModelReady": false,
+  "model3dReady": false,
+  "completePipeTopologyReady": false,
+  "hydraulicReplayReady": false,
+  "obstructionClearanceReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "answer-exposed-completed-top-view-registration-not-fresh-placement-elevation-3d-compliance-or-fabrication",
+  "receiptSha256": "cf12e52180cedf9ac9c96a2dcb282fa2f4688f3820adef0a753c59cd59c0da66"
+}

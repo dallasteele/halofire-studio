@@ -63,4 +63,31 @@ describe('authenticated Cholla Main House fresh held-out evidence', () => {
     expect(body.checks.map((check) => check.status)).toEqual(['passed', 'passed', 'qualified-pass']);
     expect(body.adversarialLoop).toMatchObject({ status: 'passed', totalCases: 8 });
   });
+
+  it('protects the answer-exposed completed-layout registration', async () => {
+    expect((await fetch(`${BASE}/api/evidence/cholla-main-house-completed-layout-registration`)).status).toBe(401);
+  });
+
+  it('returns 45 completed head coordinates without promoting Z, 3D, topology, or compliance', async () => {
+    const response = await fetch(`${BASE}/api/evidence/cholla-main-house-completed-layout-registration`, { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    const body = await response.json();
+    expect(body).toMatchObject({
+      status: 'passed', artifactType: 'halofire.cholla-main-house-completed-layout-registration.v1',
+      headExtraction: { primary: { detected: 45 }, independent: { detected: 45 }, approvedAsBuiltMaximumResidualPt: 0 },
+      pipeVectorEvidence: { coveredHeadCount: 45, completeNetworkTopologyReady: false },
+      answerExposedTopViewCalibrationReady: true, topViewReady: true,
+      topViewScope: 'completed-answer-pdf-coordinate-registration-only', freshHoldoutRequired: true,
+      unseenProjectPlacementVerified: false, exactDeflectorElevationReady: false,
+      elevationViewReady: false, wholeBuildingModelReady: false, model3dReady: false,
+      completePipeTopologyReady: false, hydraulicReplayReady: false,
+      obstructionClearanceReady: false, complianceReady: false, fabricationReady: false,
+      fieldReleaseReady: false,
+    });
+    expect(body.heads).toHaveLength(45);
+    expect(body.pipeVectorEvidence.headConnectedSegments).toHaveLength(46);
+    expect(body.topViewSvg.match(/<circle /g)).toHaveLength(45);
+    expect(body.adversarialLoop).toMatchObject({ status: 'passed', totalCases: 12 });
+  });
 });

@@ -73,6 +73,7 @@ import { buildDillonStructuralRoofModel, buildDillonStructuralRoofPacket, render
 import { renderRegerFloresBoxBeamCalibrationViews, validateRegerFloresBoxBeamCalibration, verifyRegerFloresBoxBeamCalibrationAdversarialLoop } from '../engine/reger-flores-box-beam-calibration.js';
 import { buildSagewoodPitchedAtticCalibrationViews, validateSagewoodPitchedAtticCalibration, verifySagewoodPitchedAtticCalibrationAdversarialLoop } from '../engine/sagewood-pitched-attic-calibration.js';
 import { validateChollaHeldoutComparison, verifyChollaHeldoutAdversarialLoop } from '../engine/cholla-main-house-heldout-comparison.js';
+import { buildChollaCompletedLayoutView, validateChollaCompletedLayoutRegistration, verifyChollaCompletedLayoutAdversarialLoop } from '../engine/cholla-main-house-completed-layout-registration.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -164,6 +165,7 @@ const SAGEWOOD_PITCHED_ATTIC_CALIBRATION_PATH = path.resolve(__dirname, '../data
 const CHOLLA_SOURCE_SEAL_PATH = path.resolve(__dirname, '../data/cholla-main-house-unseen-pitched-holdout.json');
 const CHOLLA_SOURCE_DECISION_PATH = path.resolve(__dirname, '../data/cholla-main-house-source-only-volume-decision.json');
 const CHOLLA_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/cholla-main-house-heldout-comparison.json');
+const CHOLLA_COMPLETED_LAYOUT_REGISTRATION_PATH = path.resolve(__dirname, '../data/cholla-main-house-completed-layout-registration.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -2279,6 +2281,42 @@ app.get('/api/evidence/cholla-main-house-pitched-heldout', authMiddleware, async
   } catch (error) {
     log.error('Failed to load Cholla Main House held-out evidence', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'cholla_main_house_heldout_load_failed', unseenProjectPlacementVerified: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/cholla-main-house-completed-layout-registration', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(CHOLLA_COMPLETED_LAYOUT_REGISTRATION_PATH, 'utf8'));
+    const [validation, adversarialLoop] = await Promise.all([
+      validateChollaCompletedLayoutRegistration(packet),
+      verifyChollaCompletedLayoutAdversarialLoop(packet),
+    ]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop,
+        answerExposedTopViewCalibrationReady: false, unseenProjectPlacementVerified: false,
+        exactDeflectorElevationReady: false, model3dReady: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, projectId: packet.projectId,
+      receiptSha256: packet.receiptSha256, sequence: packet.sequence,
+      dependencyReceipts: packet.dependencyReceipts, answerSources: packet.answerSources,
+      coordinateSystem: packet.coordinateSystem, headExtraction: packet.headExtraction,
+      heads: packet.heads, pipeVectorEvidence: packet.pipeVectorEvidence,
+      ceilingEvidence: packet.ceilingEvidence, topViewSvg: buildChollaCompletedLayoutView(packet),
+      adversarialLoop, answerExposedTopViewCalibrationReady: true, topViewReady: true,
+      topViewScope: packet.topViewScope, freshHoldoutRequired: true,
+      unseenProjectPlacementVerified: false, exactDeflectorElevationReady: false,
+      elevationViewReady: false, wholeBuildingModelReady: false, model3dReady: false,
+      completePipeTopologyReady: false, hydraulicReplayReady: false,
+      obstructionClearanceReady: false, complianceReady: false, fabricationReady: false,
+      fieldReleaseReady: false, claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load Cholla Main House completed-layout registration evidence', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'cholla_main_house_completed_layout_registration_load_failed', unseenProjectPlacementVerified: false, exactDeflectorElevationReady: false, model3dReady: false, complianceReady: false });
   }
 });
 
