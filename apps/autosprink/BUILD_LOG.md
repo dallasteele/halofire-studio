@@ -1,5 +1,14 @@
 # HaloFire Build Log
 
+## 2026-07-14 - Polaris isolated-roof candidate rejected by sealed upright registration
+
+- Registered all 77 sealed Polaris attic uprights to the source geometry committed and pushed at `4ad324b1`, without allowing answer coordinates to rewrite that geometry.
+- The adversarial registration rejected the candidate: 74/77 uprights map to a candidate face, 70/77 map to an attic compartment, only 30 are usable within the candidate envelope, and 44 sit above the candidate roof. This disproves the isolated-rectangular-hip interpretation.
+- Demoted `wholeRoofFaceTopologyReady`, `absoluteRoofElevationReady`, and `wholeRoofModelReady` to false. The surviving claims are limited to registration integrity, exact floor extrusion, and the three source draft-stop compartments.
+- Added top, elevation, and 3D rejection proof showing the failed uprights in red. The proof explicitly distinguishes a model defect from a sprinkler compliance finding.
+- Verification: 20 focused tests across four Polaris source/comparison/calibration files passed; all 18 source-candidate and all 14 answer-registration adversarial mutations were rejected; deterministic replay and `node --check` passed. GX10 Lean 4.13.0 verified `polarisCandidateRejected` in 77 ms.
+- Required correction: trace the connected main gable/truss roof, raised end/entry masses, roof fills, and roof-overhang domains from source drawings. Use another completed project with clearer source geometry where Polaris cannot independently close a feature; do not force-fit the answer.
+
 ## 2026-07-14 - Polaris source roof faces and attic compartments
 
 - Registered the sealed S4 roof-framing plan to the exact 73-vertex RCP-DWG footprint at 10 px/ft using ten independent structural-line anchors; maximum residual is 0.651 px (0.0651 ft).

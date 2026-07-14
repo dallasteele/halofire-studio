@@ -1,0 +1,22 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "gatewayHealth": {
+    "status": "ok",
+    "gatewayVersion": "0.1.0",
+    "leanStatus": "ok"
+  },
+  "theoremName": "polarisCandidateRejected",
+  "claim": "A candidate cannot be calibration-ready when only 74 of 77 uprights map to roof faces, 70 map to attic compartments, and 44 lie above the candidate roof.",
+  "theorem": "def calibrationReady (uprights faceMapped compartmentMapped above : Nat) : Bool :=\n  uprights == 77 && faceMapped == 77 && compartmentMapped == 77 && above == 0\n\ntheorem polarisCandidateRejected :\n  calibrationReady 77 74 70 44 = false := by\n  decide",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 77,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  },
+  "sourceTopologyCalibrationReady": false,
+  "freshProjectPlacementVerified": false,
+  "complianceReady": false
+}

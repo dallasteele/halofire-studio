@@ -19,8 +19,8 @@ describe('Polaris source-only roof faces and attic compartments', () => {
     expect(topology.roofModel.allFacesFourInTwelve).toBe(true);
     expect(topology.roofModel.coverage.coverageRatio).toBe(1);
     expect(topology.roofModel.continuousAtHalfFootResolution).toBe(true);
-    expect(topology.wholeRoofFaceTopologyReady).toBe(true);
-    expect(topology.absoluteRoofElevationReady).toBe(true);
+    expect(topology.wholeRoofFaceTopologyReady).toBe(false);
+    expect(topology.absoluteRoofElevationReady).toBe(false);
     expect(topology.buildingExtrusion.sideViewsUsed).toEqual(['A4 physical page 9 building sections', 'A5 physical page 10 building sections']);
   });
 
@@ -47,6 +47,7 @@ describe('Polaris source-only roof faces and attic compartments', () => {
     expect(topology.sourceOnlyPipes3d).toEqual([]);
     expect(topology.answerKeyUsedForGeometry).toBe(false);
     expect(topology.sourceOnlyAtticPlacementReady).toBe(false);
+    expect(topology.wholeRoofModelReady).toBe(false);
     expect(topology.freshProjectPlacementVerified).toBe(false);
     expect(topology.hydraulicCalculationReady).toBe(false);
     expect(topology.complianceReady).toBe(false);
@@ -72,7 +73,7 @@ describe('Polaris source-only roof faces and attic compartments', () => {
     const adversarial = await verifyPolarisSourceRoofTopologyAdversarialLoop(topology, dependencies);
     expect(adversarial.status).toBe('passed');
     expect(adversarial.rejectedCases).toHaveLength(adversarial.attemptedCases);
-    expect(adversarial.attemptedCases).toBe(16);
+    expect(adversarial.attemptedCases).toBe(18);
   }, 30_000);
 
   it('does not import or read any sprinkler answer artifact in the source-only generator', () => {

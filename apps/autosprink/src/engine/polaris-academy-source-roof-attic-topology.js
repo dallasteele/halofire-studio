@@ -281,10 +281,10 @@ export async function buildPolarisSourceRoofAtticTopology(blindCandidate, depend
     },
     floorByFloorExtrusionReady: true,
     roofPlanRegistrationReady: registration.maxResidualPx <= 0.75,
-    wholeRoofFaceTopologyReady: roofFaces.length === 28 && coverage.coverageRatio === 1 && continuousAtHalfFootResolution,
+    wholeRoofFaceTopologyReady: false,
     atticCompartmentTopologyReady: compartments.length === 3 && Math.abs(compartmentAreaSqFt - blindCandidate.buildingModel.levels[0].footprintAreaSqFt) <= 0.000002,
-    absoluteRoofElevationReady: true,
-    wholeRoofModelReady: roofFaces.length === 28 && coverage.coverageRatio === 1 && continuousAtHalfFootResolution,
+    absoluteRoofElevationReady: false,
+    wholeRoofModelReady: false,
     sourceOnlyAtticPlacementReady: false,
     pitchedAtticHeadLayoutReady: false,
     freshProjectPlacementVerified: false,
@@ -292,9 +292,9 @@ export async function buildPolarisSourceRoofAtticTopology(blindCandidate, depend
     complianceReady: false,
     fabricationReady: false,
     fieldReleaseReady: false,
-    blockedClaims: ['source-only attic sprinkler placement', 'fresh-project attic placement', 'hydraulics', 'code compliance', 'fabrication', 'field release'],
-    requiredNextLoop: 'commit and push this source-only roof and compartment topology, then register the already sealed Polaris attic answer uprights to these immutable source faces for calibration before selecting another fresh attic holdout',
-    claimStatus: 'source-registered-scaled-floor-roof-face-and-attic-compartment-model-not-sprinkler-placement-code-compliance-or-fabrication',
+    blockedClaims: ['connected whole-roof face topology', 'absolute roof elevation', 'source-only attic sprinkler placement', 'fresh-project attic placement', 'hydraulics', 'code compliance', 'fabrication', 'field release'],
+    requiredNextLoop: 'use the committed source candidate only as a rejection oracle input, preserve its failed answer registration, and replace isolated rectangular hips with source-traced connected gable, raised mass, roof-fill, and overhang domains',
+    claimStatus: 'source-registered-scaled-floor-and-attic-compartment-candidate-with-isolated-roof-masses-rejected-by-answer-registration',
   };
   const withVerification = { ...draft, internalVerification: { ...draft.internalVerification, adversarial: { ...draft.internalVerification.adversarial, status: 'passed' } } };
   return { ...withVerification, receiptSha256: await sha256Hex(withVerification) };
@@ -311,8 +311,8 @@ export async function validatePolarisSourceRoofAtticTopology(packet, dependencie
   if (packet?.planRegistration?.anchors?.length !== 10 || packet?.planRegistration?.maxResidualPx > 0.75 || packet?.planRegistration?.pixelsPerFoot !== 10) issues.push(issue('POLARIS_ROOF_REGISTRATION_DRIFT', 'S4-to-DWG registration no longer closes within the source pixel tolerance.'));
   if (packet?.roofModel?.massCount !== 7 || packet?.roofModel?.faceCount !== 28 || packet?.roofModel?.faces?.length !== 28 || packet?.roofModel?.allFacesFourInTwelve !== true || packet?.roofModel?.coverage?.coverageRatio !== 1 || packet?.roofModel?.continuousAtHalfFootResolution !== true) issues.push(issue('POLARIS_ROOF_FACE_TOPOLOGY_DRIFT', 'Seven source roof masses, 28 four-in-twelve faces, complete sampled footprint coverage, and continuous half-foot envelope replay are required.'));
   if (packet?.atticModel?.compartmentCount !== 3 || packet?.atticModel?.compartments?.length !== 3 || packet?.atticModel?.areaClosureResidualSqFt > 0.000002) issues.push(issue('POLARIS_ATTIC_COMPARTMENT_DRIFT', 'Three draft-stop compartments must close exactly to the source footprint.'));
-  if (packet?.sourceOnlyHeads3d?.length !== 0 || packet?.sourceOnlyPipes3d?.length !== 0 || packet?.answerKeyUsedForGeometry !== false || packet?.completedBidUsedForGeometry !== false || packet?.sourceOnlyAtticPlacementReady !== false || packet?.freshProjectPlacementVerified !== false || packet?.hydraulicCalculationReady !== false || packet?.complianceReady !== false || packet?.fabricationReady !== false || packet?.fieldReleaseReady !== false) issues.push(issue('POLARIS_ROOF_FALSE_PROMOTION', 'Source roof topology must not promote placement or downstream claims.'));
-  return { status: issues.length ? 'blocked' : 'passed', issues, roofFaceTopologyReady: issues.length === 0, atticCompartmentTopologyReady: issues.length === 0, sourceOnlyAtticPlacementReady: false, complianceReady: false };
+  if (packet?.sourceOnlyHeads3d?.length !== 0 || packet?.sourceOnlyPipes3d?.length !== 0 || packet?.answerKeyUsedForGeometry !== false || packet?.completedBidUsedForGeometry !== false || packet?.wholeRoofFaceTopologyReady !== false || packet?.absoluteRoofElevationReady !== false || packet?.wholeRoofModelReady !== false || packet?.sourceOnlyAtticPlacementReady !== false || packet?.freshProjectPlacementVerified !== false || packet?.hydraulicCalculationReady !== false || packet?.complianceReady !== false || packet?.fabricationReady !== false || packet?.fieldReleaseReady !== false) issues.push(issue('POLARIS_ROOF_FALSE_PROMOTION', 'Rejected source roof candidate must not promote whole-roof, absolute-elevation, placement, or downstream claims.'));
+  return { status: issues.length ? 'blocked' : 'passed', issues, roofCandidateIntegrityReady: issues.length === 0, roofFaceTopologyReady: false, atticCompartmentTopologyReady: issues.length === 0, sourceOnlyAtticPlacementReady: false, complianceReady: false };
 }
 
 export async function verifyPolarisSourceRoofTopologyAdversarialLoop(packet, dependencies) {
@@ -330,6 +330,8 @@ export async function verifyPolarisSourceRoofTopologyAdversarialLoop(packet, dep
     ['area', (value) => { value.atticModel.areaClosureResidualSqFt = 1; }],
     ['head', (value) => { value.sourceOnlyHeads3d.push({ id: 'fabricated' }); }],
     ['answer', (value) => { value.answerKeyUsedForGeometry = true; }],
+    ['whole-roof', (value) => { value.wholeRoofModelReady = true; }],
+    ['absolute-elevation', (value) => { value.absoluteRoofElevationReady = true; }],
     ['placement', (value) => { value.sourceOnlyAtticPlacementReady = true; }],
     ['fresh', (value) => { value.freshProjectPlacementVerified = true; }],
     ['compliance', (value) => { value.complianceReady = true; }],

@@ -1,0 +1,1316 @@
+{
+  "artifactType": "halofire.polaris-attic-face-calibration.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "sourceTopologyCommit": "4ad324b1",
+  "sourceTopologyReceiptSha256": "e34d8bdccd5b5f09c1708cfb84b87f350027444377e16de8a222ba1c3fc662f6",
+  "answerEvidenceReceiptSha256": "363afb88705ad516f1432c8b85a2f47f077154ca977e3f4dc5d31013cb142da9",
+  "mode": "answer-exposed-rejection-and-calibration-after-immutable-source-candidate",
+  "sequence": {
+    "sourceGeometryCommittedAndPushedBeforeRegistration": true,
+    "sourceGeometryCommit": "4ad324b1",
+    "sourceClaimDemotionRecordedWithCalibration": true,
+    "answerCoordinatesUsedToRewriteSourceGeometry": false,
+    "exactCoordinateTransferAllowed": false,
+    "normalizedCoordinateTransferAllowed": false
+  },
+  "assignments": [
+    {
+      "headId": "polaris-answer-upright-001",
+      "pointFt": [
+        7.333333,
+        55,
+        11.375
+      ],
+      "faceId": "west-north-west",
+      "massId": "west-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 12.444442,
+      "candidateRoofClearanceFt": 1.069442,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-002",
+      "pointFt": [
+        7.333333,
+        42,
+        15
+      ],
+      "faceId": "west-north-south",
+      "massId": "west-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 10.999986,
+      "candidateRoofClearanceFt": -4.000014,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-003",
+      "pointFt": [
+        20.333333,
+        42,
+        15
+      ],
+      "faceId": "west-north-south",
+      "massId": "west-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 10.999986,
+      "candidateRoofClearanceFt": -4.000014,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-004",
+      "pointFt": [
+        20.333333,
+        55,
+        11.375
+      ],
+      "faceId": "west-north-north",
+      "massId": "west-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 14.766685,
+      "candidateRoofClearanceFt": 3.391685,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-005",
+      "pointFt": [
+        33.333333,
+        55,
+        11.375
+      ],
+      "faceId": "west-north-north",
+      "massId": "west-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 14.766685,
+      "candidateRoofClearanceFt": 3.391685,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-006",
+      "pointFt": [
+        33.333333,
+        42,
+        15
+      ],
+      "faceId": "west-north-south",
+      "massId": "west-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 10.999986,
+      "candidateRoofClearanceFt": -4.000014,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-007",
+      "pointFt": [
+        168.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "east-south-north",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 11.611122,
+      "candidateRoofClearanceFt": -5.513878,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-008",
+      "pointFt": [
+        168.311198,
+        23.166667,
+        14
+      ],
+      "faceId": "east-south-east",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.229656,
+      "candidateRoofClearanceFt": -0.770344,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-009",
+      "pointFt": [
+        168.310342,
+        9.742966,
+        11.333333
+      ],
+      "faceId": "east-south-east",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.229942,
+      "candidateRoofClearanceFt": 1.896609,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-010",
+      "pointFt": [
+        168.310342,
+        0.25,
+        11.333333
+      ],
+      "faceId": "east-south-south",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 10.083333,
+      "candidateRoofClearanceFt": -1.25,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-011",
+      "pointFt": [
+        168.310342,
+        45.166667,
+        17.375
+      ],
+      "faceId": "east-north-south",
+      "massId": "east-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 12.055541,
+      "candidateRoofClearanceFt": -5.319459,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-012",
+      "pointFt": [
+        168.310342,
+        56.166667,
+        17.375
+      ],
+      "faceId": "east-north-east",
+      "massId": "east-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.229942,
+      "candidateRoofClearanceFt": -4.145058,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-013",
+      "pointFt": [
+        155.310342,
+        56.166667,
+        17.416667
+      ],
+      "faceId": "east-north-north",
+      "massId": "east-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 14.377796,
+      "candidateRoofClearanceFt": -3.038871,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-014",
+      "pointFt": [
+        155.310342,
+        45.166667,
+        17.375
+      ],
+      "faceId": "east-north-south",
+      "massId": "east-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 12.055541,
+      "candidateRoofClearanceFt": -5.319459,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-015",
+      "pointFt": [
+        142.310342,
+        56.166667,
+        17.458333
+      ],
+      "faceId": "east-north-north",
+      "massId": "east-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 14.377796,
+      "candidateRoofClearanceFt": -3.080537,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-016",
+      "pointFt": [
+        142.310342,
+        45.166667,
+        17.375
+      ],
+      "faceId": "east-north-south",
+      "massId": "east-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 12.055541,
+      "candidateRoofClearanceFt": -5.319459,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-017",
+      "pointFt": [
+        154.310342,
+        0.25,
+        11.333333
+      ],
+      "faceId": "east-south-south",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 10.083333,
+      "candidateRoofClearanceFt": -1.25,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-018",
+      "pointFt": [
+        156.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "east-south-north",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 11.611122,
+      "candidateRoofClearanceFt": -5.513878,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-019",
+      "pointFt": [
+        156.310342,
+        9.742966,
+        11.333333
+      ],
+      "faceId": "east-south-south",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.247652,
+      "candidateRoofClearanceFt": 1.914319,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-020",
+      "pointFt": [
+        156.311198,
+        23.166667,
+        14.041667
+      ],
+      "faceId": "east-south-north",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 15.277785,
+      "candidateRoofClearanceFt": 1.236118,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-021",
+      "pointFt": [
+        144.311198,
+        23.166667,
+        14.041667
+      ],
+      "faceId": "east-south-north",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 15.277785,
+      "candidateRoofClearanceFt": 1.236118,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-022",
+      "pointFt": [
+        140.310342,
+        0.25,
+        11
+      ],
+      "faceId": "east-south-south",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 10.083333,
+      "candidateRoofClearanceFt": -0.916667,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-023",
+      "pointFt": [
+        144.310342,
+        9.742966,
+        11.333333
+      ],
+      "faceId": "east-south-south",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.247652,
+      "candidateRoofClearanceFt": 1.914319,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-024",
+      "pointFt": [
+        144.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "east-south-north",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 11.611122,
+      "candidateRoofClearanceFt": -5.513878,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-025",
+      "pointFt": [
+        132.310342,
+        9.742966,
+        11.333333
+      ],
+      "faceId": "east-south-south",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.247652,
+      "candidateRoofClearanceFt": 1.914319,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-026",
+      "pointFt": [
+        132.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "east-south-north",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 11.611122,
+      "candidateRoofClearanceFt": -5.513878,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-027",
+      "pointFt": [
+        132.311198,
+        23.166667,
+        14.083333
+      ],
+      "faceId": "east-south-north",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 15.277785,
+      "candidateRoofClearanceFt": 1.194452,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-028",
+      "pointFt": [
+        120.311198,
+        23.166667,
+        14.125
+      ],
+      "faceId": "main-long-east",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.22964,
+      "candidateRoofClearanceFt": -0.89536,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-029",
+      "pointFt": [
+        120.310342,
+        9.742966,
+        11
+      ],
+      "faceId": "east-south-west",
+      "massId": "east-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 12.770074,
+      "candidateRoofClearanceFt": 1.770074,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-030",
+      "pointFt": [
+        120.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "main-long-east",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.229914,
+      "candidateRoofClearanceFt": -3.895086,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-031",
+      "pointFt": [
+        108.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "main-long-east",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 17.22991,
+      "candidateRoofClearanceFt": 0.10491,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-032",
+      "pointFt": [
+        108.311198,
+        23.166667,
+        14.166667
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 16.055548,
+      "candidateRoofClearanceFt": 1.888881,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-033",
+      "pointFt": [
+        96.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 19.722211,
+      "candidateRoofClearanceFt": 2.597211,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-034",
+      "pointFt": [
+        96.311198,
+        23.166667,
+        14.166667
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 16.055548,
+      "candidateRoofClearanceFt": 1.888881,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-035",
+      "pointFt": [
+        84.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 19.722211,
+      "candidateRoofClearanceFt": 2.597211,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-036",
+      "pointFt": [
+        84.311198,
+        23.166667,
+        14.208333
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 16.055548,
+      "candidateRoofClearanceFt": 1.847215,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-037",
+      "pointFt": [
+        72.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "main-long-west",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 18.103435,
+      "candidateRoofClearanceFt": 0.978435,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-038",
+      "pointFt": [
+        72.311198,
+        23.166667,
+        14.25
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 16.055548,
+      "candidateRoofClearanceFt": 1.805548,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-039",
+      "pointFt": [
+        60.310377,
+        34.166667,
+        17.125
+      ],
+      "faceId": "main-long-west",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 14.103439,
+      "candidateRoofClearanceFt": -3.021561,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-040",
+      "pointFt": [
+        60.311198,
+        23.166667,
+        14.291667
+      ],
+      "faceId": "main-long-west",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 14.103713,
+      "candidateRoofClearanceFt": -0.187954,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-041",
+      "pointFt": [
+        48.310377,
+        34.166667,
+        17.166667
+      ],
+      "faceId": "main-long-west",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 10.103443,
+      "candidateRoofClearanceFt": -7.063224,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-042",
+      "pointFt": [
+        48.311198,
+        23.166667,
+        14.291667
+      ],
+      "faceId": "main-long-west",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 10.103717,
+      "candidateRoofClearanceFt": -4.18795,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-043",
+      "pointFt": [
+        36.311198,
+        23.166667,
+        14.333333
+      ],
+      "faceId": "west-south-east",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 13.896279,
+      "candidateRoofClearanceFt": -0.437054,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-044",
+      "pointFt": [
+        36.310377,
+        34.166667,
+        17.166667
+      ],
+      "faceId": "west-south-north",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 11.611122,
+      "candidateRoofClearanceFt": -5.555545,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-045",
+      "pointFt": [
+        24.310377,
+        34.166667,
+        17.166667
+      ],
+      "faceId": "west-south-north",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 11.611122,
+      "candidateRoofClearanceFt": -5.555545,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-046",
+      "pointFt": [
+        24.311198,
+        23.166667,
+        14.375
+      ],
+      "faceId": "west-south-north",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 15.277785,
+      "candidateRoofClearanceFt": 0.902785,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-047",
+      "pointFt": [
+        12.310377,
+        34.166667,
+        17.166667
+      ],
+      "faceId": "west-south-north",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 11.611122,
+      "candidateRoofClearanceFt": -5.555545,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-048",
+      "pointFt": [
+        12.311198,
+        23.166667,
+        14.416667
+      ],
+      "faceId": "west-south-west",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 14.103729,
+      "candidateRoofClearanceFt": -0.312938,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-049",
+      "pointFt": [
+        0.310342,
+        23.166667,
+        14.125
+      ],
+      "faceId": "west-south-west",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": null,
+      "candidateRoofElevationFt": 10.103447,
+      "candidateRoofClearanceFt": -4.021553,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-050",
+      "pointFt": [
+        0.310342,
+        34.166667,
+        16.833333
+      ],
+      "faceId": "west-south-west",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": null,
+      "candidateRoofElevationFt": 10.103447,
+      "candidateRoofClearanceFt": -6.729886,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-051",
+      "pointFt": [
+        52.310342,
+        11.166667,
+        13.666667
+      ],
+      "faceId": "main-long-west",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": null,
+      "candidateRoofElevationFt": 11.436763,
+      "candidateRoofClearanceFt": -2.229904,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-052",
+      "pointFt": [
+        64.248022,
+        11.2644,
+        13.666667
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 12.088129,
+      "candidateRoofClearanceFt": -1.578538,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-053",
+      "pointFt": [
+        76.310342,
+        11.166667,
+        13.666667
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 12.055552,
+      "candidateRoofClearanceFt": -1.611115,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-054",
+      "pointFt": [
+        88.310342,
+        11.166667,
+        13.666667
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 12.055552,
+      "candidateRoofClearanceFt": -1.611115,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-055",
+      "pointFt": [
+        100.310342,
+        11.166667,
+        13.666667
+      ],
+      "faceId": "main-long-south",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": null,
+      "candidateRoofElevationFt": 12.055552,
+      "candidateRoofClearanceFt": -1.611115,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-056",
+      "pointFt": [
+        31.310342,
+        14.160693,
+        14.166667
+      ],
+      "faceId": "west-south-south",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 13.053559,
+      "candidateRoofClearanceFt": -1.113108,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-057",
+      "pointFt": [
+        19.310342,
+        14.16017,
+        14.208333
+      ],
+      "faceId": "west-south-south",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 13.053385,
+      "candidateRoofClearanceFt": -1.154948,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-058",
+      "pointFt": [
+        7.310342,
+        14.159647,
+        14.208333
+      ],
+      "faceId": "west-south-west",
+      "massId": "west-south",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 12.436778,
+      "candidateRoofClearanceFt": -1.771555,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-059",
+      "pointFt": [
+        31.310342,
+        4.166667,
+        13.666667
+      ],
+      "faceId": null,
+      "massId": null,
+      "massKind": null,
+      "compartmentId": null,
+      "candidateRoofElevationFt": null,
+      "candidateRoofClearanceFt": null,
+      "status": "outside-source-roof-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-060",
+      "pointFt": [
+        7.310342,
+        4.166667,
+        13.666667
+      ],
+      "faceId": null,
+      "massId": null,
+      "massKind": null,
+      "compartmentId": null,
+      "candidateRoofElevationFt": null,
+      "candidateRoofClearanceFt": null,
+      "status": "outside-source-roof-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-061",
+      "pointFt": [
+        19.310342,
+        4.166667,
+        13.666667
+      ],
+      "faceId": null,
+      "massId": null,
+      "massKind": null,
+      "compartmentId": null,
+      "candidateRoofElevationFt": null,
+      "candidateRoofClearanceFt": null,
+      "status": "outside-source-roof-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-062",
+      "pointFt": [
+        130.311048,
+        56.166667,
+        11.041667
+      ],
+      "faceId": "east-north-west",
+      "massId": "east-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 10.770306,
+      "candidateRoofClearanceFt": -0.271361,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-063",
+      "pointFt": [
+        130.310634,
+        45.166667,
+        14.708333
+      ],
+      "faceId": "east-north-west",
+      "massId": "east-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 10.770168,
+      "candidateRoofClearanceFt": -3.938165,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-064",
+      "pointFt": [
+        118.311108,
+        56.166667,
+        11.083333
+      ],
+      "faceId": "main-long-east",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.896336,
+      "candidateRoofClearanceFt": 2.813003,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-065",
+      "pointFt": [
+        118.310644,
+        45.166667,
+        14.75
+      ],
+      "faceId": "main-long-east",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-east",
+      "candidateRoofElevationFt": 13.896491,
+      "candidateRoofClearanceFt": -0.853509,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-066",
+      "pointFt": [
+        106.311168,
+        56.166667,
+        11.125
+      ],
+      "faceId": "main-long-north",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 14.377796,
+      "candidateRoofClearanceFt": 3.252796,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-067",
+      "pointFt": [
+        106.310654,
+        45.166667,
+        14.75
+      ],
+      "faceId": "main-long-east",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 17.896484,
+      "candidateRoofClearanceFt": 3.146484,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-068",
+      "pointFt": [
+        94.310664,
+        45.166667,
+        14.75
+      ],
+      "faceId": "main-long-north",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 18.044459,
+      "candidateRoofClearanceFt": 3.294459,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-069",
+      "pointFt": [
+        94.311228,
+        56.166667,
+        11.125
+      ],
+      "faceId": "main-long-north",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 14.377796,
+      "candidateRoofClearanceFt": 3.252796,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-070",
+      "pointFt": [
+        82.311289,
+        56.166667,
+        11.166667
+      ],
+      "faceId": "main-long-north",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 14.377796,
+      "candidateRoofClearanceFt": 3.211129,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-071",
+      "pointFt": [
+        82.310674,
+        45.166667,
+        14.791667
+      ],
+      "faceId": "main-long-north",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 18.044459,
+      "candidateRoofClearanceFt": 3.252792,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-072",
+      "pointFt": [
+        70.311349,
+        56.166667,
+        11.208333
+      ],
+      "faceId": "main-long-north",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 14.377796,
+      "candidateRoofClearanceFt": 3.169463,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-073",
+      "pointFt": [
+        70.310684,
+        45.166667,
+        14.791667
+      ],
+      "faceId": "main-long-west",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 17.436871,
+      "candidateRoofClearanceFt": 2.645204,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-074",
+      "pointFt": [
+        58.310342,
+        56.166667,
+        10.75
+      ],
+      "faceId": "main-long-west",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 13.436761,
+      "candidateRoofClearanceFt": 2.686761,
+      "status": "mapped-within-candidate"
+    },
+    {
+      "headId": "polaris-answer-upright-075",
+      "pointFt": [
+        58.310695,
+        45.166667,
+        14.791667
+      ],
+      "faceId": "main-long-west",
+      "massId": "main-long",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-central",
+      "candidateRoofElevationFt": 13.436879,
+      "candidateRoofClearanceFt": -1.354788,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-076",
+      "pointFt": [
+        46.310705,
+        45.166667,
+        14.791667
+      ],
+      "faceId": "west-north-east",
+      "massId": "west-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 10.563114,
+      "candidateRoofClearanceFt": -4.228553,
+      "status": "answer-upright-above-candidate-roof"
+    },
+    {
+      "headId": "polaris-answer-upright-077",
+      "pointFt": [
+        46.310342,
+        56.166667,
+        10.75
+      ],
+      "faceId": "west-north-east",
+      "massId": "west-north",
+      "massKind": "lower-hip",
+      "compartmentId": "attic-west",
+      "candidateRoofElevationFt": 10.563235,
+      "candidateRoofClearanceFt": -0.186765,
+      "status": "answer-upright-above-candidate-roof"
+    }
+  ],
+  "summary": {
+    "uprightCount": 77,
+    "faceMappedCount": 74,
+    "compartmentMappedCount": 70,
+    "combinedFaceAndCompartmentCount": 70,
+    "aboveCandidateRoofCount": 44,
+    "usableMappingCount": 30,
+    "faceCounts": {
+      "east-north-east": 1,
+      "east-north-north": 2,
+      "east-north-south": 3,
+      "east-north-west": 2,
+      "east-south-east": 2,
+      "east-south-north": 7,
+      "east-south-south": 6,
+      "east-south-west": 1,
+      "main-long-east": 6,
+      "main-long-north": 6,
+      "main-long-south": 10,
+      "main-long-west": 9,
+      "unassigned": 3,
+      "west-north-east": 2,
+      "west-north-north": 2,
+      "west-north-south": 3,
+      "west-north-west": 1,
+      "west-south-east": 1,
+      "west-south-north": 4,
+      "west-south-south": 2,
+      "west-south-west": 4
+    },
+    "massCounts": {
+      "east-north": 8,
+      "east-south": 16,
+      "main-long": 31,
+      "unassigned": 3,
+      "west-north": 8,
+      "west-south": 11
+    },
+    "compartmentCounts": {
+      "attic-central": 21,
+      "attic-east": 30,
+      "attic-west": 19,
+      "unassigned": 7
+    },
+    "statusCounts": {
+      "answer-upright-above-candidate-roof": 44,
+      "mapped-within-candidate": 30,
+      "outside-source-roof-candidate": 3
+    },
+    "answerRowBands": [
+      {
+        "yFt": 0.25,
+        "count": 3
+      },
+      {
+        "yFt": 11.17,
+        "count": 4
+      },
+      {
+        "yFt": 11.26,
+        "count": 1
+      },
+      {
+        "yFt": 14.16,
+        "count": 3
+      },
+      {
+        "yFt": 23.17,
+        "count": 15
+      },
+      {
+        "yFt": 34.17,
+        "count": 15
+      },
+      {
+        "yFt": 4.17,
+        "count": 3
+      },
+      {
+        "yFt": 42,
+        "count": 3
+      },
+      {
+        "yFt": 45.17,
+        "count": 11
+      },
+      {
+        "yFt": 55,
+        "count": 3
+      },
+      {
+        "yFt": 56.17,
+        "count": 11
+      },
+      {
+        "yFt": 9.74,
+        "count": 5
+      }
+    ]
+  },
+  "rejection": {
+    "status": "rejected-source-topology-not-calibration-ready",
+    "failedInvariant": "every sealed upright must resolve to one source roof face and attic compartment at or below the exterior roof surface",
+    "reason": "44 of 77 uprights are above the isolated-mass candidate roof; only 70 resolve to both a face and compartment",
+    "sourceInterpretationDefects": [
+      "internal roof junctions were incorrectly treated as exterior eaves",
+      "the connected main gable/truss roof was split into isolated rectangular hips",
+      "raised end and entry masses were not independently closed to source datums",
+      "roof overhang domain was conflated with the wall/floor footprint"
+    ],
+    "requiredSourceRevision": [
+      "trace connected ridge, hip, valley, gable, and roof-fill lines from S4",
+      "bind each raised mass to A3/A4/A5 side-view elevation datums",
+      "separate roof eave/overhang polygons from floor extrusion polygons",
+      "rerun this same sealed 77-upright rejection gate without changing the answer evidence"
+    ]
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic registration of all 77 sealed upright coordinates to committed source candidate resolvers"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "source section and elevation visual review confirms connected gable, raised mass, and roof-fill features missing from isolated rectangles"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "source, answer, commit, assignment, count, failure-erasure, transfer, and false-promotion mutations"
+    }
+  },
+  "sourceTopologyCalibrationReady": false,
+  "pitchedAtticSelectorReadyForFreshHoldout": false,
+  "pitchedAtticHeadLayoutReady": false,
+  "freshProjectPlacementVerified": false,
+  "wholeRoofModelReady": false,
+  "absoluteRoofElevationReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "answer-exposed-rejection-of-isolated-polaris-roof-candidate-not-placement-compliance-or-fabrication",
+  "receiptSha256": "bdb0b74231cd4c168a24a07199c37429d26135fb322b2c0054a8a7a55d5cb5d1"
+}

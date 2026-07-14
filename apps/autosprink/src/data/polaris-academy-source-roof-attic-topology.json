@@ -5664,10 +5664,10 @@
   },
   "floorByFloorExtrusionReady": true,
   "roofPlanRegistrationReady": true,
-  "wholeRoofFaceTopologyReady": true,
+  "wholeRoofFaceTopologyReady": false,
   "atticCompartmentTopologyReady": true,
-  "absoluteRoofElevationReady": true,
-  "wholeRoofModelReady": true,
+  "absoluteRoofElevationReady": false,
+  "wholeRoofModelReady": false,
   "sourceOnlyAtticPlacementReady": false,
   "pitchedAtticHeadLayoutReady": false,
   "freshProjectPlacementVerified": false,
@@ -5676,6 +5676,8 @@
   "fabricationReady": false,
   "fieldReleaseReady": false,
   "blockedClaims": [
+    "connected whole-roof face topology",
+    "absolute roof elevation",
     "source-only attic sprinkler placement",
     "fresh-project attic placement",
     "hydraulics",
@@ -5683,7 +5685,7 @@
     "fabrication",
     "field release"
   ],
-  "requiredNextLoop": "commit and push this source-only roof and compartment topology, then register the already sealed Polaris attic answer uprights to these immutable source faces for calibration before selecting another fresh attic holdout",
-  "claimStatus": "source-registered-scaled-floor-roof-face-and-attic-compartment-model-not-sprinkler-placement-code-compliance-or-fabrication",
-  "receiptSha256": "c10bb97d1fc89e1e6e21f9f9eeea9b79c18a4698404e3d9e8395bb10a94af4d4"
+  "requiredNextLoop": "use the committed source candidate only as a rejection oracle input, preserve its failed answer registration, and replace isolated rectangular hips with source-traced connected gable, raised mass, roof-fill, and overhang domains",
+  "claimStatus": "source-registered-scaled-floor-and-attic-compartment-candidate-with-isolated-roof-masses-rejected-by-answer-registration",
+  "receiptSha256": "e34d8bdccd5b5f09c1708cfb84b87f350027444377e16de8a222ba1c3fc662f6"
 }
