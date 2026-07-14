@@ -519,5 +519,25 @@
     "source": "codex",
     "confidence": 0.99
   },
+  "iteration9DeploymentVerification": {
+    "status": "passed",
+    "commit": "f634795b1a5d396e2eabfc57fd8748403f5d8473",
+    "deploymentMethod": "fast-forward-only",
+    "service": "halofire.service",
+    "serviceState": "active",
+    "publicHealthStatus": 200,
+    "realAdminLoginStatus": 200,
+    "unauthenticatedPriorRouteStatus": 401,
+    "authenticatedPriorRouteStatus": 200,
+    "cacheControl": "private, no-store",
+    "receiptSha256": "20a553b24f20219e2f3d1e8022b05079dc6e22f3189c63c9684fcf3dbbf1bf26",
+    "precision": 1,
+    "recall": 1,
+    "maxPlanErrorFt": 2.614,
+    "winterGardenUsedForTuning": false,
+    "obstructionClearanceTransferAllowed": false,
+    "unseenProjectPlacementVerified": false,
+    "complianceReady": false
+  },
   "nextAction": "ITERATE by locating a separate completed pitched project not used for Dillon tuning, seal its source-only input before opening its completed sprinkler answer key, and run the Dillon empirical prior as a true unseen-project holdout. Preserve the Winter Garden failure unchanged. Keep whole-building layout, hydraulics, compliance, fabrication, and field release false. Defer final whole-system Computer Use until the system is genuinely ready."
 }
