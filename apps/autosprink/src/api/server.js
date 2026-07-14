@@ -70,6 +70,7 @@ import { buildNashvilleExtrusionModel, buildNashvilleFloorByFloorModel, renderNa
 import { renderDillonCompletedBidViews, validateDillonCompletedBidGeometry } from '../engine/dillon-completed-bid-geometry.js';
 import { buildDillonVerticalModel, renderDillonVerticalElevationView, validateDillonVerticalRegistration } from '../engine/dillon-vertical-registration.js';
 import { buildDillonStructuralRoofModel, buildDillonStructuralRoofPacket, renderDillonStructuralRoofTopView, validateDillonStructuralRoofPacket } from '../engine/dillon-structural-roof-surfaces.js';
+import { renderRegerFloresBoxBeamCalibrationViews, validateRegerFloresBoxBeamCalibration, verifyRegerFloresBoxBeamCalibrationAdversarialLoop } from '../engine/reger-flores-box-beam-calibration.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -156,6 +157,7 @@ const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by
 const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
 const DILLON_VERTICAL_REGISTRATION_PATH = path.resolve(__dirname, '../data/dillon-vertical-registration.json');
 const DILLON_STRUCTURAL_ROOF_SOURCE_PATH = path.resolve(__dirname, '../data/dillon-structural-framing-roof-source.json');
+const REGER_FLORES_BOX_BEAM_CALIBRATION_PATH = path.resolve(__dirname, '../data/reger-flores-box-beam-calibration.json');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
@@ -2176,6 +2178,36 @@ app.get('/api/evidence/completed-hydraulic-sized-3d-registration', authMiddlewar
   } catch (error) {
     log.error('Failed to load completed hydraulic sized-3D portfolio', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'completed_hydraulic_sized_3d_load_failed', complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/reger-flores-box-beam-calibration', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(REGER_FLORES_BOX_BEAM_CALIBRATION_PATH, 'utf8'));
+    const [validation, adversarialLoop] = await Promise.all([
+      validateRegerFloresBoxBeamCalibration(packet),
+      verifyRegerFloresBoxBeamCalibrationAdversarialLoop(packet),
+    ]);
+    const views = renderRegerFloresBoxBeamCalibrationViews(packet);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed' || views.status !== 'passed') {
+      return res.status(422).json({
+        status: 'blocked', artifactType: 'halofire.reger-flores-box-beam-evidence.v1',
+        issues: [...validation.issues, ...(views.issues || [])], adversarialLoop,
+        freshHoldoutRequired: true, unseenProjectPlacementVerified: false, complianceReady: false,
+      });
+    }
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: 'halofire.reger-flores-box-beam-evidence.v1',
+      projectName: packet.projectName, receiptSha256: packet.receiptSha256,
+      sourceEvidence: packet.sourceEvidence, geometry: packet.geometry, layoutControls: packet.layoutControls,
+      calibrationResult: packet.calibrationResult, views, adversarialLoop,
+      claimStatus: 'answer-exposed-beam-topology-calibration-not-fresh-acceptance-code-compliance-or-fabrication',
+      freshHoldoutRequired: true, unseenProjectPlacementVerified: false, complianceReady: false, fabricationReady: false,
+    });
+  } catch (error) {
+    log.error('Failed to load Reger-Flores box-beam calibration evidence', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'reger_flores_box_beam_calibration_load_failed', freshHoldoutRequired: true, complianceReady: false });
   }
 });
 

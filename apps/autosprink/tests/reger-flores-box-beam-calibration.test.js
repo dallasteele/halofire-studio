@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { replayRegerFloresBoxBeamCalibration, sealRegerFloresBoxBeamCalibration, validateRegerFloresBoxBeamCalibration, verifyRegerFloresBoxBeamCalibrationAdversarialLoop } from '../src/engine/reger-flores-box-beam-calibration.js';
+import { renderRegerFloresBoxBeamCalibrationViews, replayRegerFloresBoxBeamCalibration, sealRegerFloresBoxBeamCalibration, validateRegerFloresBoxBeamCalibration, verifyRegerFloresBoxBeamCalibrationAdversarialLoop } from '../src/engine/reger-flores-box-beam-calibration.js';
 
 const packet = JSON.parse(fs.readFileSync(new URL('../src/data/reger-flores-box-beam-calibration.json', import.meta.url), 'utf8'));
 
@@ -26,5 +26,16 @@ describe('Reger-Flores answer-exposed box-beam calibration', () => {
   it('rejects a resealed false fresh-holdout claim', async () => {
     const changed = structuredClone(packet); changed.unseenProjectPlacementVerified = true;
     expect((await validateRegerFloresBoxBeamCalibration(await sealRegerFloresBoxBeamCalibration(changed))).issues.map((entry) => entry.code)).toContain('REGER_BEAM_FALSE_PROMOTION');
+  });
+
+  it('renders six-head top, source-datum elevation, and partial 3D proof without promoting readiness', () => {
+    const proof = renderRegerFloresBoxBeamCalibrationViews(packet);
+    expect(proof.status).toBe('passed');
+    expect(proof.counts).toEqual({ heads: 6, ceilingPlanes: 2, beamPartitions: 2, protectionCells: 6 });
+    expect(proof.topSvg.match(/data-head-id=/g)).toHaveLength(6);
+    expect(proof.topSvg.match(/data-box-beam=/g)).toHaveLength(2);
+    expect(proof.elevationSvg).toContain('4:12 vault');
+    expect(proof.model3dSvg).toContain('Partial-room calibration model');
+    expect(proof).toMatchObject({ freshHoldoutRequired: true, complianceReady: false });
   });
 });
