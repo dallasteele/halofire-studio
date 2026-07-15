@@ -11,12 +11,14 @@
     "operationalReferenceExcludesDimensions",
     "canonicalTopologyRemovesConnectorOnlyCycles",
     "calculationCorpusDoesNotImplyNodeBinding",
-    "governedSkeletonDoesNotPromoteProperLayout"
+    "governedSkeletonDoesNotPromoteProperLayout",
+    "route21PipeTableInventoryCloses",
+    "route21FlowDoesNotImplyWholeLayout"
   ],
-  "claim": "Primary assignment closes at 67 and the operational layer closes at 17 after excluding two dimension baselines. Contracting source-contact connectors removes two artificial cycles and preserves two real loops. A present hydraulic calculation corpus does not imply canonical node binding, flow direction, grade direction, elevation, exact field drains, or proper-layout release.",
+  "claim": "Primary assignment closes at 67 and the operational layer closes at 17 after excluding two dimension baselines. Contracting source-contact connectors removes two artificial cycles and preserves two real loops. Remote area 2-1 closes at 14 calculation nodes and 13 pipe-table legs, but one bound hydraulic route does not imply whole-FP2.0 node binding, drainage grade direction, endpoint elevation, or proper-layout release.",
   "result": {
     "status": "verified",
-    "elapsedMs": 310,
+    "elapsedMs": 152,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

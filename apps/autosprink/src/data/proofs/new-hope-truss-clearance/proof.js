@@ -6,12 +6,14 @@ import { evaluateApprovedFp20PipeVectors } from '../../../engine/approved-fp20-p
 import { buildApprovedFp20PlanGraph } from '../../../engine/approved-fp20-plan-graph.js';
 import { evaluateApprovedFp20GovernedSkeleton } from '../../../engine/approved-fp20-governed-skeleton.js';
 import { canonicalizeApprovedFp20Topology } from '../../../engine/approved-fp20-canonical-topology.js';
+import { bindApprovedFp20HydraulicRoute } from '../../../engine/approved-fp20-hydraulic-route-binding.js';
 
 const calibrationUrl = '../../new-hope-truss-clearance-calibration.json';
 const sourceUrl = '../../new-hope-truss-clearance-source.json';
 const pipeVectorUrl = '../../new-hope-approved-fp20-pipe-vectors.json';
 const planGraphUrl = '../../new-hope-approved-fp20-plan-graph.json';
 const operationalAnnotationsUrl = '../../new-hope-approved-fp20-operational-annotations.json';
+const hydraulicRoute21Url = '../../new-hope-approved-fp20-hydraulic-route-2-1.json';
 const svg = document.querySelector('#structural-overlay');
 const pipeSvg = document.querySelector('#fp20-pipe-overlay');
 const rows = document.querySelector('#clearance-rows');
@@ -25,13 +27,14 @@ function element(name, attributes = {}) {
 }
 
 try {
-  const [response, sourceResponse, pipeVectorResponse, planGraphResponse, operationalResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl), fetch(operationalAnnotationsUrl)]);
+  const [response, sourceResponse, pipeVectorResponse, planGraphResponse, operationalResponse, hydraulicRoute21Response] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl), fetch(operationalAnnotationsUrl), fetch(hydraulicRoute21Url)]);
   if (!response.ok) throw new Error(`calibration fetch ${response.status}`);
   if (!sourceResponse.ok) throw new Error(`source fetch ${sourceResponse.status}`);
   if (!pipeVectorResponse.ok) throw new Error(`pipe vector fetch ${pipeVectorResponse.status}`);
   if (!planGraphResponse.ok) throw new Error(`plan graph fetch ${planGraphResponse.status}`);
   if (!operationalResponse.ok) throw new Error(`operational annotations fetch ${operationalResponse.status}`);
-  const [calibration, source, pipeVectors, planGraph, operationalAnnotations] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json(), operationalResponse.json()]);
+  if (!hydraulicRoute21Response.ok) throw new Error(`hydraulic route 2-1 fetch ${hydraulicRoute21Response.status}`);
+  const [calibration, source, pipeVectors, planGraph, operationalAnnotations, hydraulicRoute21Evidence] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json(), operationalResponse.json(), hydraulicRoute21Response.json()]);
   const scale = 1.5;
   const branchY = 430;
 
@@ -63,6 +66,8 @@ try {
   if (governedSkeleton.status !== 'passed') throw new Error(`approved FP2.0 governed skeleton: ${governedSkeleton.blockerCodes.join(', ')}`);
   const canonicalTopology = canonicalizeApprovedFp20Topology(planGraph);
   if (!canonicalTopology.canonicalTopologyReady) throw new Error(`approved FP2.0 canonical topology: ${canonicalTopology.blockerCodes.join(', ')}`);
+  const hydraulicRoute21 = bindApprovedFp20HydraulicRoute(canonicalTopology, hydraulicRoute21Evidence);
+  if (!hydraulicRoute21.route21HydraulicNodeBindingReady) throw new Error(`approved FP2.0 hydraulic route 2-1: ${hydraulicRoute21.blockerCodes.join(', ')}`);
   const remainingLayoutBlockers = [
     ...canonicalTopology.remainingTopologyBlockers,
     ...governedSkeleton.remainingLayoutBlockers.filter((entry) => entry.code !== 'FP20_CONNECTOR_CLUSTER_CANONICALIZATION_REQUIRED'),
@@ -133,10 +138,35 @@ try {
     pipeSvg.append(element('line', { class: 'plan-connector', x1: from.pdfPt.x, y1: from.pdfPt.y, x2: to.pdfPt.x, y2: to.pdfPt.y }));
   }
   for (const node of planGraph.nodes) pipeSvg.append(element('circle', { class: 'plan-node', cx: node.pdfPt.x, cy: node.pdfPt.y, r: 1.8 }));
+  const defs = element('defs');
+  const arrow = element('marker', { id: 'hydraulic-flow-arrow', viewBox: '0 0 10 10', refX: 8.5, refY: 5, markerUnits: 'userSpaceOnUse', markerWidth: 12, markerHeight: 12, orient: 'auto-start-reverse' });
+  arrow.append(element('path', { d: 'M 0 0 L 10 5 L 0 10 z', class: 'hydraulic-flow-arrowhead' }));
+  defs.append(arrow);
+  pipeSvg.prepend(defs);
+  const canonicalNodeById = new Map(canonicalTopology.nodes.map((node) => [node.id, node]));
+  for (const routeLeg of [...hydraulicRoute21.planRouteLegs].reverse()) {
+    const physicalNodeIds = [...routeLeg.nodeIds].reverse();
+    for (let index = 0; index < physicalNodeIds.length - 1; index += 1) {
+      const from = canonicalNodeById.get(physicalNodeIds[index]);
+      const to = canonicalNodeById.get(physicalNodeIds[index + 1]);
+      const line = element('line', { class: 'hydraulic-flow-vector', x1: from.pdfPt.x, y1: from.pdfPt.y, x2: to.pdfPt.x, y2: to.pdfPt.y, 'marker-end': 'url(#hydraulic-flow-arrow)' });
+      const title = element('title');
+      title.textContent = `Remote area 2-1 physical flow: ${routeLeg.calculationToNodeId} -> ${routeLeg.calculationFromNodeId}; calculation table is stored in reverse accumulation order`;
+      line.append(title);
+      pipeSvg.append(line);
+    }
+  }
+  for (const binding of hydraulicRoute21.planNodeBindings) {
+    pipeSvg.append(element('circle', { class: 'hydraulic-node', cx: binding.leaderTargetPdfPt.x, cy: binding.leaderTargetPdfPt.y, r: 4 }));
+    const label = element('text', { class: 'hydraulic-node-label', x: binding.leaderTargetPdfPt.x + 5, y: binding.leaderTargetPdfPt.y - 6 });
+    label.textContent = binding.calculationNodeId;
+    pipeSvg.append(label);
+  }
   document.querySelector('#vector-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.connectedPipeVectorCount}/${vectorAcceptance.metrics.pipeVectorCount} connected primary vectors, ${vectorAcceptance.metrics.sprinklerCount} heads`;
   document.querySelector('#plan-graph-status').textContent = `PASS: ${planGraph.metrics.nodeCount} nodes / ${planGraph.metrics.edgeCount} split edges / ${planGraph.metrics.connectedComponentCount} component`;
   document.querySelector('#size-proof-status').textContent = `PASS: ${governedSkeleton.metrics.assignedPrimarySegmentCount}/67 primary size + role assignments`;
   document.querySelector('#operations-proof-status').textContent = `PASS: ${governedSkeleton.metrics.operationalReferenceVectorCount} drain/test vectors + ${governedSkeleton.metrics.lowPointAnchorCount} low points`;
+  document.querySelector('#hydraulic-route-proof-status').textContent = `PASS: RA2-1 ${hydraulicRoute21.metrics.planBoundCalculationNodeCount} plan nodes / ${hydraulicRoute21.metrics.pipeTableLegCount} calc legs / source-to-terminal flow`;
   const candidate = buildNewHopeProperPipeGraphCandidate(calibration, source);
   const acceptance = evaluateProperPitchedPipeGraph(candidate);
   document.querySelector('#graph-node-count').textContent = canonicalTopology.metrics.canonicalNodeCount;
@@ -149,7 +179,7 @@ try {
     row.innerHTML = `<td style="color:#fda4af">${blocker.code}</td><td>${blocker.message}</td>`;
     blockerRows.append(row);
   }
-  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | primaryPipeVectorExtractionReady=${governedSkeleton.primaryPipeVectorExtractionReady} | wholeSystemVectorExtractionReady=${governedSkeleton.wholeSystemVectorExtractionReady} | sourceTopologyConnected=${vectorAcceptance.sourceTopologyConnected} | sourcePlanGraphReady=${planGraph.sourcePlanGraphReady} | canonicalTopologyReady=${canonicalTopology.canonicalTopologyReady} | canonicalNodes=${canonicalTopology.metrics.canonicalNodeCount} | canonicalEdges=${canonicalTopology.metrics.canonicalEdgeCount} | connectorOnlyCyclesRemoved=${canonicalTopology.metrics.artificialConnectorCycleCount} | sourceLoopsAwaitingCalcBinding=${canonicalTopology.metrics.canonicalCycleRank} | primaryPipeSizeAssignmentReady=${governedSkeleton.primaryPipeSizeAssignmentReady} | primaryPipeRoleAssignmentReady=${governedSkeleton.primaryPipeRoleAssignmentReady} | operationalReferenceExtractionReady=${governedSkeleton.operationalReferenceExtractionReady} | supplySourceAnchorReady=${governedSkeleton.supplySourceAnchorReady} | lowPointIntentReady=${governedSkeleton.lowPointIntentReady} | drainIntentReady=${governedSkeleton.drainIntentReady} | gradeMagnitudeReady=${governedSkeleton.gradeMagnitudeReady} | hydraulicCalculationCorpusReady=${governedSkeleton.hydraulicCalculationCorpusReady} | hydraulicNodeBindingReady=${governedSkeleton.hydraulicNodeBindingReady} | fieldDrainRouteResolved=${governedSkeleton.fieldDrainRouteResolved} | hydraulicFlowReady=${governedSkeleton.hydraulicFlowReady} | properPipeLayoutReady=${governedSkeleton.properPipeLayoutReady} | branchGradeDirectionReady=${governedSkeleton.gradeDirectionReady} | endpointElevationsReady=${governedSkeleton.endpointElevationsReady} | complianceReady=false | fabricationReady=${governedSkeleton.fabricationReady} | fieldReleaseReady=${governedSkeleton.fieldReleaseReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | primaryPipeVectorExtractionReady=${governedSkeleton.primaryPipeVectorExtractionReady} | wholeSystemVectorExtractionReady=${governedSkeleton.wholeSystemVectorExtractionReady} | sourceTopologyConnected=${vectorAcceptance.sourceTopologyConnected} | sourcePlanGraphReady=${planGraph.sourcePlanGraphReady} | canonicalTopologyReady=${canonicalTopology.canonicalTopologyReady} | canonicalNodes=${canonicalTopology.metrics.canonicalNodeCount} | canonicalEdges=${canonicalTopology.metrics.canonicalEdgeCount} | connectorOnlyCyclesRemoved=${canonicalTopology.metrics.artificialConnectorCycleCount} | sourceLoopsAwaitingCalcBinding=${canonicalTopology.metrics.canonicalCycleRank} | primaryPipeSizeAssignmentReady=${governedSkeleton.primaryPipeSizeAssignmentReady} | primaryPipeRoleAssignmentReady=${governedSkeleton.primaryPipeRoleAssignmentReady} | operationalReferenceExtractionReady=${governedSkeleton.operationalReferenceExtractionReady} | supplySourceAnchorReady=${governedSkeleton.supplySourceAnchorReady} | lowPointIntentReady=${governedSkeleton.lowPointIntentReady} | drainIntentReady=${governedSkeleton.drainIntentReady} | gradeMagnitudeReady=${governedSkeleton.gradeMagnitudeReady} | hydraulicCalculationCorpusReady=${governedSkeleton.hydraulicCalculationCorpusReady} | route21HydraulicNodeBindingReady=${hydraulicRoute21.route21HydraulicNodeBindingReady} | route21HydraulicFlowDirectionReady=${hydraulicRoute21.route21HydraulicFlowDirectionReady} | wholeFp20HydraulicNodeBindingReady=${hydraulicRoute21.wholeFp20HydraulicNodeBindingReady} | fieldDrainRouteResolved=${governedSkeleton.fieldDrainRouteResolved} | hydraulicFlowReady=${governedSkeleton.hydraulicFlowReady} | properPipeLayoutReady=${governedSkeleton.properPipeLayoutReady} | branchGradeDirectionReady=${governedSkeleton.gradeDirectionReady} | endpointElevationsReady=${governedSkeleton.endpointElevationsReady} | complianceReady=false | fabricationReady=${governedSkeleton.fabricationReady} | fieldReleaseReady=${governedSkeleton.fieldReleaseReady}`;
   document.documentElement.dataset.proofReady = 'true';
   document.documentElement.dataset.pipeVectorStatus = vectorAcceptance.status;
   document.documentElement.dataset.sourcePlanGraphStatus = planGraph.sourcePlanGraphReady ? 'passed' : 'blocked';
@@ -165,6 +195,8 @@ try {
   document.documentElement.dataset.gradeMagnitudeReady = String(governedSkeleton.gradeMagnitudeReady);
   document.documentElement.dataset.hydraulicCalculationCorpusReady = String(governedSkeleton.hydraulicCalculationCorpusReady);
   document.documentElement.dataset.hydraulicNodeBindingReady = String(governedSkeleton.hydraulicNodeBindingReady);
+  document.documentElement.dataset.route21HydraulicNodeBindingReady = String(hydraulicRoute21.route21HydraulicNodeBindingReady);
+  document.documentElement.dataset.route21HydraulicFlowDirectionReady = String(hydraulicRoute21.route21HydraulicFlowDirectionReady);
   document.documentElement.dataset.fieldDrainRouteResolved = String(governedSkeleton.fieldDrainRouteResolved);
   document.documentElement.dataset.pipeGraphStatus = governedSkeleton.properPipeLayoutReady ? 'passed' : 'blocked';
   document.documentElement.dataset.properPipeLayoutReady = String(governedSkeleton.properPipeLayoutReady);

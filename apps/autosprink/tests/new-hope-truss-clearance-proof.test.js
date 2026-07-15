@@ -16,7 +16,7 @@ describe('New Hope PDF-bound visual proof', () => {
 
   it('states the missing pipe-layout facts instead of presenting a connector as a design', () => {
     const html = read('index.html');
-    expect(html).toContain('FLOW, GRADE DIRECTION, AND Z STILL BLOCKED');
+    expect(html).toContain('WHOLE-SYSTEM GRADE DIRECTION AND Z STILL BLOCKED');
     expect(html).toContain('primaryPipeVectorExtractionReady=false');
     expect(html).toContain('wholeSystemVectorExtractionReady=false');
     expect(html).toContain('primaryPipeSizeAssignmentReady=false');
@@ -24,6 +24,8 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('properPipeLayoutReady=false');
     expect(html).toContain('branchGradeDirectionReady=false');
     expect(html).toContain('endpointElevationsReady=false');
+    expect(html).toContain('route21HydraulicNodeBindingReady=false');
+    expect(html).toContain('route21HydraulicFlowDirectionReady=false');
   });
 
   it('loads the sealed calibration and generates the S102 overlay from data', () => {
@@ -32,6 +34,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('../../new-hope-approved-fp20-pipe-vectors.json');
     expect(script).toContain('../../new-hope-approved-fp20-plan-graph.json');
     expect(script).toContain('../../new-hope-approved-fp20-operational-annotations.json');
+    expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-1.json');
     expect(script).toContain('calibration.trussLattice.centerlines');
     expect(script).toContain('calibration.branch.nodes');
     expect(script).toContain('pipeVectors.pipeSegments');
@@ -41,6 +44,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('evaluateApprovedFp20PipeVectors');
     expect(script).toContain('evaluateApprovedFp20GovernedSkeleton');
     expect(script).toContain('canonicalizeApprovedFp20Topology');
+    expect(script).toContain('bindApprovedFp20HydraulicRoute');
     expect(script).toContain("dataset.proofReady = 'true'");
     expect(script).toContain('dataset.pipeVectorStatus = vectorAcceptance.status');
     expect(script).toContain('dataset.primaryPipeSizeAssignmentReady = String(governedSkeleton.primaryPipeSizeAssignmentReady)');
@@ -49,6 +53,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.properPipeLayoutReady = String(governedSkeleton.properPipeLayoutReady)');
     expect(script).toContain('dataset.branchGradeDirectionReady = String(governedSkeleton.gradeDirectionReady)');
     expect(script).toContain('dataset.endpointElevationsReady = String(governedSkeleton.endpointElevationsReady)');
+    expect(script).toContain('dataset.route21HydraulicNodeBindingReady = String(hydraulicRoute21.route21HydraulicNodeBindingReady)');
     expect(script).toContain("dataset.drainDestinationReady = 'false'");
     expect(script).toContain('evaluateProperPitchedPipeGraph');
     expect(script).toContain("dataset.pipeGraphStatus = governedSkeleton.properPipeLayoutReady ? 'passed' : 'blocked'");
