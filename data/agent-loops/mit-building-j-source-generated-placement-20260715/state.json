@@ -103,7 +103,9 @@
     "ceiling-component grid orientation needs source branchline or room-axis evidence rather than a generic centered-grid tie-break",
     "exact installed head Z remains unknown even though all source protection target elevations score within one-half foot"
   ],
-  "implementationCommit": null,
+  "implementationCommit": "8182c64a",
   "brainPostflightEpisodeId": null,
+  "brainPostflightStatus": "HAL_BRAIN_TOKEN_UNAVAILABLE",
+  "brainPostflightDetail": "GX10 100.116.75.108 became unreachable after successful preflight recall; SSH port 22 and ICMP timed out, so the canonical remote token could not be retrieved",
   "nextAction": "extract Building J room/partition/open-to-structure and coordinated obstruction topology from the protected floor/RCP/MEP sources, add them to the sanitized generator input, seal a v2 candidate without answer access, and run the unchanged scorer before a second fresh pitched-roof holdout"
 }

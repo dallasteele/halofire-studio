@@ -21,7 +21,7 @@ reference log entries by date; log entries reference commits by short hash.
 
 ## 2026-07-15
 
-### Entry 01 - Building J source-only placement calibration (commit pending)
+### Entry 01 - Building J source-only placement calibration (commit `8182c64a`)
 
 - Implemented a source-only extraction and deterministic placement lane for the
   MIT Riverside Building J protected architectural PDF and RCP evidence. The
@@ -46,6 +46,10 @@ reference log entries by date; log entries reference commits by short hash.
   connections but returned no response for valid requests, and local Lean is
   not installed. The exact fail-closed request and receipt are retained in the
   loop evidence.
+- Obsidian brain preflight recall succeeded before implementation. Postflight
+  writeback was attempted after commit but GX10 then became unreachable over
+  SSH and ICMP, leaving the episode id unset with the exact
+  `HAL_BRAIN_TOKEN_UNAVAILABLE` status recorded in loop state.
 - Next: extract room/partition/open-to-structure and coordinated MEP obstruction
   topology, seal a v2 candidate with the answer still inaccessible, run the
   unchanged scorer, then validate on a fresh pitched-roof holdout.
