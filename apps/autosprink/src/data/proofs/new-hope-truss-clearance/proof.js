@@ -3,10 +3,12 @@ import {
   evaluateProperPitchedPipeGraph,
 } from '../../../engine/proper-pitched-pipe-graph.js';
 import { evaluateApprovedFp20PipeVectors } from '../../../engine/approved-fp20-pipe-vectors.js';
+import { buildApprovedFp20PlanGraph } from '../../../engine/approved-fp20-plan-graph.js';
 
 const calibrationUrl = '../../new-hope-truss-clearance-calibration.json';
 const sourceUrl = '../../new-hope-truss-clearance-source.json';
 const pipeVectorUrl = '../../new-hope-approved-fp20-pipe-vectors.json';
+const planGraphUrl = '../../new-hope-approved-fp20-plan-graph.json';
 const svg = document.querySelector('#structural-overlay');
 const pipeSvg = document.querySelector('#fp20-pipe-overlay');
 const rows = document.querySelector('#clearance-rows');
@@ -20,11 +22,12 @@ function element(name, attributes = {}) {
 }
 
 try {
-  const [response, sourceResponse, pipeVectorResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl)]);
+  const [response, sourceResponse, pipeVectorResponse, planGraphResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl)]);
   if (!response.ok) throw new Error(`calibration fetch ${response.status}`);
   if (!sourceResponse.ok) throw new Error(`source fetch ${sourceResponse.status}`);
   if (!pipeVectorResponse.ok) throw new Error(`pipe vector fetch ${pipeVectorResponse.status}`);
-  const [calibration, source, pipeVectors] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json()]);
+  if (!planGraphResponse.ok) throw new Error(`plan graph fetch ${planGraphResponse.status}`);
+  const [calibration, source, pipeVectors, planGraph] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json()]);
   const scale = 1.5;
   const branchY = 430;
 
@@ -50,6 +53,8 @@ try {
   status.classList.remove('loading');
   const vectorAcceptance = evaluateApprovedFp20PipeVectors(pipeVectors);
   if (!vectorAcceptance.vectorExtractionReady) throw new Error(`approved FP2.0 vector gate: ${vectorAcceptance.blockerCodes.join(', ')}`);
+  const replayedPlanGraph = buildApprovedFp20PlanGraph(pipeVectors);
+  if (!replayedPlanGraph.sourcePlanGraphReady || JSON.stringify(replayedPlanGraph) !== JSON.stringify(planGraph)) throw new Error('approved FP2.0 persisted plan graph does not match deterministic replay');
   for (const segment of pipeVectors.pipeSegments) {
     const line = element('line', {
       class: `pipe-vector ${segment.strokeClass}`,
@@ -81,7 +86,15 @@ try {
     label.append(title);
     pipeSvg.append(label);
   }
+  const planNodeById = new Map(planGraph.nodes.map((node) => [node.id, node]));
+  for (const edge of planGraph.edges.filter((candidate) => candidate.kind !== 'visible-source-pipe')) {
+    const from = planNodeById.get(edge.fromNodeId);
+    const to = planNodeById.get(edge.toNodeId);
+    pipeSvg.append(element('line', { class: 'plan-connector', x1: from.pdfPt.x, y1: from.pdfPt.y, x2: to.pdfPt.x, y2: to.pdfPt.y }));
+  }
+  for (const node of planGraph.nodes) pipeSvg.append(element('circle', { class: 'plan-node', cx: node.pdfPt.x, cy: node.pdfPt.y, r: 1.8 }));
   document.querySelector('#vector-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.connectedPipeVectorCount}/${vectorAcceptance.metrics.pipeVectorCount} connected source vectors, ${vectorAcceptance.metrics.sprinklerCount} heads, ${vectorAcceptance.metrics.totalVisiblePipeLengthFt.toFixed(1)} visible ft`;
+  document.querySelector('#plan-graph-status').textContent = `PASS: ${planGraph.metrics.nodeCount} nodes / ${planGraph.metrics.edgeCount} split edges / ${planGraph.metrics.connectedComponentCount} component`;
   document.querySelector('#size-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.pipeSizeAnnotationCount} source diameter labels (1\u2033 through 4\u2033)`;
   const candidate = buildNewHopeProperPipeGraphCandidate(calibration, source);
   const acceptance = evaluateProperPitchedPipeGraph(candidate);
@@ -96,10 +109,17 @@ try {
     row.innerHTML = `<td style="color:#fda4af">${code}</td><td>${messages.get(code)}</td>`;
     blockerRows.append(row);
   }
-  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | fullApprovedVectorExtractionReady=${vectorAcceptance.vectorExtractionReady} | sourceTopologyConnected=${vectorAcceptance.sourceTopologyConnected} | pipeSizeAnnotationExtractionReady=${vectorAcceptance.pipeSizeAnnotationExtractionReady} | approvedPipeVectors=${vectorAcceptance.metrics.pipeVectorCount} | approvedSprinklers=${vectorAcceptance.metrics.sprinklerCount} | approvedPipeSizeAnnotations=${vectorAcceptance.metrics.pipeSizeAnnotationCount} | exactHeadXyReady=true | conditionalTrussClearanceReady=true | pipeGraphNodes=${acceptance.metrics.nodeCount} | pipeGraphEdges=${acceptance.metrics.edgeCount} | machineBlockerCodes=${acceptance.blockerCodes.length} | properPipeLayoutReady=${acceptance.properPipeLayoutReady} | branchGradeDirectionReady=false | endpointElevationsReady=false | drainDestinationReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=${acceptance.fieldReleaseReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | fullApprovedVectorExtractionReady=${vectorAcceptance.vectorExtractionReady} | sourceTopologyConnected=${vectorAcceptance.sourceTopologyConnected} | sourcePlanGraphReady=${planGraph.sourcePlanGraphReady} | sourcePlanNodes=${planGraph.metrics.nodeCount} | sourcePlanEdges=${planGraph.metrics.edgeCount} | pipeSizeAnnotationExtractionReady=${vectorAcceptance.pipeSizeAnnotationExtractionReady} | pipeSizeAssignmentReady=${planGraph.pipeSizeAssignmentReady} | approvedPipeVectors=${vectorAcceptance.metrics.pipeVectorCount} | approvedSprinklers=${vectorAcceptance.metrics.sprinklerCount} | approvedPipeSizeAnnotations=${vectorAcceptance.metrics.pipeSizeAnnotationCount} | exactHeadXyReady=true | conditionalTrussClearanceReady=true | machineBlockerCodes=${acceptance.blockerCodes.length} | properPipeLayoutReady=${acceptance.properPipeLayoutReady} | branchGradeDirectionReady=false | endpointElevationsReady=false | drainDestinationReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=${acceptance.fieldReleaseReady}`;
   document.documentElement.dataset.proofReady = 'true';
   document.documentElement.dataset.pipeVectorStatus = vectorAcceptance.status;
+  document.documentElement.dataset.sourcePlanGraphStatus = planGraph.sourcePlanGraphReady ? 'passed' : 'blocked';
+  document.documentElement.dataset.pipeSizeAssignmentReady = String(planGraph.pipeSizeAssignmentReady);
   document.documentElement.dataset.pipeGraphStatus = acceptance.status;
+  document.documentElement.dataset.properPipeLayoutReady = String(acceptance.properPipeLayoutReady);
+  document.documentElement.dataset.branchGradeDirectionReady = 'false';
+  document.documentElement.dataset.endpointElevationsReady = 'false';
+  document.documentElement.dataset.drainDestinationReady = 'false';
+  document.documentElement.dataset.fieldReleaseReady = String(acceptance.fieldReleaseReady);
 } catch (error) {
   status.textContent = `Proof blocked: ${error.message}`;
   document.documentElement.dataset.proofReady = 'false';

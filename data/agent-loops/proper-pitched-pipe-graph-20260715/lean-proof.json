@@ -7,12 +7,14 @@
     "newHopeHeadRowCannotPromoteProperPipeLayout",
     "crossProjectCoverageCannotFillProjectFacts",
     "approvedPipeSizeLabelInventoryCloses",
-    "extractedSizeLabelsDoNotImplyEdgeAssignment"
+    "extractedSizeLabelsDoNotImplyEdgeAssignment",
+    "sourcePlanGraphEdgeInventoryCloses",
+    "sourcePlanGraphDoesNotPromoteProperLayout"
   ],
-  "claim": "A head row with plan XY, role, nominal size, flow direction, and grade magnitude remains not-ready while governed project facts are missing; complementary evidence from different projects cannot fill project facts; the approved size-label inventory closes arithmetically at 79 while extraction alone cannot imply fabrication-edge assignment.",
+  "claim": "A head row with plan XY, role, nominal size, flow direction, and grade magnitude remains not-ready while governed project facts are missing; complementary evidence from different projects cannot fill project facts; the approved size-label inventory closes arithmetically at 79 while extraction alone cannot imply fabrication-edge assignment; and the 143 visible split edges plus 70 source-contact connectors close at 213 without promoting an unsized, ungraded 2D graph to a proper layout.",
   "result": {
     "status": "verified",
-    "elapsedMs": 97,
+    "elapsedMs": 279,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

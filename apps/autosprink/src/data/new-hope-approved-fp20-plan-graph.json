@@ -1,0 +1,6499 @@
+{
+  "artifactType": "halofire.approved-fp20-source-plan-graph.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "source": {
+    "role": "approved-sprinkler-plan",
+    "sheet": "FP2.0",
+    "physicalPage": 5,
+    "sha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+    "pageBoxPdfPt": {
+      "width": 3024,
+      "height": 2160
+    }
+  },
+  "issues": [],
+  "blockerCodes": [],
+  "nodes": [
+    {
+      "id": "pipe-001-node-01",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-001",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 660.675,
+        "y": 1118.512
+      },
+      "plan": {
+        "xFt": -59.776502,
+        "yFt": 65.937876
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 3520"
+    },
+    {
+      "id": "pipe-001-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-001",
+      "sourceParameter": 0.873468,
+      "pdfPt": {
+        "x": 681.985,
+        "y": 1118.512
+      },
+      "plan": {
+        "xFt": -57.408696,
+        "yFt": 65.937876
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-001"
+      ],
+      "sourceRef": "FP2.0 drawing index 3520"
+    },
+    {
+      "id": "pipe-001-node-03",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-001",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 685.072,
+        "y": 1118.512
+      },
+      "plan": {
+        "xFt": -57.065692,
+        "yFt": 65.937876
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 3520"
+    },
+    {
+      "id": "pipe-002-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-002",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 681.985,
+        "y": 1115.228
+      },
+      "plan": {
+        "xFt": -57.408696,
+        "yFt": 65.572982
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-001"
+      ],
+      "sourceRef": "FP2.0 drawing index 3594"
+    },
+    {
+      "id": "pipe-002-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-002",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 681.985,
+        "y": 1107.423
+      },
+      "plan": {
+        "xFt": -57.408696,
+        "yFt": 64.705749
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-002"
+      ],
+      "sourceRef": "FP2.0 drawing index 3594"
+    },
+    {
+      "id": "pipe-003-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-003",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 707.628,
+        "y": 1104.138
+      },
+      "plan": {
+        "xFt": -54.559439,
+        "yFt": 64.340745
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-047"
+      ],
+      "sourceRef": "FP2.0 drawing index 3624"
+    },
+    {
+      "id": "pipe-003-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-003",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 685.101,
+        "y": 1104.138
+      },
+      "plan": {
+        "xFt": -57.062469,
+        "yFt": 64.340745
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-002"
+      ],
+      "sourceRef": "FP2.0 drawing index 3624"
+    },
+    {
+      "id": "pipe-004-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-004",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 725.187,
+        "y": 1114.521
+      },
+      "plan": {
+        "xFt": -52.608415,
+        "yFt": 65.494426
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-003"
+      ],
+      "sourceRef": "FP2.0 drawing index 3664"
+    },
+    {
+      "id": "pipe-004-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-004",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 725.187,
+        "y": 1108.451
+      },
+      "plan": {
+        "xFt": -52.608415,
+        "yFt": 64.819973
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-048"
+      ],
+      "sourceRef": "FP2.0 drawing index 3664"
+    },
+    {
+      "id": "pipe-005-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-005",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 728.187,
+        "y": 1117.521
+      },
+      "plan": {
+        "xFt": -52.275078,
+        "yFt": 65.827763
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-003"
+      ],
+      "sourceRef": "FP2.0 drawing index 3675"
+    },
+    {
+      "id": "pipe-005-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-005",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 774.908,
+        "y": 1117.521
+      },
+      "plan": {
+        "xFt": -47.083793,
+        "yFt": 65.827763
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-004"
+      ],
+      "sourceRef": "FP2.0 drawing index 3675"
+    },
+    {
+      "id": "pipe-006-node-01",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-006",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 777.908,
+        "y": 1186.819
+      },
+      "plan": {
+        "xFt": -46.750456,
+        "yFt": 73.527634
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 3831"
+    },
+    {
+      "id": "pipe-006-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-006",
+      "sourceParameter": 0.057377,
+      "pdfPt": {
+        "x": 777.908,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -46.750456,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-005",
+        "contact-006"
+      ],
+      "sourceRef": "FP2.0 drawing index 3831"
+    },
+    {
+      "id": "pipe-006-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-006",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 777.908,
+        "y": 1120.521
+      },
+      "plan": {
+        "xFt": -46.750456,
+        "yFt": 66.1611
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-004"
+      ],
+      "sourceRef": "FP2.0 drawing index 3831"
+    },
+    {
+      "id": "pipe-007-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-007",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 773.783,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -47.208794,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-005"
+      ],
+      "sourceRef": "FP2.0 drawing index 3853"
+    },
+    {
+      "id": "pipe-007-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-007",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 758.822,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -48.871148,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-007",
+        "contact-008"
+      ],
+      "sourceRef": "FP2.0 drawing index 3853"
+    },
+    {
+      "id": "pipe-008-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-008",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 590.976,
+        "y": 1585.181
+      },
+      "plan": {
+        "xFt": -67.52093,
+        "yFt": 117.790615
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-020"
+      ],
+      "sourceRef": "FP2.0 drawing index 3876"
+    },
+    {
+      "id": "pipe-008-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-008",
+      "sourceParameter": 0.937311,
+      "pdfPt": {
+        "x": 534.907,
+        "y": 1585.181
+      },
+      "plan": {
+        "xFt": -73.750894,
+        "yFt": 117.790615
+      },
+      "sprinklerIds": [
+        "head-003"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 3876"
+    },
+    {
+      "id": "pipe-008-node-03",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-008",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 531.157,
+        "y": 1585.181
+      },
+      "plan": {
+        "xFt": -74.167566,
+        "yFt": 117.790615
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 3876"
+    },
+    {
+      "id": "pipe-009-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-009",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 590.976,
+        "y": 851.067
+      },
+      "plan": {
+        "xFt": -67.52093,
+        "yFt": 36.221404
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-021"
+      ],
+      "sourceRef": "FP2.0 drawing index 3894"
+    },
+    {
+      "id": "pipe-009-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-009",
+      "sourceParameter": 0.937311,
+      "pdfPt": {
+        "x": 534.907,
+        "y": 851.067
+      },
+      "plan": {
+        "xFt": -73.750894,
+        "yFt": 36.221404
+      },
+      "sprinklerIds": [
+        "head-004"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 3894"
+    },
+    {
+      "id": "pipe-009-node-03",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-009",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 531.157,
+        "y": 851.067
+      },
+      "plan": {
+        "xFt": -74.167566,
+        "yFt": 36.221404
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 3894"
+    },
+    {
+      "id": "pipe-010-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-010",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 824.533,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -41.569837,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-010"
+      ],
+      "sourceRef": "FP2.0 drawing index 4016"
+    },
+    {
+      "id": "pipe-010-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-010",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 782.033,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -46.292117,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-006"
+      ],
+      "sourceRef": "FP2.0 drawing index 4016"
+    },
+    {
+      "id": "pipe-011-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-011",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 755.956,
+        "y": 1215.312
+      },
+      "plan": {
+        "xFt": -49.189596,
+        "yFt": 76.693561
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-024"
+      ],
+      "sourceRef": "FP2.0 drawing index 4035"
+    },
+    {
+      "id": "pipe-011-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-011",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 756.005,
+        "y": 1185.827
+      },
+      "plan": {
+        "xFt": -49.184152,
+        "yFt": 73.417411
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-007",
+        "contact-009"
+      ],
+      "sourceRef": "FP2.0 drawing index 4035"
+    },
+    {
+      "id": "pipe-012-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-012",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 753.198,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -49.496044,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-008",
+        "contact-009"
+      ],
+      "sourceRef": "FP2.0 drawing index 4047"
+    },
+    {
+      "id": "pipe-012-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-012",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 605.738,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -65.880687,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-014"
+      ],
+      "sourceRef": "FP2.0 drawing index 4047"
+    },
+    {
+      "id": "pipe-013-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-013",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1013.531,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -20.569805,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-011",
+        "contact-012"
+      ],
+      "sourceRef": "FP2.0 drawing index 4110"
+    },
+    {
+      "id": "pipe-013-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-013",
+      "sourceParameter": 0.658599,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-052"
+      ],
+      "sourceRef": "FP2.0 drawing index 4110"
+    },
+    {
+      "id": "pipe-013-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-013",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 826.033,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -41.403169,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-010"
+      ],
+      "sourceRef": "FP2.0 drawing index 4110"
+    },
+    {
+      "id": "pipe-014-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-014",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1016.344,
+        "y": 1215.312
+      },
+      "plan": {
+        "xFt": -20.257246,
+        "yFt": 76.693561
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-026"
+      ],
+      "sourceRef": "FP2.0 drawing index 4116"
+    },
+    {
+      "id": "pipe-014-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-014",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1016.344,
+        "y": 1185.827
+      },
+      "plan": {
+        "xFt": -20.257246,
+        "yFt": 73.417411
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-011",
+        "contact-013"
+      ],
+      "sourceRef": "FP2.0 drawing index 4116"
+    },
+    {
+      "id": "pipe-015-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-015",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1184.126,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -1.614575,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-016"
+      ],
+      "sourceRef": "FP2.0 drawing index 4181"
+    },
+    {
+      "id": "pipe-015-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-015",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1019.156,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -19.944797,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-012",
+        "contact-013"
+      ],
+      "sourceRef": "FP2.0 drawing index 4181"
+    },
+    {
+      "id": "pipe-016-node-01",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-016",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1219.376,
+        "y": 1244.14
+      },
+      "plan": {
+        "xFt": 2.302139,
+        "yFt": 79.896711
+      },
+      "sprinklerIds": [
+        "head-001"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4191"
+    },
+    {
+      "id": "pipe-016-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-016",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1188.86,
+        "y": 1244.14
+      },
+      "plan": {
+        "xFt": -1.088569,
+        "yFt": 79.896711
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-017"
+      ],
+      "sourceRef": "FP2.0 drawing index 4191"
+    },
+    {
+      "id": "pipe-017-node-01",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-017",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 561.786,
+        "y": 1244.14
+      },
+      "plan": {
+        "xFt": -70.764302,
+        "yFt": 79.896711
+      },
+      "sprinklerIds": [
+        "head-002"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4193"
+    },
+    {
+      "id": "pipe-017-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-017",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 601.004,
+        "y": 1244.14
+      },
+      "plan": {
+        "xFt": -66.406694,
+        "yFt": 79.896711
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-015"
+      ],
+      "sourceRef": "FP2.0 drawing index 4193"
+    },
+    {
+      "id": "pipe-018-node-01",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-018",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 602.926,
+        "y": 1247.89
+      },
+      "plan": {
+        "xFt": -66.193136,
+        "yFt": 80.313383
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4195"
+    },
+    {
+      "id": "pipe-018-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-018",
+      "sourceParameter": 0.060422,
+      "pdfPt": {
+        "x": 602.926,
+        "y": 1244.14
+      },
+      "plan": {
+        "xFt": -66.193136,
+        "yFt": 79.896711
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-015"
+      ],
+      "sourceRef": "FP2.0 drawing index 4195"
+    },
+    {
+      "id": "pipe-018-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-018",
+      "sourceParameter": 0.479609,
+      "pdfPt": {
+        "x": 602.926,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -66.193136,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-025"
+      ],
+      "sourceRef": "FP2.0 drawing index 4195"
+    },
+    {
+      "id": "pipe-018-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-018",
+      "sourceParameter": 0.900295,
+      "pdfPt": {
+        "x": 602.926,
+        "y": 1192.015
+      },
+      "plan": {
+        "xFt": -66.193136,
+        "yFt": 74.104975
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-019"
+      ],
+      "sourceRef": "FP2.0 drawing index 4195"
+    },
+    {
+      "id": "pipe-018-node-05",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-018",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 602.926,
+        "y": 1185.827
+      },
+      "plan": {
+        "xFt": -66.193136,
+        "yFt": 73.417411
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-014"
+      ],
+      "sourceRef": "FP2.0 drawing index 4195"
+    },
+    {
+      "id": "pipe-019-node-01",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-019",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1186.938,
+        "y": 1247.89
+      },
+      "plan": {
+        "xFt": -1.302127,
+        "yFt": 80.313383
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4198"
+    },
+    {
+      "id": "pipe-019-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-019",
+      "sourceParameter": 0.060422,
+      "pdfPt": {
+        "x": 1186.938,
+        "y": 1244.14
+      },
+      "plan": {
+        "xFt": -1.302127,
+        "yFt": 79.896711
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-017"
+      ],
+      "sourceRef": "FP2.0 drawing index 4198"
+    },
+    {
+      "id": "pipe-019-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-019",
+      "sourceParameter": 0.900295,
+      "pdfPt": {
+        "x": 1186.938,
+        "y": 1192.015
+      },
+      "plan": {
+        "xFt": -1.302127,
+        "yFt": 74.104975
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-018"
+      ],
+      "sourceRef": "FP2.0 drawing index 4198"
+    },
+    {
+      "id": "pipe-019-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-019",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1186.938,
+        "y": 1185.827
+      },
+      "plan": {
+        "xFt": -1.302127,
+        "yFt": 73.417411
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-016"
+      ],
+      "sourceRef": "FP2.0 drawing index 4198"
+    },
+    {
+      "id": "pipe-020-node-01",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-020",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1219.376,
+        "y": 1192.015
+      },
+      "plan": {
+        "xFt": 2.302139,
+        "yFt": 74.104975
+      },
+      "sprinklerIds": [
+        "head-005"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4251"
+    },
+    {
+      "id": "pipe-020-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-020",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1188.86,
+        "y": 1192.015
+      },
+      "plan": {
+        "xFt": -1.088569,
+        "yFt": 74.104975
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-018"
+      ],
+      "sourceRef": "FP2.0 drawing index 4251"
+    },
+    {
+      "id": "pipe-021-node-01",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-021",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 561.786,
+        "y": 1192.015
+      },
+      "plan": {
+        "xFt": -70.764302,
+        "yFt": 74.104975
+      },
+      "sprinklerIds": [
+        "head-006"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4252"
+    },
+    {
+      "id": "pipe-021-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-021",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 601.004,
+        "y": 1192.015
+      },
+      "plan": {
+        "xFt": -66.406694,
+        "yFt": 74.104975
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-019"
+      ],
+      "sourceRef": "FP2.0 drawing index 4252"
+    },
+    {
+      "id": "pipe-022-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-022",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 593.976,
+        "y": 1540.582
+      },
+      "plan": {
+        "xFt": -67.187592,
+        "yFt": 112.835111
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-022"
+      ],
+      "sourceRef": "FP2.0 drawing index 4378"
+    },
+    {
+      "id": "pipe-022-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-022",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 593.976,
+        "y": 1582.272
+      },
+      "plan": {
+        "xFt": -67.187592,
+        "yFt": 117.467389
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-020"
+      ],
+      "sourceRef": "FP2.0 drawing index 4378"
+    },
+    {
+      "id": "pipe-023-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-023",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 593.976,
+        "y": 895.666
+      },
+      "plan": {
+        "xFt": -67.187592,
+        "yFt": 41.176909
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-023"
+      ],
+      "sourceRef": "FP2.0 drawing index 4379"
+    },
+    {
+      "id": "pipe-023-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-023",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 593.976,
+        "y": 853.976
+      },
+      "plan": {
+        "xFt": -67.187592,
+        "yFt": 36.54463
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-021"
+      ],
+      "sourceRef": "FP2.0 drawing index 4379"
+    },
+    {
+      "id": "pipe-024-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-024",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 711.28,
+        "y": 1537.674
+      },
+      "plan": {
+        "xFt": -54.153656,
+        "yFt": 112.511996
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-027"
+      ],
+      "sourceRef": "FP2.0 drawing index 4440"
+    },
+    {
+      "id": "pipe-024-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-024",
+      "sourceParameter": 0.401307,
+      "pdfPt": {
+        "x": 665.409,
+        "y": 1537.674
+      },
+      "plan": {
+        "xFt": -59.250496,
+        "yFt": 112.511996
+      },
+      "sprinklerIds": [
+        "head-007"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4440"
+    },
+    {
+      "id": "pipe-024-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-024",
+      "sourceParameter": 0.873731,
+      "pdfPt": {
+        "x": 611.409,
+        "y": 1537.674
+      },
+      "plan": {
+        "xFt": -65.250569,
+        "yFt": 112.511996
+      },
+      "sprinklerIds": [
+        "head-008"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4440"
+    },
+    {
+      "id": "pipe-024-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-024",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 596.976,
+        "y": 1537.674
+      },
+      "plan": {
+        "xFt": -66.854255,
+        "yFt": 112.511996
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-022"
+      ],
+      "sourceRef": "FP2.0 drawing index 4440"
+    },
+    {
+      "id": "pipe-025-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-025",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 711.28,
+        "y": 898.575
+      },
+      "plan": {
+        "xFt": -54.153656,
+        "yFt": 41.500135
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-028"
+      ],
+      "sourceRef": "FP2.0 drawing index 4442"
+    },
+    {
+      "id": "pipe-025-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-025",
+      "sourceParameter": 0.401307,
+      "pdfPt": {
+        "x": 665.409,
+        "y": 898.575
+      },
+      "plan": {
+        "xFt": -59.250496,
+        "yFt": 41.500135
+      },
+      "sprinklerIds": [
+        "head-010"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4442"
+    },
+    {
+      "id": "pipe-025-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-025",
+      "sourceParameter": 0.873731,
+      "pdfPt": {
+        "x": 611.409,
+        "y": 898.575
+      },
+      "plan": {
+        "xFt": -65.250569,
+        "yFt": 41.500135
+      },
+      "sprinklerIds": [
+        "head-009"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4442"
+    },
+    {
+      "id": "pipe-025-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-025",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 596.976,
+        "y": 898.575
+      },
+      "plan": {
+        "xFt": -66.854255,
+        "yFt": 41.500135
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-023"
+      ],
+      "sourceRef": "FP2.0 drawing index 4442"
+    },
+    {
+      "id": "pipe-026-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-026",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 753.198,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -49.496044,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-024"
+      ],
+      "sourceRef": "FP2.0 drawing index 4579"
+    },
+    {
+      "id": "pipe-026-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-026",
+      "sourceParameter": 0.244146,
+      "pdfPt": {
+        "x": 717.101,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -53.506871,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [
+        "head-011"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4579"
+    },
+    {
+      "id": "pipe-026-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-026",
+      "sourceParameter": 0.609374,
+      "pdfPt": {
+        "x": 663.102,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -59.506832,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [
+        "head-012"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4579"
+    },
+    {
+      "id": "pipe-026-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-026",
+      "sourceParameter": 0.974603,
+      "pdfPt": {
+        "x": 609.103,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -65.506794,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [
+        "head-013"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4579"
+    },
+    {
+      "id": "pipe-026-node-05",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-026",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 605.348,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -65.924021,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-025"
+      ],
+      "sourceRef": "FP2.0 drawing index 4579"
+    },
+    {
+      "id": "pipe-027-node-01",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-027",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1170.119,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -3.170927,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4682"
+    },
+    {
+      "id": "pipe-027-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-027",
+      "sourceParameter": 0.024966,
+      "pdfPt": {
+        "x": 1166.35,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -3.58971,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [
+        "head-014"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4682"
+    },
+    {
+      "id": "pipe-027-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-027",
+      "sourceParameter": 0.38273,
+      "pdfPt": {
+        "x": 1112.341,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -9.590783,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [
+        "head-016"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4682"
+    },
+    {
+      "id": "pipe-027-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-027",
+      "sourceParameter": 0.74038,
+      "pdfPt": {
+        "x": 1058.349,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -15.589967,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [
+        "head-015"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 4682"
+    },
+    {
+      "id": "pipe-027-node-05",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-027",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1019.156,
+        "y": 1218.124
+      },
+      "plan": {
+        "xFt": -19.944797,
+        "yFt": 77.00601
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-026"
+      ],
+      "sourceRef": "FP2.0 drawing index 4682"
+    },
+    {
+      "id": "pipe-028-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-028",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 714.28,
+        "y": 1605.702
+      },
+      "plan": {
+        "xFt": -53.820319,
+        "yFt": 120.070754
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-033"
+      ],
+      "sourceRef": "FP2.0 drawing index 4787"
+    },
+    {
+      "id": "pipe-028-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-028",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 714.28,
+        "y": 1540.52
+      },
+      "plan": {
+        "xFt": -53.820319,
+        "yFt": 112.828222
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-027"
+      ],
+      "sourceRef": "FP2.0 drawing index 4787"
+    },
+    {
+      "id": "pipe-029-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-029",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 714.28,
+        "y": 830.546
+      },
+      "plan": {
+        "xFt": -53.820319,
+        "yFt": 33.941265
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-034"
+      ],
+      "sourceRef": "FP2.0 drawing index 4788"
+    },
+    {
+      "id": "pipe-029-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-029",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 714.28,
+        "y": 895.728
+      },
+      "plan": {
+        "xFt": -53.820319,
+        "yFt": 41.183798
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-028"
+      ],
+      "sourceRef": "FP2.0 drawing index 4788"
+    },
+    {
+      "id": "pipe-030-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-030",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 983.79,
+        "y": 1533.418
+      },
+      "plan": {
+        "xFt": -23.8744,
+        "yFt": 112.039101
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-054"
+      ],
+      "sourceRef": "FP2.0 drawing index 4943"
+    },
+    {
+      "id": "pipe-030-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-030",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 983.79,
+        "y": 1605.263
+      },
+      "plan": {
+        "xFt": -23.8744,
+        "yFt": 120.021976
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-029"
+      ],
+      "sourceRef": "FP2.0 drawing index 4943"
+    },
+    {
+      "id": "pipe-031-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-031",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 983.79,
+        "y": 902.83
+      },
+      "plan": {
+        "xFt": -23.8744,
+        "yFt": 41.972918
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-057"
+      ],
+      "sourceRef": "FP2.0 drawing index 4944"
+    },
+    {
+      "id": "pipe-031-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-031",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 983.79,
+        "y": 830.985
+      },
+      "plan": {
+        "xFt": -23.8744,
+        "yFt": 33.990044
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-030"
+      ],
+      "sourceRef": "FP2.0 drawing index 4944"
+    },
+    {
+      "id": "pipe-032-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-032",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1033.929,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -18.303333,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-035"
+      ],
+      "sourceRef": "FP2.0 drawing index 5041"
+    },
+    {
+      "id": "pipe-032-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-032",
+      "sourceParameter": 0.469477,
+      "pdfPt": {
+        "x": 1011.911,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -20.749807,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [
+        "head-017"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5041"
+    },
+    {
+      "id": "pipe-032-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-032",
+      "sourceParameter": 0.908207,
+      "pdfPt": {
+        "x": 991.335,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -23.036057,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-032"
+      ],
+      "sourceRef": "FP2.0 drawing index 5041"
+    },
+    {
+      "id": "pipe-032-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-032",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 987.03,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -23.514396,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-029"
+      ],
+      "sourceRef": "FP2.0 drawing index 5041"
+    },
+    {
+      "id": "pipe-033-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-033",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1033.929,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -18.303333,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-036"
+      ],
+      "sourceRef": "FP2.0 drawing index 5042"
+    },
+    {
+      "id": "pipe-033-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-033",
+      "sourceParameter": 0.469477,
+      "pdfPt": {
+        "x": 1011.911,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -20.749807,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [
+        "head-018"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5042"
+    },
+    {
+      "id": "pipe-033-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-033",
+      "sourceParameter": 0.908207,
+      "pdfPt": {
+        "x": 991.335,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -23.036057,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-031"
+      ],
+      "sourceRef": "FP2.0 drawing index 5042"
+    },
+    {
+      "id": "pipe-033-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-033",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 987.03,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -23.514396,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-030"
+      ],
+      "sourceRef": "FP2.0 drawing index 5042"
+    },
+    {
+      "id": "pipe-034-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-034",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 991.335,
+        "y": 823.627
+      },
+      "plan": {
+        "xFt": -23.036057,
+        "yFt": 33.172478
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-031"
+      ],
+      "sourceRef": "FP2.0 drawing index 5120"
+    },
+    {
+      "id": "pipe-034-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-034",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 991.335,
+        "y": 820.009
+      },
+      "plan": {
+        "xFt": -23.036057,
+        "yFt": 32.770473
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-038"
+      ],
+      "sourceRef": "FP2.0 drawing index 5120"
+    },
+    {
+      "id": "pipe-035-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-035",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 991.335,
+        "y": 1612.622
+      },
+      "plan": {
+        "xFt": -23.036057,
+        "yFt": 120.839652
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-032"
+      ],
+      "sourceRef": "FP2.0 drawing index 5121"
+    },
+    {
+      "id": "pipe-035-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-035",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 991.335,
+        "y": 1616.239
+      },
+      "plan": {
+        "xFt": -23.036057,
+        "yFt": 121.241546
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-037"
+      ],
+      "sourceRef": "FP2.0 drawing index 5121"
+    },
+    {
+      "id": "pipe-036-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-036",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 802.98,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -43.964644,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-039"
+      ],
+      "sourceRef": "FP2.0 drawing index 5228"
+    },
+    {
+      "id": "pipe-036-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-036",
+      "sourceParameter": 0.178868,
+      "pdfPt": {
+        "x": 787.651,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -45.667887,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [
+        "head-033"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5228"
+    },
+    {
+      "id": "pipe-036-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-036",
+      "sourceParameter": 0.808961,
+      "pdfPt": {
+        "x": 733.652,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -51.667848,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [
+        "head-027"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5228"
+    },
+    {
+      "id": "pipe-036-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-036",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 717.28,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -53.486982,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-033"
+      ],
+      "sourceRef": "FP2.0 drawing index 5228"
+    },
+    {
+      "id": "pipe-037-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-037",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 802.98,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -43.964644,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-040"
+      ],
+      "sourceRef": "FP2.0 drawing index 5229"
+    },
+    {
+      "id": "pipe-037-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-037",
+      "sourceParameter": 0.178868,
+      "pdfPt": {
+        "x": 787.651,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -45.667887,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [
+        "head-034"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5229"
+    },
+    {
+      "id": "pipe-037-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-037",
+      "sourceParameter": 0.808961,
+      "pdfPt": {
+        "x": 733.652,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -51.667848,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [
+        "head-028"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5229"
+    },
+    {
+      "id": "pipe-037-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-037",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 717.28,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -53.486982,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-034"
+      ],
+      "sourceRef": "FP2.0 drawing index 5229"
+    },
+    {
+      "id": "pipe-038-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-038",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1222.929,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": 2.696922,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-041"
+      ],
+      "sourceRef": "FP2.0 drawing index 5241"
+    },
+    {
+      "id": "pipe-038-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-038",
+      "sourceParameter": 0.261435,
+      "pdfPt": {
+        "x": 1173.91,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -2.7497,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [
+        "head-031"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5241"
+    },
+    {
+      "id": "pipe-038-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-038",
+      "sourceParameter": 0.549435,
+      "pdfPt": {
+        "x": 1119.91,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -8.749773,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [
+        "head-029"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5241"
+    },
+    {
+      "id": "pipe-038-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-038",
+      "sourceParameter": 0.837435,
+      "pdfPt": {
+        "x": 1065.91,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -14.749845,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [
+        "head-025"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5241"
+    },
+    {
+      "id": "pipe-038-node-05",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-038",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1035.429,
+        "y": 1608.548
+      },
+      "plan": {
+        "xFt": -18.136664,
+        "yFt": 120.38698
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-035"
+      ],
+      "sourceRef": "FP2.0 drawing index 5241"
+    },
+    {
+      "id": "pipe-039-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-039",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1222.929,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": 2.696922,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-042"
+      ],
+      "sourceRef": "FP2.0 drawing index 5242"
+    },
+    {
+      "id": "pipe-039-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-039",
+      "sourceParameter": 0.261435,
+      "pdfPt": {
+        "x": 1173.91,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -2.7497,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [
+        "head-032"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5242"
+    },
+    {
+      "id": "pipe-039-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-039",
+      "sourceParameter": 0.549435,
+      "pdfPt": {
+        "x": 1119.91,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -8.749773,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [
+        "head-030"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5242"
+    },
+    {
+      "id": "pipe-039-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-039",
+      "sourceParameter": 0.837435,
+      "pdfPt": {
+        "x": 1065.91,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -14.749845,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [
+        "head-026"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5242"
+    },
+    {
+      "id": "pipe-039-node-05",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-039",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1035.429,
+        "y": 827.7
+      },
+      "plan": {
+        "xFt": -18.136664,
+        "yFt": 33.625039
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-036"
+      ],
+      "sourceRef": "FP2.0 drawing index 5242"
+    },
+    {
+      "id": "pipe-040-node-01",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-040",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 846.164,
+        "y": 1619.048
+      },
+      "plan": {
+        "xFt": -39.166364,
+        "yFt": 121.553661
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5287"
+    },
+    {
+      "id": "pipe-040-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-040",
+      "sourceParameter": 0.026342,
+      "pdfPt": {
+        "x": 849.914,
+        "y": 1619.048
+      },
+      "plan": {
+        "xFt": -38.749692,
+        "yFt": 121.553661
+      },
+      "sprinklerIds": [
+        "head-019"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5287"
+    },
+    {
+      "id": "pipe-040-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-040",
+      "sourceParameter": 0.405665,
+      "pdfPt": {
+        "x": 903.914,
+        "y": 1619.048
+      },
+      "plan": {
+        "xFt": -32.749619,
+        "yFt": 121.553661
+      },
+      "sprinklerIds": [
+        "head-020"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5287"
+    },
+    {
+      "id": "pipe-040-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-040",
+      "sourceParameter": 0.784987,
+      "pdfPt": {
+        "x": 957.914,
+        "y": 1619.048
+      },
+      "plan": {
+        "xFt": -26.749546,
+        "yFt": 121.553661
+      },
+      "sprinklerIds": [
+        "head-021"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5287"
+    },
+    {
+      "id": "pipe-040-node-05",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-040",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 988.523,
+        "y": 1619.048
+      },
+      "plan": {
+        "xFt": -23.348505,
+        "yFt": 121.553661
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-037"
+      ],
+      "sourceRef": "FP2.0 drawing index 5287"
+    },
+    {
+      "id": "pipe-041-node-01",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-041",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 846.164,
+        "y": 817.2
+      },
+      "plan": {
+        "xFt": -39.166364,
+        "yFt": 32.458359
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5288"
+    },
+    {
+      "id": "pipe-041-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-041",
+      "sourceParameter": 0.026342,
+      "pdfPt": {
+        "x": 849.914,
+        "y": 817.2
+      },
+      "plan": {
+        "xFt": -38.749692,
+        "yFt": 32.458359
+      },
+      "sprinklerIds": [
+        "head-023"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5288"
+    },
+    {
+      "id": "pipe-041-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-041",
+      "sourceParameter": 0.405665,
+      "pdfPt": {
+        "x": 903.914,
+        "y": 817.2
+      },
+      "plan": {
+        "xFt": -32.749619,
+        "yFt": 32.458359
+      },
+      "sprinklerIds": [
+        "head-024"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5288"
+    },
+    {
+      "id": "pipe-041-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-041",
+      "sourceParameter": 0.784987,
+      "pdfPt": {
+        "x": 957.914,
+        "y": 817.2
+      },
+      "plan": {
+        "xFt": -26.749546,
+        "yFt": 32.458359
+      },
+      "sprinklerIds": [
+        "head-022"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5288"
+    },
+    {
+      "id": "pipe-041-node-05",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-041",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 988.523,
+        "y": 817.2
+      },
+      "plan": {
+        "xFt": -23.348505,
+        "yFt": 32.458359
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-038"
+      ],
+      "sourceRef": "FP2.0 drawing index 5288"
+    },
+    {
+      "id": "pipe-042-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-042",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 805.98,
+        "y": 1530.644
+      },
+      "plan": {
+        "xFt": -43.631307,
+        "yFt": 111.730875
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-061"
+      ],
+      "sourceRef": "FP2.0 drawing index 5463"
+    },
+    {
+      "id": "pipe-042-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-042",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 805.98,
+        "y": 1605.549
+      },
+      "plan": {
+        "xFt": -43.631307,
+        "yFt": 120.053754
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-039"
+      ],
+      "sourceRef": "FP2.0 drawing index 5463"
+    },
+    {
+      "id": "pipe-043-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-043",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 805.98,
+        "y": 905.605
+      },
+      "plan": {
+        "xFt": -43.631307,
+        "yFt": 42.281255
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-064"
+      ],
+      "sourceRef": "FP2.0 drawing index 5464"
+    },
+    {
+      "id": "pipe-043-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-043",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 805.98,
+        "y": 830.699
+      },
+      "plan": {
+        "xFt": -43.631307,
+        "yFt": 33.958266
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-040"
+      ],
+      "sourceRef": "FP2.0 drawing index 5464"
+    },
+    {
+      "id": "pipe-044-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-044",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 960.675,
+        "y": 1532.488
+      },
+      "plan": {
+        "xFt": -26.442765,
+        "yFt": 111.935766
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-055"
+      ],
+      "sourceRef": "FP2.0 drawing index 5719"
+    },
+    {
+      "id": "pipe-044-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-044",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 960.613,
+        "y": 1591.799
+      },
+      "plan": {
+        "xFt": -26.449654,
+        "yFt": 118.525957
+      },
+      "sprinklerIds": [
+        "head-035"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5719"
+    },
+    {
+      "id": "pipe-045-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-045",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 960.675,
+        "y": 903.76
+      },
+      "plan": {
+        "xFt": -26.442765,
+        "yFt": 42.076253
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-058"
+      ],
+      "sourceRef": "FP2.0 drawing index 5720"
+    },
+    {
+      "id": "pipe-045-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-045",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 960.613,
+        "y": 844.449
+      },
+      "plan": {
+        "xFt": -26.449654,
+        "yFt": 35.486062
+      },
+      "sprinklerIds": [
+        "head-036"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5720"
+    },
+    {
+      "id": "pipe-046-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-046",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 829.163,
+        "y": 1529.766
+      },
+      "plan": {
+        "xFt": -41.055387,
+        "yFt": 111.633318
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-062"
+      ],
+      "sourceRef": "FP2.0 drawing index 5823"
+    },
+    {
+      "id": "pipe-046-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-046",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 829.128,
+        "y": 1591.847
+      },
+      "plan": {
+        "xFt": -41.059275,
+        "yFt": 118.531291
+      },
+      "sprinklerIds": [
+        "head-037"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5823"
+    },
+    {
+      "id": "pipe-047-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-047",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 829.163,
+        "y": 906.482
+      },
+      "plan": {
+        "xFt": -41.055387,
+        "yFt": 42.378701
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-065"
+      ],
+      "sourceRef": "FP2.0 drawing index 5828"
+    },
+    {
+      "id": "pipe-047-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-047",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 829.128,
+        "y": 844.401
+      },
+      "plan": {
+        "xFt": -41.059275,
+        "yFt": 35.480729
+      },
+      "sprinklerIds": [
+        "head-038"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 5828"
+    },
+    {
+      "id": "pipe-048-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-048",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1225.929,
+        "y": 1634.912
+      },
+      "plan": {
+        "xFt": 3.030259,
+        "yFt": 123.316349
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-043"
+      ],
+      "sourceRef": "FP2.0 drawing index 5862"
+    },
+    {
+      "id": "pipe-048-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-048",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1225.929,
+        "y": 1611.434
+      },
+      "plan": {
+        "xFt": 3.030259,
+        "yFt": 120.70765
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-041"
+      ],
+      "sourceRef": "FP2.0 drawing index 5862"
+    },
+    {
+      "id": "pipe-049-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-049",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1225.929,
+        "y": 801.336
+      },
+      "plan": {
+        "xFt": 3.030259,
+        "yFt": 30.695671
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-044"
+      ],
+      "sourceRef": "FP2.0 drawing index 5863"
+    },
+    {
+      "id": "pipe-049-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-049",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1225.929,
+        "y": 824.814
+      },
+      "plan": {
+        "xFt": 3.030259,
+        "yFt": 33.304369
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-042"
+      ],
+      "sourceRef": "FP2.0 drawing index 5863"
+    },
+    {
+      "id": "pipe-050-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-050",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1375.737,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 19.675794,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-045"
+      ],
+      "sourceRef": "FP2.0 drawing index 6005"
+    },
+    {
+      "id": "pipe-050-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-050",
+      "sourceParameter": 0.21005,
+      "pdfPt": {
+        "x": 1344.9,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 16.249419,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [
+        "head-043"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6005"
+    },
+    {
+      "id": "pipe-050-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-050",
+      "sourceParameter": 0.577877,
+      "pdfPt": {
+        "x": 1290.9,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 10.249346,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [
+        "head-041"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6005"
+    },
+    {
+      "id": "pipe-050-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-050",
+      "sourceParameter": 0.945705,
+      "pdfPt": {
+        "x": 1236.9,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 4.249274,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [
+        "head-039"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6005"
+    },
+    {
+      "id": "pipe-050-node-05",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-050",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1228.929,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 3.363596,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-043"
+      ],
+      "sourceRef": "FP2.0 drawing index 6005"
+    },
+    {
+      "id": "pipe-051-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-051",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1375.821,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 19.685127,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-046"
+      ],
+      "sourceRef": "FP2.0 drawing index 6006"
+    },
+    {
+      "id": "pipe-051-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-051",
+      "sourceParameter": 0.210502,
+      "pdfPt": {
+        "x": 1344.9,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 16.249419,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [
+        "head-044"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6006"
+    },
+    {
+      "id": "pipe-051-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-051",
+      "sourceParameter": 0.578119,
+      "pdfPt": {
+        "x": 1290.9,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 10.249346,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [
+        "head-042"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6006"
+    },
+    {
+      "id": "pipe-051-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-051",
+      "sourceParameter": 0.945736,
+      "pdfPt": {
+        "x": 1236.9,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 4.249274,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [
+        "head-040"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6006"
+    },
+    {
+      "id": "pipe-051-node-05",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-051",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1228.929,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 3.363596,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-044"
+      ],
+      "sourceRef": "FP2.0 drawing index 6006"
+    },
+    {
+      "id": "pipe-052-node-01",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-052",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1564.737,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 40.676049,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "pipe-052-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-052",
+      "sourceParameter": 0.020448,
+      "pdfPt": {
+        "x": 1560.903,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 40.250043,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [
+        "head-051"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "pipe-052-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-052",
+      "sourceParameter": 0.308469,
+      "pdfPt": {
+        "x": 1506.899,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 34.249526,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [
+        "head-049"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "pipe-052-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-052",
+      "sourceParameter": 0.596464,
+      "pdfPt": {
+        "x": 1452.9,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 28.249565,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [
+        "head-047"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "pipe-052-node-05",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-052",
+      "sourceParameter": 0.884464,
+      "pdfPt": {
+        "x": 1398.9,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 22.249492,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [
+        "head-045"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "pipe-052-node-06",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-052",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1377.237,
+        "y": 1637.798
+      },
+      "plan": {
+        "xFt": 19.842463,
+        "yFt": 123.637019
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-045"
+      ],
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "pipe-053-node-01",
+      "kind": "source-segment-end",
+      "sourceSegmentId": "pipe-053",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 1564.821,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 40.685382,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "pipe-053-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-053",
+      "sourceParameter": 0.020896,
+      "pdfPt": {
+        "x": 1560.903,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 40.250043,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [
+        "head-052"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "pipe-053-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-053",
+      "sourceParameter": 0.308917,
+      "pdfPt": {
+        "x": 1506.899,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 34.249526,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [
+        "head-050"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "pipe-053-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-053",
+      "sourceParameter": 0.596912,
+      "pdfPt": {
+        "x": 1452.9,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 28.249565,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [
+        "head-048"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "pipe-053-node-05",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-053",
+      "sourceParameter": 0.884912,
+      "pdfPt": {
+        "x": 1398.9,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 22.249492,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [
+        "head-046"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "pipe-053-node-06",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-053",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 1377.321,
+        "y": 798.45
+      },
+      "plan": {
+        "xFt": 19.851796,
+        "yFt": 30.375
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-046"
+      ],
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "pipe-054-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-054",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 915.495,
+        "y": 1532.51
+      },
+      "plan": {
+        "xFt": -31.462826,
+        "yFt": 111.938211
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-056"
+      ],
+      "sourceRef": "FP2.0 drawing index 6365"
+    },
+    {
+      "id": "pipe-054-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-054",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 915.488,
+        "y": 1546.798
+      },
+      "plan": {
+        "xFt": -31.463604,
+        "yFt": 113.525786
+      },
+      "sprinklerIds": [
+        "head-053"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6365"
+    },
+    {
+      "id": "pipe-055-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-055",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 915.495,
+        "y": 903.738
+      },
+      "plan": {
+        "xFt": -31.462826,
+        "yFt": 42.073808
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-059"
+      ],
+      "sourceRef": "FP2.0 drawing index 6366"
+    },
+    {
+      "id": "pipe-055-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-055",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 915.488,
+        "y": 889.45
+      },
+      "plan": {
+        "xFt": -31.463604,
+        "yFt": 40.486234
+      },
+      "sprinklerIds": [
+        "head-056"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6366"
+    },
+    {
+      "id": "pipe-056-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-056",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 874.138,
+        "y": 1529.792
+      },
+      "plan": {
+        "xFt": -36.058104,
+        "yFt": 111.636207
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-063"
+      ],
+      "sourceRef": "FP2.0 drawing index 6436"
+    },
+    {
+      "id": "pipe-056-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-056",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 874.128,
+        "y": 1546.8
+      },
+      "plan": {
+        "xFt": -36.059215,
+        "yFt": 113.526008
+      },
+      "sprinklerIds": [
+        "head-054"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6436"
+    },
+    {
+      "id": "pipe-057-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-057",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 874.138,
+        "y": 906.456
+      },
+      "plan": {
+        "xFt": -36.058104,
+        "yFt": 42.375812
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-066"
+      ],
+      "sourceRef": "FP2.0 drawing index 6438"
+    },
+    {
+      "id": "pipe-057-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-057",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 874.128,
+        "y": 889.448
+      },
+      "plan": {
+        "xFt": -36.059215,
+        "yFt": 40.486011
+      },
+      "sprinklerIds": [
+        "head-055"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6438"
+    },
+    {
+      "id": "pipe-058-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-058",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 886.929,
+        "y": 1104.138
+      },
+      "plan": {
+        "xFt": -34.636864,
+        "yFt": 64.340745
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-049",
+        "contact-051"
+      ],
+      "sourceRef": "FP2.0 drawing index 6467"
+    },
+    {
+      "id": "pipe-058-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-058",
+      "sourceParameter": 0.909286,
+      "pdfPt": {
+        "x": 725.187,
+        "y": 1104.138
+      },
+      "plan": {
+        "xFt": -52.608415,
+        "yFt": 64.340745
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-048"
+      ],
+      "sourceRef": "FP2.0 drawing index 6467"
+    },
+    {
+      "id": "pipe-058-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-058",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 709.051,
+        "y": 1104.138
+      },
+      "plan": {
+        "xFt": -54.401326,
+        "yFt": 64.340745
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-047"
+      ],
+      "sourceRef": "FP2.0 drawing index 6467"
+    },
+    {
+      "id": "pipe-059-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-059",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1100.853
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 63.975741
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-049"
+      ],
+      "sourceRef": "FP2.0 drawing index 6536"
+    },
+    {
+      "id": "pipe-059-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-059",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1098.353
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 63.697959
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-050"
+      ],
+      "sourceRef": "FP2.0 drawing index 6536"
+    },
+    {
+      "id": "pipe-060-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-060",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1096.853
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 63.531291
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-050"
+      ],
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "pipe-060-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-060",
+      "sourceParameter": 0.09039,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1079.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 61.648157
+      },
+      "sprinklerIds": [
+        "head-067"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "pipe-060-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-060",
+      "sourceParameter": 0.378393,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1025.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 55.648084
+      },
+      "sprinklerIds": [
+        "head-061"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "pipe-060-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-060",
+      "sourceParameter": 0.666396,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 971.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 49.648011
+      },
+      "sprinklerIds": [
+        "head-062"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "pipe-060-node-05",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-060",
+      "sourceParameter": 0.9544,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 917.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 43.647939
+      },
+      "sprinklerIds": [
+        "head-068"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "pipe-060-node-06",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-060",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 909.355
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 42.697927
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-060",
+        "upper-central-main-turn"
+      ],
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "pipe-061-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-061",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1107.423
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 64.705749
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-051"
+      ],
+      "sourceRef": "FP2.0 drawing index 6592"
+    },
+    {
+      "id": "pipe-061-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-061",
+      "sourceParameter": 0.63926,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1133.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 67.64823
+      },
+      "sprinklerIds": [
+        "head-060"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6592"
+    },
+    {
+      "id": "pipe-061-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-061",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1148.849
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 69.308694
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-053"
+      ],
+      "sourceRef": "FP2.0 drawing index 6592"
+    },
+    {
+      "id": "pipe-062-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-062",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1150.349
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 69.475363
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-053"
+      ],
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "pipe-062-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-062",
+      "sourceParameter": 0.174177,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1183.015
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 73.104962
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-052"
+      ],
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "pipe-062-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-062",
+      "sourceParameter": 0.200251,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1187.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 73.648302
+      },
+      "sprinklerIds": [
+        "head-059"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "pipe-062-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-062",
+      "sourceParameter": 0.488182,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1241.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 79.648375
+      },
+      "sprinklerIds": [
+        "head-066"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "pipe-062-node-05",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-062",
+      "sourceParameter": 0.776112,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1295.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 85.648448
+      },
+      "sprinklerIds": [
+        "head-065"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "pipe-062-node-06",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-062",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1337.894
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 90.313949
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-067"
+      ],
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "pipe-063-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-063",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 893.263,
+        "y": 1530.177
+      },
+      "plan": {
+        "xFt": -33.933078,
+        "yFt": 111.678986
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-068"
+      ],
+      "sourceRef": "FP2.0 drawing index 6636"
+    },
+    {
+      "id": "pipe-063-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-063",
+      "sourceParameter": 0.25462,
+      "pdfPt": {
+        "x": 915.494,
+        "y": 1530.166
+      },
+      "plan": {
+        "xFt": -31.462951,
+        "yFt": 111.677797
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-056"
+      ],
+      "sourceRef": "FP2.0 drawing index 6636"
+    },
+    {
+      "id": "pipe-063-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-063",
+      "sourceParameter": 0.772087,
+      "pdfPt": {
+        "x": 960.674,
+        "y": 1530.145
+      },
+      "plan": {
+        "xFt": -26.44289,
+        "yFt": 111.675382
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-055"
+      ],
+      "sourceRef": "FP2.0 drawing index 6636"
+    },
+    {
+      "id": "pipe-063-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-063",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 980.573,
+        "y": 1530.135
+      },
+      "plan": {
+        "xFt": -24.231849,
+        "yFt": 111.674319
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-054"
+      ],
+      "sourceRef": "FP2.0 drawing index 6636"
+    },
+    {
+      "id": "pipe-064-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-064",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 893.263,
+        "y": 906.071
+      },
+      "plan": {
+        "xFt": -33.933078,
+        "yFt": 42.333034
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-060"
+      ],
+      "sourceRef": "FP2.0 drawing index 6637"
+    },
+    {
+      "id": "pipe-064-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-064",
+      "sourceParameter": 0.25462,
+      "pdfPt": {
+        "x": 915.494,
+        "y": 906.082
+      },
+      "plan": {
+        "xFt": -31.462951,
+        "yFt": 42.334222
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-059"
+      ],
+      "sourceRef": "FP2.0 drawing index 6637"
+    },
+    {
+      "id": "pipe-064-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-064",
+      "sourceParameter": 0.772087,
+      "pdfPt": {
+        "x": 960.674,
+        "y": 906.103
+      },
+      "plan": {
+        "xFt": -26.44289,
+        "yFt": 42.336637
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-058"
+      ],
+      "sourceRef": "FP2.0 drawing index 6637"
+    },
+    {
+      "id": "pipe-064-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-064",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 980.573,
+        "y": 906.113
+      },
+      "plan": {
+        "xFt": -24.231849,
+        "yFt": 42.337701
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-057"
+      ],
+      "sourceRef": "FP2.0 drawing index 6637"
+    },
+    {
+      "id": "pipe-065-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-065",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 881.303,
+        "y": 1527.687
+      },
+      "plan": {
+        "xFt": -35.261983,
+        "yFt": 111.402315
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "lower-central-main-turn"
+      ],
+      "sourceRef": "FP2.0 drawing index 6638"
+    },
+    {
+      "id": "pipe-065-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-065",
+      "sourceParameter": 0.098955,
+      "pdfPt": {
+        "x": 874.139,
+        "y": 1527.683
+      },
+      "plan": {
+        "xFt": -36.057968,
+        "yFt": 111.401854
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-063"
+      ],
+      "sourceRef": "FP2.0 drawing index 6638"
+    },
+    {
+      "id": "pipe-065-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-065",
+      "sourceParameter": 0.720209,
+      "pdfPt": {
+        "x": 829.164,
+        "y": 1527.657
+      },
+      "plan": {
+        "xFt": -41.055251,
+        "yFt": 111.398954
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-062"
+      ],
+      "sourceRef": "FP2.0 drawing index 6638"
+    },
+    {
+      "id": "pipe-065-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-065",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 808.909,
+        "y": 1527.645
+      },
+      "plan": {
+        "xFt": -43.305858,
+        "yFt": 111.397649
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-061"
+      ],
+      "sourceRef": "FP2.0 drawing index 6638"
+    },
+    {
+      "id": "pipe-066-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-066",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 881.303,
+        "y": 908.562
+      },
+      "plan": {
+        "xFt": -35.261983,
+        "yFt": 42.609815
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "upper-central-main-turn"
+      ],
+      "sourceRef": "FP2.0 drawing index 6639"
+    },
+    {
+      "id": "pipe-066-node-02",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-066",
+      "sourceParameter": 0.098956,
+      "pdfPt": {
+        "x": 874.139,
+        "y": 908.566
+      },
+      "plan": {
+        "xFt": -36.057971,
+        "yFt": 42.610266
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-066"
+      ],
+      "sourceRef": "FP2.0 drawing index 6639"
+    },
+    {
+      "id": "pipe-066-node-03",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-066",
+      "sourceParameter": 0.720209,
+      "pdfPt": {
+        "x": 829.164,
+        "y": 908.592
+      },
+      "plan": {
+        "xFt": -41.055254,
+        "yFt": 42.613096
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-065"
+      ],
+      "sourceRef": "FP2.0 drawing index 6639"
+    },
+    {
+      "id": "pipe-066-node-04",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-066",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 808.909,
+        "y": 908.603
+      },
+      "plan": {
+        "xFt": -43.305858,
+        "yFt": 42.614371
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-064"
+      ],
+      "sourceRef": "FP2.0 drawing index 6639"
+    },
+    {
+      "id": "pipe-067-node-01",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-067",
+      "sourceParameter": 0,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1339.394
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 90.480617
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-067"
+      ],
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "pipe-067-node-02",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-067",
+      "sourceParameter": 0.056059,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1349.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 91.64852
+      },
+      "sprinklerIds": [
+        "head-064"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "pipe-067-node-03",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-067",
+      "sourceParameter": 0.344061,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1403.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 97.648593
+      },
+      "sprinklerIds": [
+        "head-063"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "pipe-067-node-04",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-067",
+      "sourceParameter": 0.632062,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1457.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 103.648666
+      },
+      "sprinklerIds": [
+        "head-058"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "pipe-067-node-05",
+      "kind": "sprinkler-junction",
+      "sourceSegmentId": "pipe-067",
+      "sourceParameter": 0.920064,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1511.905
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 109.648739
+      },
+      "sprinklerIds": [
+        "head-057"
+      ],
+      "contactIds": [],
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "pipe-067-node-06",
+      "kind": "pipe-contact",
+      "sourceSegmentId": "pipe-067",
+      "sourceParameter": 1,
+      "pdfPt": {
+        "x": 890.045,
+        "y": 1526.893
+      },
+      "plan": {
+        "xFt": -34.290638,
+        "yFt": 111.314092
+      },
+      "sprinklerIds": [],
+      "contactIds": [
+        "contact-068",
+        "lower-central-main-turn"
+      ],
+      "sourceRef": "FP2.0 drawing index 6666"
+    }
+  ],
+  "edges": [
+    {
+      "id": "source-edge-001",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-001-node-01",
+      "toNodeId": "pipe-001-node-02",
+      "sourceSegmentId": "pipe-001",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 21.31,
+      "planLengthFt": 2.367806,
+      "sourceRef": "FP2.0 drawing index 3520"
+    },
+    {
+      "id": "source-edge-002",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-001-node-02",
+      "toNodeId": "pipe-001-node-03",
+      "sourceSegmentId": "pipe-001",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 3.087,
+      "planLengthFt": 0.343004,
+      "sourceRef": "FP2.0 drawing index 3520"
+    },
+    {
+      "id": "source-edge-003",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-002-node-01",
+      "toNodeId": "pipe-002-node-02",
+      "sourceSegmentId": "pipe-002",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 7.805,
+      "planLengthFt": 0.867233,
+      "sourceRef": "FP2.0 drawing index 3594"
+    },
+    {
+      "id": "source-edge-004",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-003-node-01",
+      "toNodeId": "pipe-003-node-02",
+      "sourceSegmentId": "pipe-003",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 22.527,
+      "planLengthFt": 2.50303,
+      "sourceRef": "FP2.0 drawing index 3624"
+    },
+    {
+      "id": "source-edge-005",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-004-node-01",
+      "toNodeId": "pipe-004-node-02",
+      "sourceSegmentId": "pipe-004",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 6.07,
+      "planLengthFt": 0.674453,
+      "sourceRef": "FP2.0 drawing index 3664"
+    },
+    {
+      "id": "source-edge-006",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-005-node-01",
+      "toNodeId": "pipe-005-node-02",
+      "sourceSegmentId": "pipe-005",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 46.721,
+      "planLengthFt": 5.191285,
+      "sourceRef": "FP2.0 drawing index 3675"
+    },
+    {
+      "id": "source-edge-007",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-006-node-01",
+      "toNodeId": "pipe-006-node-02",
+      "sourceSegmentId": "pipe-006",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 3.804,
+      "planLengthFt": 0.422672,
+      "sourceRef": "FP2.0 drawing index 3831"
+    },
+    {
+      "id": "source-edge-008",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-006-node-02",
+      "toNodeId": "pipe-006-node-03",
+      "sourceSegmentId": "pipe-006",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 62.494,
+      "planLengthFt": 6.943862,
+      "sourceRef": "FP2.0 drawing index 3831"
+    },
+    {
+      "id": "source-edge-009",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-007-node-01",
+      "toNodeId": "pipe-007-node-02",
+      "sourceSegmentId": "pipe-007",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 14.961,
+      "planLengthFt": 1.662353,
+      "sourceRef": "FP2.0 drawing index 3853"
+    },
+    {
+      "id": "source-edge-010",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-008-node-01",
+      "toNodeId": "pipe-008-node-02",
+      "sourceSegmentId": "pipe-008",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 56.069,
+      "planLengthFt": 6.229964,
+      "sourceRef": "FP2.0 drawing index 3876"
+    },
+    {
+      "id": "source-edge-011",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-008-node-02",
+      "toNodeId": "pipe-008-node-03",
+      "sourceSegmentId": "pipe-008",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 3.75,
+      "planLengthFt": 0.416672,
+      "sourceRef": "FP2.0 drawing index 3876"
+    },
+    {
+      "id": "source-edge-012",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-009-node-01",
+      "toNodeId": "pipe-009-node-02",
+      "sourceSegmentId": "pipe-009",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 56.069,
+      "planLengthFt": 6.229964,
+      "sourceRef": "FP2.0 drawing index 3894"
+    },
+    {
+      "id": "source-edge-013",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-009-node-02",
+      "toNodeId": "pipe-009-node-03",
+      "sourceSegmentId": "pipe-009",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 3.75,
+      "planLengthFt": 0.416672,
+      "sourceRef": "FP2.0 drawing index 3894"
+    },
+    {
+      "id": "source-edge-014",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-010-node-01",
+      "toNodeId": "pipe-010-node-02",
+      "sourceSegmentId": "pipe-010",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 42.5,
+      "planLengthFt": 4.722279,
+      "sourceRef": "FP2.0 drawing index 4016"
+    },
+    {
+      "id": "source-edge-015",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-011-node-01",
+      "toNodeId": "pipe-011-node-02",
+      "sourceSegmentId": "pipe-011",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 29.485,
+      "planLengthFt": 3.276155,
+      "sourceRef": "FP2.0 drawing index 4035"
+    },
+    {
+      "id": "source-edge-016",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-012-node-01",
+      "toNodeId": "pipe-012-node-02",
+      "sourceSegmentId": "pipe-012",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 147.46,
+      "planLengthFt": 16.384643,
+      "sourceRef": "FP2.0 drawing index 4047"
+    },
+    {
+      "id": "source-edge-017",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-013-node-01",
+      "toNodeId": "pipe-013-node-02",
+      "sourceSegmentId": "pipe-013",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 123.486,
+      "planLengthFt": 13.720833,
+      "sourceRef": "FP2.0 drawing index 4110"
+    },
+    {
+      "id": "source-edge-018",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-013-node-02",
+      "toNodeId": "pipe-013-node-03",
+      "sourceSegmentId": "pipe-013",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 64.012,
+      "planLengthFt": 7.112531,
+      "sourceRef": "FP2.0 drawing index 4110"
+    },
+    {
+      "id": "source-edge-019",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-014-node-01",
+      "toNodeId": "pipe-014-node-02",
+      "sourceSegmentId": "pipe-014",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 29.485,
+      "planLengthFt": 3.276151,
+      "sourceRef": "FP2.0 drawing index 4116"
+    },
+    {
+      "id": "source-edge-020",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-015-node-01",
+      "toNodeId": "pipe-015-node-02",
+      "sourceSegmentId": "pipe-015",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 164.97,
+      "planLengthFt": 18.330222,
+      "sourceRef": "FP2.0 drawing index 4181"
+    },
+    {
+      "id": "source-edge-021",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-016-node-01",
+      "toNodeId": "pipe-016-node-02",
+      "sourceSegmentId": "pipe-016",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 30.516,
+      "planLengthFt": 3.390708,
+      "sourceRef": "FP2.0 drawing index 4191"
+    },
+    {
+      "id": "source-edge-022",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-017-node-01",
+      "toNodeId": "pipe-017-node-02",
+      "sourceSegmentId": "pipe-017",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 39.218,
+      "planLengthFt": 4.357608,
+      "sourceRef": "FP2.0 drawing index 4193"
+    },
+    {
+      "id": "source-edge-023",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-018-node-01",
+      "toNodeId": "pipe-018-node-02",
+      "sourceSegmentId": "pipe-018",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 3.75,
+      "planLengthFt": 0.416672,
+      "sourceRef": "FP2.0 drawing index 4195"
+    },
+    {
+      "id": "source-edge-024",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-018-node-02",
+      "toNodeId": "pipe-018-node-03",
+      "sourceSegmentId": "pipe-018",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 26.016,
+      "planLengthFt": 2.890702,
+      "sourceRef": "FP2.0 drawing index 4195"
+    },
+    {
+      "id": "source-edge-025",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-018-node-03",
+      "toNodeId": "pipe-018-node-04",
+      "sourceSegmentId": "pipe-018",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 26.109,
+      "planLengthFt": 2.901035,
+      "sourceRef": "FP2.0 drawing index 4195"
+    },
+    {
+      "id": "source-edge-026",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-018-node-04",
+      "toNodeId": "pipe-018-node-05",
+      "sourceSegmentId": "pipe-018",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 6.188,
+      "planLengthFt": 0.687564,
+      "sourceRef": "FP2.0 drawing index 4195"
+    },
+    {
+      "id": "source-edge-027",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-019-node-01",
+      "toNodeId": "pipe-019-node-02",
+      "sourceSegmentId": "pipe-019",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 3.75,
+      "planLengthFt": 0.416672,
+      "sourceRef": "FP2.0 drawing index 4198"
+    },
+    {
+      "id": "source-edge-028",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-019-node-02",
+      "toNodeId": "pipe-019-node-03",
+      "sourceSegmentId": "pipe-019",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 52.125,
+      "planLengthFt": 5.791737,
+      "sourceRef": "FP2.0 drawing index 4198"
+    },
+    {
+      "id": "source-edge-029",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-019-node-03",
+      "toNodeId": "pipe-019-node-04",
+      "sourceSegmentId": "pipe-019",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 6.188,
+      "planLengthFt": 0.687564,
+      "sourceRef": "FP2.0 drawing index 4198"
+    },
+    {
+      "id": "source-edge-030",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-020-node-01",
+      "toNodeId": "pipe-020-node-02",
+      "sourceSegmentId": "pipe-020",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 30.516,
+      "planLengthFt": 3.390708,
+      "sourceRef": "FP2.0 drawing index 4251"
+    },
+    {
+      "id": "source-edge-031",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-021-node-01",
+      "toNodeId": "pipe-021-node-02",
+      "sourceSegmentId": "pipe-021",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 39.218,
+      "planLengthFt": 4.357608,
+      "sourceRef": "FP2.0 drawing index 4252"
+    },
+    {
+      "id": "source-edge-032",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-022-node-01",
+      "toNodeId": "pipe-022-node-02",
+      "sourceSegmentId": "pipe-022",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 41.69,
+      "planLengthFt": 4.632278,
+      "sourceRef": "FP2.0 drawing index 4378"
+    },
+    {
+      "id": "source-edge-033",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-023-node-01",
+      "toNodeId": "pipe-023-node-02",
+      "sourceSegmentId": "pipe-023",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 41.69,
+      "planLengthFt": 4.632278,
+      "sourceRef": "FP2.0 drawing index 4379"
+    },
+    {
+      "id": "source-edge-034",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-024-node-01",
+      "toNodeId": "pipe-024-node-02",
+      "sourceSegmentId": "pipe-024",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 45.871,
+      "planLengthFt": 5.09684,
+      "sourceRef": "FP2.0 drawing index 4440"
+    },
+    {
+      "id": "source-edge-035",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-024-node-02",
+      "toNodeId": "pipe-024-node-03",
+      "sourceSegmentId": "pipe-024",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 4440"
+    },
+    {
+      "id": "source-edge-036",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-024-node-03",
+      "toNodeId": "pipe-024-node-04",
+      "sourceSegmentId": "pipe-024",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 14.433,
+      "planLengthFt": 1.603686,
+      "sourceRef": "FP2.0 drawing index 4440"
+    },
+    {
+      "id": "source-edge-037",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-025-node-01",
+      "toNodeId": "pipe-025-node-02",
+      "sourceSegmentId": "pipe-025",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 45.871,
+      "planLengthFt": 5.09684,
+      "sourceRef": "FP2.0 drawing index 4442"
+    },
+    {
+      "id": "source-edge-038",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-025-node-02",
+      "toNodeId": "pipe-025-node-03",
+      "sourceSegmentId": "pipe-025",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 4442"
+    },
+    {
+      "id": "source-edge-039",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-025-node-03",
+      "toNodeId": "pipe-025-node-04",
+      "sourceSegmentId": "pipe-025",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 14.433,
+      "planLengthFt": 1.603686,
+      "sourceRef": "FP2.0 drawing index 4442"
+    },
+    {
+      "id": "source-edge-040",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-026-node-01",
+      "toNodeId": "pipe-026-node-02",
+      "sourceSegmentId": "pipe-026",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 36.097,
+      "planLengthFt": 4.010826,
+      "sourceRef": "FP2.0 drawing index 4579"
+    },
+    {
+      "id": "source-edge-041",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-026-node-02",
+      "toNodeId": "pipe-026-node-03",
+      "sourceSegmentId": "pipe-026",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 53.999,
+      "planLengthFt": 5.999962,
+      "sourceRef": "FP2.0 drawing index 4579"
+    },
+    {
+      "id": "source-edge-042",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-026-node-03",
+      "toNodeId": "pipe-026-node-04",
+      "sourceSegmentId": "pipe-026",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 53.999,
+      "planLengthFt": 5.999962,
+      "sourceRef": "FP2.0 drawing index 4579"
+    },
+    {
+      "id": "source-edge-043",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-026-node-04",
+      "toNodeId": "pipe-026-node-05",
+      "sourceSegmentId": "pipe-026",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 3.755,
+      "planLengthFt": 0.417227,
+      "sourceRef": "FP2.0 drawing index 4579"
+    },
+    {
+      "id": "source-edge-044",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-027-node-01",
+      "toNodeId": "pipe-027-node-02",
+      "sourceSegmentId": "pipe-027",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 3.769,
+      "planLengthFt": 0.418783,
+      "sourceRef": "FP2.0 drawing index 4682"
+    },
+    {
+      "id": "source-edge-045",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-027-node-02",
+      "toNodeId": "pipe-027-node-03",
+      "sourceSegmentId": "pipe-027",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 54.009,
+      "planLengthFt": 6.001073,
+      "sourceRef": "FP2.0 drawing index 4682"
+    },
+    {
+      "id": "source-edge-046",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-027-node-03",
+      "toNodeId": "pipe-027-node-04",
+      "sourceSegmentId": "pipe-027",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 53.992,
+      "planLengthFt": 5.999184,
+      "sourceRef": "FP2.0 drawing index 4682"
+    },
+    {
+      "id": "source-edge-047",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-027-node-04",
+      "toNodeId": "pipe-027-node-05",
+      "sourceSegmentId": "pipe-027",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 39.193,
+      "planLengthFt": 4.354831,
+      "sourceRef": "FP2.0 drawing index 4682"
+    },
+    {
+      "id": "source-edge-048",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-028-node-01",
+      "toNodeId": "pipe-028-node-02",
+      "sourceSegmentId": "pipe-028",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 65.182,
+      "planLengthFt": 7.242532,
+      "sourceRef": "FP2.0 drawing index 4787"
+    },
+    {
+      "id": "source-edge-049",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-029-node-01",
+      "toNodeId": "pipe-029-node-02",
+      "sourceSegmentId": "pipe-029",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 65.182,
+      "planLengthFt": 7.242532,
+      "sourceRef": "FP2.0 drawing index 4788"
+    },
+    {
+      "id": "source-edge-050",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-030-node-01",
+      "toNodeId": "pipe-030-node-02",
+      "sourceSegmentId": "pipe-030",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 71.845,
+      "planLengthFt": 7.982875,
+      "sourceRef": "FP2.0 drawing index 4943"
+    },
+    {
+      "id": "source-edge-051",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-031-node-01",
+      "toNodeId": "pipe-031-node-02",
+      "sourceSegmentId": "pipe-031",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 71.845,
+      "planLengthFt": 7.982875,
+      "sourceRef": "FP2.0 drawing index 4944"
+    },
+    {
+      "id": "source-edge-052",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-032-node-01",
+      "toNodeId": "pipe-032-node-02",
+      "sourceSegmentId": "pipe-032",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 22.018,
+      "planLengthFt": 2.446474,
+      "sourceRef": "FP2.0 drawing index 5041"
+    },
+    {
+      "id": "source-edge-053",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-032-node-02",
+      "toNodeId": "pipe-032-node-03",
+      "sourceSegmentId": "pipe-032",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 20.576,
+      "planLengthFt": 2.28625,
+      "sourceRef": "FP2.0 drawing index 5041"
+    },
+    {
+      "id": "source-edge-054",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-032-node-03",
+      "toNodeId": "pipe-032-node-04",
+      "sourceSegmentId": "pipe-032",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 4.305,
+      "planLengthFt": 0.478339,
+      "sourceRef": "FP2.0 drawing index 5041"
+    },
+    {
+      "id": "source-edge-055",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-033-node-01",
+      "toNodeId": "pipe-033-node-02",
+      "sourceSegmentId": "pipe-033",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 22.018,
+      "planLengthFt": 2.446474,
+      "sourceRef": "FP2.0 drawing index 5042"
+    },
+    {
+      "id": "source-edge-056",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-033-node-02",
+      "toNodeId": "pipe-033-node-03",
+      "sourceSegmentId": "pipe-033",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 20.576,
+      "planLengthFt": 2.28625,
+      "sourceRef": "FP2.0 drawing index 5042"
+    },
+    {
+      "id": "source-edge-057",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-033-node-03",
+      "toNodeId": "pipe-033-node-04",
+      "sourceSegmentId": "pipe-033",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 4.305,
+      "planLengthFt": 0.478339,
+      "sourceRef": "FP2.0 drawing index 5042"
+    },
+    {
+      "id": "source-edge-058",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-034-node-01",
+      "toNodeId": "pipe-034-node-02",
+      "sourceSegmentId": "pipe-034",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 3.618,
+      "planLengthFt": 0.402005,
+      "sourceRef": "FP2.0 drawing index 5120"
+    },
+    {
+      "id": "source-edge-059",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-035-node-01",
+      "toNodeId": "pipe-035-node-02",
+      "sourceSegmentId": "pipe-035",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 3.617,
+      "planLengthFt": 0.401894,
+      "sourceRef": "FP2.0 drawing index 5121"
+    },
+    {
+      "id": "source-edge-060",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-036-node-01",
+      "toNodeId": "pipe-036-node-02",
+      "sourceSegmentId": "pipe-036",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 15.329,
+      "planLengthFt": 1.703243,
+      "sourceRef": "FP2.0 drawing index 5228"
+    },
+    {
+      "id": "source-edge-061",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-036-node-02",
+      "toNodeId": "pipe-036-node-03",
+      "sourceSegmentId": "pipe-036",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 53.999,
+      "planLengthFt": 5.999962,
+      "sourceRef": "FP2.0 drawing index 5228"
+    },
+    {
+      "id": "source-edge-062",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-036-node-03",
+      "toNodeId": "pipe-036-node-04",
+      "sourceSegmentId": "pipe-036",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 16.372,
+      "planLengthFt": 1.819133,
+      "sourceRef": "FP2.0 drawing index 5228"
+    },
+    {
+      "id": "source-edge-063",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-037-node-01",
+      "toNodeId": "pipe-037-node-02",
+      "sourceSegmentId": "pipe-037",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 15.329,
+      "planLengthFt": 1.703243,
+      "sourceRef": "FP2.0 drawing index 5229"
+    },
+    {
+      "id": "source-edge-064",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-037-node-02",
+      "toNodeId": "pipe-037-node-03",
+      "sourceSegmentId": "pipe-037",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 53.999,
+      "planLengthFt": 5.999962,
+      "sourceRef": "FP2.0 drawing index 5229"
+    },
+    {
+      "id": "source-edge-065",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-037-node-03",
+      "toNodeId": "pipe-037-node-04",
+      "sourceSegmentId": "pipe-037",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 16.372,
+      "planLengthFt": 1.819133,
+      "sourceRef": "FP2.0 drawing index 5229"
+    },
+    {
+      "id": "source-edge-066",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-038-node-01",
+      "toNodeId": "pipe-038-node-02",
+      "sourceSegmentId": "pipe-038",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 49.019,
+      "planLengthFt": 5.446622,
+      "sourceRef": "FP2.0 drawing index 5241"
+    },
+    {
+      "id": "source-edge-067",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-038-node-02",
+      "toNodeId": "pipe-038-node-03",
+      "sourceSegmentId": "pipe-038",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 5241"
+    },
+    {
+      "id": "source-edge-068",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-038-node-03",
+      "toNodeId": "pipe-038-node-04",
+      "sourceSegmentId": "pipe-038",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 5241"
+    },
+    {
+      "id": "source-edge-069",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-038-node-04",
+      "toNodeId": "pipe-038-node-05",
+      "sourceSegmentId": "pipe-038",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 30.481,
+      "planLengthFt": 3.386819,
+      "sourceRef": "FP2.0 drawing index 5241"
+    },
+    {
+      "id": "source-edge-070",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-039-node-01",
+      "toNodeId": "pipe-039-node-02",
+      "sourceSegmentId": "pipe-039",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 49.019,
+      "planLengthFt": 5.446622,
+      "sourceRef": "FP2.0 drawing index 5242"
+    },
+    {
+      "id": "source-edge-071",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-039-node-02",
+      "toNodeId": "pipe-039-node-03",
+      "sourceSegmentId": "pipe-039",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 5242"
+    },
+    {
+      "id": "source-edge-072",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-039-node-03",
+      "toNodeId": "pipe-039-node-04",
+      "sourceSegmentId": "pipe-039",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 5242"
+    },
+    {
+      "id": "source-edge-073",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-039-node-04",
+      "toNodeId": "pipe-039-node-05",
+      "sourceSegmentId": "pipe-039",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 30.481,
+      "planLengthFt": 3.386819,
+      "sourceRef": "FP2.0 drawing index 5242"
+    },
+    {
+      "id": "source-edge-074",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-040-node-01",
+      "toNodeId": "pipe-040-node-02",
+      "sourceSegmentId": "pipe-040",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 3.75,
+      "planLengthFt": 0.416672,
+      "sourceRef": "FP2.0 drawing index 5287"
+    },
+    {
+      "id": "source-edge-075",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-040-node-02",
+      "toNodeId": "pipe-040-node-03",
+      "sourceSegmentId": "pipe-040",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 5287"
+    },
+    {
+      "id": "source-edge-076",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-040-node-03",
+      "toNodeId": "pipe-040-node-04",
+      "sourceSegmentId": "pipe-040",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 5287"
+    },
+    {
+      "id": "source-edge-077",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-040-node-04",
+      "toNodeId": "pipe-040-node-05",
+      "sourceSegmentId": "pipe-040",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 30.609,
+      "planLengthFt": 3.401041,
+      "sourceRef": "FP2.0 drawing index 5287"
+    },
+    {
+      "id": "source-edge-078",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-041-node-01",
+      "toNodeId": "pipe-041-node-02",
+      "sourceSegmentId": "pipe-041",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 3.75,
+      "planLengthFt": 0.416672,
+      "sourceRef": "FP2.0 drawing index 5288"
+    },
+    {
+      "id": "source-edge-079",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-041-node-02",
+      "toNodeId": "pipe-041-node-03",
+      "sourceSegmentId": "pipe-041",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 5288"
+    },
+    {
+      "id": "source-edge-080",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-041-node-03",
+      "toNodeId": "pipe-041-node-04",
+      "sourceSegmentId": "pipe-041",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 5288"
+    },
+    {
+      "id": "source-edge-081",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-041-node-04",
+      "toNodeId": "pipe-041-node-05",
+      "sourceSegmentId": "pipe-041",
+      "strokeClass": "black-pipe",
+      "lengthPdfPt": 30.609,
+      "planLengthFt": 3.401041,
+      "sourceRef": "FP2.0 drawing index 5288"
+    },
+    {
+      "id": "source-edge-082",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-042-node-01",
+      "toNodeId": "pipe-042-node-02",
+      "sourceSegmentId": "pipe-042",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 74.905,
+      "planLengthFt": 8.322879,
+      "sourceRef": "FP2.0 drawing index 5463"
+    },
+    {
+      "id": "source-edge-083",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-043-node-01",
+      "toNodeId": "pipe-043-node-02",
+      "sourceSegmentId": "pipe-043",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 74.906,
+      "planLengthFt": 8.32299,
+      "sourceRef": "FP2.0 drawing index 5464"
+    },
+    {
+      "id": "source-edge-084",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-044-node-01",
+      "toNodeId": "pipe-044-node-02",
+      "sourceSegmentId": "pipe-044",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 59.311,
+      "planLengthFt": 6.590195,
+      "sourceRef": "FP2.0 drawing index 5719"
+    },
+    {
+      "id": "source-edge-085",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-045-node-01",
+      "toNodeId": "pipe-045-node-02",
+      "sourceSegmentId": "pipe-045",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 59.311,
+      "planLengthFt": 6.590195,
+      "sourceRef": "FP2.0 drawing index 5720"
+    },
+    {
+      "id": "source-edge-086",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-046-node-01",
+      "toNodeId": "pipe-046-node-02",
+      "sourceSegmentId": "pipe-046",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 62.081,
+      "planLengthFt": 6.897974,
+      "sourceRef": "FP2.0 drawing index 5823"
+    },
+    {
+      "id": "source-edge-087",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-047-node-01",
+      "toNodeId": "pipe-047-node-02",
+      "sourceSegmentId": "pipe-047",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 62.081,
+      "planLengthFt": 6.897974,
+      "sourceRef": "FP2.0 drawing index 5828"
+    },
+    {
+      "id": "source-edge-088",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-048-node-01",
+      "toNodeId": "pipe-048-node-02",
+      "sourceSegmentId": "pipe-048",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 23.478,
+      "planLengthFt": 2.608698,
+      "sourceRef": "FP2.0 drawing index 5862"
+    },
+    {
+      "id": "source-edge-089",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-049-node-01",
+      "toNodeId": "pipe-049-node-02",
+      "sourceSegmentId": "pipe-049",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 23.478,
+      "planLengthFt": 2.608698,
+      "sourceRef": "FP2.0 drawing index 5863"
+    },
+    {
+      "id": "source-edge-090",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-050-node-01",
+      "toNodeId": "pipe-050-node-02",
+      "sourceSegmentId": "pipe-050",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 30.837,
+      "planLengthFt": 3.426375,
+      "sourceRef": "FP2.0 drawing index 6005"
+    },
+    {
+      "id": "source-edge-091",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-050-node-02",
+      "toNodeId": "pipe-050-node-03",
+      "sourceSegmentId": "pipe-050",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6005"
+    },
+    {
+      "id": "source-edge-092",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-050-node-03",
+      "toNodeId": "pipe-050-node-04",
+      "sourceSegmentId": "pipe-050",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6005"
+    },
+    {
+      "id": "source-edge-093",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-050-node-04",
+      "toNodeId": "pipe-050-node-05",
+      "sourceSegmentId": "pipe-050",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 7.971,
+      "planLengthFt": 0.885677,
+      "sourceRef": "FP2.0 drawing index 6005"
+    },
+    {
+      "id": "source-edge-094",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-051-node-01",
+      "toNodeId": "pipe-051-node-02",
+      "sourceSegmentId": "pipe-051",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 30.921,
+      "planLengthFt": 3.435708,
+      "sourceRef": "FP2.0 drawing index 6006"
+    },
+    {
+      "id": "source-edge-095",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-051-node-02",
+      "toNodeId": "pipe-051-node-03",
+      "sourceSegmentId": "pipe-051",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6006"
+    },
+    {
+      "id": "source-edge-096",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-051-node-03",
+      "toNodeId": "pipe-051-node-04",
+      "sourceSegmentId": "pipe-051",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6006"
+    },
+    {
+      "id": "source-edge-097",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-051-node-04",
+      "toNodeId": "pipe-051-node-05",
+      "sourceSegmentId": "pipe-051",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 7.971,
+      "planLengthFt": 0.885677,
+      "sourceRef": "FP2.0 drawing index 6006"
+    },
+    {
+      "id": "source-edge-098",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-052-node-01",
+      "toNodeId": "pipe-052-node-02",
+      "sourceSegmentId": "pipe-052",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 3.834,
+      "planLengthFt": 0.426005,
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "source-edge-099",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-052-node-02",
+      "toNodeId": "pipe-052-node-03",
+      "sourceSegmentId": "pipe-052",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54.004,
+      "planLengthFt": 6.000517,
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "source-edge-100",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-052-node-03",
+      "toNodeId": "pipe-052-node-04",
+      "sourceSegmentId": "pipe-052",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 53.999,
+      "planLengthFt": 5.999962,
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "source-edge-101",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-052-node-04",
+      "toNodeId": "pipe-052-node-05",
+      "sourceSegmentId": "pipe-052",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "source-edge-102",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-052-node-05",
+      "toNodeId": "pipe-052-node-06",
+      "sourceSegmentId": "pipe-052",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 21.663,
+      "planLengthFt": 2.407029,
+      "sourceRef": "FP2.0 drawing index 6106"
+    },
+    {
+      "id": "source-edge-103",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-053-node-01",
+      "toNodeId": "pipe-053-node-02",
+      "sourceSegmentId": "pipe-053",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 3.918,
+      "planLengthFt": 0.435339,
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "source-edge-104",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-053-node-02",
+      "toNodeId": "pipe-053-node-03",
+      "sourceSegmentId": "pipe-053",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54.004,
+      "planLengthFt": 6.000517,
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "source-edge-105",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-053-node-03",
+      "toNodeId": "pipe-053-node-04",
+      "sourceSegmentId": "pipe-053",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 53.999,
+      "planLengthFt": 5.999962,
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "source-edge-106",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-053-node-04",
+      "toNodeId": "pipe-053-node-05",
+      "sourceSegmentId": "pipe-053",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "source-edge-107",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-053-node-05",
+      "toNodeId": "pipe-053-node-06",
+      "sourceSegmentId": "pipe-053",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 21.579,
+      "planLengthFt": 2.397696,
+      "sourceRef": "FP2.0 drawing index 6107"
+    },
+    {
+      "id": "source-edge-108",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-054-node-01",
+      "toNodeId": "pipe-054-node-02",
+      "sourceSegmentId": "pipe-054",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 14.288,
+      "planLengthFt": 1.587575,
+      "sourceRef": "FP2.0 drawing index 6365"
+    },
+    {
+      "id": "source-edge-109",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-055-node-01",
+      "toNodeId": "pipe-055-node-02",
+      "sourceSegmentId": "pipe-055",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 14.288,
+      "planLengthFt": 1.587575,
+      "sourceRef": "FP2.0 drawing index 6366"
+    },
+    {
+      "id": "source-edge-110",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-056-node-01",
+      "toNodeId": "pipe-056-node-02",
+      "sourceSegmentId": "pipe-056",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 17.008,
+      "planLengthFt": 1.889801,
+      "sourceRef": "FP2.0 drawing index 6436"
+    },
+    {
+      "id": "source-edge-111",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-057-node-01",
+      "toNodeId": "pipe-057-node-02",
+      "sourceSegmentId": "pipe-057",
+      "strokeClass": "navy-arm-over",
+      "lengthPdfPt": 17.008,
+      "planLengthFt": 1.889801,
+      "sourceRef": "FP2.0 drawing index 6438"
+    },
+    {
+      "id": "source-edge-112",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-058-node-01",
+      "toNodeId": "pipe-058-node-02",
+      "sourceSegmentId": "pipe-058",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 161.742,
+      "planLengthFt": 17.971551,
+      "sourceRef": "FP2.0 drawing index 6467"
+    },
+    {
+      "id": "source-edge-113",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-058-node-02",
+      "toNodeId": "pipe-058-node-03",
+      "sourceSegmentId": "pipe-058",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 16.136,
+      "planLengthFt": 1.792911,
+      "sourceRef": "FP2.0 drawing index 6467"
+    },
+    {
+      "id": "source-edge-114",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-059-node-01",
+      "toNodeId": "pipe-059-node-02",
+      "sourceSegmentId": "pipe-059",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 2.5,
+      "planLengthFt": 0.277781,
+      "sourceRef": "FP2.0 drawing index 6536"
+    },
+    {
+      "id": "source-edge-115",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-060-node-01",
+      "toNodeId": "pipe-060-node-02",
+      "sourceSegmentId": "pipe-060",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 16.948,
+      "planLengthFt": 1.883134,
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "source-edge-116",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-060-node-02",
+      "toNodeId": "pipe-060-node-03",
+      "sourceSegmentId": "pipe-060",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "source-edge-117",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-060-node-03",
+      "toNodeId": "pipe-060-node-04",
+      "sourceSegmentId": "pipe-060",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "source-edge-118",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-060-node-04",
+      "toNodeId": "pipe-060-node-05",
+      "sourceSegmentId": "pipe-060",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "source-edge-119",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-060-node-05",
+      "toNodeId": "pipe-060-node-06",
+      "sourceSegmentId": "pipe-060",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 8.55,
+      "planLengthFt": 0.950012,
+      "sourceRef": "FP2.0 drawing index 6544"
+    },
+    {
+      "id": "source-edge-120",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-061-node-01",
+      "toNodeId": "pipe-061-node-02",
+      "sourceSegmentId": "pipe-061",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 26.482,
+      "planLengthFt": 2.94248,
+      "sourceRef": "FP2.0 drawing index 6592"
+    },
+    {
+      "id": "source-edge-121",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-061-node-02",
+      "toNodeId": "pipe-061-node-03",
+      "sourceSegmentId": "pipe-061",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 14.944,
+      "planLengthFt": 1.660465,
+      "sourceRef": "FP2.0 drawing index 6592"
+    },
+    {
+      "id": "source-edge-122",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-062-node-01",
+      "toNodeId": "pipe-062-node-02",
+      "sourceSegmentId": "pipe-062",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 32.666,
+      "planLengthFt": 3.6296,
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "source-edge-123",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-062-node-02",
+      "toNodeId": "pipe-062-node-03",
+      "sourceSegmentId": "pipe-062",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 4.89,
+      "planLengthFt": 0.54334,
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "source-edge-124",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-062-node-03",
+      "toNodeId": "pipe-062-node-04",
+      "sourceSegmentId": "pipe-062",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "source-edge-125",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-062-node-04",
+      "toNodeId": "pipe-062-node-05",
+      "sourceSegmentId": "pipe-062",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "source-edge-126",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-062-node-05",
+      "toNodeId": "pipe-062-node-06",
+      "sourceSegmentId": "pipe-062",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 41.989,
+      "planLengthFt": 4.665501,
+      "sourceRef": "FP2.0 drawing index 6605"
+    },
+    {
+      "id": "source-edge-127",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-063-node-01",
+      "toNodeId": "pipe-063-node-02",
+      "sourceSegmentId": "pipe-063",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 22.231,
+      "planLengthFt": 2.470127,
+      "sourceRef": "FP2.0 drawing index 6636"
+    },
+    {
+      "id": "source-edge-128",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-063-node-02",
+      "toNodeId": "pipe-063-node-03",
+      "sourceSegmentId": "pipe-063",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 45.18,
+      "planLengthFt": 5.020061,
+      "sourceRef": "FP2.0 drawing index 6636"
+    },
+    {
+      "id": "source-edge-129",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-063-node-03",
+      "toNodeId": "pipe-063-node-04",
+      "sourceSegmentId": "pipe-063",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 19.899,
+      "planLengthFt": 2.211041,
+      "sourceRef": "FP2.0 drawing index 6636"
+    },
+    {
+      "id": "source-edge-130",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-064-node-01",
+      "toNodeId": "pipe-064-node-02",
+      "sourceSegmentId": "pipe-064",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 22.231,
+      "planLengthFt": 2.470127,
+      "sourceRef": "FP2.0 drawing index 6637"
+    },
+    {
+      "id": "source-edge-131",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-064-node-02",
+      "toNodeId": "pipe-064-node-03",
+      "sourceSegmentId": "pipe-064",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 45.18,
+      "planLengthFt": 5.020061,
+      "sourceRef": "FP2.0 drawing index 6637"
+    },
+    {
+      "id": "source-edge-132",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-064-node-03",
+      "toNodeId": "pipe-064-node-04",
+      "sourceSegmentId": "pipe-064",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 19.899,
+      "planLengthFt": 2.211041,
+      "sourceRef": "FP2.0 drawing index 6637"
+    },
+    {
+      "id": "source-edge-133",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-065-node-01",
+      "toNodeId": "pipe-065-node-02",
+      "sourceSegmentId": "pipe-065",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 7.164,
+      "planLengthFt": 0.795985,
+      "sourceRef": "FP2.0 drawing index 6638"
+    },
+    {
+      "id": "source-edge-134",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-065-node-02",
+      "toNodeId": "pipe-065-node-03",
+      "sourceSegmentId": "pipe-065",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 44.975,
+      "planLengthFt": 4.997284,
+      "sourceRef": "FP2.0 drawing index 6638"
+    },
+    {
+      "id": "source-edge-135",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-065-node-03",
+      "toNodeId": "pipe-065-node-04",
+      "sourceSegmentId": "pipe-065",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 20.255,
+      "planLengthFt": 2.250608,
+      "sourceRef": "FP2.0 drawing index 6638"
+    },
+    {
+      "id": "source-edge-136",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-066-node-01",
+      "toNodeId": "pipe-066-node-02",
+      "sourceSegmentId": "pipe-066",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 7.164,
+      "planLengthFt": 0.795988,
+      "sourceRef": "FP2.0 drawing index 6639"
+    },
+    {
+      "id": "source-edge-137",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-066-node-02",
+      "toNodeId": "pipe-066-node-03",
+      "sourceSegmentId": "pipe-066",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 44.975,
+      "planLengthFt": 4.997284,
+      "sourceRef": "FP2.0 drawing index 6639"
+    },
+    {
+      "id": "source-edge-138",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-066-node-03",
+      "toNodeId": "pipe-066-node-04",
+      "sourceSegmentId": "pipe-066",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 20.255,
+      "planLengthFt": 2.250605,
+      "sourceRef": "FP2.0 drawing index 6639"
+    },
+    {
+      "id": "source-edge-139",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-067-node-01",
+      "toNodeId": "pipe-067-node-02",
+      "sourceSegmentId": "pipe-067",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 10.511,
+      "planLengthFt": 1.167903,
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "source-edge-140",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-067-node-02",
+      "toNodeId": "pipe-067-node-03",
+      "sourceSegmentId": "pipe-067",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "source-edge-141",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-067-node-03",
+      "toNodeId": "pipe-067-node-04",
+      "sourceSegmentId": "pipe-067",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "source-edge-142",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-067-node-04",
+      "toNodeId": "pipe-067-node-05",
+      "sourceSegmentId": "pipe-067",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 54,
+      "planLengthFt": 6.000073,
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "source-edge-143",
+      "kind": "visible-source-pipe",
+      "fromNodeId": "pipe-067-node-05",
+      "toNodeId": "pipe-067-node-06",
+      "sourceSegmentId": "pipe-067",
+      "strokeClass": "red-pipe",
+      "lengthPdfPt": 14.988,
+      "planLengthFt": 1.665354,
+      "sourceRef": "FP2.0 drawing index 6666"
+    },
+    {
+      "id": "connector-edge-contact-001",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-002-node-01",
+      "toNodeId": "pipe-001-node-02",
+      "lengthPdfPt": 3.284,
+      "planLengthFt": 0.364893,
+      "sourceSegmentIds": [
+        "pipe-002",
+        "pipe-001"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-001"
+    },
+    {
+      "id": "connector-edge-contact-002",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-003-node-02",
+      "toNodeId": "pipe-002-node-02",
+      "lengthPdfPt": 4.528,
+      "planLengthFt": 0.503091,
+      "sourceSegmentIds": [
+        "pipe-003",
+        "pipe-002"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-002"
+    },
+    {
+      "id": "connector-edge-contact-003",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-005-node-01",
+      "toNodeId": "pipe-004-node-01",
+      "lengthPdfPt": 4.243,
+      "planLengthFt": 0.47141,
+      "sourceSegmentIds": [
+        "pipe-005",
+        "pipe-004"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-003"
+    },
+    {
+      "id": "connector-edge-contact-004",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-006-node-03",
+      "toNodeId": "pipe-005-node-02",
+      "lengthPdfPt": 4.243,
+      "planLengthFt": 0.47141,
+      "sourceSegmentIds": [
+        "pipe-006",
+        "pipe-005"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-004"
+    },
+    {
+      "id": "connector-edge-contact-005",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-007-node-01",
+      "toNodeId": "pipe-006-node-02",
+      "lengthPdfPt": 4.125,
+      "planLengthFt": 0.458339,
+      "sourceSegmentIds": [
+        "pipe-007",
+        "pipe-006"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-005"
+    },
+    {
+      "id": "connector-edge-contact-006",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-010-node-02",
+      "toNodeId": "pipe-006-node-02",
+      "lengthPdfPt": 4.125,
+      "planLengthFt": 0.458339,
+      "sourceSegmentIds": [
+        "pipe-010",
+        "pipe-006"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-006"
+    },
+    {
+      "id": "connector-edge-contact-007",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-011-node-02",
+      "toNodeId": "pipe-007-node-02",
+      "lengthPdfPt": 3.98,
+      "planLengthFt": 0.442262,
+      "sourceSegmentIds": [
+        "pipe-011",
+        "pipe-007"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-007"
+    },
+    {
+      "id": "connector-edge-contact-008",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-012-node-01",
+      "toNodeId": "pipe-007-node-02",
+      "lengthPdfPt": 5.624,
+      "planLengthFt": 0.624896,
+      "sourceSegmentIds": [
+        "pipe-012",
+        "pipe-007"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-008"
+    },
+    {
+      "id": "connector-edge-contact-009",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-012-node-01",
+      "toNodeId": "pipe-011-node-02",
+      "lengthPdfPt": 3.973,
+      "planLengthFt": 0.441476,
+      "sourceSegmentIds": [
+        "pipe-012",
+        "pipe-011"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-009"
+    },
+    {
+      "id": "connector-edge-contact-010",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-013-node-03",
+      "toNodeId": "pipe-010-node-01",
+      "lengthPdfPt": 1.5,
+      "planLengthFt": 0.166669,
+      "sourceSegmentIds": [
+        "pipe-013",
+        "pipe-010"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-010"
+    },
+    {
+      "id": "connector-edge-contact-011",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-014-node-02",
+      "toNodeId": "pipe-013-node-01",
+      "lengthPdfPt": 3.977,
+      "planLengthFt": 0.441947,
+      "sourceSegmentIds": [
+        "pipe-014",
+        "pipe-013"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-011"
+    },
+    {
+      "id": "connector-edge-contact-012",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-015-node-02",
+      "toNodeId": "pipe-013-node-01",
+      "lengthPdfPt": 5.625,
+      "planLengthFt": 0.625008,
+      "sourceSegmentIds": [
+        "pipe-015",
+        "pipe-013"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-012"
+    },
+    {
+      "id": "connector-edge-contact-013",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-015-node-02",
+      "toNodeId": "pipe-014-node-02",
+      "lengthPdfPt": 3.977,
+      "planLengthFt": 0.441869,
+      "sourceSegmentIds": [
+        "pipe-015",
+        "pipe-014"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-013"
+    },
+    {
+      "id": "connector-edge-contact-014",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-018-node-05",
+      "toNodeId": "pipe-012-node-02",
+      "lengthPdfPt": 3.977,
+      "planLengthFt": 0.441869,
+      "sourceSegmentIds": [
+        "pipe-018",
+        "pipe-012"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-014"
+    },
+    {
+      "id": "connector-edge-contact-015",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-018-node-02",
+      "toNodeId": "pipe-017-node-02",
+      "lengthPdfPt": 1.922,
+      "planLengthFt": 0.213558,
+      "sourceSegmentIds": [
+        "pipe-018",
+        "pipe-017"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-015"
+    },
+    {
+      "id": "connector-edge-contact-016",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-019-node-04",
+      "toNodeId": "pipe-015-node-01",
+      "lengthPdfPt": 3.977,
+      "planLengthFt": 0.441869,
+      "sourceSegmentIds": [
+        "pipe-019",
+        "pipe-015"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-016"
+    },
+    {
+      "id": "connector-edge-contact-017",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-019-node-02",
+      "toNodeId": "pipe-016-node-02",
+      "lengthPdfPt": 1.922,
+      "planLengthFt": 0.213558,
+      "sourceSegmentIds": [
+        "pipe-019",
+        "pipe-016"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-017"
+    },
+    {
+      "id": "connector-edge-contact-018",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-020-node-02",
+      "toNodeId": "pipe-019-node-03",
+      "lengthPdfPt": 1.922,
+      "planLengthFt": 0.213558,
+      "sourceSegmentIds": [
+        "pipe-020",
+        "pipe-019"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-018"
+    },
+    {
+      "id": "connector-edge-contact-019",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-021-node-02",
+      "toNodeId": "pipe-018-node-04",
+      "lengthPdfPt": 1.922,
+      "planLengthFt": 0.213558,
+      "sourceSegmentIds": [
+        "pipe-021",
+        "pipe-018"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-019"
+    },
+    {
+      "id": "connector-edge-contact-020",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-022-node-02",
+      "toNodeId": "pipe-008-node-01",
+      "lengthPdfPt": 4.179,
+      "planLengthFt": 0.464316,
+      "sourceSegmentIds": [
+        "pipe-022",
+        "pipe-008"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-020"
+    },
+    {
+      "id": "connector-edge-contact-021",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-023-node-02",
+      "toNodeId": "pipe-009-node-01",
+      "lengthPdfPt": 4.179,
+      "planLengthFt": 0.464316,
+      "sourceSegmentIds": [
+        "pipe-023",
+        "pipe-009"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-021"
+    },
+    {
+      "id": "connector-edge-contact-022",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-024-node-04",
+      "toNodeId": "pipe-022-node-01",
+      "lengthPdfPt": 4.178,
+      "planLengthFt": 0.464238,
+      "sourceSegmentIds": [
+        "pipe-024",
+        "pipe-022"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-022"
+    },
+    {
+      "id": "connector-edge-contact-023",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-025-node-04",
+      "toNodeId": "pipe-023-node-01",
+      "lengthPdfPt": 4.179,
+      "planLengthFt": 0.464316,
+      "sourceSegmentIds": [
+        "pipe-025",
+        "pipe-023"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-023"
+    },
+    {
+      "id": "connector-edge-contact-024",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-026-node-01",
+      "toNodeId": "pipe-011-node-01",
+      "lengthPdfPt": 3.939,
+      "planLengthFt": 0.437646,
+      "sourceSegmentIds": [
+        "pipe-026",
+        "pipe-011"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-024"
+    },
+    {
+      "id": "connector-edge-contact-025",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-026-node-05",
+      "toNodeId": "pipe-018-node-03",
+      "lengthPdfPt": 2.422,
+      "planLengthFt": 0.269114,
+      "sourceSegmentIds": [
+        "pipe-026",
+        "pipe-018"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-025"
+    },
+    {
+      "id": "connector-edge-contact-026",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-027-node-05",
+      "toNodeId": "pipe-014-node-01",
+      "lengthPdfPt": 3.977,
+      "planLengthFt": 0.441869,
+      "sourceSegmentIds": [
+        "pipe-027",
+        "pipe-014"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-026"
+    },
+    {
+      "id": "connector-edge-contact-027",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-028-node-02",
+      "toNodeId": "pipe-024-node-01",
+      "lengthPdfPt": 4.135,
+      "planLengthFt": 0.45947,
+      "sourceSegmentIds": [
+        "pipe-028",
+        "pipe-024"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-027"
+    },
+    {
+      "id": "connector-edge-contact-028",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-029-node-02",
+      "toNodeId": "pipe-025-node-01",
+      "lengthPdfPt": 4.136,
+      "planLengthFt": 0.459547,
+      "sourceSegmentIds": [
+        "pipe-029",
+        "pipe-025"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-028"
+    },
+    {
+      "id": "connector-edge-contact-029",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-032-node-04",
+      "toNodeId": "pipe-030-node-02",
+      "lengthPdfPt": 4.614,
+      "planLengthFt": 0.512671,
+      "sourceSegmentIds": [
+        "pipe-032",
+        "pipe-030"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-029"
+    },
+    {
+      "id": "connector-edge-contact-030",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-033-node-04",
+      "toNodeId": "pipe-031-node-02",
+      "lengthPdfPt": 4.614,
+      "planLengthFt": 0.512671,
+      "sourceSegmentIds": [
+        "pipe-033",
+        "pipe-031"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-030"
+    },
+    {
+      "id": "connector-edge-contact-031",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-034-node-01",
+      "toNodeId": "pipe-033-node-03",
+      "lengthPdfPt": 4.073,
+      "planLengthFt": 0.452561,
+      "sourceSegmentIds": [
+        "pipe-034",
+        "pipe-033"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-031"
+    },
+    {
+      "id": "connector-edge-contact-032",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-035-node-01",
+      "toNodeId": "pipe-032-node-03",
+      "lengthPdfPt": 4.074,
+      "planLengthFt": 0.452672,
+      "sourceSegmentIds": [
+        "pipe-035",
+        "pipe-032"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-032"
+    },
+    {
+      "id": "connector-edge-contact-033",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-036-node-04",
+      "toNodeId": "pipe-028-node-01",
+      "lengthPdfPt": 4.135,
+      "planLengthFt": 0.45947,
+      "sourceSegmentIds": [
+        "pipe-036",
+        "pipe-028"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-033"
+    },
+    {
+      "id": "connector-edge-contact-034",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-037-node-04",
+      "toNodeId": "pipe-029-node-01",
+      "lengthPdfPt": 4.135,
+      "planLengthFt": 0.45947,
+      "sourceSegmentIds": [
+        "pipe-037",
+        "pipe-029"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-034"
+    },
+    {
+      "id": "connector-edge-contact-035",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-038-node-05",
+      "toNodeId": "pipe-032-node-01",
+      "lengthPdfPt": 1.5,
+      "planLengthFt": 0.166669,
+      "sourceSegmentIds": [
+        "pipe-038",
+        "pipe-032"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-035"
+    },
+    {
+      "id": "connector-edge-contact-036",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-039-node-05",
+      "toNodeId": "pipe-033-node-01",
+      "lengthPdfPt": 1.5,
+      "planLengthFt": 0.166669,
+      "sourceSegmentIds": [
+        "pipe-039",
+        "pipe-033"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-036"
+    },
+    {
+      "id": "connector-edge-contact-037",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-040-node-05",
+      "toNodeId": "pipe-035-node-02",
+      "lengthPdfPt": 3.975,
+      "planLengthFt": 0.441633,
+      "sourceSegmentIds": [
+        "pipe-040",
+        "pipe-035"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-037"
+    },
+    {
+      "id": "connector-edge-contact-038",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-041-node-05",
+      "toNodeId": "pipe-034-node-02",
+      "lengthPdfPt": 3.975,
+      "planLengthFt": 0.441633,
+      "sourceSegmentIds": [
+        "pipe-041",
+        "pipe-034"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-038"
+    },
+    {
+      "id": "connector-edge-contact-039",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-042-node-02",
+      "toNodeId": "pipe-036-node-01",
+      "lengthPdfPt": 4.242,
+      "planLengthFt": 0.471332,
+      "sourceSegmentIds": [
+        "pipe-042",
+        "pipe-036"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-039"
+    },
+    {
+      "id": "connector-edge-contact-040",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-043-node-02",
+      "toNodeId": "pipe-037-node-01",
+      "lengthPdfPt": 4.242,
+      "planLengthFt": 0.471332,
+      "sourceSegmentIds": [
+        "pipe-043",
+        "pipe-037"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-040"
+    },
+    {
+      "id": "connector-edge-contact-041",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-048-node-02",
+      "toNodeId": "pipe-038-node-01",
+      "lengthPdfPt": 4.163,
+      "planLengthFt": 0.46254,
+      "sourceSegmentIds": [
+        "pipe-048",
+        "pipe-038"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-041"
+    },
+    {
+      "id": "connector-edge-contact-042",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-049-node-02",
+      "toNodeId": "pipe-039-node-01",
+      "lengthPdfPt": 4.163,
+      "planLengthFt": 0.46254,
+      "sourceSegmentIds": [
+        "pipe-049",
+        "pipe-039"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-042"
+    },
+    {
+      "id": "connector-edge-contact-043",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-050-node-05",
+      "toNodeId": "pipe-048-node-01",
+      "lengthPdfPt": 4.163,
+      "planLengthFt": 0.46254,
+      "sourceSegmentIds": [
+        "pipe-050",
+        "pipe-048"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-043"
+    },
+    {
+      "id": "connector-edge-contact-044",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-051-node-05",
+      "toNodeId": "pipe-049-node-01",
+      "lengthPdfPt": 4.163,
+      "planLengthFt": 0.46254,
+      "sourceSegmentIds": [
+        "pipe-051",
+        "pipe-049"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-044"
+    },
+    {
+      "id": "connector-edge-contact-045",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-052-node-06",
+      "toNodeId": "pipe-050-node-01",
+      "lengthPdfPt": 1.5,
+      "planLengthFt": 0.166669,
+      "sourceSegmentIds": [
+        "pipe-052",
+        "pipe-050"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-045"
+    },
+    {
+      "id": "connector-edge-contact-046",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-053-node-06",
+      "toNodeId": "pipe-051-node-01",
+      "lengthPdfPt": 1.5,
+      "planLengthFt": 0.166669,
+      "sourceSegmentIds": [
+        "pipe-053",
+        "pipe-051"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-046"
+    },
+    {
+      "id": "connector-edge-contact-047",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-058-node-03",
+      "toNodeId": "pipe-003-node-01",
+      "lengthPdfPt": 1.423,
+      "planLengthFt": 0.158113,
+      "sourceSegmentIds": [
+        "pipe-058",
+        "pipe-003"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-047"
+    },
+    {
+      "id": "connector-edge-contact-048",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-058-node-02",
+      "toNodeId": "pipe-004-node-02",
+      "lengthPdfPt": 4.313,
+      "planLengthFt": 0.479228,
+      "sourceSegmentIds": [
+        "pipe-058",
+        "pipe-004"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-048"
+    },
+    {
+      "id": "connector-edge-contact-049",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-059-node-01",
+      "toNodeId": "pipe-058-node-01",
+      "lengthPdfPt": 4.528,
+      "planLengthFt": 0.503091,
+      "sourceSegmentIds": [
+        "pipe-059",
+        "pipe-058"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-049"
+    },
+    {
+      "id": "connector-edge-contact-050",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-060-node-01",
+      "toNodeId": "pipe-059-node-02",
+      "lengthPdfPt": 1.5,
+      "planLengthFt": 0.166669,
+      "sourceSegmentIds": [
+        "pipe-060",
+        "pipe-059"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-050"
+    },
+    {
+      "id": "connector-edge-contact-051",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-061-node-01",
+      "toNodeId": "pipe-058-node-01",
+      "lengthPdfPt": 4.528,
+      "planLengthFt": 0.503091,
+      "sourceSegmentIds": [
+        "pipe-061",
+        "pipe-058"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-051"
+    },
+    {
+      "id": "connector-edge-contact-052",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-062-node-02",
+      "toNodeId": "pipe-013-node-02",
+      "lengthPdfPt": 0,
+      "planLengthFt": 0,
+      "sourceSegmentIds": [
+        "pipe-062",
+        "pipe-013"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-052"
+    },
+    {
+      "id": "connector-edge-contact-053",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-062-node-01",
+      "toNodeId": "pipe-061-node-03",
+      "lengthPdfPt": 1.5,
+      "planLengthFt": 0.166669,
+      "sourceSegmentIds": [
+        "pipe-062",
+        "pipe-061"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-053"
+    },
+    {
+      "id": "connector-edge-contact-054",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-063-node-04",
+      "toNodeId": "pipe-030-node-01",
+      "lengthPdfPt": 4.596,
+      "planLengthFt": 0.510721,
+      "sourceSegmentIds": [
+        "pipe-063",
+        "pipe-030"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-054"
+    },
+    {
+      "id": "connector-edge-contact-055",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-063-node-03",
+      "toNodeId": "pipe-044-node-01",
+      "lengthPdfPt": 2.343,
+      "planLengthFt": 0.260384,
+      "sourceSegmentIds": [
+        "pipe-063",
+        "pipe-044"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-055"
+    },
+    {
+      "id": "connector-edge-contact-056",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-063-node-02",
+      "toNodeId": "pipe-054-node-01",
+      "lengthPdfPt": 2.344,
+      "planLengthFt": 0.260414,
+      "sourceSegmentIds": [
+        "pipe-063",
+        "pipe-054"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-056"
+    },
+    {
+      "id": "connector-edge-contact-057",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-064-node-04",
+      "toNodeId": "pipe-031-node-01",
+      "lengthPdfPt": 4.596,
+      "planLengthFt": 0.510721,
+      "sourceSegmentIds": [
+        "pipe-064",
+        "pipe-031"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-057"
+    },
+    {
+      "id": "connector-edge-contact-058",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-064-node-03",
+      "toNodeId": "pipe-045-node-01",
+      "lengthPdfPt": 2.343,
+      "planLengthFt": 0.260384,
+      "sourceSegmentIds": [
+        "pipe-064",
+        "pipe-045"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-058"
+    },
+    {
+      "id": "connector-edge-contact-059",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-064-node-02",
+      "toNodeId": "pipe-055-node-01",
+      "lengthPdfPt": 2.344,
+      "planLengthFt": 0.260414,
+      "sourceSegmentIds": [
+        "pipe-064",
+        "pipe-055"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-059"
+    },
+    {
+      "id": "connector-edge-contact-060",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-064-node-01",
+      "toNodeId": "pipe-060-node-06",
+      "lengthPdfPt": 4.598,
+      "planLengthFt": 0.510878,
+      "sourceSegmentIds": [
+        "pipe-064",
+        "pipe-060"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-060"
+    },
+    {
+      "id": "connector-edge-contact-061",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-065-node-04",
+      "toNodeId": "pipe-042-node-01",
+      "lengthPdfPt": 4.192,
+      "planLengthFt": 0.465786,
+      "sourceSegmentIds": [
+        "pipe-065",
+        "pipe-042"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-061"
+    },
+    {
+      "id": "connector-edge-contact-062",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-065-node-03",
+      "toNodeId": "pipe-046-node-01",
+      "lengthPdfPt": 2.109,
+      "planLengthFt": 0.234364,
+      "sourceSegmentIds": [
+        "pipe-065",
+        "pipe-046"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-062"
+    },
+    {
+      "id": "connector-edge-contact-063",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-065-node-02",
+      "toNodeId": "pipe-056-node-01",
+      "lengthPdfPt": 2.109,
+      "planLengthFt": 0.234354,
+      "sourceSegmentIds": [
+        "pipe-065",
+        "pipe-056"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-063"
+    },
+    {
+      "id": "connector-edge-contact-064",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-066-node-04",
+      "toNodeId": "pipe-043-node-01",
+      "lengthPdfPt": 4.191,
+      "planLengthFt": 0.465706,
+      "sourceSegmentIds": [
+        "pipe-066",
+        "pipe-043"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-064"
+    },
+    {
+      "id": "connector-edge-contact-065",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-066-node-03",
+      "toNodeId": "pipe-047-node-01",
+      "lengthPdfPt": 2.11,
+      "planLengthFt": 0.234395,
+      "sourceSegmentIds": [
+        "pipe-066",
+        "pipe-047"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-065"
+    },
+    {
+      "id": "connector-edge-contact-066",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-066-node-02",
+      "toNodeId": "pipe-057-node-01",
+      "lengthPdfPt": 2.11,
+      "planLengthFt": 0.234454,
+      "sourceSegmentIds": [
+        "pipe-066",
+        "pipe-057"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-066"
+    },
+    {
+      "id": "connector-edge-contact-067",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-067-node-01",
+      "toNodeId": "pipe-062-node-06",
+      "lengthPdfPt": 1.5,
+      "planLengthFt": 0.166669,
+      "sourceSegmentIds": [
+        "pipe-067",
+        "pipe-062"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-067"
+    },
+    {
+      "id": "connector-edge-contact-068",
+      "kind": "source-contact-gap",
+      "fromNodeId": "pipe-067-node-06",
+      "toNodeId": "pipe-063-node-01",
+      "lengthPdfPt": 4.598,
+      "planLengthFt": 0.510878,
+      "sourceSegmentIds": [
+        "pipe-067",
+        "pipe-063"
+      ],
+      "sourceRef": "FP2.0 <=6pt source contact contact-068"
+    },
+    {
+      "id": "connector-edge-lower-central-main-turn",
+      "kind": "explicit-masked-turn",
+      "fromNodeId": "pipe-065-node-01",
+      "toNodeId": "pipe-067-node-06",
+      "lengthPdfPt": 8.778,
+      "planLengthFt": 0.975343,
+      "sourceSegmentIds": [
+        "pipe-065",
+        "pipe-067"
+      ],
+      "sourceRef": "FP2.0 approved lower central red turn between drawing indices 6638 and 6666"
+    },
+    {
+      "id": "connector-edge-upper-central-main-turn",
+      "kind": "explicit-masked-turn",
+      "fromNodeId": "pipe-066-node-01",
+      "toNodeId": "pipe-060-node-06",
+      "lengthPdfPt": 8.778,
+      "planLengthFt": 0.975333,
+      "sourceSegmentIds": [
+        "pipe-066",
+        "pipe-060"
+      ],
+      "sourceRef": "FP2.0 approved upper central red turn between drawing indices 6639 and 6544"
+    }
+  ],
+  "metrics": {
+    "sourceSegmentCount": 67,
+    "sourceContactCount": 68,
+    "explicitMaskedTurnCount": 2,
+    "nodeCount": 210,
+    "edgeCount": 213,
+    "visibleSourceEdgeCount": 143,
+    "connectorEdgeCount": 70,
+    "sprinklerNodeCount": 68,
+    "boundSprinklerCount": 68,
+    "connectedComponentCount": 1,
+    "connectedNodeCount": 210
+  },
+  "sourcePlanGraphReady": true,
+  "pipeSizeAssignmentReady": false,
+  "hydraulicFlowReady": false,
+  "gradeDirectionReady": false,
+  "elevationReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false
+}
