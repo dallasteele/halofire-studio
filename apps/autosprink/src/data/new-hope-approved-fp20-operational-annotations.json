@@ -1,0 +1,192 @@
+{
+  "artifactType": "halofire.approved-fp20-operational-annotations.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "sources": [
+    {
+      "role": "approved-plan",
+      "sheet": "FP2.0",
+      "physicalPage": 5,
+      "sha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5"
+    },
+    {
+      "role": "field-set",
+      "sheet": "FP2.0",
+      "physicalPage": 4,
+      "sha256": "4A47F9A4DBB3A35CBA3915EE4F32AD4D4E17964FE7A54D2E7F4D5442300A02B5"
+    },
+    {
+      "role": "as-built",
+      "sheet": "FP2.0",
+      "physicalPage": 4,
+      "sha256": "ED00E953A7A6E711921CF4B282137F4F69A458479D31A9FD33BFD3496ED8F34B"
+    }
+  ],
+  "hydraulicCalculationSources": {
+    "calculationReport": {
+      "role": "approved-autosprink-hydraulic-calculations",
+      "sha256": "D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719",
+      "pageCount": 33,
+      "calculationDate": "2025-01-29",
+      "software": "AutoSPRINK 2023 v18.1.44.0",
+      "remoteAreas": [
+        { "id": "1-1", "sheet": "FP1.0", "pipeTablePages": [6, 7, 8, 9], "systemDemandGpm": 275, "baseOfRiserPsi": 54.1 },
+        { "id": "2-1", "sheet": "FP2.0", "pipeTablePages": [15, 16], "systemDemandGpm": 271.5, "baseOfRiserPsi": 59.9 },
+        { "id": "2-2", "sheet": "FP2.0", "pipeTablePages": [23, 24, 25], "systemDemandGpm": 338.4, "baseOfRiserPsi": 53.7 },
+        { "id": "2-3", "sheet": "FP2.0", "pipeTablePages": [31, 32], "systemDemandGpm": 279.5, "baseOfRiserPsi": 53.7 }
+      ]
+    },
+    "closeoutCalcPlates": {
+      "role": "closeout-hydraulic-calculation-plates",
+      "sha256": "E1C8F0184EF2470FFA7450B772EAEB13D0022A79E95573D29F753DDEF0AB14AF",
+      "pageCount": 2,
+      "plateDate": "2025-03-03",
+      "remoteAreaIds": ["1-1", "2-1", "2-2", "2-3"]
+    }
+  },
+  "crossSourceCalloutInvariance": {
+    "sourceRoles": ["approved-plan", "field-set", "as-built"],
+    "preservedCalloutIds": [
+      "grade-branch-lines",
+      "grade-cross-mains",
+      "supply-from-riser-room",
+      "low-point-01",
+      "low-point-02",
+      "low-point-03",
+      "low-point-04",
+      "field-route-drum-drip-upper",
+      "field-route-drum-drip-lower",
+      "remote-inspectors-test"
+    ]
+  },
+  "gradeRequirements": [
+    {
+      "id": "grade-branch-lines",
+      "pipeRole": "branch-line",
+      "rawText": "SLOPE BRANCH LINES 1/2\" EVERY 10'-0\"",
+      "riseInPer10Ft": 0.5,
+      "slopePercent": 0.416667,
+      "bboxPdfPt": { "x0": 2095.078, "y0": 1370.42, "x1": 2268.186, "y1": 1383.424 },
+      "sourceTextRef": { "blockIndex": 7, "lineIndex": 0 }
+    },
+    {
+      "id": "grade-cross-mains",
+      "pipeRole": "cross-main",
+      "rawText": "SLOPE CROSS MAINS 1/4\" EVERY 10'-0\"",
+      "riseInPer10Ft": 0.25,
+      "slopePercent": 0.208333,
+      "bboxPdfPt": { "x0": 2097.064, "y0": 1380.92, "x1": 2266.2, "y1": 1393.924 },
+      "sourceTextRef": { "blockIndex": 7, "lineIndex": 1 }
+    }
+  ],
+  "supplyAnchor": {
+    "id": "supply-from-riser-room",
+    "rawText": "SUPPLY FROM RISER ROOM",
+    "bboxPdfPt": { "x0": 374.64, "y0": 1050.947, "x1": 514.099, "y1": 1065.809 },
+    "leaderTargetPdfPt": { "x": 650.201, "y": 1116.523 },
+    "sourceTextRef": { "blockIndex": 21, "lineIndex": 0 },
+    "sourceDrawingIndices": [343, 344],
+    "boundPrimaryNodeId": "pipe-001-node-01",
+    "maximumBindingDistancePdfPt": 11
+  },
+  "lowPointAnchors": [
+    {
+      "id": "low-point-01",
+      "rawText": "LOW POINT TIE IN DRAIN",
+      "leaderTargetPdfPt": { "x": 985.986, "y": 1612.072 },
+      "sourceTextRef": { "blockIndex": 418, "lineIndex": 0 },
+      "sourceDrawingIndices": [6741, 6742],
+      "boundPrimaryNodeIds": ["pipe-032-node-04", "pipe-035-node-01"]
+    },
+    {
+      "id": "low-point-02",
+      "rawText": "LOW POINT TIE IN DRAIN",
+      "leaderTargetPdfPt": { "x": 529.74, "y": 1587.879 },
+      "sourceTextRef": { "blockIndex": 419, "lineIndex": 0 },
+      "sourceDrawingIndices": [6744, 6745],
+      "boundPrimaryNodeIds": ["pipe-008-node-03"]
+    },
+    {
+      "id": "low-point-03",
+      "rawText": "LOW POINT TIE IN DRAIN",
+      "leaderTargetPdfPt": { "x": 520.223, "y": 851.266 },
+      "sourceTextRef": { "blockIndex": 420, "lineIndex": 0 },
+      "sourceDrawingIndices": [6747, 6748],
+      "boundPrimaryNodeIds": ["pipe-009-node-03"]
+    },
+    {
+      "id": "low-point-04",
+      "rawText": "LOW POINT TIE IN DRAIN",
+      "leaderTargetPdfPt": { "x": 980.168, "y": 825.275 },
+      "sourceTextRef": { "blockIndex": 421, "lineIndex": 0 },
+      "sourceDrawingIndices": [6750, 6751],
+      "boundPrimaryNodeIds": ["pipe-031-node-02", "pipe-033-node-04"]
+    }
+  ],
+  "fieldRouteDrainIntents": [
+    {
+      "id": "field-route-drum-drip-lower",
+      "rawText": "FIELD ROUTE / LOCATE LOW POINT DRUM DRIP DRAIN",
+      "bboxPdfPt": { "x0": 240.369, "y0": 1796.783, "x1": 514.099, "y1": 1811.645 },
+      "leaderTargetPdfPt": { "x": 563.413, "y": 1705.972 },
+      "sourceTextRef": { "blockIndex": 8, "lineIndex": 0 },
+      "sourceDrawingIndices": [307, 308],
+      "nominalDiameterIn": 1,
+      "routeStatus": "field-resolution-required",
+      "referenceVectorDrawingIndices": [3878, 3880, 3882, 3884, 3886, 3900]
+    },
+    {
+      "id": "field-route-drum-drip-upper",
+      "rawText": "FIELD ROUTE / LOCATE LOW POINT DRUM DRIP DRAIN",
+      "bboxPdfPt": { "x0": 240.369, "y0": 661.841, "x1": 514.099, "y1": 676.703 },
+      "leaderTargetPdfPt": { "x": 561.795, "y": 730.068 },
+      "sourceTextRef": { "blockIndex": 10, "lineIndex": 0 },
+      "sourceDrawingIndices": [313, 314],
+      "nominalDiameterIn": 1,
+      "routeStatus": "field-resolution-required",
+      "referenceVectorDrawingIndices": [3888, 3890, 3892, 3896, 3898, 3902]
+    }
+  ],
+  "remoteInspectorsTest": {
+    "id": "remote-inspectors-test",
+    "rawText": "REMOTE INSPECTORS TEST",
+    "bboxPdfPt": { "x0": 1629.422, "y0": 1512.801, "x1": 1770.827, "y1": 1527.662 },
+    "leaderTargetPdfPt": { "x": 1567.586, "y": 1622.472 },
+    "sourceTextRef": { "blockIndex": 415, "lineIndex": 0 },
+    "sourceDrawingIndices": [6729, 6730],
+    "nominalDiameterIn": 1,
+    "referenceVectorDrawingIndices": [3054, 6610, 6620]
+  },
+  "operationalReferenceVectors": [
+    { "drawingIndex": 3054, "systemRole": "remote-inspectors-test", "fromPdfPt": { "x": 1568.716, "y": 1625.908 }, "toPdfPt": { "x": 1582.973, "y": 1625.908 } },
+    { "drawingIndex": 3878, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 826.057, "y": 1690.467 }, "toPdfPt": { "x": 696.201, "y": 1690.467 } },
+    { "drawingIndex": 3880, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 528.979, "y": 1585.181 }, "toPdfPt": { "x": 525.995, "y": 1585.181 } },
+    { "drawingIndex": 3882, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 524.87, "y": 1586.306 }, "toPdfPt": { "x": 524.87, "y": 1689.342 } },
+    { "drawingIndex": 3884, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 525.995, "y": 1690.467 }, "toPdfPt": { "x": 562.461, "y": 1690.467 } },
+    { "drawingIndex": 3886, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 563.586, "y": 1691.592 }, "toPdfPt": { "x": 563.586, "y": 1701.125 } },
+    { "drawingIndex": 3888, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 563.586, "y": 744.657 }, "toPdfPt": { "x": 563.586, "y": 735.123 } },
+    { "drawingIndex": 3890, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 524.87, "y": 849.942 }, "toPdfPt": { "x": 524.87, "y": 746.907 } },
+    { "drawingIndex": 3892, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 528.979, "y": 851.067 }, "toPdfPt": { "x": 525.995, "y": 851.067 } },
+    { "drawingIndex": 3896, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 525.995, "y": 745.782 }, "toPdfPt": { "x": 562.461, "y": 745.782 } },
+    { "drawingIndex": 3898, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 826.057, "y": 745.782 }, "toPdfPt": { "x": 696.201, "y": 745.782 } },
+    { "drawingIndex": 3900, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 694.567, "y": 1690.467 }, "toPdfPt": { "x": 564.711, "y": 1690.467 } },
+    { "drawingIndex": 3902, "systemRole": "field-drain-reference", "fromPdfPt": { "x": 694.567, "y": 745.782 }, "toPdfPt": { "x": 564.711, "y": 745.782 } },
+    { "drawingIndex": 4834, "systemRole": "low-point-drain-reference", "fromPdfPt": { "x": 827.182, "y": 1609.58 }, "toPdfPt": { "x": 827.182, "y": 1689.434 } },
+    { "drawingIndex": 4835, "systemRole": "low-point-drain-reference", "fromPdfPt": { "x": 827.182, "y": 826.668 }, "toPdfPt": { "x": 827.182, "y": 746.814 } },
+    { "drawingIndex": 6610, "systemRole": "remote-inspectors-test", "fromPdfPt": { "x": 1554.884, "y": 1636.673 }, "toPdfPt": { "x": 1554.884, "y": 1627.033 } },
+    { "drawingIndex": 6620, "systemRole": "remote-inspectors-test", "fromPdfPt": { "x": 1556.009, "y": 1625.908 }, "toPdfPt": { "x": 1566.13, "y": 1625.908 } }
+  ],
+  "excludedNonPipeDrawingIndices": [4961, 4963],
+  "drumDripDetail": {
+    "title": "DRUM DRIP DETAIL",
+    "sourceTextRef": { "blockIndex": 120 },
+    "components": [
+      "1\" PIPE FROM DRY SYSTEM",
+      "1\" BALL VALVE (OPEN)",
+      "2\" X 1\" THREADED REDUCER",
+      "2\" X 12\" SCH.40 PIPE",
+      "2\" X 1\" THREADED REDUCER",
+      "1\" BALL VALVE (CLOSED)",
+      "1\" THREADED PLUG"
+    ]
+  }
+}

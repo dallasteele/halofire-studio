@@ -1,170 +1,110 @@
 {
   "loop": "proper-pitched-pipe-graph-20260715",
   "stage": "ITERATE",
-  "status": "verified-fp20-source-plan-graph-proper-layout-still-fails-closed",
-  "iteration": 6,
+  "status": "verified-governed-fp20-skeleton-and-canonical-topology-flow-grade-z-still-fail-closed",
+  "iteration": 7,
   "brainPreflight": {
     "status": "passed",
-    "topEpisodes": [148034, 120030, 125723, 124864, 62935]
+    "topEpisodes": [148076, 148034, 124864]
   },
   "acceptanceAuthority": {
     "humanReviewRequired": false,
-    "loops": ["primary", "crossSource", "adversarial"]
+    "loops": ["primary", "crossSource", "adversarial", "browser"]
   },
   "implementation": {
-    "productionGate": "apps/autosprink/src/engine/proper-pitched-pipe-graph.js",
     "sourceVectorGate": "apps/autosprink/src/engine/approved-fp20-pipe-vectors.js",
-    "sourceVectorEvidence": "apps/autosprink/src/data/new-hope-approved-fp20-pipe-vectors.json",
     "sourcePlanGraphEngine": "apps/autosprink/src/engine/approved-fp20-plan-graph.js",
-    "sourcePlanGraphEvidence": "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
-    "visualProof": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
-    "requirements": [
-      "scaled plan XY",
-      "pipe role",
-      "nominal fabrication size",
-      "plan direction",
-      "hydraulic flow direction",
-      "dry grade magnitude",
-      "dry grade direction",
-      "pipe centerline elevations",
-      "low points and drain destinations",
-      "fittings and size transitions",
-      "riser or source closure",
-      "hydraulic node identity",
-      "whole-network connectivity"
-    ]
+    "governedSkeletonEngine": "apps/autosprink/src/engine/approved-fp20-governed-skeleton.js",
+    "canonicalTopologyEngine": "apps/autosprink/src/engine/approved-fp20-canonical-topology.js",
+    "operationalEvidence": "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "visualProof": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html"
   },
-  "approvedFp20SourceExtraction": {
-    "status": "passed",
+  "approvedFp20PrimaryPipe": {
     "sourceSha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
-    "pipeVectorCount": 67,
-    "pipeStrokeClasses": {
-      "red-pipe": 40,
-      "black-pipe": 15,
-      "navy-arm-over": 12
-    },
+    "primarySegmentCount": 67,
     "sprinklerCount": 68,
-    "sprinklerSymbolClasses": {
-      "BB1": 58,
-      "SD1": 6,
-      "TY-FRB": 4
-    },
-    "maximumHeadToPipeDistancePdfPt": 1.466,
-    "adversarialFinding": "A red-only color classifier misses approved black branches and navy arm-over or drop paths and is rejected.",
-    "sourceTopology": {
-      "status": "connected",
-      "automaticJoinTolerancePdfPt": 6.0,
-      "connectedPipeVectorCount": 67,
-      "explicitMaskedTurns": [
-        "pipe-065 to pipe-067 at 8.778 PDF points",
-        "pipe-066 to pipe-060 at 8.778 PDF points"
-      ],
-      "broadTenPointSnapAllowed": false
-    },
-    "pipeSizeAnnotations": {
-      "status": "extraction-passed-assignment-not-ready",
-      "annotationCount": 79,
-      "countsByNominalDiameterIn": {
-        "1": 24,
-        "2": 15,
-        "2.5": 27,
-        "3": 12,
-        "4": 1
-      },
-      "sourceSignature": "Arial-BoldMT black text at 7.8 through 8.6 PDF points with exact block line span refs",
-      "fabricationEdgeAssignmentReady": false,
-      "reason": "PDF strokes must be split at sprinklers, intersections, fittings, and size transitions before one nominal size can govern each edge."
-    },
-    "sourcePlanGraph": {
-      "status": "passed-connectivity-only",
-      "sourceSegmentCount": 67,
-      "automaticSourceContactCount": 68,
-      "explicitMaskedTurnCount": 2,
-      "nodeCount": 210,
-      "visibleSplitEdgeCount": 143,
-      "sourceContactConnectorCount": 70,
-      "edgeCount": 213,
-      "sprinklerNodeCount": 68,
-      "connectedComponentCount": 1,
-      "pipeSizeAssignmentReady": false,
-      "precisionFinding": "Split lengths must be recomputed from exact endpoint geometry; using the source segment's rounded display length introduced a 0.000098-foot closure error."
-    }
+    "pipeSizeAnnotationCount": 79,
+    "primaryPipeVectorExtractionReady": true,
+    "primaryPipeSizeAssignmentReady": true,
+    "primaryPipeRoleAssignmentReady": true,
+    "wholeSystemVectorExtractionReady": false
   },
-  "currentNewHopeAssessment": {
-    "nodeCount": 7,
-    "edgeCount": 6,
-    "connectedToRiserCount": 0,
-    "distinctBlockerCount": 7,
-    "blockerCodes": [
-      "PIPE_NODE_ELEVATION_MISSING",
-      "PIPE_HYDRAULIC_NODE_ID_MISSING",
-      "PIPE_EDGE_GRADE_DIRECTION_MISSING",
-      "PIPE_RISER_SOURCE_MISSING",
-      "PIPE_FLOW_PATH_INCOMPLETE",
-      "PIPE_FITTING_IDENTITY_MISSING",
-      "PIPE_LOW_POINT_MISSING"
-    ]
+  "operationalEvidence": {
+    "approvedFieldAsBuiltCalloutInvarianceReady": true,
+    "operationalReferenceVectorCount": 17,
+    "excludedDimensionBaselineCount": 2,
+    "supplySourceAnchorReady": true,
+    "lowPointAnchorCount": 4,
+    "fieldDrainIntentCount": 2,
+    "remoteInspectorsTestCount": 1,
+    "gradeMagnitudeReady": true,
+    "fieldDrainRouteResolved": false
   },
-  "crossSourceCoverage": {
-    "newHope": "proves actual approved plan XY, nominal 2.5-inch ridge branch, visible flow direction, and dry branch/cross-main grade magnitudes",
-    "winterGarden": "proves pitched row elevation datums and operating hydraulic evidence but not nominal fabrication sizes, per-head hydraulic identity, or full-network pipe elevations",
-    "projectSpecificTransferAllowed": false
+  "canonicalTopology": {
+    "status": "passed",
+    "inputNodeCount": 210,
+    "inputEdgeCount": 213,
+    "contractedConnectorEdgeCount": 70,
+    "canonicalNodeCount": 142,
+    "canonicalEdgeCount": 143,
+    "canonicalJunctionCount": 62,
+    "connectedComponentCount": 1,
+    "inputCycleRank": 4,
+    "canonicalCycleRank": 2,
+    "artificialConnectorCycleCountRemoved": 2
   },
+  "hydraulicCalculationCorpus": {
+    "status": "source-bound-node-binding-pending",
+    "calculationReportSha256": "D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719",
+    "calculationReportPages": 33,
+    "closeoutCalcPlatesSha256": "E1C8F0184EF2470FFA7450B772EAEB13D0022A79E95573D29F753DDEF0AB14AF",
+    "closeoutCalcPlatePages": 2,
+    "fp20RemoteAreas": ["2-1", "2-2", "2-3"],
+    "calculationCorpusReady": true,
+    "hydraulicNodeBindingReady": false
+  },
+  "remainingLayoutBlockers": [
+    "FP20_SOURCE_LOOPS_REQUIRE_CALCULATION_BINDING",
+    "FP20_HYDRAULIC_FLOW_DIRECTION_UNRESOLVED",
+    "FP20_GRADE_DIRECTION_UNRESOLVED",
+    "FP20_ENDPOINT_ELEVATION_UNRESOLVED",
+    "FP20_FIELD_DRAIN_ROUTE_UNRESOLVED",
+    "FP20_FITTING_IDENTITY_UNRESOLVED"
+  ],
   "verification": {
-    "loopGuard": "passed",
-    "focusedTests": "24 passed across FP2.0 vector extraction, deterministic split graph replay, topology, pipe-size extraction, proper pipe graph, adversarial mutations, and actual-PDF proof",
+    "focusedTests": "33 passed across source extraction, plan graph, governed skeleton, canonical topology, actual-PDF proof, and adversarial mutations",
     "productionBuild": "passed Vite build",
     "formalProof": {
       "status": "verified",
       "prover": "Lean 4.13.0 on GX10",
-      "elapsedMs": 279,
-      "theorems": [
-        "approvedPipeSizeLabelInventoryCloses",
-        "extractedSizeLabelsDoNotImplyEdgeAssignment",
-        "sourcePlanGraphEdgeInventoryCloses",
-        "sourcePlanGraphDoesNotPromoteProperLayout"
-      ],
+      "elapsedMs": 310,
       "receipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-proof.json"
     },
     "browser": {
       "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
       "proofReady": true,
-      "pipeVectorStatus": "passed",
-      "sourcePlanGraphStatus": "passed",
-      "pipeGraphStatus": "blocked",
-      "sourcePlanNodeCount": 210,
-      "sourcePlanConnectorCount": 70,
-      "overlayVectorCount": 67,
-      "overlayHeadCount": 68,
-      "overlayPipeSizeLabelCount": 79,
-      "approvedUnderlayPixels": "6048x4320",
-      "overlayViewBoxPdfPt": "3024x2160",
-      "staticVisualProof": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/approved-fp20-pipe-size-overlay.png",
-      "visualInspection": "passed source boxes and decoded labels align with approved plan text; 210 split/contact nodes and 70 connector gaps render over the actual approved PDF; graph remains visibly fail-closed",
-      "machineFlags": {
-        "pipeSizeAssignmentReady": false,
-        "properPipeLayoutReady": false,
-        "branchGradeDirectionReady": false,
-        "endpointElevationsReady": false,
-        "drainDestinationReady": false,
-        "fieldReleaseReady": false
-      }
-    },
-    "agenticRules": "passed"
+      "canonicalTopologyReady": true,
+      "canonicalNodeCount": 142,
+      "canonicalEdgeCount": 143,
+      "primaryOverlayVectorCount": 67,
+      "operationalOverlayVectorCount": 17,
+      "operationalAnchorCount": 6,
+      "consoleErrorsOrWarnings": 0
+    }
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 148237,
-    "title": "Approved FP2.0 source plan graph closes without design promotion",
-    "lesson": "Recompute split lengths from exact endpoint geometry and never promote sourcePlanGraphReady to properPipeLayoutReady."
+    "episodeId": 148360,
+    "title": "FP2.0 governed pipe skeleton and hydraulic corpus recovery"
   },
   "claims": {
     "properPipeLayoutReady": false,
+    "hydraulicFlowReady": false,
     "gradeDirectionReady": false,
     "endpointElevationsReady": false,
-    "drainDestinationReady": false,
-    "wholeNetworkReady": false,
+    "fieldDrainRouteResolved": false,
+    "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "nextAction": "Assign the 79 source diameters to the 143 visible fabrication-edge candidates and classify roles; then bind hydraulic flow, grade arrows, low-point drains, riser feed, hydraulic labels, and source-derived elevations before rendering governed top, elevation, and 3D views."
+  "nextAction": "Bind approved FP2.0 red direction arrows and AutoSPRINK remote-area node routes to the 142-node canonical graph, then register architectural side/elevation views for source-backed pipe Z and per-edge grade."
 }

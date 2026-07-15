@@ -16,11 +16,14 @@ describe('New Hope PDF-bound visual proof', () => {
 
   it('states the missing pipe-layout facts instead of presenting a connector as a design', () => {
     const html = read('index.html');
-    expect(html).toContain('NOT A PROPER WHOLE-SYSTEM PIPE LAYOUT');
+    expect(html).toContain('FLOW, GRADE DIRECTION, AND Z STILL BLOCKED');
+    expect(html).toContain('primaryPipeVectorExtractionReady=false');
+    expect(html).toContain('wholeSystemVectorExtractionReady=false');
+    expect(html).toContain('primaryPipeSizeAssignmentReady=false');
+    expect(html).toContain('fieldDrainRouteResolved=false');
     expect(html).toContain('properPipeLayoutReady=false');
     expect(html).toContain('branchGradeDirectionReady=false');
     expect(html).toContain('endpointElevationsReady=false');
-    expect(html).toContain('drainDestinationReady=false');
   });
 
   it('loads the sealed calibration and generates the S102 overlay from data', () => {
@@ -28,6 +31,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('../../new-hope-truss-clearance-calibration.json');
     expect(script).toContain('../../new-hope-approved-fp20-pipe-vectors.json');
     expect(script).toContain('../../new-hope-approved-fp20-plan-graph.json');
+    expect(script).toContain('../../new-hope-approved-fp20-operational-annotations.json');
     expect(script).toContain('calibration.trussLattice.centerlines');
     expect(script).toContain('calibration.branch.nodes');
     expect(script).toContain('pipeVectors.pipeSegments');
@@ -35,14 +39,19 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('pipeVectors.pipeSizeAnnotations');
     expect(script).toContain('buildApprovedFp20PlanGraph');
     expect(script).toContain('evaluateApprovedFp20PipeVectors');
+    expect(script).toContain('evaluateApprovedFp20GovernedSkeleton');
+    expect(script).toContain('canonicalizeApprovedFp20Topology');
     expect(script).toContain("dataset.proofReady = 'true'");
     expect(script).toContain('dataset.pipeVectorStatus = vectorAcceptance.status');
-    expect(script).toContain('dataset.pipeSizeAssignmentReady = String(planGraph.pipeSizeAssignmentReady)');
-    expect(script).toContain('dataset.properPipeLayoutReady = String(acceptance.properPipeLayoutReady)');
-    expect(script).toContain("dataset.branchGradeDirectionReady = 'false'");
-    expect(script).toContain("dataset.endpointElevationsReady = 'false'");
+    expect(script).toContain('dataset.primaryPipeSizeAssignmentReady = String(governedSkeleton.primaryPipeSizeAssignmentReady)');
+    expect(script).toContain('dataset.primaryPipeRoleAssignmentReady = String(governedSkeleton.primaryPipeRoleAssignmentReady)');
+    expect(script).toContain('dataset.wholeSystemVectorExtractionReady = String(governedSkeleton.wholeSystemVectorExtractionReady)');
+    expect(script).toContain('dataset.properPipeLayoutReady = String(governedSkeleton.properPipeLayoutReady)');
+    expect(script).toContain('dataset.branchGradeDirectionReady = String(governedSkeleton.gradeDirectionReady)');
+    expect(script).toContain('dataset.endpointElevationsReady = String(governedSkeleton.endpointElevationsReady)');
     expect(script).toContain("dataset.drainDestinationReady = 'false'");
     expect(script).toContain('evaluateProperPitchedPipeGraph');
-    expect(script).toContain('dataset.pipeGraphStatus = acceptance.status');
+    expect(script).toContain("dataset.pipeGraphStatus = governedSkeleton.properPipeLayoutReady ? 'passed' : 'blocked'");
+    expect(script).toContain('canonicalTopology.remainingTopologyBlockers');
   });
 });

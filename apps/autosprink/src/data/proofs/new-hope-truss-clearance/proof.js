@@ -4,11 +4,14 @@ import {
 } from '../../../engine/proper-pitched-pipe-graph.js';
 import { evaluateApprovedFp20PipeVectors } from '../../../engine/approved-fp20-pipe-vectors.js';
 import { buildApprovedFp20PlanGraph } from '../../../engine/approved-fp20-plan-graph.js';
+import { evaluateApprovedFp20GovernedSkeleton } from '../../../engine/approved-fp20-governed-skeleton.js';
+import { canonicalizeApprovedFp20Topology } from '../../../engine/approved-fp20-canonical-topology.js';
 
 const calibrationUrl = '../../new-hope-truss-clearance-calibration.json';
 const sourceUrl = '../../new-hope-truss-clearance-source.json';
 const pipeVectorUrl = '../../new-hope-approved-fp20-pipe-vectors.json';
 const planGraphUrl = '../../new-hope-approved-fp20-plan-graph.json';
+const operationalAnnotationsUrl = '../../new-hope-approved-fp20-operational-annotations.json';
 const svg = document.querySelector('#structural-overlay');
 const pipeSvg = document.querySelector('#fp20-pipe-overlay');
 const rows = document.querySelector('#clearance-rows');
@@ -22,12 +25,13 @@ function element(name, attributes = {}) {
 }
 
 try {
-  const [response, sourceResponse, pipeVectorResponse, planGraphResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl)]);
+  const [response, sourceResponse, pipeVectorResponse, planGraphResponse, operationalResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl), fetch(operationalAnnotationsUrl)]);
   if (!response.ok) throw new Error(`calibration fetch ${response.status}`);
   if (!sourceResponse.ok) throw new Error(`source fetch ${sourceResponse.status}`);
   if (!pipeVectorResponse.ok) throw new Error(`pipe vector fetch ${pipeVectorResponse.status}`);
   if (!planGraphResponse.ok) throw new Error(`plan graph fetch ${planGraphResponse.status}`);
-  const [calibration, source, pipeVectors, planGraph] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json()]);
+  if (!operationalResponse.ok) throw new Error(`operational annotations fetch ${operationalResponse.status}`);
+  const [calibration, source, pipeVectors, planGraph, operationalAnnotations] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json(), operationalResponse.json()]);
   const scale = 1.5;
   const branchY = 430;
 
@@ -55,18 +59,54 @@ try {
   if (!vectorAcceptance.vectorExtractionReady) throw new Error(`approved FP2.0 vector gate: ${vectorAcceptance.blockerCodes.join(', ')}`);
   const replayedPlanGraph = buildApprovedFp20PlanGraph(pipeVectors);
   if (!replayedPlanGraph.sourcePlanGraphReady || JSON.stringify(replayedPlanGraph) !== JSON.stringify(planGraph)) throw new Error('approved FP2.0 persisted plan graph does not match deterministic replay');
+  const governedSkeleton = evaluateApprovedFp20GovernedSkeleton(pipeVectors, planGraph, operationalAnnotations);
+  if (governedSkeleton.status !== 'passed') throw new Error(`approved FP2.0 governed skeleton: ${governedSkeleton.blockerCodes.join(', ')}`);
+  const canonicalTopology = canonicalizeApprovedFp20Topology(planGraph);
+  if (!canonicalTopology.canonicalTopologyReady) throw new Error(`approved FP2.0 canonical topology: ${canonicalTopology.blockerCodes.join(', ')}`);
+  const remainingLayoutBlockers = [
+    ...canonicalTopology.remainingTopologyBlockers,
+    ...governedSkeleton.remainingLayoutBlockers.filter((entry) => entry.code !== 'FP20_CONNECTOR_CLUSTER_CANONICALIZATION_REQUIRED'),
+  ];
+  const assignmentBySegmentId = new Map(governedSkeleton.primaryAssignments.map((entry) => [entry.sourceSegmentId, entry]));
   for (const segment of pipeVectors.pipeSegments) {
+    const assignment = assignmentBySegmentId.get(segment.id);
     const line = element('line', {
-      class: `pipe-vector ${segment.strokeClass}`,
+      class: `pipe-vector ${segment.strokeClass} role-${assignment.systemRole}`,
       x1: segment.fromPdfPt.x,
       y1: segment.fromPdfPt.y,
       x2: segment.toPdfPt.x,
       y2: segment.toPdfPt.y,
     });
     const title = element('title');
-    title.textContent = `${segment.id}: ${segment.strokeClass}, ${(segment.lengthPdfPt / pipeVectors.planRegistration.pdfPtPerFt).toFixed(2)} ft visible`;
+    title.textContent = `${segment.id}: ${assignment.nominalDiameterIn}\u2033 ${assignment.systemRole}, ${(segment.lengthPdfPt / pipeVectors.planRegistration.pdfPtPerFt).toFixed(2)} ft visible`;
     line.append(title);
     pipeSvg.append(line);
+  }
+  for (const reference of governedSkeleton.operationalReferenceVectors) {
+    const line = element('line', {
+      class: `operational-vector ${reference.systemRole}`,
+      x1: reference.fromPdfPt.x,
+      y1: reference.fromPdfPt.y,
+      x2: reference.toPdfPt.x,
+      y2: reference.toPdfPt.y,
+    });
+    const title = element('title');
+    title.textContent = `drawing ${reference.drawingIndex}: ${reference.systemRole}`;
+    line.append(title);
+    pipeSvg.append(line);
+  }
+  const operationalAnchors = [operationalAnnotations.supplyAnchor, ...operationalAnnotations.lowPointAnchors, operationalAnnotations.remoteInspectorsTest];
+  for (const anchor of operationalAnchors) {
+    const marker = element('circle', {
+      class: anchor.id === 'supply-from-riser-room' ? 'operational-anchor supply-anchor' : anchor.id === 'remote-inspectors-test' ? 'operational-anchor inspector-anchor' : 'operational-anchor low-point-anchor',
+      cx: anchor.leaderTargetPdfPt.x,
+      cy: anchor.leaderTargetPdfPt.y,
+      r: 8,
+    });
+    const title = element('title');
+    title.textContent = `${anchor.id}: ${anchor.rawText}`;
+    marker.append(title);
+    pipeSvg.append(marker);
   }
   for (const head of pipeVectors.sprinklers) {
     const circle = element('circle', { class: `pipe-head ${head.symbolType}`, cx: head.centerPdfPt.x, cy: head.centerPdfPt.y, r: 5.6 });
@@ -93,33 +133,45 @@ try {
     pipeSvg.append(element('line', { class: 'plan-connector', x1: from.pdfPt.x, y1: from.pdfPt.y, x2: to.pdfPt.x, y2: to.pdfPt.y }));
   }
   for (const node of planGraph.nodes) pipeSvg.append(element('circle', { class: 'plan-node', cx: node.pdfPt.x, cy: node.pdfPt.y, r: 1.8 }));
-  document.querySelector('#vector-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.connectedPipeVectorCount}/${vectorAcceptance.metrics.pipeVectorCount} connected source vectors, ${vectorAcceptance.metrics.sprinklerCount} heads, ${vectorAcceptance.metrics.totalVisiblePipeLengthFt.toFixed(1)} visible ft`;
+  document.querySelector('#vector-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.connectedPipeVectorCount}/${vectorAcceptance.metrics.pipeVectorCount} connected primary vectors, ${vectorAcceptance.metrics.sprinklerCount} heads`;
   document.querySelector('#plan-graph-status').textContent = `PASS: ${planGraph.metrics.nodeCount} nodes / ${planGraph.metrics.edgeCount} split edges / ${planGraph.metrics.connectedComponentCount} component`;
-  document.querySelector('#size-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.pipeSizeAnnotationCount} source diameter labels (1\u2033 through 4\u2033)`;
+  document.querySelector('#size-proof-status').textContent = `PASS: ${governedSkeleton.metrics.assignedPrimarySegmentCount}/67 primary size + role assignments`;
+  document.querySelector('#operations-proof-status').textContent = `PASS: ${governedSkeleton.metrics.operationalReferenceVectorCount} drain/test vectors + ${governedSkeleton.metrics.lowPointAnchorCount} low points`;
   const candidate = buildNewHopeProperPipeGraphCandidate(calibration, source);
   const acceptance = evaluateProperPitchedPipeGraph(candidate);
-  document.querySelector('#graph-node-count').textContent = acceptance.metrics.nodeCount;
-  document.querySelector('#graph-edge-count').textContent = acceptance.metrics.edgeCount;
-  document.querySelector('#graph-connected-count').textContent = acceptance.metrics.connectedNodeCount;
-  document.querySelector('#graph-blocker-count').textContent = acceptance.blockerCodes.length;
-  const messages = new Map(acceptance.issues.map((entry) => [entry.code, entry.message]));
+  document.querySelector('#graph-node-count').textContent = canonicalTopology.metrics.canonicalNodeCount;
+  document.querySelector('#graph-edge-count').textContent = canonicalTopology.metrics.canonicalEdgeCount;
+  document.querySelector('#graph-connected-count').textContent = canonicalTopology.metrics.connectedNodeCount;
+  document.querySelector('#graph-blocker-count').textContent = remainingLayoutBlockers.length;
   const blockerRows = document.querySelector('#pipe-blocker-rows');
-  for (const code of acceptance.blockerCodes) {
+  for (const blocker of remainingLayoutBlockers) {
     const row = document.createElement('tr');
-    row.innerHTML = `<td style="color:#fda4af">${code}</td><td>${messages.get(code)}</td>`;
+    row.innerHTML = `<td style="color:#fda4af">${blocker.code}</td><td>${blocker.message}</td>`;
     blockerRows.append(row);
   }
-  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | fullApprovedVectorExtractionReady=${vectorAcceptance.vectorExtractionReady} | sourceTopologyConnected=${vectorAcceptance.sourceTopologyConnected} | sourcePlanGraphReady=${planGraph.sourcePlanGraphReady} | sourcePlanNodes=${planGraph.metrics.nodeCount} | sourcePlanEdges=${planGraph.metrics.edgeCount} | pipeSizeAnnotationExtractionReady=${vectorAcceptance.pipeSizeAnnotationExtractionReady} | pipeSizeAssignmentReady=${planGraph.pipeSizeAssignmentReady} | approvedPipeVectors=${vectorAcceptance.metrics.pipeVectorCount} | approvedSprinklers=${vectorAcceptance.metrics.sprinklerCount} | approvedPipeSizeAnnotations=${vectorAcceptance.metrics.pipeSizeAnnotationCount} | exactHeadXyReady=true | conditionalTrussClearanceReady=true | machineBlockerCodes=${acceptance.blockerCodes.length} | properPipeLayoutReady=${acceptance.properPipeLayoutReady} | branchGradeDirectionReady=false | endpointElevationsReady=false | drainDestinationReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=${acceptance.fieldReleaseReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | primaryPipeVectorExtractionReady=${governedSkeleton.primaryPipeVectorExtractionReady} | wholeSystemVectorExtractionReady=${governedSkeleton.wholeSystemVectorExtractionReady} | sourceTopologyConnected=${vectorAcceptance.sourceTopologyConnected} | sourcePlanGraphReady=${planGraph.sourcePlanGraphReady} | canonicalTopologyReady=${canonicalTopology.canonicalTopologyReady} | canonicalNodes=${canonicalTopology.metrics.canonicalNodeCount} | canonicalEdges=${canonicalTopology.metrics.canonicalEdgeCount} | connectorOnlyCyclesRemoved=${canonicalTopology.metrics.artificialConnectorCycleCount} | sourceLoopsAwaitingCalcBinding=${canonicalTopology.metrics.canonicalCycleRank} | primaryPipeSizeAssignmentReady=${governedSkeleton.primaryPipeSizeAssignmentReady} | primaryPipeRoleAssignmentReady=${governedSkeleton.primaryPipeRoleAssignmentReady} | operationalReferenceExtractionReady=${governedSkeleton.operationalReferenceExtractionReady} | supplySourceAnchorReady=${governedSkeleton.supplySourceAnchorReady} | lowPointIntentReady=${governedSkeleton.lowPointIntentReady} | drainIntentReady=${governedSkeleton.drainIntentReady} | gradeMagnitudeReady=${governedSkeleton.gradeMagnitudeReady} | hydraulicCalculationCorpusReady=${governedSkeleton.hydraulicCalculationCorpusReady} | hydraulicNodeBindingReady=${governedSkeleton.hydraulicNodeBindingReady} | fieldDrainRouteResolved=${governedSkeleton.fieldDrainRouteResolved} | hydraulicFlowReady=${governedSkeleton.hydraulicFlowReady} | properPipeLayoutReady=${governedSkeleton.properPipeLayoutReady} | branchGradeDirectionReady=${governedSkeleton.gradeDirectionReady} | endpointElevationsReady=${governedSkeleton.endpointElevationsReady} | complianceReady=false | fabricationReady=${governedSkeleton.fabricationReady} | fieldReleaseReady=${governedSkeleton.fieldReleaseReady}`;
   document.documentElement.dataset.proofReady = 'true';
   document.documentElement.dataset.pipeVectorStatus = vectorAcceptance.status;
   document.documentElement.dataset.sourcePlanGraphStatus = planGraph.sourcePlanGraphReady ? 'passed' : 'blocked';
-  document.documentElement.dataset.pipeSizeAssignmentReady = String(planGraph.pipeSizeAssignmentReady);
-  document.documentElement.dataset.pipeGraphStatus = acceptance.status;
-  document.documentElement.dataset.properPipeLayoutReady = String(acceptance.properPipeLayoutReady);
-  document.documentElement.dataset.branchGradeDirectionReady = 'false';
-  document.documentElement.dataset.endpointElevationsReady = 'false';
+  document.documentElement.dataset.canonicalTopologyReady = String(canonicalTopology.canonicalTopologyReady);
+  document.documentElement.dataset.sourceLoopsAwaitingCalcBinding = String(canonicalTopology.metrics.canonicalCycleRank);
+  document.documentElement.dataset.primaryPipeSizeAssignmentReady = String(governedSkeleton.primaryPipeSizeAssignmentReady);
+  document.documentElement.dataset.primaryPipeRoleAssignmentReady = String(governedSkeleton.primaryPipeRoleAssignmentReady);
+  document.documentElement.dataset.wholeSystemVectorExtractionReady = String(governedSkeleton.wholeSystemVectorExtractionReady);
+  document.documentElement.dataset.operationalReferenceExtractionReady = String(governedSkeleton.operationalReferenceExtractionReady);
+  document.documentElement.dataset.supplySourceAnchorReady = String(governedSkeleton.supplySourceAnchorReady);
+  document.documentElement.dataset.lowPointIntentReady = String(governedSkeleton.lowPointIntentReady);
+  document.documentElement.dataset.drainIntentReady = String(governedSkeleton.drainIntentReady);
+  document.documentElement.dataset.gradeMagnitudeReady = String(governedSkeleton.gradeMagnitudeReady);
+  document.documentElement.dataset.hydraulicCalculationCorpusReady = String(governedSkeleton.hydraulicCalculationCorpusReady);
+  document.documentElement.dataset.hydraulicNodeBindingReady = String(governedSkeleton.hydraulicNodeBindingReady);
+  document.documentElement.dataset.fieldDrainRouteResolved = String(governedSkeleton.fieldDrainRouteResolved);
+  document.documentElement.dataset.pipeGraphStatus = governedSkeleton.properPipeLayoutReady ? 'passed' : 'blocked';
+  document.documentElement.dataset.properPipeLayoutReady = String(governedSkeleton.properPipeLayoutReady);
+  document.documentElement.dataset.branchGradeDirectionReady = String(governedSkeleton.gradeDirectionReady);
+  document.documentElement.dataset.endpointElevationsReady = String(governedSkeleton.endpointElevationsReady);
   document.documentElement.dataset.drainDestinationReady = 'false';
-  document.documentElement.dataset.fieldReleaseReady = String(acceptance.fieldReleaseReady);
+  document.documentElement.dataset.fieldReleaseReady = String(governedSkeleton.fieldReleaseReady);
 } catch (error) {
   status.textContent = `Proof blocked: ${error.message}`;
   document.documentElement.dataset.proofReady = 'false';

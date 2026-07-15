@@ -1,6 +1,6 @@
 /**
- * Deterministic acceptance for the vector geometry exposed by New Hope's
- * approved FP2.0 answer sheet. This gate proves extraction fidelity only. It
+ * Deterministic acceptance for New Hope's primary pipe vector geometry.
+ * This gate proves main, branch, and arm-over extraction fidelity only. It
  * deliberately does not promote plan vectors into a fabrication/compliance
  * graph until size, role, flow, grade direction, elevation, fittings, drains,
  * and riser topology close on the same project.
@@ -185,6 +185,8 @@ export function evaluateApprovedFp20PipeVectors(evidence) {
       pipeSizeClassCounts: pipeSizes.sizeClassCounts,
     },
     vectorExtractionReady: issues.length === 0,
+    primaryPipeVectorExtractionReady: issues.length === 0,
+    wholeSystemVectorExtractionReady: false,
     pipeSizeAnnotationExtractionReady: issues.length === 0 && pipeSizes.annotationCount === 79,
     sourceTopologyConnected: issues.length === 0 && topology.connectedPipeVectorCount === segments.length,
     properPipeLayoutReady: false,
