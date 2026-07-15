@@ -14,6 +14,7 @@ import { evaluateNewHopeSideBranchDrainage } from '../../../engine/new-hope-side
 import { evaluateNewHopeCrossMainDrainage } from '../../../engine/new-hope-cross-main-drainage.js';
 import { evaluateNewHopeCentralBranchDrainage } from '../../../engine/new-hope-central-branch-drainage.js';
 import { evaluateNewHopeArmOverDrainage } from '../../../engine/new-hope-arm-over-drainage.js';
+import { evaluateNewHopeElevationDatum } from '../../../engine/new-hope-elevation-datum.js';
 import { evaluateNewHopeProperPipeLayout } from '../../../engine/new-hope-proper-pipe-layout.js';
 
 const calibrationUrl = '../../new-hope-truss-clearance-calibration.json';
@@ -25,6 +26,7 @@ const hydraulicRoute21Url = '../../new-hope-approved-fp20-hydraulic-route-2-1.js
 const hydraulicRoute22Url = '../../new-hope-approved-fp20-hydraulic-route-2-2.json';
 const hydraulicRoute23Url = '../../new-hope-approved-fp20-hydraulic-route-2-3.json';
 const architecturalSourceUrl = '../../new-hope-pitched-holdout-source.json';
+const elevationDatumUrl = '../../new-hope-approved-elevation-datum.json';
 const atticSourceUrl = '../../new-hope-attic-specific-application-source.json';
 const atticCalibrationUrl = '../../new-hope-attic-specific-application-calibration.json';
 const answerEvidenceUrl = '../../new-hope-pitched-holdout-answer-evidence.json';
@@ -47,7 +49,7 @@ function element(name, attributes = {}) {
 }
 
 try {
-  const [response, sourceResponse, pipeVectorResponse, planGraphResponse, operationalResponse, hydraulicRoute21Response, hydraulicRoute22Response, hydraulicRoute23Response, architecturalSourceResponse, atticSourceResponse, atticCalibrationResponse, answerEvidenceResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl), fetch(operationalAnnotationsUrl), fetch(hydraulicRoute21Url), fetch(hydraulicRoute22Url), fetch(hydraulicRoute23Url), fetch(architecturalSourceUrl), fetch(atticSourceUrl), fetch(atticCalibrationUrl), fetch(answerEvidenceUrl)]);
+  const [response, sourceResponse, pipeVectorResponse, planGraphResponse, operationalResponse, hydraulicRoute21Response, hydraulicRoute22Response, hydraulicRoute23Response, architecturalSourceResponse, elevationDatumResponse, atticSourceResponse, atticCalibrationResponse, answerEvidenceResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl), fetch(operationalAnnotationsUrl), fetch(hydraulicRoute21Url), fetch(hydraulicRoute22Url), fetch(hydraulicRoute23Url), fetch(architecturalSourceUrl), fetch(elevationDatumUrl), fetch(atticSourceUrl), fetch(atticCalibrationUrl), fetch(answerEvidenceUrl)]);
   if (!response.ok) throw new Error(`calibration fetch ${response.status}`);
   if (!sourceResponse.ok) throw new Error(`source fetch ${sourceResponse.status}`);
   if (!pipeVectorResponse.ok) throw new Error(`pipe vector fetch ${pipeVectorResponse.status}`);
@@ -57,10 +59,11 @@ try {
   if (!hydraulicRoute22Response.ok) throw new Error(`hydraulic route 2-2 fetch ${hydraulicRoute22Response.status}`);
   if (!hydraulicRoute23Response.ok) throw new Error(`hydraulic route 2-3 fetch ${hydraulicRoute23Response.status}`);
   if (!architecturalSourceResponse.ok) throw new Error(`architectural source fetch ${architecturalSourceResponse.status}`);
+  if (!elevationDatumResponse.ok) throw new Error(`elevation datum fetch ${elevationDatumResponse.status}`);
   if (!atticSourceResponse.ok) throw new Error(`attic source fetch ${atticSourceResponse.status}`);
   if (!atticCalibrationResponse.ok) throw new Error(`attic calibration fetch ${atticCalibrationResponse.status}`);
   if (!answerEvidenceResponse.ok) throw new Error(`answer evidence fetch ${answerEvidenceResponse.status}`);
-  const [calibration, source, pipeVectors, planGraph, operationalAnnotations, hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence, architecturalSource, atticSource, atticCalibration, answerEvidence] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json(), operationalResponse.json(), hydraulicRoute21Response.json(), hydraulicRoute22Response.json(), hydraulicRoute23Response.json(), architecturalSourceResponse.json(), atticSourceResponse.json(), atticCalibrationResponse.json(), answerEvidenceResponse.json()]);
+  const [calibration, source, pipeVectors, planGraph, operationalAnnotations, hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence, architecturalSource, elevationDatumSource, atticSource, atticCalibration, answerEvidence] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json(), operationalResponse.json(), hydraulicRoute21Response.json(), hydraulicRoute22Response.json(), hydraulicRoute23Response.json(), architecturalSourceResponse.json(), elevationDatumResponse.json(), atticSourceResponse.json(), atticCalibrationResponse.json(), answerEvidenceResponse.json()]);
   const scale = 1.5;
   const branchY = 430;
 
@@ -98,6 +101,8 @@ try {
   if (!architecturalValidation.sourceRegistrationReady) throw new Error(`architectural RCP/roof/elevation/section source registration: ${architecturalValidation.issues.map((entry) => entry.code).join(', ')}`);
   const architecturalVerticalControlReady = architecturalValidation.architecturalVerticalControlReady;
   const pipeCenterlineOffsetReady = architecturalValidation.pipeCenterlineOffsetReady;
+  const elevationDatum = evaluateNewHopeElevationDatum(elevationDatumSource, [hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence]);
+  if (!elevationDatum.calculationToArchitecturalDatumRegistrationReady) throw new Error(`calculation elevation datum: ${elevationDatum.blockerCodes.join(', ')}`);
   const ridgeGrade = evaluateNewHopeRidgeBranchGradeEnvelope({ pipeVectors, canonicalTopology, operationalAnnotations, atticSource, atticCalibration, answerEvidence });
   if (!ridgeGrade.boundedDeflectorGradeEnvelopeReady) throw new Error(`bounded ridge grade envelope: ${ridgeGrade.blockerCodes.join(', ')}`);
   const longBranchDrainage = evaluateNewHopeLongBranchDrainage({ pipeVectors, canonicalTopology, governedSkeleton, operationalAnnotations });
@@ -138,6 +143,7 @@ try {
     hydraulicRoutes: [hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence],
     hydraulicRouteSet,
     architecturalVerticalControls: architecturalValidation,
+    elevationDatum,
     operationalAnnotations,
     longBranchDrainage,
     sideBranchDrainage,
@@ -517,7 +523,7 @@ try {
   document.querySelector('#cross-main-grade-proof-status').textContent = `PASS: 35-node / 34-edge cross-main tree, including fabricated CMK.01-.03, directed from three high points toward low-point-01, low-point-04, and the riser return`;
   document.querySelector('#central-branch-grade-proof-status').textContent = `PASS: BL48/BL49 23-node / 23-edge branch component; eight-edge BL49 loop graded on both arms toward CMK; false BL48/CMI crossing kept separated; 4 attached arm-overs source-bound`;
   document.querySelector('#arm-over-grade-proof-status').textContent = `PASS: all 12 threaded terminal arm-overs bound to exact source edges, sprinklers, carrier roles, cut-length groups, and explicit drainage catchments`;
-  document.querySelector('#proper-pipe-layout-proof-status').textContent = `AUDITED: ${properPipeLayout.metrics.directedEdgeCount}/${properPipeLayout.metrics.canonicalEdgeCount} edges direction-bound; ${properPipeLayout.metrics.exactElevationPortCount} exact Z ports on ${properPipeLayout.metrics.exactElevationCanonicalNodeCount}/${properPipeLayout.metrics.canonicalNodeCount} nodes; proper layout remains blocked`;
+  document.querySelector('#proper-pipe-layout-proof-status').textContent = `AUDITED: ${properPipeLayout.metrics.directedEdgeCount}/${properPipeLayout.metrics.canonicalEdgeCount} edges direction-bound; ${properPipeLayout.metrics.exactElevationPortCount} exact Z ports on ${properPipeLayout.metrics.exactElevationCanonicalNodeCount}/${properPipeLayout.metrics.canonicalNodeCount} nodes; datum 100'-0\" registered across ${elevationDatum.metrics.distinctRoofRidgeElevationCount} roof regions; proper layout remains blocked`;
   document.querySelector('#ridge-grade-proof-status').textContent = `PASS: bounded seven-head ridge branch drains east-high to west-low toward low-point-04; ${ridgeGrade.totalHeadRowRiseIn.toFixed(1)} in across 36 ft`;
   const candidate = buildNewHopeProperPipeGraphCandidate(calibration, source);
   const acceptance = evaluateProperPitchedPipeGraph(candidate);

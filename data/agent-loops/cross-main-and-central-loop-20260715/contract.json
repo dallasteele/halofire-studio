@@ -8,6 +8,7 @@
     "E:/ClaudeBot/CODEX.md",
     "AGENTS.md",
     "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Crisis Center - Approved/Approved Plans.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Ceiling Heights.pdf",
     "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/10-Field Set/24-052_NHCC_INSTALL PLAN.pdf",
     "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
     "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/NEW HOPE CRISIS CENTER_NHCC List.FAB",
@@ -16,6 +17,7 @@
     "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-1.json",
     "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-2.json",
     "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-3.json",
+    "apps/autosprink/src/data/new-hope-approved-elevation-datum.json",
     "data/agent-loops/proper-pitched-pipe-graph-20260715/state.json"
   ],
   "exit_criteria": [
@@ -26,6 +28,7 @@
     "the BL48.02/CMI plan crossing remains explicitly separated because the fabrication listing proves no fitting or outlet",
     "all 12 one-inch terminal arm-overs bind to exact source edges, terminal sprinklers, fabrication groups, carrier segments, and source-backed drainage catchments",
     "unknown endpoint Z, fitting identities, field drains, or compliance decisions remain typed fail-closed blockers",
+    "approved calculation elevations are registered to the 100-foot finished-floor architectural datum without collapsing the six FP2.0 ridge elevations into one roof plane",
     "actual-PDF top-down and relative elevation proof render without obscuring the source",
     "focused tests, adversarial mutations, production build, formal proof, rules verification, and brain postflight pass"
   ],
@@ -47,10 +50,12 @@
     "apps/autosprink/src/engine/new-hope-central-branch-drainage.js",
     "apps/autosprink/src/engine/new-hope-arm-over-drainage.js",
     "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js",
+    "apps/autosprink/src/engine/new-hope-elevation-datum.js",
     "apps/autosprink/tests/new-hope-cross-main-drainage.test.js",
     "apps/autosprink/tests/new-hope-central-branch-drainage.test.js",
     "apps/autosprink/tests/new-hope-arm-over-drainage.test.js",
     "apps/autosprink/tests/new-hope-proper-pipe-layout.test.js",
+    "apps/autosprink/tests/new-hope-elevation-datum.test.js",
     "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
     "data/agent-loops/cross-main-and-central-loop-20260715/lean-proper-layout-proof.json",
     "data/agent-loops/cross-main-and-central-loop-20260715/state.json"

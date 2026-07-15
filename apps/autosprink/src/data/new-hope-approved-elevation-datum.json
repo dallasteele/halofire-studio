@@ -1,0 +1,104 @@
+{
+  "artifactType": "halofire.new-hope-approved-elevation-datum.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "sourceBindings": {
+    "approvedPlan": {
+      "path": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Crisis Center - Approved/Approved Plans.PDF",
+      "sha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+      "elevationLegend": {
+        "sheet": "FP0.1",
+        "physicalPage": 2,
+        "belowRoofDeckText": "PIPE ELEV. BELOW ROOF DECK",
+        "aboveFinishedFloorText": "PIPE ELEV. ABOVE FINISHED FLOOR",
+        "belowRoofDeckTextBboxPdfPt": [2514.97, 910.56, 2699.84, 926.94],
+        "aboveFinishedFloorTextBboxPdfPt": [2512.83, 931.12, 2723.58, 947.5]
+      },
+      "atticLayout": {
+        "sheet": "FP2.0",
+        "physicalPage": 5,
+        "dryPipeGradeNote": {
+          "branchLinesInPer10Ft": 0.5,
+          "crossMainsInPer10Ft": 0.25
+        },
+        "belowDeckTagValues": [
+          "1'-8 BD",
+          "1'-8 1/2 BD",
+          "1'-9 BD",
+          "2'-8 BD",
+          "2'-9 BD"
+        ]
+      }
+    },
+    "ceilingDatumPlan": {
+      "path": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Ceiling Heights.pdf",
+      "sha256": "A32CF45D59635ABA9E40EDFE7754F1721763659D48766B35A8917EC167FF7794",
+      "sheet": "A102",
+      "physicalPage": 1,
+      "generalNoteNumber": 8,
+      "generalNote": "ALL CEILING ELEVATIONS ARE MEASURED FROM BOTTOM OF CEILING MATERIAL TO 100'-0\"."
+    },
+    "architecturalBidSet": {
+      "path": "1-Bid Documents/GC - Bid Plans/Building/New Hope Crisis Center Bid Set Drawings.pdf",
+      "sha256": "9F9F8B97CFB35931474566156F35D97520AE993052DAC046EFACB408F32EA0A7",
+      "registeredSheets": ["A102", "A201", "A301"]
+    },
+    "approvedHydraulicCalculation": {
+      "sha256": "D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719",
+      "software": "AutoSPRINK 2023 v18.1.44.0",
+      "columnLabel": "Elevation (Foot)",
+      "remoteAreaIds": ["2-1", "2-2", "2-3"]
+    }
+  },
+  "verticalDatum": {
+    "name": "New Hope finished floor",
+    "architecturalProjectElevationFt": 100,
+    "autosprinkLocalElevationFt": 0,
+    "conversion": "architecturalProjectElevationFt = 100 + autosprinkLocalElevationFt",
+    "coordinateMeaning": "Approved hydraulic calculation node elevation registered to the project finished-floor datum; it is not automatically a pipe-centerline elevation for unbound plan nodes."
+  },
+  "roofRegions": [
+    {
+      "id": "fp20-ridge-23-0.5",
+      "label": "RIDGELINE AT 23'-1/2\"",
+      "localElevationFt": 23.041667,
+      "labelBboxPdfPt": [871.65, 1172.5, 885.5, 1257.3]
+    },
+    {
+      "id": "fp20-ridge-21-2.5",
+      "label": "RIDGE AT 21'-2 1/2\"",
+      "localElevationFt": 21.208333,
+      "labelBboxPdfPt": [1472.78, 774.91, 1546.1, 788.76]
+    },
+    {
+      "id": "fp20-ridge-20-1",
+      "label": "RIDGE AT 20'-1\"",
+      "localElevationFt": 20.083333,
+      "labelBboxPdfPt": [1084.79, 804.1, 1144.45, 817.95]
+    },
+    {
+      "id": "fp20-ridge-18-2.5",
+      "label": "RIDGE AT 18'-2 1/2\"",
+      "localElevationFt": 18.208333,
+      "labelBboxPdfPt": [1176.63, 1204.55, 1249.95, 1218.4]
+    },
+    {
+      "id": "fp20-ridge-17-5",
+      "label": "RIDGE AT 17'-5\"",
+      "localElevationFt": 17.416667,
+      "labelBboxPdfPt": [602.25, 880.55, 661.91, 894.4]
+    },
+    {
+      "id": "fp20-ridge-16-0",
+      "label": "RIDGE AT 16'-0\"",
+      "localElevationFt": 16,
+      "labelBboxPdfPt": [527.1, 841.98, 586.75, 855.84]
+    }
+  ],
+  "modelingRules": {
+    "globalRoofPlaneAllowed": false,
+    "roofRegionAssignmentRequiredBeforeRoofClearance": true,
+    "pieceLengthMayBeUsedAsElevation": false,
+    "belowDeckTagMayBeUsedAsFinishedFloorElevation": false,
+    "hydraulicNodeElevationMayBePropagatedWithoutSourceBoundPath": false
+  }
+}

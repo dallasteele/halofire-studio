@@ -7,6 +7,7 @@ import { bindApprovedFp20HydraulicRouteSet } from '../src/engine/approved-fp20-h
 import { evaluateNewHopeArmOverDrainage } from '../src/engine/new-hope-arm-over-drainage.js'
 import { evaluateNewHopeCentralBranchDrainage } from '../src/engine/new-hope-central-branch-drainage.js'
 import { evaluateNewHopeCrossMainDrainage } from '../src/engine/new-hope-cross-main-drainage.js'
+import { evaluateNewHopeElevationDatum } from '../src/engine/new-hope-elevation-datum.js'
 import { evaluateNewHopeLongBranchDrainage } from '../src/engine/new-hope-long-branch-drainage.js'
 import { evaluateNewHopeProperPipeLayout } from '../src/engine/new-hope-proper-pipe-layout.js'
 import { evaluateNewHopeSideBranchDrainage } from '../src/engine/new-hope-side-branch-drainage.js'
@@ -20,6 +21,7 @@ const hydraulicRoutes = ['2-1', '2-2', '2-3'].map((id) =>
   read(`new-hope-approved-fp20-hydraulic-route-${id}.json`),
 )
 const architecturalSource = read('new-hope-pitched-holdout-source.json')
+const elevationDatumSource = read('new-hope-approved-elevation-datum.json')
 const canonicalTopology = canonicalizeApprovedFp20Topology(planGraph)
 const governedSkeleton = evaluateApprovedFp20GovernedSkeleton(
   pipeVectors,
@@ -29,6 +31,7 @@ const governedSkeleton = evaluateApprovedFp20GovernedSkeleton(
 const hydraulicRouteSet = bindApprovedFp20HydraulicRouteSet(canonicalTopology, hydraulicRoutes)
 const architecturalVerticalControls =
   evaluateApprovedFp20ArchitecturalVerticalControls(architecturalSource)
+const elevationDatum = evaluateNewHopeElevationDatum(elevationDatumSource, hydraulicRoutes)
 const longBranchDrainage = evaluateNewHopeLongBranchDrainage({
   pipeVectors,
   canonicalTopology,
@@ -72,6 +75,7 @@ const inputs = {
   hydraulicRoutes,
   hydraulicRouteSet,
   architecturalVerticalControls,
+  elevationDatum,
   operationalAnnotations,
   longBranchDrainage,
   sideBranchDrainage,
@@ -111,6 +115,7 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.wholeFp20RelativeGradeDirectionReady).toBe(true)
     expect(result.partialExactPipeElevationAnchorReady).toBe(true)
     expect(result.exactPipeCenterlineZReady).toBe(false)
+    expect(result.calculationToArchitecturalDatumRegistrationReady).toBe(true)
     expect(result.properPipeLayoutReady).toBe(false)
     expect(result.fabricationReady).toBe(false)
   })
@@ -129,8 +134,9 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.sameXyVerticalLegReady).toBe(true)
     expect(result.architecturalRegistration).toMatchObject({
       calculationAnchorRangeFt: { min: 11.5, max: 21.5 },
-      maximumAnchorAboveArchitecturalRidgeFt: 0.291667,
-      calculationToArchitecturalDatumRegistrationReady: false,
+      architecturalProjectAnchorRangeFt: { min: 111.5, max: 121.5 },
+      globalRoofComparisonAllowed: false,
+      calculationToArchitecturalDatumRegistrationReady: true,
     })
   })
 
@@ -139,7 +145,6 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.acceptanceBlockerCodes).toEqual([
       'NH_PROPER_PIPE_LOW_POINT_ZONE_GRADE_UNRESOLVED',
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
-      'NH_PROPER_PIPE_CALC_ARCH_DATUM_UNREGISTERED',
       'NH_PROPER_PIPE_EXACT_Z_INCOMPLETE',
       'NH_PROPER_PIPE_FIELD_DRAIN_ROUTES_UNRESOLVED',
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',

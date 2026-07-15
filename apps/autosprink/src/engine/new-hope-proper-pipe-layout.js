@@ -9,10 +9,10 @@
  * remaining blocker that prevents a proper plan/elevation/3D pipe layout.
  *
  * Known limitations: approved calculations anchor only a subset of the plan
- * graph; they do not establish a calculation-to-architectural vertical datum,
- * the source-feed transition, the field-routed drum-drip drains, or a complete
- * fitting schedule. This module therefore never invents pipe Z from roof Z and
- * never treats hydraulic flow as drainage grade.
+ * graph; the registered calculation datum still does not establish Z for the
+ * remaining plan nodes, the source-feed transition, the field-routed drum-drip
+ * drains, or a complete fitting schedule. This module therefore never invents
+ * pipe Z from roof Z and never treats hydraulic flow as drainage grade.
  */
 
 const EXPECTED_PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut'
@@ -161,6 +161,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object[]} inputs.hydraulicRoutes - Three approved calculation evidence packets.
  * @param {object} inputs.hydraulicRouteSet - Evaluated calculation route set.
  * @param {object} inputs.architecturalVerticalControls - Evaluated A201/A301 controls.
+ * @param {object} inputs.elevationDatum - Evaluated FP0.1/A102/calculation datum registration.
  * @param {object} inputs.operationalAnnotations - Source notes, grades, drains, and details.
  * @param {object} inputs.longBranchDrainage - Long-branch drainage schedule.
  * @param {object} inputs.sideBranchDrainage - Side-branch drainage schedule.
@@ -178,6 +179,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     hydraulicRoutes = [],
     hydraulicRouteSet,
     architecturalVerticalControls,
+    elevationDatum,
     operationalAnnotations,
     longBranchDrainage,
     sideBranchDrainage,
@@ -192,6 +194,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     governedSkeleton,
     hydraulicRouteSet,
     architecturalVerticalControls,
+    elevationDatum,
     operationalAnnotations,
   ].map((entry) => entry?.projectId)
   if (projectIds.some((projectId) => projectId !== EXPECTED_PROJECT_ID)) {
@@ -218,6 +221,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['governed-skeleton', governedSkeleton?.status],
     ['hydraulic-route-set', hydraulicRouteSet?.status],
     ['architectural-vertical-controls', architecturalVerticalControls?.status],
+    ['calculation-elevation-datum', elevationDatum?.status],
     ['long-branch-drainage', longBranchDrainage?.status],
     ['side-branch-drainage', sideBranchDrainage?.status],
     ['cross-main-drainage', crossMainDrainage?.status],
@@ -322,13 +326,29 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
   }
 
   const anchorElevations = ports.map((port) => port.elevationFt)
-  const roofEnvelope = architecturalVerticalControls?.roofEnvelope
   const fieldRouteDrainIntents = operationalAnnotations?.fieldRouteDrainIntents || []
   const fieldDrainRoutesReady =
     fieldRouteDrainIntents.length > 0 &&
     fieldRouteDrainIntents.every((intent) => intent.routeStatus === 'source-resolved')
   const drumDripDetailReady = operationalAnnotations?.drumDripDetail?.components?.length === 7
-  const calculationToArchitecturalDatumRegistrationReady = false
+  const datumPortKeys = new Set(
+    (elevationDatum?.registeredPorts || []).map(
+      (port) => `${port.canonicalNodeId}|${port.calculationNodeId}|${port.autosprinkLocalElevationFt}`,
+    ),
+  )
+  const calculationToArchitecturalDatumRegistrationReady =
+    elevationDatum?.calculationToArchitecturalDatumRegistrationReady === true &&
+    ports.every((port) =>
+      datumPortKeys.has(`${port.canonicalNodeId}|${port.calculationNodeId}|${port.elevationFt}`),
+    )
+  if (!calculationToArchitecturalDatumRegistrationReady) {
+    issues.push(
+      issue(
+        'NH_PROPER_PIPE_CALC_ARCH_DATUM_INVALID',
+        'Every approved calculation port must remain registered to the project finished-floor datum.',
+      ),
+    )
+  }
   const exactPipeCenterlineZReady = false
   const fittingScheduleReady = false
   const properPipeLayoutReady = false
@@ -342,10 +362,6 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
       'The supply-feed transition is source-anchored in plan but does not yet have a complete side-view/3D path.',
       'source-edge-001,source-edge-002',
-    ),
-    issue(
-      'NH_PROPER_PIPE_CALC_ARCH_DATUM_UNREGISTERED',
-      'Approved calculation elevations have not yet been registered to the A201/A301 architectural vertical datum.',
     ),
     issue(
       'NH_PROPER_PIPE_EXACT_Z_INCOMPLETE',
@@ -386,14 +402,26 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     multiElevationNodes,
     architecturalRegistration: {
       registeredSheets: architecturalVerticalControls?.registeredSheets || [],
-      roofEnvelope: roofEnvelope || null,
+      verticalDatum: elevationDatum?.verticalDatum || null,
+      roofRegions: elevationDatum?.roofRegions || [],
       calculationAnchorRangeFt: anchorElevations.length
         ? { min: Math.min(...anchorElevations), max: Math.max(...anchorElevations) }
         : null,
-      maximumAnchorAboveArchitecturalRidgeFt:
-        anchorElevations.length && Number.isFinite(roofEnvelope?.ridgeDatumZFt)
-          ? round(Math.max(...anchorElevations) - roofEnvelope.ridgeDatumZFt)
-          : null,
+      architecturalProjectAnchorRangeFt: elevationDatum?.registeredPorts?.length
+        ? {
+            min: Math.min(
+              ...elevationDatum.registeredPorts.map(
+                (port) => port.architecturalProjectElevationFt,
+              ),
+            ),
+            max: Math.max(
+              ...elevationDatum.registeredPorts.map(
+                (port) => port.architecturalProjectElevationFt,
+              ),
+            ),
+          }
+        : null,
+      globalRoofComparisonAllowed: false,
       calculationToArchitecturalDatumRegistrationReady,
     },
     fieldDrainRoutes: fieldRouteDrainIntents.map((intent) => ({

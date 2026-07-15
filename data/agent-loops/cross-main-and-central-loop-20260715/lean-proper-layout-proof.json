@@ -6,12 +6,13 @@
   "theoremNames": [
     "wholeNewHopeDirectionInventory",
     "exactElevationPortInventory",
+    "finishedFloorDatumConversion",
     "partialElevationCannotPromoteProperLayout"
   ],
-  "claim": "The five independent drainage schedules uniquely cover 140 canonical edges and the two source-feed plus one low-point-zone exceptions close the 143-edge inventory. Thirty-one canonical nodes plus the second same-XY vertical port produce 32 exact elevation ports, while partial Z coverage and five unresolved engineering conditions cannot promote exact pipe-centerline Z or proper-layout readiness.",
+  "claim": "The five independent drainage schedules uniquely cover 140 canonical edges and the two source-feed plus one low-point-zone exceptions close the 143-edge inventory. Thirty-one canonical nodes plus the second same-XY vertical port produce 32 exact elevation ports. The 100-foot finished-floor datum converts the 11.5-to-21.5-foot local anchor range to 111.5-to-121.5-foot project elevation, six roof regions prohibit a global plane, and the remaining partial Z coverage plus four engineering conditions cannot promote exact pipe-centerline Z or proper-layout readiness.",
   "result": {
     "status": "verified",
-    "elapsedMs": 73,
+    "elapsedMs": 79,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }
