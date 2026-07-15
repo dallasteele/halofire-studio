@@ -31,9 +31,9 @@ describe('MIT Riverside Building J protected-source roof planes and elevation ta
     expect(packet.headAssignments.every((head) => head.headInstallationZFt === null)).toBe(true);
   });
 
-  it('renders top, side-view, and 3D proof without promoting compliance', () => {
+  it('keeps the former blank-background renderer diagnostic-only and rejects it as visual proof', () => {
     const views = renderMitRiversideBuildingJRoofPlaneElevation(packet);
-    expect(views).toMatchObject({ status: 'passed', counts: { main: 36, membrane: 17, pending: 15 }, headInstallationZReady: false, complianceReady: false });
+    expect(views).toMatchObject({ status: 'diagnostic-only', counts: { main: 36, membrane: 17, pending: 15 }, sourceUnderlayVisible: false, visualProofAccepted: false, requiredVisualProof: 'protected-pdf-roof-plan-and-e-f-section-underlays', headInstallationZReady: false, complianceReady: false });
     expect((views.topSvg.match(/class="cricket"/g) || [])).toHaveLength(4);
     expect(views.elevationSvg).toContain('supersedes legacy 0.5');
     expect((views.model3dSvg.match(/class="target"/g) || [])).toHaveLength(53);

@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildMitRiversideBuildingJRoofPlaneElevation, renderMitRiversideBuildingJRoofPlaneElevation, validateMitRiversideBuildingJRoofPlaneElevation, verifyMitRiversideBuildingJRoofPlaneElevationAdversarialLoop } from '../src/engine/mit-riverside-building-j-roof-plane-elevation.js';
+import { buildMitRiversideBuildingJRoofPlaneElevation, validateMitRiversideBuildingJRoofPlaneElevation, verifyMitRiversideBuildingJRoofPlaneElevationAdversarialLoop } from '../src/engine/mit-riverside-building-j-roof-plane-elevation.js';
+import { validateMitRiversideBuildingJSourceUnderlayVisualProof, verifyMitRiversideBuildingJSourceUnderlayVisualProofAdversarialLoop } from '../src/engine/mit-riverside-building-j-source-underlay-visual-proof.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const data = (name) => path.join(root, 'src', 'data', name);
@@ -14,15 +15,12 @@ const validation = await validateMitRiversideBuildingJRoofPlaneElevation(packet,
 const adversarial = await verifyMitRiversideBuildingJRoofPlaneElevationAdversarialLoop(packet, dependencies);
 if (validation.status !== 'passed' || adversarial.status !== 'passed') throw new Error(JSON.stringify({ validation, adversarial }));
 fs.writeFileSync(data('mit-riverside-building-j-roof-plane-elevation.json'), `${JSON.stringify(packet, null, 2)}\n`);
-const views = renderMitRiversideBuildingJRoofPlaneElevation(packet);
 const proofDir = path.join(root, 'src', 'data', 'proofs', 'mit-riverside-building-j-roof-plane-elevation');
-fs.mkdirSync(proofDir, { recursive: true });
-for (const [name, svg] of Object.entries({ top: views.topSvg, elevation: views.elevationSvg, model3d: views.model3dSvg })) fs.writeFileSync(path.join(proofDir, `${name}.svg`), svg);
-const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:,"><title>MIT Riverside Building J roof-plane proof</title><style>body{margin:0;background:#020617;color:#e2e8f0;font-family:system-ui}header{padding:24px 32px;background:#07111f;border-bottom:1px solid #334155}h1{margin:0 0 8px;font-size:26px}p{margin:0;color:#cbd5e1}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px}.card{background:#06111f;border:1px solid #334155;border-radius:12px;overflow:hidden}.card:last-child{grid-column:1/-1}.card h2{margin:0;padding:14px 18px;font-size:18px;border-bottom:1px solid #334155}.card img{display:block;width:100%;height:auto}.gate{color:#fbbf24;font-weight:700}</style></head><body><header><h1>MIT Riverside - Building J source roof/elevation proof</h1><p>Protected PDF vectors + section E/F DWGs. <span class="gate">53 source protection-plane targets; no installed head Z or compliance claim.</span></p></header><main class="grid"><section class="card"><h2>PDF roof topology</h2><img src="top.svg" alt="source roof topology"></section><section class="card"><h2>Side-view elevation replay</h2><img src="elevation.svg" alt="section elevation replay"></section><section class="card"><h2>3D source protection planes</h2><img src="model3d.svg" alt="3D source protection planes"></section></main></body></html>`;
-fs.writeFileSync(path.join(proofDir, 'index.html'), html);
+const visualProof = JSON.parse(fs.readFileSync(path.join(proofDir, 'proof.json'), 'utf8'));
+const visualValidation = validateMitRiversideBuildingJSourceUnderlayVisualProof(visualProof);
+const visualAdversarial = verifyMitRiversideBuildingJSourceUnderlayVisualProofAdversarialLoop(visualProof);
+if (visualValidation.status !== 'passed' || visualAdversarial.status !== 'passed') throw new Error(JSON.stringify({ visualValidation, visualAdversarial }));
 const out = path.join(root, 'out', 'visual-proof', 'mit-riverside-building-j-roof-plane-elevation');
 fs.mkdirSync(out, { recursive: true });
-for (const [name, svg] of Object.entries({ top: views.topSvg, elevation: views.elevationSvg, model3d: views.model3dSvg })) fs.writeFileSync(path.join(out, `${name}.svg`), svg);
-fs.writeFileSync(path.join(out, 'index.html'), html);
-fs.writeFileSync(path.join(out, 'proof.json'), `${JSON.stringify({ validation, adversarial, evidenceReceiptSha256: evidence.receiptSha256, packetReceiptSha256: packet.receiptSha256, counts: packet.counts }, null, 2)}\n`);
-console.log(JSON.stringify({ status: 'passed', validation, adversarial, receiptSha256: packet.receiptSha256, counts: packet.counts, proofDir }, null, 2));
+for (const name of ['source-pdf-roof-plan-overlay.png', 'source-pdf-section-overlay.png', 'source-pdf-rcp-ceiling-envelope-overlay.png', 'source-pdf-registered-3d.svg', 'index.html', 'proof.json']) fs.copyFileSync(path.join(proofDir, name), path.join(out, name));
+console.log(JSON.stringify({ status: 'passed', validation, adversarial, visualValidation, visualAdversarial, receiptSha256: packet.receiptSha256, counts: packet.counts, proofDir }, null, 2));

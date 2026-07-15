@@ -1,0 +1,2239 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-ceiling-installation-envelope.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "sourceRoofPlanePacketReceiptSha256": "9fc9718be4ff957b36483319c629fe90478f0a5075d77b041b47ddcaa4d587fd",
+  "sourceCeilingInstallationEvidenceReceiptSha256": "368496bdc3db1362b20889af81a4ef6fc7d264d94be09d33ca7f831e9ddb4e6d",
+  "generationMode": "protected-rcp-ceiling-polygons-approved-fp2-product-schedule-and-submitted-tfp171-conditional-geometry",
+  "approvedProducts": {
+    "source": {
+      "physicalPage": 2,
+      "sheet": "FP-2",
+      "scheduleTitle": "SPRINKLER SCHEDULE",
+      "transcriptionMode": "pixel-verified-approved-plan-schedule"
+    },
+    "pendent": {
+      "count": 15,
+      "position": "PEND",
+      "finish": "CHROME",
+      "temperatureF": 155,
+      "kFactor": 5.6,
+      "nptIn": 0.5,
+      "sin": "TY3231",
+      "manufacturer": "Tyco",
+      "model": "TY-FRB"
+    },
+    "upright": {
+      "count": 53,
+      "position": "UPR",
+      "finish": "BRASS",
+      "temperatureF": 200,
+      "kFactor": 5.6,
+      "nptIn": 0.5,
+      "sin": "TY3131",
+      "manufacturer": "Tyco",
+      "model": "TY-FRB"
+    }
+  },
+  "submittedManufacturerData": {
+    "source": {
+      "document": "TFP171",
+      "revision": "March 2020",
+      "physicalPages": [
+        1,
+        3,
+        6
+      ]
+    },
+    "approvedSinBindings": {
+      "pendent": "TY3231",
+      "upright": "TY3131"
+    },
+    "standardPendentFigure": {
+      "physicalPage": 3,
+      "figure": 3,
+      "overallFittingFaceToDeflectorIn": 2.1875,
+      "escutcheonPlateSeatingSurfaceToDeflectorIn": 1.5,
+      "nominalThreadMakeIn": 0.4375
+    },
+    "recessedOptionsNotSelectedByApprovedSchedule": [
+      {
+        "style": 10,
+        "totalAdjustmentIn": 0.75,
+        "deflectorBelowMountingSurfaceIn": [
+          0.75,
+          1.25
+        ]
+      },
+      {
+        "style": 20,
+        "totalAdjustmentIn": 0.5,
+        "deflectorBelowMountingSurfaceIn": [
+          1,
+          1.5
+        ]
+      }
+    ],
+    "installationConclusion": "approved schedule says PEND, not recessed pendent; standard pendent geometry is conditionally usable, but exact installed deflector Z remains null until the ceiling seating-surface/fitting detail is source-proved"
+  },
+  "ceilingControls": [
+    {
+      "id": "J102",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          534.938171,
+          1514.044922,
+          551.560486,
+          1525.216919
+        ],
+        "centerPt": {
+          "x": 543.249329,
+          "y": 1519.63092
+        },
+        "matchDistancePt": 0.000001
+      }
+    },
+    {
+      "id": "J101",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          534.050903,
+          1608.9375,
+          550.673218,
+          1620.109497
+        ],
+        "centerPt": {
+          "x": 542.362061,
+          "y": 1614.523499
+        },
+        "matchDistancePt": 0.000001
+      }
+    },
+    {
+      "id": "J103",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          724.836975,
+          1642.845703,
+          741.45929,
+          1654.0177
+        ],
+        "centerPt": {
+          "x": 733.148132,
+          "y": 1648.431702
+        },
+        "matchDistancePt": 0
+      }
+    },
+    {
+      "id": "J104",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          950.237,
+          1625.676147,
+          966.859314,
+          1636.848145
+        ],
+        "centerPt": {
+          "x": 958.548157,
+          "y": 1631.262146
+        },
+        "matchDistancePt": 0
+      }
+    },
+    {
+      "id": "southwest-9ft-control",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          641.280029,
+          1740.20459,
+          657.902344,
+          1751.376587
+        ],
+        "centerPt": {
+          "x": 649.591187,
+          "y": 1745.790588
+        },
+        "matchDistancePt": 0.000001
+      }
+    },
+    {
+      "id": "J109",
+      "ceilingHeightFt": 10,
+      "sourceLabel": {
+        "text": "10'-0\"",
+        "bboxPt": [
+          817.705811,
+          1552.307007,
+          838.976562,
+          1563.479004
+        ],
+        "centerPt": {
+          "x": 828.341187,
+          "y": 1557.893005
+        },
+        "matchDistancePt": 0.000091
+      }
+    },
+    {
+      "id": "east-8ft-control",
+      "ceilingHeightFt": 8,
+      "sourceLabel": {
+        "text": "8'-0\"",
+        "bboxPt": [
+          1118.530273,
+          1672.070923,
+          1135.152588,
+          1683.24292
+        ],
+        "centerPt": {
+          "x": 1126.841431,
+          "y": 1677.656921
+        },
+        "matchDistancePt": 0.000575
+      }
+    },
+    {
+      "id": "J100",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'",
+        "bboxPt": [
+          709.518555,
+          1588.182251,
+          715.613647,
+          1599.354248
+        ],
+        "centerPt": {
+          "x": 712.566101,
+          "y": 1593.76825
+        },
+        "matchDistancePt": 0
+      }
+    }
+  ],
+  "ceilingZones": [
+    {
+      "id": "Slab_1-AD7",
+      "blockName": "Slab_1",
+      "insertHandle": "AD7",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AD6",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 68.765236,
+          "y": 96.147417
+        },
+        {
+          "x": 70.764836,
+          "y": 96.147417
+        },
+        {
+          "x": 70.764836,
+          "y": 82.148917
+        },
+        {
+          "x": 68.765236,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.991401,
+      "headAssignments": [
+        {
+          "id": "MIT-J-U-049",
+          "kind": "upright"
+        },
+        {
+          "id": "MIT-J-U-053",
+          "kind": "upright"
+        }
+      ]
+    },
+    {
+      "id": "Slab_2-ADD",
+      "blockName": "Slab_2",
+      "insertHandle": "ADD",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "ADB",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.387076,
+          "y": 99.146236
+        },
+        {
+          "x": 36.990991,
+          "y": 99.146236
+        },
+        {
+          "x": 36.990991,
+          "y": 84.556657
+        },
+        {
+          "x": 25.387076,
+          "y": 84.556657
+        }
+      ],
+      "areaSqFt": 169.296235,
+      "headAssignments": [
+        {
+          "id": "MIT-J-U-045",
+          "kind": "upright"
+        },
+        {
+          "id": "MIT-J-P-010",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-012",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_3-AE4",
+      "blockName": "Slab_3",
+      "insertHandle": "AE4",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AE1",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.687625,
+          "y": 77.116771
+        },
+        {
+          "x": 16.948461,
+          "y": 77.116771
+        },
+        {
+          "x": 16.948461,
+          "y": 65.500118
+        },
+        {
+          "x": 0.687625,
+          "y": 65.500118
+        }
+      ],
+      "areaSqFt": 188.896489,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-001",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-002",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_4-AEA",
+      "blockName": "Slab_4",
+      "insertHandle": "AEA",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AE8",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.687625,
+          "y": 89.150164
+        },
+        {
+          "x": 17.000451,
+          "y": 89.150164
+        },
+        {
+          "x": 17.000451,
+          "y": 77.887741
+        },
+        {
+          "x": 0.687625,
+          "y": 77.887741
+        }
+      ],
+      "areaSqFt": 183.721947,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-005",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-006",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_5-AF0",
+      "blockName": "Slab_5",
+      "insertHandle": "AF0",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AEE",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.386453,
+          "y": 78.11801
+        },
+        {
+          "x": 46.981771,
+          "y": 78.11801
+        },
+        {
+          "x": 46.981771,
+          "y": 65.500118
+        },
+        {
+          "x": 36.386453,
+          "y": 65.500118
+        }
+      ],
+      "areaSqFt": 133.690578,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-003",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-004",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_6-AF6",
+      "blockName": "Slab_6",
+      "insertHandle": "AF6",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AF4",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 51.270261,
+          "y": 96.147417
+        },
+        {
+          "x": 53.269498,
+          "y": 96.147417
+        },
+        {
+          "x": 53.269498,
+          "y": 82.148917
+        },
+        {
+          "x": 51.270261,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_7-AFB",
+      "blockName": "Slab_7",
+      "insertHandle": "AFB",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AFA",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 53.269498,
+          "y": 96.147417
+        },
+        {
+          "x": 55.268735,
+          "y": 96.147417
+        },
+        {
+          "x": 55.268735,
+          "y": 82.148917
+        },
+        {
+          "x": 53.269498,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-008",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-014",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_8-B01",
+      "blockName": "Slab_8",
+      "insertHandle": "B01",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AFF",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 55.768645,
+          "y": 96.147417
+        },
+        {
+          "x": 57.767882,
+          "y": 96.147417
+        },
+        {
+          "x": 57.767882,
+          "y": 82.148917
+        },
+        {
+          "x": 55.768645,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_9-B06",
+      "blockName": "Slab_9",
+      "insertHandle": "B06",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B05",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 57.767882,
+          "y": 96.147417
+        },
+        {
+          "x": 59.767119,
+          "y": 96.147417
+        },
+        {
+          "x": 59.767119,
+          "y": 82.148917
+        },
+        {
+          "x": 57.767882,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_10-B0B",
+      "blockName": "Slab_10",
+      "insertHandle": "B0B",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B0A",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 59.767119,
+          "y": 96.147417
+        },
+        {
+          "x": 61.766435,
+          "y": 96.147417
+        },
+        {
+          "x": 61.766435,
+          "y": 82.148917
+        },
+        {
+          "x": 59.767119,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.987425,
+      "headAssignments": [
+        {
+          "id": "MIT-J-U-048",
+          "kind": "upright"
+        },
+        {
+          "id": "MIT-J-U-052",
+          "kind": "upright"
+        }
+      ]
+    },
+    {
+      "id": "Slab_11-B10",
+      "blockName": "Slab_11",
+      "insertHandle": "B10",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B0F",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 62.266435,
+          "y": 96.147417
+        },
+        {
+          "x": 64.266036,
+          "y": 96.147417
+        },
+        {
+          "x": 64.266036,
+          "y": 82.148917
+        },
+        {
+          "x": 62.266435,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.991415,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_12-B15",
+      "blockName": "Slab_12",
+      "insertHandle": "B15",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B14",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 64.266036,
+          "y": 96.147417
+        },
+        {
+          "x": 66.265636,
+          "y": 96.147417
+        },
+        {
+          "x": 66.265636,
+          "y": 82.148917
+        },
+        {
+          "x": 64.266036,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.991401,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-009",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-015",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_13-B1B",
+      "blockName": "Slab_13",
+      "insertHandle": "B1B",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B19",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 66.265636,
+          "y": 96.147417
+        },
+        {
+          "x": 68.265236,
+          "y": 96.147417
+        },
+        {
+          "x": 68.265236,
+          "y": 82.148917
+        },
+        {
+          "x": 66.265636,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.991401,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_14-B21",
+      "blockName": "Slab_14",
+      "insertHandle": "B21",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B1F",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 18.020841,
+          "y": 99.146236
+        },
+        {
+          "x": 24.980735,
+          "y": 99.146236
+        },
+        {
+          "x": 24.980735,
+          "y": 89.504201
+        },
+        {
+          "x": 18.020841,
+          "y": 89.504201
+        }
+      ],
+      "areaSqFt": 67.107542,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-011",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_15-B26",
+      "blockName": "Slab_15",
+      "insertHandle": "B26",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B25",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 49.271023,
+          "y": 96.147417
+        },
+        {
+          "x": 51.270261,
+          "y": 96.147417
+        },
+        {
+          "x": 51.270261,
+          "y": 82.148917
+        },
+        {
+          "x": 49.271023,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986333,
+      "headAssignments": [
+        {
+          "id": "MIT-J-U-047",
+          "kind": "upright"
+        },
+        {
+          "id": "MIT-J-U-051",
+          "kind": "upright"
+        }
+      ]
+    },
+    {
+      "id": "Slab_16-B2B",
+      "blockName": "Slab_16",
+      "insertHandle": "B2B",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B2A",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 42.771505,
+          "y": 96.147417
+        },
+        {
+          "x": 44.772053,
+          "y": 96.147417
+        },
+        {
+          "x": 44.772053,
+          "y": 82.148917
+        },
+        {
+          "x": 42.771505,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 28.004671,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_17-B31",
+      "blockName": "Slab_17",
+      "insertHandle": "B31",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B2F",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 44.772053,
+          "y": 96.147417
+        },
+        {
+          "x": 46.771877,
+          "y": 96.147417
+        },
+        {
+          "x": 46.771877,
+          "y": 82.148917
+        },
+        {
+          "x": 44.772053,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.994536,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_18-B36",
+      "blockName": "Slab_18",
+      "insertHandle": "B36",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B35",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 46.771877,
+          "y": 96.147417
+        },
+        {
+          "x": 48.771114,
+          "y": 96.147417
+        },
+        {
+          "x": 48.771114,
+          "y": 82.148917
+        },
+        {
+          "x": 46.771877,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_27-31456",
+      "blockName": "Slab_27",
+      "insertHandle": "31456",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "31454",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 40.27072,
+          "y": 96.147417
+        },
+        {
+          "x": 42.271268,
+          "y": 96.147417
+        },
+        {
+          "x": 42.271268,
+          "y": 82.148917
+        },
+        {
+          "x": 40.27072,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 28.004671,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-007",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-013",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_28-3262D",
+      "blockName": "Slab_28",
+      "insertHandle": "3262D",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "3262B",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 73.0625,
+          "y": 98.125804
+        },
+        {
+          "x": 75.3125,
+          "y": 98.125804
+        },
+        {
+          "x": 75.3125,
+          "y": 78.47224
+        },
+        {
+          "x": 73.0625,
+          "y": 78.47224
+        }
+      ],
+      "areaSqFt": 44.220519,
+      "headAssignments": []
+    }
+  ],
+  "headAssignments": [
+    {
+      "id": "MIT-J-U-001",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-002",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-003",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-004",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-005",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-006",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 5.53954
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 17.660368,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-007",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-008",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-009",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-010",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-011",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-012",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 16.208364
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 18.771704,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-013",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-014",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-015",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-016",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-017",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-018",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 26.877188
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 19.88304,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-019",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-020",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-021",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-022",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-023",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-024",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 38.332839
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 21.076337,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-025",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-026",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-027",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-028",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-029",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-030",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 49.001663
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 22.187673,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-031",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 5.23984,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-032",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 15.239175,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-033",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 25.241465,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-034",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 35.242845,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-035",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 45.24275,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-036",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 55.245439,
+        "y": 59.670487
+      },
+      "roofBaseRegionId": "main-standing-seam",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "main-open-structure-bod",
+      "sourceProtectionPlaneZFt": 23.299009,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-037",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 68.634745,
+        "y": 69.135524
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.94889,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-P-001",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 4.319904,
+        "y": 71.537465
+      },
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_3-AE4",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J102",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-002",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 13.319314,
+        "y": 71.537465
+      },
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_3-AE4",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J102",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-003",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 37.777269,
+        "y": 71.537472
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_5-AF0",
+      "sourceProtectionPlaneZFt": 10,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 10,
+      "ceilingControlId": "J109",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 9.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-004",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 45.77597,
+        "y": 71.537472
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_5-AF0",
+      "sourceProtectionPlaneZFt": 10,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 10,
+      "ceilingControlId": "J109",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 9.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-U-038",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 19.70873,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-039",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 30.21425,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-040",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 49.21698,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-041",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 56.219055,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-042",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 64.220904,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-043",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 68.634745,
+        "y": 72.259444
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.851267,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-P-005",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 4.319918,
+        "y": 84.033142
+      },
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_4-AEA",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J101",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-006",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 13.319326,
+        "y": 84.033142
+      },
+      "roofBaseRegionId": "west-lower-standing-seam",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_4-AEA",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J101",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-007",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 41.297544,
+        "y": 84.227519
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_27-31456",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J104",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-008",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 53.298247,
+        "y": 84.227519
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_7-AFB",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J104",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-009",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 65.301092,
+        "y": 84.227519
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_12-B15",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J104",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-U-044",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 19.70873,
+        "y": 84.755117
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460778,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-045",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 30.21425,
+        "y": 84.755117
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "above-finished-ceiling-upright-to-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460778,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": true,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-046",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 40.217881,
+        "y": 84.75512
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460777,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-047",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 50.217276,
+        "y": 84.75512
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "above-finished-ceiling-upright-to-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460777,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": true,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-048",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 60.220241,
+        "y": 84.75512
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "above-finished-ceiling-upright-to-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460777,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": true,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-049",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 70.221594,
+        "y": 84.75512
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "above-finished-ceiling-upright-to-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.460777,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": true,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-P-010",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 32.268264,
+        "y": 87.740191
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_2-ADD",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J103",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-U-050",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 40.217881,
+        "y": 94.073316
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "source-bottom-of-deck-target-no-finished-ceiling-zone-overlap",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.169584,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": false,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-051",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 50.217276,
+        "y": 94.073316
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "above-finished-ceiling-upright-to-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.169584,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": true,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-052",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 60.220241,
+        "y": 94.073316
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "above-finished-ceiling-upright-to-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.169584,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": true,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-U-053",
+      "kind": "upright",
+      "structuralRoofLocalFt": {
+        "x": 70.221594,
+        "y": 94.073316
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "above-finished-ceiling-upright-to-sloped-bottom-of-deck",
+      "sourceProtectionPlaneId": "membrane-open-structure-bod",
+      "sourceProtectionPlaneZFt": 12.169584,
+      "headInstallationZFt": null,
+      "approvedSin": "TY3131",
+      "approvedPosition": "UPR",
+      "finishedCeilingOverlap": true,
+      "ceilingHeightFt": null,
+      "conditionalManufacturerDeflectorZFt": null,
+      "conditionalDeflectorBasis": null
+    },
+    {
+      "id": "MIT-J-P-011",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 23.628312,
+        "y": 95.297806
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_14-B21",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "southwest-9ft-control",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-012",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 32.268271,
+        "y": 95.322052
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_2-ADD",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J103",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-013",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 41.297572,
+        "y": 95.443296
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_27-31456",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J104",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-014",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 53.298274,
+        "y": 95.443296
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_7-AFB",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J104",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    },
+    {
+      "id": "MIT-J-P-015",
+      "kind": "pendent",
+      "structuralRoofLocalFt": {
+        "x": 65.30112,
+        "y": 95.443296
+      },
+      "roofBaseRegionId": "membrane-base",
+      "sourceProtectionRegime": "finished-ceiling-ty3231-standard-pendent-detail-unsealed",
+      "sourceProtectionPlaneId": "Slab_12-B15",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "ceilingHeightFt": 9,
+      "ceilingControlId": "J104",
+      "approvedSin": "TY3231",
+      "approvedPosition": "PEND",
+      "finishedCeilingOverlap": true,
+      "conditionalManufacturerDeflectorZFt": 8.875,
+      "conditionalDeflectorBasis": "TFP171 figure 3 standard pendent, only if the escutcheon plate seating surface equals the proved ceiling plane"
+    }
+  ],
+  "counts": {
+    "totalHeads": 68,
+    "pendentCeilingPlanes": 15,
+    "pendentAt9Ft": 13,
+    "pendentAt10Ft": 2,
+    "aboveFinishedCeilingUprights": 7,
+    "uprightNoFinishedCeilingZoneOverlap": 46,
+    "allSourceProtectionTargets": 68,
+    "conditionalManufacturerDeflectorValues": 15,
+    "exactInstalledHeadZ": 0
+  },
+  "regimeCorrection": {
+    "priorGenericOpenStructureUprightCount": 53,
+    "provedAboveFinishedCeilingUprightCount": 7,
+    "remainingUprightsWithoutFinishedCeilingZoneOverlap": 46,
+    "openStructureLabelNoLongerUsedAsIndividualHeadFact": true
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "RCP DWG exact ceiling-material polygon containment plus RCP PDF ceiling-height text replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "approved FP-2 schedule and submitted TFP171 TY3131/TY3231 dimensional binding"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "dependency, count, zone, height, product, overlap, conditional geometry, installed-Z, compliance, fabrication, and release mutations"
+    }
+  },
+  "allPendentCeilingPlanesReady": true,
+  "allSourceProtectionTargetsReady": true,
+  "approvedProductScheduleReady": true,
+  "conditionalStandardPendentGeometryReady": true,
+  "exactInstalledHeadZReady": false,
+  "headElevationsReady": false,
+  "sourceGeneratedPitchedPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "prove the selected ceiling escutcheon/fitting seating detail or preserve conditional TY3231 deflector values; then bind source-generated placement to the registered top/elevation/3D underlay proof",
+  "claimStatus": "68-source-protection-targets-and-approved-products-ready-with-15-conditional-ty3231-deflector-values-not-exact-installed-z-compliance-fabrication-or-release",
+  "receiptSha256": "dabb807d19c4aa5f59ea24fbb2c0d87d97508f655d168a7601eec94c73de86b5"
+}

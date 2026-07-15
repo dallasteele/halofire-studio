@@ -1,0 +1,61 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-underlay-visual-proof.v1",
+  "sourcePdf": {
+    "bytes": 116713715,
+    "sha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c"
+  },
+  "roofPlan": {
+    "pixelWidth": 1860,
+    "pixelHeight": 2410,
+    "sourcePage": 106,
+    "sourcePageIndex": 105,
+    "bytes": 320873,
+    "sha256": "a053559b329bbe53cfb3262f5d5830ba8cc9a6ba2c71ddb4f3952ef138646e3d",
+    "file": "source-pdf-roof-plan-overlay.png",
+    "actualProtectedPdfUnderlayVisible": true,
+    "registeredHeadCount": 68,
+    "registeredCricketFaceCount": 4
+  },
+  "sections": {
+    "pixelWidth": 2290,
+    "pixelHeight": 1690,
+    "sourcePage": 110,
+    "sourcePageIndex": 109,
+    "sourceProfiles": 4,
+    "bytes": 511210,
+    "sha256": "2c434181de8fb4c856823dec5d1526c49dbb97be5e227b96c2da61baed163150",
+    "file": "source-pdf-section-overlay.png",
+    "actualProtectedPdfUnderlayVisible": true
+  },
+  "rcpCeilingEnvelope": {
+    "file": "source-pdf-rcp-ceiling-envelope-overlay.png",
+    "pixelWidth": 2100,
+    "pixelHeight": 2760,
+    "sourcePage": 105,
+    "sourcePageIndex": 104,
+    "ceilingZoneCount": 20,
+    "pendentCeilingPlaneCount": 15,
+    "aboveFinishedCeilingUprightCount": 7,
+    "exactInstalledHeadZReady": false,
+    "bytes": 577905,
+    "sha256": "6337a0d841ae25e528819a5ddc62bca33ee638ee4f4223eee37d0b8c3338df61",
+    "actualProtectedPdfUnderlayVisible": true
+  },
+  "model3d": {
+    "file": "source-pdf-registered-3d.svg",
+    "bytes": 435700,
+    "sha256": "e7b74ccc8179ff244d9c2bf6c3bf91cc827b3c13f5c58a450e7cefd3af9acc8c",
+    "sourcePdfPlanProjectedInto3d": true,
+    "registrationAnchorCount": 4,
+    "roofSurfaceCount": 3,
+    "sourceProtectionTargetCount": 53,
+    "pendingPendentXyCount": 15
+  },
+  "claimBoundary": {
+    "sourceRegistrationReady": true,
+    "installedHeadElevationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

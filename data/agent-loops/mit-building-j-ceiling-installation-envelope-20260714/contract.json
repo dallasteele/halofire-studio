@@ -1,0 +1,58 @@
+{
+  "name": "mit-building-j-ceiling-installation-envelope-20260714",
+  "owner": "codex",
+  "goal": "Reconstruct exact Building J finished-ceiling and open-to-structure source zones from the protected architectural RCP PDF and DWG, bind the 68 registered sprinkler heads to their below-ceiling, above-ceiling, or exposed-deck regimes, and derive manufacturer/source installation elevation envelopes without promoting an exact installed Z, compliance, fabrication, or field release unless the source evidence closes those claims.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-09-CODEX-MASTER-BUILD.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-13-CODEX-MASTER-BUILD-ADDENDUM-01-PLATFORM-SPINE.md",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-rcp-registration.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-roof-plane-elevation.json",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ"
+  ],
+  "exit_criteria": [
+    "protected RCP PDF and DWG plus any completed-bid schedule and cut-sheet sources are hash-verified and remain unmodified",
+    "finished-ceiling source polygons and printed elevation controls replay deterministically in structural-local feet",
+    "all 15 pendent heads have a unique finished-ceiling zone or remain explicit per-head residuals",
+    "upright heads inside finished-ceiling XY domains are identified as above-ceiling protection rather than falsely treated as exposed-room protection",
+    "manufacturer or submitted-product installation limits are source-bound and separated from generic code ranges",
+    "head elevation output distinguishes exact installed Z, bounded installation envelope, source protection target, and unresolved values",
+    "top, elevation, and 3D proof visibly distinguishes below-ceiling, above-ceiling, exposed-deck, and unresolved conditions",
+    "deterministic replay, independent closure, adversarial mutation, focused regression, production build, formal proof, rules verification, and browser inspection are recorded",
+    "source-generated placement, code compliance, approval, fabrication, and field release remain false unless separately proven",
+    "brain postflight records the exact commit, receipts, residuals, and next action"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "protected source path, byte size, and SHA-256 inventory",
+    "RCP PDF text/vector and independent DWG ceiling-material replay",
+    "piecewise J-grid registration replay",
+    "closed polygon, overlap, gap, and per-head membership checks",
+    "printed ceiling-control association checks",
+    "completed-bid sprinkler schedule and submitted cut-sheet binding",
+    "installation-envelope arithmetic and exact-Z fail-closed checks",
+    "primary, independent, and adversarial verification loops",
+    "focused Building J regression tests",
+    "production build and syntax checks",
+    "GX10 Lean 4 proof or exact prover-unavailable evidence",
+    "authoritative agentic-rule check",
+    "real-browser top, elevation, and 3D screenshot inspection",
+    "brain close writeback with confirmed episode or exact failure"
+  ],
+  "state_path": "data/agent-loops/mit-building-j-ceiling-installation-envelope-20260714/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/mit-riverside-building-j-ceiling-installation-envelope-evidence.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-ceiling-installation-envelope.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-roof-plane-elevation",
+    "data/agent-loops/mit-building-j-ceiling-installation-envelope-20260714/state.json",
+    "apps/autosprink/BUILD_LOG.md"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 250000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

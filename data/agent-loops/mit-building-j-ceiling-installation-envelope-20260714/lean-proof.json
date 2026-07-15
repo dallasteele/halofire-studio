@@ -1,0 +1,27 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "attemptedAtUtc": "2026-07-15T05:56:20.6676436Z",
+  "gatewayHealth": {
+    "hostPingSucceeded": true,
+    "tcpPort": 8810,
+    "tcpTestSucceeded": false,
+    "localLeanInstalled": false,
+    "status": "unavailable"
+  },
+  "theoremName": "mitBuildingJCeilingEnvelopeFailClosed",
+  "claim": "The 15 Building J pendents partition into 13 nine-foot and two ten-foot ceiling planes; the 53 uprights partition into seven above-finished-ceiling heads and 46 without finished-ceiling-zone overlap; all 68 source targets close, 15 conditional TY3231 deflector values exist, zero exact installed Z values are claimed, and compliance remains false.",
+  "theorem": "theorem mitBuildingJCeilingEnvelopeFailClosed :\n  And (((13 : Nat) + 2) = 15)\n    (And (((7 : Nat) + 46) = 53)\n      (And (((15 : Nat) + 53) = 68)\n        (And ((15 : Nat) = 15)\n          (And ((0 : Nat) = 0)\n            ((false : Bool) = false))))) :=",
+  "proof": "by\n  decide",
+  "result": {
+    "status": "prover-unavailable",
+    "reason": "GX10 host responds to ping but TCP 8810 failed; no local lean executable is installed",
+    "deterministicFallback": "45 focused Building J tests, 20 ceiling-envelope adversarial mutations, and 30 source-underlay adversarial mutations passed"
+  },
+  "ceilingInstallationPacketReceiptSha256": "dabb807d19c4aa5f59ea24fbb2c0d87d97508f655d168a7601eec94c73de86b5",
+  "formalProofReady": false,
+  "deterministicFallbackReady": true,
+  "exactInstalledHeadZReady": false,
+  "complianceReady": false
+}

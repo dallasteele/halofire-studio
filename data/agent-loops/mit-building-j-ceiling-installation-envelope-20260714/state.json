@@ -1,0 +1,64 @@
+{
+  "loop": "mit-building-j-ceiling-installation-envelope-20260714",
+  "stage": "VERIFY",
+  "status": "verified-source-envelope-with-external-lean-endpoint-unavailable",
+  "iteration": 4,
+  "projectId": "mit-riverside-building-j",
+  "priorRoofPlaneElevationReceiptSha256": "9fc9718be4ff957b36483319c629fe90478f0a5075d77b041b47ddcaa4d587fd",
+  "ceilingInstallationEvidenceReceiptSha256": "368496bdc3db1362b20889af81a4ef6fc7d264d94be09d33ca7f831e9ddb4e6d",
+  "ceilingInstallationPacketReceiptSha256": "dabb807d19c4aa5f59ea24fbb2c0d87d97508f655d168a7601eec94c73de86b5",
+  "platformSpineAddendum": {
+    "acknowledged": true,
+    "spatialB1ThroughB7PriorityOne": true,
+    "platformM1MixedIntoThisBranch": false
+  },
+  "verificationDoctrine": ["internal-primary", "internal-independent", "adversarial"],
+  "sourceFacts": {
+    "ceilingZoneCount": 20,
+    "pendentHeadCount": 15,
+    "pendentAt9Ft": 13,
+    "pendentAt10Ft": 2,
+    "aboveFinishedCeilingUprightCount": 7,
+    "uprightWithoutFinishedCeilingZoneOverlapCount": 46,
+    "approvedPendentSin": "TY3231",
+    "approvedUprightSin": "TY3131",
+    "conditionalPendentDeflectorValues": 15,
+    "exactInstalledHeadZCount": 0
+  },
+  "visualProof": {
+    "protectedRoofPlanUnderlayVisible": true,
+    "protectedSectionUnderlayVisible": true,
+    "protectedRcpUnderlayVisible": true,
+    "protectedPlanProjectedInto3d": true,
+    "browserConsoleErrors": 0,
+    "roofPlanSha256": "a053559b329bbe53cfb3262f5d5830ba8cc9a6ba2c71ddb4f3952ef138646e3d",
+    "sectionSha256": "2c434181de8fb4c856823dec5d1526c49dbb97be5e227b96c2da61baed163150",
+    "rcpSha256": "6337a0d841ae25e528819a5ddc62bca33ee638ee4f4223eee37d0b8c3338df61",
+    "model3dSha256": "e7b74ccc8179ff244d9c2bf6c3bf91cc827b3c13f5c58a450e7cefd3af9acc8c"
+  },
+  "verification": {
+    "focusedBuildingJTestFiles": 10,
+    "focusedBuildingJTestsPassed": 45,
+    "ceilingEnvelopeAdversarialCasesRejected": 20,
+    "sourceUnderlayAdversarialCasesRejected": 30,
+    "viteBuild": "passed",
+    "pythonCompile": "passed",
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "browserInspection": "passed",
+    "formalProver": "unavailable-host-ping-true-tcp-8810-false-local-lean-not-installed"
+  },
+  "claims": {
+    "finishedCeilingZonesReady": true,
+    "allPendentCeilingAssignmentsReady": true,
+    "aboveCeilingUprightClassificationReady": true,
+    "manufacturerInstallationEnvelopeReady": true,
+    "allSourceProtectionTargetsReady": true,
+    "exactHeadInstallationZReady": false,
+    "sourceGeneratedPitchedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "nextAction": "use the registered top/elevation/RCP/3D proof contract to drive and score source-generated Building J placement, while preserving conditional TY3231 deflector values and exact installed Z as null until a source seating-detail closes it"
+}

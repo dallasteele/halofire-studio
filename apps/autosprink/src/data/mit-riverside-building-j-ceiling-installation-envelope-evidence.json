@@ -1,0 +1,1064 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-ceiling-installation-envelope-evidence.v1",
+  "projectId": "mit-riverside-building-j",
+  "generationMode": "protected-rcp-pdf-text-plus-rcp-dwg-ceiling-polygons-plus-approved-fp-schedule-plus-submitted-manufacturer-data",
+  "sources": {
+    "architecturalBidSet": {
+      "physicalPage": 105,
+      "pageIndex": 104,
+      "bytes": 116713715,
+      "sha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c"
+    },
+    "rcpDwg": {
+      "bytes": 6423002,
+      "sha256": "05cdadaa2dd74dd7d02199b7030960864cc30c99044e82de28ca7176188b5658"
+    },
+    "approvedFp": {
+      "bytes": 2432530,
+      "sha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421"
+    },
+    "materialData": {
+      "bytes": 1577551,
+      "sha256": "709d594e3238992b5a0c4380afbf757d5988f9d7490ca49ab34031739beaad9e"
+    },
+    "headPacketReceiptSha256": "9fc9718be4ff957b36483319c629fe90478f0a5075d77b041b47ddcaa4d587fd"
+  },
+  "extraction": {
+    "pdfReader": "PyMuPDF 1.27.1",
+    "dwgReader": "@mlightcad/libredwg-web 0.7.7",
+    "unknownRcpEntityCount": 0
+  },
+  "gridRegistration": {
+    "xStructuralFt": [
+      0,
+      15.666667,
+      17.333333,
+      30.666667,
+      39.666667,
+      45.666667,
+      61.333333,
+      76.333333
+    ],
+    "xRcpDwg": [
+      13437.687842947527,
+      13625.653727606074,
+      13645.689597076707,
+      13805.653727606074,
+      13913.687842947527,
+      13985.653727606074,
+      14173.687842947525,
+      14353.687842947522
+    ],
+    "yStructuralFt": [
+      0,
+      32.166667,
+      64.833333,
+      89.166667,
+      100.166667
+    ],
+    "yRcpDwg": [
+      11469.52854430901,
+      11083.52854430901,
+      10691.528544309007,
+      10399.580543635211,
+      10267.528543428964
+    ],
+    "method": "piecewise-exact-cross-drawing-grid-anchor-replay"
+  },
+  "ceilingControls": [
+    {
+      "id": "J102",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          534.938171,
+          1514.044922,
+          551.560486,
+          1525.216919
+        ],
+        "centerPt": {
+          "x": 543.249329,
+          "y": 1519.63092
+        },
+        "matchDistancePt": 1e-06
+      }
+    },
+    {
+      "id": "J101",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          534.050903,
+          1608.9375,
+          550.673218,
+          1620.109497
+        ],
+        "centerPt": {
+          "x": 542.362061,
+          "y": 1614.523499
+        },
+        "matchDistancePt": 1e-06
+      }
+    },
+    {
+      "id": "J103",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          724.836975,
+          1642.845703,
+          741.45929,
+          1654.0177
+        ],
+        "centerPt": {
+          "x": 733.148132,
+          "y": 1648.431702
+        },
+        "matchDistancePt": 0.0
+      }
+    },
+    {
+      "id": "J104",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          950.237,
+          1625.676147,
+          966.859314,
+          1636.848145
+        ],
+        "centerPt": {
+          "x": 958.548157,
+          "y": 1631.262146
+        },
+        "matchDistancePt": 0.0
+      }
+    },
+    {
+      "id": "southwest-9ft-control",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'-0\"",
+        "bboxPt": [
+          641.280029,
+          1740.20459,
+          657.902344,
+          1751.376587
+        ],
+        "centerPt": {
+          "x": 649.591187,
+          "y": 1745.790588
+        },
+        "matchDistancePt": 1e-06
+      }
+    },
+    {
+      "id": "J109",
+      "ceilingHeightFt": 10,
+      "sourceLabel": {
+        "text": "10'-0\"",
+        "bboxPt": [
+          817.705811,
+          1552.307007,
+          838.976562,
+          1563.479004
+        ],
+        "centerPt": {
+          "x": 828.341187,
+          "y": 1557.893005
+        },
+        "matchDistancePt": 9.1e-05
+      }
+    },
+    {
+      "id": "east-8ft-control",
+      "ceilingHeightFt": 8,
+      "sourceLabel": {
+        "text": "8'-0\"",
+        "bboxPt": [
+          1118.530273,
+          1672.070923,
+          1135.152588,
+          1683.24292
+        ],
+        "centerPt": {
+          "x": 1126.841431,
+          "y": 1677.656921
+        },
+        "matchDistancePt": 0.000575
+      }
+    },
+    {
+      "id": "J100",
+      "ceilingHeightFt": 9,
+      "sourceLabel": {
+        "text": "9'",
+        "bboxPt": [
+          709.518555,
+          1588.182251,
+          715.613647,
+          1599.354248
+        ],
+        "centerPt": {
+          "x": 712.566101,
+          "y": 1593.76825
+        },
+        "matchDistancePt": 0.0
+      }
+    }
+  ],
+  "ceilingZones": [
+    {
+      "id": "Slab_1-AD7",
+      "blockName": "Slab_1",
+      "insertHandle": "AD7",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AD6",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 68.765236,
+          "y": 96.147417
+        },
+        {
+          "x": 70.764836,
+          "y": 96.147417
+        },
+        {
+          "x": 70.764836,
+          "y": 82.148917
+        },
+        {
+          "x": 68.765236,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.991401,
+      "headAssignments": [
+        {
+          "id": "MIT-J-U-049",
+          "kind": "upright"
+        },
+        {
+          "id": "MIT-J-U-053",
+          "kind": "upright"
+        }
+      ]
+    },
+    {
+      "id": "Slab_2-ADD",
+      "blockName": "Slab_2",
+      "insertHandle": "ADD",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "ADB",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.387076,
+          "y": 99.146236
+        },
+        {
+          "x": 36.990991,
+          "y": 99.146236
+        },
+        {
+          "x": 36.990991,
+          "y": 84.556657
+        },
+        {
+          "x": 25.387076,
+          "y": 84.556657
+        }
+      ],
+      "areaSqFt": 169.296235,
+      "headAssignments": [
+        {
+          "id": "MIT-J-U-045",
+          "kind": "upright"
+        },
+        {
+          "id": "MIT-J-P-010",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-012",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_3-AE4",
+      "blockName": "Slab_3",
+      "insertHandle": "AE4",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AE1",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.687625,
+          "y": 77.116771
+        },
+        {
+          "x": 16.948461,
+          "y": 77.116771
+        },
+        {
+          "x": 16.948461,
+          "y": 65.500118
+        },
+        {
+          "x": 0.687625,
+          "y": 65.500118
+        }
+      ],
+      "areaSqFt": 188.896489,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-001",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-002",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_4-AEA",
+      "blockName": "Slab_4",
+      "insertHandle": "AEA",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AE8",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.687625,
+          "y": 89.150164
+        },
+        {
+          "x": 17.000451,
+          "y": 89.150164
+        },
+        {
+          "x": 17.000451,
+          "y": 77.887741
+        },
+        {
+          "x": 0.687625,
+          "y": 77.887741
+        }
+      ],
+      "areaSqFt": 183.721947,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-005",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-006",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_5-AF0",
+      "blockName": "Slab_5",
+      "insertHandle": "AF0",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AEE",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.386453,
+          "y": 78.11801
+        },
+        {
+          "x": 46.981771,
+          "y": 78.11801
+        },
+        {
+          "x": 46.981771,
+          "y": 65.500118
+        },
+        {
+          "x": 36.386453,
+          "y": 65.500118
+        }
+      ],
+      "areaSqFt": 133.690578,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-003",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-004",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_6-AF6",
+      "blockName": "Slab_6",
+      "insertHandle": "AF6",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AF4",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 51.270261,
+          "y": 96.147417
+        },
+        {
+          "x": 53.269498,
+          "y": 96.147417
+        },
+        {
+          "x": 53.269498,
+          "y": 82.148917
+        },
+        {
+          "x": 51.270261,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_7-AFB",
+      "blockName": "Slab_7",
+      "insertHandle": "AFB",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AFA",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 53.269498,
+          "y": 96.147417
+        },
+        {
+          "x": 55.268735,
+          "y": 96.147417
+        },
+        {
+          "x": 55.268735,
+          "y": 82.148917
+        },
+        {
+          "x": 53.269498,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-008",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-014",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_8-B01",
+      "blockName": "Slab_8",
+      "insertHandle": "B01",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "AFF",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 55.768645,
+          "y": 96.147417
+        },
+        {
+          "x": 57.767882,
+          "y": 96.147417
+        },
+        {
+          "x": 57.767882,
+          "y": 82.148917
+        },
+        {
+          "x": 55.768645,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_9-B06",
+      "blockName": "Slab_9",
+      "insertHandle": "B06",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B05",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 57.767882,
+          "y": 96.147417
+        },
+        {
+          "x": 59.767119,
+          "y": 96.147417
+        },
+        {
+          "x": 59.767119,
+          "y": 82.148917
+        },
+        {
+          "x": 57.767882,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_10-B0B",
+      "blockName": "Slab_10",
+      "insertHandle": "B0B",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B0A",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 59.767119,
+          "y": 96.147417
+        },
+        {
+          "x": 61.766435,
+          "y": 96.147417
+        },
+        {
+          "x": 61.766435,
+          "y": 82.148917
+        },
+        {
+          "x": 59.767119,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.987425,
+      "headAssignments": [
+        {
+          "id": "MIT-J-U-048",
+          "kind": "upright"
+        },
+        {
+          "id": "MIT-J-U-052",
+          "kind": "upright"
+        }
+      ]
+    },
+    {
+      "id": "Slab_11-B10",
+      "blockName": "Slab_11",
+      "insertHandle": "B10",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B0F",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 62.266435,
+          "y": 96.147417
+        },
+        {
+          "x": 64.266036,
+          "y": 96.147417
+        },
+        {
+          "x": 64.266036,
+          "y": 82.148917
+        },
+        {
+          "x": 62.266435,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.991415,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_12-B15",
+      "blockName": "Slab_12",
+      "insertHandle": "B15",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B14",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 64.266036,
+          "y": 96.147417
+        },
+        {
+          "x": 66.265636,
+          "y": 96.147417
+        },
+        {
+          "x": 66.265636,
+          "y": 82.148917
+        },
+        {
+          "x": 64.266036,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.991401,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-009",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-015",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_13-B1B",
+      "blockName": "Slab_13",
+      "insertHandle": "B1B",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B19",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 66.265636,
+          "y": 96.147417
+        },
+        {
+          "x": 68.265236,
+          "y": 96.147417
+        },
+        {
+          "x": 68.265236,
+          "y": 82.148917
+        },
+        {
+          "x": 66.265636,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.991401,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_14-B21",
+      "blockName": "Slab_14",
+      "insertHandle": "B21",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B1F",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 18.020841,
+          "y": 99.146236
+        },
+        {
+          "x": 24.980735,
+          "y": 99.146236
+        },
+        {
+          "x": 24.980735,
+          "y": 89.504201
+        },
+        {
+          "x": 18.020841,
+          "y": 89.504201
+        }
+      ],
+      "areaSqFt": 67.107542,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-011",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_15-B26",
+      "blockName": "Slab_15",
+      "insertHandle": "B26",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B25",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 49.271023,
+          "y": 96.147417
+        },
+        {
+          "x": 51.270261,
+          "y": 96.147417
+        },
+        {
+          "x": 51.270261,
+          "y": 82.148917
+        },
+        {
+          "x": 49.271023,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986333,
+      "headAssignments": [
+        {
+          "id": "MIT-J-U-047",
+          "kind": "upright"
+        },
+        {
+          "id": "MIT-J-U-051",
+          "kind": "upright"
+        }
+      ]
+    },
+    {
+      "id": "Slab_16-B2B",
+      "blockName": "Slab_16",
+      "insertHandle": "B2B",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B2A",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 42.771505,
+          "y": 96.147417
+        },
+        {
+          "x": 44.772053,
+          "y": 96.147417
+        },
+        {
+          "x": 44.772053,
+          "y": 82.148917
+        },
+        {
+          "x": 42.771505,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 28.004671,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_17-B31",
+      "blockName": "Slab_17",
+      "insertHandle": "B31",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B2F",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 44.772053,
+          "y": 96.147417
+        },
+        {
+          "x": 46.771877,
+          "y": 96.147417
+        },
+        {
+          "x": 46.771877,
+          "y": 82.148917
+        },
+        {
+          "x": 44.772053,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.994536,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_18-B36",
+      "blockName": "Slab_18",
+      "insertHandle": "B36",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "B35",
+      "patternName": "closed-ceiling-material-polyline",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 46.771877,
+          "y": 96.147417
+        },
+        {
+          "x": 48.771114,
+          "y": 96.147417
+        },
+        {
+          "x": 48.771114,
+          "y": 82.148917
+        },
+        {
+          "x": 46.771877,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 27.986319,
+      "headAssignments": []
+    },
+    {
+      "id": "Slab_27-31456",
+      "blockName": "Slab_27",
+      "insertHandle": "31456",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "31454",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 40.27072,
+          "y": 96.147417
+        },
+        {
+          "x": 42.271268,
+          "y": 96.147417
+        },
+        {
+          "x": 42.271268,
+          "y": 82.148917
+        },
+        {
+          "x": 40.27072,
+          "y": 82.148917
+        }
+      ],
+      "areaSqFt": 28.004671,
+      "headAssignments": [
+        {
+          "id": "MIT-J-P-007",
+          "kind": "pendent"
+        },
+        {
+          "id": "MIT-J-P-013",
+          "kind": "pendent"
+        }
+      ]
+    },
+    {
+      "id": "Slab_28-3262D",
+      "blockName": "Slab_28",
+      "insertHandle": "3262D",
+      "sourceLayer": "New_A-CLNG-MTRL.3D",
+      "sourceGeometryHandle": "3262B",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 73.0625,
+          "y": 98.125804
+        },
+        {
+          "x": 75.3125,
+          "y": 98.125804
+        },
+        {
+          "x": 75.3125,
+          "y": 78.47224
+        },
+        {
+          "x": 73.0625,
+          "y": 78.47224
+        }
+      ],
+      "areaSqFt": 44.220519,
+      "headAssignments": []
+    }
+  ],
+  "pendentBindings": [
+    {
+      "headId": "MIT-J-P-010",
+      "ceilingZoneId": "Slab_2-ADD",
+      "ceilingHeightFt": 9,
+      "controlId": "J103"
+    },
+    {
+      "headId": "MIT-J-P-012",
+      "ceilingZoneId": "Slab_2-ADD",
+      "ceilingHeightFt": 9,
+      "controlId": "J103"
+    },
+    {
+      "headId": "MIT-J-P-001",
+      "ceilingZoneId": "Slab_3-AE4",
+      "ceilingHeightFt": 9,
+      "controlId": "J102"
+    },
+    {
+      "headId": "MIT-J-P-002",
+      "ceilingZoneId": "Slab_3-AE4",
+      "ceilingHeightFt": 9,
+      "controlId": "J102"
+    },
+    {
+      "headId": "MIT-J-P-005",
+      "ceilingZoneId": "Slab_4-AEA",
+      "ceilingHeightFt": 9,
+      "controlId": "J101"
+    },
+    {
+      "headId": "MIT-J-P-006",
+      "ceilingZoneId": "Slab_4-AEA",
+      "ceilingHeightFt": 9,
+      "controlId": "J101"
+    },
+    {
+      "headId": "MIT-J-P-003",
+      "ceilingZoneId": "Slab_5-AF0",
+      "ceilingHeightFt": 10,
+      "controlId": "J109"
+    },
+    {
+      "headId": "MIT-J-P-004",
+      "ceilingZoneId": "Slab_5-AF0",
+      "ceilingHeightFt": 10,
+      "controlId": "J109"
+    },
+    {
+      "headId": "MIT-J-P-008",
+      "ceilingZoneId": "Slab_7-AFB",
+      "ceilingHeightFt": 9,
+      "controlId": "J104"
+    },
+    {
+      "headId": "MIT-J-P-014",
+      "ceilingZoneId": "Slab_7-AFB",
+      "ceilingHeightFt": 9,
+      "controlId": "J104"
+    },
+    {
+      "headId": "MIT-J-P-009",
+      "ceilingZoneId": "Slab_12-B15",
+      "ceilingHeightFt": 9,
+      "controlId": "J104"
+    },
+    {
+      "headId": "MIT-J-P-015",
+      "ceilingZoneId": "Slab_12-B15",
+      "ceilingHeightFt": 9,
+      "controlId": "J104"
+    },
+    {
+      "headId": "MIT-J-P-011",
+      "ceilingZoneId": "Slab_14-B21",
+      "ceilingHeightFt": 9,
+      "controlId": "southwest-9ft-control"
+    },
+    {
+      "headId": "MIT-J-P-007",
+      "ceilingZoneId": "Slab_27-31456",
+      "ceilingHeightFt": 9,
+      "controlId": "J104"
+    },
+    {
+      "headId": "MIT-J-P-013",
+      "ceilingZoneId": "Slab_27-31456",
+      "ceilingHeightFt": 9,
+      "controlId": "J104"
+    }
+  ],
+  "aboveFinishedCeilingUprightIds": [
+    "MIT-J-U-045",
+    "MIT-J-U-047",
+    "MIT-J-U-048",
+    "MIT-J-U-049",
+    "MIT-J-U-051",
+    "MIT-J-U-052",
+    "MIT-J-U-053"
+  ],
+  "approvedSprinklerSchedule": {
+    "source": {
+      "physicalPage": 2,
+      "sheet": "FP-2",
+      "scheduleTitle": "SPRINKLER SCHEDULE",
+      "transcriptionMode": "pixel-verified-approved-plan-schedule"
+    },
+    "pendent": {
+      "count": 15,
+      "position": "PEND",
+      "finish": "CHROME",
+      "temperatureF": 155,
+      "kFactor": 5.6,
+      "nptIn": 0.5,
+      "sin": "TY3231",
+      "manufacturer": "Tyco",
+      "model": "TY-FRB"
+    },
+    "upright": {
+      "count": 53,
+      "position": "UPR",
+      "finish": "BRASS",
+      "temperatureF": 200,
+      "kFactor": 5.6,
+      "nptIn": 0.5,
+      "sin": "TY3131",
+      "manufacturer": "Tyco",
+      "model": "TY-FRB"
+    }
+  },
+  "submittedManufacturerData": {
+    "source": {
+      "document": "TFP171",
+      "revision": "March 2020",
+      "physicalPages": [
+        1,
+        3,
+        6
+      ]
+    },
+    "approvedSinBindings": {
+      "pendent": "TY3231",
+      "upright": "TY3131"
+    },
+    "standardPendentFigure": {
+      "physicalPage": 3,
+      "figure": 3,
+      "overallFittingFaceToDeflectorIn": 2.1875,
+      "escutcheonPlateSeatingSurfaceToDeflectorIn": 1.5,
+      "nominalThreadMakeIn": 0.4375
+    },
+    "recessedOptionsNotSelectedByApprovedSchedule": [
+      {
+        "style": 10,
+        "totalAdjustmentIn": 0.75,
+        "deflectorBelowMountingSurfaceIn": [
+          0.75,
+          1.25
+        ]
+      },
+      {
+        "style": 20,
+        "totalAdjustmentIn": 0.5,
+        "deflectorBelowMountingSurfaceIn": [
+          1.0,
+          1.5
+        ]
+      }
+    ],
+    "installationConclusion": "approved schedule says PEND, not recessed pendent; standard pendent geometry is conditionally usable, but exact installed deflector Z remains null until the ceiling seating-surface/fitting detail is source-proved"
+  },
+  "counts": {
+    "ceilingZones": 20,
+    "pendentHeadsBound": 15,
+    "pendentAt9Ft": 13,
+    "pendentAt10Ft": 2,
+    "aboveFinishedCeilingUprights": 7
+  },
+  "claims": {
+    "allPendentCeilingPlanesReady": true,
+    "approvedProductScheduleReady": true,
+    "conditionalStandardPendentGeometryReady": true,
+    "exactInstalledDeflectorZReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "368496bdc3db1362b20889af81a4ef6fc7d264d94be09d33ca7f831e9ddb4e6d"
+}
