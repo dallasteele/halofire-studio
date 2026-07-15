@@ -527,11 +527,108 @@ function directSameSpanRoute(pipeById, startAttachments, endAttachments) {
   return best;
 }
 
-export function bindHydraulicReportSegmentsToPhysicalSpans({ pipeCalibration, reports, graph = null }) {
+function fittingSizeIncludesNominal(fitting, nominalSizeInches) {
+  const values = String(fitting.sourceAttributes?.Size ?? '').match(/\d+(?:½|¼|¾|\.\d+)?/g) ?? [];
+  return values.some((value) => Number(value.replace('½', '.5').replace('¼', '.25').replace('¾', '.75')) === nominalSizeInches);
+}
+
+function fittingBridgedRiserRoute({ pipeCalibration, physicalClass, startPointFt, endPointFt, bridgeToleranceFt = 0.5 }) {
+  const compatiblePipes = pipeCalibration.pipes.filter((pipe) => pipeMatchesPhysicalClass(pipe, physicalClass));
+  const compatibleFittings = pipeCalibration.fittings.filter((fitting) => fittingSizeIncludesNominal(
+    fitting,
+    physicalClass.nominalSizeInches,
+  ));
+  const nodes = [
+    { id: 'source', pointFt: startPointFt },
+    { id: 'target', pointFt: endPointFt },
+    ...compatiblePipes.flatMap((pipe) => [
+      { id: `${pipe.id}:start`, pointFt: pipe.startFt, pipeId: pipe.id },
+      { id: `${pipe.id}:end`, pointFt: pipe.endFt, pipeId: pipe.id },
+    ]),
+    ...compatibleFittings.map((fitting) => ({
+      id: fitting.id,
+      pointFt: fitting.pointFt,
+      fittingId: fitting.id,
+    })),
+  ];
+  const adjacency = new Map(nodes.map((node) => [node.id, []]));
+  const addEdge = (from, to, lengthFt, evidence) => {
+    adjacency.get(from).push({ nodeId: to, lengthFt, evidence });
+    adjacency.get(to).push({ nodeId: from, lengthFt, evidence });
+  };
+  for (const pipe of compatiblePipes) {
+    addEdge(`${pipe.id}:start`, `${pipe.id}:end`, pipe.length3dFt, { kind: 'source-pipe', pipeId: pipe.id });
+  }
+  for (let left = 0; left < nodes.length; left += 1) {
+    for (let right = left + 1; right < nodes.length; right += 1) {
+      if (nodes[left].pipeId && nodes[left].pipeId === nodes[right].pipeId) continue;
+      const residualFt = distance(nodes[left].pointFt, nodes[right].pointFt);
+      if (residualFt <= bridgeToleranceFt) {
+        addEdge(nodes[left].id, nodes[right].id, residualFt, { kind: 'source-fitting-port-gap', residualFt });
+      }
+    }
+  }
+  const distances = new Map(nodes.map((node) => [node.id, Number.POSITIVE_INFINITY]));
+  const previous = new Map();
+  distances.set('source', 0);
+  const pending = new Set(nodes.map((node) => node.id));
+  while (pending.size) {
+    let current = null;
+    for (const nodeId of pending) {
+      if (current === null || distances.get(nodeId) < distances.get(current)) current = nodeId;
+    }
+    if (!Number.isFinite(distances.get(current))) break;
+    pending.delete(current);
+    if (current === 'target') break;
+    for (const edge of adjacency.get(current)) {
+      const candidate = distances.get(current) + edge.lengthFt;
+      if (candidate < distances.get(edge.nodeId)) {
+        distances.set(edge.nodeId, candidate);
+        previous.set(edge.nodeId, { nodeId: current, evidence: edge.evidence });
+      }
+    }
+  }
+  if (!Number.isFinite(distances.get('target'))) return null;
+  const nodeById = new Map(nodes.map((node) => [node.id, node]));
+  const nodeIds = ['target'];
+  const evidence = [];
+  let current = 'target';
+  while (current !== 'source') {
+    const entry = previous.get(current);
+    if (!entry) return null;
+    evidence.push(entry.evidence);
+    current = entry.nodeId;
+    nodeIds.push(current);
+  }
+  nodeIds.reverse();
+  evidence.reverse();
+  return {
+    fittingBridgeRoute: true,
+    lengthFt: distances.get('target'),
+    points: nodeIds.map((nodeId) => nodeById.get(nodeId).pointFt)
+      .filter((value, index, values) => index === 0 || distance(value, values[index - 1]) > 1e-7),
+    pipeIds: [...new Set(evidence.map((edge) => edge.pipeId).filter(Boolean))],
+    fittingIds: [...new Set(nodeIds.map((nodeId) => nodeById.get(nodeId).fittingId).filter(Boolean))],
+    maximumFittingPortGapFt: Math.max(0, ...evidence
+      .filter((edge) => edge.kind === 'source-fitting-port-gap')
+      .map((edge) => edge.residualFt)),
+  };
+}
+
+export function bindHydraulicReportSegmentsToPhysicalSpans({
+  pipeCalibration,
+  reports,
+  calculatedSprinklerLeafBindings = [],
+  graph = null,
+}) {
   const physicalGraph = graph ?? buildPhysicalPipeGraph(pipeCalibration.pipes);
   const pipeById = new Map(pipeCalibration.pipes.map((pipe) => [pipe.id, pipe]));
+  const fittingById = new Map(pipeCalibration.fittings.map((fitting) => [fitting.id, fitting]));
   const sourcePointByNodeId = new Map(pipeCalibration.hydraulicNodeLabels
     .map((label) => [label.nodeId, label.connectionPointFt]));
+  const sprinklerBindingByNodeId = new Map(calculatedSprinklerLeafBindings
+    .flatMap((bindingSet) => bindingSet.bindings)
+    .map((binding) => [binding.nodeId, binding]));
   const segmentOccurrences = new Map();
   for (const segment of reports.flatMap((report) => report.segments)) {
     const key = [segment.upstreamNode, segment.downstreamNode, segment.diameterInternalInches, segment.lengthFt].join('|');
@@ -557,11 +654,29 @@ export function bindHydraulicReportSegmentsToPhysicalSpans({ pipeCalibration, re
         exactPhysicalSpanRouteReady: false,
       };
     }
+    const sprinklerBinding = sprinklerBindingByNodeId.get(segment.downstreamNode);
+    const flexTerminal = segment.pipeRole === 'arm-over'
+      && sprinklerBinding?.sprinklerCategory === 'Pendent'
+      && sprinklerBinding.terminalConnection?.topologyReady
+      ? sprinklerBinding
+      : null;
+    const flexTerminalPipe = flexTerminal
+      ? pipeById.get(flexTerminal.terminalConnection.pipeId)
+      : null;
+    const routeEndPointFt = flexTerminalPipe
+      ? flexTerminalPipe[`${flexTerminal.terminalConnection.pipeEndpoint}Ft`]
+      : endPointFt;
+    if (flexTerminal && !routeEndPointFt) {
+      throw new Error(`POLARIS_FLEX_TERMINAL_PIPE_ENDPOINT_MISSING:${segment.downstreamNode}`);
+    }
     const startAttachments = attachmentsForPoint(physicalGraph, pipeCalibration.pipes, startPointFt, physicalClass);
-    const endAttachments = attachmentsForPoint(physicalGraph, pipeCalibration.pipes, endPointFt, physicalClass);
+    const endAttachments = attachmentsForPoint(physicalGraph, pipeCalibration.pipes, routeEndPointFt, physicalClass);
     const graphRoute = shortestPhysicalClassPath(physicalGraph, pipeById, physicalClass, startAttachments, endAttachments);
     const directRoute = directSameSpanRoute(pipeById, startAttachments, endAttachments);
-    const candidates = [graphRoute, directRoute].filter(Boolean)
+    const fittingBridgeRoute = segment.pipeRole === 'feed-riser'
+      ? fittingBridgedRiserRoute({ pipeCalibration, physicalClass, startPointFt, endPointFt: routeEndPointFt })
+      : null;
+    const candidates = [graphRoute, directRoute, fittingBridgeRoute].filter(Boolean)
       .sort((left, right) => Math.abs(left.lengthFt - segment.lengthFt) - Math.abs(right.lengthFt - segment.lengthFt));
     const route = candidates[0];
     if (!route) {
@@ -578,7 +693,7 @@ export function bindHydraulicReportSegmentsToPhysicalSpans({ pipeCalibration, re
         exactPhysicalSpanRouteReady: false,
       };
     }
-    const pipeIds = [...new Set([
+    const pipeIds = route.fittingBridgeRoute ? route.pipeIds : [...new Set([
       route.startAttachment.pipeId,
       ...route.edges.map((edge) => edge.pipeId),
       route.endAttachment.pipeId,
@@ -586,13 +701,34 @@ export function bindHydraulicReportSegmentsToPhysicalSpans({ pipeCalibration, re
     ].filter(Boolean))];
     const reportLengthResidualFt = Math.abs(route.lengthFt - segment.lengthFt);
     const physicalNodeById = new Map(physicalGraph.nodes.map((node) => [node.id, node]));
-    const physicalPathPolylineFt = [
+    const physicalPathPolylineFt = route.fittingBridgeRoute ? route.points : [
       startPointFt,
       route.startAttachment.projectedPointFt,
       ...route.steps.map((step) => physicalNodeById.get(step.toNodeId).pointFt),
       route.endAttachment.projectedPointFt,
-      endPointFt,
+      routeEndPointFt,
     ].filter((value, index, values) => index === 0 || distance(value, values[index - 1]) > 1e-7);
+    const flexDropFitting = flexTerminal
+      ? fittingById.get(flexTerminal.terminalConnection.flexDropFittingId)
+      : null;
+    const flexibleTerminalComponent = flexTerminal ? {
+      mode: 'source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints',
+      fittingId: flexTerminal.terminalConnection.flexDropFittingId,
+      description: flexDropFitting?.sourceAttributes?.Description ?? null,
+      fittingPointFt: flexDropFitting?.pointFt ?? null,
+      rigidPipeId: flexTerminal.terminalConnection.pipeId,
+      rigidPipeEndpoint: flexTerminal.terminalConnection.pipeEndpoint,
+      rigidPipePortFt: routeEndPointFt,
+      rigidPipePortResidualFt: flexTerminal.terminalConnection.pipePortResidualFt,
+      sprinklerId: flexTerminal.sprinklerId,
+      sprinklerPointFt: flexTerminal.sprinklerPointFt,
+      centerlineStatus: 'not-exported-by-source-use-semantic-flex-component-with-exact-endpoints',
+      endpointBindingReady: Boolean(flexDropFitting)
+        && flexTerminal.terminalConnection.pipePortResidualFt <= 0.07
+        && flexTerminal.sourceNodeToSprinklerResidualFt === 0,
+    } : null;
+    const exactPhysicalSpanRouteReady = reportLengthResidualFt <= 0.25
+      && (!flexibleTerminalComponent || flexibleTerminalComponent.endpointBindingReady);
     return {
       upstreamNode: segment.upstreamNode,
       downstreamNode: segment.downstreamNode,
@@ -604,15 +740,22 @@ export function bindHydraulicReportSegmentsToPhysicalSpans({ pipeCalibration, re
       reportLengthResidualFt: round(reportLengthResidualFt),
       physicalClass,
       occurrenceCount,
-      startPortResidualFt: round(route.startAttachment.portResidualFt),
-      endPortResidualFt: round(route.endAttachment.portResidualFt),
+      startPortResidualFt: round(route.startAttachment?.portResidualFt ?? 0),
+      endPortResidualFt: round(route.endAttachment?.portResidualFt ?? 0),
       pipeIds,
-      physicalSpanIds: route.edges.map((edge) => edge.id),
+      physicalSpanIds: (route.edges ?? []).map((edge) => edge.id),
+      fittingBridgeIds: route.fittingIds ?? [],
+      maximumFittingPortGapFt: route.fittingBridgeRoute ? round(route.maximumFittingPortGapFt) : null,
       physicalPathPolylineFt,
-      bindingStatus: reportLengthResidualFt <= 0.25
-        ? 'exact-source-pipe-span-route-within-quarter-foot'
+      flexibleTerminalComponent,
+      bindingStatus: exactPhysicalSpanRouteReady
+        ? route.fittingBridgeRoute
+          ? 'exact-source-riser-through-attributed-fitting-bridges-within-quarter-foot'
+          : flexibleTerminalComponent
+          ? 'exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot'
+          : 'exact-source-pipe-span-route-within-quarter-foot'
         : 'held-report-length-residual-exceeds-quarter-foot',
-      exactPhysicalSpanRouteReady: reportLengthResidualFt <= 0.25,
+      exactPhysicalSpanRouteReady,
     };
   });
   const roleCounts = Object.fromEntries([...routes.reduce((counts, route) => {
@@ -661,9 +804,14 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
   const ambiguousRootEdges = rootEdges.filter((edge) => edge.sourceRootDirection.startsWith('ambiguous'));
   const rootCycleRank = rootComponent.edgeIds.length - rootComponent.nodeIds.length + 1;
   const reports = [atticReport, belowCeilingReport];
+  const calculatedSprinklerLeafBindings = reports.map((report) => bindCalculationSprinklerLeaves({
+    report,
+    pipeCalibration,
+  }));
   const physicalSpanBinding = bindHydraulicReportSegmentsToPhysicalSpans({
     pipeCalibration,
     reports,
+    calculatedSprinklerLeafBindings,
     graph,
   });
   const loopInteriorRoles = ['branch-line', 'cross-main', 'feed-main'];
@@ -671,10 +819,16 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
     const counts = physicalSpanBinding.roleCounts[role];
     return counts && counts.total > 0 && counts.exactPhysicalSpanRouteReady === counts.total;
   });
-  const calculatedSprinklerLeafBindings = reports.map((report) => bindCalculationSprinklerLeaves({
-    report,
-    pipeCalibration,
-  }));
+  const directedBuildingRoles = [...loopInteriorRoles, 'arm-over'];
+  const buildingRigidPipeSpanHydraulicDirectionReady = directedBuildingRoles.every((role) => {
+    const counts = physicalSpanBinding.roleCounts[role];
+    return counts && counts.total > 0 && counts.exactPhysicalSpanRouteReady === counts.total;
+  });
+  const exactArmOverFlexTerminalBindings = physicalSpanBinding.routes.filter((route) => route.pipeRole === 'arm-over'
+    && route.exactPhysicalSpanRouteReady
+    && route.flexibleTerminalComponent?.endpointBindingReady);
+  const riserFittingBridgeRoute = physicalSpanBinding.routes.find((route) => route.upstreamNode === '116'
+    && route.downstreamNode === '13');
   const reportNodeIds = [...new Set(reports.flatMap((report) => report.nodes.map((node) => node.nodeId)))].sort((a, b) => Number(a) - Number(b));
   const labelNodeIds = [...new Set(pipeCalibration.hydraulicNodeLabels.map((label) => label.nodeId))].sort((a, b) => Number(a) - Number(b));
   const missingCadLabels = reportNodeIds.filter((nodeId) => !labelNodeIds.includes(nodeId));
@@ -799,7 +953,7 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
         && exactCadNodeConnectionPoints.length === 59
         ? 'exact-source-glyph-leader-tips-ready-for-all-on-plan-nodes'
         : 'held-source-glyph-or-elevation-residual-invalid',
-      geometryBindingStatus: 'exact-node-points-ready-segment-to-physical-pipe-span-routes-still-held',
+      geometryBindingStatus: 'exact-node-points-and-building-rigid-routes-ready-riser-source-and-drainage-held',
       calculatedSprinklerLeafBindings,
       exactCalculatedSprinklerLeafCount: calculatedSprinklerLeafBindings
         .reduce((sum, binding) => sum + binding.assignedSourceSprinklerCount, 0),
@@ -811,7 +965,20 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
       ...physicalSpanBinding,
       loopInteriorRoles,
       loopInteriorPipeSpanDirectionReady,
-      interpretation: 'Report upstream-to-downstream direction is promoted onto a physical span route only when source pipe material/nominal size, exact 3D node tips, connectivity, and report length agree within 0.25 ft.',
+      directedBuildingRoles,
+      buildingRigidPipeSpanHydraulicDirectionReady,
+      exactArmOverFlexTerminalBindingCount: exactArmOverFlexTerminalBindings.length,
+      riserFittingBridge: {
+        upstreamNode: riserFittingBridgeRoute?.upstreamNode ?? null,
+        downstreamNode: riserFittingBridgeRoute?.downstreamNode ?? null,
+        sourceComponentPathPresent: (riserFittingBridgeRoute?.fittingBridgeIds?.length ?? 0) > 0,
+        fittingBridgeIds: riserFittingBridgeRoute?.fittingBridgeIds ?? [],
+        physicalRouteLengthFt: riserFittingBridgeRoute?.physicalRouteLengthFt ?? null,
+        reportLengthFt: riserFittingBridgeRoute?.reportLengthFt ?? null,
+        reportLengthResidualFt: riserFittingBridgeRoute?.reportLengthResidualFt ?? null,
+        reportLengthAgreementReady: riserFittingBridgeRoute?.exactPhysicalSpanRouteReady ?? false,
+      },
+      interpretation: 'Report upstream-to-downstream direction is promoted onto a physical span route only when source pipe material/nominal size, exact 3D node tips, connectivity, and report length agree within 0.25 ft. Flexible terminals use the source fitting identity and exact rigid-port/sprinkler endpoints; an unexported hose centerline is never fabricated.',
     },
     physicalNetwork: {
       toleranceFt: graph.toleranceFt,
@@ -883,7 +1050,12 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
         && exactCadNodeConnectionPoints.length === 59
         && maximumCadNodeElevationResidualInches <= 0.25,
       loopInteriorPipeSpanDirectionReady,
-      buildingRigidPipeSpanHydraulicDirectionReady: loopInteriorPipeSpanDirectionReady,
+      exactArmOverRigidToFlexTerminalDirectionReady: exactArmOverFlexTerminalBindings.length === 15,
+      semanticFlexTerminalEndpointBindingReady: exactArmOverFlexTerminalBindings.length === 15,
+      flexibleHoseCenterlineReady: false,
+      riserFittingBridgeComponentPathReady: Boolean(riserFittingBridgeRoute?.fittingBridgeIds?.length),
+      riserReportToSourceLengthAgreementReady: riserFittingBridgeRoute?.exactPhysicalSpanRouteReady === true,
+      buildingRigidPipeSpanHydraulicDirectionReady,
       calculationNodeToDwgGeometryBindingReady: false,
       wholeNetworkHydraulicFlowDirectionReady: false,
       drainageGradeSemanticsReady: false,

@@ -4595,7 +4595,7 @@
       }
     ],
     "connectionPointBindingStatus": "exact-source-glyph-leader-tips-ready-for-all-on-plan-nodes",
-    "geometryBindingStatus": "exact-node-points-ready-segment-to-physical-pipe-span-routes-still-held",
+    "geometryBindingStatus": "exact-node-points-and-building-rigid-routes-ready-riser-source-and-drainage-held",
     "calculatedSprinklerLeafBindings": [
       {
         "reportDescription": "Light Hazard (ATTIC)",
@@ -5601,12 +5601,12 @@
   "physicalSpanRegistration": {
     "uniqueReportSegmentCount": 68,
     "onPlanSegmentCount": 66,
-    "exactPhysicalSpanRouteCount": 50,
-    "maximumReadyRouteLengthResidualFt": 0.024833257,
+    "exactPhysicalSpanRouteCount": 65,
+    "maximumReadyRouteLengthResidualFt": 0.079908961,
     "roleCounts": {
       "arm-over": {
         "total": 15,
-        "exactPhysicalSpanRouteReady": 0
+        "exactPhysicalSpanRouteReady": 15
       },
       "branch-line": {
         "total": 45,
@@ -5652,6 +5652,8 @@
         "physicalSpanIds": [
           "pipe-17853:span-1"
         ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.310342169,
@@ -5664,6 +5666,7 @@
             "z": 13.671059385
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -5689,6 +5692,8 @@
         "physicalSpanIds": [
           "pipe-17853:span-3"
         ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.310342169,
@@ -5711,6 +5716,7 @@
             "z": 13.875577252700294
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -5734,6 +5740,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 12.310342169,
@@ -5746,6 +5754,7 @@
             "z": 14.059643333494375
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -5769,6 +5778,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 7.310342169,
@@ -5781,6 +5792,7 @@
             "z": 14.077900722013156
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -5804,6 +5816,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 1.663494618,
@@ -5821,6 +5835,7 @@
             "z": 14.090941713812292
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -5844,6 +5859,8 @@
           "pipe-7661"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 1.664551967,
@@ -5856,6 +5873,7 @@
             "z": 11.000582726780653
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -5879,6 +5897,8 @@
           "pipe-7661"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 1.665609317,
@@ -5891,6 +5911,7 @@
             "z": 11.010148753675916
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -5914,6 +5935,8 @@
           "pipe-7661"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 1.666666667,
@@ -5926,6 +5949,7 @@
             "z": 11.019714779958083
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -5969,6 +5993,8 @@
           "pipe-15736:span-2",
           "pipe-15736:span-1"
         ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -6076,6 +6102,7 @@
             "z": 11.029280806
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6099,6 +6126,8 @@
           "pipe-3714"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -6111,6 +6140,7 @@
             "z": 14.369775119
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6134,6 +6164,8 @@
           "pipe-3714"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -6146,6 +6178,7 @@
             "z": 14.369775119
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6169,6 +6202,8 @@
           "pipe-17499"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -6186,6 +6221,7 @@
             "z": 14.369775119
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6196,12 +6232,91 @@
         "reportLengthFt": 10.75,
         "pipeRole": "feed-riser",
         "diameterInternalInches": 3.334,
+        "physicalRouteLengthFt": 13.582466883,
+        "reportLengthResidualFt": 2.832466883,
         "physicalClass": {
           "nominalSizeInches": 3,
           "subCategory": "Eddy Flow"
         },
         "occurrenceCount": 2,
-        "bindingStatus": "no-compatible-source-pipe-path",
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-22492",
+          "pipe-23024",
+          "pipe-22275"
+        ],
+        "physicalSpanIds": [],
+        "fittingBridgeIds": [
+          "fitting-78838",
+          "fitting-69385",
+          "fitting-71354"
+        ],
+        "maximumFittingPortGapFt": 0.461043503,
+        "physicalPathPolylineFt": [
+          {
+            "x": 177.598713214,
+            "y": 39.666666667,
+            "z": 0.436666667
+          },
+          {
+            "x": 177.598713214,
+            "y": 39.666666667,
+            "z": 0.853333333
+          },
+          {
+            "x": 177.317046547,
+            "y": 39.666666667,
+            "z": 1.218333333
+          },
+          {
+            "x": 177.233713214,
+            "y": 39.666666667,
+            "z": 1.218333333
+          },
+          {
+            "x": 174.573333333,
+            "y": 39.666666667,
+            "z": 1.218333333
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 1.5
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 1.578333333
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 3.791666667
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 4.156666667
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 4.521666667
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 10.64
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 11
+          }
+        ],
+        "flexibleTerminalComponent": null,
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
         "exactPhysicalSpanRouteReady": false
       },
       {
@@ -6254,6 +6369,8 @@
           "pipe-17523"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 31.310342169,
@@ -6266,6 +6383,7 @@
             "z": 13.671059385
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6289,6 +6407,8 @@
           "pipe-17523"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 31.310342169,
@@ -6306,6 +6426,7 @@
             "z": 13.859104420806178
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6329,6 +6450,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 36.310342169,
@@ -6341,6 +6464,7 @@
             "z": 14.028344953176452
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6364,6 +6488,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 48.310342169,
@@ -6376,6 +6502,7 @@
             "z": 14.015303961377318
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6415,6 +6542,8 @@
           "pipe-3943:span-9",
           "pipe-3943:span-8"
         ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -6507,6 +6636,7 @@
             "z": 13.984005581059401
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6530,6 +6660,8 @@
           "pipe-3279"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -6542,6 +6674,7 @@
             "z": 11
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6565,6 +6698,8 @@
           "pipe-3279"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -6582,6 +6717,7 @@
             "z": 11
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6605,6 +6741,8 @@
           "pipe-18285"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 7.310342169,
@@ -6617,6 +6755,7 @@
             "z": 13.671059385
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6640,6 +6779,8 @@
           "pipe-18285"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 7.310342169,
@@ -6657,6 +6798,7 @@
             "z": 13.892050084509945
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6680,6 +6822,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 31.310342169,
@@ -6692,6 +6836,7 @@
             "z": 14.046602341695241
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6717,6 +6862,8 @@
         "physicalSpanIds": [
           "pipe-12312:span-2"
         ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 12.310342169,
@@ -6734,6 +6881,7 @@
             "z": 16.831702310755123
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6757,6 +6905,8 @@
           "pipe-12312"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 1.666666667,
@@ -6769,6 +6919,7 @@
             "z": 16.833022362128226
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6792,6 +6943,8 @@
           "pipe-15686"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 1.664551967,
@@ -6809,6 +6962,7 @@
             "z": 16.834193212
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6832,6 +6986,8 @@
           "pipe-12312"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 36.310342169,
@@ -6844,6 +7000,7 @@
             "z": 16.831702310755123
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6867,6 +7024,8 @@
           "pipe-12312"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 48.310342169,
@@ -6879,6 +7038,7 @@
             "z": 16.83038225938202
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -6915,6 +7075,8 @@
           "pipe-12312:span-7",
           "pipe-12312:span-6"
         ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -6987,6 +7149,7 @@
             "z": 16.829062208008917
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7028,6 +7191,8 @@
           "pipe-8683:span-3",
           "pipe-8683:span-2"
         ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -7135,6 +7300,7 @@
             "z": 11.01971478
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7158,6 +7324,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 24.310342169,
@@ -7170,6 +7338,7 @@
             "z": 14.059643333494375
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7180,20 +7349,21 @@
         "reportLengthFt": 3.125,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 4.141580259,
-        "reportLengthResidualFt": 1.016580259,
+        "physicalRouteLengthFt": 3.066129626,
+        "reportLengthResidualFt": 0.058870374,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 0.416666667,
-        "endPortResidualFt": 3.724913592,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-19538",
-          "pipe-19516"
+          "pipe-19538"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.310342169,
@@ -7206,13 +7376,39 @@
             "z": 13.711962959
           },
           {
+            "x": 18.893675502,
+            "y": 6.166666667,
+            "z": 11.0625
+          }
+        ],
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-28561",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 18.893675502,
+            "y": 6.166666667,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-19538",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 18.893675502,
+            "y": 6.166666667,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-890",
+          "sprinklerPointFt": {
             "x": 18.583333333,
             "y": 6.166666667,
             "z": 10
-          }
-        ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "244",
@@ -7234,6 +7430,8 @@
           "pipe-17853"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.310342169,
@@ -7246,6 +7444,7 @@
             "z": 13.711962958540225
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7269,6 +7468,8 @@
           "pipe-17853"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.310342169,
@@ -7281,6 +7482,7 @@
             "z": 13.936932613010216
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7304,6 +7506,8 @@
           "pipe-17853"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.310342169,
@@ -7321,6 +7525,7 @@
             "z": 13.953123610856242
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7344,6 +7549,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 7.310342169,
@@ -7356,6 +7563,7 @@
             "z": 14.059643333494375
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7379,6 +7587,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 6.708333333,
@@ -7391,6 +7601,7 @@
             "z": 14.090941713812292
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7414,6 +7625,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 1.663494618,
@@ -7431,6 +7644,7 @@
             "z": 14.092511872270945
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7441,20 +7655,21 @@
         "reportLengthFt": 3.333333,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 4.464183836,
-        "reportLengthResidualFt": 1.130850836,
+        "physicalRouteLengthFt": 3.291099279,
+        "reportLengthResidualFt": 0.042233721,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 0.416666666,
-        "endPortResidualFt": 4.04751717,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-21444",
-          "pipe-21422"
+          "pipe-21444"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.310342169,
@@ -7467,13 +7682,39 @@
             "z": 13.936932613
           },
           {
+            "x": 19.727008835,
+            "y": 17.166666667,
+            "z": 11.0625
+          }
+        ],
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-57721",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 19.727008835,
+            "y": 17.166666667,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-21444",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 19.727008835,
+            "y": 17.166666667,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-762",
+          "sprinklerPointFt": {
             "x": 20.666666667,
             "y": 17.166666667,
             "z": 10
-          }
-        ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "243",
@@ -7482,22 +7723,21 @@
         "reportLengthFt": 3.75,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 7.43723933,
-        "reportLengthResidualFt": 3.68723933,
+        "physicalRouteLengthFt": 3.670091039,
+        "reportLengthResidualFt": 0.079908961,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 0,
-        "endPortResidualFt": 3.767148291,
+        "endPortResidualFt": 2.890623611,
         "pipeIds": [
-          "pipe-21468",
-          "pipe-21490"
+          "pipe-21468"
         ],
-        "physicalSpanIds": [
-          "pipe-21490:span-1"
-        ],
+        "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.310342169,
@@ -7507,16 +7747,42 @@
           {
             "x": 18.53087474,
             "y": 17.958333333,
-            "z": 11.0625
+            "z": 13.953123611
           },
           {
+            "x": 18.53087474,
+            "y": 17.958333333,
+            "z": 11.0625
+          }
+        ],
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-58369",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 18.53087474,
+            "y": 17.958333333,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-21490",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 18.53087474,
+            "y": 17.958333333,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-1642",
+          "sprinklerPointFt": {
             "x": 14.916666667,
             "y": 17.958333333,
             "z": 10
-          }
-        ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "294",
@@ -7525,19 +7791,24 @@
         "reportLengthFt": 3.125,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 4.134701246,
-        "reportLengthResidualFt": 1.009701246,
+        "physicalRouteLengthFt": 3.069424192,
+        "reportLengthResidualFt": 0.055575808,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 0,
-        "endPortResidualFt": 3.718034579,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-19700"
+          "pipe-19700",
+          "pipe-19722"
         ],
-        "physicalSpanIds": [],
+        "physicalSpanIds": [
+          "pipe-19722:span-1"
+        ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 7.310342169,
@@ -7547,16 +7818,37 @@
           {
             "x": 6.893675502,
             "y": 6.166666667,
-            "z": 13.715257525
+            "z": 11.0625
+          }
+        ],
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-31153",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 6.893675502,
+            "y": 6.166666667,
+            "z": 11
           },
-          {
+          "rigidPipeId": "pipe-19722",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 6.893675502,
+            "y": 6.166666667,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-730",
+          "sprinklerPointFt": {
             "x": 6.75,
             "y": 6.166666667,
             "z": 10
-          }
-        ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "249",
@@ -7578,6 +7870,8 @@
           "pipe-18285"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 7.310342169,
@@ -7590,6 +7884,7 @@
             "z": 13.715257524901988
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7613,6 +7908,8 @@
           "pipe-18285"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 7.310342169,
@@ -7630,6 +7927,7 @@
             "z": 13.957426499774073
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7640,19 +7938,21 @@
         "reportLengthFt": 3.375,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 4.378430949,
-        "reportLengthResidualFt": 1.003430949,
+        "physicalRouteLengthFt": 3.311593167,
+        "reportLengthResidualFt": 0.063406833,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 0,
-        "endPortResidualFt": 3.961764282,
+        "endPortResidualFt": 2.8949265,
         "pipeIds": [
           "pipe-21560"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 7.310342169,
@@ -7665,13 +7965,39 @@
             "z": 13.9574265
           },
           {
+            "x": 6.893675502,
+            "y": 17.125,
+            "z": 11.0625
+          }
+        ],
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-59665",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 6.893675502,
+            "y": 17.125,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-21582",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 6.893675502,
+            "y": 17.125,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-746",
+          "sprinklerPointFt": {
             "x": 6.708333333,
             "y": 17.125,
             "z": 10
-          }
-        ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "291",
@@ -7680,20 +8006,21 @@
         "reportLengthFt": 3.125,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 4.1759085,
-        "reportLengthResidualFt": 1.0509085,
+        "physicalRouteLengthFt": 3.082801016,
+        "reportLengthResidualFt": 0.042198984,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 0.416666667,
-        "endPortResidualFt": 3.759241833,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-20710",
-          "pipe-20688"
+          "pipe-20710"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 31.310342169,
@@ -7706,13 +8033,39 @@
             "z": 13.728634349
           },
           {
+            "x": 30.893675502,
+            "y": 7.228431264,
+            "z": 11.0625
+          }
+        ],
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-46705",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 30.893675502,
+            "y": 7.228431264,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-20710",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 30.893675502,
+            "y": 7.228431264,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-714",
+          "sprinklerPointFt": {
             "x": 30.414942745,
             "y": 7.228431264,
             "z": 10
-          }
-        ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "238",
@@ -7734,6 +8087,8 @@
           "pipe-17523"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 31.310342169,
@@ -7746,6 +8101,7 @@
             "z": 13.728634348327512
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7769,6 +8125,8 @@
           "pipe-17523"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 31.310342169,
@@ -7786,6 +8144,7 @@
             "z": 13.966055034920862
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7809,6 +8168,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 46.652287372,
@@ -7821,6 +8182,7 @@
             "z": 14.028344953176452
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7860,6 +8222,8 @@
           "pipe-3943:span-9",
           "pipe-3943:span-8"
         ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -7952,6 +8316,7 @@
             "z": 13.988330116861441
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -7962,20 +8327,21 @@
         "reportLengthFt": 3.375,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 4.395184241,
-        "reportLengthResidualFt": 1.020184241,
+        "physicalRouteLengthFt": 3.320221701,
+        "reportLengthResidualFt": 0.054778299,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 0.416666666,
-        "endPortResidualFt": 3.978517575,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-19470",
-          "pipe-19448"
+          "pipe-19470"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 31.310342169,
@@ -7988,13 +8354,39 @@
             "z": 13.966055035
           },
           {
+            "x": 31.727008835,
+            "y": 19.854166667,
+            "z": 11.0625
+          }
+        ],
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-27265",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 31.727008835,
+            "y": 19.854166667,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-19470",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 31.727008835,
+            "y": 19.854166667,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-1674",
+          "sprinklerPointFt": {
             "x": 32.041666667,
             "y": 19.854166667,
             "z": 10
-          }
-        ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "173",
@@ -8003,19 +8395,21 @@
         "reportLengthFt": 3.458333,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 4.929524722,
-        "reportLengthResidualFt": 1.471191722,
+        "physicalRouteLengthFt": 3.41211991,
+        "reportLengthResidualFt": 0.04621309,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 0.416666666,
-        "endPortResidualFt": 1.517404812,
+        "endPortResidualFt": 0,
         "pipeIds": [
           "pipe-20480"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.958333333,
@@ -8031,15 +8425,36 @@
             "x": 19.958333333,
             "y": 23.583333333,
             "z": 11.0625
+          }
+        ],
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-43465",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 19.958333333,
+            "y": 23.583333333,
+            "z": 11
           },
-          {
+          "rigidPipeId": "pipe-20480",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 19.958333333,
+            "y": 23.583333333,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-1658",
+          "sprinklerPointFt": {
             "x": 19.958333333,
             "y": 24.666666667,
             "z": 10
-          }
-        ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "25",
@@ -8061,6 +8476,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 31.310342169,
@@ -8073,6 +8490,7 @@
             "z": 14.057953244003246
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -8083,19 +8501,21 @@
         "reportLengthFt": 4.625,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 8.349618756,
-        "reportLengthResidualFt": 3.724618756,
+        "physicalRouteLengthFt": 4.582470465,
+        "reportLengthResidualFt": 0.042529535,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 1.552458593,
-        "endPortResidualFt": 3.767148291,
+        "endPortResidualFt": 0,
         "pipeIds": [
           "pipe-20572"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 6.708333333,
@@ -8111,15 +8531,36 @@
             "x": 6.708333333,
             "y": 24.71912526,
             "z": 11.0625
+          }
+        ],
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-44761",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 6.708333333,
+            "y": 24.71912526,
+            "z": 11
           },
-          {
+          "rigidPipeId": "pipe-20572",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 6.708333333,
+            "y": 24.71912526,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-858",
+          "sprinklerPointFt": {
             "x": 6.708333333,
             "y": 28.333333333,
             "z": 10
-          }
-        ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "176",
@@ -8128,19 +8569,21 @@
         "reportLengthFt": 3.416667,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 4.151428183,
-        "reportLengthResidualFt": 0.734761183,
+        "physicalRouteLengthFt": 3.342496784,
+        "reportLengthResidualFt": 0.074170216,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
         "startPortResidualFt": 0,
-        "endPortResidualFt": 3.988330117,
+        "endPortResidualFt": 2.925830117,
         "pipeIds": [
           "pipe-20596"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 46.652287372,
@@ -8149,17 +8592,43 @@
           },
           {
             "x": 46.652287372,
-            "y": 23.003568601,
+            "y": 22.75,
             "z": 13.988330117
           },
           {
             "x": 46.652287372,
-            "y": 23.003568601,
-            "z": 10
+            "y": 22.75,
+            "z": 11.0625
           }
         ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-45409",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 46.652287372,
+            "y": 22.75,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-20618",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 46.652287372,
+            "y": 22.75,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-1610",
+          "sprinklerPointFt": {
+            "x": 46.652287372,
+            "y": 23.003568601,
+            "z": 10
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "109",
@@ -8168,22 +8637,21 @@
         "reportLengthFt": 6.875,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 10.587660419,
-        "reportLengthResidualFt": 3.712660419,
+        "physicalRouteLengthFt": 6.820512127,
+        "reportLengthResidualFt": 0.054487873,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
-        "startPortResidualFt": 0,
-        "endPortResidualFt": 3.767148292,
+        "startPortResidualFt": 1.052458593,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-21354",
           "pipe-21376"
         ],
-        "physicalSpanIds": [
-          "pipe-21376:span-1"
-        ],
+        "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 34.753363992,
@@ -8193,16 +8661,42 @@
           {
             "x": 34.753363992,
             "y": 33.114208074,
-            "z": 11.0625
+            "z": 16.830553534
           },
           {
             "x": 34.753363992,
-            "y": 29.5,
-            "z": 10
+            "y": 33.114208074,
+            "z": 11.0625
           }
         ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-56425",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 34.753363992,
+            "y": 33.114208074,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-21376",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 34.753363992,
+            "y": 33.114208074,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-1690",
+          "sprinklerPointFt": {
+            "x": 34.753363992,
+            "y": 29.5,
+            "z": 10
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "111",
@@ -8224,6 +8718,8 @@
           "pipe-12312"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 46.101750049,
@@ -8236,6 +8732,7 @@
             "z": 16.830553533647056
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -8259,6 +8756,8 @@
           "pipe-12312"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 50.84301221,
@@ -8271,6 +8770,7 @@
             "z": 16.8293051625973
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -8307,6 +8807,8 @@
           "pipe-12312:span-7",
           "pipe-12312:span-6"
         ],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 174.208333333,
@@ -8374,6 +8876,7 @@
             "z": 16.828783603
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -8384,20 +8887,21 @@
         "reportLengthFt": 6.25,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 9.665923934,
-        "reportLengthResidualFt": 3.415923934,
+        "physicalRouteLengthFt": 6.185935488,
+        "reportLengthResidualFt": 0.064064512,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
-        "startPortResidualFt": 0,
-        "endPortResidualFt": 3.479988446,
+        "startPortResidualFt": 0.416666667,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-19608",
           "pipe-19630"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 23.705723524,
@@ -8407,16 +8911,42 @@
           {
             "x": 23.705723524,
             "y": 33.75,
-            "z": 11.0625
+            "z": 16.831768821
           },
           {
             "x": 23.705723524,
-            "y": 30.43617844,
-            "z": 10
+            "y": 33.75,
+            "z": 11.0625
           }
         ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-29857",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 23.705723524,
+            "y": 33.75,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-19630",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 23.705723524,
+            "y": 33.75,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-1626",
+          "sprinklerPointFt": {
+            "x": 23.705723524,
+            "y": 30.43617844,
+            "z": 10
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "106",
@@ -8438,6 +8968,8 @@
           "pipe-12312"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 16.291666667,
@@ -8450,6 +8982,7 @@
             "z": 16.8317688213945
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -8473,6 +9006,8 @@
           "pipe-12312"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 1.666666667,
@@ -8485,6 +9020,7 @@
             "z": 16.83258439938903
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -8495,20 +9031,21 @@
         "reportLengthFt": 6.25,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 9.290917733,
-        "reportLengthResidualFt": 3.040917733,
+        "physicalRouteLengthFt": 6.186751066,
+        "reportLengthResidualFt": 0.063248934,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
-        "startPortResidualFt": 0,
-        "endPortResidualFt": 3.104166667,
+        "startPortResidualFt": 0.416666667,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-19562",
           "pipe-19584"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 16.291666667,
@@ -8518,16 +9055,42 @@
           {
             "x": 16.291666667,
             "y": 33.75,
-            "z": 11.0625
+            "z": 16.832584399
           },
           {
             "x": 16.291666667,
-            "y": 30.833333333,
-            "z": 10
+            "y": 33.75,
+            "z": 11.0625
           }
         ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-29209",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 16.291666667,
+            "y": 33.75,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-19584",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 16.291666667,
+            "y": 33.75,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-874",
+          "sprinklerPointFt": {
+            "x": 16.291666667,
+            "y": 30.833333333,
+            "z": 10
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "111",
@@ -8536,20 +9099,21 @@
         "reportLengthFt": 6.25,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 9.909099105,
-        "reportLengthResidualFt": 3.659099105,
+        "physicalRouteLengthFt": 6.183471829,
+        "reportLengthResidualFt": 0.066528171,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
-        "startPortResidualFt": 0,
-        "endPortResidualFt": 3.725627276,
+        "startPortResidualFt": 0.416666667,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-19402",
           "pipe-19424"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 46.101750049,
@@ -8559,16 +9123,42 @@
           {
             "x": 46.101750049,
             "y": 33.75,
-            "z": 11.0625
+            "z": 16.829305162
           },
           {
             "x": 46.101750049,
-            "y": 30.179090823,
-            "z": 10
+            "y": 33.75,
+            "z": 11.0625
           }
         ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-26617",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 46.101750049,
+            "y": 33.75,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-19424",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 46.101750049,
+            "y": 33.75,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-794",
+          "sprinklerPointFt": {
+            "x": 46.101750049,
+            "y": 30.179090823,
+            "z": 10
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "113",
@@ -8577,20 +9167,21 @@
         "reportLengthFt": 6.25,
         "pipeRole": "arm-over",
         "diameterInternalInches": 1.049,
-        "physicalRouteLengthFt": 9.176116418,
-        "reportLengthResidualFt": 2.926116418,
+        "physicalRouteLengthFt": 6.18295027,
+        "reportLengthResidualFt": 0.06704973,
         "physicalClass": {
           "nominalSizeInches": 1,
           "subCategory": "Schedule 40"
         },
         "occurrenceCount": 1,
-        "startPortResidualFt": 0,
-        "endPortResidualFt": 2.993166148,
+        "startPortResidualFt": 0.416666667,
+        "endPortResidualFt": 0,
         "pipeIds": [
-          "pipe-21606",
           "pipe-21628"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 50.84301221,
@@ -8600,16 +9191,42 @@
           {
             "x": 50.84301221,
             "y": 33.75,
-            "z": 11.0625
+            "z": 16.828783603
           },
           {
             "x": 50.84301221,
-            "y": 30.951761744,
-            "z": 10
+            "y": 33.75,
+            "z": 11.0625
           }
         ],
-        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
-        "exactPhysicalSpanRouteReady": false
+        "flexibleTerminalComponent": {
+          "mode": "source-flex-drop-component-with-exact-rigid-port-and-sprinkler-endpoints",
+          "fittingId": "fitting-68737",
+          "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+          "fittingPointFt": {
+            "x": 50.84301221,
+            "y": 33.75,
+            "z": 11
+          },
+          "rigidPipeId": "pipe-21628",
+          "rigidPipeEndpoint": "end",
+          "rigidPipePortFt": {
+            "x": 50.84301221,
+            "y": 33.75,
+            "z": 11.0625
+          },
+          "rigidPipePortResidualFt": 0.0625,
+          "sprinklerId": "sprinkler-1594",
+          "sprinklerPointFt": {
+            "x": 50.84301221,
+            "y": 30.951761744,
+            "z": 10
+          },
+          "centerlineStatus": "not-exported-by-source-use-semantic-flex-component-with-exact-endpoints",
+          "endpointBindingReady": true
+        },
+        "bindingStatus": "exact-source-rigid-arm-over-to-semantic-flex-terminal-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
       },
       {
         "upstreamNode": "109",
@@ -8631,6 +9248,8 @@
           "pipe-12312"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 34.753363992,
@@ -8643,6 +9262,7 @@
             "z": 16.8317688213945
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       },
@@ -8666,6 +9286,8 @@
           "pipe-3943"
         ],
         "physicalSpanIds": [],
+        "fittingBridgeIds": [],
+        "maximumFittingPortGapFt": null,
         "physicalPathPolylineFt": [
           {
             "x": 19.958333333,
@@ -8678,6 +9300,7 @@
             "z": 14.059643333494375
           }
         ],
+        "flexibleTerminalComponent": null,
         "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
         "exactPhysicalSpanRouteReady": true
       }
@@ -8688,7 +9311,29 @@
       "feed-main"
     ],
     "loopInteriorPipeSpanDirectionReady": true,
-    "interpretation": "Report upstream-to-downstream direction is promoted onto a physical span route only when source pipe material/nominal size, exact 3D node tips, connectivity, and report length agree within 0.25 ft."
+    "directedBuildingRoles": [
+      "branch-line",
+      "cross-main",
+      "feed-main",
+      "arm-over"
+    ],
+    "buildingRigidPipeSpanHydraulicDirectionReady": true,
+    "exactArmOverFlexTerminalBindingCount": 15,
+    "riserFittingBridge": {
+      "upstreamNode": "116",
+      "downstreamNode": "13",
+      "sourceComponentPathPresent": true,
+      "fittingBridgeIds": [
+        "fitting-78838",
+        "fitting-69385",
+        "fitting-71354"
+      ],
+      "physicalRouteLengthFt": 13.582466883,
+      "reportLengthFt": 10.75,
+      "reportLengthResidualFt": 2.832466883,
+      "reportLengthAgreementReady": false
+    },
+    "interpretation": "Report upstream-to-downstream direction is promoted onto a physical span route only when source pipe material/nominal size, exact 3D node tips, connectivity, and report length agree within 0.25 ft. Flexible terminals use the source fitting identity and exact rigid-port/sprinkler endpoints; an unexported hose centerline is never fabricated."
   },
   "physicalNetwork": {
     "toleranceFt": 0.04,
@@ -10770,6 +11415,11 @@
     "exactHydraulicNodeConnectionPointsReady": true,
     "calculationNodeToDwgConnectionPointBindingReady": true,
     "loopInteriorPipeSpanDirectionReady": true,
+    "exactArmOverRigidToFlexTerminalDirectionReady": true,
+    "semanticFlexTerminalEndpointBindingReady": true,
+    "flexibleHoseCenterlineReady": false,
+    "riserFittingBridgeComponentPathReady": true,
+    "riserReportToSourceLengthAgreementReady": false,
     "buildingRigidPipeSpanHydraulicDirectionReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,
     "wholeNetworkHydraulicFlowDirectionReady": false,
@@ -10781,5 +11431,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "receiptSha256": "0F7B05D3856D46AE300DE225CA25B010351B2DC1CCB1B2BE5AC8ED6B1DDB85F6"
+  "receiptSha256": "32EB2CD75A3CB532415488D8B777E6B457D0602058AA30CDE9CF883A14F4F999"
 }

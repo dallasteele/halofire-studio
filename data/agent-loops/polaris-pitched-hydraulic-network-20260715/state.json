@@ -1,5 +1,5 @@
 {
-  "iteration": 4,
+  "iteration": 5,
   "phase": "verify-and-bind",
   "status": "in_progress",
   "observations": [
@@ -15,6 +15,9 @@
     "All 59 on-plan hydraulic nodes are now bound to the exact 3D leader tip of their source seven-line AutoSPRINK calculation glyph; the worst report-to-source elevation residual is 0.243616 inches.",
     "Fifty report segments now route over exact rigid source spans with a worst accepted length residual of 0.024833257 feet: 45 branch-line, four cross-main, and one feed-main segment.",
     "The exact rigid routes cover all three physical loop interiors, so their direction is report-proven instead of inferred from geometric slope or riser distance.",
+    "All 15 arm-over calculations now bind their exact rigid source-pipe route to an attributed 48-inch braided flex-drop component and exact sprinkler endpoint; the worst accepted rigid-route length residual is 0.079908961 feet.",
+    "The source does not export braided-hose centerlines, so the governed representation preserves the exact fitting identity and endpoints without fabricating a hose curve.",
+    "The source riser components form an attributed fitting-bridged path from node 116 to node 13, but the 13.582466883-foot physical path differs from the report's 10.75-foot length by 2.832466883 feet and remains held.",
     "No independent human-review gate is required; deterministic, adversarial, formal, visual, and browser loops provide acceptance."
   ],
   "attempts": [
@@ -34,11 +37,16 @@
     "An adversarial one-foot branch-length mutation reduces exact branch bindings from 45 to 44 and drops loop-interior readiness, proving the gate is evidence-sensitive.",
     "Playwright rendered the 50 span routes over the actual approved FP2, verified the span-direction layer off and back on, and reported zero browser errors or warnings.",
     "Lean 4 verified exact-node coverage, 45 + 4 + 1 = 50 rigid routes, loop-interior readiness, and the fail-closed whole-layout boundary in 118 ms; brain postflight persisted the rule as episode 149495."
+    ,"Rebound arm-over report endpoints to the exact rigid pipe port of the already-proven flex component instead of incorrectly projecting the sprinkler head back to roof-level rigid pipe.",
+    "All 15 arm-over rigid routes now pass the quarter-foot report-length gate; a one-foot adversarial report mutation reduces coverage to 14 and drops building-rigid readiness.",
+    "A fitting-size-aware riser bridge traces the separated source components while refusing the 2.832466883-foot report-length discrepancy.",
+    "Playwright rendered 65 physical directions over the approved FP2, verified the direction layer off/on, and reported zero errors or warnings.",
+    "Lean 4 verified 45 + 4 + 1 + 15 = 65 rigid routes, semantic flex endpoint readiness, and the fail-closed riser/whole-layout boundary in 79 ms; brain postflight persisted the rule as episode 149531."
   ],
   "blockers": [
-    "Fifteen flexible arm-over report segments have exact source head, flex-drop, and rigid-pipe endpoints, but the source export does not provide a truthful flexible-hose centerline.",
-    "Two feed-riser segments cross separated fitting bodies, and the two source nodes are off-building; continuous source-to-building geometry remains unproven.",
+    "The node-116-to-node-13 riser source path is component-complete but fails the report-length agreement gate by 2.832466883 feet; the discrepancy must be explained from completed-design semantics before promotion.",
+    "The two source nodes remain off-building; fire-line-to-sprinkler CAD registration and the underground/source segment are unproven.",
     "The ten remote geometric low points cannot be classified as acceptable trapped volume or auxiliary-drain requirements until completed-design system/drainage intent is bound."
   ],
-  "next_action": "Bind the 15 arm-over endpoint routes without fabricating hose centerlines, bridge the separated riser fittings and same-project fire-line source registration, then classify each of the ten remote low points before promoting whole-network flow or proper-layout readiness."
+  "next_action": "Resolve the 13.582466883-foot physical-versus-10.75-foot hydraulic riser discrepancy from the completed source semantics, register the same-project fire-line source nodes, then classify each of the ten remote low points before promoting whole-network flow or proper-layout readiness."
 }

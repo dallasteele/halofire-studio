@@ -151,27 +151,37 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
     });
   });
 
-  it('routes every loop-interior report segment over exact material-and-size-matched source spans', () => {
+  it('routes every rigid building segment over exact material-and-size-matched source spans', () => {
     expect(expected.physicalSpanRegistration).toMatchObject({
       uniqueReportSegmentCount: 68,
       onPlanSegmentCount: 66,
-      exactPhysicalSpanRouteCount: 50,
-      maximumReadyRouteLengthResidualFt: 0.024833257,
+      exactPhysicalSpanRouteCount: 65,
+      maximumReadyRouteLengthResidualFt: 0.079908961,
       roleCounts: {
         'branch-line': { total: 45, exactPhysicalSpanRouteReady: 45 },
         'cross-main': { total: 4, exactPhysicalSpanRouteReady: 4 },
         'feed-main': { total: 1, exactPhysicalSpanRouteReady: 1 },
-        'arm-over': { total: 15, exactPhysicalSpanRouteReady: 0 },
+        'arm-over': { total: 15, exactPhysicalSpanRouteReady: 15 },
         'feed-riser': { total: 2, exactPhysicalSpanRouteReady: 0 },
         underground: { total: 1, exactPhysicalSpanRouteReady: 0 },
       },
       loopInteriorPipeSpanDirectionReady: true,
+      buildingRigidPipeSpanHydraulicDirectionReady: true,
+      exactArmOverFlexTerminalBindingCount: 15,
     });
     expect(expected.physicalSpanRegistration.routes
-      .filter((route) => ['branch-line', 'cross-main', 'feed-main'].includes(route.pipeRole))
+      .filter((route) => ['branch-line', 'cross-main', 'feed-main', 'arm-over'].includes(route.pipeRole))
       .every((route) => route.exactPhysicalSpanRouteReady && route.physicalPathPolylineFt.length >= 2)).toBe(true);
+    expect(expected.physicalSpanRegistration.routes.filter((route) => route.pipeRole === 'arm-over')
+      .every((route) => route.flexibleTerminalComponent?.endpointBindingReady
+        && route.flexibleTerminalComponent.centerlineStatus === 'not-exported-by-source-use-semantic-flex-component-with-exact-endpoints')).toBe(true);
     expect(expected.claims).toMatchObject({
       loopInteriorPipeSpanDirectionReady: true,
+      exactArmOverRigidToFlexTerminalDirectionReady: true,
+      semanticFlexTerminalEndpointBindingReady: true,
+      flexibleHoseCenterlineReady: false,
+      riserFittingBridgeComponentPathReady: true,
+      riserReportToSourceLengthAgreementReady: false,
       buildingRigidPipeSpanHydraulicDirectionReady: true,
       wholeNetworkHydraulicFlowDirectionReady: false,
       properPipeLayoutReady: false,
@@ -187,6 +197,19 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       exactPhysicalSpanRouteReady: 44,
     });
     expect(result.claims.loopInteriorPipeSpanDirectionReady).toBe(false);
+    expect(result.claims.wholeNetworkHydraulicFlowDirectionReady).toBe(false);
+  });
+
+  it('holds an arm-over when report length no longer agrees with its rigid-to-flex source route', () => {
+    const attacked = structuredClone(belowCeilingReport);
+    attacked.segments.find((segment) => segment.upstreamNode === '297' && segment.downstreamNode === '538').lengthFt += 1;
+    const result = build({ belowCeilingReport: attacked });
+    expect(result.physicalSpanRegistration.roleCounts['arm-over']).toMatchObject({
+      total: 15,
+      exactPhysicalSpanRouteReady: 14,
+    });
+    expect(result.claims.exactArmOverRigidToFlexTerminalDirectionReady).toBe(false);
+    expect(result.claims.buildingRigidPipeSpanHydraulicDirectionReady).toBe(false);
     expect(result.claims.wholeNetworkHydraulicFlowDirectionReady).toBe(false);
   });
 
@@ -212,7 +235,7 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
     expect(html).toContain("data-proof-layer':'device'");
     expect(html).toContain("data-proof-layer':'terminal'");
     expect(html).toContain("data-proof-layer':'span'");
-    expect(html).toContain('50 exact physical span routes');
+    expect(html).toContain('65 exact physical span routes');
     expect(html).toContain('3 loop interiors resolved');
     expect(html).toContain('whole-network flow held');
     expect(html).toContain('Attic calculation graph (diagnostic)');
@@ -222,7 +245,8 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       counts: {
         hydraulicReportSegments: 82,
         exactHydraulicNodeConnectionPoints: 59,
-        exactPhysicalSpanRoutes: 50,
+        exactPhysicalSpanRoutes: 65,
+        exactArmOverRigidToFlexTerminalRoutes: 15,
         exactBranchLineSpanRoutes: 45,
         exactCrossMainSpanRoutes: 4,
         exactFeedMainSpanRoutes: 1,

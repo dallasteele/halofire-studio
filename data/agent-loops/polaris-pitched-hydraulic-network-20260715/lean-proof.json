@@ -11,10 +11,10 @@
     "polarisRigidSpanRouteCoverage",
     "polarisGradeAndDrainageBoundary"
   ],
-  "claim": "The two calculation reports contain 82 segments and 61 nodes with exactly 59 source-proven on-plan 3D connection points plus two off-building source nodes; 14 attic plus 15 below-ceiling calculated sprinklers equal 29 exact source-head and terminal-pipe bindings; all 186 pipe objects and 98 fitting identities partition exactly; 45 branch-line plus four cross-main plus one feed-main route equal 50 exact rigid span routes covering all three loop interiors; and the remaining flexible-armover, riser/source, and drainage-semantic gaps keep whole-network flow and proper-layout readiness fail-closed.",
+  "claim": "The two calculation reports contain 82 segments and 61 nodes with exactly 59 source-proven on-plan 3D connection points plus two off-building source nodes; 14 attic plus 15 below-ceiling calculated sprinklers equal 29 exact source-head and terminal-pipe bindings; all 186 pipe objects and 98 fitting identities partition exactly; 45 branch-line plus four cross-main plus one feed-main plus 15 rigid-to-flex-terminal arm-over routes equal 65 exact rigid span routes; the three loop interiors and all semantic flex endpoints are ready while the riser report-length mismatch, off-building source, and drainage semantics keep whole-network flow and proper-layout readiness fail-closed.",
   "result": {
     "status": "verified",
-    "elapsedMs": 118,
+    "elapsedMs": 79,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }
