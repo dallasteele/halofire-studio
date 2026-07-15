@@ -1,0 +1,48 @@
+{
+  "name": "polaris-pitched-pipe-xyz-calibration-20260715",
+  "owner": "codex",
+  "goal": "Bind a completed pitched-attic project's native AutoSPRINK model, paired exported DWGs, approved FP2 plan, and as-built FP2 to exact pipe XYZ, plan direction, roof-relative geometric slope, vertical transitions, pipe sizes, and source-underlaid visual proof without promoting unsupported hydraulic-flow, drainage, fitting, fabrication, compliance, or field-release claims.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/05-CAD Files/FP1 Polaris Academy.cad",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/05-CAD Files/Polaris Academy Fire Sprinkler CAD 2.DWG",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/05-CAD Files/Polaris Academy Fire Sprinkler CAD.DWG",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/07-AHJ Submittals/05-20-24-R5/Polaris Academy - Mesa AZ_FP2.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/11-As-Built Set/As Built.pdf",
+    "apps/autosprink/src/data/polaris-answer-extracted-evidence.json",
+    "apps/autosprink/src/data/polaris-pitched-pipe-xyz-calibration.json",
+    "apps/autosprink/src/engine/polaris-pitched-pipe-xyz-calibration.js"
+  ],
+  "exit_criteria": [
+    "Protected native CAD, both exported DWGs, approved FP2, and as-built PDFs are hash-gated and source metadata is recorded.",
+    "All 186 exact DWG pipe centerlines are transformed into project feet with their endpoint XYZ, size, plan direction, geometric class, and roof-relative slope preserved.",
+    "The two exported DWGs agree on exact pipe and sprinkler geometry, and all 158 extracted head XY anchors agree with the sealed completed-job answer evidence.",
+    "Approved and as-built FP2 rendered pixels are identical, and the exact pipe model is visibly registered over the actual approved plan underlay.",
+    "Independent evaluator checks and adversarial mutations reject wrong sources, registration, inventory, coordinates, sizes, direction, grade, and false readiness promotion.",
+    "Hydraulic-flow direction, drainage-grade semantics, complete fitting identity, drain destinations, fabrication, and field release remain fail-closed because roof-relative geometric slope alone does not prove them.",
+    "Focused tests, production build, visual/browser inspection, agent-loop guard, rulebook validation, formal invariant proof, and brain postflight pass without an independent human-review gate."
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/polaris-pitched-pipe-xyz-calibration-20260715/contract.json",
+    "cd apps/autosprink && npx vitest run tests/polaris-pitched-pipe-xyz-calibration.test.js tests/polaris-academy-pitched-attic-heldout-comparison.test.js tests/proper-pitched-pipe-graph.test.js tests/new-hope-ridge-branch-grade-envelope.test.js tests/approved-fp20-architectural-vertical-controls.test.js",
+    "cd apps/autosprink && npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "GX10 Lean check for inventory sums, geometry-class partition, pipe-size partition, and fail-closed promotion",
+    "Browser inspection of source-underlaid top plan, X-Z and Y-Z elevations, and exact-source isometric proof",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/brain_sync_session.py close writeback"
+  ],
+  "state_path": "data/agent-loops/polaris-pitched-pipe-xyz-calibration-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/polaris-pitched-pipe-xyz-calibration.json",
+    "apps/autosprink/src/data/proofs/polaris-pitched-pipe-xyz/proof.json",
+    "apps/autosprink/src/data/proofs/polaris-pitched-pipe-xyz/index.html",
+    "data/agent-loops/polaris-pitched-pipe-xyz-calibration-20260715/lean-proof.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 500000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

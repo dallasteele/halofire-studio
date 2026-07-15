@@ -85,6 +85,9 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
         return rawCenterlines.findIndex((candidate) => JSON.stringify([candidate.startPoint, candidate.endPoint]) === key) === index;
       });
       if (centerlines.length !== 1) throw new Error(`PIPE_CENTERLINE_CARDINALITY:${entity.name}:${centerlines.length}`);
+      const sectionRadii = block?.entities
+        .filter((child) => child.type === 'CIRCLE' && Number.isFinite(child.radius))
+        .map((child) => child.radius) ?? [];
       const start = transformBlockPoint(centerlines[0].startPoint, entity, block.basePoint);
       const end = transformBlockPoint(centerlines[0].endPoint, entity, block.basePoint);
       const planLength = Math.hypot(end.x - start.x, end.y - start.y);
@@ -98,6 +101,7 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
         planLength: round(planLength),
         length3d: round(length3d),
         deltaZ: round(end.z - start.z),
+        maxSectionRadius: sectionRadii.length ? round(Math.max(...sectionRadii)) : null,
       };
     });
 

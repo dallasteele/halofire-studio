@@ -1,0 +1,19 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/polaris-pitched-pipe-xyz-calibration-20260715/lean-request.json",
+  "theoremNames": [
+    "polarisPipeInventoryPartitionsExactly",
+    "polarisNominalPipeSizesPartitionExactly",
+    "polarisCrossSourceInventoriesAgree",
+    "geometricSlopeDoesNotPromoteDesignSemantics"
+  ],
+  "claim": "The 186 exact pipe centerlines partition completely by geometric class, plan direction, and nominal size; completed-job DWG and sealed calibration inventories agree; and exact source XYZ plus roof-relative geometric slope cannot promote hydraulic-flow, drainage, drain-destination, fabrication, field-release, or proper-layout readiness.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 72,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

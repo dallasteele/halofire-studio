@@ -1,0 +1,29 @@
+{
+  "iteration": 1,
+  "phase": "complete",
+  "status": "completed",
+  "observations": [
+    "The earlier generated pitched-roof visuals were not acceptable proof because they lacked an actual approved PDF underlay and did not preserve a completed design's exact pipe centerline XYZ.",
+    "Polaris Academy supplies a completed pitched-attic native AutoSPRINK model, two exported DWGs, an approved FP2, an as-built FP2, and prior sealed answer extraction for one source-bound calibration.",
+    "The extracted model contains 186 pipes, 158 sprinklers, 98 fittings, 119 distinct endpoint elevations, 86 level runs, 14 sloped plan runs, and 86 vertical transitions.",
+    "Roof-relative geometric slope and exact downhill endpoint are source facts; hydraulic flow and drainage intent are separate design semantics and remain held.",
+    "No independent human review gate is required; deterministic, cross-source, adversarial, formal, visual, and browser loops are the acceptance mechanism.",
+    "The two exported DWGs have identical pipe and sprinkler geometry; all 158 extracted head XY anchors match the sealed answer evidence with a maximum residual of 0.000000648 feet.",
+    "Approved FP2 and as-built FP2 rendered pixels are identical; the source-underlaid visual proof registers all 158 heads at 0.279512 pixel median and 1.314084 pixel p95 residual.",
+    "The browser loaded the proof at a 1265-pixel main width with all four images decoded, the approved-underlay statement visible, and explicit HELD badges for hydraulic flow, drainage semantics, and New Hope exact Z.",
+    "The 13-case adversarial verifier, 20 focused Vitest cases, syntax checks, production build, agent-loop guard, agentic-rule verifier, and Lean 4.13 formal proof all passed.",
+    "Brain postflight episode 149238 recorded the source hashes, verification evidence, fail-closed boundary, and next calibration slice."
+  ],
+  "attempts": [
+    {
+      "action": "Focused visual-proof test",
+      "result": "The first assertion expected wording not emitted by the proof generator. The generator was strengthened with explicit hydraulic-flow and drainage-semantics HELD badges, the test was corrected to bind the actual approved-underlay and AutoSPRINK-DWG source statements, and all 20 focused tests then passed."
+    },
+    {
+      "action": "Full-page browser screenshot",
+      "result": "The capture tool produced a narrow duplicated stitched image. Direct viewport screenshots and computed layout measurements proved the page itself was 1265 pixels wide and correctly rendered; source overlay, elevations, and isometric were each inspected viewport-by-viewport."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Use the completed Polaris graph rooted at the 4-inch riser to calibrate the still-held hydraulic-flow, drainage, fitting, and drain-destination semantics before transferring the verified rules to New Hope."
+}

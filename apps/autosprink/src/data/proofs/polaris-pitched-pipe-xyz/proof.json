@@ -1,0 +1,120 @@
+{
+  "schema": "halofire.polaris-pitched-pipe-visual-proof.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "sources": {
+    "nativeCad": {
+      "fileName": "FP1 Polaris Academy.cad",
+      "byteLength": 20746352,
+      "sha256": "1224C1268B19FD4390FEEB0E7A563852AEC6B9B82EADE8452B3686EDD405D3F4",
+      "archiveEntryCount": 6,
+      "typeCount": 157,
+      "nativeSpatialTypesReady": true
+    },
+    "exportedDwg": {
+      "fileName": "Polaris Academy Fire Sprinkler CAD 2.DWG",
+      "byteLength": 3081423,
+      "sha256": "3B27B60D74C6058508789929AD0CA20DF490C28905828B5AC096183454154C2F",
+      "pipeGeometrySha256": "33CE1D1119D64BB349152C3AF83767313404C8ED3443F770A8BA123FBEAEA34A"
+    },
+    "approvedFp2": {
+      "fileName": "Polaris Academy - Mesa AZ_FP2.pdf",
+      "byteLength": 2575184,
+      "sha256": "06C502687CE21D66AEE8D7C5212CB5FF2B5E31E17A7433BD22448DE12CA80DD1"
+    },
+    "asBuilt": {
+      "fileName": "As Built.pdf",
+      "byteLength": 4103231,
+      "sha256": "1442BE77DA8D08388084E6F56EE3DDFEA9565F08307022449267D065A504E81A"
+    },
+    "approvedAndAsBuiltFp2RasterSha256": "9BFC1F1F01299E86FF3335ED865F7BD977504B8BD8535BBAC81A5534EDC01904"
+  },
+  "approvedAndAsBuiltRenderedPixelsIdentical": true,
+  "renderedPixelSha256": "E3AB4064D566D04FF99447224BFED7AFF27A34BD299AAAEF9B55BE51EBB7193D",
+  "planRegistration": {
+    "scalePxPerFt": 9.0,
+    "offsetXPx": 521.125,
+    "offsetYPx": 1192.25,
+    "headSamples": 158,
+    "medianResidualPx": 0.279512,
+    "p95ResidualPx": 1.314084
+  },
+  "counts": {
+    "pipeCount": 186,
+    "headCount": 158,
+    "fittingCount": 98,
+    "nominalSizeCounts": {
+      "1": 152,
+      "2": 3,
+      "3": 7,
+      "4": 2,
+      "1.25": 17,
+      "1.5": 4,
+      "2.5": 1
+    },
+    "geometryKindCounts": {
+      "level-run": 86,
+      "sloped-plan-run": 14,
+      "vertical-transition": 86
+    },
+    "planDirectionCounts": {
+      "north-south": 73,
+      "east-west": 20,
+      "diagonal": 7,
+      "vertical-transition": 86
+    },
+    "distinctEndpointElevations": 119,
+    "endpointElevationRangeFt": [
+      -0.931250925,
+      16.834193212
+    ],
+    "fittingFamilyCounts": {
+      "Flex Drop": 70,
+      "Fitting25": 16,
+      "Fitting425": 1,
+      "Fitting28": 3,
+      "Fitting408": 2,
+      "Fitting21": 3,
+      "Fitting468": 1,
+      "Fitting1024": 1,
+      "Fitting470": 1
+    }
+  },
+  "artifacts": {
+    "approved-fp2-source.png": {
+      "sha256": "51E633E8EDD82FD9C4A6D281E304A036CC7FC5865E40FCC279F9E87876BA3060",
+      "bytes": 730443
+    },
+    "approved-fp2-pipe-overlay.png": {
+      "sha256": "6F797097679CFAB2204C3B293A0FDE00074E2A5BB1731C9E518FE21408682EDF",
+      "bytes": 722424
+    },
+    "pipe-elevation-xz.png": {
+      "sha256": "AF8D159C93A2BDE11D8F57886F26846C0B8FADCD5F312C519F13C8DDB0D86D7F",
+      "bytes": 28626
+    },
+    "pipe-elevation-yz.png": {
+      "sha256": "98594081A9C6DD23D5143E1DA2ED5B1D7E804F52F45F32F4415994A487630EE2",
+      "bytes": 28431
+    },
+    "pipe-model-3d.png": {
+      "sha256": "0186C147FBE25DBB045DDAC26A8E8C264B03EA6AFB6839588BDE96ACC66F45DD",
+      "bytes": 36997
+    }
+  },
+  "claims": {
+    "exactSourcePipeXyzReady": true,
+    "sourceUnitConversionReady": true,
+    "approvedAndAsBuiltRegistrationReady": true,
+    "planDirectionReady": true,
+    "roofRelativePipeGradeGeometryReady": true,
+    "hydraulicFlowDirectionReady": false,
+    "drainageGradeSemanticsReady": false,
+    "fullFittingIdentityReady": false,
+    "drainDestinationReady": false,
+    "nativeElementGeometryRecordDecodeReady": false,
+    "newHopeExactPipeCenterlineZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

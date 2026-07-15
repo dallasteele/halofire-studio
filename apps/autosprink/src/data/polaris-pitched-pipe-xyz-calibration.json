@@ -1,0 +1,5179 @@
+{
+  "schema": "halofire.polaris-pitched-pipe-xyz-calibration.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "sources": {
+    "nativeCad": {
+      "fileName": "FP1 Polaris Academy.cad",
+      "byteLength": 20746352,
+      "sha256": "1224C1268B19FD4390FEEB0E7A563852AEC6B9B82EADE8452B3686EDD405D3F4",
+      "archiveEntryCount": 6,
+      "typeCount": 157,
+      "nativeSpatialTypesReady": true
+    },
+    "exportedDwg": {
+      "fileName": "Polaris Academy Fire Sprinkler CAD 2.DWG",
+      "byteLength": 3081423,
+      "sha256": "3B27B60D74C6058508789929AD0CA20DF490C28905828B5AC096183454154C2F",
+      "pipeGeometrySha256": "33CE1D1119D64BB349152C3AF83767313404C8ED3443F770A8BA123FBEAEA34A"
+    },
+    "approvedFp2": {
+      "fileName": "Polaris Academy - Mesa AZ_FP2.pdf",
+      "byteLength": 2575184,
+      "sha256": "06C502687CE21D66AEE8D7C5212CB5FF2B5E31E17A7433BD22448DE12CA80DD1"
+    },
+    "asBuilt": {
+      "fileName": "As Built.pdf",
+      "byteLength": 4103231,
+      "sha256": "1442BE77DA8D08388084E6F56EE3DDFEA9565F08307022449267D065A504E81A"
+    },
+    "approvedAndAsBuiltFp2RasterSha256": "9BFC1F1F01299E86FF3335ED865F7BD977504B8BD8535BBAC81A5534EDC01904"
+  },
+  "registration": {
+    "sourceUnits": "inches",
+    "projectUnits": "feet",
+    "xyOffsetInches": [
+      2089.742556327576,
+      545.357810486682
+    ],
+    "zDatumOffsetInches": 11.175011099624,
+    "architecturalOutlineVertices": 73,
+    "architecturalOutlineMaxResidualInches": 1.8e-11,
+    "headCount": 158,
+    "headXyMaxResidualFt": 6.48e-7,
+    "headLabelZMaxResidualInches": 0.24555
+  },
+  "summary": {
+    "pipeCount": 186,
+    "headCount": 158,
+    "fittingCount": 98,
+    "nominalSizeCounts": {
+      "1": 152,
+      "2": 3,
+      "3": 7,
+      "4": 2,
+      "1.25": 17,
+      "1.5": 4,
+      "2.5": 1
+    },
+    "geometryKindCounts": {
+      "level-run": 86,
+      "sloped-plan-run": 14,
+      "vertical-transition": 86
+    },
+    "planDirectionCounts": {
+      "north-south": 73,
+      "east-west": 20,
+      "diagonal": 7,
+      "vertical-transition": 86
+    },
+    "distinctEndpointElevations": 119,
+    "endpointElevationRangeFt": [
+      -0.931250925,
+      16.834193212
+    ],
+    "fittingFamilyCounts": {
+      "Flex Drop": 70,
+      "Fitting25": 16,
+      "Fitting425": 1,
+      "Fitting28": 3,
+      "Fitting408": 2,
+      "Fitting21": 3,
+      "Fitting468": 1,
+      "Fitting1024": 1,
+      "Fitting470": 1
+    }
+  },
+  "pipes": [
+    {
+      "id": "pipe-3279",
+      "sourceBlockName": "Pipe43847",
+      "nominalSizeInches": 3,
+      "startFt": {
+        "x": 174.208333333,
+        "y": 39.301666667,
+        "z": 11
+      },
+      "endFt": {
+        "x": 174.208333333,
+        "y": -0.416666667,
+        "z": 11
+      },
+      "planLengthFt": 39.718333333,
+      "length3dFt": 39.718333333,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-3714",
+      "sourceBlockName": "Pipe43832",
+      "nominalSizeInches": 3,
+      "startFt": {
+        "x": 174.208333333,
+        "y": 57.029603747,
+        "z": 14.369775119
+      },
+      "endFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 14.369775119
+      },
+      "planLengthFt": 17.36293708,
+      "length3dFt": 17.36293708,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-3943",
+      "sourceBlockName": "Pipe43828",
+      "nominalSizeInches": 1.5,
+      "startFt": {
+        "x": 1.666666667,
+        "y": 23.166666667,
+        "z": 14.105661539
+      },
+      "endFt": {
+        "x": 174.208333333,
+        "y": 23.166666667,
+        "z": 13.655638647
+      },
+      "planLengthFt": 172.541666667,
+      "length3dFt": 172.54225354,
+      "deltaZInches": -5.400274712,
+      "gradeInPer10Ft": 0.312984,
+      "downhillDirection": "start-to-end",
+      "planDirection": "east-west",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-7661",
+      "sourceBlockName": "Pipe43862",
+      "nominalSizeInches": 2.5,
+      "startFt": {
+        "x": 1.666741605,
+        "y": 56.946275716,
+        "z": 11.029958785
+      },
+      "endFt": {
+        "x": 1.663430536,
+        "y": 22.5,
+        "z": 11.000002968
+      },
+      "planLengthFt": 34.446275875,
+      "length3dFt": 34.446288901,
+      "deltaZInches": -0.359469795,
+      "gradeInPer10Ft": 0.104357,
+      "downhillDirection": "start-to-end",
+      "planDirection": "diagonal",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-8096",
+      "sourceBlockName": "Pipe44167",
+      "nominalSizeInches": 1.5,
+      "startFt": {
+        "x": 174.208333333,
+        "y": 23.166666667,
+        "z": 13.655638647
+      },
+      "endFt": {
+        "x": 174.201447701,
+        "y": 23.166666667,
+        "z": 11.015643012
+      },
+      "planLengthFt": 0.006885632,
+      "length3dFt": 2.640004614,
+      "deltaZInches": -31.679947612,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-8121",
+      "sourceBlockName": "Pipe43830",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 140.310342169,
+        "y": 0.25,
+        "z": 11
+      },
+      "endFt": {
+        "x": 174.1953125,
+        "y": 0.25,
+        "z": 11
+      },
+      "planLengthFt": 33.884970331,
+      "length3dFt": 33.884970331,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-8658",
+      "sourceBlockName": "Pipe43897",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 133.400599754,
+        "y": 56.166666667,
+        "z": 10.734221615
+      },
+      "endFt": {
+        "x": 133.400599754,
+        "y": 56.166666667,
+        "z": 14.461174962
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.726953347,
+      "deltaZInches": 44.723440166,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "end-to-start",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-8683",
+      "sourceBlockName": "Pipe43827",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 1.66910233,
+        "y": 45.166666667,
+        "z": 14.528038583
+      },
+      "endFt": {
+        "x": 174.195312505,
+        "y": 45.166666667,
+        "z": 14.369787062
+      },
+      "planLengthFt": 172.526210175,
+      "length3dFt": 172.526282754,
+      "deltaZInches": -1.899018251,
+      "gradeInPer10Ft": 0.110071,
+      "downhillDirection": "start-to-end",
+      "planDirection": "east-west",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-11366",
+      "sourceBlockName": "Pipe43829",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 120.310342169,
+        "y": 9.742966075,
+        "z": 11
+      },
+      "endFt": {
+        "x": 174.1953125,
+        "y": 9.742966075,
+        "z": 11
+      },
+      "planLengthFt": 53.884970331,
+      "length3dFt": 53.884970331,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-12312",
+      "sourceBlockName": "Pipe43831",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 1.666666667,
+        "y": 34.166666667,
+        "z": 16.834193212
+      },
+      "endFt": {
+        "x": 174.208333333,
+        "y": 34.166666667,
+        "z": 16.81521289
+      },
+      "planLengthFt": 172.541666667,
+      "length3dFt": 172.541667711,
+      "deltaZInches": -0.22776387,
+      "gradeInPer10Ft": 0.013201,
+      "downhillDirection": "start-to-end",
+      "planDirection": "east-west",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-15307",
+      "sourceBlockName": "Pipe43895",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 174.195312529,
+        "y": 56.166666667,
+        "z": 14.369802491
+      },
+      "endFt": {
+        "x": 133.400599754,
+        "y": 56.166666667,
+        "z": 14.461174962
+      },
+      "planLengthFt": 40.794712775,
+      "length3dFt": 40.794815103,
+      "deltaZInches": 1.096469651,
+      "gradeInPer10Ft": 0.268777,
+      "downhillDirection": "end-to-start",
+      "planDirection": "east-west",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-15636",
+      "sourceBlockName": "Pipe44169",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 174.208333333,
+        "y": 34.166666667,
+        "z": 16.81521289
+      },
+      "endFt": {
+        "x": 174.207695067,
+        "y": 34.166666667,
+        "z": 11.013020904
+      },
+      "planLengthFt": 0.000638266,
+      "length3dFt": 5.802192021,
+      "deltaZInches": -69.626303831,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-15661",
+      "sourceBlockName": "Pipe44194",
+      "nominalSizeInches": 1.5,
+      "startFt": {
+        "x": 1.666666667,
+        "y": 23.166666667,
+        "z": 14.105661539
+      },
+      "endFt": {
+        "x": 1.658607293,
+        "y": 23.166666667,
+        "z": 11.015646074
+      },
+      "planLengthFt": 0.008059373,
+      "length3dFt": 3.090025976,
+      "deltaZInches": -37.080185588,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-15686",
+      "sourceBlockName": "Pipe44196",
+      "nominalSizeInches": 1.5,
+      "startFt": {
+        "x": 1.666666667,
+        "y": 34.166666667,
+        "z": 16.834193212
+      },
+      "endFt": {
+        "x": 1.664557641,
+        "y": 34.166666808,
+        "z": 11.025773753
+      },
+      "planLengthFt": 0.002109026,
+      "length3dFt": 5.808419842,
+      "deltaZInches": -69.701033509,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-15711",
+      "sourceBlockName": "Pipe44206",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 1.66910233,
+        "y": 45.166666667,
+        "z": 14.528038583
+      },
+      "endFt": {
+        "x": 1.665895849,
+        "y": 45.166666667,
+        "z": 11.032324662
+      },
+      "planLengthFt": 0.003206481,
+      "length3dFt": 3.495715392,
+      "deltaZInches": -41.948567052,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-15736",
+      "sourceBlockName": "Pipe43812",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 1.679687467,
+        "y": 56.166666667,
+        "z": 11.029251642
+      },
+      "endFt": {
+        "x": 133.400599754,
+        "y": 56.166666667,
+        "z": 10.734221615
+      },
+      "planLengthFt": 131.720912287,
+      "length3dFt": 131.721242692,
+      "deltaZInches": -3.540360329,
+      "gradeInPer10Ft": 0.268777,
+      "downhillDirection": "start-to-end",
+      "planDirection": "east-west",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-17499",
+      "sourceBlockName": "Pipe44208",
+      "nominalSizeInches": 3,
+      "startFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 11.365
+      },
+      "endFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 14.369775119
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.004775119,
+      "deltaZInches": 36.057301425,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "end-to-start",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-17523",
+      "sourceBlockName": "Pipe44209",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 31.310342169,
+        "y": 4.166666667,
+        "z": 13.671059385
+      },
+      "endFt": {
+        "x": 31.310342169,
+        "y": 23.153648135,
+        "z": 14.028100146
+      },
+      "planLengthFt": 18.986981468,
+      "length3dFt": 18.990338159,
+      "deltaZInches": 4.28448913,
+      "gradeInPer10Ft": 2.25654,
+      "downhillDirection": "end-to-start",
+      "planDirection": "north-south",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-17853",
+      "sourceBlockName": "Pipe44211",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 19.310342169,
+        "y": 4.166666667,
+        "z": 13.671059385
+      },
+      "endFt": {
+        "x": 19.310342169,
+        "y": 23.153648556,
+        "z": 14.05937709
+      },
+      "planLengthFt": 18.986981889,
+      "length3dFt": 18.990952369,
+      "deltaZInches": 4.659812455,
+      "gradeInPer10Ft": 2.454214,
+      "downhillDirection": "end-to-start",
+      "planDirection": "north-south",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-18285",
+      "sourceBlockName": "Pipe44213",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 7.310342169,
+        "y": 4.166666667,
+        "z": 13.671059385
+      },
+      "endFt": {
+        "x": 7.310342169,
+        "y": 23.153649012,
+        "z": 14.090654036
+      },
+      "planLengthFt": 18.986982345,
+      "length3dFt": 18.991618105,
+      "deltaZInches": 5.035135806,
+      "gradeInPer10Ft": 2.651888,
+      "downhillDirection": "end-to-start",
+      "planDirection": "north-south",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-18615",
+      "sourceBlockName": "Pipe44215",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 52.310342169,
+        "y": 11.166666667,
+        "z": 13.671059385
+      },
+      "endFt": {
+        "x": 52.310342169,
+        "y": 23.153649974,
+        "z": 13.973422435
+      },
+      "planLengthFt": 11.986983307,
+      "length3dFt": 11.990796146,
+      "deltaZInches": 3.628356593,
+      "gradeInPer10Ft": 3.026914,
+      "downhillDirection": "end-to-start",
+      "planDirection": "north-south",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-18740",
+      "sourceBlockName": "Pipe44217",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 64.310342169,
+        "y": 11.166666667,
+        "z": 13.671059385
+      },
+      "endFt": {
+        "x": 64.310342169,
+        "y": 23.153649158,
+        "z": 13.941980195
+      },
+      "planLengthFt": 11.986982491,
+      "length3dFt": 11.990043675,
+      "deltaZInches": 3.251049718,
+      "gradeInPer10Ft": 2.71215,
+      "downhillDirection": "end-to-start",
+      "planDirection": "north-south",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-18866",
+      "sourceBlockName": "Pipe44221",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 88.310342169,
+        "y": 11.166666667,
+        "z": 13.671059385
+      },
+      "endFt": {
+        "x": 88.310342169,
+        "y": 23.153647803,
+        "z": 13.8795697
+      },
+      "planLengthFt": 11.986981136,
+      "length3dFt": 11.988794489,
+      "deltaZInches": 2.502123777,
+      "gradeInPer10Ft": 2.087368,
+      "downhillDirection": "end-to-start",
+      "planDirection": "north-south",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-18991",
+      "sourceBlockName": "Pipe44219",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 76.310342169,
+        "y": 11.166666667,
+        "z": 13.671059385
+      },
+      "endFt": {
+        "x": 76.310342169,
+        "y": 23.153648435,
+        "z": 13.910720927
+      },
+      "planLengthFt": 11.986981768,
+      "length3dFt": 11.989377364,
+      "deltaZInches": 2.875938495,
+      "gradeInPer10Ft": 2.399218,
+      "downhillDirection": "end-to-start",
+      "planDirection": "north-south",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-19116",
+      "sourceBlockName": "Pipe44233",
+      "nominalSizeInches": 1.25,
+      "startFt": {
+        "x": 100.310342169,
+        "y": 11.166666667,
+        "z": 13.671059385
+      },
+      "endFt": {
+        "x": 100.310342169,
+        "y": 23.153647255,
+        "z": 13.848186449
+      },
+      "planLengthFt": 11.986980588,
+      "length3dFt": 11.988289186,
+      "deltaZInches": 2.125524767,
+      "gradeInPer10Ft": 1.773194,
+      "downhillDirection": "end-to-start",
+      "planDirection": "north-south",
+      "geometryKind": "sloped-plan-run"
+    },
+    {
+      "id": "pipe-19242",
+      "sourceBlockName": "Pipe44307",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 141.291666667,
+        "y": 9.742966075,
+        "z": 11
+      },
+      "endFt": {
+        "x": 141.291666667,
+        "y": 10.097132742,
+        "z": 11
+      },
+      "planLengthFt": 0.354166667,
+      "length3dFt": 0.354166667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19264",
+      "sourceBlockName": "Pipe44311",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 132.821904788,
+        "y": 45.166666667,
+        "z": 14.407737265
+      },
+      "endFt": {
+        "x": 132.821904788,
+        "y": 43.32863145,
+        "z": 14.407737265
+      },
+      "planLengthFt": 1.838035217,
+      "length3dFt": 1.838035217,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19286",
+      "sourceBlockName": "Pipe44313",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 132.821904788,
+        "y": 43.32863145,
+        "z": 14.407737265
+      },
+      "endFt": {
+        "x": 132.821904788,
+        "y": 43.32863145,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.345237265,
+      "deltaZInches": -40.142847183,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19310",
+      "sourceBlockName": "Pipe44316",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 63.416666667,
+        "y": 45.166666667,
+        "z": 14.471399966
+      },
+      "endFt": {
+        "x": 63.416666667,
+        "y": 43.754416701,
+        "z": 14.471399966
+      },
+      "planLengthFt": 1.412249966,
+      "length3dFt": 1.412249966,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19332",
+      "sourceBlockName": "Pipe44318",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 63.416666667,
+        "y": 43.754416701,
+        "z": 14.471399966
+      },
+      "endFt": {
+        "x": 63.416666667,
+        "y": 43.754416701,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.408899966,
+      "deltaZInches": -40.906799592,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19356",
+      "sourceBlockName": "Pipe44321",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 20.5,
+        "y": 45.166666667,
+        "z": 14.51076574
+      },
+      "endFt": {
+        "x": 20.5,
+        "y": 44.75,
+        "z": 14.51076574
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19378",
+      "sourceBlockName": "Pipe44323",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 20.5,
+        "y": 44.75,
+        "z": 14.51076574
+      },
+      "endFt": {
+        "x": 20.5,
+        "y": 44.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.44826574,
+      "deltaZInches": -41.379188878,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19402",
+      "sourceBlockName": "Pipe44326",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 46.101750049,
+        "y": 34.166666667,
+        "z": 16.829305162
+      },
+      "endFt": {
+        "x": 46.101750049,
+        "y": 33.75,
+        "z": 16.829305162
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19424",
+      "sourceBlockName": "Pipe44328",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 46.101750049,
+        "y": 33.75,
+        "z": 16.829305162
+      },
+      "endFt": {
+        "x": 46.101750049,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.766805162,
+      "deltaZInches": -69.20166195,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19448",
+      "sourceBlockName": "Pipe44331",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 31.310342169,
+        "y": 19.854166667,
+        "z": 13.966055035
+      },
+      "endFt": {
+        "x": 31.727008835,
+        "y": 19.854166667,
+        "z": 13.966055035
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19470",
+      "sourceBlockName": "Pipe44333",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 31.727008835,
+        "y": 19.854166667,
+        "z": 13.966055035
+      },
+      "endFt": {
+        "x": 31.727008835,
+        "y": 19.854166667,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.903555035,
+      "deltaZInches": -34.842660423,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19494",
+      "sourceBlockName": "Pipe44336",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 168.810342169,
+        "y": 9.742966075,
+        "z": 11
+      },
+      "endFt": {
+        "x": 168.456208065,
+        "y": 9.747768601,
+        "z": 11
+      },
+      "planLengthFt": 0.354166667,
+      "length3dFt": 0.354166667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "diagonal",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19516",
+      "sourceBlockName": "Pipe44340",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 19.310342169,
+        "y": 6.166666667,
+        "z": 13.711962959
+      },
+      "endFt": {
+        "x": 18.893675502,
+        "y": 6.166666667,
+        "z": 13.711962959
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19538",
+      "sourceBlockName": "Pipe44342",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 18.893675502,
+        "y": 6.166666667,
+        "z": 13.711962959
+      },
+      "endFt": {
+        "x": 18.893675502,
+        "y": 6.166666667,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.649462959,
+      "deltaZInches": -31.793555507,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19562",
+      "sourceBlockName": "Pipe44345",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 16.291666667,
+        "y": 34.166666667,
+        "z": 16.832584399
+      },
+      "endFt": {
+        "x": 16.291666667,
+        "y": 33.75,
+        "z": 16.832584399
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19584",
+      "sourceBlockName": "Pipe44347",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 16.291666667,
+        "y": 33.75,
+        "z": 16.832584399
+      },
+      "endFt": {
+        "x": 16.291666667,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.770084399,
+      "deltaZInches": -69.241012792,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19608",
+      "sourceBlockName": "Pipe44350",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 23.705723524,
+        "y": 34.166666667,
+        "z": 16.831768821
+      },
+      "endFt": {
+        "x": 23.705723524,
+        "y": 33.75,
+        "z": 16.831768821
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19630",
+      "sourceBlockName": "Pipe44352",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 23.705723524,
+        "y": 33.75,
+        "z": 16.831768821
+      },
+      "endFt": {
+        "x": 23.705723524,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.769268821,
+      "deltaZInches": -69.231225856,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19654",
+      "sourceBlockName": "Pipe44355",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 167.541666667,
+        "y": 23.166666667,
+        "z": 13.673026636
+      },
+      "endFt": {
+        "x": 167.541666667,
+        "y": 22.75,
+        "z": 13.673026636
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19676",
+      "sourceBlockName": "Pipe44357",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 167.541666667,
+        "y": 22.75,
+        "z": 13.673026636
+      },
+      "endFt": {
+        "x": 167.541666667,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.610526636,
+      "deltaZInches": -31.326319628,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19700",
+      "sourceBlockName": "Pipe44360",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 7.310342169,
+        "y": 6.166666667,
+        "z": 13.715257525
+      },
+      "endFt": {
+        "x": 6.893675502,
+        "y": 6.166666667,
+        "z": 13.715257525
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19722",
+      "sourceBlockName": "Pipe44362",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 6.893675502,
+        "y": 6.166666667,
+        "z": 13.715257525
+      },
+      "endFt": {
+        "x": 6.893675502,
+        "y": 6.166666667,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.652757525,
+      "deltaZInches": -31.833090304,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19746",
+      "sourceBlockName": "Pipe44365",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 52.310342169,
+        "y": 13.428051432,
+        "z": 13.728101193
+      },
+      "endFt": {
+        "x": 52.727008835,
+        "y": 13.428051432,
+        "z": 13.728101193
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19768",
+      "sourceBlockName": "Pipe44367",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 52.727008835,
+        "y": 13.428051432,
+        "z": 13.728101193
+      },
+      "endFt": {
+        "x": 52.727008835,
+        "y": 13.428051432,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.665601193,
+      "deltaZInches": -31.987214314,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19792",
+      "sourceBlockName": "Pipe44370",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 155.208333333,
+        "y": 56.166666667,
+        "z": 14.412329747
+      },
+      "endFt": {
+        "x": 155.208333333,
+        "y": 55.75,
+        "z": 14.412329747
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19814",
+      "sourceBlockName": "Pipe44372",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 155.208333333,
+        "y": 55.75,
+        "z": 14.412329747
+      },
+      "endFt": {
+        "x": 155.208333333,
+        "y": 55.75,
+        "z": 13.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 1.349829747,
+      "deltaZInches": -16.197956967,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19838",
+      "sourceBlockName": "Pipe44375",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 76.310342169,
+        "y": 11.666566762,
+        "z": 13.681054131
+      },
+      "endFt": {
+        "x": 75.1147682,
+        "y": 11.666566762,
+        "z": 13.681054131
+      },
+      "planLengthFt": 1.195573968,
+      "length3dFt": 1.195573968,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19860",
+      "sourceBlockName": "Pipe44377",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 75.1147682,
+        "y": 11.666566762,
+        "z": 13.681054131
+      },
+      "endFt": {
+        "x": 75.1147682,
+        "y": 11.666566762,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.618554131,
+      "deltaZInches": -31.422649567,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19884",
+      "sourceBlockName": "Pipe44380",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 59.810342172,
+        "y": 34.166666667,
+        "z": 16.827797159
+      },
+      "endFt": {
+        "x": 59.892251674,
+        "y": 33.600209822,
+        "z": 16.827797159
+      },
+      "planLengthFt": 0.572348254,
+      "length3dFt": 0.572348254,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "diagonal",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19906",
+      "sourceBlockName": "Pipe44382",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 59.892251674,
+        "y": 33.600209822,
+        "z": 16.827797159
+      },
+      "endFt": {
+        "x": 59.892251674,
+        "y": 33.600209822,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.765297159,
+      "deltaZInches": -69.183565903,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19930",
+      "sourceBlockName": "Pipe44387",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 100.310342169,
+        "y": 11.666612088,
+        "z": 13.678446889
+      },
+      "endFt": {
+        "x": 99.935525971,
+        "y": 11.484612283,
+        "z": 13.678446889
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "diagonal",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19952",
+      "sourceBlockName": "Pipe44389",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 99.935525971,
+        "y": 11.484612283,
+        "z": 13.678446889
+      },
+      "endFt": {
+        "x": 99.935525971,
+        "y": 11.484612283,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.615946889,
+      "deltaZInches": -31.391362671,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-19976",
+      "sourceBlockName": "Pipe44392",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 93.4375,
+        "y": 23.166666667,
+        "z": 13.866305002
+      },
+      "endFt": {
+        "x": 93.4375,
+        "y": 22.75,
+        "z": 13.866305002
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-19998",
+      "sourceBlockName": "Pipe44394",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 93.4375,
+        "y": 22.75,
+        "z": 13.866305002
+      },
+      "endFt": {
+        "x": 93.4375,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.803805002,
+      "deltaZInches": -33.645660023,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20022",
+      "sourceBlockName": "Pipe44397",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 104.291666667,
+        "y": 45.166666667,
+        "z": 14.433906933
+      },
+      "endFt": {
+        "x": 104.291666667,
+        "y": 44.75,
+        "z": 14.433906933
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20044",
+      "sourceBlockName": "Pipe44399",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 104.291666667,
+        "y": 44.75,
+        "z": 14.433906933
+      },
+      "endFt": {
+        "x": 104.291666667,
+        "y": 44.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.371406933,
+      "deltaZInches": -40.456883194,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20068",
+      "sourceBlockName": "Pipe44402",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 140,
+        "y": 23.166666667,
+        "z": 13.744860766
+      },
+      "endFt": {
+        "x": 140,
+        "y": 22.75,
+        "z": 13.744860766
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20090",
+      "sourceBlockName": "Pipe44404",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 140,
+        "y": 22.75,
+        "z": 13.744860766
+      },
+      "endFt": {
+        "x": 140,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.682360766,
+      "deltaZInches": -32.188329187,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20114",
+      "sourceBlockName": "Pipe44407",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 134.791666667,
+        "y": 9.742966075,
+        "z": 11
+      },
+      "endFt": {
+        "x": 134.791666667,
+        "y": 9.388799408,
+        "z": 11
+      },
+      "planLengthFt": 0.354166667,
+      "length3dFt": 0.354166667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20136",
+      "sourceBlockName": "Pipe44411",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 115.916666667,
+        "y": 34.166666667,
+        "z": 16.821625223
+      },
+      "endFt": {
+        "x": 115.916666667,
+        "y": 33.75,
+        "z": 16.821625223
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20158",
+      "sourceBlockName": "Pipe44413",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 115.916666667,
+        "y": 33.75,
+        "z": 16.821625223
+      },
+      "endFt": {
+        "x": 115.916666667,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.759125223,
+      "deltaZInches": -69.109502671,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20182",
+      "sourceBlockName": "Pipe44416",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 48.083333333,
+        "y": 45.166666667,
+        "z": 14.485464631
+      },
+      "endFt": {
+        "x": 48.083333333,
+        "y": 45.583333333,
+        "z": 14.485464631
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20204",
+      "sourceBlockName": "Pipe44418",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 48.083333333,
+        "y": 45.583333333,
+        "z": 14.485464631
+      },
+      "endFt": {
+        "x": 48.083333333,
+        "y": 45.583333333,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.422964631,
+      "deltaZInches": -41.07557557,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20228",
+      "sourceBlockName": "Pipe44421",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 87.416666667,
+        "y": 34.166666667,
+        "z": 16.824760345
+      },
+      "endFt": {
+        "x": 87.416666667,
+        "y": 34.583333333,
+        "z": 16.824760345
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20250",
+      "sourceBlockName": "Pipe44423",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 87.416666667,
+        "y": 34.583333333,
+        "z": 16.824760345
+      },
+      "endFt": {
+        "x": 87.416666667,
+        "y": 34.583333333,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.762260345,
+      "deltaZInches": -69.147124136,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20274",
+      "sourceBlockName": "Pipe44428",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 112.959196671,
+        "y": 45.166666667,
+        "z": 14.425956548
+      },
+      "endFt": {
+        "x": 112.959196671,
+        "y": 43.419989991,
+        "z": 14.425956548
+      },
+      "planLengthFt": 1.746676675,
+      "length3dFt": 1.746676675,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20296",
+      "sourceBlockName": "Pipe44430",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 112.959196671,
+        "y": 43.419989991,
+        "z": 14.425956548
+      },
+      "endFt": {
+        "x": 112.959196671,
+        "y": 43.419989991,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.363456548,
+      "deltaZInches": -40.361478573,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20320",
+      "sourceBlockName": "Pipe44433",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 47.583333544,
+        "y": 45.166666667,
+        "z": 14.485923261
+      },
+      "endFt": {
+        "x": 47.583333544,
+        "y": 43.657033318,
+        "z": 14.485923261
+      },
+      "planLengthFt": 1.509633349,
+      "length3dFt": 1.509633349,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20342",
+      "sourceBlockName": "Pipe44435",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 47.583333544,
+        "y": 43.657033318,
+        "z": 14.485923261
+      },
+      "endFt": {
+        "x": 47.583333544,
+        "y": 43.657033318,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.423423261,
+      "deltaZInches": -41.081079132,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20366",
+      "sourceBlockName": "Pipe44438",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 6.5,
+        "y": 45.166666667,
+        "z": 14.52360739
+      },
+      "endFt": {
+        "x": 6.5,
+        "y": 44.75,
+        "z": 14.52360739
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20388",
+      "sourceBlockName": "Pipe44440",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 6.5,
+        "y": 44.75,
+        "z": 14.52360739
+      },
+      "endFt": {
+        "x": 6.5,
+        "y": 44.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.46110739,
+      "deltaZInches": -41.533288684,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20412",
+      "sourceBlockName": "Pipe44443",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 6.5,
+        "y": 56.166666667,
+        "z": 11.01845505
+      },
+      "endFt": {
+        "x": 6.5,
+        "y": 55.75,
+        "z": 11.01845505
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20434",
+      "sourceBlockName": "Pipe44445",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 6.5,
+        "y": 55.75,
+        "z": 11.01845505
+      },
+      "endFt": {
+        "x": 6.5,
+        "y": 55.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.04404495,
+      "deltaZInches": 0.528539397,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "end-to-start",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20458",
+      "sourceBlockName": "Pipe44448",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 19.958333333,
+        "y": 23.166666667,
+        "z": 14.057953244
+      },
+      "endFt": {
+        "x": 19.958333333,
+        "y": 23.583333333,
+        "z": 14.057953244
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20480",
+      "sourceBlockName": "Pipe44450",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 19.958333333,
+        "y": 23.583333333,
+        "z": 14.057953244
+      },
+      "endFt": {
+        "x": 19.958333333,
+        "y": 23.583333333,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.995453244,
+      "deltaZInches": -35.94543893,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20504",
+      "sourceBlockName": "Pipe44453",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 152.541666667,
+        "y": 34.166666667,
+        "z": 16.817596316
+      },
+      "endFt": {
+        "x": 152.541666667,
+        "y": 33.75,
+        "z": 16.817596316
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20526",
+      "sourceBlockName": "Pipe44455",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 152.541666667,
+        "y": 33.75,
+        "z": 16.817596316
+      },
+      "endFt": {
+        "x": 152.541666667,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.755096316,
+      "deltaZInches": -69.061155788,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20550",
+      "sourceBlockName": "Pipe44458",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 6.708333333,
+        "y": 23.166666667,
+        "z": 14.092511872
+      },
+      "endFt": {
+        "x": 6.708333333,
+        "y": 24.71912526,
+        "z": 14.092511872
+      },
+      "planLengthFt": 1.552458593,
+      "length3dFt": 1.552458593,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20572",
+      "sourceBlockName": "Pipe44460",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 6.708333333,
+        "y": 24.71912526,
+        "z": 14.092511872
+      },
+      "endFt": {
+        "x": 6.708333333,
+        "y": 24.71912526,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.030011872,
+      "deltaZInches": -36.36014247,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20596",
+      "sourceBlockName": "Pipe44463",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 46.652287372,
+        "y": 23.166666667,
+        "z": 13.988330117
+      },
+      "endFt": {
+        "x": 46.652287372,
+        "y": 22.75,
+        "z": 13.988330117
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20618",
+      "sourceBlockName": "Pipe44465",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 46.652287372,
+        "y": 22.75,
+        "z": 13.988330117
+      },
+      "endFt": {
+        "x": 46.652287372,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.925830117,
+      "deltaZInches": -35.109961403,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20642",
+      "sourceBlockName": "Pipe44468",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 141.875,
+        "y": 45.166666667,
+        "z": 14.399433216
+      },
+      "endFt": {
+        "x": 141.875,
+        "y": 44.75,
+        "z": 14.399433216
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20664",
+      "sourceBlockName": "Pipe44470",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 141.875,
+        "y": 44.75,
+        "z": 14.399433216
+      },
+      "endFt": {
+        "x": 141.875,
+        "y": 44.75,
+        "z": 13.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 1.336933216,
+      "deltaZInches": -16.043198596,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20688",
+      "sourceBlockName": "Pipe44473",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 31.310342169,
+        "y": 7.228431264,
+        "z": 13.728634349
+      },
+      "endFt": {
+        "x": 30.893675502,
+        "y": 7.228431264,
+        "z": 13.728634349
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20710",
+      "sourceBlockName": "Pipe44475",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 30.893675502,
+        "y": 7.228431264,
+        "z": 13.728634349
+      },
+      "endFt": {
+        "x": 30.893675502,
+        "y": 7.228431264,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.666134349,
+      "deltaZInches": -31.993612185,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20734",
+      "sourceBlockName": "Pipe44478",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 64.310342169,
+        "y": 11.666539011,
+        "z": 13.682357126
+      },
+      "endFt": {
+        "x": 64.248022174,
+        "y": 11.264400171,
+        "z": 13.682357126
+      },
+      "planLengthFt": 0.406939098,
+      "length3dFt": 0.406939098,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "diagonal",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20756",
+      "sourceBlockName": "Pipe44483",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 155.208333333,
+        "y": 45.166666667,
+        "z": 14.387203073
+      },
+      "endFt": {
+        "x": 155.208333333,
+        "y": 44.75,
+        "z": 14.387203073
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20778",
+      "sourceBlockName": "Pipe44485",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 155.208333333,
+        "y": 44.75,
+        "z": 14.387203073
+      },
+      "endFt": {
+        "x": 155.208333333,
+        "y": 44.75,
+        "z": 13.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 1.324703073,
+      "deltaZInches": -15.896436876,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20802",
+      "sourceBlockName": "Pipe44488",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 82.104166667,
+        "y": 23.166666667,
+        "z": 13.895864583
+      },
+      "endFt": {
+        "x": 82.104166667,
+        "y": 22.75,
+        "z": 13.895864583
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20824",
+      "sourceBlockName": "Pipe44490",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 82.104166667,
+        "y": 22.75,
+        "z": 13.895864583
+      },
+      "endFt": {
+        "x": 82.104166667,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.833364583,
+      "deltaZInches": -34.000375,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20848",
+      "sourceBlockName": "Pipe44493",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 70.520833333,
+        "y": 34.166666667,
+        "z": 16.826618959
+      },
+      "endFt": {
+        "x": 70.520833333,
+        "y": 33.75,
+        "z": 16.826618959
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20870",
+      "sourceBlockName": "Pipe44495",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 70.520833333,
+        "y": 33.75,
+        "z": 16.826618959
+      },
+      "endFt": {
+        "x": 70.520833333,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.764118959,
+      "deltaZInches": -69.169427504,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20894",
+      "sourceBlockName": "Pipe44498",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 167.541666667,
+        "y": 34.166666667,
+        "z": 16.815946251
+      },
+      "endFt": {
+        "x": 167.541666667,
+        "y": 33.75,
+        "z": 16.815946251
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20916",
+      "sourceBlockName": "Pipe44500",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 167.541666667,
+        "y": 33.75,
+        "z": 16.815946251
+      },
+      "endFt": {
+        "x": 167.541666667,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.753446251,
+      "deltaZInches": -69.041355017,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20940",
+      "sourceBlockName": "Pipe44503",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 116.958333333,
+        "y": 45.166666667,
+        "z": 14.422288297
+      },
+      "endFt": {
+        "x": 116.958333333,
+        "y": 45.583333333,
+        "z": 14.422288297
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-20962",
+      "sourceBlockName": "Pipe44505",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 116.958333333,
+        "y": 45.583333333,
+        "z": 14.422288297
+      },
+      "endFt": {
+        "x": 116.958333333,
+        "y": 45.583333333,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.359788297,
+      "deltaZInches": -40.31745956,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-20986",
+      "sourceBlockName": "Pipe44508",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 128.75,
+        "y": 45.166666667,
+        "z": 14.411472264
+      },
+      "endFt": {
+        "x": 128.75,
+        "y": 45.583333333,
+        "z": 14.411472264
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21008",
+      "sourceBlockName": "Pipe44510",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 128.75,
+        "y": 45.583333333,
+        "z": 14.411472264
+      },
+      "endFt": {
+        "x": 128.75,
+        "y": 45.583333333,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.348972264,
+      "deltaZInches": -40.187667164,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21032",
+      "sourceBlockName": "Pipe44513",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 88.310342169,
+        "y": 11.66659104,
+        "z": 13.679755436
+      },
+      "endFt": {
+        "x": 87.48970444,
+        "y": 11.66659104,
+        "z": 13.679755436
+      },
+      "planLengthFt": 0.820637728,
+      "length3dFt": 0.820637728,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21054",
+      "sourceBlockName": "Pipe44515",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 87.48970444,
+        "y": 11.66659104,
+        "z": 13.679755436
+      },
+      "endFt": {
+        "x": 87.48970444,
+        "y": 11.66659104,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.617255436,
+      "deltaZInches": -31.407065226,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21078",
+      "sourceBlockName": "Pipe44518",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 140,
+        "y": 34.166666667,
+        "z": 16.818975953
+      },
+      "endFt": {
+        "x": 140,
+        "y": 33.75,
+        "z": 16.818975953
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21100",
+      "sourceBlockName": "Pipe44520",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 140,
+        "y": 33.75,
+        "z": 16.818975953
+      },
+      "endFt": {
+        "x": 140,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.756475953,
+      "deltaZInches": -69.077711433,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21124",
+      "sourceBlockName": "Pipe44523",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 122.852484671,
+        "y": 45.166666667,
+        "z": 14.416881823
+      },
+      "endFt": {
+        "x": 122.852484671,
+        "y": 43.568354667,
+        "z": 14.416881823
+      },
+      "planLengthFt": 1.598311999,
+      "length3dFt": 1.598311999,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21146",
+      "sourceBlockName": "Pipe44525",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 122.852484671,
+        "y": 43.568354667,
+        "z": 14.416881823
+      },
+      "endFt": {
+        "x": 122.852484671,
+        "y": 43.568354667,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.354381823,
+      "deltaZInches": -40.252581876,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21170",
+      "sourceBlockName": "Pipe44528",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 101.416666667,
+        "y": 34.166666667,
+        "z": 16.823220285
+      },
+      "endFt": {
+        "x": 101.416666667,
+        "y": 33.75,
+        "z": 16.823220285
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21192",
+      "sourceBlockName": "Pipe44530",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 101.416666667,
+        "y": 33.75,
+        "z": 16.823220285
+      },
+      "endFt": {
+        "x": 101.416666667,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.760720285,
+      "deltaZInches": -69.128643416,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21216",
+      "sourceBlockName": "Pipe44533",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 77.416666667,
+        "y": 34.166666667,
+        "z": 16.825860388
+      },
+      "endFt": {
+        "x": 77.416666667,
+        "y": 34.583333333,
+        "z": 16.825860388
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21238",
+      "sourceBlockName": "Pipe44535",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 77.416666667,
+        "y": 34.583333333,
+        "z": 16.825860388
+      },
+      "endFt": {
+        "x": 77.416666667,
+        "y": 34.583333333,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.763360388,
+      "deltaZInches": -69.16032465,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21262",
+      "sourceBlockName": "Pipe44538",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 34.5,
+        "y": 45.166666667,
+        "z": 14.497924089
+      },
+      "endFt": {
+        "x": 34.5,
+        "y": 44.75,
+        "z": 14.497924089
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21284",
+      "sourceBlockName": "Pipe44540",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 34.5,
+        "y": 44.75,
+        "z": 14.497924089
+      },
+      "endFt": {
+        "x": 34.5,
+        "y": 44.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.435424089,
+      "deltaZInches": -41.225089072,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21308",
+      "sourceBlockName": "Pipe44543",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 113.728131066,
+        "y": 23.166666667,
+        "z": 13.813383011
+      },
+      "endFt": {
+        "x": 113.728131066,
+        "y": 22.75,
+        "z": 13.813383011
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21330",
+      "sourceBlockName": "Pipe44545",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 113.728131066,
+        "y": 22.75,
+        "z": 13.813383011
+      },
+      "endFt": {
+        "x": 113.728131066,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.750883011,
+      "deltaZInches": -33.010596134,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21354",
+      "sourceBlockName": "Pipe44548",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 34.753363992,
+        "y": 34.166666667,
+        "z": 16.830553534
+      },
+      "endFt": {
+        "x": 34.753363992,
+        "y": 33.114208074,
+        "z": 16.830553534
+      },
+      "planLengthFt": 1.052458593,
+      "length3dFt": 1.052458593,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21376",
+      "sourceBlockName": "Pipe44550",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 34.753363992,
+        "y": 33.114208074,
+        "z": 16.830553534
+      },
+      "endFt": {
+        "x": 34.753363992,
+        "y": 33.114208074,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.768053534,
+      "deltaZInches": -69.216642403,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21400",
+      "sourceBlockName": "Pipe44553",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 154.791666667,
+        "y": 9.742966075,
+        "z": 11
+      },
+      "endFt": {
+        "x": 154.791666667,
+        "y": 10.097132742,
+        "z": 11
+      },
+      "planLengthFt": 0.354166667,
+      "length3dFt": 0.354166667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21422",
+      "sourceBlockName": "Pipe44557",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 19.310342169,
+        "y": 17.166666667,
+        "z": 13.936932613
+      },
+      "endFt": {
+        "x": 19.727008835,
+        "y": 17.166666667,
+        "z": 13.936932613
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21444",
+      "sourceBlockName": "Pipe44559",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 19.727008835,
+        "y": 17.166666667,
+        "z": 13.936932613
+      },
+      "endFt": {
+        "x": 19.727008835,
+        "y": 17.166666667,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.874432613,
+      "deltaZInches": -34.493191358,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21468",
+      "sourceBlockName": "Pipe44562",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 19.310342169,
+        "y": 17.958333333,
+        "z": 13.953123611
+      },
+      "endFt": {
+        "x": 18.53087474,
+        "y": 17.958333333,
+        "z": 13.953123611
+      },
+      "planLengthFt": 0.779467428,
+      "length3dFt": 0.779467428,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21490",
+      "sourceBlockName": "Pipe44564",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 18.53087474,
+        "y": 17.958333333,
+        "z": 13.953123611
+      },
+      "endFt": {
+        "x": 18.53087474,
+        "y": 17.958333333,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.890623611,
+      "deltaZInches": -34.687483332,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21514",
+      "sourceBlockName": "Pipe44567",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 152.541666667,
+        "y": 23.166666667,
+        "z": 13.712149611
+      },
+      "endFt": {
+        "x": 152.541666667,
+        "y": 22.75,
+        "z": 13.712149611
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21536",
+      "sourceBlockName": "Pipe44569",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 152.541666667,
+        "y": 22.75,
+        "z": 13.712149611
+      },
+      "endFt": {
+        "x": 152.541666667,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.649649611,
+      "deltaZInches": -31.795795334,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21560",
+      "sourceBlockName": "Pipe44572",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 7.310342169,
+        "y": 17.125,
+        "z": 13.9574265
+      },
+      "endFt": {
+        "x": 6.893675502,
+        "y": 17.125,
+        "z": 13.9574265
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21582",
+      "sourceBlockName": "Pipe44574",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 6.893675502,
+        "y": 17.125,
+        "z": 13.9574265
+      },
+      "endFt": {
+        "x": 6.893675502,
+        "y": 17.125,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.8949265,
+      "deltaZInches": -34.739117999,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21606",
+      "sourceBlockName": "Pipe44577",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 50.84301221,
+        "y": 34.166666667,
+        "z": 16.828783603
+      },
+      "endFt": {
+        "x": 50.84301221,
+        "y": 33.75,
+        "z": 16.828783603
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21628",
+      "sourceBlockName": "Pipe44579",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 50.84301221,
+        "y": 33.75,
+        "z": 16.828783603
+      },
+      "endFt": {
+        "x": 50.84301221,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.766283603,
+      "deltaZInches": -69.19540324,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21652",
+      "sourceBlockName": "Pipe44582",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 141.875,
+        "y": 56.166666667,
+        "z": 14.442193902
+      },
+      "endFt": {
+        "x": 141.875,
+        "y": 55.75,
+        "z": 14.442193902
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21674",
+      "sourceBlockName": "Pipe44584",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 141.875,
+        "y": 55.75,
+        "z": 14.442193902
+      },
+      "endFt": {
+        "x": 141.875,
+        "y": 55.75,
+        "z": 13.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 1.379693902,
+      "deltaZInches": -16.556326823,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21698",
+      "sourceBlockName": "Pipe44587",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 59.810343869,
+        "y": 23.166666667,
+        "z": 13.954011296
+      },
+      "endFt": {
+        "x": 59.905319134,
+        "y": 22.760968737,
+        "z": 13.954011296
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "diagonal",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21720",
+      "sourceBlockName": "Pipe44589",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 59.905319134,
+        "y": 22.760968737,
+        "z": 13.954011296
+      },
+      "endFt": {
+        "x": 59.905319134,
+        "y": 22.760968737,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.891511296,
+      "deltaZInches": -34.698135546,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21744",
+      "sourceBlockName": "Pipe44592",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 168.541666667,
+        "y": 45.166666667,
+        "z": 14.37497293
+      },
+      "endFt": {
+        "x": 168.541666667,
+        "y": 44.75,
+        "z": 14.37497293
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21766",
+      "sourceBlockName": "Pipe44594",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 168.541666667,
+        "y": 44.75,
+        "z": 14.37497293
+      },
+      "endFt": {
+        "x": 168.541666667,
+        "y": 44.75,
+        "z": 13.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 1.31247293,
+      "deltaZInches": -15.749675156,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21790",
+      "sourceBlockName": "Pipe44597",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 122.958333333,
+        "y": 9.742966075,
+        "z": 11
+      },
+      "endFt": {
+        "x": 122.958333333,
+        "y": 9.388799408,
+        "z": 11
+      },
+      "planLengthFt": 0.354166667,
+      "length3dFt": 0.354166667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21812",
+      "sourceBlockName": "Pipe44601",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 70.520833333,
+        "y": 23.166666667,
+        "z": 13.926076214
+      },
+      "endFt": {
+        "x": 70.520833333,
+        "y": 22.75,
+        "z": 13.926076214
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21834",
+      "sourceBlockName": "Pipe44603",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 70.520833333,
+        "y": 22.75,
+        "z": 13.926076214
+      },
+      "endFt": {
+        "x": 70.520833333,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.863576214,
+      "deltaZInches": -34.362914573,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21858",
+      "sourceBlockName": "Pipe44606",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 168.541666667,
+        "y": 56.166666667,
+        "z": 14.382465593
+      },
+      "endFt": {
+        "x": 168.541666667,
+        "y": 55.75,
+        "z": 14.382465593
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21880",
+      "sourceBlockName": "Pipe44608",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 168.541666667,
+        "y": 55.75,
+        "z": 14.382465593
+      },
+      "endFt": {
+        "x": 168.541666667,
+        "y": 55.75,
+        "z": 13.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 1.319965593,
+      "deltaZInches": -15.839587111,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21904",
+      "sourceBlockName": "Pipe44611",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 104.770833333,
+        "y": 23.166666667,
+        "z": 13.83674542
+      },
+      "endFt": {
+        "x": 104.770833333,
+        "y": 22.75,
+        "z": 13.83674542
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21926",
+      "sourceBlockName": "Pipe44613",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 104.770833333,
+        "y": 22.75,
+        "z": 13.83674542
+      },
+      "endFt": {
+        "x": 104.770833333,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.77424542,
+      "deltaZInches": -33.290945045,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21950",
+      "sourceBlockName": "Pipe44616",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 91.625,
+        "y": 45.166666667,
+        "z": 14.445525569
+      },
+      "endFt": {
+        "x": 91.625,
+        "y": 44.75,
+        "z": 14.445525569
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-21972",
+      "sourceBlockName": "Pipe44618",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 91.625,
+        "y": 44.75,
+        "z": 14.445525569
+      },
+      "endFt": {
+        "x": 91.625,
+        "y": 44.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.383025569,
+      "deltaZInches": -40.596306828,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-21996",
+      "sourceBlockName": "Pipe44621",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 134.791666667,
+        "y": 23.166666667,
+        "z": 13.758445132
+      },
+      "endFt": {
+        "x": 134.791666667,
+        "y": 22.75,
+        "z": 13.758445132
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22018",
+      "sourceBlockName": "Pipe44623",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 134.791666667,
+        "y": 22.75,
+        "z": 13.758445132
+      },
+      "endFt": {
+        "x": 134.791666667,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.695945132,
+      "deltaZInches": -32.351341585,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22042",
+      "sourceBlockName": "Pipe44626",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 77.791666667,
+        "y": 45.166666667,
+        "z": 14.458214343
+      },
+      "endFt": {
+        "x": 77.791666667,
+        "y": 45.583333333,
+        "z": 14.458214343
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22064",
+      "sourceBlockName": "Pipe44628",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 77.791666667,
+        "y": 45.583333333,
+        "z": 14.458214343
+      },
+      "endFt": {
+        "x": 77.791666667,
+        "y": 45.583333333,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.395714343,
+      "deltaZInches": -40.748572113,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22088",
+      "sourceBlockName": "Pipe44631",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 129.916666667,
+        "y": 34.166666667,
+        "z": 16.820085163
+      },
+      "endFt": {
+        "x": 129.916666667,
+        "y": 33.75,
+        "z": 16.820085163
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22110",
+      "sourceBlockName": "Pipe44633",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 129.916666667,
+        "y": 33.75,
+        "z": 16.820085163
+      },
+      "endFt": {
+        "x": 129.916666667,
+        "y": 33.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 5.757585163,
+      "deltaZInches": -69.091021951,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22134",
+      "sourceBlockName": "Pipe44636",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 122.958333333,
+        "y": 23.166666667,
+        "z": 13.789308813
+      },
+      "endFt": {
+        "x": 122.958333333,
+        "y": 22.75,
+        "z": 13.789308813
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22156",
+      "sourceBlockName": "Pipe44638",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 122.958333333,
+        "y": 22.75,
+        "z": 13.789308813
+      },
+      "endFt": {
+        "x": 122.958333333,
+        "y": 22.75,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.726808813,
+      "deltaZInches": -32.721705753,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22180",
+      "sourceBlockName": "Pipe44641",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 62.625000333,
+        "y": 45.166666667,
+        "z": 14.47212613
+      },
+      "endFt": {
+        "x": 62.663593365,
+        "y": 45.581542177,
+        "z": 14.47212613
+      },
+      "planLengthFt": 0.416666667,
+      "length3dFt": 0.416666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "diagonal",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22202",
+      "sourceBlockName": "Pipe44643",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 62.663593365,
+        "y": 45.581542177,
+        "z": 14.47212613
+      },
+      "endFt": {
+        "x": 62.663593365,
+        "y": 45.581542177,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 3.40962613,
+      "deltaZInches": -40.915513565,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22226",
+      "sourceBlockName": "Pipe44646",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 64.246532462,
+        "y": 11.254787348,
+        "z": 13.671059385
+      },
+      "endFt": {
+        "x": 64.246532462,
+        "y": 11.254787348,
+        "z": 11.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.608559385,
+      "deltaZInches": -31.302712625,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22250",
+      "sourceBlockName": "Pipe45385",
+      "nominalSizeInches": 3,
+      "startFt": {
+        "x": 177.598713214,
+        "y": 39.666666667,
+        "z": 0.55125
+      },
+      "endFt": {
+        "x": 177.598713214,
+        "y": 39.666666667,
+        "z": 0.853333333
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.302083333,
+      "deltaZInches": 3.625,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "end-to-start",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22275",
+      "sourceBlockName": "Pipe45384",
+      "nominalSizeInches": 3,
+      "startFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 4.521666667
+      },
+      "endFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 10.64
+      },
+      "planLengthFt": 0,
+      "length3dFt": 6.118333333,
+      "deltaZInches": 73.42,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "end-to-start",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22402",
+      "sourceBlockName": "Pipe45378",
+      "nominalSizeInches": 2,
+      "startFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 6.99
+      },
+      "endFt": {
+        "x": 174.208333333,
+        "y": 40.622204932,
+        "z": 6.99
+      },
+      "planLengthFt": 0.955538265,
+      "length3dFt": 0.955538265,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22424",
+      "sourceBlockName": "Pipe45383",
+      "nominalSizeInches": 2,
+      "startFt": {
+        "x": 174.395833333,
+        "y": 40.840954932,
+        "z": 1.677059048
+      },
+      "endFt": {
+        "x": 175.850528505,
+        "y": 40.840954932,
+        "z": 1.677059048
+      },
+      "planLengthFt": 1.454695172,
+      "length3dFt": 1.454695172,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22446",
+      "sourceBlockName": "Pipe45380",
+      "nominalSizeInches": 4,
+      "startFt": {
+        "x": 174.63125,
+        "y": 38.749166667,
+        "z": 3.291666667
+      },
+      "endFt": {
+        "x": 175.699486839,
+        "y": 38.749166667,
+        "z": 3.291666667
+      },
+      "planLengthFt": 1.068236839,
+      "length3dFt": 1.068236839,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22468",
+      "sourceBlockName": "Pipe45379",
+      "nominalSizeInches": 2,
+      "startFt": {
+        "x": 174.208333333,
+        "y": 40.840954932,
+        "z": 1.864559048
+      },
+      "endFt": {
+        "x": 174.208333333,
+        "y": 40.840954932,
+        "z": 6.667083333
+      },
+      "planLengthFt": 0,
+      "length3dFt": 4.802524285,
+      "deltaZInches": 57.630291426,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "end-to-start",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22492",
+      "sourceBlockName": "Pipe45424",
+      "nominalSizeInches": 3,
+      "startFt": {
+        "x": 174.573333333,
+        "y": 39.666666667,
+        "z": 1.218333333
+      },
+      "endFt": {
+        "x": 177.233713214,
+        "y": 39.666666667,
+        "z": 1.218333333
+      },
+      "planLengthFt": 2.66037988,
+      "length3dFt": 2.66037988,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "east-west",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22515",
+      "sourceBlockName": "Pipe45454",
+      "nominalSizeInches": 4,
+      "startFt": {
+        "x": 177.598713214,
+        "y": 39.666666667,
+        "z": 0.415833333
+      },
+      "endFt": {
+        "x": 177.598713214,
+        "y": 39.666666667,
+        "z": -0.931250925
+      },
+      "planLengthFt": 0,
+      "length3dFt": 1.347084258,
+      "deltaZInches": -16.1650111,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22540",
+      "sourceBlockName": "Pipe45508",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 26.5,
+        "y": 56.166666667,
+        "z": 10.973658818
+      },
+      "endFt": {
+        "x": 26.5,
+        "y": 55.5,
+        "z": 10.973658818
+      },
+      "planLengthFt": 0.666666667,
+      "length3dFt": 0.666666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22562",
+      "sourceBlockName": "Pipe45510",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 26.5,
+        "y": 55.5,
+        "z": 10.973658818
+      },
+      "endFt": {
+        "x": 26.5,
+        "y": 55.5,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.911158818,
+      "deltaZInches": -10.933905819,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22586",
+      "sourceBlockName": "Pipe45512",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 128.75,
+        "y": 56.166666667,
+        "z": 10.744638082
+      },
+      "endFt": {
+        "x": 128.75,
+        "y": 54.875,
+        "z": 10.744638082
+      },
+      "planLengthFt": 1.291666667,
+      "length3dFt": 1.291666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22608",
+      "sourceBlockName": "Pipe45514",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 128.75,
+        "y": 54.875,
+        "z": 10.744638082
+      },
+      "endFt": {
+        "x": 128.75,
+        "y": 54.875,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.682138082,
+      "deltaZInches": -8.185656985,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22632",
+      "sourceBlockName": "Pipe45516",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 77.791666667,
+        "y": 56.166666667,
+        "z": 10.858775148
+      },
+      "endFt": {
+        "x": 77.791666667,
+        "y": 57.25,
+        "z": 10.858775148
+      },
+      "planLengthFt": 1.083333333,
+      "length3dFt": 1.083333333,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22654",
+      "sourceBlockName": "Pipe45518",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 77.791666667,
+        "y": 57.25,
+        "z": 10.858775148
+      },
+      "endFt": {
+        "x": 77.791666667,
+        "y": 57.25,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.796275148,
+      "deltaZInches": -9.555301779,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22678",
+      "sourceBlockName": "Pipe45520",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 16.5,
+        "y": 56.166666667,
+        "z": 10.996056934
+      },
+      "endFt": {
+        "x": 16.5,
+        "y": 55.5,
+        "z": 10.996056934
+      },
+      "planLengthFt": 0.666666667,
+      "length3dFt": 0.666666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22700",
+      "sourceBlockName": "Pipe45522",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 16.5,
+        "y": 55.5,
+        "z": 10.996056934
+      },
+      "endFt": {
+        "x": 16.5,
+        "y": 55.5,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.933556934,
+      "deltaZInches": -11.202683211,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22724",
+      "sourceBlockName": "Pipe45524",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 154.791666667,
+        "y": 0.25,
+        "z": 11
+      },
+      "endFt": {
+        "x": 154.791666667,
+        "y": 0.25,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.9375,
+      "deltaZInches": -11.25,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22748",
+      "sourceBlockName": "Pipe45526",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 48.083333333,
+        "y": 56.166666667,
+        "z": 10.925316218
+      },
+      "endFt": {
+        "x": 48.083333333,
+        "y": 57.25,
+        "z": 10.925316218
+      },
+      "planLengthFt": 1.083333333,
+      "length3dFt": 1.083333333,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22770",
+      "sourceBlockName": "Pipe45528",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 48.083333333,
+        "y": 57.25,
+        "z": 10.925316218
+      },
+      "endFt": {
+        "x": 48.083333333,
+        "y": 57.25,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.862816218,
+      "deltaZInches": -10.353794615,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22794",
+      "sourceBlockName": "Pipe45530",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 116.958333333,
+        "y": 56.166666667,
+        "z": 10.771049194
+      },
+      "endFt": {
+        "x": 116.958333333,
+        "y": 54.875,
+        "z": 10.771049194
+      },
+      "planLengthFt": 1.291666667,
+      "length3dFt": 1.291666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22816",
+      "sourceBlockName": "Pipe45532",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 116.958333333,
+        "y": 54.875,
+        "z": 10.771049194
+      },
+      "endFt": {
+        "x": 116.958333333,
+        "y": 54.875,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.708549194,
+      "deltaZInches": -8.502590327,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22840",
+      "sourceBlockName": "Pipe45534",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 104.291666667,
+        "y": 56.166666667,
+        "z": 10.799420141
+      },
+      "endFt": {
+        "x": 104.291666667,
+        "y": 55.416666667,
+        "z": 10.799420141
+      },
+      "planLengthFt": 0.75,
+      "length3dFt": 0.75,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22862",
+      "sourceBlockName": "Pipe45536",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 104.291666667,
+        "y": 55.416666667,
+        "z": 10.799420141
+      },
+      "endFt": {
+        "x": 104.291666667,
+        "y": 55.416666667,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.736920141,
+      "deltaZInches": -8.84304169,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22886",
+      "sourceBlockName": "Pipe45538",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 62.958333333,
+        "y": 56.166666667,
+        "z": 10.89199902
+      },
+      "endFt": {
+        "x": 62.958333333,
+        "y": 57.25,
+        "z": 10.89199902
+      },
+      "planLengthFt": 1.083333333,
+      "length3dFt": 1.083333333,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22908",
+      "sourceBlockName": "Pipe45540",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 62.958333333,
+        "y": 57.25,
+        "z": 10.89199902
+      },
+      "endFt": {
+        "x": 62.958333333,
+        "y": 57.25,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.82949902,
+      "deltaZInches": -9.953988244,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22932",
+      "sourceBlockName": "Pipe45542",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 36.5,
+        "y": 56.166666667,
+        "z": 10.951260702
+      },
+      "endFt": {
+        "x": 36.5,
+        "y": 55.5,
+        "z": 10.951260702
+      },
+      "planLengthFt": 0.666666667,
+      "length3dFt": 0.666666667,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-22954",
+      "sourceBlockName": "Pipe45544",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 36.5,
+        "y": 55.5,
+        "z": 10.951260702
+      },
+      "endFt": {
+        "x": 36.5,
+        "y": 55.5,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.888760702,
+      "deltaZInches": -10.665128427,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-22978",
+      "sourceBlockName": "Pipe45546",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 91.625,
+        "y": 56.166666667,
+        "z": 10.827791088
+      },
+      "endFt": {
+        "x": 91.625,
+        "y": 55.416666667,
+        "z": 10.827791088
+      },
+      "planLengthFt": 0.75,
+      "length3dFt": 0.75,
+      "deltaZInches": 0,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "level",
+      "planDirection": "north-south",
+      "geometryKind": "level-run"
+    },
+    {
+      "id": "pipe-23000",
+      "sourceBlockName": "Pipe45548",
+      "nominalSizeInches": 1,
+      "startFt": {
+        "x": 91.625,
+        "y": 55.416666667,
+        "z": 10.827791088
+      },
+      "endFt": {
+        "x": 91.625,
+        "y": 55.416666667,
+        "z": 10.0625
+      },
+      "planLengthFt": 0,
+      "length3dFt": 0.765291088,
+      "deltaZInches": -9.183493053,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    },
+    {
+      "id": "pipe-23024",
+      "sourceBlockName": "Pipe45577",
+      "nominalSizeInches": 3,
+      "startFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 3.791666667
+      },
+      "endFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 1.578333333
+      },
+      "planLengthFt": 0,
+      "length3dFt": 2.213333333,
+      "deltaZInches": -26.56,
+      "gradeInPer10Ft": null,
+      "downhillDirection": "start-to-end",
+      "planDirection": "vertical-transition",
+      "geometryKind": "vertical-transition"
+    }
+  ],
+  "fittings": [
+    {
+      "id": "fitting-24025",
+      "sourceBlockName": "Flex Drop241_6301907_44310",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 141.291666667,
+        "y": 10.159632742,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-24673",
+      "sourceBlockName": "Flex Drop241_6301907_44315",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 132.821904788,
+        "y": 43.32863145,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-25321",
+      "sourceBlockName": "Flex Drop241_6301907_44320",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 63.416666667,
+        "y": 43.754416701,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-25969",
+      "sourceBlockName": "Flex Drop241_6301907_44325",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 20.5,
+        "y": 44.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-26617",
+      "sourceBlockName": "Flex Drop241_6301907_44330",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 46.101750049,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-27265",
+      "sourceBlockName": "Flex Drop241_6301907_44335",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 31.727008835,
+        "y": 19.854166667,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-27913",
+      "sourceBlockName": "Flex Drop241_6301907_44339",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 168.393713811,
+        "y": 9.748616106,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-28561",
+      "sourceBlockName": "Flex Drop241_6301907_44344",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 18.893675502,
+        "y": 6.166666667,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-29209",
+      "sourceBlockName": "Flex Drop241_6301907_44349",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 16.291666667,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-29857",
+      "sourceBlockName": "Flex Drop241_6301907_44354",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 23.705723524,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-30505",
+      "sourceBlockName": "Flex Drop241_6301907_44359",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 167.541666667,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-31153",
+      "sourceBlockName": "Flex Drop241_6301907_44364",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 6.893675502,
+        "y": 6.166666667,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-31801",
+      "sourceBlockName": "Flex Drop241_6301907_44369",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 52.727008835,
+        "y": 13.428051432,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-32449",
+      "sourceBlockName": "Flex Drop241_6301907_44374",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 155.208333333,
+        "y": 55.75,
+        "z": 13
+      }
+    },
+    {
+      "id": "fitting-33097",
+      "sourceBlockName": "Flex Drop241_6301907_44379",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 75.1147682,
+        "y": 11.666566762,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-33745",
+      "sourceBlockName": "Flex Drop241_6301907_44384",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 59.892251674,
+        "y": 33.600209822,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-34393",
+      "sourceBlockName": "Flex Drop241_6301907_44386",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 168.810342169,
+        "y": 0.25,
+        "z": 11.317708333
+      }
+    },
+    {
+      "id": "fitting-35041",
+      "sourceBlockName": "Flex Drop241_6301907_44391",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 99.935525971,
+        "y": 11.484612283,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-35689",
+      "sourceBlockName": "Flex Drop241_6301907_44396",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 93.4375,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-36337",
+      "sourceBlockName": "Flex Drop241_6301907_44401",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 104.291666667,
+        "y": 44.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-36985",
+      "sourceBlockName": "Flex Drop241_6301907_44406",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 140,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-37633",
+      "sourceBlockName": "Flex Drop241_6301907_44410",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 134.791666667,
+        "y": 9.326299408,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-38281",
+      "sourceBlockName": "Flex Drop241_6301907_44415",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 115.916666667,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-38929",
+      "sourceBlockName": "Flex Drop241_6301907_44420",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 48.083333333,
+        "y": 45.583333333,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-39577",
+      "sourceBlockName": "Flex Drop241_6301907_44425",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 87.416666667,
+        "y": 34.583333333,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-40225",
+      "sourceBlockName": "Flex Drop241_6301907_44427",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 141.291666667,
+        "y": 0.25,
+        "z": 11.317708333
+      }
+    },
+    {
+      "id": "fitting-40873",
+      "sourceBlockName": "Flex Drop241_6301907_44432",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 112.959196671,
+        "y": 43.419989991,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-41521",
+      "sourceBlockName": "Flex Drop241_6301907_44437",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 47.583333544,
+        "y": 43.657033318,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-42169",
+      "sourceBlockName": "Flex Drop241_6301907_44442",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 6.5,
+        "y": 44.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-42817",
+      "sourceBlockName": "Flex Drop241_6301907_44447",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 6.5,
+        "y": 55.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-43465",
+      "sourceBlockName": "Flex Drop241_6301907_44452",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 19.958333333,
+        "y": 23.583333333,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-44113",
+      "sourceBlockName": "Flex Drop241_6301907_44457",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 152.541666667,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-44761",
+      "sourceBlockName": "Flex Drop241_6301907_44462",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 6.708333333,
+        "y": 24.71912526,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-45409",
+      "sourceBlockName": "Flex Drop241_6301907_44467",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 46.652287372,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-46057",
+      "sourceBlockName": "Flex Drop241_6301907_44472",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 141.875,
+        "y": 44.75,
+        "z": 13
+      }
+    },
+    {
+      "id": "fitting-46705",
+      "sourceBlockName": "Flex Drop241_6301907_44477",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 30.893675502,
+        "y": 7.228431264,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-47353",
+      "sourceBlockName": "Flex Drop241_6301907_44482",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 64.246532462,
+        "y": 11.254787348,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-48001",
+      "sourceBlockName": "Flex Drop241_6301907_44487",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 155.208333333,
+        "y": 44.75,
+        "z": 13
+      }
+    },
+    {
+      "id": "fitting-48649",
+      "sourceBlockName": "Flex Drop241_6301907_44492",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 82.104166667,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-49297",
+      "sourceBlockName": "Flex Drop241_6301907_44497",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 70.520833333,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-49945",
+      "sourceBlockName": "Flex Drop241_6301907_44502",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 167.541666667,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-50593",
+      "sourceBlockName": "Flex Drop241_6301907_44507",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 116.958333333,
+        "y": 45.583333333,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-51241",
+      "sourceBlockName": "Flex Drop241_6301907_44512",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 128.75,
+        "y": 45.583333333,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-51889",
+      "sourceBlockName": "Flex Drop241_6301907_44517",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 87.48970444,
+        "y": 11.66659104,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-52537",
+      "sourceBlockName": "Flex Drop241_6301907_44522",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 140,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-53185",
+      "sourceBlockName": "Flex Drop241_6301907_44527",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 122.852484671,
+        "y": 43.568354667,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-53833",
+      "sourceBlockName": "Flex Drop241_6301907_44532",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 101.416666667,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-54481",
+      "sourceBlockName": "Flex Drop241_6301907_44537",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 77.416666667,
+        "y": 34.583333333,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-55129",
+      "sourceBlockName": "Flex Drop241_6301907_44542",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 34.5,
+        "y": 44.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-55777",
+      "sourceBlockName": "Flex Drop241_6301907_44547",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 113.728131066,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-56425",
+      "sourceBlockName": "Flex Drop241_6301907_44552",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 34.753363992,
+        "y": 33.114208074,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-57073",
+      "sourceBlockName": "Flex Drop241_6301907_44556",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 154.791666667,
+        "y": 10.159632742,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-57721",
+      "sourceBlockName": "Flex Drop241_6301907_44561",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 19.727008835,
+        "y": 17.166666667,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-58369",
+      "sourceBlockName": "Flex Drop241_6301907_44566",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 18.53087474,
+        "y": 17.958333333,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-59017",
+      "sourceBlockName": "Flex Drop241_6301907_44571",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 152.541666667,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-59665",
+      "sourceBlockName": "Flex Drop241_6301907_44576",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 6.893675502,
+        "y": 17.125,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-60313",
+      "sourceBlockName": "Flex Drop241_6301907_44586",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 141.875,
+        "y": 55.75,
+        "z": 13
+      }
+    },
+    {
+      "id": "fitting-60961",
+      "sourceBlockName": "Flex Drop241_6301907_44591",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 59.905319134,
+        "y": 22.760968737,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-61609",
+      "sourceBlockName": "Flex Drop241_6301907_44596",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 168.541666667,
+        "y": 44.75,
+        "z": 13
+      }
+    },
+    {
+      "id": "fitting-62257",
+      "sourceBlockName": "Flex Drop241_6301907_44600",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 122.958333333,
+        "y": 9.326299408,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-62905",
+      "sourceBlockName": "Flex Drop241_6301907_44605",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 70.520833333,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-63553",
+      "sourceBlockName": "Flex Drop241_6301907_44610",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 168.541666667,
+        "y": 55.75,
+        "z": 13
+      }
+    },
+    {
+      "id": "fitting-64201",
+      "sourceBlockName": "Flex Drop241_6301907_44615",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 104.770833333,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-64849",
+      "sourceBlockName": "Flex Drop241_6301907_44620",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 91.625,
+        "y": 44.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-65497",
+      "sourceBlockName": "Flex Drop241_6301907_44625",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 134.791666667,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-66145",
+      "sourceBlockName": "Flex Drop241_6301907_44630",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 77.791666667,
+        "y": 45.583333333,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-66793",
+      "sourceBlockName": "Flex Drop241_6301907_44635",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 129.916666667,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-67441",
+      "sourceBlockName": "Flex Drop241_6301907_44640",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 122.958333333,
+        "y": 22.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-68089",
+      "sourceBlockName": "Flex Drop241_6301907_44645",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 62.663593365,
+        "y": 45.581542177,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-68737",
+      "sourceBlockName": "Flex Drop241_6301907_44581",
+      "family": "Flex Drop",
+      "pointFt": {
+        "x": 50.84301221,
+        "y": 33.75,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-69385",
+      "sourceBlockName": "Fitting25_6301934_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 1.5
+      }
+    },
+    {
+      "id": "fitting-69616",
+      "sourceBlockName": "Fitting425_1252_4934475",
+      "family": "Fitting425",
+      "pointFt": {
+        "x": 177.598713214,
+        "y": 39.666666667,
+        "z": 0.436666667
+      }
+    },
+    {
+      "id": "fitting-69835",
+      "sourceBlockName": "Fitting25_6301934_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 10.718333333
+      }
+    },
+    {
+      "id": "fitting-69852",
+      "sourceBlockName": "Fitting25_6301826_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-71128",
+      "sourceBlockName": "Fitting25_6300008_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 11.281666667
+      }
+    },
+    {
+      "id": "fitting-71338",
+      "sourceBlockName": "Fitting25_6300008_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.385,
+        "z": 11
+      }
+    },
+    {
+      "id": "fitting-71354",
+      "sourceBlockName": "Fitting25_6301826_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 4.156666667
+      }
+    },
+    {
+      "id": "fitting-71371",
+      "sourceBlockName": "Fitting28_6300015_33023",
+      "family": "Fitting28",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 38.749166667,
+        "z": 3.291666667
+      }
+    },
+    {
+      "id": "fitting-72019",
+      "sourceBlockName": "Fitting28_6300008_33023",
+      "family": "Fitting28",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 38.749166667,
+        "z": 3.625
+      }
+    },
+    {
+      "id": "fitting-72229",
+      "sourceBlockName": "Fitting25_6300008_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.385,
+        "z": 4.156666667
+      }
+    },
+    {
+      "id": "fitting-72246",
+      "sourceBlockName": "Fitting408_6301932_33023",
+      "family": "Fitting408",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.030833333,
+        "z": 4.156666667
+      }
+    },
+    {
+      "id": "fitting-72456",
+      "sourceBlockName": "Fitting28_6300008_33023",
+      "family": "Fitting28",
+      "pointFt": {
+        "x": 174.541666667,
+        "y": 38.749166667,
+        "z": 3.291666667
+      }
+    },
+    {
+      "id": "fitting-72473",
+      "sourceBlockName": "Fitting21_1682_8421504",
+      "family": "Fitting21",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 40.840954932,
+        "z": 6.99
+      }
+    },
+    {
+      "id": "fitting-72935",
+      "sourceBlockName": "Fitting25_6300015_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 38.749166667,
+        "z": 4.156666667
+      }
+    },
+    {
+      "id": "fitting-73684",
+      "sourceBlockName": "Fitting25_6300008_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 4.443541667
+      }
+    },
+    {
+      "id": "fitting-73700",
+      "sourceBlockName": "Fitting408_6301932_33023",
+      "family": "Fitting408",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 38.749166667,
+        "z": 3.875
+      }
+    },
+    {
+      "id": "fitting-73716",
+      "sourceBlockName": "Fitting25_6300008_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 3.875
+      }
+    },
+    {
+      "id": "fitting-73733",
+      "sourceBlockName": "Fitting21_2943_9868950",
+      "family": "Fitting21",
+      "pointFt": {
+        "x": 175.991153505,
+        "y": 40.840954932,
+        "z": 1.677059048
+      }
+    },
+    {
+      "id": "fitting-74585",
+      "sourceBlockName": "Fitting21_668_4934475",
+      "family": "Fitting21",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 40.840954932,
+        "z": 1.677059048
+      }
+    },
+    {
+      "id": "fitting-75434",
+      "sourceBlockName": "Fitting25_6301845_0",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.207916667,
+        "z": 4.156666667
+      }
+    },
+    {
+      "id": "fitting-75663",
+      "sourceBlockName": "Fitting468_1062_255",
+      "family": "Fitting468",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 5.010833333
+      }
+    },
+    {
+      "id": "fitting-75693",
+      "sourceBlockName": "Fitting1024_1014_1357015",
+      "family": "Fitting1024",
+      "pointFt": {
+        "x": 175.991153505,
+        "y": 38.749166667,
+        "z": 3.291666667
+      }
+    },
+    {
+      "id": "fitting-78603",
+      "sourceBlockName": "Fitting470_6301866_33023",
+      "family": "Fitting470",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 38.749166667,
+        "z": 3.75
+      }
+    },
+    {
+      "id": "fitting-78774",
+      "sourceBlockName": "Fitting25_6300015_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 39.666666667,
+        "z": 1.218333333
+      }
+    },
+    {
+      "id": "fitting-78790",
+      "sourceBlockName": "Fitting25_6300008_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 174.49,
+        "y": 39.666666667,
+        "z": 1.218333333
+      }
+    },
+    {
+      "id": "fitting-78806",
+      "sourceBlockName": "Fitting25_6300015_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 177.598713214,
+        "y": 39.666666667,
+        "z": 1.218333333
+      }
+    },
+    {
+      "id": "fitting-78822",
+      "sourceBlockName": "Fitting25_6300008_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 177.598713214,
+        "y": 39.666666667,
+        "z": 0.936666667
+      }
+    },
+    {
+      "id": "fitting-78838",
+      "sourceBlockName": "Fitting25_6300008_33023",
+      "family": "Fitting25",
+      "pointFt": {
+        "x": 177.317046547,
+        "y": 39.666666667,
+        "z": 1.218333333
+      }
+    }
+  ],
+  "claims": {
+    "exactSourcePipeXyzReady": true,
+    "sourceUnitConversionReady": true,
+    "approvedAndAsBuiltRegistrationReady": true,
+    "planDirectionReady": true,
+    "roofRelativePipeGradeGeometryReady": true,
+    "hydraulicFlowDirectionReady": false,
+    "drainageGradeSemanticsReady": false,
+    "fullFittingIdentityReady": false,
+    "drainDestinationReady": false,
+    "nativeElementGeometryRecordDecodeReady": false,
+    "newHopeExactPipeCenterlineZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "55F3B3A8F1F03D7B04D4CA25D3A12317176A1E394CB8B61D118ABC5E2B90A426"
+}
