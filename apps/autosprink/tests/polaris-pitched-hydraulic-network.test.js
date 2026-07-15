@@ -6,6 +6,7 @@ import atticReport from '../src/data/polaris-hydraulic-calcs-attic.json';
 import belowCeilingReport from '../src/data/polaris-hydraulic-calcs-below-ceiling.json';
 import expected from '../src/data/polaris-pitched-hydraulic-network.json';
 import sourceContinuityEvidence from '../src/data/polaris-pipe-layout-source-continuity.json';
+import drainageCodeBasis from '../src/data/polaris-wet-pipe-drainage-code-basis.json';
 import {
   bindCalculationSprinklerLeaves,
   buildPhysicalPipeGraph,
@@ -19,6 +20,7 @@ const build = (overrides = {}) => buildPolarisPitchedHydraulicNetwork({
   fireLineEvidence: overrides.fireLineEvidence ?? expected.sourceBoundary.fireLineCad,
   fireLineRegistration: overrides.fireLineRegistration ?? expected.sourceBoundary.fireLineRegistration,
   sourceContinuityEvidence: overrides.sourceContinuityEvidence ?? sourceContinuityEvidence,
+  drainageCodeBasis: overrides.drainageCodeBasis ?? drainageCodeBasis,
 });
 
 describe('Polaris completed pitched hydraulic and drainage network', () => {
@@ -213,8 +215,37 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       explicitMainDrainCalloutCount: 1,
       drainageIntentStatus: 'held',
     });
+    expect(expected.gradeAndDrainage.wetPipeDrainage).toMatchObject({
+      systemType: 'wet',
+      lowPointCandidateCount: 10,
+      uniqueBasinCount: 9,
+      totalTrappedVolumeGallons: 37.962174,
+      codeBasisBoundBasinCount: 8,
+      sourceDispositionReadyBasinCount: 0,
+      exactBasinGeometryReady: true,
+      drainageGradeSemanticsReady: false,
+    });
+    expect(expected.gradeAndDrainage.wetPipeDrainage.basins.map((basin) => ({
+      lowPoints: basin.lowPointCandidateIds,
+      gallons: basin.trappedVolumeGallons,
+      termination: basin.termination.type,
+      tier: basin.arrangement.tier,
+      codeBasisReady: basin.arrangement.codeBasisReady,
+    }))).toEqual([
+      { lowPoints: ['pipe-15736', 'pipe-7661'], gallons: 25.035649, termination: 'open-pipe-geometry', tier: '5-to-less-than-50-gallons', codeBasisReady: false },
+      { lowPoints: ['pipe-17523'], gallons: 2.10121, termination: 'upright-sprinkler', tier: 'less-than-5-gallons', codeBasisReady: true },
+      { lowPoints: ['pipe-17853'], gallons: 2.263986, termination: 'upright-sprinkler', tier: 'less-than-5-gallons', codeBasisReady: true },
+      { lowPoints: ['pipe-18285'], gallons: 2.100345, termination: 'upright-sprinkler', tier: 'less-than-5-gallons', codeBasisReady: true },
+      { lowPoints: ['pipe-18615'], gallons: 1.283605, termination: 'upright-sprinkler', tier: 'less-than-5-gallons', codeBasisReady: true },
+      { lowPoints: ['pipe-18740'], gallons: 1.280536, termination: 'upright-sprinkler', tier: 'less-than-5-gallons', codeBasisReady: true },
+      { lowPoints: ['pipe-18866'], gallons: 1.29938, termination: 'upright-sprinkler', tier: 'less-than-5-gallons', codeBasisReady: true },
+      { lowPoints: ['pipe-18991'], gallons: 1.316327, termination: 'upright-sprinkler', tier: 'less-than-5-gallons', codeBasisReady: true },
+      { lowPoints: ['pipe-19116'], gallons: 1.281136, termination: 'upright-sprinkler', tier: 'less-than-5-gallons', codeBasisReady: true },
+    ]);
     expect(expected.claims).toMatchObject({
       roofRelativePipeGradeGeometryReady: true,
+      exactWetPipeDrainageBasinGeometryReady: true,
+      wetPipeDrainageCorrectionPlanReady: false,
       drainageGradeSemanticsReady: false,
       continuousDrainPathReady: false,
       properPipeLayoutReady: false,
@@ -342,20 +373,23 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
     const proof = JSON.parse(fs.readFileSync(new URL('../src/data/proofs/polaris-pitched-hydraulic-network/proof.json', import.meta.url), 'utf8'));
     expect(html).toContain('../polaris-pitched-pipe-xyz/approved-fp2-pipe-overlay.png');
     expect(html).toContain('82 calculated flow segments');
-    expect(html).toContain('4 / 10');
+    expect(html).toContain('37.962 gal');
+    expect(html).toContain('9 exact trapped basins');
+    expect(html).toContain('25.035649-gallon');
     expect(html).toContain('29 exact sprinkler terminals');
     expect(html).toContain('exact 3D source leader tips');
     expect(html).toContain("data-proof-layer':'grade'");
+    expect(html).toContain("data-proof-layer':'basin'");
     expect(html).toContain("data-proof-layer':'device'");
     expect(html).toContain("data-proof-layer':'terminal'");
     expect(html).toContain("data-proof-layer':'span'");
     expect(html).toContain('65 exact physical span routes');
     expect(html).toContain('3 loop interiors resolved');
-    expect(html).toContain('semantic source continuity resolved');
-    expect(html).toContain('exact fire-line endpoint held');
+    expect(html).toContain('Same-project source continuity - semantic pass, exact endpoint hold');
+    expect(html).toContain('exact cross-drawing endpoint geometry stays false');
     expect(html).toContain('718.821 inches from node 116');
     expect(html).toContain('whole-network flow directed');
-    expect(html).toContain('drainage intent held');
+    expect(html).toContain('proper pipe layout held');
     expect(html).toContain('polaris-final-fl3-source-chain.png');
     expect(html).toContain('polaris-asbuilt-fp1-riser-source-chain.png');
     expect(html).toContain('Attic calculation graph (diagnostic)');
@@ -373,18 +407,26 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
         exactCalculatedSprinklerTerminalBindings: 29,
         buildingComponentPipes: 177,
         slopedPlanRuns: 14,
+        uniqueWetPipeTrappedBasins: 9,
+        codeBasisBoundWetPipeBasins: 8,
+        sourceDispositionReadyWetPipeBasins: 0,
+        totalTrappedVolumeGallons: 37.962174,
       },
       defaultLayers: {
         atticCalculationGraphDiagnostic: false,
         exactPhysicalSpanDirections: true,
         calculatedSprinklerTerminals: true,
         geometricDownhillEndpoints: true,
+        exactWetPipeTrappedBasins: true,
       },
       browserVerification: {
         exactPhysicalSpanLayerVisible: true,
         exactPhysicalSpanToggleVerified: true,
         exactTerminalLayerVisible: true,
         exactTerminalToggleVerified: true,
+        exactWetPipeBasinLayerVisible: true,
+        exactWetPipeBasinToggleVerified: true,
+        wetPipeBasinRegisterVisible: true,
         diagnosticToggleVerified: true,
         sourceContinuityImagesVisible: true,
         browserErrorCount: 0,
@@ -400,6 +442,8 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
         buildingRigidPipeSpanHydraulicDirectionReady: true,
         riserHydraulicSemanticBindingReady: true,
         wholeNetworkHydraulicFlowDirectionReady: true,
+        exactWetPipeDrainageBasinGeometryReady: true,
+        wetPipeDrainageCorrectionPlanReady: false,
         properPipeLayoutReady: false,
       },
     });

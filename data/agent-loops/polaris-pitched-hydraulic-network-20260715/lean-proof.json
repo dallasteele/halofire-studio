@@ -4,12 +4,12 @@
   "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
   "requestPath": "data/agent-loops/polaris-pitched-hydraulic-network-20260715/lean-request.json",
   "theoremNames": [
-    "polarisSemanticSourceAndDrainageBoundary"
+    "polarisWetPipeDrainageBoundary"
   ],
-  "claim": "The source-gated evidence preserves 82 report segments, 65 exact rigid span routes, and 14 sloped runs partitioned into four geometrically drainable runs plus ten remote low points. Same-project semantic source continuity proves whole-network flow direction while exact cross-drawing endpoint geometry remains held, and unresolved drainage semantics keep proper-layout readiness fail-closed.",
+  "claim": "The source-gated evidence preserves 82 report segments and 65 exact rigid span routes; four geometrically drainable runs plus ten remote downhill candidates account for all 14 sloped runs. The ten candidates resolve into nine exact trapped wet-pipe basins totaling 37.962174 gallons, including one shared 25.035649-gallon basin. Only eight basins have a locally bound sizing rule and zero have source-approved disposition, so correction-plan, drainage-semantics, and proper-layout readiness remain fail-closed.",
   "result": {
     "status": "verified",
-    "elapsedMs": 69,
+    "elapsedMs": 120,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

@@ -1,7 +1,7 @@
 {
-  "schema": "halofire.polaris-pitched-hydraulic-network-proof.v3",
+  "schema": "halofire.polaris-pitched-hydraulic-network-proof.v4",
   "projectId": "polaris-academy-mesa-az",
-  "networkReceiptSha256": "70E554662743B3DE1F97434D07240A968A870107574196F8D1F19AFC4B529F8C",
+  "networkReceiptSha256": "7EF5F02FCF4837371DAFE7CC4B380C68E01D57C540DF4F7962C8884F2E322294",
   "underlay": "../polaris-pitched-pipe-xyz/approved-fp2-pipe-overlay.png",
   "sourceContinuityImages": [
     "polaris-final-fl3-source-chain.png",
@@ -24,13 +24,19 @@
     "slopedPlanRuns": 14,
     "geometricallyDrainableSlopedRuns": 4,
     "lowPointAwaySlopedRuns": 10,
-    "physicalCycleRank": 3
+    "physicalCycleRank": 3,
+    "wetPipeLowPointCandidates": 10,
+    "uniqueWetPipeTrappedBasins": 9,
+    "codeBasisBoundWetPipeBasins": 8,
+    "sourceDispositionReadyWetPipeBasins": 0,
+    "totalTrappedVolumeGallons": 37.962174
   },
   "defaultLayers": {
     "approvedFp2AndExactPipes": true,
     "exactPhysicalSpanDirections": true,
     "calculatedSprinklerTerminals": true,
     "geometricDownhillEndpoints": true,
+    "exactWetPipeTrappedBasins": true,
     "riserAndDrainDevices": true,
     "atticCalculationGraphDiagnostic": false,
     "belowCeilingCalculationGraphDiagnostic": false
@@ -42,6 +48,9 @@
     "exactPhysicalSpanToggleVerified": true,
     "exactTerminalLayerVisible": true,
     "exactTerminalToggleVerified": true,
+    "exactWetPipeBasinLayerVisible": true,
+    "exactWetPipeBasinToggleVerified": true,
+    "wetPipeBasinRegisterVisible": true,
     "diagnosticLayersDefaultOff": true,
     "diagnosticToggleVerified": true,
     "sourceContinuityImagesVisible": true,
@@ -69,6 +78,8 @@
     "calculatedSprinklerLeafToDwgPipeBindingReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,
     "wholeNetworkHydraulicFlowDirectionReady": true,
+    "exactWetPipeDrainageBasinGeometryReady": true,
+    "wetPipeDrainageCorrectionPlanReady": false,
     "drainageGradeSemanticsReady": false,
     "properPipeLayoutReady": false,
     "fabricationReady": false,

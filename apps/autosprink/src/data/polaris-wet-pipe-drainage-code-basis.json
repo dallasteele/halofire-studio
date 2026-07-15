@@ -1,0 +1,36 @@
+{
+  "schema": "halofire.wet-pipe-drainage-code-basis.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "systemType": "wet",
+  "systemTypeEvidence": {
+    "source": "Polaris Academy - Hydraulic Calcs I.pdf",
+    "sha256": "690BFA978E60A7B4704F0DCDFD9FAE4BA5A87EBD8E6C7C38BD62BF22D8D24EA9",
+    "page": 2,
+    "wetPipeCapacityGallons": 1875.65,
+    "dryPipeCapacityGallons": 0
+  },
+  "adoptedEdition": {
+    "jurisdiction": "City of Mesa, Arizona",
+    "standard": "NFPA 13",
+    "edition": 2019,
+    "primarySourceReady": true
+  },
+  "lessThan5Gallons": {
+    "section": "NFPA 13 (2019) 16.10.5.2.3",
+    "primarySourceReady": true,
+    "primarySource": "NFPA 13 2021 AUT-SSI Public Input Responses, Public Input 216, page 360",
+    "primarySourceSha256": "DB90F5F107DC074B73FC398639D64A4856C410C6B7CC71944A961849F67DD3B6",
+    "arrangements": [
+      "nipple and cap or plug not less than one-half inch",
+      "remove a single pendent sprinkler",
+      "flexible coupling or other easily separated connection"
+    ]
+  },
+  "fiveGallonsOrMore": {
+    "primarySourceReady": false,
+    "status": "held-until-project-edition-primary-source-section-is-bound"
+  },
+  "flexibleOrEasilySeparatedFittingCategories": [
+    "Flex Drop"
+  ]
+}

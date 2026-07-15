@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 
 import { evaluatePipeLayoutSourceContinuity } from './pipe-layout-source-continuity.js';
+import { evaluateWetPipeDrainageBasins } from './wet-pipe-drainage-basins.js';
 
 const round = (value, precision = 9) => Number(value.toFixed(precision));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -880,6 +881,7 @@ export function buildPolarisPitchedHydraulicNetwork({
   fireLineEvidence,
   fireLineRegistration,
   sourceContinuityEvidence,
+  drainageCodeBasis,
 }) {
   const graph = buildPhysicalPipeGraph(pipeCalibration.pipes);
   const semanticFittings = pipeCalibration.fittings.filter((fitting) => fitting.sourceAttributes?.['Sub Category']);
@@ -1020,8 +1022,20 @@ export function buildPolarisPitchedHydraulicNetwork({
       : 'geometric-low-point-does-not-reach-source-main-drain-entry-without-rise';
   }
   const geometricallyDrainableCount = geometricGrades.filter((grade) => grade.continuousNonRisingPathToMainDrainEntry).length;
+  const wetPipeDrainage = evaluateWetPipeDrainageBasins({
+    pipes: pipeCalibration.pipes,
+    graph,
+    physicalSpanRoutes: physicalSpanBinding.routes,
+    lowPointCandidates: geometricGrades
+      .filter((grade) => !grade.continuousNonRisingPathToMainDrainEntry)
+      .map((grade) => ({ id: grade.pipeId, pointFt: grade.downhillEndpointFt })),
+    mainDrainEntryNodeIds,
+    sprinklers: pipeCalibration.sprinklers,
+    fittings: pipeCalibration.fittings,
+    codeBasis: drainageCodeBasis,
+  });
   const packet = {
-    schema: 'halofire.polaris-pitched-hydraulic-network.v4',
+    schema: 'halofire.polaris-pitched-hydraulic-network.v5',
     projectId: pipeCalibration.projectId,
     sourceBoundary: {
       pipeCalibrationReceiptSha256: pipeCalibration.receiptSha256,
@@ -1139,6 +1153,7 @@ export function buildPolarisPitchedHydraulicNetwork({
       slopedRunLowPointAwayFromMainDrainCount: geometricGrades.length - geometricallyDrainableCount,
       drainageAcceptanceRule: 'A lower endpoint is geometric evidence only. Drainage requires an explicit drain destination and a continuous non-rising path with no trapped low point.',
       drainageIntentStatus: 'held',
+      wetPipeDrainage,
     },
     claims: {
       exactHydraulicReportGraphReady: reports.every((report) => report.claims.hydraulicDirectionReady === true
@@ -1181,8 +1196,10 @@ export function buildPolarisPitchedHydraulicNetwork({
           && report.claims.sourceNodeClosureReady === true)
         && buildingRigidPipeSpanHydraulicDirectionReady
         && riserHydraulicSemantics.hydraulicSemanticBindingReady === true,
-      drainageGradeSemanticsReady: false,
-      continuousDrainPathReady: false,
+      exactWetPipeDrainageBasinGeometryReady: wetPipeDrainage.exactBasinGeometryReady,
+      wetPipeDrainageCorrectionPlanReady: wetPipeDrainage.correctionPlanReady,
+      drainageGradeSemanticsReady: wetPipeDrainage.drainageGradeSemanticsReady,
+      continuousDrainPathReady: wetPipeDrainage.drainageGradeSemanticsReady,
       drainDestinationReady: mainDrainNote.leaderSegmentCount === 2,
       newHopeTransferReady: false,
       properPipeLayoutReady: false,

@@ -1,5 +1,5 @@
 {
-  "schema": "halofire.polaris-pitched-hydraulic-network.v4",
+  "schema": "halofire.polaris-pitched-hydraulic-network.v5",
   "projectId": "polaris-academy-mesa-az",
   "sourceBoundary": {
     "pipeCalibrationReceiptSha256": "3F9528A0F964579411A17E933334D07F1E3DEB973A75477102B2E5D49BA23CC5",
@@ -13495,7 +13495,1865 @@
     "geometricallyDrainableSlopedRunCount": 4,
     "slopedRunLowPointAwayFromMainDrainCount": 10,
     "drainageAcceptanceRule": "A lower endpoint is geometric evidence only. Drainage requires an explicit drain destination and a continuous non-rising path with no trapped low point.",
-    "drainageIntentStatus": "held"
+    "drainageIntentStatus": "held",
+    "wetPipeDrainage": {
+      "schema": "halofire.wet-pipe-drainage-basins.v1",
+      "systemType": "wet",
+      "lowPointCandidateCount": 10,
+      "uniqueBasinCount": 9,
+      "totalTrappedVolumeGallons": 37.962174,
+      "basins": [
+        {
+          "id": "wet-basin-01",
+          "lowPointCandidateIds": [
+            "pipe-15736",
+            "pipe-7661"
+          ],
+          "lowNodeIds": [
+            "physical-node-40",
+            "physical-node-43"
+          ],
+          "lowPointFt": {
+            "x": 133.400599754,
+            "y": 56.166666667,
+            "z": 10.734221615
+          },
+          "spillElevationFt": 14.105661539,
+          "trappedLengthFt": 196.695659,
+          "trappedVolumeGallons": 25.035649,
+          "pieces": [
+            {
+              "edgeId": "pipe-15661:span-1",
+              "pipeId": "pipe-15661",
+              "startPointFt": {
+                "x": 1.661050956,
+                "y": 23.166672982,
+                "z": 11.008114406
+              },
+              "endPointFt": {
+                "x": 1.666666667,
+                "y": 23.166666667,
+                "z": 14.105661539
+              },
+              "lengthFt": 3.090025976,
+              "diameterInternalInches": 1.728,
+              "gallons": 0.376451259
+            },
+            {
+              "edgeId": "pipe-15686:span-1",
+              "pipeId": "pipe-15686",
+              "startPointFt": {
+                "x": 1.664554805,
+                "y": 34.166673602,
+                "z": 11.017961259
+              },
+              "endPointFt": {
+                "x": 1.665675943,
+                "y": 34.16666992,
+                "z": 14.105661539
+              },
+              "lengthFt": 3.083553015,
+              "diameterInternalInches": 1.728,
+              "gallons": 0.375662672
+            },
+            {
+              "edgeId": "pipe-15711:span-1",
+              "pipeId": "pipe-15711",
+              "startPointFt": {
+                "x": 1.665752584,
+                "y": 45.166672164,
+                "z": 11.026019726
+              },
+              "endPointFt": {
+                "x": 1.668698319,
+                "y": 45.16666733,
+                "z": 14.105661539
+              },
+              "lengthFt": 3.074098606,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.293602536
+            },
+            {
+              "edgeId": "pipe-15736:span-1",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 1.673177067,
+                "y": 56.16666728,
+                "z": 11.029266225
+              },
+              "endPointFt": {
+                "x": 6.5,
+                "y": 56.166666667,
+                "z": 11.01845505
+              },
+              "lengthFt": 4.820324624,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.460381958
+            },
+            {
+              "edgeId": "pipe-15736:span-10",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 104.291666667,
+                "y": 56.166666667,
+                "z": 10.799420141
+              },
+              "endPointFt": {
+                "x": 116.958333333,
+                "y": 56.166666667,
+                "z": 10.771049194
+              },
+              "lengthFt": 12.666698439,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.209777325
+            },
+            {
+              "edgeId": "pipe-15736:span-11",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 116.958333333,
+                "y": 56.166666667,
+                "z": 10.771049194
+              },
+              "endPointFt": {
+                "x": 128.75,
+                "y": 56.166666667,
+                "z": 10.744638082
+              },
+              "lengthFt": 11.791696245,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.126207181
+            },
+            {
+              "edgeId": "pipe-15736:span-12",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 128.75,
+                "y": 56.166666667,
+                "z": 10.744638082
+              },
+              "endPointFt": {
+                "x": 133.400599754,
+                "y": 56.166666667,
+                "z": 10.734221615
+              },
+              "lengthFt": 4.650611419,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.444172905
+            },
+            {
+              "edgeId": "pipe-15736:span-2",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 6.5,
+                "y": 56.166666667,
+                "z": 11.01845505
+              },
+              "endPointFt": {
+                "x": 16.5,
+                "y": 56.166666667,
+                "z": 10.996056934
+              },
+              "lengthFt": 10.000025084,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.955087362
+            },
+            {
+              "edgeId": "pipe-15736:span-3",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 16.5,
+                "y": 56.166666667,
+                "z": 10.996056934
+              },
+              "endPointFt": {
+                "x": 26.5,
+                "y": 56.166666667,
+                "z": 10.973658818
+              },
+              "lengthFt": 10.000025084,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.955087362
+            },
+            {
+              "edgeId": "pipe-15736:span-4",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 26.5,
+                "y": 56.166666667,
+                "z": 10.973658818
+              },
+              "endPointFt": {
+                "x": 36.5,
+                "y": 56.166666667,
+                "z": 10.951260702
+              },
+              "lengthFt": 10.000025084,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.955087362
+            },
+            {
+              "edgeId": "pipe-15736:span-5",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 36.5,
+                "y": 56.166666667,
+                "z": 10.951260702
+              },
+              "endPointFt": {
+                "x": 48.083333333,
+                "y": 56.166666667,
+                "z": 10.925316218
+              },
+              "lengthFt": 11.583362388,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.106309528
+            },
+            {
+              "edgeId": "pipe-15736:span-6",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 48.083333333,
+                "y": 56.166666667,
+                "z": 10.925316218
+              },
+              "endPointFt": {
+                "x": 62.958333333,
+                "y": 56.166666667,
+                "z": 10.89199902
+              },
+              "lengthFt": 14.875037312,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.420692451
+            },
+            {
+              "edgeId": "pipe-15736:span-7",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 62.958333333,
+                "y": 56.166666667,
+                "z": 10.89199902
+              },
+              "endPointFt": {
+                "x": 77.791666667,
+                "y": 56.166666667,
+                "z": 10.858775148
+              },
+              "lengthFt": 14.833370542,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.416712921
+            },
+            {
+              "edgeId": "pipe-15736:span-8",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 77.791666667,
+                "y": 56.166666667,
+                "z": 10.858775148
+              },
+              "endPointFt": {
+                "x": 91.625,
+                "y": 56.166666667,
+                "z": 10.827791088
+              },
+              "lengthFt": 13.833368032,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.321204184
+            },
+            {
+              "edgeId": "pipe-15736:span-9",
+              "pipeId": "pipe-15736",
+              "startPointFt": {
+                "x": 91.625,
+                "y": 56.166666667,
+                "z": 10.827791088
+              },
+              "endPointFt": {
+                "x": 104.291666667,
+                "y": 56.166666667,
+                "z": 10.799420141
+              },
+              "lengthFt": 12.66669844,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.209777326
+            },
+            {
+              "edgeId": "pipe-20412:span-1",
+              "pipeId": "pipe-20412",
+              "startPointFt": {
+                "x": 6.5,
+                "y": 56.166666667,
+                "z": 11.01845505
+              },
+              "endPointFt": {
+                "x": 6.5,
+                "y": 55.75,
+                "z": 11.01845505
+              },
+              "lengthFt": 0.416666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018706773
+            },
+            {
+              "edgeId": "pipe-20434:span-1",
+              "pipeId": "pipe-20434",
+              "startPointFt": {
+                "x": 6.5,
+                "y": 55.75,
+                "z": 11.01845505
+              },
+              "endPointFt": {
+                "x": 6.5,
+                "y": 55.75,
+                "z": 11.0625
+              },
+              "lengthFt": 0.04404495,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.001977453
+            },
+            {
+              "edgeId": "pipe-22540:span-1",
+              "pipeId": "pipe-22540",
+              "startPointFt": {
+                "x": 26.5,
+                "y": 56.166666667,
+                "z": 10.973658818
+              },
+              "endPointFt": {
+                "x": 26.5,
+                "y": 55.5,
+                "z": 10.973658818
+              },
+              "lengthFt": 0.666666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.029930837
+            },
+            {
+              "edgeId": "pipe-22562:span-1",
+              "pipeId": "pipe-22562",
+              "startPointFt": {
+                "x": 26.5,
+                "y": 55.5,
+                "z": 10.973658818
+              },
+              "endPointFt": {
+                "x": 26.5,
+                "y": 55.5,
+                "z": 10.0625
+              },
+              "lengthFt": 0.911158818,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.040907619
+            },
+            {
+              "edgeId": "pipe-22586:span-1",
+              "pipeId": "pipe-22586",
+              "startPointFt": {
+                "x": 128.75,
+                "y": 56.166666667,
+                "z": 10.744638082
+              },
+              "endPointFt": {
+                "x": 128.75,
+                "y": 54.875,
+                "z": 10.744638082
+              },
+              "lengthFt": 1.291666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.057990997
+            },
+            {
+              "edgeId": "pipe-22608:span-1",
+              "pipeId": "pipe-22608",
+              "startPointFt": {
+                "x": 128.75,
+                "y": 54.875,
+                "z": 10.744638082
+              },
+              "endPointFt": {
+                "x": 128.75,
+                "y": 54.875,
+                "z": 10.0625
+              },
+              "lengthFt": 0.682138082,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.030625446
+            },
+            {
+              "edgeId": "pipe-22632:span-1",
+              "pipeId": "pipe-22632",
+              "startPointFt": {
+                "x": 77.791666667,
+                "y": 56.166666667,
+                "z": 10.858775148
+              },
+              "endPointFt": {
+                "x": 77.791666667,
+                "y": 57.25,
+                "z": 10.858775148
+              },
+              "lengthFt": 1.083333333,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.04863761
+            },
+            {
+              "edgeId": "pipe-22654:span-1",
+              "pipeId": "pipe-22654",
+              "startPointFt": {
+                "x": 77.791666667,
+                "y": 57.25,
+                "z": 10.858775148
+              },
+              "endPointFt": {
+                "x": 77.791666667,
+                "y": 57.25,
+                "z": 10.0625
+              },
+              "lengthFt": 0.796275148,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.035749773
+            },
+            {
+              "edgeId": "pipe-22678:span-1",
+              "pipeId": "pipe-22678",
+              "startPointFt": {
+                "x": 16.5,
+                "y": 56.166666667,
+                "z": 10.996056934
+              },
+              "endPointFt": {
+                "x": 16.5,
+                "y": 55.5,
+                "z": 10.996056934
+              },
+              "lengthFt": 0.666666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.029930837
+            },
+            {
+              "edgeId": "pipe-22700:span-1",
+              "pipeId": "pipe-22700",
+              "startPointFt": {
+                "x": 16.5,
+                "y": 55.5,
+                "z": 10.996056934
+              },
+              "endPointFt": {
+                "x": 16.5,
+                "y": 55.5,
+                "z": 10.0625
+              },
+              "lengthFt": 0.933556934,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.041913211
+            },
+            {
+              "edgeId": "pipe-22748:span-1",
+              "pipeId": "pipe-22748",
+              "startPointFt": {
+                "x": 48.083333333,
+                "y": 56.166666667,
+                "z": 10.925316218
+              },
+              "endPointFt": {
+                "x": 48.083333333,
+                "y": 57.25,
+                "z": 10.925316218
+              },
+              "lengthFt": 1.083333333,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.04863761
+            },
+            {
+              "edgeId": "pipe-22770:span-1",
+              "pipeId": "pipe-22770",
+              "startPointFt": {
+                "x": 48.083333333,
+                "y": 57.25,
+                "z": 10.925316218
+              },
+              "endPointFt": {
+                "x": 48.083333333,
+                "y": 57.25,
+                "z": 10.0625
+              },
+              "lengthFt": 0.862816218,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.038737218
+            },
+            {
+              "edgeId": "pipe-22794:span-1",
+              "pipeId": "pipe-22794",
+              "startPointFt": {
+                "x": 116.958333333,
+                "y": 56.166666667,
+                "z": 10.771049194
+              },
+              "endPointFt": {
+                "x": 116.958333333,
+                "y": 54.875,
+                "z": 10.771049194
+              },
+              "lengthFt": 1.291666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.057990997
+            },
+            {
+              "edgeId": "pipe-22816:span-1",
+              "pipeId": "pipe-22816",
+              "startPointFt": {
+                "x": 116.958333333,
+                "y": 54.875,
+                "z": 10.771049194
+              },
+              "endPointFt": {
+                "x": 116.958333333,
+                "y": 54.875,
+                "z": 10.0625
+              },
+              "lengthFt": 0.708549194,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.031811206
+            },
+            {
+              "edgeId": "pipe-22840:span-1",
+              "pipeId": "pipe-22840",
+              "startPointFt": {
+                "x": 104.291666667,
+                "y": 56.166666667,
+                "z": 10.799420141
+              },
+              "endPointFt": {
+                "x": 104.291666667,
+                "y": 55.416666667,
+                "z": 10.799420141
+              },
+              "lengthFt": 0.75,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.033672192
+            },
+            {
+              "edgeId": "pipe-22862:span-1",
+              "pipeId": "pipe-22862",
+              "startPointFt": {
+                "x": 104.291666667,
+                "y": 55.416666667,
+                "z": 10.799420141
+              },
+              "endPointFt": {
+                "x": 104.291666667,
+                "y": 55.416666667,
+                "z": 10.0625
+              },
+              "lengthFt": 0.736920141,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.033084955
+            },
+            {
+              "edgeId": "pipe-22886:span-1",
+              "pipeId": "pipe-22886",
+              "startPointFt": {
+                "x": 62.958333333,
+                "y": 56.166666667,
+                "z": 10.89199902
+              },
+              "endPointFt": {
+                "x": 62.958333333,
+                "y": 57.25,
+                "z": 10.89199902
+              },
+              "lengthFt": 1.083333333,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.04863761
+            },
+            {
+              "edgeId": "pipe-22908:span-1",
+              "pipeId": "pipe-22908",
+              "startPointFt": {
+                "x": 62.958333333,
+                "y": 57.25,
+                "z": 10.89199902
+              },
+              "endPointFt": {
+                "x": 62.958333333,
+                "y": 57.25,
+                "z": 10.0625
+              },
+              "lengthFt": 0.82949902,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.0372414
+            },
+            {
+              "edgeId": "pipe-22932:span-1",
+              "pipeId": "pipe-22932",
+              "startPointFt": {
+                "x": 36.5,
+                "y": 56.166666667,
+                "z": 10.951260702
+              },
+              "endPointFt": {
+                "x": 36.5,
+                "y": 55.5,
+                "z": 10.951260702
+              },
+              "lengthFt": 0.666666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.029930837
+            },
+            {
+              "edgeId": "pipe-22954:span-1",
+              "pipeId": "pipe-22954",
+              "startPointFt": {
+                "x": 36.5,
+                "y": 55.5,
+                "z": 10.951260702
+              },
+              "endPointFt": {
+                "x": 36.5,
+                "y": 55.5,
+                "z": 10.0625
+              },
+              "lengthFt": 0.888760702,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.039902028
+            },
+            {
+              "edgeId": "pipe-22978:span-1",
+              "pipeId": "pipe-22978",
+              "startPointFt": {
+                "x": 91.625,
+                "y": 56.166666667,
+                "z": 10.827791088
+              },
+              "endPointFt": {
+                "x": 91.625,
+                "y": 55.416666667,
+                "z": 10.827791088
+              },
+              "lengthFt": 0.75,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.033672192
+            },
+            {
+              "edgeId": "pipe-23000:span-1",
+              "pipeId": "pipe-23000",
+              "startPointFt": {
+                "x": 91.625,
+                "y": 55.416666667,
+                "z": 10.827791088
+              },
+              "endPointFt": {
+                "x": 91.625,
+                "y": 55.416666667,
+                "z": 10.0625
+              },
+              "lengthFt": 0.765291088,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.034358704
+            },
+            {
+              "edgeId": "pipe-7661:span-1",
+              "pipeId": "pipe-7661",
+              "startPointFt": {
+                "x": 1.673177067,
+                "y": 56.16666728,
+                "z": 11.029266225
+              },
+              "endPointFt": {
+                "x": 1.666741605,
+                "y": 56.946275716,
+                "z": 11.029958785
+              },
+              "lengthFt": 0.779608121,
+              "diameterInternalInches": 2.705,
+              "gallons": 0.23273947
+            },
+            {
+              "edgeId": "pipe-7661:span-2",
+              "pipeId": "pipe-7661",
+              "startPointFt": {
+                "x": 1.665752584,
+                "y": 45.166672164,
+                "z": 11.026019726
+              },
+              "endPointFt": {
+                "x": 1.673177067,
+                "y": 56.16666728,
+                "z": 11.029266225
+              },
+              "lengthFt": 10.999994443,
+              "diameterInternalInches": 2.705,
+              "gallons": 3.283871482
+            },
+            {
+              "edgeId": "pipe-7661:span-3",
+              "pipeId": "pipe-7661",
+              "startPointFt": {
+                "x": 1.664554805,
+                "y": 34.166673602,
+                "z": 11.017961259
+              },
+              "endPointFt": {
+                "x": 1.665752584,
+                "y": 45.166672164,
+                "z": 11.026019726
+              },
+              "lengthFt": 11.000001474,
+              "diameterInternalInches": 2.705,
+              "gallons": 3.283873581
+            },
+            {
+              "edgeId": "pipe-7661:span-4",
+              "pipeId": "pipe-7661",
+              "startPointFt": {
+                "x": 1.661050956,
+                "y": 23.166672982,
+                "z": 11.008114406
+              },
+              "endPointFt": {
+                "x": 1.664554805,
+                "y": 34.166673602,
+                "z": 11.017961259
+              },
+              "lengthFt": 11.00000531,
+              "diameterInternalInches": 2.705,
+              "gallons": 3.283874726
+            },
+            {
+              "edgeId": "pipe-7661:span-5",
+              "pipeId": "pipe-7661",
+              "startPointFt": {
+                "x": 1.663430536,
+                "y": 22.5,
+                "z": 11.000002968
+              },
+              "endPointFt": {
+                "x": 1.661050956,
+                "y": 23.166672982,
+                "z": 11.008114406
+              },
+              "lengthFt": 0.666679552,
+              "diameterInternalInches": 2.705,
+              "gallons": 0.199026461
+            },
+            {
+              "edgeId": "pipe-8658:span-1",
+              "pipeId": "pipe-8658",
+              "startPointFt": {
+                "x": 133.400599754,
+                "y": 56.166666667,
+                "z": 10.734221615
+              },
+              "endPointFt": {
+                "x": 133.400599754,
+                "y": 56.166666667,
+                "z": 14.105661539
+              },
+              "lengthFt": 3.371439924,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.322001159
+            }
+          ],
+          "termination": {
+            "type": "open-pipe-geometry",
+            "nearbySprinklers": [],
+            "nearbyFittings": [],
+            "sourceDrainDeviceReady": false,
+            "singlePendentRemovalReady": false
+          },
+          "arrangement": {
+            "tier": "5-to-less-than-50-gallons",
+            "section": null,
+            "minimumArrangement": null,
+            "codeBasisReady": false,
+            "existingMethodReady": false,
+            "correctionCandidate": "held-bind-project-edition-primary-source-before-sizing-auxiliary-drain"
+          },
+          "sourceDispositionReady": false
+        },
+        {
+          "id": "wet-basin-02",
+          "lowPointCandidateIds": [
+            "pipe-17523"
+          ],
+          "lowNodeIds": [
+            "physical-node-103"
+          ],
+          "lowPointFt": {
+            "x": 31.310342169,
+            "y": 4.166666667,
+            "z": 13.671059385
+          },
+          "spillElevationFt": 14.028222549,
+          "trappedLengthFt": 25.393361,
+          "trappedVolumeGallons": 2.10121,
+          "pieces": [
+            {
+              "edgeId": "pipe-17523:span-1",
+              "pipeId": "pipe-17523",
+              "startPointFt": {
+                "x": 31.310342169,
+                "y": 4.166666667,
+                "z": 13.671059385
+              },
+              "endPointFt": {
+                "x": 31.310342169,
+                "y": 7.228431264,
+                "z": 13.728634349
+              },
+              "lengthFt": 3.062305884,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.292476231
+            },
+            {
+              "edgeId": "pipe-17523:span-2",
+              "pipeId": "pipe-17523",
+              "startPointFt": {
+                "x": 31.310342169,
+                "y": 7.228431264,
+                "z": 13.728634349
+              },
+              "endPointFt": {
+                "x": 31.310342169,
+                "y": 19.854166667,
+                "z": 13.966055035
+              },
+              "lengthFt": 12.627967495,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.206078191
+            },
+            {
+              "edgeId": "pipe-17523:span-3",
+              "pipeId": "pipe-17523",
+              "startPointFt": {
+                "x": 31.310342169,
+                "y": 19.854166667,
+                "z": 13.966055035
+              },
+              "endPointFt": {
+                "x": 31.310342488,
+                "y": 23.160157401,
+                "z": 14.028222549
+              },
+              "lengthFt": 3.30006478,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.315184226
+            },
+            {
+              "edgeId": "pipe-19448:span-1",
+              "pipeId": "pipe-19448",
+              "startPointFt": {
+                "x": 31.310342169,
+                "y": 19.854166667,
+                "z": 13.966055035
+              },
+              "endPointFt": {
+                "x": 31.727008835,
+                "y": 19.854166667,
+                "z": 13.966055035
+              },
+              "lengthFt": 0.416666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018706773
+            },
+            {
+              "edgeId": "pipe-19470:span-1",
+              "pipeId": "pipe-19470",
+              "startPointFt": {
+                "x": 31.727008835,
+                "y": 19.854166667,
+                "z": 13.966055035
+              },
+              "endPointFt": {
+                "x": 31.727008835,
+                "y": 19.854166667,
+                "z": 11.0625
+              },
+              "lengthFt": 2.903555035,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.13035875
+            },
+            {
+              "edgeId": "pipe-20688:span-1",
+              "pipeId": "pipe-20688",
+              "startPointFt": {
+                "x": 31.310342169,
+                "y": 7.228431264,
+                "z": 13.728634349
+              },
+              "endPointFt": {
+                "x": 30.893675502,
+                "y": 7.228431264,
+                "z": 13.728634349
+              },
+              "lengthFt": 0.416666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018706773
+            },
+            {
+              "edgeId": "pipe-20710:span-1",
+              "pipeId": "pipe-20710",
+              "startPointFt": {
+                "x": 30.893675502,
+                "y": 7.228431264,
+                "z": 13.728634349
+              },
+              "endPointFt": {
+                "x": 30.893675502,
+                "y": 7.228431264,
+                "z": 11.0625
+              },
+              "lengthFt": 2.666134349,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.11969945
+            }
+          ],
+          "termination": {
+            "type": "upright-sprinkler",
+            "nearbySprinklers": [
+              {
+                "id": "sprinkler-2925",
+                "category": "Upright",
+                "residualFt": 0
+              }
+            ],
+            "nearbyFittings": [],
+            "sourceDrainDeviceReady": false,
+            "singlePendentRemovalReady": false
+          },
+          "arrangement": {
+            "tier": "less-than-5-gallons",
+            "section": "NFPA 13 (2019) 16.10.5.2.3",
+            "minimumArrangement": "one-half-inch nipple-and-cap-or-plug, or a source-proven allowed alternative",
+            "codeBasisReady": true,
+            "existingMethodReady": false,
+            "correctionCandidate": "add-one-half-inch-nipple-and-cap-or-plug-at-low-point"
+          },
+          "sourceDispositionReady": false
+        },
+        {
+          "id": "wet-basin-03",
+          "lowPointCandidateIds": [
+            "pipe-17853"
+          ],
+          "lowNodeIds": [
+            "physical-node-106"
+          ],
+          "lowPointFt": {
+            "x": 19.310342169,
+            "y": 4.166666667,
+            "z": 13.671059385
+          },
+          "spillElevationFt": 14.059510211,
+          "trappedLengthFt": 29.018272,
+          "trappedVolumeGallons": 2.263986,
+          "pieces": [
+            {
+              "edgeId": "pipe-17853:span-1",
+              "pipeId": "pipe-17853",
+              "startPointFt": {
+                "x": 19.310342169,
+                "y": 4.166666667,
+                "z": 13.671059385
+              },
+              "endPointFt": {
+                "x": 19.310342169,
+                "y": 6.166666667,
+                "z": 13.711962959
+              },
+              "lengthFt": 2.000418232,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.191056938
+            },
+            {
+              "edgeId": "pipe-17853:span-2",
+              "pipeId": "pipe-17853",
+              "startPointFt": {
+                "x": 19.310342169,
+                "y": 6.166666667,
+                "z": 13.711962959
+              },
+              "endPointFt": {
+                "x": 19.310342169,
+                "y": 17.166666667,
+                "z": 13.936932613
+              },
+              "lengthFt": 11.002300275,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.050813159
+            },
+            {
+              "edgeId": "pipe-17853:span-3",
+              "pipeId": "pipe-17853",
+              "startPointFt": {
+                "x": 19.310342169,
+                "y": 17.166666667,
+                "z": 13.936932613
+              },
+              "endPointFt": {
+                "x": 19.310342169,
+                "y": 17.958333333,
+                "z": 13.953123611
+              },
+              "lengthFt": 0.791832216,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.075626705
+            },
+            {
+              "edgeId": "pipe-17853:span-4",
+              "pipeId": "pipe-17853",
+              "startPointFt": {
+                "x": 19.310342169,
+                "y": 17.958333333,
+                "z": 13.953123611
+              },
+              "endPointFt": {
+                "x": 19.310342516,
+                "y": 23.160157612,
+                "z": 14.059510211
+              },
+              "lengthFt": 5.196401646,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.496300509
+            },
+            {
+              "edgeId": "pipe-19516:span-1",
+              "pipeId": "pipe-19516",
+              "startPointFt": {
+                "x": 19.310342169,
+                "y": 6.166666667,
+                "z": 13.711962959
+              },
+              "endPointFt": {
+                "x": 18.893675502,
+                "y": 6.166666667,
+                "z": 13.711962959
+              },
+              "lengthFt": 0.416666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018706773
+            },
+            {
+              "edgeId": "pipe-19538:span-1",
+              "pipeId": "pipe-19538",
+              "startPointFt": {
+                "x": 18.893675502,
+                "y": 6.166666667,
+                "z": 13.711962959
+              },
+              "endPointFt": {
+                "x": 18.893675502,
+                "y": 6.166666667,
+                "z": 11.0625
+              },
+              "lengthFt": 2.649462959,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.118950967
+            },
+            {
+              "edgeId": "pipe-21422:span-1",
+              "pipeId": "pipe-21422",
+              "startPointFt": {
+                "x": 19.310342169,
+                "y": 17.166666667,
+                "z": 13.936932613
+              },
+              "endPointFt": {
+                "x": 19.727008835,
+                "y": 17.166666667,
+                "z": 13.936932613
+              },
+              "lengthFt": 0.416666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018706773
+            },
+            {
+              "edgeId": "pipe-21444:span-1",
+              "pipeId": "pipe-21444",
+              "startPointFt": {
+                "x": 19.727008835,
+                "y": 17.166666667,
+                "z": 13.936932613
+              },
+              "endPointFt": {
+                "x": 19.727008835,
+                "y": 17.166666667,
+                "z": 11.0625
+              },
+              "lengthFt": 2.874432613,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.129051262
+            },
+            {
+              "edgeId": "pipe-21468:span-1",
+              "pipeId": "pipe-21468",
+              "startPointFt": {
+                "x": 19.310342169,
+                "y": 17.958333333,
+                "z": 13.953123611
+              },
+              "endPointFt": {
+                "x": 18.53087474,
+                "y": 17.958333333,
+                "z": 13.953123611
+              },
+              "lengthFt": 0.779467428,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.034995169
+            },
+            {
+              "edgeId": "pipe-21490:span-1",
+              "pipeId": "pipe-21490",
+              "startPointFt": {
+                "x": 18.53087474,
+                "y": 17.958333333,
+                "z": 13.953123611
+              },
+              "endPointFt": {
+                "x": 18.53087474,
+                "y": 17.958333333,
+                "z": 11.0625
+              },
+              "lengthFt": 2.890623611,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.129778177
+            }
+          ],
+          "termination": {
+            "type": "upright-sprinkler",
+            "nearbySprinklers": [
+              {
+                "id": "sprinkler-2957",
+                "category": "Upright",
+                "residualFt": 0
+              }
+            ],
+            "nearbyFittings": [],
+            "sourceDrainDeviceReady": false,
+            "singlePendentRemovalReady": false
+          },
+          "arrangement": {
+            "tier": "less-than-5-gallons",
+            "section": "NFPA 13 (2019) 16.10.5.2.3",
+            "minimumArrangement": "one-half-inch nipple-and-cap-or-plug, or a source-proven allowed alternative",
+            "codeBasisReady": true,
+            "existingMethodReady": false,
+            "correctionCandidate": "add-one-half-inch-nipple-and-cap-or-plug-at-low-point"
+          },
+          "sourceDispositionReady": false
+        },
+        {
+          "id": "wet-basin-04",
+          "lowPointCandidateIds": [
+            "pipe-18285"
+          ],
+          "lowNodeIds": [
+            "physical-node-110"
+          ],
+          "lowPointFt": {
+            "x": 7.310342169,
+            "y": 4.166666667,
+            "z": 13.671059385
+          },
+          "spillElevationFt": 14.090797874,
+          "trappedLengthFt": 25.372635,
+          "trappedVolumeGallons": 2.100345,
+          "pieces": [
+            {
+              "edgeId": "pipe-18285:span-1",
+              "pipeId": "pipe-18285",
+              "startPointFt": {
+                "x": 7.310342169,
+                "y": 4.166666667,
+                "z": 13.671059385
+              },
+              "endPointFt": {
+                "x": 7.310342169,
+                "y": 6.166666667,
+                "z": 13.715257525
+              },
+              "lengthFt": 2.000488309,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.191063631
+            },
+            {
+              "edgeId": "pipe-18285:span-2",
+              "pipeId": "pipe-18285",
+              "startPointFt": {
+                "x": 7.310342169,
+                "y": 6.166666667,
+                "z": 13.715257525
+              },
+              "endPointFt": {
+                "x": 7.310342169,
+                "y": 17.125,
+                "z": 13.9574265
+              },
+              "lengthFt": 10.961008861,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.046869478
+            },
+            {
+              "edgeId": "pipe-18285:span-3",
+              "pipeId": "pipe-18285",
+              "startPointFt": {
+                "x": 7.310342169,
+                "y": 17.125,
+                "z": 13.9574265
+              },
+              "endPointFt": {
+                "x": 7.310342544,
+                "y": 23.16015784,
+                "z": 14.090797874
+              },
+              "lengthFt": 6.030120935,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.575927785
+            },
+            {
+              "edgeId": "pipe-19700:span-1",
+              "pipeId": "pipe-19700",
+              "startPointFt": {
+                "x": 7.310342169,
+                "y": 6.166666667,
+                "z": 13.715257525
+              },
+              "endPointFt": {
+                "x": 6.893675502,
+                "y": 6.166666667,
+                "z": 13.715257525
+              },
+              "lengthFt": 0.416666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018706773
+            },
+            {
+              "edgeId": "pipe-19722:span-1",
+              "pipeId": "pipe-19722",
+              "startPointFt": {
+                "x": 6.893675502,
+                "y": 6.166666667,
+                "z": 13.715257525
+              },
+              "endPointFt": {
+                "x": 6.893675502,
+                "y": 6.166666667,
+                "z": 11.0625
+              },
+              "lengthFt": 2.652757525,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.11909888
+            },
+            {
+              "edgeId": "pipe-21560:span-1",
+              "pipeId": "pipe-21560",
+              "startPointFt": {
+                "x": 7.310342169,
+                "y": 17.125,
+                "z": 13.9574265
+              },
+              "endPointFt": {
+                "x": 6.893675502,
+                "y": 17.125,
+                "z": 13.9574265
+              },
+              "lengthFt": 0.416666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018706773
+            },
+            {
+              "edgeId": "pipe-21582:span-1",
+              "pipeId": "pipe-21582",
+              "startPointFt": {
+                "x": 6.893675502,
+                "y": 17.125,
+                "z": 13.9574265
+              },
+              "endPointFt": {
+                "x": 6.893675502,
+                "y": 17.125,
+                "z": 11.0625
+              },
+              "lengthFt": 2.8949265,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.129971361
+            }
+          ],
+          "termination": {
+            "type": "upright-sprinkler",
+            "nearbySprinklers": [
+              {
+                "id": "sprinkler-2941",
+                "category": "Upright",
+                "residualFt": 0
+              }
+            ],
+            "nearbyFittings": [],
+            "sourceDrainDeviceReady": false,
+            "singlePendentRemovalReady": false
+          },
+          "arrangement": {
+            "tier": "less-than-5-gallons",
+            "section": "NFPA 13 (2019) 16.10.5.2.3",
+            "minimumArrangement": "one-half-inch nipple-and-cap-or-plug, or a source-proven allowed alternative",
+            "codeBasisReady": true,
+            "existingMethodReady": false,
+            "correctionCandidate": "add-one-half-inch-nipple-and-cap-or-plug-at-low-point"
+          },
+          "sourceDispositionReady": false
+        },
+        {
+          "id": "wet-basin-05",
+          "lowPointCandidateIds": [
+            "pipe-18615"
+          ],
+          "lowNodeIds": [
+            "physical-node-113"
+          ],
+          "lowPointFt": {
+            "x": 52.310342169,
+            "y": 11.166666667,
+            "z": 13.671059385
+          },
+          "spillElevationFt": 13.973497611,
+          "trappedLengthFt": 15.073064,
+          "trappedVolumeGallons": 1.283605,
+          "pieces": [
+            {
+              "edgeId": "pipe-18615:span-1",
+              "pipeId": "pipe-18615",
+              "startPointFt": {
+                "x": 52.310342169,
+                "y": 11.166666667,
+                "z": 13.671059385
+              },
+              "endPointFt": {
+                "x": 52.310342169,
+                "y": 13.428051432,
+                "z": 13.728101193
+              },
+              "lengthFt": 2.26210407,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.216050159
+            },
+            {
+              "edgeId": "pipe-18615:span-2",
+              "pipeId": "pipe-18615",
+              "startPointFt": {
+                "x": 52.310342169,
+                "y": 13.428051432,
+                "z": 13.728101193
+              },
+              "endPointFt": {
+                "x": 52.310342365,
+                "y": 23.160158321,
+                "z": 13.973497611
+              },
+              "lengthFt": 9.728692076,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.929172755
+            },
+            {
+              "edgeId": "pipe-19746:span-1",
+              "pipeId": "pipe-19746",
+              "startPointFt": {
+                "x": 52.310342169,
+                "y": 13.428051432,
+                "z": 13.728101193
+              },
+              "endPointFt": {
+                "x": 52.727008835,
+                "y": 13.428051432,
+                "z": 13.728101193
+              },
+              "lengthFt": 0.416666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018706773
+            },
+            {
+              "edgeId": "pipe-19768:span-1",
+              "pipeId": "pipe-19768",
+              "startPointFt": {
+                "x": 52.727008835,
+                "y": 13.428051432,
+                "z": 13.728101193
+              },
+              "endPointFt": {
+                "x": 52.727008835,
+                "y": 13.428051432,
+                "z": 11.0625
+              },
+              "lengthFt": 2.665601193,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.119675513
+            }
+          ],
+          "termination": {
+            "type": "upright-sprinkler",
+            "nearbySprinklers": [
+              {
+                "id": "sprinkler-2797",
+                "category": "Upright",
+                "residualFt": 0
+              }
+            ],
+            "nearbyFittings": [],
+            "sourceDrainDeviceReady": false,
+            "singlePendentRemovalReady": false
+          },
+          "arrangement": {
+            "tier": "less-than-5-gallons",
+            "section": "NFPA 13 (2019) 16.10.5.2.3",
+            "minimumArrangement": "one-half-inch nipple-and-cap-or-plug, or a source-proven allowed alternative",
+            "codeBasisReady": true,
+            "existingMethodReady": false,
+            "correctionCandidate": "add-one-half-inch-nipple-and-cap-or-plug-at-low-point"
+          },
+          "sourceDispositionReady": false
+        },
+        {
+          "id": "wet-basin-06",
+          "lowPointCandidateIds": [
+            "pipe-18740"
+          ],
+          "lowNodeIds": [
+            "physical-node-115"
+          ],
+          "lowPointFt": {
+            "x": 64.310342169,
+            "y": 11.166666667,
+            "z": 13.671059385
+          },
+          "spillElevationFt": 13.9421273,
+          "trappedLengthFt": 15.005542,
+          "trappedVolumeGallons": 1.280536,
+          "pieces": [
+            {
+              "edgeId": "pipe-18740:span-1",
+              "pipeId": "pipe-18740",
+              "startPointFt": {
+                "x": 64.310342169,
+                "y": 11.166666667,
+                "z": 13.671059385
+              },
+              "endPointFt": {
+                "x": 64.310342169,
+                "y": 11.666539011,
+                "z": 13.682357126
+              },
+              "lengthFt": 0.499999999,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.047754248
+            },
+            {
+              "edgeId": "pipe-18740:span-2",
+              "pipeId": "pipe-18740",
+              "startPointFt": {
+                "x": 64.310342169,
+                "y": 11.666539011,
+                "z": 13.682357126
+              },
+              "endPointFt": {
+                "x": 64.310342553,
+                "y": 23.160157913,
+                "z": 13.9421273
+              },
+              "lengthFt": 11.490043676,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.097396798
+            },
+            {
+              "edgeId": "pipe-20734:span-1",
+              "pipeId": "pipe-20734",
+              "startPointFt": {
+                "x": 64.310342169,
+                "y": 11.666539011,
+                "z": 13.682357126
+              },
+              "endPointFt": {
+                "x": 64.247277318,
+                "y": 11.259593759,
+                "z": 13.676708255
+              },
+              "lengthFt": 0.406939098,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018270042
+            },
+            {
+              "edgeId": "pipe-22226:span-1",
+              "pipeId": "pipe-22226",
+              "startPointFt": {
+                "x": 64.247277318,
+                "y": 11.259593759,
+                "z": 13.676708255
+              },
+              "endPointFt": {
+                "x": 64.246532462,
+                "y": 11.254787348,
+                "z": 11.0625
+              },
+              "lengthFt": 2.608559385,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.117114549
+            }
+          ],
+          "termination": {
+            "type": "upright-sprinkler",
+            "nearbySprinklers": [
+              {
+                "id": "sprinkler-2813",
+                "category": "Upright",
+                "residualFt": 0.116461404
+              }
+            ],
+            "nearbyFittings": [],
+            "sourceDrainDeviceReady": false,
+            "singlePendentRemovalReady": false
+          },
+          "arrangement": {
+            "tier": "less-than-5-gallons",
+            "section": "NFPA 13 (2019) 16.10.5.2.3",
+            "minimumArrangement": "one-half-inch nipple-and-cap-or-plug, or a source-proven allowed alternative",
+            "codeBasisReady": true,
+            "existingMethodReady": false,
+            "correctionCandidate": "add-one-half-inch-nipple-and-cap-or-plug-at-low-point"
+          },
+          "sourceDispositionReady": false
+        },
+        {
+          "id": "wet-basin-07",
+          "lowPointCandidateIds": [
+            "pipe-18866"
+          ],
+          "lowNodeIds": [
+            "physical-node-117"
+          ],
+          "lowPointFt": {
+            "x": 88.310342169,
+            "y": 11.166666667,
+            "z": 13.671059385
+          },
+          "spillElevationFt": 13.879623673,
+          "trappedLengthFt": 15.426688,
+          "trappedVolumeGallons": 1.29938,
+          "pieces": [
+            {
+              "edgeId": "pipe-18866:span-1",
+              "pipeId": "pipe-18866",
+              "startPointFt": {
+                "x": 88.310342169,
+                "y": 11.166666667,
+                "z": 13.671059385
+              },
+              "endPointFt": {
+                "x": 88.310342169,
+                "y": 11.66659104,
+                "z": 13.679755436
+              },
+              "lengthFt": 0.5,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.047754248
+            },
+            {
+              "edgeId": "pipe-18866:span-2",
+              "pipeId": "pipe-18866",
+              "startPointFt": {
+                "x": 88.310342169,
+                "y": 11.66659104,
+                "z": 13.679755436
+              },
+              "endPointFt": {
+                "x": 88.31034231,
+                "y": 23.160157235,
+                "z": 13.879623673
+              },
+              "lengthFt": 11.488794489,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.09727749
+            },
+            {
+              "edgeId": "pipe-21032:span-1",
+              "pipeId": "pipe-21032",
+              "startPointFt": {
+                "x": 88.310342169,
+                "y": 11.66659104,
+                "z": 13.679755436
+              },
+              "endPointFt": {
+                "x": 87.48970444,
+                "y": 11.66659104,
+                "z": 13.679755436
+              },
+              "lengthFt": 0.820637728,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.036843561
+            },
+            {
+              "edgeId": "pipe-21054:span-1",
+              "pipeId": "pipe-21054",
+              "startPointFt": {
+                "x": 87.48970444,
+                "y": 11.66659104,
+                "z": 13.679755436
+              },
+              "endPointFt": {
+                "x": 87.48970444,
+                "y": 11.66659104,
+                "z": 11.0625
+              },
+              "lengthFt": 2.617255436,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.11750497
+            }
+          ],
+          "termination": {
+            "type": "upright-sprinkler",
+            "nearbySprinklers": [
+              {
+                "id": "sprinkler-2845",
+                "category": "Upright",
+                "residualFt": 0
+              }
+            ],
+            "nearbyFittings": [],
+            "sourceDrainDeviceReady": false,
+            "singlePendentRemovalReady": false
+          },
+          "arrangement": {
+            "tier": "less-than-5-gallons",
+            "section": "NFPA 13 (2019) 16.10.5.2.3",
+            "minimumArrangement": "one-half-inch nipple-and-cap-or-plug, or a source-proven allowed alternative",
+            "codeBasisReady": true,
+            "existingMethodReady": false,
+            "correctionCandidate": "add-one-half-inch-nipple-and-cap-or-plug-at-low-point"
+          },
+          "sourceDispositionReady": false
+        },
+        {
+          "id": "wet-basin-08",
+          "lowPointCandidateIds": [
+            "pipe-18991"
+          ],
+          "lowNodeIds": [
+            "physical-node-119"
+          ],
+          "lowPointFt": {
+            "x": 76.310342169,
+            "y": 11.166666667,
+            "z": 13.671059385
+          },
+          "spillElevationFt": 13.910848476,
+          "trappedLengthFt": 15.803505,
+          "trappedVolumeGallons": 1.316327,
+          "pieces": [
+            {
+              "edgeId": "pipe-18991:span-1",
+              "pipeId": "pipe-18991",
+              "startPointFt": {
+                "x": 76.310342169,
+                "y": 11.166666667,
+                "z": 13.671059385
+              },
+              "endPointFt": {
+                "x": 76.310342169,
+                "y": 11.666566762,
+                "z": 13.681054131
+              },
+              "lengthFt": 0.5,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.047754248
+            },
+            {
+              "edgeId": "pipe-18991:span-2",
+              "pipeId": "pipe-18991",
+              "startPointFt": {
+                "x": 76.310342169,
+                "y": 11.666566762,
+                "z": 13.681054131
+              },
+              "endPointFt": {
+                "x": 76.310342502,
+                "y": 23.160157551,
+                "z": 13.910848476
+              },
+              "lengthFt": 11.489377364,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.09733316
+            },
+            {
+              "edgeId": "pipe-19838:span-1",
+              "pipeId": "pipe-19838",
+              "startPointFt": {
+                "x": 76.310342169,
+                "y": 11.666566762,
+                "z": 13.681054131
+              },
+              "endPointFt": {
+                "x": 75.1147682,
+                "y": 11.666566762,
+                "z": 13.681054131
+              },
+              "lengthFt": 1.195573968,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.053676795
+            },
+            {
+              "edgeId": "pipe-19860:span-1",
+              "pipeId": "pipe-19860",
+              "startPointFt": {
+                "x": 75.1147682,
+                "y": 11.666566762,
+                "z": 13.681054131
+              },
+              "endPointFt": {
+                "x": 75.1147682,
+                "y": 11.666566762,
+                "z": 11.0625
+              },
+              "lengthFt": 2.618554131,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.117563276
+            }
+          ],
+          "termination": {
+            "type": "upright-sprinkler",
+            "nearbySprinklers": [
+              {
+                "id": "sprinkler-2829",
+                "category": "Upright",
+                "residualFt": 0
+              }
+            ],
+            "nearbyFittings": [],
+            "sourceDrainDeviceReady": false,
+            "singlePendentRemovalReady": false
+          },
+          "arrangement": {
+            "tier": "less-than-5-gallons",
+            "section": "NFPA 13 (2019) 16.10.5.2.3",
+            "minimumArrangement": "one-half-inch nipple-and-cap-or-plug, or a source-proven allowed alternative",
+            "codeBasisReady": true,
+            "existingMethodReady": false,
+            "correctionCandidate": "add-one-half-inch-nipple-and-cap-or-plug-at-low-point"
+          },
+          "sourceDispositionReady": false
+        },
+        {
+          "id": "wet-basin-09",
+          "lowPointCandidateIds": [
+            "pipe-19116"
+          ],
+          "lowNodeIds": [
+            "physical-node-121"
+          ],
+          "lowPointFt": {
+            "x": 100.310342169,
+            "y": 11.166666667,
+            "z": 13.671059385
+          },
+          "spillElevationFt": 13.848282857,
+          "trappedLengthFt": 15.020903,
+          "trappedVolumeGallons": 1.281136,
+          "pieces": [
+            {
+              "edgeId": "pipe-19116:span-1",
+              "pipeId": "pipe-19116",
+              "startPointFt": {
+                "x": 100.310342169,
+                "y": 11.166666667,
+                "z": 13.671059385
+              },
+              "endPointFt": {
+                "x": 100.310342169,
+                "y": 11.666612088,
+                "z": 13.678446889
+              },
+              "lengthFt": 0.499999999,
+              "diameterInternalInches": 1.53,
+              "gallons": 0.047754248
+            },
+            {
+              "edgeId": "pipe-19116:span-2",
+              "pipeId": "pipe-19116",
+              "startPointFt": {
+                "x": 100.310342169,
+                "y": 11.666612088,
+                "z": 13.678446889
+              },
+              "endPointFt": {
+                "x": 100.31034242,
+                "y": 23.160156961,
+                "z": 13.848282857
+              },
+              "lengthFt": 11.488289187,
+              "diameterInternalInches": 1.53,
+              "gallons": 1.097229229
+            },
+            {
+              "edgeId": "pipe-19930:span-1",
+              "pipeId": "pipe-19930",
+              "startPointFt": {
+                "x": 100.310342169,
+                "y": 11.666612088,
+                "z": 13.678446889
+              },
+              "endPointFt": {
+                "x": 99.935525971,
+                "y": 11.484612283,
+                "z": 13.678446889
+              },
+              "lengthFt": 0.416666667,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.018706773
+            },
+            {
+              "edgeId": "pipe-19952:span-1",
+              "pipeId": "pipe-19952",
+              "startPointFt": {
+                "x": 99.935525971,
+                "y": 11.484612283,
+                "z": 13.678446889
+              },
+              "endPointFt": {
+                "x": 99.935525971,
+                "y": 11.484612283,
+                "z": 11.0625
+              },
+              "lengthFt": 2.615946889,
+              "diameterInternalInches": 1.049,
+              "gallons": 0.117446221
+            }
+          ],
+          "termination": {
+            "type": "upright-sprinkler",
+            "nearbySprinklers": [
+              {
+                "id": "sprinkler-2861",
+                "category": "Upright",
+                "residualFt": 0
+              }
+            ],
+            "nearbyFittings": [],
+            "sourceDrainDeviceReady": false,
+            "singlePendentRemovalReady": false
+          },
+          "arrangement": {
+            "tier": "less-than-5-gallons",
+            "section": "NFPA 13 (2019) 16.10.5.2.3",
+            "minimumArrangement": "one-half-inch nipple-and-cap-or-plug, or a source-proven allowed alternative",
+            "codeBasisReady": true,
+            "existingMethodReady": false,
+            "correctionCandidate": "add-one-half-inch-nipple-and-cap-or-plug-at-low-point"
+          },
+          "sourceDispositionReady": false
+        }
+      ],
+      "exactBasinGeometryReady": true,
+      "codeBasisBoundBasinCount": 8,
+      "sourceDispositionReadyBasinCount": 0,
+      "correctionPlanReady": false,
+      "drainageGradeSemanticsReady": false
+    }
   },
   "claims": {
     "exactHydraulicReportGraphReady": true,
@@ -13526,6 +15384,8 @@
     "buildingRigidPipeSpanHydraulicDirectionReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,
     "wholeNetworkHydraulicFlowDirectionReady": true,
+    "exactWetPipeDrainageBasinGeometryReady": true,
+    "wetPipeDrainageCorrectionPlanReady": false,
     "drainageGradeSemanticsReady": false,
     "continuousDrainPathReady": false,
     "drainDestinationReady": true,
@@ -13534,5 +15394,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "receiptSha256": "70E554662743B3DE1F97434D07240A968A870107574196F8D1F19AFC4B529F8C"
+  "receiptSha256": "7EF5F02FCF4837371DAFE7CC4B380C68E01D57C540DF4F7962C8884F2E322294"
 }

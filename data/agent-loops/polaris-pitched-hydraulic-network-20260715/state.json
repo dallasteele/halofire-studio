@@ -1,5 +1,5 @@
 {
-  "iteration": 7,
+  "iteration": 8,
   "phase": "verify-and-bind",
   "status": "in_progress",
   "observations": [
@@ -24,7 +24,13 @@
     "A completed Dallas dry-system bid proves the reusable source-chain pattern and role-specific slope/drain topology, but no Dallas dimensions, grades, or drain decisions are transferred into Polaris.",
     "Polaris now has a same-project five-node semantic chain from the FL3 fire-riser connection through the FP1 underground inlet, riser assembly, and building feed to hydraulic source node 116.",
     "The semantic source chain proves whole-network hydraulic direction while remaining explicitly separate from the still-unproven civil-to-sprinkler CAD endpoint geometry.",
-    "A current primary-source code basis was not sufficiently bound to classify the ten remote low points, so drainage semantics remain held instead of importing an unverified threshold."
+    "A current primary-source code basis was not sufficiently bound to classify the ten remote low points, so drainage semantics remain held instead of importing an unverified threshold.",
+    "The completed hydraulic report identifies Polaris as a wet system with 1,875.65 gallons of wet-pipe capacity and zero dry-pipe capacity.",
+    "The ten remote downhill candidates resolve into nine unique trapped basins because pipe-7661 and pipe-15736 share one 25.035649-gallon catchment and spill elevation.",
+    "The nine basins total 37.962174 gallons. Eight upright-ended basins are individually under five gallons; the completed source contains no remote auxiliary-drain fitting at any of them, and upright removal is not substituted for the source rule's single-pendent allowance.",
+    "NFPA 13 (2019) section 16.10.5.2.3 is locally primary-source bound for the eight under-five-gallon basins, producing one-half-inch nipple-and-cap-or-plug correction candidates while keeping source disposition false.",
+    "The shared 25.035649-gallon basin has exact geometry and volume but remains unsized until the project-edition primary text for that tier is locally bound.",
+    "The approved FP2 proof now overlays all nine exact trapped pipe portions and basin IDs on the real plan and lists exact gallons, coordinates, termination type, and correction status in a browser-verified register."
   ],
   "attempts": [
     "Upgraded the read-only LibreDWG parser to 0.7.7 and extracted pipe, sprinkler, fitting, calculation-label, and source-note attributes with zero unknown entities.",
@@ -58,11 +64,16 @@
     "Hash-gated the Polaris FL3, as-built FP1/FP2, sprinkler DWG, and both hydraulic reports into one directed semantic source-continuity receipt.",
     "Adversarial tests reject a missing sheet transition, altered source hash, and missing main-drain device semantics while retaining the exact-endpoint hold.",
     "Rendered the actual FL3 and FP1 source sheets beside the approved FP2 overlay; browser inspection proved both source images loaded, all six diagnostic layers toggled, and no page or browser errors.",
-    "Lean 4.13 verified the semantic-source-versus-exact-endpoint boundary in 69 ms; 38 focused tests, production build, rules, loop guard, syntax, JSON, and diff checks pass; brain postflight persisted the result as episode 149745."
+    "Lean 4.13 verified the semantic-source-versus-exact-endpoint boundary in 69 ms; 38 focused tests, production build, rules, loop guard, syntax, JSON, and diff checks pass; brain postflight persisted the result as episode 149745.",
+    "Implemented a minimax-spill wet-pipe basin solver over the exact physical graph, including linearly clipped pipe portions below spill elevation and hydraulic-report internal-diameter volume arithmetic.",
+    "Adversarial tests reject missing or conflicting internal diameters and refuse to credit an upright sprinkler as the single-pendent drain alternative; 30 focused integration tests pass.",
+    "Visual inspection caught overlapping gallon labels on the real FP2 overlay; the plan was corrected to compact basin IDs with exact values retained in the register, and the layer was verified off/on with nine register rows.",
+    "Lean 4.13.0 verified the nine-basin partition, 37.962174-gallon arithmetic, and fail-closed correction/drainage/proper-layout boundary in 120 ms; brain postflight persisted the exact basin contract as episode 149846."
   ],
   "blockers": [
     "The exact cross-drawing CAD endpoint remains unproven: the nearest extracted fire-line pipe endpoint is 718.821404366 inches from hydraulic node 116. This no longer blocks semantic hydraulic direction, but it must remain labeled as non-exact geometry.",
-    "The ten remote geometric low points cannot be classified as acceptable trapped volume or auxiliary-drain requirements until completed-design system/drainage intent is bound."
+    "The shared 25.035649-gallon basin cannot receive a promoted drain size until NFPA 13 (2019) 16.10.5.2.2 is locally bound from a primary source.",
+    "All nine trapped basins lack a source-approved drain disposition; eight have code-basis-bound correction candidates, but none are promoted as installed or approved."
   ],
-  "next_action": "Calculate trapped volume and catchment for each of the ten exact-source low points, then bind a project-edition rule and completed-design drain method/destination before promoting drainage semantics or proper-layout readiness; do not encode an unverified volume threshold."
+  "next_action": "Bind the primary project-edition rule for the 25.035649-gallon basin, then use the nine-basin register as the correction contract for a source-grounded New Hope pitched layout; keep every correction visibly candidate-only until same-project plan disposition exists."
 }
