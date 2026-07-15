@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="950" viewBox="0 0 1500 950" role="img" aria-labelledby="title desc">
+  <title id="title">Blossom Rock registered Roof 3 calibration model</title>
+  <desc id="desc">A three-dimensional Lake Pump Room envelope registered to the protected PDFs. Eight XY target columns, a one-and-one-half-to-twelve roof surface, six-inch purlins, and twelve-inch beams are shown. Exact sprinkler elevation remains unresolved.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07111d"/><stop offset="1" stop-color="#12324a"/></linearGradient>
+    <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#22d3ee" stop-opacity=".42"/><stop offset="1" stop-color="#0ea5e9" stop-opacity=".12"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-opacity=".42"/></filter>
+    <style>
+      text{font-family:Inter,Segoe UI,sans-serif;fill:#e6edf5}.muted{fill:#9fb3c6}.label{font-size:21px;font-weight:750}.small{font-size:16px}.tiny{font-size:14px}.frame{fill:#0c1d2bdd;stroke:#29445f;stroke-width:2}.roof{fill:url(#roof);stroke:#22d3ee;stroke-width:5}.wall{fill:#0b263455;stroke:#4f6b80;stroke-width:3}.purlin{stroke:#fbbf24;stroke-width:7;stroke-linecap:round}.beam{stroke:#a78bfa;stroke-width:13;stroke-linecap:round}.xy{stroke:#22c55e;stroke-width:4;stroke-dasharray:9 8}.xyTop{fill:#fbbf24;stroke:#78350f;stroke-width:3}.xyBase{fill:none;stroke:#22c55e;stroke-width:5}.unknown{fill:#fecaca;stroke:#ef4444;stroke-width:2}
+    </style>
+  </defs>
+  <rect width="1500" height="950" fill="url(#bg)"/>
+  <rect x="36" y="30" width="1428" height="100" rx="25" fill="#102a43" stroke="#22d3ee" stroke-width="2"/>
+  <text x="70" y="70" font-size="27" font-weight="850">ANSWER-EXPOSED CALIBRATION — REGISTERED SOURCE MODEL</text>
+  <text x="70" y="105" class="small">Actual A3.2 footprint + A5.1/M2.0 slope + A6.1 regime + A8.1 datum + S2.2 structure. Not a fresh holdout or release drawing.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="36" y="160" width="980" height="750" rx="28" class="frame"/>
+    <text x="72" y="204" class="label">Lake Pump Room Roof 3 — 39.94 ft × 25.06 ft</text>
+    <text x="72" y="232" class="small muted">1.5:12 surface · low T.O. roof 18.03 ft · high T.O. roof 21.17 ft</text>
+
+    <polygon points="140,800 690,800 900,670 350,670" class="wall"/>
+    <polygon points="140,800 140,500 350,370 350,670" class="wall"/>
+    <polygon points="690,800 690,440 900,310 900,670" class="wall"/>
+    <polygon points="140,500 690,440 900,310 350,370" class="roof"/>
+
+    <g opacity=".9">
+      <line x1="170" y1="497" x2="380" y2="367" class="purlin"/><line x1="245" y1="489" x2="455" y2="359" class="purlin"/><line x1="320" y1="481" x2="530" y2="351" class="purlin"/><line x1="395" y1="473" x2="605" y2="343" class="purlin"/><line x1="470" y1="464" x2="680" y2="334" class="purlin"/><line x1="545" y1="456" x2="755" y2="326" class="purlin"/><line x1="620" y1="448" x2="830" y2="318" class="purlin"/>
+      <line x1="240" y1="489" x2="790" y2="429" class="beam"/><line x1="350" y1="433" x2="900" y2="373" class="beam"/>
+    </g>
+
+    <g>
+      <line x1="245" y1="482" x2="245" y2="735" class="xy"/><circle cx="245" cy="482" r="10" class="xyTop"/><circle cx="245" cy="735" r="15" class="xyBase"/>
+      <line x1="380" y1="467" x2="380" y2="706" class="xy"/><circle cx="380" cy="467" r="10" class="xyTop"/><circle cx="380" cy="706" r="15" class="xyBase"/>
+      <line x1="515" y1="452" x2="515" y2="677" class="xy"/><circle cx="515" cy="452" r="10" class="xyTop"/><circle cx="515" cy="677" r="15" class="xyBase"/>
+      <line x1="650" y1="437" x2="650" y2="648" class="xy"/><circle cx="650" cy="437" r="10" class="xyTop"/><circle cx="650" cy="648" r="15" class="xyBase"/>
+      <line x1="360" y1="407" x2="360" y2="690" class="xy"/><circle cx="360" cy="407" r="10" class="xyTop"/><circle cx="360" cy="690" r="15" class="xyBase"/>
+      <line x1="495" y1="392" x2="495" y2="661" class="xy"/><circle cx="495" cy="392" r="10" class="xyTop"/><circle cx="495" cy="661" r="15" class="xyBase"/>
+      <line x1="630" y1="377" x2="630" y2="632" class="xy"/><circle cx="630" cy="377" r="10" class="xyTop"/><circle cx="630" cy="632" r="15" class="xyBase"/>
+      <line x1="765" y1="362" x2="765" y2="603" class="xy"/><circle cx="765" cy="362" r="10" class="xyTop"/><circle cx="765" cy="603" r="15" class="xyBase"/>
+    </g>
+
+    <rect x="92" y="264" width="285" height="78" rx="17" fill="#064e3b" stroke="#22c55e" stroke-width="2"/>
+    <text x="116" y="296" class="label">8 registered XY columns</text><text x="116" y="324" class="small">4 × 2 count/kind parity</text>
+    <rect x="610" y="742" width="340" height="106" rx="18" fill="#450a0a" stroke="#ef4444" stroke-width="2"/>
+    <text x="634" y="779" class="label">Exact upright Z is unresolved</text><text x="634" y="808" class="small">green rings are XY projections</text><text x="634" y="832" class="small">not invented deflector elevations</text>
+    <text x="150" y="875" class="tiny muted">amber = roof-surface sample · green dashed = registered XY column · purlins = HSS 6×4×1/4 @ 46 in O.C. · beams = HSS 12×8×1/4</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="1045" y="160" width="419" height="355" rx="28" class="frame"/>
+    <text x="1080" y="204" class="label">Evidence closure</text>
+    <text x="1080" y="246" class="small">✓ A3.2 interior wall faces</text>
+    <text x="1080" y="279" class="small">✓ A5.1 Roof 3 + 1.5:12</text>
+    <text x="1080" y="312" class="small">✓ A6.1 open to structure</text>
+    <text x="1080" y="345" class="small">✓ A8.1 T.O. Roof 3 = 21 ft 2 in</text>
+    <text x="1080" y="378" class="small">✓ S2.2 purlin and beam sections</text>
+    <text x="1080" y="411" class="small">✓ FP2 4 × 2 upright calibration</text>
+    <text x="1080" y="456" class="small muted">One feature id: lake-pump-room-roof-3</text>
+    <text x="1080" y="484" class="small muted">PDF transform: six numeric coefficients</text>
+
+    <rect x="1045" y="545" width="419" height="365" rx="28" fill="#24161b" stroke="#71343b" stroke-width="2"/>
+    <text x="1080" y="590" class="label">Remaining vertical gates</text>
+    <text x="1080" y="632" class="small">○ roof assembly thickness</text>
+    <text x="1080" y="665" class="small">○ purlin underside offset</text>
+    <text x="1080" y="698" class="small">○ branch-line elevation</text>
+    <text x="1080" y="731" class="small">○ model/deflector offset</text>
+    <text x="1080" y="764" class="small">○ member obstruction clearance</text>
+    <text x="1080" y="797" class="small">○ hydraulic node/topology</text>
+    <rect x="1080" y="828" width="348" height="52" rx="14" fill="#450a0a" stroke="#ef4444"/>
+    <text x="1102" y="861" class="small" font-weight="800">COMPLIANCE / RELEASE = FALSE</text>
+  </g>
+</svg>

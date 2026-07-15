@@ -220,13 +220,15 @@ export async function buildSourceTopologyPlacementCandidate(packet, options = {}
     for (const point of grid.points) {
       const id = `${packet.candidateIdPrefix}-S-${String(heads.filter((head) => head.sourceProtectionRegime === 'exposed-sloped-source-protection-target').length + 1).padStart(3, '0')}`;
       candidateIds.push(id);
-      heads.push({
+      const sourceRoofSurfaceZFt = exposedSlopeTargetZ(volume, point);
+      const protectionPlaneUnresolved = volume.protectionPlaneOffsetStatus && volume.protectionPlaneOffsetStatus !== 'resolved';
+      const target = {
         id,
         kind: volume.targetKind || 'orientation-unresolved',
         localFt: { x: point.x, y: point.y },
         sourceProtectionRegime: 'exposed-sloped-source-protection-target',
         sourceProtectionPlaneId: volume.id,
-        sourceProtectionPlaneZFt: exposedSlopeTargetZ(volume, point),
+        sourceProtectionPlaneZFt: protectionPlaneUnresolved ? null : sourceRoofSurfaceZFt,
         headInstallationZFt: null,
         sprinklerModel: null,
         sourceDerivation: {
@@ -240,7 +242,12 @@ export async function buildSourceTopologyPlacementCandidate(packet, options = {}
         },
         obstructionClearanceVerified: false,
         hydraulicNodeAssigned: false,
+      };
+      if (protectionPlaneUnresolved) Object.assign(target, {
+        sourceRoofSurfaceZFt,
+        sourceVerticalDatumStatus: volume.protectionPlaneOffsetStatus,
       });
+      heads.push(target);
     }
     exposedSlopedAudit.push({
       sourceVolumeId: volume.id,

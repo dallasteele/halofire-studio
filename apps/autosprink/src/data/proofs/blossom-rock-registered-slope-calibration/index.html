@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Blossom Rock registered slope calibration</title>
+  <style>
+    :root{color-scheme:dark;--glass:#102131c9;--line:#2b4965;--cyan:#22d3ee;--green:#22c55e;--amber:#fbbf24;--red:#ef4444}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 8% 0,#173d5a 0,transparent 38%),radial-gradient(circle at 92% 12%,#173b35 0,transparent 30%),#07111d;color:#e6edf5;font-family:Inter,Segoe UI,sans-serif}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 0 45%,#ffffff06 50%,transparent 55%);background-size:240% 100%;animation:sheen 12s linear infinite}@keyframes sheen{to{background-position:-240% 0}}
+    header{padding:54px 5vw 42px;border-bottom:1px solid #ffffff18;background:linear-gradient(135deg,#102a43d9,#0b3a36bb);position:relative;overflow:hidden}h1{font-size:clamp(38px,5.4vw,74px);line-height:1.02;margin:14px 0;max-width:1250px}.badge{display:inline-block;padding:10px 16px;border-radius:999px;background:#cffafe;color:#155e75;font-weight:900;letter-spacing:.05em}.lede{max-width:1100px;font-size:19px;line-height:1.55;color:#ccdae6}
+    main{max-width:1740px;margin:auto;padding:32px 4vw 90px}.summary{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;margin-bottom:28px}.metric,.card,figure{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--line);box-shadow:0 22px 60px #0007;border-radius:24px}.metric{padding:19px;transition:transform .25s,border-color .25s}.metric:hover{transform:translateY(-4px);border-color:#67e8f9}.metric strong{display:block;font-size:31px}.metric small{color:#aebfd0}.good{color:#86efac}.warn{color:#fde68a}.bad{color:#fca5a5}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}figure{margin:0;overflow:hidden;transform:translateY(0);transition:transform .25s,border-color .25s}figure:hover{transform:translateY(-3px);border-color:#67e8f9}figure.wide{grid-column:1/-1}img{display:block;width:100%;height:auto;background:white}figcaption{padding:17px 21px;color:#c7d5e1;line-height:1.48}.card{margin-top:24px;padding:25px}.card h2{margin-top:0}.boundary{border:2px solid var(--red);background:#3f1318}.gate{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;color:#fecaca}.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.step{padding:14px;border-radius:16px;background:#ffffff08;border:1px solid #ffffff14}.step b{display:block;color:#67e8f9;margin-bottom:5px}
+    @media(max-width:1100px){.summary{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}figure.wide{grid-column:auto}.flow{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header><span class="badge">REGISTERED CALIBRATION</span><h1>The corrected model now sits on the actual PDFs</h1><p class="lede">This replaces the rejected 29′-5″ × 14′ / ¼:12 cross-registration with one feature identity: the A3.2 Lake Pump Room interior, A5.1 Roof 3, A6.1 open structure, A8.1 Roof 3 datum, and S2.2 steel framing. FP2 was already exposed, so this is calibration evidence—not a fresh transfer pass.</p></header>
+  <main>
+    <section class="summary">
+      <div class="metric"><strong>39.94′</strong><small>registered interior width</small></div>
+      <div class="metric"><strong>25.06′</strong><small>registered interior depth</small></div>
+      <div class="metric"><strong>1.5:12</strong><small>actual Roof 3 slope</small></div>
+      <div class="metric"><strong class="good">8 / 8</strong><small>count and kind parity</small></div>
+      <div class="metric"><strong class="warn">4 × 2</strong><small>registered XY pattern</small></div>
+      <div class="metric"><strong class="bad">Z pending</strong><small>no invented elevation</small></div>
+    </section>
+
+    <section class="grid">
+      <figure class="wide"><img src="top-plan-a3-2-registered-overlay.png" alt="Actual A3.2 floor-plan PDF with exact Lake Pump Room transform and eight registered upright XY targets"><figcaption><b>Top view on the actual A3.2 PDF.</b> The cyan rectangle is the interior wall-face transform at rotated-PDF coordinates x=1640, y=987, width=359.5 pt, height=225.5 pt. The frozen spacing/area policy produces eight upright XY targets without a hand-entered count.</figcaption></figure>
+      <figure><img src="roof-plan-a5-1-registered-overlay.png" alt="Actual A5.1 Roof 3 plan with the one-and-one-half-to-twelve slope highlighted"><figcaption><b>Actual A5.1 Roof 3.</b> The corrected feature uses the larger 1½:12 plane. The earlier ¼:12 value belongs to a different roof feature and is now rejected by feature binding.</figcaption></figure>
+      <figure><img src="rcp-a6-1-registered-overlay.png" alt="Actual A6.1 reflected-ceiling plan with the same eight registered target columns"><figcaption><b>Actual A6.1 RCP.</b> The same transform lands on an open-to-structure room with visible purlins and beams. The circles are XY columns; they are not fabricated deflector elevations.</figcaption></figure>
+      <figure class="wide"><img src="section-a8-1-registered-elevation-overlay.png" alt="Actual A8.1 Lake Pump Room section with registered Roof 3 surface elevations and unresolved upright deflector elevation"><figcaption><b>Elevation view on the actual A8.1 section.</b> The Roof 3 surface is bounded from 18.03 ft to the labeled 21′-2″ high datum. The two grid rows sample the surface at 18.82 ft and 20.38 ft. Dashed red drops show that branch-line and upright-deflector Z remain unresolved.</figcaption></figure>
+      <figure><img src="structure-s2-2-high-roof.png" alt="Actual S2.2 high-roof framing plan"><figcaption><b>Actual S2.2 framing plan.</b> The Lake Pump Room roof contains repeat purlins and primary beams; clearance evaluation must use these members rather than a flat empty plane.</figcaption></figure>
+      <figure><img src="structure-s2-2-keynotes.png" alt="Actual S2.2 structural keynotes identifying purlin and beam sections"><figcaption><b>Actual S2.2 member evidence.</b> HSS 6×4×¼ purlins are spaced at 46 inches on center; the plan labels HSS 12×8×¼ primary beams. Their 6-inch and 12-inch depths are now explicit model inputs.</figcaption></figure>
+      <figure class="wide"><img src="completed-approved-lake-room-evidence.png" alt="Actual approved FP2 crop showing eight upright sprinkler symbols"><figcaption><b>Answer-exposed calibration target.</b> Approved FP2 visibly contains eight open-circle uprights in four columns by two rows. This establishes calibration parity but cannot serve as a fresh holdout.</figcaption></figure>
+      <figure class="wide"><img src="registered-envelope-3d.svg" alt="Three-dimensional registered Roof 3 envelope with structural members and eight XY target columns"><figcaption><b>Registered PDF-to-3D envelope.</b> The room dimensions, slope, surface elevations, purlins, beams, and eight XY columns are source-backed. Green rings are XY projections; exact upright elevation remains deliberately unrendered.</figcaption></figure>
+    </section>
+
+    <section class="card"><h2>One-feature registration path</h2><div class="flow"><div class="step"><b>A3.2</b>interior wall faces + six-coefficient PDF transform</div><div class="step"><b>A5.1 / M2.0</b>Roof 3 identity + 1½:12 slope</div><div class="step"><b>A6.1</b>open-to-structure ceiling regime</div><div class="step"><b>A8.1</b>Roof 3 high datum + elevation direction</div><div class="step"><b>S2.2</b>purlin and beam sections/depths</div></div></section>
+    <section class="card boundary"><h2>Still fail-closed</h2><p>Roof-assembly thickness, exact purlin underside, branch-line elevation, deflector offset, member obstruction clearance, hydraulic topology, compliance, fabrication, and field release remain false. This calibration must transfer unchanged to another untouched project before fresh-project placement can pass.</p><p class="gate">freshProjectPlacementVerified=false · exactHeadElevationReady=false · obstructionClearanceReady=false · complianceReady=false · fieldReleaseReady=false</p></section>
+  </main>
+</body>
+</html>

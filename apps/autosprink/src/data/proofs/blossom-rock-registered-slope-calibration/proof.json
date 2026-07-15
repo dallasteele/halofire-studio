@@ -1,0 +1,57 @@
+{
+  "artifactType": "halofire.answer-exposed-registered-slope-visual-proof.v1",
+  "projectId": "blossom-rock-pool-pavilion-apache-junction-az",
+  "sourceReceiptSha256": "cf6252094ca67aa8c226d733b6f08a7b602f83823ee07f1dbeb503bac0a0dedb",
+  "modelReceiptSha256": "61ccabfa74222969273e517dbc0ce0949519b9dc5b0f3118e06c36efa8f1918c",
+  "approvedAnswerSha256": "df8624f88afc39842a208636676479208aef058ba7a59f8fca4aedd3dd1308b4",
+  "sequence": { "answerExposed": true, "freshHoldoutEligible": false, "calibrationOnly": true },
+  "visualReview": {
+    "browserInspected": true,
+    "decodedImageCount": 8,
+    "brokenImageCount": 0,
+    "normalZoomLayoutReadable": true,
+    "horizontalOverflow": false,
+    "actualPdfUnderlaysPresent": true,
+    "topViewReadable": true,
+    "roofPlanReadable": true,
+    "rcpViewReadable": true,
+    "elevationViewReadable": true,
+    "structuralMemberEvidenceReadable": true,
+    "threeDimensionalEnvelopeReadable": true,
+    "unresolvedElevationVisiblyDisclosed": true
+  },
+  "calibration": {
+    "registeredInteriorFt": { "width": 39.944444, "depth": 25.055556 },
+    "roofSlope": "1.5:12",
+    "candidatePattern": { "columns": 4, "rows": 2, "upright": 8 },
+    "completedPattern": { "columns": 4, "rows": 2, "upright": 8 },
+    "countParity": true,
+    "kindParity": true,
+    "normalizedPatternParity": true,
+    "exactXyScoreAvailable": false,
+    "exactHeadElevationReady": false
+  },
+  "claimBoundary": {
+    "registeredSourceModelReady": true,
+    "topViewReady": true,
+    "roofSurfaceElevationViewReady": true,
+    "threeDimensionalEnvelopeReady": true,
+    "freshProjectPlacementVerified": false,
+    "exactHeadElevationReady": false,
+    "obstructionClearanceReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "files": [
+    { "file": "completed-approved-lake-room-evidence.png", "sha256": "b3ee473ddd20e935bba5eec5962c9616aa7f49fd46f3d3633e99ca4af89cddd2", "bytes": 82566 },
+    { "file": "rcp-a6-1-registered-overlay.png", "sha256": "9d25e994350f30a95c836da08df3dad4cc09f6ee55bd0f0678b8390e5964c49e", "bytes": 219188 },
+    { "file": "registered-envelope-3d.svg", "sha256": "f902a851f9402c13f4c1c83b11440595dfe80e3fc849574398c136a139aeb03e", "bytes": 6915 },
+    { "file": "roof-plan-a5-1-registered-overlay.png", "sha256": "20b14dd9669dc464c0a1c878668ee00854502d998310cf866508bc8759b588b2", "bytes": 205862 },
+    { "file": "section-a8-1-registered-elevation-overlay.png", "sha256": "3ee676655d12f82e362bd2283c9f478553911ee73a4c9cd88bb77cc0d41875cb", "bytes": 266137 },
+    { "file": "structure-s2-2-high-roof.png", "sha256": "d4dd6398f66ecd8890dff3312c7a505013a322f3427225c9409863d06ce688ef", "bytes": 163883 },
+    { "file": "structure-s2-2-keynotes.png", "sha256": "fb7df7cf913e2a7149e689987d147c12270593b53dac406a1807fd985c53defa", "bytes": 186460 },
+    { "file": "top-plan-a3-2-registered-overlay.png", "sha256": "22dc7a938ad5e80b6532d314ee301a8fb1526a58b27d3cb24306f34cdcabefeb", "bytes": 175258 }
+  ]
+}

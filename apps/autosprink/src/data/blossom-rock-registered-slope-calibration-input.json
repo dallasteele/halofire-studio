@@ -1,0 +1,79 @@
+{
+  "artifactType": "halofire.answer-exposed-source-registration-calibration-input.v1",
+  "projectId": "blossom-rock-pool-pavilion-apache-junction-az",
+  "projectName": "Blossom Rock Pool Pavilion - Apache Junction AZ",
+  "boundedScope": "Lake Pump Room exposed Roof 3 protection envelope",
+  "sequence": {
+    "answerExposed": true,
+    "candidateCommitBeforeAnswerOpen": "c1d915a6",
+    "freshHoldoutEligible": false,
+    "calibrationOnly": true
+  },
+  "protectedSources": [
+    { "role": "architectural-floor-dimension", "page": "A3.2", "sha256": "2db70b398eca43244e5e0a44e3f773a03def39b449a9d20c94f618082dfe4b84" },
+    { "role": "architectural-roof-plan", "page": "A5.1", "sha256": "1f998ad75557402e6b17010cc6febbdf5da105ede5a7a012ddc9f4726826aff1" },
+    { "role": "architectural-rcp", "page": "A6.1", "sha256": "93dde254758ec42a612b935f2bd6e351106a99f452e1c7f092b518b78bb04b55" },
+    { "role": "architectural-sections", "page": "A8.1", "sha256": "38a1838e4092bc89d43952d48b807a275ae9bb7a6660251c6b5b9695f579fe70" },
+    { "role": "structural-roof-framing", "page": "S2.2", "sha256": "95e2e3575f3cb91c620290f059c1ed1c0dbf4f2d44e770f9bdc96846bf077594" },
+    { "role": "mechanical-floor-plan", "page": "M2.0", "sha256": "2c650271037a18ffcd8df810db026889b8b7e7803eb25077078c38a18e91fe96" }
+  ],
+  "approvedAnswer": {
+    "page": "FP2",
+    "sha256": "df8624f88afc39842a208636676479208aef058ba7a59f8fca4aedd3dd1308b4",
+    "boundedUprightPattern": { "columns": 4, "rows": 2, "total": 8 }
+  },
+  "candidateIdPrefix": "BLOSSOM-CAL",
+  "placementPolicy": { "maxAreaSqFt": 130, "maxSpacingFt": 15, "minSpacingFt": 6, "status": "answer-exposed calibration policy, not a compliance determination" },
+  "exposedSlopedPlacementPolicy": { "maxAreaSqFt": 130, "maxSpacingFt": 15 },
+  "finishedCeilingRooms": [],
+  "pitchedConcealedVolumes": [],
+  "exposedSlopedCeilingVolumes": [
+    {
+      "id": "lake-pump-room-roof-3",
+      "verticesFt": [{ "x": 0, "y": 0 }, { "x": 39.944444, "y": 0 }, { "x": 39.944444, "y": 25.055556 }, { "x": 0, "y": 25.055556 }],
+      "sourcePages": ["A3.2", "A5.1", "A6.1", "A8.1", "S2.2", "M2.0"],
+      "slopeAxis": "y",
+      "slopeDirection": 1,
+      "lowEdgeCoordinateFt": 0,
+      "lowEdgeDatumZFt": 18.034723,
+      "highEdgeDatumZFt": 21.166667,
+      "datumType": "top-of-roof-upper-bound",
+      "slopeRise": 1.5,
+      "slopeRun": 12,
+      "targetKind": "upright",
+      "protectionPlaneOffsetStatus": "unresolved-roof-assembly-purlin-and-branch-line-offset",
+      "sourceRegistration": {
+        "featureId": "lake-pump-room-roof-3",
+        "plan": {
+          "page": "A3.2",
+          "sourceFeatureId": "lake-pump-room-roof-3",
+          "coordinateSpace": "rotated-pdf-points",
+          "widthFt": 39.944444,
+          "heightFt": 25.055556,
+          "pdfBoundsPt": { "x": 1640, "y": 987, "width": 359.5, "height": 225.5 },
+          "pdfToLocalFtTransform": [0.111111111, 0, 0, 0.111111111, -182.222222, -109.666667]
+        },
+        "roof": { "page": "A5.1", "sourceFeatureId": "lake-pump-room-roof-3", "slopeRise": 1.5, "slopeRun": 12, "roofPlane": "Roof 3" },
+        "rcp": { "page": "A6.1", "sourceFeatureId": "lake-pump-room-roof-3", "ceilingRegime": "open to structure; purlins and beams per structural" },
+        "section": { "page": "A8.1", "sourceFeatureId": "lake-pump-room-roof-3", "slopeRise": 1.5, "slopeRun": 12, "lowEdgeDatumZFt": 18.034723, "highEdgeDatumZFt": 21.166667, "highDatumLabel": "T.O. ROOF 3 = 21 feet 2 inches" }
+      },
+      "structuralMembers": {
+        "sourcePage": "S2.2",
+        "purlin": { "section": "HSS 6x4x1/4", "depthIn": 6, "widthIn": 4, "spacingIn": 46 },
+        "beam": { "section": "HSS 12x8x1/4", "depthIn": 12, "widthIn": 8 },
+        "roofAssemblyThicknessResolved": false,
+        "branchLineElevationResolved": false
+      }
+    }
+  ],
+  "claims": {
+    "freshProjectPlacementVerified": false,
+    "exactHeadElevationReady": false,
+    "obstructionClearanceReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "sourceReceiptSha256": "cf6252094ca67aa8c226d733b6f08a7b602f83823ee07f1dbeb503bac0a0dedb"
+}
