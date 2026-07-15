@@ -1,0 +1,17 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-request.json",
+  "theoremNames": [
+    "newHopeHeadRowCannotPromoteProperPipeLayout",
+    "crossProjectCoverageCannotFillProjectFacts"
+  ],
+  "claim": "A head row with plan XY, role, nominal size, flow direction, and grade magnitude remains not-ready while grade direction, project elevations, low points, drains, fittings, riser closure, hydraulic identity, or connectivity are missing; complementary evidence from different projects cannot fill project-specific facts.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 76,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

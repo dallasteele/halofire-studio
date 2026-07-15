@@ -45,7 +45,7 @@
     </section>
 
     <section class="card">
-      <h2>Pipe-layout contract exposed by the proof</h2>
+      <h2>Proper pipe-layout acceptance contract</h2>
       <div class="status-grid">
         <div class="status"><b>Plan role and direction</b>Ridge branch line; D.1-to-E / west-to-east plan axis.</div>
         <div class="status"><b>Visible feed direction</b>West network connection toward the east terminal, as exposed on approved FP2.0.</div>
@@ -54,6 +54,18 @@
         <div class="status closed"><b>Drainage closed</b>No source-proved low-point node or drum-drip destination is assigned to the bounded branch.</div>
         <div class="status closed"><b>Proper layout closed</b>Full mains, branches, fittings, riser path, drains, elevations, and hydraulic node identities are not reconstructed yet.</div>
       </div>
+    </section>
+
+    <section class="card">
+      <h2>Machine blockers — computed from the source-bound graph</h2>
+      <p>This is the system's acceptance result, not a human review gate. Primary replay, cross-source coverage, and adversarial mutation loops must drive every blocker count to zero on the same project before release.</p>
+      <div class="metrics" style="grid-template-columns:repeat(4,1fr)">
+        <div class="metric"><strong id="graph-node-count">—</strong><small>source-bound graph nodes</small></div>
+        <div class="metric"><strong id="graph-edge-count">—</strong><small>source-bound pipe edges</small></div>
+        <div class="metric"><strong id="graph-connected-count">—</strong><small>nodes connected to riser</small></div>
+        <div class="metric"><strong id="graph-blocker-count" style="color:var(--rose)">—</strong><small>distinct blocking requirements</small></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Blocking code</th><th>What must be source-proved</th></tr></thead><tbody id="pipe-blocker-rows"></tbody></table></div>
     </section>
 
     <section class="card">
@@ -69,7 +81,7 @@
 
     <section class="card" style="border-color:#fb7185;background:#4c1d2455">
       <h2>Acceptance boundary</h2>
-      <p class="gate">actualPdfUnderlays=true | exactHeadXyReady=true | conditionalTrussClearanceReady=true | hydraulicTopologyReady=true | properPipeLayoutReady=false | branchGradeDirectionReady=false | endpointElevationsReady=false | drainDestinationReady=false | obstructionClearanceReady=false | hydraulicCalculationReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=false</p>
+      <p class="gate" id="machine-acceptance-boundary">actualPdfUnderlays=true | exactHeadXyReady=true | conditionalTrussClearanceReady=true | properPipeLayoutReady=false | branchGradeDirectionReady=false | endpointElevationsReady=false | drainDestinationReady=false | obstructionClearanceReady=false | hydraulicCalculationReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=false</p>
     </section>
   </main>
   <script type="module" src="proof.js"></script>

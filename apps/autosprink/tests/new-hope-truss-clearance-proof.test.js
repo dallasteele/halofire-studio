@@ -29,5 +29,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('calibration.trussLattice.centerlines');
     expect(script).toContain('calibration.branch.nodes');
     expect(script).toContain("dataset.proofReady = 'true'");
+    expect(script).toContain('evaluateProperPitchedPipeGraph');
+    expect(script).toContain('dataset.pipeGraphStatus = acceptance.status');
   });
 });

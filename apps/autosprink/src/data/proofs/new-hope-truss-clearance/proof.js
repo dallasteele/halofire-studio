@@ -1,4 +1,10 @@
+import {
+  buildNewHopeProperPipeGraphCandidate,
+  evaluateProperPitchedPipeGraph,
+} from '../../../engine/proper-pitched-pipe-graph.js';
+
 const calibrationUrl = '../../new-hope-truss-clearance-calibration.json';
+const sourceUrl = '../../new-hope-truss-clearance-source.json';
 const svg = document.querySelector('#structural-overlay');
 const rows = document.querySelector('#clearance-rows');
 const status = document.querySelector('#load-status');
@@ -11,9 +17,10 @@ function element(name, attributes = {}) {
 }
 
 try {
-  const response = await fetch(calibrationUrl);
+  const [response, sourceResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl)]);
   if (!response.ok) throw new Error(`calibration fetch ${response.status}`);
-  const calibration = await response.json();
+  if (!sourceResponse.ok) throw new Error(`source fetch ${sourceResponse.status}`);
+  const [calibration, source] = await Promise.all([response.json(), sourceResponse.json()]);
   const scale = 1.5;
   const branchY = 430;
 
@@ -37,7 +44,22 @@ try {
   }
   status.textContent = `Sealed replay loaded: ${calibration.trussLattice.detectedCount} trusses, ${calibration.branch.nodes.length} approved heads, receipt ${calibration.receiptSha256.slice(0, 16)}...`;
   status.classList.remove('loading');
+  const candidate = buildNewHopeProperPipeGraphCandidate(calibration, source);
+  const acceptance = evaluateProperPitchedPipeGraph(candidate);
+  document.querySelector('#graph-node-count').textContent = acceptance.metrics.nodeCount;
+  document.querySelector('#graph-edge-count').textContent = acceptance.metrics.edgeCount;
+  document.querySelector('#graph-connected-count').textContent = acceptance.metrics.connectedNodeCount;
+  document.querySelector('#graph-blocker-count').textContent = acceptance.blockerCodes.length;
+  const messages = new Map(acceptance.issues.map((entry) => [entry.code, entry.message]));
+  const blockerRows = document.querySelector('#pipe-blocker-rows');
+  for (const code of acceptance.blockerCodes) {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td style="color:#fda4af">${code}</td><td>${messages.get(code)}</td>`;
+    blockerRows.append(row);
+  }
+  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | exactHeadXyReady=true | conditionalTrussClearanceReady=true | pipeGraphNodes=${acceptance.metrics.nodeCount} | pipeGraphEdges=${acceptance.metrics.edgeCount} | machineBlockerCodes=${acceptance.blockerCodes.length} | properPipeLayoutReady=${acceptance.properPipeLayoutReady} | complianceReady=false | fabricationReady=false | fieldReleaseReady=${acceptance.fieldReleaseReady}`;
   document.documentElement.dataset.proofReady = 'true';
+  document.documentElement.dataset.pipeGraphStatus = acceptance.status;
 } catch (error) {
   status.textContent = `Proof blocked: ${error.message}`;
   document.documentElement.dataset.proofReady = 'false';

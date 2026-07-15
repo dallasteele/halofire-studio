@@ -1,0 +1,87 @@
+{
+  "loop": "proper-pitched-pipe-graph-20260715",
+  "stage": "ITERATE",
+  "status": "verified-contract-current-new-hope-graph-fails-closed",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [148034, 120030, 125723, 124864, 62935]
+  },
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial"]
+  },
+  "implementation": {
+    "productionGate": "apps/autosprink/src/engine/proper-pitched-pipe-graph.js",
+    "visualProof": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "requirements": [
+      "scaled plan XY",
+      "pipe role",
+      "nominal fabrication size",
+      "plan direction",
+      "hydraulic flow direction",
+      "dry grade magnitude",
+      "dry grade direction",
+      "pipe centerline elevations",
+      "low points and drain destinations",
+      "fittings and size transitions",
+      "riser or source closure",
+      "hydraulic node identity",
+      "whole-network connectivity"
+    ]
+  },
+  "currentNewHopeAssessment": {
+    "nodeCount": 7,
+    "edgeCount": 6,
+    "connectedToRiserCount": 0,
+    "distinctBlockerCount": 7,
+    "blockerCodes": [
+      "PIPE_NODE_ELEVATION_MISSING",
+      "PIPE_HYDRAULIC_NODE_ID_MISSING",
+      "PIPE_EDGE_GRADE_DIRECTION_MISSING",
+      "PIPE_RISER_SOURCE_MISSING",
+      "PIPE_FLOW_PATH_INCOMPLETE",
+      "PIPE_FITTING_IDENTITY_MISSING",
+      "PIPE_LOW_POINT_MISSING"
+    ]
+  },
+  "crossSourceCoverage": {
+    "newHope": "proves actual approved plan XY, nominal 2.5-inch ridge branch, visible flow direction, and dry branch/cross-main grade magnitudes",
+    "winterGarden": "proves pitched row elevation datums and operating hydraulic evidence but not nominal fabrication sizes, per-head hydraulic identity, or full-network pipe elevations",
+    "projectSpecificTransferAllowed": false
+  },
+  "verification": {
+    "loopGuard": "passed",
+    "focusedTests": "14 passed across proper pipe graph, New Hope calibration, and actual-PDF proof",
+    "productionBuild": "passed Vite build",
+    "formalProof": {
+      "status": "verified",
+      "prover": "Lean 4.13.0 on GX10",
+      "elapsedMs": 76,
+      "receipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-proof.json"
+    },
+    "browser": {
+      "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+      "actualPdfImagesDecoded": 4,
+      "machineBlockerRows": 7,
+      "viewport": "778x1270",
+      "horizontalOverflow": false,
+      "consoleWarningsOrErrors": 0
+    },
+    "agenticRules": "passed"
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 148076,
+    "title": "Proper pitched pipe layout is now a fail-closed graph contract"
+  },
+  "claims": {
+    "properPipeLayoutReady": false,
+    "gradeDirectionReady": false,
+    "endpointElevationsReady": false,
+    "drainDestinationReady": false,
+    "wholeNetworkReady": false,
+    "fieldReleaseReady": false
+  },
+  "nextAction": "Extract the full approved New Hope FP2.0 vector topology and bind grade arrows, pipe-size labels, low-point leaders, drum-drip destinations, fittings, riser feed, and hydraulic node labels. Then replay every edge through this gate and render the source-bound top, elevation, and 3D views."
+}

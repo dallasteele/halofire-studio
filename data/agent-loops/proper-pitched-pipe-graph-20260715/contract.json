@@ -1,0 +1,51 @@
+{
+  "name": "proper-pitched-pipe-graph-20260715",
+  "owner": "codex",
+  "goal": "Replace head-only and coarse routed-line evidence with a source-bound pitched dry-pipe graph that separately governs pipe role, plan direction, hydraulic flow direction, grade magnitude, grade direction, endpoint elevations, low points, drains, fittings, size transitions, riser connectivity, hydraulic identity, and whole-network closure.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Crisis Center - Approved/Approved Plans.PDF",
+    "apps/autosprink/src/data/winter-garden-pitched-hydraulic-registration.json",
+    "apps/autosprink/src/engine/completed-hydraulic-routed-plan-registration.js",
+    "apps/autosprink/src/data/new-hope-truss-clearance-calibration.json"
+  ],
+  "exit_criteria": [
+    "actual approved PDF vectors and text are classified without treating color alone as pipe geometry",
+    "each accepted pipe edge has source coordinates, role, size, plan direction, and graph endpoints",
+    "flow direction and grade direction are represented separately and remain unknown where the source does not prove them",
+    "dry branch and cross-main grade magnitudes are associated with the correct roles",
+    "low points, drain or drum-drip destinations, fittings, transitions, riser connectivity, and hydraulic node identity are explicit graph entities or fail-closed unknowns",
+    "whole-network connectivity and elevation consistency are checked rather than inferred from a head row",
+    "the contract is replayed against New Hope and at least one independent completed-project corpus source",
+    "primary, cross-source, and adversarial loops own acceptance without an independent human-review blocker",
+    "focused tests, production build, actual-PDF visual proof, formal proof or exact unavailability, rules verification, and brain postflight are recorded"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source file hash replay",
+    "vector topology and text-anchor association",
+    "cross-source completed-project replay",
+    "adversarial layer, direction, grade, drain, size, elevation, fitting, connectivity, and false-promotion mutations",
+    "focused Vitest regression and AutoSprink production build",
+    "actual PDF underlay browser proof",
+    "formal proof or exact prover-unavailable receipt",
+    "authoritative agentic-rule verification",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/proper-pitched-pipe-graph-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/proper-pitched-pipe-graph-source.json",
+    "apps/autosprink/src/engine/proper-pitched-pipe-graph.js",
+    "apps/autosprink/tests/proper-pitched-pipe-graph.test.js",
+    "apps/autosprink/src/data/proofs/proper-pitched-pipe-graph",
+    "data/agent-loops/proper-pitched-pipe-graph-20260715/state.json"
+  ],
+  "max_iterations": 12,
+  "max_tokens": 240000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
