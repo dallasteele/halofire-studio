@@ -1,0 +1,46 @@
+{
+  "artifactType": "halofire.protected-curved-roof-holdout-source.v1",
+  "projectId": "mvc-2plex-heber-city-ut",
+  "projectName": "MVC 2-Plex - Heber City UT",
+  "boundedScope": "Third-level grid C-D / 10-12 barrel-roof bay",
+  "protectedSource": {
+    "egnyteRelativePath": "02-Active jobs/Bell Mountain Homes/MVC 2-Plex - Heber City UT/1-Bid Documents/GC - Bid Plans/Building/2 plex.pdf",
+    "bytes": 25178954,
+    "sha256": "8f4509b5407847e09c0ac4d88d86b78420fa66f7e53d7ee1880c8b3d80462fe1",
+    "pageCount": 81,
+    "allowedSheets": ["A107", "A109", "A110", "A302", "S1.3"]
+  },
+  "answerKeyDenylist": [
+    { "sheet": "FP1", "path": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/2-PLEX  FP1.pdf", "sha256": null, "openedBeforeCandidateCommit": false },
+    { "sheet": "FP2", "path": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/2-PLEX  FP2.pdf", "sha256": null, "openedBeforeCandidateCommit": false },
+    { "sheet": "FP3", "path": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/2-PLEX  FP3.pdf", "sha256": null, "openedBeforeCandidateCommit": false },
+    { "sheet": "AS-BUILT", "path": "2-Internal Ops/MVC 2-Plex A - Close-Out Docs/MVC 2 Plex - Heber City UT_as builts.pdf", "sha256": null, "openedBeforeCandidateCommit": false }
+  ],
+  "sequence": { "repoReferenceHitsBeforeSelection": 0, "answerArtifactRead": false, "answerArtifactHashed": false, "completedLayoutRead": false, "candidateMustBeCommittedBeforeAnswerOpen": true },
+  "placementPolicy": { "maxAreaSqFt": 130, "maxSpacingFt": 15, "minSpacingFt": 6, "status": "frozen transfer policy only; not a code determination" },
+  "curvedCeilingVolume": {
+    "id": "third-level-c-d-10-12-barrel-bay",
+    "verticesFt": [{ "x": 0, "y": 0 }, { "x": 30, "y": 0 }, { "x": 30, "y": 8 }, { "x": 0, "y": 8 }],
+    "sourcePages": ["A107", "A109", "A110", "A302", "S1.3"],
+    "curveType": "cylindrical-barrel",
+    "curveAxis": "x",
+    "extrusionAxis": "y",
+    "radiusFt": 38.5,
+    "structuralChordFt": 34.5,
+    "structuralArcLengthFt": 35.666667,
+    "interiorChordFt": 30,
+    "interiorCrownRiseFt": 3.042279,
+    "targetKind": "orientation-unresolved",
+    "protectionPlaneOffsetStatus": "unresolved-curved-ceiling-assembly-truss-and-deflector-offset",
+    "sourceRegistration": {
+      "featureId": "third-level-c-d-10-12-barrel-bay",
+      "plan": { "page": "A110", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "coordinateSpace": "rotated-pdf-points", "widthFt": 30, "heightFt": 8, "pdfBoundsPt": { "x": 1785.296631, "y": 629.400024, "width": 270, "height": 72 }, "pdfToLocalFtTransform": [0.111111111, 0, 0, 0.111111111, -198.366292, -69.933336] },
+      "roof": { "page": "A109", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "roofType": "RF8 bent metal standing seam barrel roof" },
+      "rcp": { "page": "A110", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "ceilingRegime": "variable; follow barrel roof" },
+      "section": { "page": "A302", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "view": "Building Section 3", "thirdFloorDatumZFt": 28.208333, "flatRoofBottomChordDatumZFt": 38.260417 },
+      "structure": { "page": "S1.3", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "radiusIn": 462, "chordIn": 414, "arcLengthIn": 428, "roofTrussSpacingIn": 24 }
+    }
+  },
+  "claims": { "sourceXyCandidateReady": false, "freshProjectPlacementVerified": false, "exactHeadElevationReady": false, "obstructionClearanceReady": false, "hydraulicCalculationReady": false, "complianceReady": false, "fabricationReady": false, "fieldReleaseReady": false },
+  "sourceReceiptSha256": "88859b6d1092c4dd0a8afda7cb39413fac67970f28398ff8bf4563fc4783d9f4"
+}

@@ -1,0 +1,34 @@
+{
+  "artifactType": "halofire.fresh-curved-roof-source-only-candidate.v1",
+  "projectId": "mvc-2plex-heber-city-ut",
+  "boundedScope": "Third-level grid C-D / 10-12 barrel-roof bay",
+  "sourceReceiptSha256": "88859b6d1092c4dd0a8afda7cb39413fac67970f28398ff8bf4563fc4783d9f4",
+  "sequence": { "answerArtifactRead": false, "completedLayoutRead": false, "candidateCommittedBeforeAnswerOpen": false },
+  "registration": {
+    "featureId": "third-level-c-d-10-12-barrel-bay",
+    "plan": { "page": "A110", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "coordinateSpace": "rotated-pdf-points", "widthFt": 30, "heightFt": 8, "pdfBoundsPt": { "x": 1785.296631, "y": 629.400024, "width": 270, "height": 72 }, "pdfToLocalFtTransform": [0.111111111, 0, 0, 0.111111111, -198.366292, -69.933336] },
+    "roof": { "page": "A109", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "roofType": "RF8 bent metal standing seam barrel roof" },
+    "rcp": { "page": "A110", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "ceilingRegime": "variable; follow barrel roof" },
+    "section": { "page": "A302", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "view": "Building Section 3", "thirdFloorDatumZFt": 28.208333, "flatRoofBottomChordDatumZFt": 38.260417 },
+    "structure": { "page": "S1.3", "sourceFeatureId": "third-level-c-d-10-12-barrel-bay", "radiusIn": 462, "chordIn": 414, "arcLengthIn": 428, "roofTrussSpacingIn": 24 }
+  },
+  "curve": { "type": "cylindrical-barrel", "radiusFt": 38.5, "structuralChordFt": 34.5, "interiorChordFt": 30, "interiorCrownRiseFt": 3.042279, "extrusionDepthFt": 8 },
+  "gridAudit": { "widthFt": 30, "depthFt": 8, "areaSqFt": 240, "columns": 2, "rows": 1, "targetCount": 2, "maxAreaSqFt": 130, "maxSpacingFt": 15 },
+  "targets": [
+    { "id": "MVC-BARREL-C-001", "kind": "orientation-unresolved", "localFt": { "x": 7.5, "y": 4 }, "sourceProtectionRegime": "finished-curved-ceiling-source-target", "sourceProtectionPlaneId": "third-level-c-d-10-12-barrel-bay", "sourceProtectionPlaneZFt": null, "headInstallationZFt": null, "sprinklerModel": null, "sourceRoofSurfaceRelativeZFt": 2.304694, "sourceSurfaceNormal": { "x": -0.194805, "y": 0, "z": 0.980842 }, "sourceVerticalDatumStatus": "unresolved-curved-ceiling-assembly-truss-and-deflector-offset", "sourceDerivation": { "method": "source-cylindrical-barrel-centered-policy-grid", "sourceVolumeId": "third-level-c-d-10-12-barrel-bay", "row": 0, "column": 0, "radiusFt": 38.5, "interiorChordFt": 30 }, "obstructionClearanceVerified": false, "hydraulicNodeAssigned": false },
+    { "id": "MVC-BARREL-C-002", "kind": "orientation-unresolved", "localFt": { "x": 22.5, "y": 4 }, "sourceProtectionRegime": "finished-curved-ceiling-source-target", "sourceProtectionPlaneId": "third-level-c-d-10-12-barrel-bay", "sourceProtectionPlaneZFt": null, "headInstallationZFt": null, "sprinklerModel": null, "sourceRoofSurfaceRelativeZFt": 2.304694, "sourceSurfaceNormal": { "x": 0.194805, "y": 0, "z": 0.980842 }, "sourceVerticalDatumStatus": "unresolved-curved-ceiling-assembly-truss-and-deflector-offset", "sourceDerivation": { "method": "source-cylindrical-barrel-centered-policy-grid", "sourceVolumeId": "third-level-c-d-10-12-barrel-bay", "row": 0, "column": 1, "radiusFt": 38.5, "interiorChordFt": 30 }, "obstructionClearanceVerified": false, "hydraulicNodeAssigned": false }
+  ],
+  "counts": { "total": 2, "orientationUnresolved": 2 },
+  "internalVerification": { "primary": { "status": "passed", "method": "deterministic curve-aware policy replay" }, "crossSource": { "status": "passed", "method": "A107/A109/A110/A302/S1.3 bind grid C-D / 10-12" }, "adversarial": { "status": "passed", "method": "source, answer-isolation, curve, XY, Z, and false-promotion mutations rejected" } },
+  "sourceXyCandidateReady": true,
+  "curvedEnvelopeReady": true,
+  "freshProjectPlacementVerified": false,
+  "exactHeadElevationReady": false,
+  "obstructionClearanceReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "fresh-source-only-barrel-xy-candidate-sealed-before-answer-not-scored-or-engineering-ready",
+  "receiptSha256": "45d97d683be74d15d19c08b5f4c9713f4f4af89c857d86c472860c8afbb7d762"
+}
