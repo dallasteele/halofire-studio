@@ -1,7 +1,7 @@
 {
   "schema": "halofire.polaris-pitched-hydraulic-network-proof.v2",
   "projectId": "polaris-academy-mesa-az",
-  "networkReceiptSha256": "32EB2CD75A3CB532415488D8B777E6B457D0602058AA30CDE9CF883A14F4F999",
+  "networkReceiptSha256": "B475A4A5C6A545EE010D6BCBD7E1713B3226B62FBECC663BFC1F5B413349C3BE",
   "underlay": "../polaris-pitched-pipe-xyz/approved-fp2-pipe-overlay.png",
   "counts": {
     "hydraulicReportSegments": 82,
@@ -48,6 +48,8 @@
     "fullFittingIdentityReady": true,
     "mainDrainCalloutReady": true,
     "roofRelativePipeGradeGeometryReady": true,
+    "sprinklerCadToFireLineCoordinateRegistrationReady": true,
+    "hydraulicNodeToFireLinePipeBindingReady": false,
     "exactHydraulicNodeConnectionPointsReady": true,
     "calculationNodeToDwgConnectionPointBindingReady": true,
     "loopInteriorPipeSpanDirectionReady": true,
@@ -56,6 +58,7 @@
     "flexibleHoseCenterlineReady": false,
     "riserFittingBridgeComponentPathReady": true,
     "riserReportToSourceLengthAgreementReady": false,
+    "riserHydraulicSemanticBindingReady": true,
     "buildingRigidPipeSpanHydraulicDirectionReady": true,
     "calculatedSprinklerLeafToDwgPipeBindingReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,

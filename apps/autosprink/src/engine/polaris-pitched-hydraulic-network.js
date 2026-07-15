@@ -532,6 +532,95 @@ function fittingSizeIncludesNominal(fitting, nominalSizeInches) {
   return values.some((value) => Number(value.replace('½', '.5').replace('¼', '.25').replace('¾', '.75')) === nominalSizeInches);
 }
 
+function pointToSegmentDistance(value, start, end) {
+  const vector = { x: end.x - start.x, y: end.y - start.y, z: end.z - start.z };
+  const lengthSquared = vector.x ** 2 + vector.y ** 2 + vector.z ** 2;
+  if (lengthSquared === 0) return distance(value, start);
+  const t = Math.max(0, Math.min(1, ((value.x - start.x) * vector.x
+    + (value.y - start.y) * vector.y
+    + (value.z - start.z) * vector.z) / lengthSquared));
+  return distance(value, {
+    x: start.x + vector.x * t,
+    y: start.y + vector.y * t,
+    z: start.z + vector.z * t,
+  });
+}
+
+function parseFeetInches(value) {
+  const match = String(value ?? '').match(/(-?\d+)'-(\d+)(?:½|¼|¾)?/);
+  if (!match) return null;
+  const fraction = value.includes('½') ? 0.5 : value.includes('¼') ? 0.25 : value.includes('¾') ? 0.75 : 0;
+  return Number(match[1]) + (Number(match[2]) + fraction) / 12;
+}
+
+function buildRiserHydraulicSemantics({ reports, physicalSpanBinding, pipeCalibration, fireLineEvidence }) {
+  const reportSegments = reports.flatMap((report) => report.segments)
+    .filter((segment) => segment.upstreamNode === '116' && segment.downstreamNode === '13');
+  const segment = reportSegments[0];
+  const route = physicalSpanBinding.routes.find((candidate) => candidate.upstreamNode === '116'
+    && candidate.downstreamNode === '13');
+  if (!segment || !route?.physicalPathPolylineFt?.length) return { hydraulicSemanticBindingReady: false };
+  const fittingText = String(segment.upstreamFittings ?? '');
+  const transitionEquivalentFt = Number(fittingText.match(/Tr\((\d+)'/)?.[1] ?? Number.NaN);
+  const backflowPressureChangePsi = Number(fittingText.match(/BFP\((-?\d+(?:\.\d+)?)\)/)?.[1] ?? Number.NaN);
+  const fireElbowMatch = fittingText.match(/(\d+)fE\((\d+)'-(\d+)\)/);
+  const fireElbowCount = Number(fireElbowMatch?.[1] ?? Number.NaN);
+  const fireElbowEquivalentEachFt = fireElbowMatch
+    ? Number(fireElbowMatch[2]) + Number(fireElbowMatch[3]) / 12
+    : Number.NaN;
+  const reportEquivalentLengthFt = parseFeetInches(segment.equivalentLengthRaw);
+  const computedEquivalentLengthFt = transitionEquivalentFt + fireElbowCount * fireElbowEquivalentEachFt;
+  const sourceRiserFittings = pipeCalibration.fittings.filter((fitting) => fittingSizeIncludesNominal(fitting, 3)
+    && route.physicalPathPolylineFt.slice(1).some((point, index) => pointToSegmentDistance(
+      fitting.pointFt,
+      route.physicalPathPolylineFt[index],
+      point,
+    ) <= 0.5));
+  const sourceThreeInchElbowCount = sourceRiserFittings
+    .filter((fitting) => fitting.sourceAttributes?.['Sub Category'] === 'Elbow').length;
+  const sourcePoint = route.physicalPathPolylineFt[0];
+  const targetPoint = route.physicalPathPolylineFt.at(-1);
+  const reportElevationRiseFt = Math.abs(targetPoint.z - sourcePoint.z);
+  const reportRawLengthToElevationRiseResidualFt = Math.abs(segment.lengthFt - reportElevationRiseFt);
+  const reportOccurrencesAgree = reportSegments.every((candidate) => candidate.lengthFt === segment.lengthFt
+    && candidate.equivalentLengthRaw === segment.equivalentLengthRaw
+    && candidate.upstreamFittings === segment.upstreamFittings);
+  const reportFittingSemanticsReady = reportEquivalentLengthFt !== null
+    && Math.abs(reportEquivalentLengthFt - computedEquivalentLengthFt) <= 1 / 24
+    && sourceThreeInchElbowCount === fireElbowCount
+    && fireLineEvidence?.evidence?.backflowNotes?.length > 0
+    && backflowPressureChangePsi === -5;
+  return {
+    upstreamNode: segment.upstreamNode,
+    downstreamNode: segment.downstreamNode,
+    reportOccurrenceCount: reportSegments.length,
+    reportOccurrencesAgree,
+    sourceComponentPathLengthFt: route.physicalRouteLengthFt,
+    reportRawLengthFt: segment.lengthFt,
+    reportElevationRiseFt: round(reportElevationRiseFt),
+    reportRawLengthToElevationRiseResidualFt: round(reportRawLengthToElevationRiseResidualFt),
+    sourceCenterlineToReportRawLengthResidualFt: route.reportLengthResidualFt,
+    reportEquivalentLengthFt,
+    transitionEquivalentLengthFt: transitionEquivalentFt,
+    backflowPressureChangePsi,
+    fireElbowCount,
+    fireElbowEquivalentEachFt,
+    computedEquivalentLengthFt,
+    sourceRiserFittingIds: sourceRiserFittings.map((fitting) => fitting.id),
+    sourceThreeInchElbowCount,
+    sourceBackflowNoteCount: fireLineEvidence?.evidence?.backflowNotes?.length ?? 0,
+    sourceComponentPathReady: (route.fittingBridgeIds?.length ?? 0) > 0,
+    reportRawLengthUsesElevationRiseReady: reportRawLengthToElevationRiseResidualFt <= 0.25,
+    reportFittingSemanticsReady,
+    sourceCenterlineEqualsReportRawLength: route.reportLengthResidualFt <= 0.25,
+    interpretation: 'The feed-riser report raw length is governed by the node elevation rise; transition and two fire-elbow losses are carried separately as equivalent length, while the BFP is a fixed pressure change. Exact source centerline length remains separately preserved.',
+    hydraulicSemanticBindingReady: reportOccurrencesAgree
+      && (route.fittingBridgeIds?.length ?? 0) > 0
+      && reportRawLengthToElevationRiseResidualFt <= 0.25
+      && reportFittingSemanticsReady,
+  };
+}
+
 function fittingBridgedRiserRoute({ pipeCalibration, physicalClass, startPointFt, endPointFt, bridgeToleranceFt = 0.5 }) {
   const compatiblePipes = pipeCalibration.pipes.filter((pipe) => pipeMatchesPhysicalClass(pipe, physicalClass));
   const compatibleFittings = pipeCalibration.fittings.filter((fitting) => fittingSizeIncludesNominal(
@@ -782,7 +871,13 @@ const countBy = (items, getter) => Object.fromEntries([...items.reduce((counts, 
   return counts;
 }, new Map())].sort(([left], [right]) => String(left).localeCompare(String(right))));
 
-export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticReport, belowCeilingReport, fireLineEvidence }) {
+export function buildPolarisPitchedHydraulicNetwork({
+  pipeCalibration,
+  atticReport,
+  belowCeilingReport,
+  fireLineEvidence,
+  fireLineRegistration,
+}) {
   const graph = buildPhysicalPipeGraph(pipeCalibration.pipes);
   const semanticFittings = pipeCalibration.fittings.filter((fitting) => fitting.sourceAttributes?.['Sub Category']);
   const testDrain = semanticFittings.find((fitting) => fitting.sourceAttributes['Sub Category'] === 'Inspectors Test & Drain');
@@ -829,6 +924,12 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
     && route.flexibleTerminalComponent?.endpointBindingReady);
   const riserFittingBridgeRoute = physicalSpanBinding.routes.find((route) => route.upstreamNode === '116'
     && route.downstreamNode === '13');
+  const riserHydraulicSemantics = buildRiserHydraulicSemantics({
+    reports,
+    physicalSpanBinding,
+    pipeCalibration,
+    fireLineEvidence,
+  });
   const reportNodeIds = [...new Set(reports.flatMap((report) => report.nodes.map((node) => node.nodeId)))].sort((a, b) => Number(a) - Number(b));
   const labelNodeIds = [...new Set(pipeCalibration.hydraulicNodeLabels.map((label) => label.nodeId))].sort((a, b) => Number(a) - Number(b));
   const missingCadLabels = reportNodeIds.filter((nodeId) => !labelNodeIds.includes(nodeId));
@@ -923,6 +1024,7 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
       atticHydraulicReportSha256: atticReport.source.sha256,
       belowCeilingHydraulicReportSha256: belowCeilingReport.source.sha256,
       fireLineCad: fireLineEvidence,
+      fireLineRegistration,
       directionRule: 'Hydraulic flow uses report upstream-to-downstream columns. Source-root topology and geometric downhill are separately named and never substituted for report flow or drainage intent.',
     },
     hydraulicReports: reports.map((report) => ({
@@ -953,7 +1055,9 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
         && exactCadNodeConnectionPoints.length === 59
         ? 'exact-source-glyph-leader-tips-ready-for-all-on-plan-nodes'
         : 'held-source-glyph-or-elevation-residual-invalid',
-      geometryBindingStatus: 'exact-node-points-and-building-rigid-routes-ready-riser-source-and-drainage-held',
+      geometryBindingStatus: fireLineRegistration?.claims?.sprinklerCadToFireLineCoordinateRegistrationReady
+        ? 'exact-node-points-building-routes-and-cross-drawing-coordinate-frame-ready-hydraulic-source-pipe-and-drainage-held'
+        : 'exact-node-points-and-building-rigid-routes-ready-riser-source-and-drainage-held',
       calculatedSprinklerLeafBindings,
       exactCalculatedSprinklerLeafCount: calculatedSprinklerLeafBindings
         .reduce((sum, binding) => sum + binding.assignedSourceSprinklerCount, 0),
@@ -978,6 +1082,7 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
         reportLengthResidualFt: riserFittingBridgeRoute?.reportLengthResidualFt ?? null,
         reportLengthAgreementReady: riserFittingBridgeRoute?.exactPhysicalSpanRouteReady ?? false,
       },
+      riserHydraulicSemantics,
       interpretation: 'Report upstream-to-downstream direction is promoted onto a physical span route only when source pipe material/nominal size, exact 3D node tips, connectivity, and report length agree within 0.25 ft. Flexible terminals use the source fitting identity and exact rigid-port/sprinkler endpoints; an unexported hose centerline is never fabricated.',
     },
     physicalNetwork: {
@@ -1034,6 +1139,10 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
       reportSourceClosureReady: reports.every((report) => report.summary.sourceClosureReady === true),
       reportHydraulicFlowDirectionReady: reports.every((report) => report.directionSemantics.hydraulicFlowDirection === 'upstream-to-downstream'),
       sourceFireLineContextReady: fireLineEvidence?.claims?.sourceFireLineContextReady === true,
+      sprinklerCadToFireLineCoordinateRegistrationReady:
+        fireLineRegistration?.claims?.sprinklerCadToFireLineCoordinateRegistrationReady === true,
+      hydraulicNodeToFireLinePipeBindingReady:
+        fireLineRegistration?.claims?.hydraulicNodeToFireLinePipeBindingReady === true,
       exactPhysicalPipeGraphReady: rootComponent.pipeIds.length === 177,
       sourceRootedTopologicalDirectionReady: rootCycleRank === 0 && ambiguousRootEdges.length === 0,
       fullFittingIdentityReady: semanticFittings.length === pipeCalibration.fittings.length,
@@ -1055,6 +1164,7 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
       flexibleHoseCenterlineReady: false,
       riserFittingBridgeComponentPathReady: Boolean(riserFittingBridgeRoute?.fittingBridgeIds?.length),
       riserReportToSourceLengthAgreementReady: riserFittingBridgeRoute?.exactPhysicalSpanRouteReady === true,
+      riserHydraulicSemanticBindingReady: riserHydraulicSemantics.hydraulicSemanticBindingReady === true,
       buildingRigidPipeSpanHydraulicDirectionReady,
       calculationNodeToDwgGeometryBindingReady: false,
       wholeNetworkHydraulicFlowDirectionReady: false,

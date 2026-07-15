@@ -345,6 +345,2047 @@
         "fieldReleaseReady": false
       }
     },
+    "fireLineRegistration": {
+      "schema": "halofire.polaris-fireline-registration.v1",
+      "sources": {
+        "sitePlan": {
+          "fileName": "Site Plan.dwg",
+          "byteLength": 603448,
+          "sha256": "05580889F5D855EED5A54C76DE1CFB5371B984B52F1C2822DF6838ECE8C314EC"
+        },
+        "fireLine": {
+          "fileName": "Polaris Academy Fire Line CAD.dwg",
+          "byteLength": 633976,
+          "sha256": "EE9B22E5235AC137882BDB680A0295AFF87C53D444ED939E28CDA0A7EAAB9C9A"
+        },
+        "sprinklerCandidate": {
+          "fileName": "polaris-academy-source-only-pitched-attic-candidate.json",
+          "byteLength": 8452,
+          "sha256": "D31FCA25A97FCAE42950C8B489988BC6B3A683A34D4673ED07561BF686BF50F5"
+        }
+      },
+      "siteRegistration": {
+        "siteOutlineHandle": "625",
+        "matchedVertexCount": 73,
+        "cyclicOffset": 0,
+        "reversed": false,
+        "scale": 0.999959998904,
+        "rotationRadians": 1.388220077453,
+        "rotationDegrees": 79.539151473,
+        "localOriginInSiteInches": {
+          "x": 3511.969317402,
+          "y": 2054.562391347
+        },
+        "maximumResidualInches": 0.281881785,
+        "rootMeanSquareResidualInches": 0.158968546,
+        "secondBestRootMeanSquareResidualInches": 145.479451259,
+        "rigidRegistrationUniquenessMarginInches": 145.320482713,
+        "sprinklerRiserInSiteInches": {
+          "node116": {
+            "x": 3430.82960979,
+            "y": 4236.661950446
+          },
+          "node13": {
+            "x": 3423.443070224,
+            "y": 4196.655202018
+          }
+        },
+        "parserUnknownEntityCount": 0
+      },
+      "sharedLayer": "PDF_A-ANNO-TEXT",
+      "sitePolylineCount": 2886,
+      "fireLinePolylineCount": 506,
+      "translationCandidateCount": 12060,
+      "dominantExactTranslationMatchCount": 506,
+      "siteToFireLineTranslationInches": [
+        5278.06152,
+        -119.90866
+      ],
+      "dominantMatchHandles": [
+        {
+          "siteHandle": "31AB",
+          "fireLineHandle": "31AB"
+        },
+        {
+          "siteHandle": "31AC",
+          "fireLineHandle": "31AC"
+        },
+        {
+          "siteHandle": "31AD",
+          "fireLineHandle": "31AD"
+        },
+        {
+          "siteHandle": "31AE",
+          "fireLineHandle": "31AE"
+        },
+        {
+          "siteHandle": "31AF",
+          "fireLineHandle": "31AF"
+        },
+        {
+          "siteHandle": "31B0",
+          "fireLineHandle": "31B0"
+        },
+        {
+          "siteHandle": "31B1",
+          "fireLineHandle": "31B1"
+        },
+        {
+          "siteHandle": "31B2",
+          "fireLineHandle": "31B2"
+        },
+        {
+          "siteHandle": "31B3",
+          "fireLineHandle": "31B3"
+        },
+        {
+          "siteHandle": "31B4",
+          "fireLineHandle": "31B4"
+        },
+        {
+          "siteHandle": "31B5",
+          "fireLineHandle": "31B5"
+        },
+        {
+          "siteHandle": "31B6",
+          "fireLineHandle": "31B6"
+        },
+        {
+          "siteHandle": "31B7",
+          "fireLineHandle": "31B7"
+        },
+        {
+          "siteHandle": "31B8",
+          "fireLineHandle": "31B8"
+        },
+        {
+          "siteHandle": "31B9",
+          "fireLineHandle": "31B9"
+        },
+        {
+          "siteHandle": "31BA",
+          "fireLineHandle": "31BA"
+        },
+        {
+          "siteHandle": "31BB",
+          "fireLineHandle": "31BB"
+        },
+        {
+          "siteHandle": "31BC",
+          "fireLineHandle": "31BC"
+        },
+        {
+          "siteHandle": "31BD",
+          "fireLineHandle": "31BD"
+        },
+        {
+          "siteHandle": "31BE",
+          "fireLineHandle": "31BE"
+        }
+      ],
+      "topSameLayerExactTranslationClusters": [
+        {
+          "translationInches": [
+            5278.06152,
+            -119.90866
+          ],
+          "matchCount": 506,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 506
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "31AB",
+              "fireLineHandle": "31AB"
+            },
+            {
+              "siteHandle": "31AC",
+              "fireLineHandle": "31AC"
+            },
+            {
+              "siteHandle": "31AD",
+              "fireLineHandle": "31AD"
+            },
+            {
+              "siteHandle": "31AE",
+              "fireLineHandle": "31AE"
+            },
+            {
+              "siteHandle": "31AF",
+              "fireLineHandle": "31AF"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5113.86501,
+            592.53717
+          ],
+          "matchCount": 22,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 22
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3685",
+              "fireLineHandle": "3294"
+            },
+            {
+              "siteHandle": "3686",
+              "fireLineHandle": "3295"
+            },
+            {
+              "siteHandle": "3687",
+              "fireLineHandle": "3296"
+            },
+            {
+              "siteHandle": "3688",
+              "fireLineHandle": "3297"
+            },
+            {
+              "siteHandle": "3689",
+              "fireLineHandle": "3298"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5278.06152,
+            -139.3896
+          ],
+          "matchCount": 18,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 18
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3224",
+              "fireLineHandle": "3220"
+            },
+            {
+              "siteHandle": "3225",
+              "fireLineHandle": "3221"
+            },
+            {
+              "siteHandle": "325C",
+              "fireLineHandle": "3258"
+            },
+            {
+              "siteHandle": "325D",
+              "fireLineHandle": "3259"
+            },
+            {
+              "siteHandle": "327A",
+              "fireLineHandle": "3276"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5278.06152,
+            -100.42772
+          ],
+          "matchCount": 18,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 18
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3220",
+              "fireLineHandle": "3224"
+            },
+            {
+              "siteHandle": "3221",
+              "fireLineHandle": "3225"
+            },
+            {
+              "siteHandle": "3258",
+              "fireLineHandle": "325C"
+            },
+            {
+              "siteHandle": "3259",
+              "fireLineHandle": "325D"
+            },
+            {
+              "siteHandle": "3276",
+              "fireLineHandle": "327A"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5775.42186,
+            1393.2436
+          ],
+          "matchCount": 14,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 14
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3B6D",
+              "fireLineHandle": "321B"
+            },
+            {
+              "siteHandle": "3B6E",
+              "fireLineHandle": "321C"
+            },
+            {
+              "siteHandle": "3B6F",
+              "fireLineHandle": "321D"
+            },
+            {
+              "siteHandle": "3B70",
+              "fireLineHandle": "321E"
+            },
+            {
+              "siteHandle": "3B71",
+              "fireLineHandle": "321F"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            4975.11301,
+            255.00006
+          ],
+          "matchCount": 12,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 12
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "34BF",
+              "fireLineHandle": "329F"
+            },
+            {
+              "siteHandle": "34C0",
+              "fireLineHandle": "32A0"
+            },
+            {
+              "siteHandle": "34C1",
+              "fireLineHandle": "32A1"
+            },
+            {
+              "siteHandle": "34C2",
+              "fireLineHandle": "32A2"
+            },
+            {
+              "siteHandle": "34C3",
+              "fireLineHandle": "32A3"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5233.93122,
+            1467.19166
+          ],
+          "matchCount": 12,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 12
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "39E7",
+              "fireLineHandle": "3300"
+            },
+            {
+              "siteHandle": "39E8",
+              "fireLineHandle": "3301"
+            },
+            {
+              "siteHandle": "39E9",
+              "fireLineHandle": "3302"
+            },
+            {
+              "siteHandle": "39EA",
+              "fireLineHandle": "3303"
+            },
+            {
+              "siteHandle": "39EB",
+              "fireLineHandle": "3304"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5105.51604,
+            142.48768
+          ],
+          "matchCount": 11,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 11
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "33D6",
+              "fireLineHandle": "329F"
+            },
+            {
+              "siteHandle": "33DA",
+              "fireLineHandle": "32A3"
+            },
+            {
+              "siteHandle": "33DB",
+              "fireLineHandle": "32A4"
+            },
+            {
+              "siteHandle": "33DC",
+              "fireLineHandle": "32A5"
+            },
+            {
+              "siteHandle": "33DD",
+              "fireLineHandle": "32A6"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5233.93122,
+            1168.21886
+          ],
+          "matchCount": 11,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 11
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3B99",
+              "fireLineHandle": "3300"
+            },
+            {
+              "siteHandle": "3B9A",
+              "fireLineHandle": "3301"
+            },
+            {
+              "siteHandle": "3B9B",
+              "fireLineHandle": "3302"
+            },
+            {
+              "siteHandle": "3B9C",
+              "fireLineHandle": "3303"
+            },
+            {
+              "siteHandle": "3B9D",
+              "fireLineHandle": "3304"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            4671.36936,
+            142.48768
+          ],
+          "matchCount": 11,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 11
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "34DC",
+              "fireLineHandle": "3307"
+            },
+            {
+              "siteHandle": "34DE",
+              "fireLineHandle": "3309"
+            },
+            {
+              "siteHandle": "34DF",
+              "fireLineHandle": "330A"
+            },
+            {
+              "siteHandle": "34E2",
+              "fireLineHandle": "330F"
+            },
+            {
+              "siteHandle": "34E3",
+              "fireLineHandle": "3310"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            4671.36936,
+            255.00006
+          ],
+          "matchCount": 11,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 11
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3578",
+              "fireLineHandle": "3307"
+            },
+            {
+              "siteHandle": "357A",
+              "fireLineHandle": "3309"
+            },
+            {
+              "siteHandle": "357B",
+              "fireLineHandle": "330A"
+            },
+            {
+              "siteHandle": "357E",
+              "fireLineHandle": "330F"
+            },
+            {
+              "siteHandle": "357F",
+              "fireLineHandle": "3310"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5152.03175,
+            -7.39629
+          ],
+          "matchCount": 10,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 10
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "330D",
+              "fireLineHandle": "329B"
+            },
+            {
+              "siteHandle": "330F",
+              "fireLineHandle": "329D"
+            },
+            {
+              "siteHandle": "3310",
+              "fireLineHandle": "329E"
+            },
+            {
+              "siteHandle": "3317",
+              "fireLineHandle": "32A5"
+            },
+            {
+              "siteHandle": "3318",
+              "fireLineHandle": "32A6"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5404.09128,
+            -232.42104
+          ],
+          "matchCount": 10,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 10
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "329B",
+              "fireLineHandle": "330D"
+            },
+            {
+              "siteHandle": "329D",
+              "fireLineHandle": "330F"
+            },
+            {
+              "siteHandle": "329E",
+              "fireLineHandle": "3310"
+            },
+            {
+              "siteHandle": "32A5",
+              "fireLineHandle": "3317"
+            },
+            {
+              "siteHandle": "32A6",
+              "fireLineHandle": "3318"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            4651.09327,
+            -7.39629
+          ],
+          "matchCount": 10,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 10
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3439",
+              "fireLineHandle": "3376"
+            },
+            {
+              "siteHandle": "343A",
+              "fireLineHandle": "3377"
+            },
+            {
+              "siteHandle": "343C",
+              "fireLineHandle": "3379"
+            },
+            {
+              "siteHandle": "3440",
+              "fireLineHandle": "3380"
+            },
+            {
+              "siteHandle": "3441",
+              "fireLineHandle": "3381"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5206.1013,
+            480.0248
+          ],
+          "matchCount": 10,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 10
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3740",
+              "fireLineHandle": "337A"
+            },
+            {
+              "siteHandle": "3742",
+              "fireLineHandle": "337C"
+            },
+            {
+              "siteHandle": "3743",
+              "fireLineHandle": "337D"
+            },
+            {
+              "siteHandle": "3744",
+              "fireLineHandle": "3380"
+            },
+            {
+              "siteHandle": "3745",
+              "fireLineHandle": "3381"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5053.83191,
+            480.0248
+          ],
+          "matchCount": 10,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 10
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "377B",
+              "fireLineHandle": "339B"
+            },
+            {
+              "siteHandle": "377C",
+              "fireLineHandle": "339C"
+            },
+            {
+              "siteHandle": "377D",
+              "fireLineHandle": "339D"
+            },
+            {
+              "siteHandle": "377E",
+              "fireLineHandle": "339E"
+            },
+            {
+              "siteHandle": "377F",
+              "fireLineHandle": "339F"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5251.02674,
+            -119.90866
+          ],
+          "matchCount": 9,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 9
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "321B",
+              "fireLineHandle": "3216"
+            },
+            {
+              "siteHandle": "321C",
+              "fireLineHandle": "3217"
+            },
+            {
+              "siteHandle": "321D",
+              "fireLineHandle": "3218"
+            },
+            {
+              "siteHandle": "321E",
+              "fireLineHandle": "3219"
+            },
+            {
+              "siteHandle": "321F",
+              "fireLineHandle": "321A"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5305.09629,
+            -119.90866
+          ],
+          "matchCount": 9,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 9
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3216",
+              "fireLineHandle": "321B"
+            },
+            {
+              "siteHandle": "3217",
+              "fireLineHandle": "321C"
+            },
+            {
+              "siteHandle": "3218",
+              "fireLineHandle": "321D"
+            },
+            {
+              "siteHandle": "3219",
+              "fireLineHandle": "321E"
+            },
+            {
+              "siteHandle": "321A",
+              "fireLineHandle": "321F"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5218.02841,
+            854.93352
+          ],
+          "matchCount": 9,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 9
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "382C",
+              "fireLineHandle": "329D"
+            },
+            {
+              "siteHandle": "382D",
+              "fireLineHandle": "329E"
+            },
+            {
+              "siteHandle": "382E",
+              "fireLineHandle": "329F"
+            },
+            {
+              "siteHandle": "3832",
+              "fireLineHandle": "32A5"
+            },
+            {
+              "siteHandle": "3833",
+              "fireLineHandle": "32A6"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            5049.45864,
+            1700.16781
+          ],
+          "matchCount": 9,
+          "layerCounts": {
+            "PDF_A-ANNO-TEXT": 9
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "3AB6",
+              "fireLineHandle": "32FD"
+            },
+            {
+              "siteHandle": "3AB7",
+              "fireLineHandle": "32FE"
+            },
+            {
+              "siteHandle": "3AB8",
+              "fireLineHandle": "32FF"
+            },
+            {
+              "siteHandle": "3AB9",
+              "fireLineHandle": "3300"
+            },
+            {
+              "siteHandle": "3ABA",
+              "fireLineHandle": "3301"
+            }
+          ]
+        }
+      ],
+      "rejectedAnnotationTransformedSprinklerRiserInFireLineInches": {
+        "node116": {
+          "x": 8708.89112979,
+          "y": 4116.753290446
+        },
+        "node13": {
+          "x": 8701.504590224,
+          "y": 4076.746542018
+        }
+      },
+      "embeddedSiteBlock": {
+        "name": "A$C2896eb2f",
+        "handle": "4884",
+        "insertionPoint": {
+          "x": -2069.822115944975,
+          "y": 2077.2077456865736,
+          "z": 0
+        },
+        "scale": [
+          1,
+          1
+        ],
+        "rotationRadians": 0,
+        "polylineCount": 3420
+      },
+      "topEmbeddedSiteExactTranslationClusters": [
+        {
+          "translationInches": [
+            -2342.96544,
+            -792.62277
+          ],
+          "matchCount": 3428,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-CONC -> PDF_SITE$A-SITE-CONC": 67,
+            "PDF_SITE$A-SITE-PROP -> PDF_SITE$A-SITE-PROP": 231,
+            "PDF_SITE$A-SITE$STRPG -> PDF_SITE$A-SITE$STRPG": 53,
+            "PDF_SITE$A-SITE-FENCE -> PDF_SITE$A-SITE-FENCE": 36,
+            "PDF_SITE$A-SITE-EQUIP -> PDF_SITE$A-SITE-EQUIP": 46,
+            "PDF_SITE$A-SITE-SBKLN -> PDF_SITE$A-SITE-SBKLN": 346,
+            "PDF_PLAN$A-FLOR-CONC -> PDF_PLAN$A-FLOR-CONC": 9,
+            "PDF_PLAN$A-SITE-PATT -> PDF_PLAN$A-SITE-PATT": 81,
+            "PDF_PLAN$A-SITE-BLDG-OTLN -> PDF_PLAN$A-SITE-BLDG-OTLN": 3,
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 1558,
+            "PDF_TEXT -> PDF_TEXT": 850,
+            "PDF_A-TEXT-MED -> PDF_A-TEXT-MED": 134,
+            "PDF_DIMS -> PDF_DIMS": 10,
+            "PDF_0 -> PDF_0": 4
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "257",
+              "fireLineHandle": "4885"
+            },
+            {
+              "siteHandle": "258",
+              "fireLineHandle": "4886"
+            },
+            {
+              "siteHandle": "259",
+              "fireLineHandle": "4887"
+            },
+            {
+              "siteHandle": "25A",
+              "fireLineHandle": "4888"
+            },
+            {
+              "siteHandle": "25B",
+              "fireLineHandle": "4889"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2342.96544,
+            -787.45436
+          ],
+          "matchCount": 1008,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 1008
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "69F",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "6A5",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "6A7",
+              "fireLineHandle": "4C24"
+            },
+            {
+              "siteHandle": "6C5",
+              "fireLineHandle": "4C2F"
+            },
+            {
+              "siteHandle": "6C7",
+              "fireLineHandle": "4C30"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2342.96544,
+            -797.79118
+          ],
+          "matchCount": 1008,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 1008
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "1473",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "1481",
+              "fireLineHandle": "4C24"
+            },
+            {
+              "siteHandle": "697",
+              "fireLineHandle": "4C27"
+            },
+            {
+              "siteHandle": "699",
+              "fireLineHandle": "4C2A"
+            },
+            {
+              "siteHandle": "69B",
+              "fireLineHandle": "4C2B"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2342.96544,
+            -802.9596
+          ],
+          "matchCount": 704,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 704
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "1459",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "1473",
+              "fireLineHandle": "4C27"
+            },
+            {
+              "siteHandle": "1475",
+              "fireLineHandle": "4C28"
+            },
+            {
+              "siteHandle": "1481",
+              "fireLineHandle": "4C2B"
+            },
+            {
+              "siteHandle": "1483",
+              "fireLineHandle": "4C2C"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2342.96544,
+            -782.28594
+          ],
+          "matchCount": 704,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 704
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "6DF",
+              "fireLineHandle": "4C2F"
+            },
+            {
+              "siteHandle": "6E1",
+              "fireLineHandle": "4C30"
+            },
+            {
+              "siteHandle": "6E3",
+              "fireLineHandle": "4C31"
+            },
+            {
+              "siteHandle": "6E5",
+              "fireLineHandle": "4C32"
+            },
+            {
+              "siteHandle": "6E7",
+              "fireLineHandle": "4C33"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2356.48283,
+            -753.66089
+          ],
+          "matchCount": 656,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 656
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "73F",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "74B",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "74D",
+              "fireLineHandle": "4C24"
+            },
+            {
+              "siteHandle": "75A",
+              "fireLineHandle": "4C27"
+            },
+            {
+              "siteHandle": "75C",
+              "fireLineHandle": "4C28"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2329.44806,
+            -831.58465
+          ],
+          "matchCount": 656,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 656
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "13F3",
+              "fireLineHandle": "4C2D"
+            },
+            {
+              "siteHandle": "1419",
+              "fireLineHandle": "4C41"
+            },
+            {
+              "siteHandle": "141B",
+              "fireLineHandle": "4C42"
+            },
+            {
+              "siteHandle": "141D",
+              "fireLineHandle": "4C43"
+            },
+            {
+              "siteHandle": "1425",
+              "fireLineHandle": "4C47"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2356.48283,
+            -758.8293
+          ],
+          "matchCount": 639,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 639
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "725",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "731",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "733",
+              "fireLineHandle": "4C24"
+            },
+            {
+              "siteHandle": "73F",
+              "fireLineHandle": "4C27"
+            },
+            {
+              "siteHandle": "741",
+              "fireLineHandle": "4C28"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2329.44806,
+            -826.41624
+          ],
+          "matchCount": 639,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 639
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "140D",
+              "fireLineHandle": "4C2D"
+            },
+            {
+              "siteHandle": "1419",
+              "fireLineHandle": "4C32"
+            },
+            {
+              "siteHandle": "141B",
+              "fireLineHandle": "4C33"
+            },
+            {
+              "siteHandle": "1425",
+              "fireLineHandle": "4C38"
+            },
+            {
+              "siteHandle": "1427",
+              "fireLineHandle": "4C39"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2356.48283,
+            -831.58465
+          ],
+          "matchCount": 628,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 628
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "13CD",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "13D9",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "13DB",
+              "fireLineHandle": "4C24"
+            },
+            {
+              "siteHandle": "13E7",
+              "fireLineHandle": "4C27"
+            },
+            {
+              "siteHandle": "13E9",
+              "fireLineHandle": "4C28"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2329.44806,
+            -753.66089
+          ],
+          "matchCount": 628,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 628
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "745",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "756",
+              "fireLineHandle": "4C28"
+            },
+            {
+              "siteHandle": "760",
+              "fireLineHandle": "4C2A"
+            },
+            {
+              "siteHandle": "764",
+              "fireLineHandle": "4C2C"
+            },
+            {
+              "siteHandle": "766",
+              "fireLineHandle": "4C2D"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2356.48283,
+            -826.41624
+          ],
+          "matchCount": 590,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 590
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "13E7",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "13F3",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "13F5",
+              "fireLineHandle": "4C24"
+            },
+            {
+              "siteHandle": "1401",
+              "fireLineHandle": "4C27"
+            },
+            {
+              "siteHandle": "1403",
+              "fireLineHandle": "4C28"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2329.44806,
+            -758.8293
+          ],
+          "matchCount": 590,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 590
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "72B",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "73B",
+              "fireLineHandle": "4C28"
+            },
+            {
+              "siteHandle": "745",
+              "fireLineHandle": "4C2A"
+            },
+            {
+              "siteHandle": "749",
+              "fireLineHandle": "4C2C"
+            },
+            {
+              "siteHandle": "74B",
+              "fireLineHandle": "4C2D"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2356.48283,
+            -763.99771
+          ],
+          "matchCount": 514,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 514
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "70B",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "717",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "719",
+              "fireLineHandle": "4C24"
+            },
+            {
+              "siteHandle": "725",
+              "fireLineHandle": "4C27"
+            },
+            {
+              "siteHandle": "727",
+              "fireLineHandle": "4C28"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2329.44806,
+            -821.24783
+          ],
+          "matchCount": 514,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 514
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "1433",
+              "fireLineHandle": "4C32"
+            },
+            {
+              "siteHandle": "1435",
+              "fireLineHandle": "4C33"
+            },
+            {
+              "siteHandle": "143F",
+              "fireLineHandle": "4C38"
+            },
+            {
+              "siteHandle": "1441",
+              "fireLineHandle": "4C39"
+            },
+            {
+              "siteHandle": "144D",
+              "fireLineHandle": "4C41"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2342.96544,
+            -865.37812
+          ],
+          "matchCount": 501,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 501
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "134A",
+              "fireLineHandle": "4C2C"
+            },
+            {
+              "siteHandle": "134C",
+              "fireLineHandle": "4C2D"
+            },
+            {
+              "siteHandle": "1358",
+              "fireLineHandle": "4C32"
+            },
+            {
+              "siteHandle": "135A",
+              "fireLineHandle": "4C33"
+            },
+            {
+              "siteHandle": "1364",
+              "fireLineHandle": "4C38"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2342.96544,
+            -719.86742
+          ],
+          "matchCount": 501,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 501
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "E33",
+              "fireLineHandle": "4DD0"
+            },
+            {
+              "siteHandle": "E5E",
+              "fireLineHandle": "4DEE"
+            },
+            {
+              "siteHandle": "E6D",
+              "fireLineHandle": "4DF9"
+            },
+            {
+              "siteHandle": "E7B",
+              "fireLineHandle": "4E04"
+            },
+            {
+              "siteHandle": "E97",
+              "fireLineHandle": "4E16"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2370.00022,
+            -792.62277
+          ],
+          "matchCount": 497,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 497
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "1492",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "149A",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "14A4",
+              "fireLineHandle": "4C28"
+            },
+            {
+              "siteHandle": "6AB",
+              "fireLineHandle": "4C2A"
+            },
+            {
+              "siteHandle": "6B5",
+              "fireLineHandle": "4C30"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2315.93067,
+            -792.62277
+          ],
+          "matchCount": 497,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 497
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "6A5",
+              "fireLineHandle": "4C2D"
+            },
+            {
+              "siteHandle": "6AF",
+              "fireLineHandle": "4C33"
+            },
+            {
+              "siteHandle": "6B9",
+              "fireLineHandle": "4C39"
+            },
+            {
+              "siteHandle": "6C7",
+              "fireLineHandle": "4C42"
+            },
+            {
+              "siteHandle": "6C9",
+              "fireLineHandle": "4C43"
+            }
+          ]
+        },
+        {
+          "translationInches": [
+            -2356.48283,
+            -748.49247
+          ],
+          "matchCount": 481,
+          "layerPairCounts": {
+            "PDF_SITE$A-SITE-PATT -> PDF_SITE$A-SITE-PATT": 481
+          },
+          "exampleHandles": [
+            {
+              "siteHandle": "75A",
+              "fireLineHandle": "4C22"
+            },
+            {
+              "siteHandle": "766",
+              "fireLineHandle": "4C23"
+            },
+            {
+              "siteHandle": "768",
+              "fireLineHandle": "4C24"
+            },
+            {
+              "siteHandle": "78E",
+              "fireLineHandle": "4C30"
+            },
+            {
+              "siteHandle": "790",
+              "fireLineHandle": "4C31"
+            }
+          ]
+        }
+      ],
+      "siteOutlineEmbeddedMatches": [
+        {
+          "siteHandle": "625",
+          "embeddedHandle": "4BC6",
+          "embeddedLayer": "PDF_PLAN$A-SITE-BLDG-OTLN",
+          "translationInches": [
+            -2342.96544,
+            -792.62277
+          ]
+        }
+      ],
+      "transformedSiteOutlineInFireLineInches": [
+        {
+          "x": -961.396332578,
+          "y": 3363.744983848
+        },
+        {
+          "x": -880.292007256,
+          "y": 3802.662509122
+        },
+        {
+          "x": -918.856318806,
+          "y": 3809.818773121
+        },
+        {
+          "x": -917.266037918,
+          "y": 3817.372607342
+        },
+        {
+          "x": -948.674085469,
+          "y": 3823.336160674
+        },
+        {
+          "x": -950.264366358,
+          "y": 3815.384756231
+        },
+        {
+          "x": -1040.51280679,
+          "y": 3832.082705562
+        },
+        {
+          "x": -1079.872258784,
+          "y": 3888.935247332
+        },
+        {
+          "x": -1023.417287237,
+          "y": 3927.499558882
+        },
+        {
+          "x": -954.637638802,
+          "y": 3915.174881995
+        },
+        {
+          "x": -924.819872139,
+          "y": 4077.38353264
+        },
+        {
+          "x": -864.786768592,
+          "y": 4066.251566419
+        },
+        {
+          "x": -855.24508326,
+          "y": 4117.140554856
+        },
+        {
+          "x": -865.581909036,
+          "y": 4119.128405967
+        },
+        {
+          "x": -867.967330369,
+          "y": 4119.525976189
+        },
+        {
+          "x": -812.307499265,
+          "y": 4422.474485481
+        },
+        {
+          "x": -799.585252156,
+          "y": 4420.089064148
+        },
+        {
+          "x": -790.043566824,
+          "y": 4471.375622808
+        },
+        {
+          "x": -850.076670371,
+          "y": 4482.507589029
+        },
+        {
+          "x": -819.861333487,
+          "y": 4644.716239673
+        },
+        {
+          "x": -889.038552144,
+          "y": 4657.438486783
+        },
+        {
+          "x": -927.602863694,
+          "y": 4713.495888108
+        },
+        {
+          "x": -870.750321924,
+          "y": 4752.457769881
+        },
+        {
+          "x": -780.10431127,
+          "y": 4735.75982055
+        },
+        {
+          "x": -781.694592158,
+          "y": 4728.205986329
+        },
+        {
+          "x": -750.286544607,
+          "y": 4722.242432996
+        },
+        {
+          "x": -748.696263719,
+          "y": 4730.193837439
+        },
+        {
+          "x": -710.52952239,
+          "y": 4723.03757344
+        },
+        {
+          "x": -669.579789507,
+          "y": 4943.291476521
+        },
+        {
+          "x": -606.763694405,
+          "y": 4931.761940079
+        },
+        {
+          "x": -515.322543306,
+          "y": 5427.1344369
+        },
+        {
+          "x": -987.238397019,
+          "y": 5514.599885777
+        },
+        {
+          "x": -984.852975686,
+          "y": 5527.322132886
+        },
+        {
+          "x": -1034.946823679,
+          "y": 5536.466247996
+        },
+        {
+          "x": -1037.332245012,
+          "y": 5523.744000887
+        },
+        {
+          "x": -1276.271948535,
+          "y": 5567.874295547
+        },
+        {
+          "x": -1273.886527202,
+          "y": 5580.596542657
+        },
+        {
+          "x": -1323.980375196,
+          "y": 5589.740657767
+        },
+        {
+          "x": -1333.522060528,
+          "y": 5539.646809773
+        },
+        {
+          "x": -1320.799813418,
+          "y": 5537.26138844
+        },
+        {
+          "x": -1394.747874741,
+          "y": 5137.305744939
+        },
+        {
+          "x": -1407.470121851,
+          "y": 5139.29359605
+        },
+        {
+          "x": -1416.614236961,
+          "y": 5089.199748057
+        },
+        {
+          "x": -1403.891989851,
+          "y": 5086.814326724
+        },
+        {
+          "x": -1424.565641404,
+          "y": 4973.904383628
+        },
+        {
+          "x": -1437.287888513,
+          "y": 4976.289804961
+        },
+        {
+          "x": -1446.829573845,
+          "y": 4926.195956968
+        },
+        {
+          "x": -1434.107326736,
+          "y": 4923.810535635
+        },
+        {
+          "x": -1475.454629842,
+          "y": 4698.388219666
+        },
+        {
+          "x": -1488.176876951,
+          "y": 4700.773640999
+        },
+        {
+          "x": -1497.718562283,
+          "y": 4650.679793006
+        },
+        {
+          "x": -1484.996315174,
+          "y": 4648.294371673
+        },
+        {
+          "x": -1526.343618279,
+          "y": 4423.269625926
+        },
+        {
+          "x": -1539.065865388,
+          "y": 4425.655047259
+        },
+        {
+          "x": -1548.60755072,
+          "y": 4375.561199266
+        },
+        {
+          "x": -1535.487733389,
+          "y": 4373.175777933
+        },
+        {
+          "x": -1577.232606717,
+          "y": 4147.753461963
+        },
+        {
+          "x": -1589.954853826,
+          "y": 4150.138883296
+        },
+        {
+          "x": -1599.098968936,
+          "y": 4100.045035303
+        },
+        {
+          "x": -1586.376721826,
+          "y": 4097.65961397
+        },
+        {
+          "x": -1606.652803157,
+          "y": 3987.930232652
+        },
+        {
+          "x": -1619.375050266,
+          "y": 3990.315653985
+        },
+        {
+          "x": -1628.916735598,
+          "y": 3940.221805992
+        },
+        {
+          "x": -1615.796918267,
+          "y": 3937.836384659
+        },
+        {
+          "x": -1690.142549812,
+          "y": 3536.688030491
+        },
+        {
+          "x": -1702.864796922,
+          "y": 3539.073451824
+        },
+        {
+          "x": -1712.008912031,
+          "y": 3488.979603831
+        },
+        {
+          "x": -1661.915064038,
+          "y": 3479.835488721
+        },
+        {
+          "x": -1659.529642705,
+          "y": 3492.557735831
+        },
+        {
+          "x": -1418.602088072,
+          "y": 3448.029870948
+        },
+        {
+          "x": -1420.987509405,
+          "y": 3435.307623838
+        },
+        {
+          "x": -1370.893661411,
+          "y": 3425.765938506
+        },
+        {
+          "x": -1368.508240078,
+          "y": 3438.885755838
+        }
+      ],
+      "nearestFireLinePipeEndpointsToBuildingOutline": [
+        {
+          "pipeHandle": "6F85",
+          "endpointIndex": 1,
+          "point": {
+            "id": 1,
+            "x": -1864.567512080801,
+            "y": 3469.4859480150626,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -1712.008912031,
+            "y": 3488.979603831
+          },
+          "outlineSegmentIndex": 65,
+          "residualInches": 153.798989159
+        },
+        {
+          "pipeHandle": "6F83",
+          "endpointIndex": 1,
+          "point": {
+            "id": 1,
+            "x": -1380.238716527972,
+            "y": 6119.641979025206,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -1323.980375196,
+            "y": 5589.740657767
+          },
+          "outlineSegmentIndex": 36,
+          "residualInches": 532.879358993
+        },
+        {
+          "pipeHandle": "6F85",
+          "endpointIndex": 0,
+          "point": {
+            "id": 0,
+            "x": -1380.238716527972,
+            "y": 6119.641979025206,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -1323.980375196,
+            "y": 5589.740657767
+          },
+          "outlineSegmentIndex": 36,
+          "residualInches": 532.879358993
+        },
+        {
+          "pipeHandle": "60A7",
+          "endpointIndex": 1,
+          "point": {
+            "id": 1,
+            "x": -728.2756115117455,
+            "y": 6225.9007968516435,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -984.852975686,
+            "y": 5527.322132886
+          },
+          "outlineSegmentIndex": 31,
+          "residualInches": 744.207023317
+        },
+        {
+          "pipeHandle": "60A7",
+          "endpointIndex": 0,
+          "point": {
+            "id": 0,
+            "x": -739.4216722933346,
+            "y": 6230.312039094766,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -984.852975686,
+            "y": 5527.322132886
+          },
+          "outlineSegmentIndex": 31,
+          "residualInches": 744.601459115
+        },
+        {
+          "pipeHandle": "609E",
+          "endpointIndex": 1,
+          "point": {
+            "id": 1,
+            "x": -762.2468110671284,
+            "y": 6239.349393976516,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -984.852975686,
+            "y": 5527.322132886
+          },
+          "outlineSegmentIndex": 31,
+          "residualInches": 746.013622572
+        },
+        {
+          "pipeHandle": "6F8F",
+          "endpointIndex": 1,
+          "point": {
+            "id": 1,
+            "x": -901.070968416177,
+            "y": 6295.582890425047,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -1034.946823679,
+            "y": 5536.466247996
+          },
+          "outlineSegmentIndex": 32,
+          "residualInches": 770.831253541
+        },
+        {
+          "pipeHandle": "6F87",
+          "endpointIndex": 1,
+          "point": {
+            "id": 1,
+            "x": -1249.1534082099222,
+            "y": 6362.726095254072,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -1323.980375196,
+            "y": 5589.740657767
+          },
+          "outlineSegmentIndex": 36,
+          "residualInches": 776.598713336
+        },
+        {
+          "pipeHandle": "6F87",
+          "endpointIndex": 0,
+          "point": {
+            "id": 0,
+            "x": -1281.088927348797,
+            "y": 6375.365117581507,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -1323.980375196,
+            "y": 5589.740657767
+          },
+          "outlineSegmentIndex": 36,
+          "residualInches": 786.794425601
+        },
+        {
+          "pipeHandle": "6F83",
+          "endpointIndex": 0,
+          "point": {
+            "id": 0,
+            "x": -1255.4745915915757,
+            "y": 6434.88844323173,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -1323.980375196,
+            "y": 5589.740657767
+          },
+          "outlineSegmentIndex": 36,
+          "residualInches": 847.919702368
+        },
+        {
+          "pipeHandle": "609E",
+          "endpointIndex": 0,
+          "point": {
+            "id": 0,
+            "x": -1297.4177842770791,
+            "y": 6451.488171782586,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -1323.980375196,
+            "y": 5589.740657767
+          },
+          "outlineSegmentIndex": 36,
+          "residualInches": 862.15680079
+        },
+        {
+          "pipeHandle": "6F5F",
+          "endpointIndex": 1,
+          "point": {
+            "id": 1,
+            "x": 23.543061390175353,
+            "y": 6524.229490098679,
+            "bulge": 0
+          },
+          "nearestOutlinePoint": {
+            "x": -515.322543306,
+            "y": 5427.1344369
+          },
+          "outlineSegmentIndex": 29,
+          "residualInches": 1222.290348353
+        }
+      ],
+      "nearestFireLinePipeEndpointToHydraulicNode116": {
+        "pipeHandle": "6F83",
+        "endpointIndex": 1,
+        "point": {
+          "id": 1,
+          "x": -1380.238716527972,
+          "y": 6119.641979025206,
+          "bulge": 0
+        },
+        "residualInches": 718.821404366
+      },
+      "transformedSprinklerRiserInFireLineInches": {
+        "node116": {
+          "x": -981.957946155,
+          "y": 5521.246926133
+        },
+        "node13": {
+          "x": -989.344485721,
+          "y": 5481.240177705
+        }
+      },
+      "nearestFireLineRiser": {
+        "id": "riser-73F2",
+        "point": {
+          "x": -805.2784987149037,
+          "y": 6051.626254587287,
+          "z": 0
+        },
+        "residualInches": 559.0329679
+      },
+      "fireLineRisers": [
+        {
+          "id": "riser-605F",
+          "point": {
+            "x": -750.5364661922997,
+            "y": 6234.992312226061,
+            "z": 0
+          }
+        },
+        {
+          "id": "riser-6F8C",
+          "point": {
+            "x": -451.51183381503967,
+            "y": 7419.8036966508525,
+            "z": 0
+          }
+        },
+        {
+          "id": "riser-73F2",
+          "point": {
+            "x": -805.2784987149037,
+            "y": 6051.626254587287,
+            "z": 0
+          }
+        },
+        {
+          "id": "riser-73F3",
+          "point": {
+            "x": -796.2855947022301,
+            "y": 6074.023539537853,
+            "z": 0
+          }
+        },
+        {
+          "id": "riser-761A",
+          "point": {
+            "x": -743.7018085015135,
+            "y": 6206.600932306291,
+            "z": 0
+          }
+        }
+      ],
+      "claims": {
+        "rejectedAnnotationTranslationFound": true,
+        "exactSharedGeometryTranslationReady": true,
+        "sitePlanToFireLineCoordinateRegistrationReady": true,
+        "sprinklerCadToFireLineCoordinateRegistrationReady": true,
+        "hydraulicNodeToFireLinePipeBindingReady": false,
+        "sprinklerRiserToFireLineRiserReady": false
+      },
+      "receiptSha256": "0280786AE1E1E6A5E74A58831C77521F31C9972C85623371AB2F8278068575AD"
+    },
     "directionRule": "Hydraulic flow uses report upstream-to-downstream columns. Source-root topology and geometric downhill are separately named and never substituted for report flow or drainage intent."
   },
   "hydraulicReports": [
@@ -4595,7 +6636,7 @@
       }
     ],
     "connectionPointBindingStatus": "exact-source-glyph-leader-tips-ready-for-all-on-plan-nodes",
-    "geometryBindingStatus": "exact-node-points-and-building-rigid-routes-ready-riser-source-and-drainage-held",
+    "geometryBindingStatus": "exact-node-points-building-routes-and-cross-drawing-coordinate-frame-ready-hydraulic-source-pipe-and-drainage-held",
     "calculatedSprinklerLeafBindings": [
       {
         "reportDescription": "Light Hazard (ATTIC)",
@@ -9333,6 +11374,49 @@
       "reportLengthResidualFt": 2.832466883,
       "reportLengthAgreementReady": false
     },
+    "riserHydraulicSemantics": {
+      "upstreamNode": "116",
+      "downstreamNode": "13",
+      "reportOccurrenceCount": 2,
+      "reportOccurrencesAgree": true,
+      "sourceComponentPathLengthFt": 13.582466883,
+      "reportRawLengthFt": 10.75,
+      "reportElevationRiseFt": 10.563333333,
+      "reportRawLengthToElevationRiseResidualFt": 0.186666667,
+      "sourceCenterlineToReportRawLengthResidualFt": 2.832466883,
+      "reportEquivalentLengthFt": 20,
+      "transitionEquivalentLengthFt": 5,
+      "backflowPressureChangePsi": -5,
+      "fireElbowCount": 2,
+      "fireElbowEquivalentEachFt": 7.5,
+      "computedEquivalentLengthFt": 20,
+      "sourceRiserFittingIds": [
+        "fitting-69385",
+        "fitting-69616",
+        "fitting-69835",
+        "fitting-69852",
+        "fitting-71128",
+        "fitting-71338",
+        "fitting-71354",
+        "fitting-72229",
+        "fitting-73684",
+        "fitting-73716",
+        "fitting-75434",
+        "fitting-78774",
+        "fitting-78790",
+        "fitting-78806",
+        "fitting-78822",
+        "fitting-78838"
+      ],
+      "sourceThreeInchElbowCount": 2,
+      "sourceBackflowNoteCount": 1,
+      "sourceComponentPathReady": true,
+      "reportRawLengthUsesElevationRiseReady": true,
+      "reportFittingSemanticsReady": true,
+      "sourceCenterlineEqualsReportRawLength": false,
+      "interpretation": "The feed-riser report raw length is governed by the node elevation rise; transition and two fire-elbow losses are carried separately as equivalent length, while the BFP is a fixed pressure change. Exact source centerline length remains separately preserved.",
+      "hydraulicSemanticBindingReady": true
+    },
     "interpretation": "Report upstream-to-downstream direction is promoted onto a physical span route only when source pipe material/nominal size, exact 3D node tips, connectivity, and report length agree within 0.25 ft. Flexible terminals use the source fitting identity and exact rigid-port/sprinkler endpoints; an unexported hose centerline is never fabricated."
   },
   "physicalNetwork": {
@@ -11403,6 +13487,8 @@
     "reportSourceClosureReady": true,
     "reportHydraulicFlowDirectionReady": true,
     "sourceFireLineContextReady": true,
+    "sprinklerCadToFireLineCoordinateRegistrationReady": true,
+    "hydraulicNodeToFireLinePipeBindingReady": false,
     "exactPhysicalPipeGraphReady": true,
     "sourceRootedTopologicalDirectionReady": false,
     "fullFittingIdentityReady": true,
@@ -11420,6 +13506,7 @@
     "flexibleHoseCenterlineReady": false,
     "riserFittingBridgeComponentPathReady": true,
     "riserReportToSourceLengthAgreementReady": false,
+    "riserHydraulicSemanticBindingReady": true,
     "buildingRigidPipeSpanHydraulicDirectionReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,
     "wholeNetworkHydraulicFlowDirectionReady": false,
@@ -11431,5 +13518,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "receiptSha256": "32EB2CD75A3CB532415488D8B777E6B457D0602058AA30CDE9CF883A14F4F999"
+  "receiptSha256": "B475A4A5C6A545EE010D6BCBD7E1713B3226B62FBECC663BFC1F5B413349C3BE"
 }

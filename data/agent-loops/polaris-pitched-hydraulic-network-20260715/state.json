@@ -1,5 +1,5 @@
 {
-  "iteration": 5,
+  "iteration": 6,
   "phase": "verify-and-bind",
   "status": "in_progress",
   "observations": [
@@ -17,7 +17,9 @@
     "The exact rigid routes cover all three physical loop interiors, so their direction is report-proven instead of inferred from geometric slope or riser distance.",
     "All 15 arm-over calculations now bind their exact rigid source-pipe route to an attributed 48-inch braided flex-drop component and exact sprinkler endpoint; the worst accepted rigid-route length residual is 0.079908961 feet.",
     "The source does not export braided-hose centerlines, so the governed representation preserves the exact fitting identity and endpoints without fabricating a hose curve.",
-    "The source riser components form an attributed fitting-bridged path from node 116 to node 13, but the 13.582466883-foot physical path differs from the report's 10.75-foot length by 2.832466883 feet and remains held.",
+    "The source riser components form an attributed fitting-bridged path from node 116 to node 13. The physical centerline remains 13.582466883 feet, while the report's 10.75-foot raw length is elevation-governed and its separate 20-foot equivalent length is exactly the 5-foot transition plus two 7.5-foot fire elbows; the -5 psi backflow term remains a fixed pressure change.",
+    "The sprinkler plan is now registered into the fire-line coordinate frame through one unique 73-vertex building outline match with 0.158968546-inch RMS error, a 145.320482713-inch alternative-orientation margin, and 3,428 exact embedded-site geometry matches.",
+    "Coordinate registration does not establish pipe connectivity: the nearest extracted fire-line pipe endpoint remains 718.821404366 inches from hydraulic node 116, so the source-pipe binding remains held.",
     "No independent human-review gate is required; deterministic, adversarial, formal, visual, and browser loops provide acceptance."
   ],
   "attempts": [
@@ -41,12 +43,18 @@
     "All 15 arm-over rigid routes now pass the quarter-foot report-length gate; a one-foot adversarial report mutation reduces coverage to 14 and drops building-rigid readiness.",
     "A fitting-size-aware riser bridge traces the separated source components while refusing the 2.832466883-foot report-length discrepancy.",
     "Playwright rendered 65 physical directions over the approved FP2, verified the direction layer off/on, and reported zero errors or warnings.",
-    "Lean 4 verified 45 + 4 + 1 + 15 = 65 rigid routes, semantic flex endpoint readiness, and the fail-closed riser/whole-layout boundary in 79 ms; brain postflight persisted the rule as episode 149531."
+    "Lean 4 verified 45 + 4 + 1 + 15 = 65 rigid routes, semantic flex endpoint readiness, and the fail-closed riser/whole-layout boundary in 79 ms; brain postflight persisted the rule as episode 149531.",
+    "Reconciled the riser without overwriting either source truth: 10.75 feet remains the hydraulic raw elevation-governed length, 20 feet remains separately encoded fitting equivalent length, and 13.582466883 feet remains the physical component centerline.",
+    "Rejected a 506-entity copied annotation-frame translation, then registered through the fire-line model-space embedded site block and the unique 73-vertex building outline instead.",
+    "An adversarial fitting-loss mutation and removal of the backflow note both drop riser semantic readiness; a coordinate-registration claim mutation drops cross-drawing registration readiness.",
+    "Rendered and visually inspected the latest completed FL-3 and FP2/as-built sources; the plan sources show the intended building connection, while deterministic DWG geometry still does not bind that endpoint to node 116.",
+    "Playwright loaded the governed proof over HTTP 200, enabled both diagnostic graph layers alongside the exact span, terminal, grade, and device layers, verified the 718.821-inch source-binding hold and whole-network hold, and reported zero browser or page errors.",
+    "Lean 4.13.0 verified the riser-equivalent-length arithmetic plus the coordinate-registration-versus-connectivity fail-closed boundary in 105 ms; 33 focused tests, the production build, JSON parsing, and the agentic-rule verifier also pass.",
+    "Brain postflight persisted the proper-layout separation of slope, direction, drainage intent, and source continuity as episode 149654."
   ],
   "blockers": [
-    "The node-116-to-node-13 riser source path is component-complete but fails the report-length agreement gate by 2.832466883 feet; the discrepancy must be explained from completed-design semantics before promotion.",
-    "The two source nodes remain off-building; fire-line-to-sprinkler CAD registration and the underground/source segment are unproven.",
+    "The cross-drawing coordinate frame is proven, but the extracted fire-line pipe endpoint is 718.821404366 inches from hydraulic node 116; the underground/source pipe binding is unproven and must not be inferred from registration alone.",
     "The ten remote geometric low points cannot be classified as acceptable trapped volume or auxiliary-drain requirements until completed-design system/drainage intent is bound."
   ],
-  "next_action": "Resolve the 13.582466883-foot physical-versus-10.75-foot hydraulic riser discrepancy from the completed source semantics, register the same-project fire-line source nodes, then classify each of the ten remote low points before promoting whole-network flow or proper-layout readiness."
+  "next_action": "Reconcile the completed FL-3 connection-point evidence with sprinkler hydraulic node 116, using another completed project with explicit civil-to-sprinkler endpoint continuity if Polaris omits the needed bridge; then classify each of the ten remote low points before promoting whole-network flow or proper-layout readiness."
 }

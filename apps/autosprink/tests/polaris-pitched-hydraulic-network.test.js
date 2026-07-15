@@ -16,6 +16,7 @@ const build = (overrides = {}) => buildPolarisPitchedHydraulicNetwork({
   atticReport: overrides.atticReport ?? atticReport,
   belowCeilingReport: overrides.belowCeilingReport ?? belowCeilingReport,
   fireLineEvidence: overrides.fireLineEvidence ?? expected.sourceBoundary.fireLineCad,
+  fireLineRegistration: overrides.fireLineRegistration ?? expected.sourceBoundary.fireLineRegistration,
 });
 
 describe('Polaris completed pitched hydraulic and drainage network', () => {
@@ -60,6 +61,47 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       calculationNodeToDwgConnectionPointBindingReady: true,
       calculationNodeToDwgGeometryBindingReady: false,
     });
+  });
+
+  it('registers the sprinkler plan into the fire-line coordinate frame without fabricating a hydraulic connection', () => {
+    expect(expected.sourceBoundary.fireLineRegistration).toMatchObject({
+      schema: 'halofire.polaris-fireline-registration.v1',
+      siteRegistration: {
+        matchedVertexCount: 73,
+        maximumResidualInches: 0.281881785,
+        rootMeanSquareResidualInches: 0.158968546,
+        secondBestRootMeanSquareResidualInches: 145.479451259,
+        rigidRegistrationUniquenessMarginInches: 145.320482713,
+      },
+      siteOutlineEmbeddedMatches: [{
+        siteHandle: '625',
+        embeddedHandle: '4BC6',
+        translationInches: [-2342.96544, -792.62277],
+      }],
+      nearestFireLinePipeEndpointToHydraulicNode116: {
+        pipeHandle: '6F83',
+        endpointIndex: 1,
+        residualInches: 718.821404366,
+      },
+      claims: {
+        rejectedAnnotationTranslationFound: true,
+        exactSharedGeometryTranslationReady: true,
+        sitePlanToFireLineCoordinateRegistrationReady: true,
+        sprinklerCadToFireLineCoordinateRegistrationReady: true,
+        hydraulicNodeToFireLinePipeBindingReady: false,
+        sprinklerRiserToFireLineRiserReady: false,
+      },
+    });
+    expect(expected.claims).toMatchObject({
+      sprinklerCadToFireLineCoordinateRegistrationReady: true,
+      hydraulicNodeToFireLinePipeBindingReady: false,
+      wholeNetworkHydraulicFlowDirectionReady: false,
+      properPipeLayoutReady: false,
+    });
+
+    const attacked = structuredClone(expected.sourceBoundary.fireLineRegistration);
+    attacked.claims.sprinklerCadToFireLineCoordinateRegistrationReady = false;
+    expect(build({ fireLineRegistration: attacked }).claims.sprinklerCadToFireLineCoordinateRegistrationReady).toBe(false);
   });
 
   it('binds every calculated sprinkler to a unique source head and exact terminal pipe connection', () => {
@@ -182,10 +224,52 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       flexibleHoseCenterlineReady: false,
       riserFittingBridgeComponentPathReady: true,
       riserReportToSourceLengthAgreementReady: false,
+      riserHydraulicSemanticBindingReady: true,
       buildingRigidPipeSpanHydraulicDirectionReady: true,
       wholeNetworkHydraulicFlowDirectionReady: false,
       properPipeLayoutReady: false,
     });
+  });
+
+  it('reconciles riser hydraulic length semantics without overwriting physical centerline length', () => {
+    expect(expected.physicalSpanRegistration.riserHydraulicSemantics).toMatchObject({
+      reportOccurrenceCount: 2,
+      reportOccurrencesAgree: true,
+      sourceComponentPathLengthFt: 13.582466883,
+      reportRawLengthFt: 10.75,
+      reportElevationRiseFt: 10.563333333,
+      reportRawLengthToElevationRiseResidualFt: 0.186666667,
+      sourceCenterlineToReportRawLengthResidualFt: 2.832466883,
+      reportEquivalentLengthFt: 20,
+      transitionEquivalentLengthFt: 5,
+      backflowPressureChangePsi: -5,
+      fireElbowCount: 2,
+      fireElbowEquivalentEachFt: 7.5,
+      computedEquivalentLengthFt: 20,
+      sourceThreeInchElbowCount: 2,
+      sourceBackflowNoteCount: 1,
+      sourceComponentPathReady: true,
+      reportRawLengthUsesElevationRiseReady: true,
+      reportFittingSemanticsReady: true,
+      sourceCenterlineEqualsReportRawLength: false,
+      hydraulicSemanticBindingReady: true,
+    });
+    expect(expected.claims).toMatchObject({
+      riserFittingBridgeComponentPathReady: true,
+      riserReportToSourceLengthAgreementReady: false,
+      riserHydraulicSemanticBindingReady: true,
+    });
+  });
+
+  it('holds riser semantics when fitting losses or backflow evidence are changed', () => {
+    const attacked = structuredClone(atticReport);
+    attacked.segments.find((segment) => segment.upstreamNode === '116' && segment.downstreamNode === '13')
+      .upstreamFittings = "Tr(5'-0), BFP(-5.000), 3fE(7'-6)";
+    expect(build({ atticReport: attacked }).claims.riserHydraulicSemanticBindingReady).toBe(false);
+
+    const noBackflow = structuredClone(expected.sourceBoundary.fireLineCad);
+    noBackflow.evidence.backflowNotes = [];
+    expect(build({ fireLineEvidence: noBackflow }).claims.riserHydraulicSemanticBindingReady).toBe(false);
   });
 
   it('holds loop direction when report length no longer agrees with the source span route', () => {
@@ -237,6 +321,9 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
     expect(html).toContain("data-proof-layer':'span'");
     expect(html).toContain('65 exact physical span routes');
     expect(html).toContain('3 loop interiors resolved');
+    expect(html).toContain('fire-line coordinate frame registered');
+    expect(html).toContain('hydraulic source-pipe binding held');
+    expect(html).toContain('718.821 inches from hydraulic node 116');
     expect(html).toContain('whole-network flow held');
     expect(html).toContain('Attic calculation graph (diagnostic)');
     expect(html).not.toContain('data-layer="attic" checked');
@@ -272,8 +359,11 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
         calculatedSprinklerLeafToDwgPipeBindingReady: true,
         exactHydraulicNodeConnectionPointsReady: true,
         calculationNodeToDwgConnectionPointBindingReady: true,
+        sprinklerCadToFireLineCoordinateRegistrationReady: true,
+        hydraulicNodeToFireLinePipeBindingReady: false,
         loopInteriorPipeSpanDirectionReady: true,
         buildingRigidPipeSpanHydraulicDirectionReady: true,
+        riserHydraulicSemanticBindingReady: true,
         wholeNetworkHydraulicFlowDirectionReady: false,
         properPipeLayoutReady: false,
       },
