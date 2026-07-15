@@ -143,7 +143,7 @@ export function evaluateApprovedFp20GovernedSkeleton(pipeEvidence, planGraph, an
     },
     {
       code: 'FP20_ENDPOINT_ELEVATION_UNRESOLVED',
-      message: 'Pipe centerline Z must be registered from architectural side/elevation views before grade or pitched-roof routing can be accepted.',
+      message: 'A102/A103/A201/A301 and the coordinated roof/RCP/section DWGs register the pitched building envelope; exact pipe centerline offsets and every non-calculated endpoint Z still must be source-bound before grade or pitched-roof routing can be accepted.',
     },
     {
       code: 'FP20_FIELD_DRAIN_ROUTE_UNRESOLVED',

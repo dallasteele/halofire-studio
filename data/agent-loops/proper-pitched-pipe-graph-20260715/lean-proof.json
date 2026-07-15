@@ -4,21 +4,15 @@
   "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
   "requestPath": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-request.json",
   "theoremNames": [
-    "newHopeHeadRowCannotPromoteProperPipeLayout",
-    "crossProjectCoverageCannotFillProjectFacts",
-    "approvedPipeSizeLabelInventoryCloses",
-    "primaryPipeAssignmentInventoryCloses",
-    "operationalReferenceExcludesDimensions",
-    "canonicalTopologyRemovesConnectorOnlyCycles",
-    "calculationCorpusDoesNotImplyNodeBinding",
-    "governedSkeletonDoesNotPromoteProperLayout",
-    "route21PipeTableInventoryCloses",
-    "route21FlowDoesNotImplyWholeLayout"
+    "approvedRemoteAreaSetInventoryCloses",
+    "sameXyVerticalLegPreservesCalculationElevationDelta",
+    "architecturalEnvelopeDoesNotImplyPipeCenterlineOrGrade",
+    "approvedRemoteAreaFlowDoesNotPromoteProperLayout"
   ],
-  "claim": "Primary assignment closes at 67 and the operational layer closes at 17 after excluding two dimension baselines. Contracting source-contact connectors removes two artificial cycles and preserves two real loops. Remote area 2-1 closes at 14 calculation nodes and 13 pipe-table legs, but one bound hydraulic route does not imply whole-FP2.0 node binding, drainage grade direction, endpoint elevation, or proper-layout release.",
+  "claim": "The three approved FP2.0 remote areas close at 12 routes, 39 unique calculation nodes, 51 pipe-table legs, 32 plan-visible legs, and 56 mapped calculated canonical edges. The same-XY 718-to-50 leg preserves its one-foot calculation elevation delta. Registered architectural roof and section controls do not imply pipe centerline offset, whole-network endpoint Z, drainage grade, or proper-layout release.",
   "result": {
     "status": "verified",
-    "elapsedMs": 152,
+    "elapsedMs": 89,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

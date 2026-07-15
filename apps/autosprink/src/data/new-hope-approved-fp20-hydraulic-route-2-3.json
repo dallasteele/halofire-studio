@@ -1,0 +1,66 @@
+{
+  "artifactType": "halofire.approved-fp20-hydraulic-route-binding.v3",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "remoteAreaId": "2-3",
+  "sourceBindings": {
+    "approvedPlan": { "sha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5", "sheet": "FP2.0", "physicalPage": 5 },
+    "hydraulicCalculation": { "sha256": "D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719", "physicalPages": [31, 32], "software": "AutoSPRINK 2023 v18.1.44.0", "calculationDate": "2025-01-29" }
+  },
+  "calculationDirection": "remote-terminal-to-water-source",
+  "physicalFlowDirection": "water-source-to-remote-terminal",
+  "gradeDirectionRelationship": "independent-drainage-vector-not-derived-from-hydraulic-flow",
+  "calculationRoutes": [
+    { "routeId": "1", "calculationNodeIds": ["822", "62", "63", "54", "118", "414", "560", "554", "25", "1"] },
+    { "routeId": "2", "calculationNodeIds": ["820", "63"] },
+    { "routeId": "3", "calculationNodeIds": ["818", "819", "823", "824", "62"] },
+    { "routeId": "4", "calculationNodeIds": ["821", "818"] },
+    { "routeId": "5", "calculationNodeIds": ["28", "32", "25"] }
+  ],
+  "planNodeBindings": [
+    { "calculationNodeId": "822", "canonicalNodeId": "canonical-node-094", "leaderTargetPdfPt": { "x": 829.127, "y": 1592.925 }, "sourceTextRef": { "blockIndex": 319, "lineIndex": 0, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 5836 },
+    { "calculationNodeId": "62", "canonicalNodeId": "canonical-node-093", "leaderTargetPdfPt": { "x": 829.163, "y": 1527.657 }, "sourceTextRef": { "blockIndex": 320, "lineIndex": 0, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 5843 },
+    { "calculationNodeId": "63", "canonicalNodeId": "canonical-node-121", "leaderTargetPdfPt": { "x": 874.137, "y": 1527.682 }, "sourceTextRef": { "blockIndex": 377, "lineIndex": 0, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 6435 },
+    { "calculationNodeId": "54", "canonicalNodeId": "canonical-node-138", "leaderTargetPdfPt": { "x": 890.045, "y": 1523.143 }, "sourceTextRef": { "blockIndex": 415, "lineIndex": 0, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 6759 },
+    { "calculationNodeId": "118", "canonicalNodeId": "canonical-node-002", "leaderTargetPdfPt": { "x": 678.087, "y": 1118.512 }, "sourceTextRef": { "blockIndex": 137, "lineIndex": 0, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 3543 },
+    { "calculationNodeId": "820", "canonicalNodeId": "canonical-node-122", "leaderTargetPdfPt": { "x": 874.127, "y": 1547.925 }, "sourceTextRef": { "blockIndex": 419, "lineIndex": 1, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 6916 },
+    { "calculationNodeId": "818", "canonicalNodeId": "canonical-node-040", "leaderTargetPdfPt": { "x": 611.409, "y": 1537.674 }, "sourceTextRef": { "blockIndex": 210, "lineIndex": 0, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 4432 },
+    { "calculationNodeId": "819", "canonicalNodeId": "canonical-node-039", "leaderTargetPdfPt": { "x": 665.409, "y": 1537.674 }, "sourceTextRef": { "blockIndex": 210, "lineIndex": 1, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 4439 },
+    { "calculationNodeId": "823", "canonicalNodeId": "canonical-node-067", "leaderTargetPdfPt": { "x": 733.658, "y": 1608.548 }, "sourceTextRef": { "blockIndex": 263, "lineIndex": 1, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 5117 },
+    { "calculationNodeId": "824", "canonicalNodeId": "canonical-node-066", "leaderTargetPdfPt": { "x": 787.657, "y": 1608.548 }, "sourceTextRef": { "blockIndex": 279, "lineIndex": 1, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 5213 },
+    { "calculationNodeId": "821", "canonicalNodeId": "canonical-node-013", "leaderTargetPdfPt": { "x": 534.907, "y": 1585.181 }, "sourceTextRef": { "blockIndex": 185, "lineIndex": 0, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 3930 }
+  ],
+  "externalNodeIds": ["414", "560", "554", "25", "1", "28", "32"],
+  "planLegBindings": [
+    { "routeId": "1", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "822", "calculationToNodeId": "62", "canonicalNodeIds": ["canonical-node-094", "canonical-node-093"], "canonicalEdgeIds": ["source-edge-086"] },
+    { "routeId": "1", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "62", "calculationToNodeId": "63", "canonicalNodeIds": ["canonical-node-093", "canonical-node-121"], "canonicalEdgeIds": ["source-edge-134"] },
+    { "routeId": "1", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "63", "calculationToNodeId": "54", "canonicalNodeIds": ["canonical-node-121", "canonical-node-138"], "canonicalEdgeIds": ["source-edge-133"] },
+    { "routeId": "1", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "54", "calculationToNodeId": "118", "canonicalNodeIds": ["canonical-node-138", "canonical-node-142", "canonical-node-141", "canonical-node-140", "canonical-node-139", "canonical-node-137", "canonical-node-136", "canonical-node-135", "canonical-node-134", "canonical-node-022", "canonical-node-133", "canonical-node-132", "canonical-node-125", "canonical-node-007", "canonical-node-005", "canonical-node-004", "canonical-node-002"], "canonicalEdgeIds": ["source-edge-143", "source-edge-142", "source-edge-141", "source-edge-140", "source-edge-139", "source-edge-126", "source-edge-125", "source-edge-124", "source-edge-123", "source-edge-122", "source-edge-121", "source-edge-120", "source-edge-112", "source-edge-113", "source-edge-004", "source-edge-003"] },
+    { "routeId": "2", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "820", "calculationToNodeId": "63", "canonicalNodeIds": ["canonical-node-122", "canonical-node-121"], "canonicalEdgeIds": ["source-edge-110"] },
+    { "routeId": "3", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "818", "calculationToNodeId": "819", "canonicalNodeIds": ["canonical-node-040", "canonical-node-039"], "canonicalEdgeIds": ["source-edge-035"] },
+    { "routeId": "3", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "819", "calculationToNodeId": "823", "canonicalNodeIds": ["canonical-node-039", "canonical-node-038", "canonical-node-051", "canonical-node-067"], "canonicalEdgeIds": ["source-edge-034", "source-edge-048", "source-edge-062"] },
+    { "routeId": "3", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "823", "calculationToNodeId": "824", "canonicalNodeIds": ["canonical-node-067", "canonical-node-066"], "canonicalEdgeIds": ["source-edge-061"] },
+    { "routeId": "3", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "824", "calculationToNodeId": "62", "canonicalNodeIds": ["canonical-node-066", "canonical-node-065", "canonical-node-087", "canonical-node-093"], "canonicalEdgeIds": ["source-edge-060", "source-edge-082", "source-edge-135"] },
+    { "routeId": "4", "pathKind": "source-plan-edge-sequence", "calculationFromNodeId": "821", "calculationToNodeId": "818", "canonicalNodeIds": ["canonical-node-013", "canonical-node-012", "canonical-node-036", "canonical-node-040"], "canonicalEdgeIds": ["source-edge-010", "source-edge-032", "source-edge-036"] }
+  ],
+  "pipeTableLegs": [
+    { "routeId": "1", "node1": "822", "node2": "62", "elevation1Ft": 19.166667, "elevation2Ft": 19.166667, "nominalDiameterIn": 1, "actualDiameterIn": 1.049, "flowAddedGpm": 38, "totalFlowGpm": 38, "lengthFt": 7.25, "cFactor": 100, "fittingEquivalentLengthFt": 3.583333, "notes": "Sprinkler; PO" },
+    { "routeId": "1", "node1": "62", "node2": "63", "elevation1Ft": 19.166667, "elevation2Ft": 20.25, "nominalDiameterIn": 2.5, "actualDiameterIn": 2.635, "flowAddedGpm": 201.9, "totalFlowGpm": 239.9, "lengthFt": 5.125, "cFactor": 100, "fittingEquivalentLengthFt": 0, "notes": "Flow from Route 3" },
+    { "routeId": "1", "node1": "63", "node2": "54", "elevation1Ft": 20.25, "elevation2Ft": 20.5, "nominalDiameterIn": 2.5, "actualDiameterIn": 2.635, "flowAddedGpm": 39.5, "totalFlowGpm": 279.5, "lengthFt": 1.166667, "cFactor": 100, "fittingEquivalentLengthFt": 20.166667, "notes": "Flow from Route 2; 2fE; PO" },
+    { "routeId": "1", "node1": "54", "node2": "118", "elevation1Ft": 20.5, "elevation2Ft": 11.5, "nominalDiameterIn": 3, "actualDiameterIn": 3.26, "flowAddedGpm": 0, "totalFlowGpm": 279.5, "lengthFt": 74.041667, "cFactor": 100, "fittingEquivalentLengthFt": 36.416667, "notes": "T; 2fE; PO" },
+    { "routeId": "1", "node1": "118", "node2": "414", "elevation1Ft": 11.5, "elevation2Ft": 5.458333, "nominalDiameterIn": 4, "actualDiameterIn": 4.26, "flowAddedGpm": 0, "totalFlowGpm": 279.5, "lengthFt": 8.416667, "cFactor": 100, "fittingEquivalentLengthFt": 6.375, "notes": "fE; DPV; BOR" },
+    { "routeId": "1", "node1": "414", "node2": "560", "elevation1Ft": 5.458333, "elevation2Ft": 4.625, "nominalDiameterIn": 4, "actualDiameterIn": 4.26, "flowAddedGpm": 0, "totalFlowGpm": 279.5, "lengthFt": 0, "cFactor": 100, "fittingEquivalentLengthFt": 11.25, "notes": "BV" },
+    { "routeId": "1", "node1": "560", "node2": "554", "elevation1Ft": 4.625, "elevation2Ft": 1.166667, "nominalDiameterIn": 4, "actualDiameterIn": 4.26, "flowAddedGpm": 0, "totalFlowGpm": 279.5, "lengthFt": 0, "cFactor": 120, "fittingEquivalentLengthFt": 6.791667, "notes": "Tr; BFP" },
+    { "routeId": "1", "node1": "554", "node2": "25", "elevation1Ft": 1.166667, "elevation2Ft": -13.791667, "nominalDiameterIn": 6, "actualDiameterIn": 5.86, "flowAddedGpm": 0, "totalFlowGpm": 279.5, "lengthFt": 191.791667, "cFactor": 150, "fittingEquivalentLengthFt": 56.208333, "notes": "E; T" },
+    { "routeId": "1", "node1": "25", "node2": "1", "elevation1Ft": -13.791667, "elevation2Ft": -13.791667, "nominalDiameterIn": 8, "actualDiameterIn": 7.68, "flowAddedGpm": 100, "totalFlowGpm": 379.5, "lengthFt": 526.291667, "cFactor": 150, "fittingEquivalentLengthFt": 71.375, "notes": "Flow from Route 5; 2EE; GV; S; T" },
+    { "routeId": "2", "node1": "820", "node2": "63", "elevation1Ft": 20.75, "elevation2Ft": 20.25, "nominalDiameterIn": 1, "actualDiameterIn": 1.049, "flowAddedGpm": 39.5, "totalFlowGpm": 39.5, "lengthFt": 2.75, "cFactor": 100, "fittingEquivalentLengthFt": 5, "notes": "Sprinkler; E; PO" },
+    { "routeId": "3", "node1": "818", "node2": "819", "elevation1Ft": 15.75, "elevation2Ft": 15.75, "nominalDiameterIn": 2.5, "actualDiameterIn": 2.635, "flowAddedGpm": 40.1, "totalFlowGpm": 80.5, "lengthFt": 6, "cFactor": 100, "fittingEquivalentLengthFt": 0, "notes": "Sprinkler; upstream route contribution" },
+    { "routeId": "3", "node1": "819", "node2": "823", "elevation1Ft": 15.75, "elevation2Ft": 18.375, "nominalDiameterIn": 2.5, "actualDiameterIn": 2.635, "flowAddedGpm": 40.2, "totalFlowGpm": 120.7, "lengthFt": 15.875, "cFactor": 100, "fittingEquivalentLengthFt": 8.416667, "notes": "2fE" },
+    { "routeId": "3", "node1": "823", "node2": "824", "elevation1Ft": 18.375, "elevation2Ft": 18.416667, "nominalDiameterIn": 2.5, "actualDiameterIn": 2.635, "flowAddedGpm": 40.4, "totalFlowGpm": 161.1, "lengthFt": 6, "cFactor": 100, "fittingEquivalentLengthFt": 0, "notes": "Sprinkler" },
+    { "routeId": "3", "node1": "824", "node2": "62", "elevation1Ft": 18.416667, "elevation2Ft": 19.166667, "nominalDiameterIn": 2.5, "actualDiameterIn": 2.635, "flowAddedGpm": 40.9, "totalFlowGpm": 201.9, "lengthFt": 13.666667, "cFactor": 100, "fittingEquivalentLengthFt": 8.416667, "notes": "2fE" },
+    { "routeId": "4", "node1": "821", "node2": "818", "elevation1Ft": 14.416667, "elevation2Ft": 15.75, "nominalDiameterIn": 2.5, "actualDiameterIn": 2.635, "flowAddedGpm": 40.4, "totalFlowGpm": 40.4, "lengthFt": 13.958333, "cFactor": 100, "fittingEquivalentLengthFt": 8.416667, "notes": "2fE" },
+    { "routeId": "5", "node1": "28", "node2": "32", "elevation1Ft": 2, "elevation2Ft": -13.791667, "nominalDiameterIn": 6, "actualDiameterIn": 5.86, "flowAddedGpm": 100, "totalFlowGpm": 100, "lengthFt": 53.291667, "cFactor": 150, "fittingEquivalentLengthFt": 56.208333, "notes": "Hydrant; E; T" },
+    { "routeId": "5", "node1": "32", "node2": "25", "elevation1Ft": -13.791667, "elevation2Ft": -13.791667, "nominalDiameterIn": 8, "actualDiameterIn": 7.68, "flowAddedGpm": 100, "totalFlowGpm": 100, "lengthFt": 268.75, "cFactor": 150, "fittingEquivalentLengthFt": 22.541667, "notes": "2EE" }
+  ],
+  "systemDemandGpm": 279.5,
+  "baseOfRiserPressurePsi": 53.7
+}

@@ -1,15 +1,15 @@
 {
   "loop": "proper-pitched-pipe-graph-20260715",
   "stage": "ITERATE",
-  "status": "verified-ra2-1-hydraulic-route-binding-whole-system-grade-z-still-fail-closed",
-  "iteration": 8,
+  "status": "verified-all-approved-remote-area-flow-and-architectural-vertical-controls-grade-and-pipe-z-still-fail-closed",
+  "iteration": 9,
   "brainPreflight": {
     "status": "passed",
-    "topEpisodes": [148076, 148034, 124864]
+    "topEpisodes": [148441, 124864, 148034]
   },
   "acceptanceAuthority": {
     "humanReviewRequired": false,
-    "loops": ["primary", "crossSource", "adversarial", "browser"]
+    "loops": ["primary", "crossSource", "adversarial", "browser", "formal"]
   },
   "implementation": {
     "sourceVectorGate": "apps/autosprink/src/engine/approved-fp20-pipe-vectors.js",
@@ -17,8 +17,13 @@
     "governedSkeletonEngine": "apps/autosprink/src/engine/approved-fp20-governed-skeleton.js",
     "canonicalTopologyEngine": "apps/autosprink/src/engine/approved-fp20-canonical-topology.js",
     "hydraulicRouteBindingEngine": "apps/autosprink/src/engine/approved-fp20-hydraulic-route-binding.js",
-    "operationalEvidence": "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
-    "hydraulicRoute21Evidence": "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-1.json",
+    "architecturalVerticalControlEngine": "apps/autosprink/src/engine/approved-fp20-architectural-vertical-controls.js",
+    "hydraulicRouteEvidence": [
+      "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-1.json",
+      "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-2.json",
+      "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-3.json"
+    ],
+    "architecturalSourceEvidence": "apps/autosprink/src/data/new-hope-pitched-holdout-source.json",
     "visualProof": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html"
   },
   "approvedFp20PrimaryPipe": {
@@ -31,92 +36,92 @@
     "primaryPipeRoleAssignmentReady": true,
     "wholeSystemVectorExtractionReady": false
   },
-  "operationalEvidence": {
-    "approvedFieldAsBuiltCalloutInvarianceReady": true,
-    "operationalReferenceVectorCount": 17,
-    "excludedDimensionBaselineCount": 2,
-    "supplySourceAnchorReady": true,
-    "lowPointAnchorCount": 4,
-    "fieldDrainIntentCount": 2,
-    "remoteInspectorsTestCount": 1,
-    "gradeMagnitudeReady": true,
-    "fieldDrainRouteResolved": false
-  },
   "canonicalTopology": {
     "status": "passed",
-    "inputNodeCount": 210,
-    "inputEdgeCount": 213,
-    "contractedConnectorEdgeCount": 70,
     "canonicalNodeCount": 142,
     "canonicalEdgeCount": 143,
     "canonicalJunctionCount": 62,
     "connectedComponentCount": 1,
-    "inputCycleRank": 4,
     "canonicalCycleRank": 2,
     "artificialConnectorCycleCountRemoved": 2
   },
-  "hydraulicCalculationCorpus": {
-    "status": "remote-area-2-1-bound-remote-areas-2-2-and-2-3-pending",
+  "approvedRemoteAreaSet": {
+    "status": "passed",
     "calculationReportSha256": "D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719",
-    "calculationReportPages": 33,
-    "closeoutCalcPlatesSha256": "E1C8F0184EF2470FFA7450B772EAEB13D0022A79E95573D29F753DDEF0AB14AF",
-    "closeoutCalcPlatePages": 2,
-    "fp20RemoteAreas": ["2-1", "2-2", "2-3"],
-    "calculationCorpusReady": true,
-    "route21CalculationNodeCount": 14,
-    "route21PipeTableLegCount": 13,
-    "route21PlanBoundNodeCount": 9,
-    "route21HydraulicNodeBindingReady": true,
-    "route21HydraulicFlowDirectionReady": true,
+    "remoteAreas": ["2-1", "2-2", "2-3"],
+    "calculationRouteCount": 12,
+    "uniqueCalculationNodeCount": 39,
+    "planBoundCalculationNodeCount": 35,
+    "pipeTableLegCount": 51,
+    "planVisibleLegCount": 32,
+    "mappedCalculatedCanonicalEdgeCount": 56,
+    "sameXyVerticalLegCount": 1,
+    "approvedRemoteAreaHydraulicFlowReady": true,
+    "calculationEndpointElevationEvidenceReady": true,
     "wholeFp20HydraulicNodeBindingReady": false,
-    "hydraulicNodeBindingReady": false
+    "wholeFp20HydraulicFlowReady": false
+  },
+  "architecturalVerticalControls": {
+    "status": "passed",
+    "sourcePdfSha256": "9F9F8B97CFB35931474566156F35D97520AE993052DAC046EFACB408F32EA0A7",
+    "registeredSheets": ["A102", "A103", "A201", "A301"],
+    "coordinatedDwgCount": 6,
+    "roofSlope": "4:12",
+    "eaveDatumZFt": 11.083333,
+    "ridgeDatumZFt": 21.208333,
+    "trussBearingDatumZFt": 10.96875,
+    "architecturalSourceRegistrationReady": true,
+    "architecturalVerticalControlReady": true,
+    "pipeCenterlineOffsetReady": false,
+    "endpointElevationsReady": false
   },
   "remainingLayoutBlockers": [
-    "FP20_SOURCE_LOOPS_REQUIRE_CALCULATION_BINDING",
-    "FP20_HYDRAULIC_FLOW_DIRECTION_UNRESOLVED",
+    "FP20_NON_CALCULATED_EDGES_AWAIT_DIRECTION_BINDING",
+    "FP20_DRAINAGE_GRADE_REQUIRES_ELEVATION_BINDING",
     "FP20_GRADE_DIRECTION_UNRESOLVED",
     "FP20_ENDPOINT_ELEVATION_UNRESOLVED",
     "FP20_FIELD_DRAIN_ROUTE_UNRESOLVED",
     "FP20_FITTING_IDENTITY_UNRESOLVED"
   ],
   "verification": {
-    "focusedTests": "42 passed across source extraction, plan graph, governed skeleton, canonical topology, RA2-1 hydraulic route binding, actual-PDF proof, and adversarial mutations",
+    "focusedTests": "37 passed across all three hydraulic route bindings, architectural vertical controls, governed/canonical topology, actual-PDF proof, and adversarial mutations",
     "productionBuild": "passed Vite build",
     "formalProof": {
       "status": "verified",
       "prover": "Lean 4.13.0 on GX10",
-      "elapsedMs": 152,
+      "elapsedMs": 89,
       "receipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-proof.json"
     },
     "browser": {
       "url": "http://127.0.0.1:3312/src/data/proofs/new-hope-truss-clearance/index.html",
       "proofReady": true,
-      "canonicalTopologyReady": true,
-      "canonicalNodeCount": 142,
-      "canonicalEdgeCount": 143,
-      "primaryOverlayVectorCount": 67,
-      "operationalOverlayVectorCount": 17,
-      "operationalAnchorCount": 6,
-      "route21HydraulicNodeBindingReady": true,
-      "route21HydraulicFlowDirectionReady": true,
-      "hydraulicFlowOverlayVectorCount": 36,
-      "hydraulicPlanNodeMarkerCount": 9,
-      "consoleErrorsOrWarnings": 0
-    }
+      "actualPdfImageCount": 8,
+      "architecturalSourceRegistrationReady": true,
+      "architecturalVerticalControlReady": true,
+      "approvedRemoteAreaSetReady": true,
+      "route21FlowOverlayVectorCount": 36,
+      "route22FlowOverlayVectorCount": 31,
+      "route23FlowOverlayVectorCount": 31,
+      "properPipeLayoutReady": false,
+      "consoleErrorsOrWarnings": 0,
+      "visualInspection": "passed actual A102 RCP, A103 roof, A201 elevations, A301 sections, S102 framing, and approved FP2.0 overlay"
+    },
+    "agenticRules": "passed"
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 148441,
-    "title": "FP2.0 remote area 2-1 hydraulic route bound without grade promotion"
+    "episodeId": 148601,
+    "title": "FP2.0 all remote areas and architectural vertical controls bound"
   },
   "claims": {
     "properPipeLayoutReady": false,
-    "hydraulicFlowReady": false,
+    "wholeFp20HydraulicFlowReady": false,
     "gradeDirectionReady": false,
     "endpointElevationsReady": false,
+    "pipeCenterlineOffsetReady": false,
     "fieldDrainRouteResolved": false,
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "nextAction": "Bind AutoSPRINK remote-area 2-2 and 2-3 node routes to the canonical graph, then register architectural side/elevation views and solve high-to-low drainage grade independently from hydraulic flow."
+  "nextAction": "Bind every remaining non-calculated FP2.0 edge to an explicit high/low endpoint, solve pipe centerline offsets against the registered architectural and structural envelope, and bind each drainage catchment to its source-proved low point or field-route boundary independently from hydraulic flow."
 }

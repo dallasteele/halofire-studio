@@ -11,12 +11,16 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('approved-ridge-branch-underlay.png');
     expect(html).toContain('approved-dry-pipe-note.png');
     expect(html).toContain('approved-fp20-full-underlay.png');
-    for (const image of ['s102-roof-framing-underlay.png', 'approved-ridge-branch-underlay.png', 'approved-dry-pipe-note.png', 'approved-fp20-full-underlay.png', 'approved-fp20-pipe-size-overlay.png']) expect(fs.statSync(new URL(image, proof)).size).toBeGreaterThan(30_000);
+    expect(html).toContain('architectural-a102-rcp.png');
+    expect(html).toContain('architectural-a103-roof-plan.png');
+    expect(html).toContain('architectural-a201-elevations.png');
+    expect(html).toContain('architectural-a301-sections.png');
+    for (const image of ['s102-roof-framing-underlay.png', 'approved-ridge-branch-underlay.png', 'approved-dry-pipe-note.png', 'approved-fp20-full-underlay.png', 'approved-fp20-pipe-size-overlay.png', 'architectural-a102-rcp.png', 'architectural-a103-roof-plan.png', 'architectural-a201-elevations.png', 'architectural-a301-sections.png']) expect(fs.statSync(new URL(image, proof)).size).toBeGreaterThan(30_000);
   });
 
   it('states the missing pipe-layout facts instead of presenting a connector as a design', () => {
     const html = read('index.html');
-    expect(html).toContain('WHOLE-SYSTEM GRADE DIRECTION AND Z STILL BLOCKED');
+    expect(html).toContain('GRADE DIRECTION AND Z STILL BLOCKED');
     expect(html).toContain('primaryPipeVectorExtractionReady=false');
     expect(html).toContain('wholeSystemVectorExtractionReady=false');
     expect(html).toContain('primaryPipeSizeAssignmentReady=false');
@@ -24,10 +28,15 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('properPipeLayoutReady=false');
     expect(html).toContain('branchGradeDirectionReady=false');
     expect(html).toContain('endpointElevationsReady=false');
-    expect(html).toContain('route21HydraulicNodeBindingReady=false');
-    expect(html).toContain('route21HydraulicFlowDirectionReady=false');
+    expect(html).toContain('architecturalSourceRegistrationReady=false');
+    expect(html).toContain('architecturalVerticalControlReady=false');
+    expect(html).toContain('pipeCenterlineOffsetReady=false');
+    expect(html).toContain('approvedRemoteAreaSetReady=false');
+    expect(html).toContain('approvedRemoteAreaHydraulicFlowReady=false');
     expect(html).toContain('route21ExplicitPlanPathReady=false');
-    expect(html).toContain('no shortest-path fallback is allowed');
+    expect(html).toContain('route22ExplicitPlanPathReady=false');
+    expect(html).toContain('route23ExplicitPlanPathReady=false');
+    expect(html).toContain('same-XY vertical evidence instead of a fake horizontal connector');
   });
 
   it('loads the sealed calibration and generates the S102 overlay from data', () => {
@@ -37,6 +46,10 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('../../new-hope-approved-fp20-plan-graph.json');
     expect(script).toContain('../../new-hope-approved-fp20-operational-annotations.json');
     expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-1.json');
+    expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-2.json');
+    expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-3.json');
+    expect(script).toContain('../../new-hope-pitched-holdout-source.json');
+    expect(script).toContain('evaluateApprovedFp20ArchitecturalVerticalControls');
     expect(script).toContain('calibration.trussLattice.centerlines');
     expect(script).toContain('calibration.branch.nodes');
     expect(script).toContain('pipeVectors.pipeSegments');
@@ -46,8 +59,11 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('evaluateApprovedFp20PipeVectors');
     expect(script).toContain('evaluateApprovedFp20GovernedSkeleton');
     expect(script).toContain('canonicalizeApprovedFp20Topology');
-    expect(script).toContain('bindApprovedFp20HydraulicRoute');
+    expect(script).toContain('bindApprovedFp20HydraulicRouteSet');
     expect(script).toContain("dataset.proofReady = 'true'");
+    expect(script).toContain('dataset.architecturalSourceRegistrationReady = String(architecturalValidation.sourceRegistrationReady)');
+    expect(script).toContain('dataset.architecturalVerticalControlReady = String(architecturalVerticalControlReady)');
+    expect(script).toContain('dataset.pipeCenterlineOffsetReady = String(pipeCenterlineOffsetReady)');
     expect(script).toContain('dataset.pipeVectorStatus = vectorAcceptance.status');
     expect(script).toContain('dataset.primaryPipeSizeAssignmentReady = String(governedSkeleton.primaryPipeSizeAssignmentReady)');
     expect(script).toContain('dataset.primaryPipeRoleAssignmentReady = String(governedSkeleton.primaryPipeRoleAssignmentReady)');
@@ -56,10 +72,13 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.branchGradeDirectionReady = String(governedSkeleton.gradeDirectionReady)');
     expect(script).toContain('dataset.endpointElevationsReady = String(governedSkeleton.endpointElevationsReady)');
     expect(script).toContain('dataset.route21HydraulicNodeBindingReady = String(hydraulicRoute21.route21HydraulicNodeBindingReady)');
-    expect(script).toContain('dataset.route21ExplicitPlanPathReady = String(hydraulicRoute21.route21ExplicitPlanPathReady)');
+    expect(script).toContain('dataset.route21ExplicitPlanPathReady = String(hydraulicRoute21.explicitPlanPathReady)');
+    expect(script).toContain('dataset.route22ExplicitPlanPathReady = String(hydraulicRoute22.explicitPlanPathReady)');
+    expect(script).toContain('dataset.route23ExplicitPlanPathReady = String(hydraulicRoute23.explicitPlanPathReady)');
+    expect(script).toContain('dataset.approvedRemoteAreaSetReady = String(hydraulicRouteSet.approvedRemoteAreaSetReady)');
     expect(script).toContain("dataset.drainDestinationReady = 'false'");
     expect(script).toContain('evaluateProperPitchedPipeGraph');
     expect(script).toContain("dataset.pipeGraphStatus = governedSkeleton.properPipeLayoutReady ? 'passed' : 'blocked'");
-    expect(script).toContain('canonicalTopology.remainingTopologyBlockers');
+    expect(script).toContain('hydraulicRouteSet.remainingBlockers');
   });
 });
