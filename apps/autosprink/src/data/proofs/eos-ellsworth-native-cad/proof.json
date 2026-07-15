@@ -1,0 +1,56 @@
+{
+  "schema": "halofire.autosprink-dwg-pdf-visual-proof.v1",
+  "project": "EoS Fitness Ellsworth and Baseline calibration",
+  "sourceDwgSha256": "93C002A7A8F689A441FBD17C3602106DA99013CD1070430A17E792EF29081A9B",
+  "nativeCadSha256": "1CBD6B94271DBD482E572230089535BF48D6C2BC8BF686022A10C79802510BA8",
+  "approvedPdfSha256": "BB65A4FED0CDEF28B6503C3E613EB7674CAC1642383374078BA4F240969EE04C",
+  "registeredPage": 1,
+  "counts": {
+    "pipes": 248,
+    "sprinklerSymbols": 271,
+    "fittingSymbols": 63,
+    "distinctPipeElevations": 7,
+    "verticalTransitions": 71
+  },
+  "pipeElevationTransitions": {
+    "60-to-60": 177,
+    "60-to-12.75": 59,
+    "60-to-10.75": 4,
+    "60-to-58.75": 3,
+    "60-to-58.9375": 2,
+    "60-to-58": 1,
+    "60-to-0.75": 2
+  },
+  "planRegistration": {
+    "sprinklerSymbolSamples": 271,
+    "meanResidualPx": 4.234797,
+    "medianResidualPx": 2.828427,
+    "p95ResidualPx": 11.022681,
+    "renderedPageWidthPx": 3111
+  },
+  "artifacts": {
+    "approvedSource": {
+      "path": "approved-fp1-source.png",
+      "sha256": "0F75964928E46A68235A15BBAB729857D1C2F5B6109E3AC0EA011DE9E66075D3"
+    },
+    "approvedOverlay": {
+      "path": "approved-fp1-dwg-overlay.png",
+      "sha256": "2D9398987BB03D70B0CA06B63A1A8900407A8D6C3958CE6DC9A59F5F5AD3EA40"
+    },
+    "dwgPlanOnly": {
+      "path": "dwg-plan-only.png",
+      "sha256": "88E97561124E56771885417DE5041CF997D331F08964D8239C463EF49CCFE196"
+    }
+  },
+  "claims": {
+    "nativeSpatialTypeCatalogReady": true,
+    "exactSourceDrawingXyzReady": true,
+    "approvedPdfPlanProjectionRegistrationReady": true,
+    "sourceDrawingUnitConversionReady": false,
+    "pitchedRoofCalibrationReady": false,
+    "newHopeExactPipeCenterlineZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

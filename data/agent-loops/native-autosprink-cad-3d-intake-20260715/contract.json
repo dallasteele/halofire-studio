@@ -1,0 +1,56 @@
+{
+  "name": "native-autosprink-cad-3d-intake-20260715",
+  "owner": "codex",
+  "goal": "Build a deterministic read-only intake for a completed Halo Fire native AutoSPRINK CAD answer key so exact pipe, sprinkler, and fitting XYZ geometry can be learned from real finished work and checked against approved and as-built PDFs without inventing New Hope elevations.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "docs/specs/AUTOSPRINK_PIPE_LAYOUT_ACCEPTANCE.md",
+    "Y:/Shared/HaloOps/02-Active jobs/FP Contracting/Harbor Freight Tools - Cave Creek AZ/Engineering/CAD Files/FP1 Harbor Freight Tools - Cave Creek AZ.cad",
+    "Y:/Shared/HaloOps/02-Active jobs/FP Contracting/Harbor Freight Tools - Cave Creek AZ/Engineering/Submittal/FP1 Harbor Freight Tools - Cave Creek AZ.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/FP Contracting/Harbor Freight Tools - Cave Creek AZ/Field Ops/As Built Drawings/Harbor Freight - Cave Creek AZ_As Builts.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Bergman/EoS Fitness Ellsworth & Baseline - Mesa AZ/2-Internal Ops/01-Design/05-CAD Files/FP1 EOS Fitness Ellsworth.cad",
+    "Y:/Shared/HaloOps/02-Active jobs/Bergman/EoS Fitness Ellsworth & Baseline - Mesa AZ/2-Internal Ops/01-Design/05-CAD Files/EOS Fitness Ellsworth and Baseline - Mesa AZ.DWG",
+    "Y:/Shared/HaloOps/02-Active jobs/Bergman/EoS Fitness Ellsworth & Baseline - Mesa AZ/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/PMT23-12738B  APPROVED PLANS .pdf"
+  ],
+  "exit_criteria": [
+    "the native CAD archive hash, member names, sizes, and SEiDB header offsets are parsed deterministically without modifying the source",
+    "the SEiDB type catalog proves native CEltPipe, CEltSprinkler, CEltFitting, CEltRoof, and CEltCeiling capability and rejects corrupt offsets, hashes, or missing members",
+    "native pipe, sprinkler, and fitting records expose source-grounded X, Y, and Z geometry, or the exact unsupported record boundary is emitted as a typed fail-closed issue without promoting geometry readiness",
+    "extracted native geometry is registered to the approved and as-built PDF evidence and visually checked on the actual PDF underlay before it is accepted as calibration evidence",
+    "New Hope exact endpoint elevations and properPipeLayoutReady remain false until its own source-bound transfer is verified",
+    "primary, cross-source, adversarial, browser, and formal loops own acceptance without an independent human-review blocker",
+    "focused tests, production build, actual-PDF visual proof, formal proof, rules verification, and brain postflight are recorded"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source archive SHA-256 replay",
+    "ZIP member and SEiDB bounds validation",
+    "type-catalog and native element-record decoding",
+    "approved and as-built PDF registration",
+    "adversarial hash, offset, truncation, member-substitution, type-substitution, coordinate, and false-promotion mutations",
+    "focused Vitest regression and AutoSprink production build",
+    "actual PDF underlay browser proof",
+    "Lean 4 parser-bound and promotion invariant proof",
+    "authoritative agentic-rule verification",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/native-autosprink-cad-3d-intake-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/eos-ellsworth-autosprink-dwg-calibration.json",
+    "apps/autosprink/src/data/eos-ellsworth-native-cad-inspection.json",
+    "apps/autosprink/scripts/inspect-autosprink-native-cad.mjs",
+    "apps/autosprink/src/engine/native-autosprink-cad-intake.js",
+    "apps/autosprink/tests/native-autosprink-cad-intake.test.js",
+    "apps/autosprink/src/data/proofs/eos-ellsworth-native-cad",
+    "data/agent-loops/native-autosprink-cad-3d-intake-20260715/lean-proof.json",
+    "data/agent-loops/native-autosprink-cad-3d-intake-20260715/state.json"
+  ],
+  "max_iterations": 10,
+  "max_tokens": 180000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

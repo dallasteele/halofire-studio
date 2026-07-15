@@ -1,0 +1,7882 @@
+{
+  "schema": "halofire.autosprink-dwg-3d-calibration.v1",
+  "source": {
+    "fileName": "EOS Fitness Ellsworth and Baseline - Mesa AZ.DWG",
+    "byteLength": 2298805,
+    "sha256": "93C002A7A8F689A441FBD17C3602106DA99013CD1070430A17E792EF29081A9B",
+    "parser": "@mlightcad/libredwg-web@0.4.2 (LibreDWG)",
+    "parserScope": "read-only development intake; not included in the production browser bundle"
+  },
+  "pairedSources": {
+    "nativeAutosprinkCad": {
+      "fileName": "FP1 EOS Fitness Ellsworth.cad",
+      "byteLength": 36805317,
+      "sha256": "1CBD6B94271DBD482E572230089535BF48D6C2BC8BF686022A10C79802510BA8"
+    },
+    "approvedPdf": {
+      "fileName": "PMT23-12738B  APPROVED PLANS .pdf",
+      "byteLength": 12075291,
+      "sha256": "BB65A4FED0CDEF28B6503C3E613EB7674CAC1642383374078BA4F240969EE04C",
+      "pageCount": 3,
+      "registeredPage": 1
+    }
+  },
+  "pdfPlanRegistration": {
+    "renderScale": 1.2,
+    "renderedPageSizePx": [3111, 2074],
+    "sourceBounds": {
+      "xMin": -2936.212628173,
+      "yMax": 1566.580896398
+    },
+    "affine": {
+      "scale": 0.459,
+      "translateX": 84,
+      "translateY": 684,
+      "formula": "px=84+(x+2936.212628173)*0.459; py=684+(1566.580896398-y)*0.459"
+    },
+    "sprinklerSymbolSamples": 271,
+    "nearestDarkPixelResidualPx": {
+      "mean": 4.234797,
+      "median": 2.828427,
+      "p95": 11.022681
+    },
+    "scope": "actual approved FP1 plan projection only; the PDF does not independently prove source-DWG elevation values"
+  },
+  "coordinateSystem": {
+    "units": "source-drawing-units",
+    "conversionToFeetReady": false,
+    "note": "Coordinates are preserved exactly in source drawing units; unit conversion requires a drawing-specific scale receipt."
+  },
+  "summary": {
+    "modelEntityCount": 1178,
+    "pipeCount": 248,
+    "sprinklerSymbolCount": 271,
+    "fittingSymbolCount": 63,
+    "distinctPipeElevationCount": 7,
+    "pipeElevationRange": [
+      0.75,
+      60
+    ]
+  },
+  "pipes": [
+    {
+      "id": "pipe-5314",
+      "blockName": "Pipe40121",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 476.647433096,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "planLength": 241.855927723,
+      "length3d": 241.855927723,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-5745",
+      "blockName": "Pipe40122",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 476.647433096,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "planLength": 241.855927723,
+      "length3d": 241.855927723,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-5971",
+      "blockName": "Pipe40124",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 476.647433096,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "planLength": 241.855927723,
+      "length3d": 241.855927723,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-6605",
+      "blockName": "Pipe40125",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 476.647433096,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "planLength": 241.855927723,
+      "length3d": 241.855927723,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-6933",
+      "blockName": "Pipe40126",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 476.647433096,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "planLength": 241.855927723,
+      "length3d": 241.855927723,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-7159",
+      "blockName": "Pipe40127",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 476.647433096,
+        "y": 668.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -2697.091550342,
+        "y": 668.630979875,
+        "z": 60
+      },
+      "planLength": 3173.738983438,
+      "length3d": 3173.738983438,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-8507",
+      "blockName": "Pipe40128",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 476.647433096,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "planLength": 241.855927723,
+      "length3d": 241.855927723,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-8631",
+      "blockName": "Pipe40129",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 476.647433096,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "planLength": 241.855927723,
+      "length3d": 241.855927723,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-8857",
+      "blockName": "Pipe40130",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 20.177103965,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "planLength": 2713.289522347,
+      "length3d": 2713.289522347,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9287",
+      "blockName": "Pipe40131",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 476.647433096,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "planLength": 241.855927723,
+      "length3d": 241.855927723,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9615",
+      "blockName": "Pipe40132",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -1146.545264691,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "planLength": 129.176244566,
+      "length3d": 129.176244566,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9637",
+      "blockName": "Pipe40133",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2697.968476891,
+        "y": 617.65681141,
+        "z": 60
+      },
+      "end": {
+        "x": -2697.968476891,
+        "y": 1231.132235808,
+        "z": 60
+      },
+      "planLength": 613.475424399,
+      "length3d": 613.475424399,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9659",
+      "blockName": "Pipe40134",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2697.968476891,
+        "y": 1231.132235808,
+        "z": 60
+      },
+      "end": {
+        "x": 237.276752531,
+        "y": 1231.132235808,
+        "z": 60
+      },
+      "planLength": 2935.245229422,
+      "length3d": 2935.245229422,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9681",
+      "blockName": "Pipe40135",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 237.276752531,
+        "y": 1231.132235808,
+        "z": 60
+      },
+      "end": {
+        "x": 237.276752531,
+        "y": 658.448200436,
+        "z": 60
+      },
+      "planLength": 572.684035372,
+      "length3d": 572.684035372,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9703",
+      "blockName": "Pipe40136",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": 456.493881893,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "planLength": 3.862902018,
+      "length3d": 3.862902018,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9725",
+      "blockName": "Pipe40137",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1221.625522138,
+        "y": -1068.079618458,
+        "z": 60
+      },
+      "end": {
+        "x": -1221.625522138,
+        "y": 520.776951506,
+        "z": 60
+      },
+      "planLength": 1588.856569964,
+      "length3d": 1588.856569964,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9747",
+      "blockName": "Pipe40138",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1221.625522138,
+        "y": 520.776951506,
+        "z": 60
+      },
+      "end": {
+        "x": -1847.280896569,
+        "y": 520.776951506,
+        "z": 60
+      },
+      "planLength": 625.65537443,
+      "length3d": 625.65537443,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9769",
+      "blockName": "Pipe40139",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1847.280896569,
+        "y": 520.776951506,
+        "z": 60
+      },
+      "end": {
+        "x": -1847.280896569,
+        "y": 1566.580896398,
+        "z": 60
+      },
+      "planLength": 1045.803944892,
+      "length3d": 1045.803944892,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9791",
+      "blockName": "Pipe40140",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1868.118164025,
+        "y": 1566.222662573,
+        "z": 60
+      },
+      "end": {
+        "x": -1868.118164025,
+        "y": 1231.132235808,
+        "z": 60
+      },
+      "planLength": 335.090426765,
+      "length3d": 335.090426765,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9813",
+      "blockName": "Pipe40141",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 20.177103965,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 20.177103965,
+        "y": -920.468624766,
+        "z": 60
+      },
+      "planLength": 23.099604642,
+      "length3d": 23.099604642,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9835",
+      "blockName": "Pipe40142",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 20.177103965,
+        "y": -920.468624766,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -920.468624766,
+        "z": 60
+      },
+      "planLength": 214.614401409,
+      "length3d": 214.614401409,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9857",
+      "blockName": "Pipe40143",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 119.407873342,
+        "y": -845.597755453,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -845.597755453,
+        "z": 60
+      },
+      "planLength": 115.383632032,
+      "length3d": 115.383632032,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-9879",
+      "blockName": "Pipe40144",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2884.434987241,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "planLength": 191.322568859,
+      "length3d": 191.322568859,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10003",
+      "blockName": "Pipe40145",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2313.410271041,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "end": {
+        "x": -2313.410271041,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "planLength": 73.709441997,
+      "length3d": 73.709441997,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10025",
+      "blockName": "Pipe40146",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2896.659716501,
+        "y": -337.73414043,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -337.73414043,
+        "z": 60
+      },
+      "planLength": 203.547298119,
+      "length3d": 203.547298119,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10149",
+      "blockName": "Pipe40147",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2918.982161688,
+        "y": 625.7805097,
+        "z": 60
+      },
+      "end": {
+        "x": -2686.130175785,
+        "y": 625.7805097,
+        "z": 60
+      },
+      "planLength": 232.851985903,
+      "length3d": 232.851985903,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10171",
+      "blockName": "Pipe40148",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2795.391492247,
+        "y": 734.683592338,
+        "z": 60
+      },
+      "end": {
+        "x": -2686.130175785,
+        "y": 734.683592338,
+        "z": 60
+      },
+      "planLength": 109.261316462,
+      "length3d": 109.261316462,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10193",
+      "blockName": "Pipe40149",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2719.44592146,
+        "y": 833.197894066,
+        "z": 60
+      },
+      "end": {
+        "x": 237.276752531,
+        "y": 833.197894066,
+        "z": 60
+      },
+      "planLength": 2956.722673991,
+      "length3d": 2956.722673991,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10215",
+      "blockName": "Pipe40150",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 461.312205976,
+        "y": 784.478093939,
+        "z": 60
+      },
+      "end": {
+        "x": 237.276752531,
+        "y": 784.478093939,
+        "z": 60
+      },
+      "planLength": 224.035453445,
+      "length3d": 224.035453445,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10237",
+      "blockName": "Pipe40151",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 451.639892716,
+        "y": 932.786897268,
+        "z": 60
+      },
+      "end": {
+        "x": -1885.835811927,
+        "y": 932.786897268,
+        "z": 60
+      },
+      "planLength": 2337.475704643,
+      "length3d": 2337.475704643,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10259",
+      "blockName": "Pipe40152",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1885.835811927,
+        "y": 932.786897268,
+        "z": 60
+      },
+      "end": {
+        "x": -1885.835811927,
+        "y": 897.321748646,
+        "z": 60
+      },
+      "planLength": 35.465148622,
+      "length3d": 35.465148622,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10281",
+      "blockName": "Pipe40153",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1885.835811927,
+        "y": 897.321748646,
+        "z": 60
+      },
+      "end": {
+        "x": -2909.668082252,
+        "y": 897.321748646,
+        "z": 60
+      },
+      "planLength": 1023.832270325,
+      "length3d": 1023.832270325,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10303",
+      "blockName": "Pipe40154",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2697.951891992,
+        "y": 981.506697395,
+        "z": 60
+      },
+      "end": {
+        "x": -2482.295129663,
+        "y": 981.506697395,
+        "z": 60
+      },
+      "planLength": 215.656762329,
+      "length3d": 215.656762329,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10325",
+      "blockName": "Pipe40155",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2482.295129663,
+        "y": 981.506697395,
+        "z": 60
+      },
+      "end": {
+        "x": -2482.295129663,
+        "y": 999.418388619,
+        "z": 60
+      },
+      "planLength": 17.911691223,
+      "length3d": 17.911691223,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10347",
+      "blockName": "Pipe40156",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2482.295129663,
+        "y": 999.418388619,
+        "z": 60
+      },
+      "end": {
+        "x": -1766.185714555,
+        "y": 999.418388619,
+        "z": 60
+      },
+      "planLength": 716.109415108,
+      "length3d": 716.109415108,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10369",
+      "blockName": "Pipe40157",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1766.185714555,
+        "y": 999.418388619,
+        "z": 60
+      },
+      "end": {
+        "x": -1766.185714555,
+        "y": 1038.82410931,
+        "z": 60
+      },
+      "planLength": 39.405720691,
+      "length3d": 39.405720691,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10391",
+      "blockName": "Pipe40158",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1766.185714555,
+        "y": 1038.82410931,
+        "z": 60
+      },
+      "end": {
+        "x": -625.569217455,
+        "y": 1038.82410931,
+        "z": 60
+      },
+      "planLength": 1140.616497101,
+      "length3d": 1140.616497101,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10413",
+      "blockName": "Pipe40159",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -625.569217455,
+        "y": 1038.82410931,
+        "z": 60
+      },
+      "end": {
+        "x": -625.569217455,
+        "y": 995.477816549,
+        "z": 60
+      },
+      "planLength": 43.34629276,
+      "length3d": 43.34629276,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10435",
+      "blockName": "Pipe40160",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -625.569217455,
+        "y": 995.477816549,
+        "z": 60
+      },
+      "end": {
+        "x": -145.53589267,
+        "y": 995.477816549,
+        "z": 60
+      },
+      "planLength": 480.033324785,
+      "length3d": 480.033324785,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10457",
+      "blockName": "Pipe40161",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -145.53589267,
+        "y": 995.477816549,
+        "z": 60
+      },
+      "end": {
+        "x": -145.53589267,
+        "y": 1050.645825517,
+        "z": 60
+      },
+      "planLength": 55.168008968,
+      "length3d": 55.168008968,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10479",
+      "blockName": "Pipe40162",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -145.53589267,
+        "y": 1050.645825517,
+        "z": 60
+      },
+      "end": {
+        "x": 463.819842747,
+        "y": 1050.645825517,
+        "z": 60
+      },
+      "planLength": 609.355735417,
+      "length3d": 609.355735417,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10501",
+      "blockName": "Pipe40163",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -145.53589267,
+        "y": 1050.645825517,
+        "z": 60
+      },
+      "end": {
+        "x": -145.53589267,
+        "y": 1090.768013857,
+        "z": 60
+      },
+      "planLength": 40.12218834,
+      "length3d": 40.12218834,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10523",
+      "blockName": "Pipe40164",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -145.53589267,
+        "y": 1090.768013857,
+        "z": 60
+      },
+      "end": {
+        "x": -625.569217455,
+        "y": 1090.768013857,
+        "z": 60
+      },
+      "planLength": 480.033324785,
+      "length3d": 480.033324785,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10545",
+      "blockName": "Pipe40165",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -625.569217455,
+        "y": 1090.768013857,
+        "z": 60
+      },
+      "end": {
+        "x": -625.569217455,
+        "y": 1038.82410931,
+        "z": 60
+      },
+      "planLength": 51.943904548,
+      "length3d": 51.943904548,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10567",
+      "blockName": "Pipe40482",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "end": {
+        "x": -2313.410271041,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "planLength": 379.70214734,
+      "length3d": 379.70214734,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10895",
+      "blockName": "Pipe40484",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "planLength": 142.290558003,
+      "length3d": 142.290558003,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10917",
+      "blockName": "Pipe40486",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "planLength": 168,
+      "length3d": 168,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10939",
+      "blockName": "Pipe40488",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "planLength": 120,
+      "length3d": 120,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-10961",
+      "blockName": "Pipe40490",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1221.625522138,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "planLength": 1456.417027512,
+      "length3d": 1456.417027512,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-12309",
+      "blockName": "Pipe40492",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -2936.212628173,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "planLength": 3171.004133547,
+      "length3d": 3171.004133547,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-13759",
+      "blockName": "Pipe40494",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -845.597755453,
+        "z": 60
+      },
+      "end": {
+        "x": 261.26846783,
+        "y": -845.597755453,
+        "z": 60
+      },
+      "planLength": 26.476962457,
+      "length3d": 26.476962457,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-13781",
+      "blockName": "Pipe40496",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2916.132875991,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "planLength": 223.020457609,
+      "length3d": 223.020457609,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-13803",
+      "blockName": "Pipe40498",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "planLength": 2927.903923755,
+      "length3d": 2927.903923755,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-14641",
+      "blockName": "Pipe40500",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2313.410271041,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "planLength": 379.70214734,
+      "length3d": 379.70214734,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-15071",
+      "blockName": "Pipe40502",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2313.410271041,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "planLength": 2548.201776415,
+      "length3d": 2548.201776415,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-17541",
+      "blockName": "Pipe40504",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "planLength": 2927.903923755,
+      "length3d": 2927.903923755,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-19195",
+      "blockName": "Pipe40506",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "planLength": 2927.903923755,
+      "length3d": 2927.903923755,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-20951",
+      "blockName": "Pipe40508",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -920.468624766,
+        "z": 60
+      },
+      "end": {
+        "x": 335.064635671,
+        "y": -920.468624766,
+        "z": 60
+      },
+      "planLength": 100.273130297,
+      "length3d": 100.273130297,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-20973",
+      "blockName": "Pipe40510",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -845.597755453,
+        "z": 60
+      },
+      "planLength": 50.228735329,
+      "length3d": 50.228735329,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-20995",
+      "blockName": "Pipe40512",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "planLength": 216,
+      "length3d": 216,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21017",
+      "blockName": "Pipe40514",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -337.73414043,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "planLength": 142.365120305,
+      "length3d": 142.365120305,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21039",
+      "blockName": "Pipe40516",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -337.73414043,
+        "z": 60
+      },
+      "planLength": 73.634879695,
+      "length3d": 73.634879695,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21163",
+      "blockName": "Pipe40518",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "planLength": 102,
+      "length3d": 102,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21185",
+      "blockName": "Pipe40520",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -845.597755453,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -920.468624766,
+        "z": 60
+      },
+      "planLength": 74.870869313,
+      "length3d": 74.870869313,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21207",
+      "blockName": "Pipe40522",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "planLength": 168,
+      "length3d": 168,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21229",
+      "blockName": "Pipe40524",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "planLength": 216,
+      "length3d": 216,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21251",
+      "blockName": "Pipe40526",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "planLength": 216,
+      "length3d": 216,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21273",
+      "blockName": "Pipe40528",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -1065.930215511,
+        "z": 60
+      },
+      "planLength": 48.561195387,
+      "length3d": 48.561195387,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21295",
+      "blockName": "Pipe40530",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -920.468624766,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "planLength": 96.900395358,
+      "length3d": 96.900395358,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21317",
+      "blockName": "Pipe40532",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "planLength": 216,
+      "length3d": 216,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21441",
+      "blockName": "Pipe40534",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "planLength": 216,
+      "length3d": 216,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21463",
+      "blockName": "Pipe40536",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 234.791505374,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "planLength": 216,
+      "length3d": 216,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21485",
+      "blockName": "Pipe40538",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2557.60042821,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2557.60042821,
+        "y": -402.376918276,
+        "z": 60
+      },
+      "planLength": 8.992101848,
+      "length3d": 8.992101848,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21507",
+      "blockName": "Pipe40539",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2557.60042821,
+        "y": -402.376918276,
+        "z": 60
+      },
+      "end": {
+        "x": -2557.60042821,
+        "y": -402.376918276,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21531",
+      "blockName": "Pipe40541",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 39.881901647,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 39.881901647,
+        "y": -733.357711493,
+        "z": 60
+      },
+      "planLength": 62.011308632,
+      "length3d": 62.011308632,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21553",
+      "blockName": "Pipe40542",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 39.881901647,
+        "y": -733.357711493,
+        "z": 60
+      },
+      "end": {
+        "x": 39.881901647,
+        "y": -733.357711493,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21577",
+      "blockName": "Pipe40544",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2869.60042821,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "end": {
+        "x": -2869.60042821,
+        "y": -558.376918276,
+        "z": 60
+      },
+      "planLength": 4.717340149,
+      "length3d": 4.717340149,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21599",
+      "blockName": "Pipe40545",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2869.60042821,
+        "y": -558.376918276,
+        "z": 60
+      },
+      "end": {
+        "x": -2869.60042821,
+        "y": -558.376918276,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21623",
+      "blockName": "Pipe40547",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -105.486892135,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -105.486892135,
+        "y": -872.76197151,
+        "z": 60
+      },
+      "planLength": 24.607048615,
+      "length3d": 24.607048615,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21645",
+      "blockName": "Pipe40548",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -105.486892135,
+        "y": -872.76197151,
+        "z": 60
+      },
+      "end": {
+        "x": -105.486892135,
+        "y": -872.76197151,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21669",
+      "blockName": "Pipe40550",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1874.154050237,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1874.154050237,
+        "y": -737.275922879,
+        "z": 60
+      },
+      "planLength": 58.093097245,
+      "length3d": 58.093097245,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21691",
+      "blockName": "Pipe40551",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1874.154050237,
+        "y": -737.275922879,
+        "z": 60
+      },
+      "end": {
+        "x": -1874.154050237,
+        "y": -737.275922879,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21715",
+      "blockName": "Pipe40553",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1404.731940628,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1404.731940628,
+        "y": -1052.147128431,
+        "z": 60
+      },
+      "planLength": 34.778108306,
+      "length3d": 34.778108306,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21737",
+      "blockName": "Pipe40554",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1404.731940628,
+        "y": -1052.147128431,
+        "z": 60
+      },
+      "end": {
+        "x": -1404.731940628,
+        "y": -1052.147128431,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21761",
+      "blockName": "Pipe40556",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 345.907150497,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 345.907150497,
+        "y": 118.16508313,
+        "z": 60
+      },
+      "planLength": 97.534103255,
+      "length3d": 97.534103255,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21783",
+      "blockName": "Pipe40557",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 345.907150497,
+        "y": 118.16508313,
+        "z": 60
+      },
+      "end": {
+        "x": 345.907150497,
+        "y": 118.16508313,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21807",
+      "blockName": "Pipe40559",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 474.440285418,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 474.440285418,
+        "y": 406.080777266,
+        "z": 60
+      },
+      "planLength": 46.550202609,
+      "length3d": 46.550202609,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21829",
+      "blockName": "Pipe40560",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 474.440285418,
+        "y": 406.080777266,
+        "z": 60
+      },
+      "end": {
+        "x": 474.440285418,
+        "y": 406.080777266,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21853",
+      "blockName": "Pipe40562",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2594.536066222,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2594.536066222,
+        "y": -371.465494728,
+        "z": 60
+      },
+      "planLength": 39.903525396,
+      "length3d": 39.903525396,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21875",
+      "blockName": "Pipe40563",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2594.536066222,
+        "y": -371.465494728,
+        "z": 60
+      },
+      "end": {
+        "x": -2594.536066222,
+        "y": -371.465494728,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21899",
+      "blockName": "Pipe40565",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 279.004045287,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 279.004045287,
+        "y": 34.080777266,
+        "z": 60
+      },
+      "planLength": 13.449797391,
+      "length3d": 13.449797391,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21921",
+      "blockName": "Pipe40566",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 279.004045287,
+        "y": 34.080777266,
+        "z": 60
+      },
+      "end": {
+        "x": 279.004045287,
+        "y": 34.080777266,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21945",
+      "blockName": "Pipe40568",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1999.910386903,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1999.910386903,
+        "y": -1026.282984256,
+        "z": 60
+      },
+      "planLength": 8.913964132,
+      "length3d": 8.913964132,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-21967",
+      "blockName": "Pipe40569",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1999.910386903,
+        "y": -1026.282984256,
+        "z": 60
+      },
+      "end": {
+        "x": -1999.910386903,
+        "y": -1026.282984256,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-21991",
+      "blockName": "Pipe40571",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 323.613524275,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 323.613524275,
+        "y": -627.369020125,
+        "z": 10.75
+      },
+      "planLength": 0,
+      "length3d": 49.25,
+      "deltaZ": -49.25
+    },
+    {
+      "id": "pipe-22015",
+      "blockName": "Pipe40573",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -14.706203444,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -14.706203444,
+        "y": -156.570328912,
+        "z": 60
+      },
+      "planLength": 38.798691213,
+      "length3d": 38.798691213,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22037",
+      "blockName": "Pipe40574",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -14.706203444,
+        "y": -156.570328912,
+        "z": 60
+      },
+      "end": {
+        "x": -14.706203444,
+        "y": -156.570328912,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22061",
+      "blockName": "Pipe40576",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 19.613524275,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 19.613524275,
+        "y": -469.515998951,
+        "z": 60
+      },
+      "planLength": 58.146978826,
+      "length3d": 58.146978826,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22083",
+      "blockName": "Pipe40577",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 19.613524275,
+        "y": -469.515998951,
+        "z": 60
+      },
+      "end": {
+        "x": 19.613524275,
+        "y": -469.515998951,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22107",
+      "blockName": "Pipe40579",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 343.421225938,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 343.421225938,
+        "y": -348.150251643,
+        "z": 60
+      },
+      "planLength": 63.218768482,
+      "length3d": 63.218768482,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22129",
+      "blockName": "Pipe40580",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 343.421225938,
+        "y": -348.150251643,
+        "z": 60
+      },
+      "end": {
+        "x": 343.421225938,
+        "y": -348.150251643,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22153",
+      "blockName": "Pipe40582",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -318.74410297,
+        "z": 60
+      },
+      "end": {
+        "x": 216.337928991,
+        "y": -318.74410297,
+        "z": 60
+      },
+      "planLength": 18.453576383,
+      "length3d": 18.453576383,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22175",
+      "blockName": "Pipe40583",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 216.337928991,
+        "y": -318.74410297,
+        "z": 60
+      },
+      "end": {
+        "x": 216.337928991,
+        "y": -318.74410297,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22199",
+      "blockName": "Pipe40585",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -526.590413828,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -526.590413828,
+        "y": -884.707154263,
+        "z": 60
+      },
+      "planLength": 12.661865862,
+      "length3d": 12.661865862,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22221",
+      "blockName": "Pipe40586",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -526.590413828,
+        "y": -884.707154263,
+        "z": 60
+      },
+      "end": {
+        "x": -526.590413828,
+        "y": -884.707154263,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22245",
+      "blockName": "Pipe40588",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 15.083031896,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 15.083031896,
+        "y": -255.602933362,
+        "z": 60
+      },
+      "planLength": 60.233913238,
+      "length3d": 60.233913238,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22267",
+      "blockName": "Pipe40589",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 15.083031896,
+        "y": -255.602933362,
+        "z": 60
+      },
+      "end": {
+        "x": 15.083031896,
+        "y": -255.602933362,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22291",
+      "blockName": "Pipe40591",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -646.590413828,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -646.590413828,
+        "y": -680.707154263,
+        "z": 60
+      },
+      "planLength": 53.338134138,
+      "length3d": 53.338134138,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22313",
+      "blockName": "Pipe40592",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -646.590413828,
+        "y": -680.707154263,
+        "z": 60
+      },
+      "end": {
+        "x": -646.590413828,
+        "y": -680.707154263,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22337",
+      "blockName": "Pipe40594",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 459.057566073,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 459.057566073,
+        "y": -771.124176409,
+        "z": 60
+      },
+      "planLength": 24.244843715,
+      "length3d": 24.244843715,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22359",
+      "blockName": "Pipe40595",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 459.057566073,
+        "y": -771.124176409,
+        "z": 60
+      },
+      "end": {
+        "x": 459.057566073,
+        "y": -771.124176409,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22383",
+      "blockName": "Pipe40597",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -790.590413828,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -790.590413828,
+        "y": -824.707154263,
+        "z": 60
+      },
+      "planLength": 29.338134138,
+      "length3d": 29.338134138,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22405",
+      "blockName": "Pipe40598",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -790.590413828,
+        "y": -824.707154263,
+        "z": 60
+      },
+      "end": {
+        "x": -790.590413828,
+        "y": -824.707154263,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22429",
+      "blockName": "Pipe40600",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 89.523940518,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 89.523940518,
+        "y": -819.999866317,
+        "z": 60
+      },
+      "planLength": 24.630846192,
+      "length3d": 24.630846192,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22451",
+      "blockName": "Pipe40601",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 89.523940518,
+        "y": -819.999866317,
+        "z": 60
+      },
+      "end": {
+        "x": 89.523940518,
+        "y": -819.999866317,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22475",
+      "blockName": "Pipe40603",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -396.376918276,
+        "z": 60
+      },
+      "end": {
+        "x": -2695.60042821,
+        "y": -396.376918276,
+        "z": 60
+      },
+      "planLength": 2.488009828,
+      "length3d": 2.488009828,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22497",
+      "blockName": "Pipe40604",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2695.60042821,
+        "y": -396.376918276,
+        "z": 60
+      },
+      "end": {
+        "x": -2695.60042821,
+        "y": -396.376918276,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22521",
+      "blockName": "Pipe40606",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 5.485532042,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 5.485532042,
+        "y": -995.690210005,
+        "z": 60
+      },
+      "planLength": 21.678810119,
+      "length3d": 21.678810119,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22543",
+      "blockName": "Pipe40607",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 5.485532042,
+        "y": -995.690210005,
+        "z": 60
+      },
+      "end": {
+        "x": 5.485532042,
+        "y": -995.690210005,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22567",
+      "blockName": "Pipe40609",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2472.851553378,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2472.851553378,
+        "y": -371.465494728,
+        "z": 60
+      },
+      "planLength": 39.903525396,
+      "length3d": 39.903525396,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22589",
+      "blockName": "Pipe40610",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2472.851553378,
+        "y": -371.465494728,
+        "z": 60
+      },
+      "end": {
+        "x": -2472.851553378,
+        "y": -371.465494728,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22613",
+      "blockName": "Pipe40612",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -105.486892135,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -105.486892135,
+        "y": -1017.369020125,
+        "z": 10.75
+      },
+      "planLength": 0,
+      "length3d": 49.25,
+      "deltaZ": -49.25
+    },
+    {
+      "id": "pipe-22637",
+      "blockName": "Pipe40614",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1407.748898348,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1407.748898348,
+        "y": -736.391986019,
+        "z": 60
+      },
+      "planLength": 58.977034105,
+      "length3d": 58.977034105,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22659",
+      "blockName": "Pipe40615",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1407.748898348,
+        "y": -736.391986019,
+        "z": 60
+      },
+      "end": {
+        "x": -1407.748898348,
+        "y": -736.391986019,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22683",
+      "blockName": "Pipe40617",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1394.67514827,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1394.67514827,
+        "y": -888.420730059,
+        "z": 60
+      },
+      "planLength": 8.948290065,
+      "length3d": 8.948290065,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22705",
+      "blockName": "Pipe40618",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1394.67514827,
+        "y": -888.420730059,
+        "z": 60
+      },
+      "end": {
+        "x": -1394.67514827,
+        "y": -888.420730059,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22729",
+      "blockName": "Pipe40620",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 345.907150497,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 345.907150497,
+        "y": 202.16508313,
+        "z": 60
+      },
+      "planLength": 34.465896745,
+      "length3d": 34.465896745,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22751",
+      "blockName": "Pipe40621",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 345.907150497,
+        "y": 202.16508313,
+        "z": 60
+      },
+      "end": {
+        "x": 345.907150497,
+        "y": 202.16508313,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22775",
+      "blockName": "Pipe40623",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2423.391499629,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "end": {
+        "x": -2423.391499629,
+        "y": -546.008347723,
+        "z": 60
+      },
+      "planLength": 7.651230404,
+      "length3d": 7.651230404,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22797",
+      "blockName": "Pipe40624",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2423.391499629,
+        "y": -546.008347723,
+        "z": 60
+      },
+      "end": {
+        "x": -2423.391499629,
+        "y": -546.008347723,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22821",
+      "blockName": "Pipe40626",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 474.440285418,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 474.440285418,
+        "y": 226.080777266,
+        "z": 60
+      },
+      "planLength": 10.550202609,
+      "length3d": 10.550202609,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22843",
+      "blockName": "Pipe40627",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 474.440285418,
+        "y": 226.080777266,
+        "z": 60
+      },
+      "end": {
+        "x": 474.440285418,
+        "y": 226.080777266,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22867",
+      "blockName": "Pipe40629",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2129.792790326,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2129.792790326,
+        "y": -646.532085614,
+        "z": 60
+      },
+      "planLength": 19.16306549,
+      "length3d": 19.16306549,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22889",
+      "blockName": "Pipe40630",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2129.792790326,
+        "y": -646.532085614,
+        "z": 60
+      },
+      "end": {
+        "x": -2129.792790326,
+        "y": -646.532085614,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22913",
+      "blockName": "Pipe40633",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1999.910386903,
+        "y": -896.95295549,
+        "z": 60
+      },
+      "end": {
+        "x": -1999.910386903,
+        "y": -896.95295549,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-22937",
+      "blockName": "Pipe40635",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 171.613524275,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 171.613524275,
+        "y": -627.369020125,
+        "z": 10.75
+      },
+      "planLength": 0,
+      "length3d": 49.25,
+      "deltaZ": -49.25
+    },
+    {
+      "id": "pipe-22961",
+      "blockName": "Pipe40637",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 297.809956399,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 297.809956399,
+        "y": -237.187769697,
+        "z": 60
+      },
+      "planLength": 41.818749573,
+      "length3d": 41.818749573,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-22983",
+      "blockName": "Pipe40638",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 297.809956399,
+        "y": -237.187769697,
+        "z": 60
+      },
+      "end": {
+        "x": 297.809956399,
+        "y": -237.187769697,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23007",
+      "blockName": "Pipe40640",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -646.590413828,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -646.590413828,
+        "y": -1064.707154263,
+        "z": 60
+      },
+      "planLength": 47.338134138,
+      "length3d": 47.338134138,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23029",
+      "blockName": "Pipe40641",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -646.590413828,
+        "y": -1064.707154263,
+        "z": 60
+      },
+      "end": {
+        "x": -646.590413828,
+        "y": -1064.707154263,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23053",
+      "blockName": "Pipe40643",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -19.30999436,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -19.30999436,
+        "y": -386.759874724,
+        "z": 60
+      },
+      "planLength": 24.609145401,
+      "length3d": 24.609145401,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23075",
+      "blockName": "Pipe40644",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -19.30999436,
+        "y": -386.759874724,
+        "z": 60
+      },
+      "end": {
+        "x": -19.30999436,
+        "y": -386.759874724,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23099",
+      "blockName": "Pipe40646",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -526.590413828,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -526.590413828,
+        "y": -740.707154263,
+        "z": 60
+      },
+      "planLength": 54.661865862,
+      "length3d": 54.661865862,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23121",
+      "blockName": "Pipe40647",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -526.590413828,
+        "y": -740.707154263,
+        "z": 60
+      },
+      "end": {
+        "x": -526.590413828,
+        "y": -740.707154263,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23145",
+      "blockName": "Pipe40649",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 19.613524275,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 19.613524275,
+        "y": -627.369020125,
+        "z": 10.75
+      },
+      "planLength": 0,
+      "length3d": 49.25,
+      "deltaZ": -49.25
+    },
+    {
+      "id": "pipe-23169",
+      "blockName": "Pipe40651",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -646.590413828,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -646.590413828,
+        "y": -824.707154263,
+        "z": 60
+      },
+      "planLength": 29.338134138,
+      "length3d": 29.338134138,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23191",
+      "blockName": "Pipe40652",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -646.590413828,
+        "y": -824.707154263,
+        "z": 60
+      },
+      "end": {
+        "x": -646.590413828,
+        "y": -824.707154263,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23215",
+      "blockName": "Pipe40654",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 338.376057785,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 338.376057785,
+        "y": -771.124176409,
+        "z": 60
+      },
+      "planLength": 24.244843715,
+      "length3d": 24.244843715,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23237",
+      "blockName": "Pipe40655",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 338.376057785,
+        "y": -771.124176409,
+        "z": 60
+      },
+      "end": {
+        "x": 338.376057785,
+        "y": -771.124176409,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23261",
+      "blockName": "Pipe40657",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2557.60042821,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "end": {
+        "x": -2557.60042821,
+        "y": -558.376918276,
+        "z": 60
+      },
+      "planLength": 4.717340149,
+      "length3d": 4.717340149,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23283",
+      "blockName": "Pipe40658",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2557.60042821,
+        "y": -558.376918276,
+        "z": 60
+      },
+      "end": {
+        "x": -2557.60042821,
+        "y": -558.376918276,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23307",
+      "blockName": "Pipe40660",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -19.602955275,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -19.602955275,
+        "y": -819.999866317,
+        "z": 60
+      },
+      "planLength": 24.630846192,
+      "length3d": 24.630846192,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23329",
+      "blockName": "Pipe40661",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -19.602955275,
+        "y": -819.999866317,
+        "z": 60
+      },
+      "end": {
+        "x": -19.602955275,
+        "y": -819.999866317,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23353",
+      "blockName": "Pipe40664",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2695.60042821,
+        "y": -564.376918276,
+        "z": 60
+      },
+      "end": {
+        "x": -2695.60042821,
+        "y": -564.376918276,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23377",
+      "blockName": "Pipe40666",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -105.486892135,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -105.486892135,
+        "y": -703.490856986,
+        "z": 60
+      },
+      "planLength": 76.121836861,
+      "length3d": 76.121836861,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23399",
+      "blockName": "Pipe40667",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -105.486892135,
+        "y": -703.490856986,
+        "z": 60
+      },
+      "end": {
+        "x": -105.486892135,
+        "y": -703.490856986,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23423",
+      "blockName": "Pipe40669",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1730.154050237,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1730.154050237,
+        "y": -737.275922879,
+        "z": 60
+      },
+      "planLength": 58.093097245,
+      "length3d": 58.093097245,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23445",
+      "blockName": "Pipe40670",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1730.154050237,
+        "y": -737.275922879,
+        "z": 60
+      },
+      "end": {
+        "x": -1730.154050237,
+        "y": -737.275922879,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23469",
+      "blockName": "Pipe40672",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -790.590413828,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -790.590413828,
+        "y": -680.707154263,
+        "z": 60
+      },
+      "planLength": 53.338134138,
+      "length3d": 53.338134138,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23491",
+      "blockName": "Pipe40673",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -790.590413828,
+        "y": -680.707154263,
+        "z": 60
+      },
+      "end": {
+        "x": -790.590413828,
+        "y": -680.707154263,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23515",
+      "blockName": "Pipe40675",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 13.621770836,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 13.621770836,
+        "y": 90.271526402,
+        "z": 60
+      },
+      "planLength": 69.640546527,
+      "length3d": 69.640546527,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23537",
+      "blockName": "Pipe40676",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 13.621770836,
+        "y": 90.271526402,
+        "z": 60
+      },
+      "end": {
+        "x": 13.621770836,
+        "y": 90.271526402,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23561",
+      "blockName": "Pipe40678",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1569.748898348,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1569.748898348,
+        "y": -736.391986019,
+        "z": 60
+      },
+      "planLength": 58.977034105,
+      "length3d": 58.977034105,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23583",
+      "blockName": "Pipe40679",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1569.748898348,
+        "y": -736.391986019,
+        "z": 60
+      },
+      "end": {
+        "x": -1569.748898348,
+        "y": -736.391986019,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23607",
+      "blockName": "Pipe40681",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 468.440285418,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 468.440285418,
+        "y": 556.080777266,
+        "z": 60
+      },
+      "planLength": 103.449797391,
+      "length3d": 103.449797391,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23629",
+      "blockName": "Pipe40682",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 468.440285418,
+        "y": 556.080777266,
+        "z": 60
+      },
+      "end": {
+        "x": 468.440285418,
+        "y": 556.080777266,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23653",
+      "blockName": "Pipe40684",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2428.578774062,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2428.578774062,
+        "y": -417.060424653,
+        "z": 60
+      },
+      "planLength": 5.691404529,
+      "length3d": 5.691404529,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23675",
+      "blockName": "Pipe40685",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2428.578774062,
+        "y": -417.060424653,
+        "z": 60
+      },
+      "end": {
+        "x": -2428.578774062,
+        "y": -417.060424653,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23699",
+      "blockName": "Pipe40687",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 459.004045287,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 459.004045287,
+        "y": 34.080777266,
+        "z": 60
+      },
+      "planLength": 13.449797391,
+      "length3d": 13.449797391,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23721",
+      "blockName": "Pipe40688",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 459.004045287,
+        "y": 34.080777266,
+        "z": 60
+      },
+      "end": {
+        "x": 459.004045287,
+        "y": 34.080777266,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23745",
+      "blockName": "Pipe40690",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2018.154050237,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2018.154050237,
+        "y": -737.275922879,
+        "z": 60
+      },
+      "planLength": 58.093097245,
+      "length3d": 58.093097245,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23767",
+      "blockName": "Pipe40691",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2018.154050237,
+        "y": -737.275922879,
+        "z": 60
+      },
+      "end": {
+        "x": -2018.154050237,
+        "y": -737.275922879,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23791",
+      "blockName": "Pipe40693",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 323.613524275,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 323.613524275,
+        "y": -469.515998951,
+        "z": 60
+      },
+      "planLength": 58.146978826,
+      "length3d": 58.146978826,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23813",
+      "blockName": "Pipe40694",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 323.613524275,
+        "y": -469.515998951,
+        "z": 60
+      },
+      "end": {
+        "x": 323.613524275,
+        "y": -469.515998951,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23837",
+      "blockName": "Pipe40696",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 99.004045287,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 99.004045287,
+        "y": 34.080777266,
+        "z": 60
+      },
+      "planLength": 13.449797391,
+      "length3d": 13.449797391,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23859",
+      "blockName": "Pipe40697",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 99.004045287,
+        "y": 34.080777266,
+        "z": 60
+      },
+      "end": {
+        "x": 99.004045287,
+        "y": 34.080777266,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23883",
+      "blockName": "Pipe40699",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2869.60042821,
+        "y": -337.73414043,
+        "z": 60
+      },
+      "end": {
+        "x": -2869.60042821,
+        "y": -390.376918276,
+        "z": 60
+      },
+      "planLength": 52.642777846,
+      "length3d": 52.642777846,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23905",
+      "blockName": "Pipe40700",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2869.60042821,
+        "y": -390.376918276,
+        "z": 60
+      },
+      "end": {
+        "x": -2869.60042821,
+        "y": -390.376918276,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23929",
+      "blockName": "Pipe40705",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 458.130204777,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 458.130204777,
+        "y": -351.825226007,
+        "z": 60
+      },
+      "planLength": 59.543794118,
+      "length3d": 59.543794118,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23951",
+      "blockName": "Pipe40706",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 458.130204777,
+        "y": -351.825226007,
+        "z": 60
+      },
+      "end": {
+        "x": 458.130204777,
+        "y": -351.825226007,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-23975",
+      "blockName": "Pipe40708",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 101.471814383,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 101.471814383,
+        "y": -255.602933362,
+        "z": 60
+      },
+      "planLength": 60.233913238,
+      "length3d": 60.233913238,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-23997",
+      "blockName": "Pipe40709",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 101.471814383,
+        "y": -255.602933362,
+        "z": 60
+      },
+      "end": {
+        "x": 101.471814383,
+        "y": -255.602933362,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-24021",
+      "blockName": "Pipe40712",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -502.590413828,
+        "y": -1015.584966056,
+        "z": 60
+      },
+      "end": {
+        "x": -502.590413828,
+        "y": -1015.584966056,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-24045",
+      "blockName": "Pipe40714",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 86.848007943,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 86.848007943,
+        "y": -386.759874724,
+        "z": 60
+      },
+      "planLength": 24.609145401,
+      "length3d": 24.609145401,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24067",
+      "blockName": "Pipe40715",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 86.848007943,
+        "y": -386.759874724,
+        "z": 60
+      },
+      "end": {
+        "x": 86.848007943,
+        "y": -386.759874724,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-24091",
+      "blockName": "Pipe40717",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -646.590413828,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -646.590413828,
+        "y": -974.707154263,
+        "z": 60
+      },
+      "planLength": 42.661865862,
+      "length3d": 42.661865862,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24113",
+      "blockName": "Pipe40718",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -646.590413828,
+        "y": -974.707154263,
+        "z": 60
+      },
+      "end": {
+        "x": -646.590413828,
+        "y": -974.707154263,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-24137",
+      "blockName": "Pipe40720",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -790.590413828,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -790.590413828,
+        "y": -980.707154263,
+        "z": 60
+      },
+      "planLength": 36.661865862,
+      "length3d": 36.661865862,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24159",
+      "blockName": "Pipe40721",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -790.590413828,
+        "y": -980.707154263,
+        "z": 60
+      },
+      "end": {
+        "x": -790.590413828,
+        "y": -980.707154263,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-24183",
+      "blockName": "Pipe40724",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 210.633397416,
+        "y": -796.569679867,
+        "z": 60
+      },
+      "end": {
+        "x": 210.633397416,
+        "y": -796.569679867,
+        "z": 12.75
+      },
+      "planLength": 0,
+      "length3d": 47.25,
+      "deltaZ": -47.25
+    },
+    {
+      "id": "pipe-24207",
+      "blockName": "Pipe40726",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "planLength": 216,
+      "length3d": 216,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24229",
+      "blockName": "Pipe40728",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "planLength": 216,
+      "length3d": 216,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24251",
+      "blockName": "Pipe40730",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2896.78824947,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "planLength": 203.675831088,
+      "length3d": 203.675831088,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24273",
+      "blockName": "Pipe40732",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -2936.212628173,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "planLength": 243.100209791,
+      "length3d": 243.100209791,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24295",
+      "blockName": "Pipe40734",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -553.659578127,
+        "z": 60
+      },
+      "planLength": 73.709441997,
+      "length3d": 73.709441997,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24419",
+      "blockName": "Pipe40736",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2896.78824947,
+        "y": -897.369020125,
+        "z": 60
+      },
+      "planLength": 203.675831088,
+      "length3d": 203.675831088,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24441",
+      "blockName": "Pipe40738",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -2936.212628173,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "planLength": 243.100209791,
+      "length3d": 243.100209791,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-24463",
+      "blockName": "Pipe40740",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -1221.625522138,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "planLength": 1456.417027512,
+      "length3d": 1456.417027512,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25505",
+      "blockName": "Pipe40742",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2936.212628173,
+        "y": -195.369020125,
+        "z": 60
+      },
+      "planLength": 243.100209791,
+      "length3d": 243.100209791,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25527",
+      "blockName": "Pipe40746",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2912.371420834,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "planLength": 219.259002453,
+      "length3d": 219.259002453,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25651",
+      "blockName": "Pipe40748",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": 452.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": 458.003936973,
+        "z": 60
+      },
+      "planLength": 5.372957097,
+      "length3d": 5.372957097,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25673",
+      "blockName": "Pipe40750",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2693.112418382,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2765.626158885,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "planLength": 72.513740503,
+      "length3d": 72.513740503,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25695",
+      "blockName": "Pipe40979",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1130.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1130.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25717",
+      "blockName": "Pipe40980",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -290.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -290.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25739",
+      "blockName": "Pipe40981",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2234.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2234.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25761",
+      "blockName": "Pipe40982",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2330.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2330.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25783",
+      "blockName": "Pipe40983",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2450.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2450.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25805",
+      "blockName": "Pipe40984",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -914.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -914.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25827",
+      "blockName": "Pipe40985",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1250.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1250.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25849",
+      "blockName": "Pipe40986",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -170.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -170.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25871",
+      "blockName": "Pipe40987",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2570.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2570.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25893",
+      "blockName": "Pipe40988",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1010.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1010.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25915",
+      "blockName": "Pipe40990",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2138.64478536,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2138.64478536,
+        "y": -747.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25937",
+      "blockName": "Pipe40991",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2678.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2678.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25959",
+      "blockName": "Pipe40992",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2798.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2798.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-25981",
+      "blockName": "Pipe40996",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 457.421225938,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 457.421225938,
+        "y": -27.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-26003",
+      "blockName": "Pipe40997",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 457.421225938,
+        "y": -27.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 457.421225938,
+        "y": -27.369020125,
+        "z": 58.75
+      },
+      "planLength": 0,
+      "length3d": 1.25,
+      "deltaZ": -1.25
+    },
+    {
+      "id": "pipe-26027",
+      "blockName": "Pipe40998",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 289.421225938,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 289.421225938,
+        "y": -27.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-26049",
+      "blockName": "Pipe40999",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 289.421225938,
+        "y": -27.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 289.421225938,
+        "y": -27.369020125,
+        "z": 58.75
+      },
+      "planLength": 0,
+      "length3d": 1.25,
+      "deltaZ": -1.25
+    },
+    {
+      "id": "pipe-26073",
+      "blockName": "Pipe41000",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 97.421225938,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 97.421225938,
+        "y": -27.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-26095",
+      "blockName": "Pipe41001",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 97.421225938,
+        "y": -27.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 97.421225938,
+        "y": -27.369020125,
+        "z": 58.75
+      },
+      "planLength": 0,
+      "length3d": 1.25,
+      "deltaZ": -1.25
+    },
+    {
+      "id": "pipe-26119",
+      "blockName": "Pipe41002",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1221.625522138,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "planLength": 1471.486896243,
+      "length3d": 1471.486896243,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-26855",
+      "blockName": "Pipe41004",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 166.405969882,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 166.405969882,
+        "y": 273.836407198,
+        "z": 60
+      },
+      "planLength": 37.205427323,
+      "length3d": 37.205427323,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-26877",
+      "blockName": "Pipe41005",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 166.405969882,
+        "y": 273.836407198,
+        "z": 60
+      },
+      "end": {
+        "x": 166.405969882,
+        "y": 273.836407198,
+        "z": 58.9375
+      },
+      "planLength": 0,
+      "length3d": 1.0625,
+      "deltaZ": -1.0625
+    },
+    {
+      "id": "pipe-26901",
+      "blockName": "Pipe41006",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 337.421225938,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 337.421225938,
+        "y": 273.836407198,
+        "z": 60
+      },
+      "planLength": 37.205427323,
+      "length3d": 37.205427323,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-26923",
+      "blockName": "Pipe41007",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 337.421225938,
+        "y": 273.836407198,
+        "z": 60
+      },
+      "end": {
+        "x": 337.421225938,
+        "y": 273.836407198,
+        "z": 58
+      },
+      "planLength": 0,
+      "length3d": 2,
+      "deltaZ": -2
+    },
+    {
+      "id": "pipe-26947",
+      "blockName": "Pipe41008",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -6.091920431,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -6.091920431,
+        "y": 273.836407198,
+        "z": 60
+      },
+      "planLength": 37.205427323,
+      "length3d": 37.205427323,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-26969",
+      "blockName": "Pipe41009",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -6.091920431,
+        "y": 273.836407198,
+        "z": 60
+      },
+      "end": {
+        "x": -6.091920431,
+        "y": 273.836407198,
+        "z": 58.9375
+      },
+      "planLength": 0,
+      "length3d": 1.0625,
+      "deltaZ": -1.0625
+    },
+    {
+      "id": "pipe-26993",
+      "blockName": "Pipe40744",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 234.791505374,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "planLength": 2927.903923755,
+      "length3d": 2927.903923755,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-29463",
+      "blockName": "Pipe41012",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 171.613524275,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 171.613524275,
+        "y": -475.515998951,
+        "z": 60
+      },
+      "planLength": 64.146978826,
+      "length3d": 64.146978826,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-29485",
+      "blockName": "Pipe41013",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 171.613524275,
+        "y": -475.515998951,
+        "z": 60
+      },
+      "end": {
+        "x": 171.613524275,
+        "y": -475.515998951,
+        "z": 0.75
+      },
+      "planLength": 0,
+      "length3d": 59.25,
+      "deltaZ": -59.25
+    },
+    {
+      "id": "pipe-29509",
+      "blockName": "Pipe41735",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 435.812904539,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 435.812904539,
+        "y": -920.977101176,
+        "z": 60
+      },
+      "planLength": 96.391918949,
+      "length3d": 96.391918949,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-29531",
+      "blockName": "Pipe41736",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 435.812904539,
+        "y": -920.977101176,
+        "z": 60
+      },
+      "end": {
+        "x": 435.812904539,
+        "y": -920.977101176,
+        "z": 0.75
+      },
+      "planLength": 0,
+      "length3d": 59.25,
+      "deltaZ": -59.25
+    },
+    {
+      "id": "pipe-29555",
+      "blockName": "Pipe41740",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 459.685898926,
+        "y": -411.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": 459.685898926,
+        "y": -503.119429406,
+        "z": 60
+      },
+      "planLength": 91.750409281,
+      "length3d": 91.750409281,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-29577",
+      "blockName": "Pipe41742",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2126.64478536,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2126.64478536,
+        "y": -807.369020125,
+        "z": 60
+      },
+      "planLength": 12,
+      "length3d": 12,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-29599",
+      "blockName": "Pipe41744",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2210.64478536,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2210.64478536,
+        "y": -807.369020125,
+        "z": 60
+      },
+      "planLength": 12,
+      "length3d": 12,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-29621",
+      "blockName": "Pipe41746",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1221.625522138,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -2693.112418382,
+        "y": -795.369020125,
+        "z": 60
+      },
+      "planLength": 1471.486896243,
+      "length3d": 1471.486896243,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31071",
+      "blockName": "Pipe40989",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -410.64478536,
+        "y": -627.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -410.64478536,
+        "y": -675.369020125,
+        "z": 60
+      },
+      "planLength": 48,
+      "length3d": 48,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31093",
+      "blockName": "Pipe41763",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -24.600242209,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -24.600242209,
+        "y": -1051.473221489,
+        "z": 60
+      },
+      "planLength": 34.104201364,
+      "length3d": 34.104201364,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31115",
+      "blockName": "Pipe41767",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -834.122954149,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -834.122954149,
+        "y": -1051.473221489,
+        "z": 60
+      },
+      "planLength": 34.104201364,
+      "length3d": 34.104201364,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31137",
+      "blockName": "Pipe41771",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -1436.653782783,
+        "y": -1017.369020125,
+        "z": 60
+      },
+      "end": {
+        "x": -1436.653782783,
+        "y": -985.208493169,
+        "z": 60
+      },
+      "planLength": 32.160526955,
+      "length3d": 32.160526955,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31159",
+      "blockName": "Pipe41776",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -2473.406445827,
+        "y": -627.722170485,
+        "z": 60
+      },
+      "end": {
+        "x": -2473.406445827,
+        "y": -615.904080173,
+        "z": 60
+      },
+      "planLength": 11.818090312,
+      "length3d": 11.818090312,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31181",
+      "blockName": "Pipe41781",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": -30.915824826,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": -30.915824826,
+        "y": -11.877298099,
+        "z": 60
+      },
+      "planLength": 32.508277974,
+      "length3d": 32.508277974,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31203",
+      "blockName": "Pipe41785",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 14.171516093,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 14.171516093,
+        "y": 208.390821783,
+        "z": 60
+      },
+      "planLength": 28.240158093,
+      "length3d": 28.240158093,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31225",
+      "blockName": "Pipe41789",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 110.266757847,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 110.266757847,
+        "y": 208.390821783,
+        "z": 60
+      },
+      "planLength": 28.240158093,
+      "length3d": 28.240158093,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31247",
+      "blockName": "Pipe41793",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 206.266757847,
+        "y": 236.630979875,
+        "z": 60
+      },
+      "end": {
+        "x": 206.266757847,
+        "y": 208.390821783,
+        "z": 60
+      },
+      "planLength": 28.240158093,
+      "length3d": 28.240158093,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31269",
+      "blockName": "Pipe41802",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 110.266757847,
+        "y": 112.390821783,
+        "z": 60
+      },
+      "end": {
+        "x": 110.266757847,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "planLength": 91.759841907,
+      "length3d": 91.759841907,
+      "deltaZ": 0
+    },
+    {
+      "id": "pipe-31291",
+      "blockName": "Pipe41804",
+      "layer": "AS_SPRINKLER SYSTEM_PIPES",
+      "start": {
+        "x": 206.266757847,
+        "y": 112.390821783,
+        "z": 60
+      },
+      "end": {
+        "x": 206.266757847,
+        "y": 20.630979875,
+        "z": 60
+      },
+      "planLength": 91.759841907,
+      "length3d": 91.759841907,
+      "deltaZ": 0
+    }
+  ],
+  "sprinklers": [
+    {
+      "id": "sprinkler-122",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2869.60042821,
+        "y": -396.376918276,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-184",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1999.910386903,
+        "y": -890.95295549,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-200",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1999.910386903,
+        "y": -1032.282984256,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-216",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2018.154050237,
+        "y": -731.275922879,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-232",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2129.792790326,
+        "y": -652.532085614,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-248",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2594.536066222,
+        "y": -365.465494728,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-264",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2423.391499629,
+        "y": -420.075749504,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-280",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2423.391499629,
+        "y": -540.008347723,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-296",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1569.748898348,
+        "y": -730.391986019,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-312",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1394.67514827,
+        "y": -882.420730059,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-328",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1404.731940628,
+        "y": -1058.147128431,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-344",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -790.590413828,
+        "y": -686.707154263,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-360",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -105.486892135,
+        "y": -1017.369020125,
+        "z": -2
+      }
+    },
+    {
+      "id": "sprinkler-376",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -105.486892135,
+        "y": -866.76197151,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-392",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -105.486892135,
+        "y": -709.490856986,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-408",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 5.485532042,
+        "y": -989.690210005,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-424",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 39.881901647,
+        "y": -727.357711493,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-440",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -19.602955275,
+        "y": -825.999866317,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-456",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 89.523940518,
+        "y": -825.999866317,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-472",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 210.633397416,
+        "y": -802.569679867,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-488",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 338.376057785,
+        "y": -765.124176409,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-504",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 459.057566073,
+        "y": -765.124176409,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-520",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 19.613524275,
+        "y": -627.369020125,
+        "z": -2
+      }
+    },
+    {
+      "id": "sprinkler-536",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 15.083031896,
+        "y": -261.602933362,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-552",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 86.848007943,
+        "y": -380.759874724,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-568",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 210.337928991,
+        "y": -318.74410297,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-584",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 101.471814383,
+        "y": -261.602933362,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-600",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -19.30999436,
+        "y": -380.759874724,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-616",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 337.890018494,
+        "y": -345.825226007,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-632",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 458.130204777,
+        "y": -345.825226007,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-648",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 297.809956399,
+        "y": -243.187769697,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-664",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -14.706203444,
+        "y": -150.570328912,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-680",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 99.004045287,
+        "y": 40.080777266,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-696",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 279.004045287,
+        "y": 40.080777266,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-712",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 459.004045287,
+        "y": 40.080777266,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-728",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 474.440285418,
+        "y": 220.080777266,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-744",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 474.440285418,
+        "y": 400.080777266,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-760",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 474.440285418,
+        "y": 556.080777266,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-776",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 345.907150497,
+        "y": 196.16508313,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-792",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 345.907150497,
+        "y": 124.16508313,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-808",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 13.621770836,
+        "y": 96.271526402,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-824",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1407.748898348,
+        "y": -730.391986019,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-840",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1874.154050237,
+        "y": -731.275922879,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-856",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1730.154050237,
+        "y": -731.275922879,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-872",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2472.851553378,
+        "y": -365.465494728,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-888",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2869.60042821,
+        "y": -564.376918276,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-904",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2701.60042821,
+        "y": -564.376918276,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-920",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2701.60042821,
+        "y": -396.376918276,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-936",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2557.60042821,
+        "y": -396.376918276,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-952",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2557.60042821,
+        "y": -564.376918276,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-968",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -790.590413828,
+        "y": -830.707154263,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-984",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -790.590413828,
+        "y": -974.707154263,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1000",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -646.590413828,
+        "y": -830.707154263,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1016",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -646.590413828,
+        "y": -686.707154263,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1032",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -646.590413828,
+        "y": -974.707154263,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1048",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.590413828,
+        "y": -734.707154263,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1064",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.590413828,
+        "y": -878.707154263,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1080",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -502.590413828,
+        "y": -1009.584966056,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1096",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -646.590413828,
+        "y": -1070.707154263,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1112",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 19.613524275,
+        "y": -475.515998951,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1128",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 171.613524275,
+        "y": -475.515998951,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1144",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 171.613524275,
+        "y": -627.369020125,
+        "z": -2
+      }
+    },
+    {
+      "id": "sprinkler-1160",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 323.613524275,
+        "y": -627.369020125,
+        "z": -2
+      }
+    },
+    {
+      "id": "sprinkler-1176",
+      "blockName": "Fitting8_5950143_03",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 323.613524275,
+        "y": -475.515998951,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-1193",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -170.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-1237",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -290.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-1253",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -410.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-1269",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -410.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1285",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -170.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1301",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -290.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1317",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -170.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1333",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -410.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1349",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -290.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1365",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 69.35521464,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1381",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 69.35521464,
+        "y": -920.468624766,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1397",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 189.35521464,
+        "y": -920.468624766,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1413",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 189.35521464,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1429",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 309.35521464,
+        "y": -920.468624766,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1445",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 309.35521464,
+        "y": -1017.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-1461",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 429.35521464,
+        "y": -1017.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-1477",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -914.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1493",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -914.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-1509",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -914.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1525",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1010.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1541",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1010.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-1557",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1010.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1573",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1130.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1589",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1130.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-1605",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1130.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1621",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1250.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1637",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1250.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-1653",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1250.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1669",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1490.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1685",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1490.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1701",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1610.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1717",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1610.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1733",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1730.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1749",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1730.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1765",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1850.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1781",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1850.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1797",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2210.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1813",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2210.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1829",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2330.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1845",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2330.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1861",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2450.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1877",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2450.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1893",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2570.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1909",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2570.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1925",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2678.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1941",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2678.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1957",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2798.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1973",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2798.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-1989",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2906.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2005",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2906.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2021",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2906.64478536,
+        "y": -795.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2037",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2798.64478536,
+        "y": -795.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2053",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2678.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-2069",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2570.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-2085",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2450.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-2101",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2330.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-2117",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2210.64478536,
+        "y": -807.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2133",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1250.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2149",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1130.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2165",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1010.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2181",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -914.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2197",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2126.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2213",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2126.64478536,
+        "y": -807.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2229",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2126.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2245",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2246.64478536,
+        "y": -897.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2261",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2246.64478536,
+        "y": -795.369020125,
+        "z": 62
+      }
+    },
+    {
+      "id": "sprinkler-2277",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2246.64478536,
+        "y": -1017.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2293",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2450.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2309",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2798.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2325",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2570.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2341",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2330.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2357",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2678.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2373",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2906.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2389",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2234.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2405",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2138.64478536,
+        "y": -747.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2487",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -170.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2503",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -290.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2597",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1342.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-2637",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -94.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-2653",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1558.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2669",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1990.578774062,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-2685",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2701",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -718.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-2717",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1774.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2733",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 97.421225938,
+        "y": -27.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2749",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1558.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-2765",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 337.421225938,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2781",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -94.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-2797",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-2813",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -6.091920431,
+        "y": 273.836407198,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2829",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1774.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-2845",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 337.421225938,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2861",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1558.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2877",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -94.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2893",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": -411.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2909",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -718.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-2925",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -718.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2941",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1150.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2957",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1558.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-2973",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1342.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-2989",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -94.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3005",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -934.578774062,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-3021",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1342.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3037",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2422.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3053",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -718.578774062,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-3069",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1990.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3085",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2344.447376685,
+        "y": -411.369020125,
+        "z": 62.0625
+      }
+    },
+    {
+      "id": "sprinkler-3101",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2614.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3117",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1774.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3133",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1558.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3149",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1774.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3165",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -718.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3181",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -934.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3197",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3213",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1150.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3229",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1150.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3245",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3261",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -718.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3277",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2422.578774062,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-3293",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -718.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3309",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3325",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1150.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3341",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3357",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2422.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3373",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 289.421225938,
+        "y": -27.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3389",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -94.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3405",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 121.421225938,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3421",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 337.421225938,
+        "y": 255.233693537,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-3437",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -310.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3453",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -934.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3469",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 476.647433096,
+        "y": -627.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-3485",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 121.421225938,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3501",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3517",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1150.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3533",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -310.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3549",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -94.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3565",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2614.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3581",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -934.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3597",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1774.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3613",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1558.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3629",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -718.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3645",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1342.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3661",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -310.578774062,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-3677",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2422.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3693",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -310.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3709",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -94.578774062,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-3725",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -310.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3741",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": -411.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3757",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -934.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3773",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2614.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3789",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3805",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1558.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3821",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1774.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3837",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2422.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3853",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1774.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3869",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -934.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3885",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -310.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3901",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-3917",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1342.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3933",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -310.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-3949",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 121.421225938,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3965",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2422.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3981",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 457.421225938,
+        "y": -27.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-3997",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1990.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4013",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 337.421225938,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4029",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 166.405969882,
+        "y": 273.836407198,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4045",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1990.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4061",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -310.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4077",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 121.421225938,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4093",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -934.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4109",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2422.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4125",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 337.421225938,
+        "y": 644.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-4141",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2614.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4157",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4173",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4189",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4205",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1342.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4221",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1126.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4237",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2422.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4253",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -94.578774062,
+        "y": 236.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4269",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.578774062,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-4285",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1342.578774062,
+        "y": -195.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4301",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2206.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4317",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 121.421225938,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-4333",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4349",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1990.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4365",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1126.578774062,
+        "y": 836.630979875,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-4381",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -934.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4397",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1990.578774062,
+        "y": -411.369020125,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4413",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1990.578774062,
+        "y": 20.630979875,
+        "z": 57.9375
+      }
+    },
+    {
+      "id": "sprinkler-4429",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1150.578774062,
+        "y": 452.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4445",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1990.578774062,
+        "y": 668.630979875,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4461",
+      "blockName": "Fitting11_6401875_01",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -526.578774062,
+        "y": -627.369020125,
+        "z": 58
+      }
+    },
+    {
+      "id": "sprinkler-4594",
+      "blockName": "Fitting8_5950156_021",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 441.761170409,
+        "y": -195.498246364,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-5092",
+      "blockName": "Fitting8_5950156_021",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 435.812904539,
+        "y": -920.977101176,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-5109",
+      "blockName": "Fitting8_5950156_021",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 459.685898926,
+        "y": -503.119429406,
+        "z": 0
+      }
+    },
+    {
+      "id": "sprinkler-5126",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -410.64478536,
+        "y": -675.369020125,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5142",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -24.600242209,
+        "y": -1051.473221489,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5160",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -834.122954149,
+        "y": -1051.473221489,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5177",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -1436.653782783,
+        "y": -985.208493169,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5193",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -2473.406445827,
+        "y": -615.904080173,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5210",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": -30.915824826,
+        "y": -11.877298099,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5228",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 14.171516093,
+        "y": 208.390821783,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5245",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 110.266757847,
+        "y": 208.390821783,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5261",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 206.266757847,
+        "y": 208.390821783,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5278",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 206.266757847,
+        "y": 112.390821783,
+        "z": 60
+      }
+    },
+    {
+      "id": "sprinkler-5294",
+      "blockName": "Fitting8_5950115_04001",
+      "layer": "AS_SPRINKLER SYSTEM_SPRINKLERS",
+      "point": {
+        "x": 110.266757847,
+        "y": 112.390821783,
+        "z": 60
+      }
+    }
+  ],
+  "fittings": [
+    {
+      "id": "fitting-31611",
+      "blockName": "Flex Drop241_6301907_40540",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2557.60042821,
+        "y": -402.376918276,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-32259",
+      "blockName": "Flex Drop241_6301907_40543",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 39.881901647,
+        "y": -733.357711493,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-32907",
+      "blockName": "Flex Drop241_6301907_40546",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2869.60042821,
+        "y": -558.376918276,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-33555",
+      "blockName": "Flex Drop241_6301907_40549",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -105.486892135,
+        "y": -872.76197151,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-34203",
+      "blockName": "Flex Drop241_6301907_40552",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -1874.154050237,
+        "y": -737.275922879,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-34851",
+      "blockName": "Flex Drop241_6301907_40555",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -1404.731940628,
+        "y": -1052.147128431,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-35499",
+      "blockName": "Flex Drop241_6301907_40558",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 345.907150497,
+        "y": 118.16508313,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-36147",
+      "blockName": "Flex Drop241_6301907_40561",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 474.440285418,
+        "y": 406.080777266,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-36795",
+      "blockName": "Flex Drop241_6301907_40564",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2594.536066222,
+        "y": -371.465494728,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-37443",
+      "blockName": "Flex Drop241_6301907_40567",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 279.004045287,
+        "y": 34.080777266,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-38091",
+      "blockName": "Flex Drop241_6301907_40570",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -1999.910386903,
+        "y": -1026.282984256,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-38739",
+      "blockName": "Flex Drop241_6301907_40572",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 323.613524275,
+        "y": -627.369020125,
+        "z": 10
+      }
+    },
+    {
+      "id": "fitting-39387",
+      "blockName": "Flex Drop241_6301907_40575",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -14.706203444,
+        "y": -156.570328912,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-40035",
+      "blockName": "Flex Drop241_6301907_40578",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 19.613524275,
+        "y": -469.515998951,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-40683",
+      "blockName": "Flex Drop241_6301907_40581",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 343.421225938,
+        "y": -348.150251643,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-41331",
+      "blockName": "Flex Drop241_6301907_40584",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 216.337928991,
+        "y": -318.74410297,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-41979",
+      "blockName": "Flex Drop241_6301907_40587",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -526.590413828,
+        "y": -884.707154263,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-42627",
+      "blockName": "Flex Drop241_6301907_40590",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 15.083031896,
+        "y": -255.602933362,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-43275",
+      "blockName": "Flex Drop241_6301907_40593",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -646.590413828,
+        "y": -680.707154263,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-43923",
+      "blockName": "Flex Drop241_6301907_40596",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 459.057566073,
+        "y": -771.124176409,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-44571",
+      "blockName": "Flex Drop241_6301907_40599",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -790.590413828,
+        "y": -824.707154263,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-45219",
+      "blockName": "Flex Drop241_6301907_40602",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 89.523940518,
+        "y": -819.999866317,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-45867",
+      "blockName": "Flex Drop241_6301907_40605",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2695.60042821,
+        "y": -396.376918276,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-46515",
+      "blockName": "Flex Drop241_6301907_40608",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 5.485532042,
+        "y": -995.690210005,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-47163",
+      "blockName": "Flex Drop241_6301907_40611",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2472.851553378,
+        "y": -371.465494728,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-47811",
+      "blockName": "Flex Drop241_6301907_40613",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -105.486892135,
+        "y": -1017.369020125,
+        "z": 10
+      }
+    },
+    {
+      "id": "fitting-48459",
+      "blockName": "Flex Drop241_6301907_40616",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -1407.748898348,
+        "y": -736.391986019,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-49107",
+      "blockName": "Flex Drop241_6301907_40619",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -1394.67514827,
+        "y": -888.420730059,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-49755",
+      "blockName": "Flex Drop241_6301907_40622",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 345.907150497,
+        "y": 202.16508313,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-50403",
+      "blockName": "Flex Drop241_6301907_40625",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2423.391499629,
+        "y": -546.008347723,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-51051",
+      "blockName": "Flex Drop241_6301907_40628",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 474.440285418,
+        "y": 226.080777266,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-51699",
+      "blockName": "Flex Drop241_6301907_40631",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2129.792790326,
+        "y": -646.532085614,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-52347",
+      "blockName": "Flex Drop241_6301907_40634",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -1999.910386903,
+        "y": -896.95295549,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-52995",
+      "blockName": "Flex Drop241_6301907_40636",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 171.613524275,
+        "y": -627.369020125,
+        "z": 10
+      }
+    },
+    {
+      "id": "fitting-53643",
+      "blockName": "Flex Drop241_6301907_40639",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 297.809956399,
+        "y": -237.187769697,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-54291",
+      "blockName": "Flex Drop241_6301907_40642",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -646.590413828,
+        "y": -1064.707154263,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-54939",
+      "blockName": "Flex Drop241_6301907_40645",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -19.30999436,
+        "y": -386.759874724,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-55587",
+      "blockName": "Flex Drop241_6301907_40648",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -526.590413828,
+        "y": -740.707154263,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-56235",
+      "blockName": "Flex Drop241_6301907_40650",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 19.613524275,
+        "y": -627.369020125,
+        "z": 10
+      }
+    },
+    {
+      "id": "fitting-56883",
+      "blockName": "Flex Drop241_6301907_40653",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -646.590413828,
+        "y": -824.707154263,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-57531",
+      "blockName": "Flex Drop241_6301907_40656",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 338.376057785,
+        "y": -771.124176409,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-58179",
+      "blockName": "Flex Drop241_6301907_40659",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2557.60042821,
+        "y": -558.376918276,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-58827",
+      "blockName": "Flex Drop241_6301907_40662",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -19.602955275,
+        "y": -819.999866317,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-59475",
+      "blockName": "Flex Drop241_6301907_40665",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2695.60042821,
+        "y": -564.376918276,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-60123",
+      "blockName": "Flex Drop241_6301907_40668",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -105.486892135,
+        "y": -703.490856986,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-60771",
+      "blockName": "Flex Drop241_6301907_40671",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -1730.154050237,
+        "y": -737.275922879,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-61419",
+      "blockName": "Flex Drop241_6301907_40674",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -790.590413828,
+        "y": -680.707154263,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-62067",
+      "blockName": "Flex Drop241_6301907_40677",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 13.621770836,
+        "y": 90.271526402,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-62715",
+      "blockName": "Flex Drop241_6301907_40680",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -1569.748898348,
+        "y": -736.391986019,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-63363",
+      "blockName": "Flex Drop241_6301907_40683",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 468.440285418,
+        "y": 556.080777266,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-64011",
+      "blockName": "Flex Drop241_6301907_40686",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2428.578774062,
+        "y": -417.060424653,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-64659",
+      "blockName": "Flex Drop241_6301907_40689",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 459.004045287,
+        "y": 34.080777266,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-65307",
+      "blockName": "Flex Drop241_6301907_40692",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2018.154050237,
+        "y": -737.275922879,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-65955",
+      "blockName": "Flex Drop241_6301907_40695",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 323.613524275,
+        "y": -469.515998951,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-66603",
+      "blockName": "Flex Drop241_6301907_40698",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 99.004045287,
+        "y": 34.080777266,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-67251",
+      "blockName": "Flex Drop241_6301907_40701",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -2869.60042821,
+        "y": -390.376918276,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-67899",
+      "blockName": "Flex Drop241_6301907_40707",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 458.130204777,
+        "y": -351.825226007,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-68547",
+      "blockName": "Flex Drop241_6301907_40710",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 101.471814383,
+        "y": -255.602933362,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-69195",
+      "blockName": "Flex Drop241_6301907_40713",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -502.590413828,
+        "y": -1015.584966056,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-69843",
+      "blockName": "Flex Drop241_6301907_40716",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 86.848007943,
+        "y": -386.759874724,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-70491",
+      "blockName": "Flex Drop241_6301907_40719",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -640.590413828,
+        "y": -974.707154263,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-71139",
+      "blockName": "Flex Drop241_6301907_40722",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": -790.590413828,
+        "y": -980.707154263,
+        "z": 12
+      }
+    },
+    {
+      "id": "fitting-71787",
+      "blockName": "Flex Drop241_6301907_40725",
+      "layer": "AS_SPRINKLER SYSTEM_FITTINGS",
+      "point": {
+        "x": 210.633397416,
+        "y": -796.569679867,
+        "z": 12
+      }
+    }
+  ],
+  "claims": {
+    "sourceArchiveHashVerified": true,
+    "exactSourceDrawingXyzReady": true,
+    "sourceDrawingUnitConversionReady": false,
+    "approvedPdfRegistrationReady": true,
+    "pitchedRoofCalibrationReady": false,
+    "newHopeExactPipeCenterlineZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "loop": "native-autosprink-cad-3d-intake-20260715",
+  "stage": "VERIFY",
+  "status": "bounded-calibration-verified",
+  "iteration": 1,
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "browser", "formal"]
+  },
+  "sourceEvidence": {
+    "nativeCad": {
+      "sha256": "1CBD6B94271DBD482E572230089535BF48D6C2BC8BF686022A10C79802510BA8",
+      "byteLength": 36805317,
+      "archiveEntries": 8,
+      "drawingSeidbBytes": 39008232,
+      "rootOffset": 39002555,
+      "typeCatalogOffset": 39002906,
+      "typeCount": 157,
+      "requiredSpatialTypes": ["CEltPipe", "CEltSprinkler", "CEltFitting", "CEltRoof", "CEltCeiling"],
+      "nativeElementGeometryRecordDecodeReady": false
+    },
+    "exportedDwg": {
+      "sha256": "93C002A7A8F689A441FBD17C3602106DA99013CD1070430A17E792EF29081A9B",
+      "byteLength": 2298805,
+      "pipes": 248,
+      "sprinklers": 271,
+      "fittings": 63,
+      "distinctPipeElevations": 7,
+      "verticalTransitions": 71
+    },
+    "approvedPdf": {
+      "sha256": "BB65A4FED0CDEF28B6503C3E613EB7674CAC1642383374078BA4F240969EE04C",
+      "byteLength": 12075291,
+      "registeredPage": 1,
+      "sprinklerResidualMedianPx": 2.828427,
+      "sprinklerResidualP95Px": 11.022681,
+      "renderedPageWidthPx": 3111
+    }
+  },
+  "verification": {
+    "nativeArchiveReplay": "passed against protected Y-drive source",
+    "focusedTests": "18 passed across native intake, New Hope grade envelope, proper pitched graph, and FP2.0 architectural vertical controls",
+    "productionBuild": "passed",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "browser": {
+      "url": "http://127.0.0.1:5175/src/data/proofs/eos-ellsworth-native-cad/index.html",
+      "title": "AutoSPRINK native 3D calibration proof",
+      "imagesDecoded": 3,
+      "consoleWarningsOrErrors": 0,
+      "visualInspection": "approved FP1 remains visible under green source-DWG pipe centerlines and coral WCS sprinkler points"
+    },
+    "formalProof": {
+      "status": "verified",
+      "prover": "Lean 4.13.0 on GX10",
+      "elapsedMs": 92,
+      "receipt": "data/agent-loops/native-autosprink-cad-3d-intake-20260715/lean-proof.json"
+    },
+    "brainPostflight": {
+      "status": "recorded",
+      "episodeId": 149155
+    },
+    "developmentDependencyBoundary": "@mlightcad/libredwg-web@0.4.2 is GPL-2.0-only and remains a read-only development extractor; it is not imported into the production browser bundle."
+  },
+  "claims": {
+    "nativeCadArchiveIntakeReady": true,
+    "nativeElementTypeCatalogReady": true,
+    "nativeElementGeometryRecordDecodeReady": false,
+    "pairedDwgExactSourceXyzReady": true,
+    "approvedPdfPlanProjectionRegistrationReady": true,
+    "sourceDrawingUnitConversionReady": false,
+    "pitchedRoofCalibrationReady": false,
+    "newHopeExactPipeCenterlineZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "nextAction": "Use the verified native catalog plus paired DWG answer key to implement the bounded SEiDB element-record decoder, and locate a completed pitched-roof native CAD plus approved PDF pair before promoting New Hope exact pipe Z, direction, continuous grade, fittings, drains, fabrication, or field release."
+}

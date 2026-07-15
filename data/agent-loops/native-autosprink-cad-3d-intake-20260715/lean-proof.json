@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/native-autosprink-cad-3d-intake-20260715/lean-request.json",
+  "theoremNames": [
+    "nativeCadArchiveBoundsAndCounts",
+    "pairedDwgGeometryCountsAreNonzero",
+    "nativeCatalogAndPairedDwgDoNotPromotePitchedRelease"
+  ],
+  "claim": "The hash-bound native AutoSPRINK archive has bounded SEiDB offsets and a nonempty spatial type catalog; the paired exported DWG has nonzero pipe, sprinkler, fitting, elevation, and vertical-transition evidence; those bounded facts do not promote native element decoding, unit conversion, pitched-roof calibration, New Hope exact Z, proper layout, fabrication, or field release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 92,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

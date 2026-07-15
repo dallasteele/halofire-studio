@@ -1,0 +1,49 @@
+{
+  "schema": "halofire.autosprink-native-cad-inspection.v1",
+  "source": {
+    "fileName": "FP1 EOS Fitness Ellsworth.cad",
+    "byteLength": 36805317,
+    "sha256": "1CBD6B94271DBD482E572230089535BF48D6C2BC8BF686022A10C79802510BA8",
+    "hashVerified": true
+  },
+  "archive": {
+    "entryCount": 8,
+    "entries": [
+      { "name": "drawing.SEiDB", "compressedSize": 2732464, "uncompressedSize": 39008232 },
+      { "name": "sheet_1.SEiDB", "compressedSize": 638358, "uncompressedSize": 29680299 },
+      { "name": "sheet_2.SEiDB", "compressedSize": 2207462, "uncompressedSize": 55436251 },
+      { "name": "sheet_3.SEiDB", "compressedSize": 12247049, "uncompressedSize": 166480765 },
+      { "name": "sheet_4.SEiDB", "compressedSize": 9483415, "uncompressedSize": 130436153 },
+      { "name": "sheet_5.SEiDB", "compressedSize": 9489899, "uncompressedSize": 130469344 },
+      { "name": "TreeItem.bmp", "compressedSize": 132, "uncompressedSize": 246 },
+      { "name": "CADThumb.bmp", "compressedSize": 5704, "uncompressedSize": 36918 }
+    ]
+  },
+  "drawingSeidb": {
+    "rootOffset": 39002555,
+    "typeCatalogOffset": 39002906,
+    "byteLength": 39008232,
+    "typeCount": 157,
+    "nativeSpatialTypesReady": true,
+    "missingRequiredTypes": [],
+    "requiredTypes": [
+      { "name": "CEltSprinkler", "id": 87 },
+      { "name": "CEltFitting", "id": 23 },
+      { "name": "CEltCeiling", "id": 103 },
+      { "name": "CEltPipe", "id": 79 },
+      { "name": "CEltRoof", "id": 125 }
+    ],
+    "geometryRecordDecodeReady": false,
+    "unsupportedBoundary": "Native SEiDB element payload records are not decoded; exact XYZ comes from the paired exported DWG only."
+  },
+  "claims": {
+    "nativeCadArchiveIntakeReady": true,
+    "nativeElementTypeCatalogReady": true,
+    "nativeElementGeometryRecordDecodeReady": false,
+    "exactSourceDrawingXyzReady": false,
+    "newHopeExactPipeCenterlineZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}
