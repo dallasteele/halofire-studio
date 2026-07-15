@@ -46,10 +46,13 @@
     "apps/autosprink/src/engine/new-hope-cross-main-drainage.js",
     "apps/autosprink/src/engine/new-hope-central-branch-drainage.js",
     "apps/autosprink/src/engine/new-hope-arm-over-drainage.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js",
     "apps/autosprink/tests/new-hope-cross-main-drainage.test.js",
     "apps/autosprink/tests/new-hope-central-branch-drainage.test.js",
     "apps/autosprink/tests/new-hope-arm-over-drainage.test.js",
+    "apps/autosprink/tests/new-hope-proper-pipe-layout.test.js",
     "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "data/agent-loops/cross-main-and-central-loop-20260715/lean-proper-layout-proof.json",
     "data/agent-loops/cross-main-and-central-loop-20260715/state.json"
   ],
   "max_iterations": 8,

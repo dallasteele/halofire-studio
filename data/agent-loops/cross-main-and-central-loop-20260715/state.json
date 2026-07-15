@@ -1,8 +1,8 @@
 {
   "loop": "cross-main-and-central-loop-20260715",
   "stage": "VERIFY",
-  "status": "whole-fp20-relative-grade-passed-exact-z-fittings-field-drains-open",
-  "iteration": 3,
+  "status": "proper-layout-contract-passed-exact-z-datum-fittings-field-drains-open",
+  "iteration": 4,
   "brainPreflight": {
     "status": "passed",
     "topEpisodes": [148709, 148734, 148662, 148601, 148360]
@@ -51,6 +51,17 @@
     "armOverFabricationBindingReady": true,
     "armOverCrossProjectMethodCalibrationReady": true,
     "wholeFp20GradeDirectionReady": true,
+    "properPipeEvidenceAssemblyReady": true,
+    "directedCanonicalEdgeCount": 140,
+    "canonicalEdgeCount": 143,
+    "exactElevationPortCount": 32,
+    "exactElevationCanonicalNodeCount": 31,
+    "sameXyVerticalLegReady": true,
+    "calculationToArchitecturalDatumRegistrationReady": false,
+    "sourceFeed3dPathReady": false,
+    "lowPointZoneGradeReady": false,
+    "fieldDrainRoutesReady": false,
+    "fittingScheduleReady": false,
     "exactPipeCenterlineZReady": false,
     "properPipeLayoutReady": false,
     "fabricationReady": false,
@@ -114,9 +125,38 @@
     },
     "formalProof": "verified"
   },
+  "properPipeLayoutEvidence": {
+    "canonicalNodes": 142,
+    "canonicalEdges": 143,
+    "directedEdges": 140,
+    "undirectedSourceFeedEdges": 2,
+    "undirectedLowPointZoneEdges": 1,
+    "directionConflicts": 0,
+    "exactElevationPorts": 32,
+    "exactElevationCanonicalNodes": 31,
+    "sameXyVerticalLegCount": 1,
+    "calculationAnchorRangeFt": [11.5, 21.5],
+    "remainingAcceptanceBlockers": [
+      "NH_PROPER_PIPE_LOW_POINT_ZONE_GRADE_UNRESOLVED",
+      "NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED",
+      "NH_PROPER_PIPE_CALC_ARCH_DATUM_UNREGISTERED",
+      "NH_PROPER_PIPE_EXACT_Z_INCOMPLETE",
+      "NH_PROPER_PIPE_FIELD_DRAIN_ROUTES_UNRESOLVED",
+      "NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE"
+    ],
+    "browser": {
+      "actualPdfUnderlays": true,
+      "properLayoutAuditVisible": true,
+      "machineGateValuesVerified": true,
+      "consoleWarningsOrErrors": 0
+    },
+    "focusedTests": "37 passed",
+    "productionBuild": "passed",
+    "formalProof": "verified"
+  },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 148985
+    "episodeId": 149894
   },
-  "nextAction": "Bind exact pipe centerline Z from architectural side views and coordinated source offsets, then resolve field drain routes and fitting identities without using roof Z, hydraulic flow, nearest-low-point, or shortest-path shortcuts."
+  "nextAction": "Register the approved calculation elevation datum to A201/A301 side-view datums and coordinated DWG controls, then propagate only source-constrained pipe Z while keeping the two supply transitions, low-point tie-in, field drains, and fittings fail-closed until their exact evidence resolves."
 }

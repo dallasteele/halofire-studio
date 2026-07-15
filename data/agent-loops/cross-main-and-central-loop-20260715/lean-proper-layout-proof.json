@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/cross-main-and-central-loop-20260715/lean-proper-layout-request.json",
+  "theoremNames": [
+    "wholeNewHopeDirectionInventory",
+    "exactElevationPortInventory",
+    "partialElevationCannotPromoteProperLayout"
+  ],
+  "claim": "The five independent drainage schedules uniquely cover 140 canonical edges and the two source-feed plus one low-point-zone exceptions close the 143-edge inventory. Thirty-one canonical nodes plus the second same-XY vertical port produce 32 exact elevation ports, while partial Z coverage and five unresolved engineering conditions cannot promote exact pipe-centerline Z or proper-layout readiness.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 73,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}
