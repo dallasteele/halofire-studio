@@ -96,6 +96,130 @@
       }
     ]
   },
+  "armOverFabricationEvidence": {
+    "artifactType": "halofire.approved-fp20-arm-over-fabrication-evidence.v1",
+    "fieldSet": {
+      "fileName": "24-052_NHCC_INSTALL PLAN.pdf",
+      "sheet": "FP2.0",
+      "physicalPage": 4,
+      "sha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5"
+    },
+    "fabricationListing": {
+      "fileName": "24-052_NHCC_LIST.PDF",
+      "sha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734",
+      "software": "AutoSPRINK 2023 v18.1.44.0",
+      "threadedPipelinePages": [41, 42]
+    },
+    "fabricationArchive": {
+      "fileName": "NEW HOPE CRISIS CENTER_NHCC List.FAB",
+      "sha256": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9"
+    },
+    "bindingRule": "Equal-length listing pieces are bound as source-supported sets unless the plan or listing distinguishes the individual segment; no one-to-one assignment is inferred.",
+    "groups": [
+      {
+        "id": "bl48-terminal-arm-overs",
+        "lineName": "BL48",
+        "sourceSegmentIds": ["pipe-016", "pipe-020"],
+        "sourceEdgeIds": ["source-edge-021", "source-edge-030"],
+        "pieceIds": ["BL48.08", "BL48.09"],
+        "listedCutLengthsIn": [42, 42],
+        "terminalFitting": "1 x 1/2 Threaded 90 degree Reducing Elbow DI",
+        "carrierRole": "branch-line",
+        "drainageCatchmentId": "cmk-riser-return"
+      },
+      {
+        "id": "bl49-terminal-arm-overs",
+        "lineName": "BL49",
+        "sourceSegmentIds": ["pipe-017", "pipe-021"],
+        "sourceEdgeIds": ["source-edge-022", "source-edge-031"],
+        "pieceIds": ["BL49.07", "BL49.08"],
+        "listedCutLengthsIn": [54, 54],
+        "terminalFitting": "1 x 1/2 Threaded 90 degree Reducing Elbow DI",
+        "carrierRole": "branch-line",
+        "drainageCatchmentId": "cmk-riser-return"
+      },
+      {
+        "id": "cmi-long-terminal-arm-overs",
+        "lineName": "CMI",
+        "sourceSegmentIds": ["pipe-044", "pipe-045"],
+        "sourceEdgeIds": ["source-edge-084", "source-edge-085"],
+        "pieceIds": ["CMI.25", "CMI.29"],
+        "listedCutLengthsIn": [80.5, 80.5],
+        "terminalFitting": "1 inch Threaded 90 degree Elbow",
+        "carrierRole": "cross-main",
+        "drainageCatchmentId": "riser-return"
+      },
+      {
+        "id": "cmi-short-terminal-arm-overs",
+        "lineName": "CMI",
+        "sourceSegmentIds": ["pipe-054", "pipe-055"],
+        "sourceEdgeIds": ["source-edge-108", "source-edge-109"],
+        "pieceIds": ["CMI.23", "CMI.27"],
+        "listedCutLengthsIn": [20, 20],
+        "terminalFitting": "1 inch Threaded 90 degree Elbow",
+        "carrierRole": "cross-main",
+        "drainageCatchmentId": "riser-return"
+      },
+      {
+        "id": "cmh-terminal-arm-overs",
+        "lineName": "CMH",
+        "sourceSegmentIds": ["pipe-046", "pipe-056"],
+        "sourceEdgeIds": ["source-edge-086", "source-edge-110"],
+        "pieceIds": ["CMH.08", "CMH.09"],
+        "listedCutLengthsIn": [84, 24],
+        "terminalFittings": ["1 x 1/2 Threaded 90 degree Reducing Elbow DI", "1 inch Threaded 90 degree Elbow"],
+        "carrierRole": "branch-line",
+        "drainageCatchmentId": "low-point-02"
+      },
+      {
+        "id": "cmj-terminal-arm-overs",
+        "lineName": "CMJ",
+        "sourceSegmentIds": ["pipe-047", "pipe-057"],
+        "sourceEdgeIds": ["source-edge-087", "source-edge-111"],
+        "pieceIds": ["CMJ.08", "CMJ.09"],
+        "listedCutLengthsIn": [84, 24],
+        "terminalFittings": ["1 x 1/2 Threaded 90 degree Reducing Elbow DI", "1 inch Threaded 90 degree Elbow"],
+        "carrierRole": "branch-line",
+        "drainageCatchmentId": "low-point-03"
+      }
+    ],
+    "terminalSprinklerBindings": [
+      { "sourceEdgeId": "source-edge-021", "sourceSegmentId": "pipe-016", "terminalCanonicalNodeId": "canonical-node-025", "carrierCanonicalNodeId": "canonical-node-026", "sprinklerId": "head-001", "symbolType": "TY-FRB", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-022", "sourceSegmentId": "pipe-017", "terminalCanonicalNodeId": "canonical-node-027", "carrierCanonicalNodeId": "canonical-node-028", "sprinklerId": "head-002", "symbolType": "TY-FRB", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-030", "sourceSegmentId": "pipe-020", "terminalCanonicalNodeId": "canonical-node-034", "carrierCanonicalNodeId": "canonical-node-033", "sprinklerId": "head-005", "symbolType": "TY-FRB", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-031", "sourceSegmentId": "pipe-021", "terminalCanonicalNodeId": "canonical-node-035", "carrierCanonicalNodeId": "canonical-node-031", "sprinklerId": "head-006", "symbolType": "TY-FRB", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-084", "sourceSegmentId": "pipe-044", "terminalCanonicalNodeId": "canonical-node-090", "carrierCanonicalNodeId": "canonical-node-089", "sprinklerId": "head-035", "symbolType": "BB1", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-085", "sourceSegmentId": "pipe-045", "terminalCanonicalNodeId": "canonical-node-092", "carrierCanonicalNodeId": "canonical-node-091", "sprinklerId": "head-036", "symbolType": "BB1", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-086", "sourceSegmentId": "pipe-046", "terminalCanonicalNodeId": "canonical-node-094", "carrierCanonicalNodeId": "canonical-node-093", "sprinklerId": "head-037", "symbolType": "BB1", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-087", "sourceSegmentId": "pipe-047", "terminalCanonicalNodeId": "canonical-node-096", "carrierCanonicalNodeId": "canonical-node-095", "sprinklerId": "head-038", "symbolType": "BB1", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-108", "sourceSegmentId": "pipe-054", "terminalCanonicalNodeId": "canonical-node-118", "carrierCanonicalNodeId": "canonical-node-117", "sprinklerId": "head-053", "symbolType": "BB1", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-109", "sourceSegmentId": "pipe-055", "terminalCanonicalNodeId": "canonical-node-120", "carrierCanonicalNodeId": "canonical-node-119", "sprinklerId": "head-056", "symbolType": "BB1", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-110", "sourceSegmentId": "pipe-056", "terminalCanonicalNodeId": "canonical-node-122", "carrierCanonicalNodeId": "canonical-node-121", "sprinklerId": "head-054", "symbolType": "BB1", "maximumResidualPdfPt": 2 },
+      { "sourceEdgeId": "source-edge-111", "sourceSegmentId": "pipe-057", "terminalCanonicalNodeId": "canonical-node-124", "carrierCanonicalNodeId": "canonical-node-123", "sprinklerId": "head-055", "symbolType": "BB1", "maximumResidualPdfPt": 2 }
+    ],
+    "generatedDrainageRule": {
+      "highEnd": "terminal-sprinkler",
+      "lowEnd": "carrier-junction",
+      "gradeRequirementId": "grade-branch-lines",
+      "riseInPer10Ft": 0.5,
+      "absolutePipeCenterlineZReady": false,
+      "basis": "Terminal threaded sprinkler extensions inherit branch-line grade and drain into their explicitly bound carrier catchment; this is a generated relative schedule, not absolute elevation evidence."
+    },
+    "crossProjectMethodCalibration": {
+      "project": "Boys & Girls Club Community Center - Brigham City UT",
+      "fieldSetListing": {
+        "fileName": "BGC_LIST.PDF",
+        "sha256": "7FE066904709725ABD407C786B28B87E2B34DBC3071DCF6462B66D11F7E7D141",
+        "software": "AutoSPRINK 2023 v18.1.44.0",
+        "threadedPipelinePages": [19, 20]
+      },
+      "installPlan": {
+        "fileName": "BGC_INSTALL PLAN.pdf",
+        "sha256": "6F20B0AD824AAAE6A8A71FAC46E5FAF89E5904EEF0AD762CF98B8D0ED186B252"
+      },
+      "scope": "Validates the line-piece-plan and elevation-tag extraction method only; it does not prove New Hope grade, absolute Z, or compliance."
+    }
+  },
   "hydraulicCalculationSources": {
     "calculationReport": {
       "role": "approved-autosprink-hydraulic-calculations",

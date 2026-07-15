@@ -20,7 +20,7 @@ describe('New Hope PDF-bound visual proof', () => {
 
   it('states the missing pipe-layout facts instead of presenting a connector as a design', () => {
     const html = read('index.html');
-    expect(html).toContain('CENTRAL BL48/BL49 LOOP + COMPLETE CROSS-MAIN DRAINAGE BOUND');
+    expect(html).toContain('WHOLE-SHEET PIPE DIRECTION + ALL 12 ARM-OVERS BOUND');
     expect(html).toContain('primaryPipeVectorExtractionReady=false');
     expect(html).toContain('wholeSystemVectorExtractionReady=false');
     expect(html).toContain('primaryPipeSizeAssignmentReady=false');
@@ -89,6 +89,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('evaluateNewHopeSideBranchDrainage');
     expect(script).toContain('evaluateNewHopeCrossMainDrainage');
     expect(script).toContain('evaluateNewHopeCentralBranchDrainage');
+    expect(script).toContain('evaluateNewHopeArmOverDrainage');
     expect(script).toContain('calibration.trussLattice.centerlines');
     expect(script).toContain('calibration.branch.nodes');
     expect(script).toContain('pipeVectors.pipeSegments');
@@ -111,7 +112,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.sideBranchLowPointBindingReady = String(sideBranchDrainage.sideBranchLowPointBindingReady)');
     expect(script).toContain('dataset.sideBranchLineGradeDirectionReady = String(sideBranchDrainage.sideBranchLineGradeDirectionReady)');
     expect(script).toContain('dataset.sideBranchRelativeGradeProfilesReady = String(sideBranchDrainage.sideBranchRelativeGradeProfilesReady)');
-    expect(script).toContain('dataset.sideBranchArmOverDrainageReady = String(sideBranchDrainage.sideBranchArmOverDrainageReady)');
+    expect(script).toContain('dataset.sideBranchArmOverDrainageReady = String(armOverDrainage.sideBranchArmOverDrainageReady)');
     expect(script).toContain('dataset.crossMainSourceTopologyReady = String(crossMainDrainage.crossMainSourceTopologyReady)');
     expect(script).toContain('dataset.crossMainHighPointBindingReady = String(crossMainDrainage.crossMainHighPointBindingReady)');
     expect(script).toContain('dataset.crossMainLowPointBindingReady = String(crossMainDrainage.crossMainLowPointBindingReady)');
@@ -129,7 +130,9 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.centralBranchRelativeGradeProfilesReady = String(centralBranchDrainage.centralBranchRelativeGradeProfilesReady)');
     expect(script).toContain('dataset.centralLoopDirectionReady = String(centralBranchDrainage.centralLoopDirectionReady)');
     expect(script).toContain('dataset.selectedLoopHighPointAbsoluteZReady = String(centralBranchDrainage.selectedLoopHighPointAbsoluteZReady)');
-    expect(script).toContain('dataset.centralBranchArmOverDrainageReady = String(centralBranchDrainage.centralBranchArmOverDrainageReady)');
+    expect(script).toContain('dataset.centralBranchArmOverDrainageReady = String(armOverDrainage.centralBranchArmOverDrainageReady)');
+    expect(script).toContain('dataset.allTwelveArmOverDrainageReady = String(armOverDrainage.allTwelveArmOverDrainageReady)');
+    expect(script).toContain('dataset.wholeFp20GradeDirectionReady = String(armOverDrainage.wholeFp20GradeDirectionReady)');
     expect(script).toContain('dataset.boundedRidgeBranchGradeDirectionReady = String(ridgeGrade.boundedBranchGradeDirectionReady)');
     expect(script).toContain('dataset.boundedRidgeBranchDrainCatchmentReady = String(ridgeGrade.boundedBranchDrainCatchmentReady)');
     expect(script).toContain('dataset.boundedDeflectorGradeEnvelopeReady = String(ridgeGrade.boundedDeflectorGradeEnvelopeReady)');
@@ -145,12 +148,14 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('cross-main-relative-profile');
     expect(script).toContain('central-branch-grade-vector');
     expect(script).toContain('central-branch-relative-profile');
+    expect(script).toContain('arm-over-grade-vector');
+    expect(script).toContain('arm-over-relative-profile');
     expect(script).toContain('dataset.pipeVectorStatus = vectorAcceptance.status');
     expect(script).toContain('dataset.primaryPipeSizeAssignmentReady = String(governedSkeleton.primaryPipeSizeAssignmentReady)');
     expect(script).toContain('dataset.primaryPipeRoleAssignmentReady = String(governedSkeleton.primaryPipeRoleAssignmentReady)');
     expect(script).toContain('dataset.wholeSystemVectorExtractionReady = String(governedSkeleton.wholeSystemVectorExtractionReady)');
-    expect(script).toContain('dataset.properPipeLayoutReady = String(governedSkeleton.properPipeLayoutReady)');
-    expect(script).toContain('dataset.branchGradeDirectionReady = String(governedSkeleton.gradeDirectionReady)');
+    expect(script).toContain('dataset.properPipeLayoutReady = String(armOverDrainage.properPipeLayoutReady)');
+    expect(script).toContain('dataset.branchGradeDirectionReady = String(armOverDrainage.wholeFp20GradeDirectionReady)');
     expect(script).toContain('dataset.endpointElevationsReady = String(governedSkeleton.endpointElevationsReady)');
     expect(script).toContain('dataset.route21HydraulicNodeBindingReady = String(hydraulicRoute21.route21HydraulicNodeBindingReady)');
     expect(script).toContain('dataset.route21ExplicitPlanPathReady = String(hydraulicRoute21.explicitPlanPathReady)');
@@ -159,7 +164,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.approvedRemoteAreaSetReady = String(hydraulicRouteSet.approvedRemoteAreaSetReady)');
     expect(script).toContain("dataset.drainDestinationReady = 'false'");
     expect(script).toContain('evaluateProperPitchedPipeGraph');
-    expect(script).toContain("dataset.pipeGraphStatus = governedSkeleton.properPipeLayoutReady ? 'passed' : 'blocked'");
+    expect(script).toContain("dataset.pipeGraphStatus = armOverDrainage.properPipeLayoutReady ? 'passed' : 'blocked'");
     expect(script).toContain('hydraulicRouteSet.remainingBlockers');
   });
 });

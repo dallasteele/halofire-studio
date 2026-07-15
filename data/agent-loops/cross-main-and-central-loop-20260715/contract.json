@@ -1,7 +1,7 @@
 {
   "name": "cross-main-and-central-loop-20260715",
   "owner": "codex",
-  "goal": "Bind the approved FP2.0 cross-main tree and central looped branch component to explicit source topology, riser/high-point evidence, low-point catchments, calculation elevations, grade direction, and truthful unresolved vertical conditions without deriving drainage from hydraulic flow.",
+  "goal": "Bind the approved FP2.0 cross-main tree, central looped branch component, and all 12 terminal arm-overs to explicit source topology, fabrication groups, sprinkler terminals, carrier junctions, drainage catchments, and relative grade direction while keeping exact vertical and field-release conditions fail-closed.",
   "loop_type": "closed",
   "sources_of_truth": [
     "E:/ClaudeBot/AGENTIC_RULES.md",
@@ -24,7 +24,8 @@
     "the 0.25-inch-per-10-foot cross-main grade is represented independently from hydraulic flow",
     "the central 23-edge BL48/BL49 component retains its exact eight-edge fabricated loop and is graded on both arms toward the sole CMK.03 feed without using shortest path",
     "the BL48.02/CMI plan crossing remains explicitly separated because the fabrication listing proves no fitting or outlet",
-    "unknown endpoint Z, arm-over offsets, field drains, or loop decisions remain typed fail-closed blockers",
+    "all 12 one-inch terminal arm-overs bind to exact source edges, terminal sprinklers, fabrication groups, carrier segments, and source-backed drainage catchments",
+    "unknown endpoint Z, fitting identities, field drains, or compliance decisions remain typed fail-closed blockers",
     "actual-PDF top-down and relative elevation proof render without obscuring the source",
     "focused tests, adversarial mutations, production build, formal proof, rules verification, and brain postflight pass"
   ],
@@ -44,8 +45,10 @@
   "evidence_paths": [
     "apps/autosprink/src/engine/new-hope-cross-main-drainage.js",
     "apps/autosprink/src/engine/new-hope-central-branch-drainage.js",
+    "apps/autosprink/src/engine/new-hope-arm-over-drainage.js",
     "apps/autosprink/tests/new-hope-cross-main-drainage.test.js",
     "apps/autosprink/tests/new-hope-central-branch-drainage.test.js",
+    "apps/autosprink/tests/new-hope-arm-over-drainage.test.js",
     "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
     "data/agent-loops/cross-main-and-central-loop-20260715/state.json"
   ],

@@ -4,14 +4,15 @@
   "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
   "requestPath": "data/agent-loops/cross-main-and-central-loop-20260715/lean-cross-main-request.json",
   "theoremNames": [
-    "correctedCrossMainAndCentralCoverage",
+    "correctedCrossMainCentralAndArmOverCoverage",
     "correctedDrainageMinimumFallArithmetic",
-    "correctedDrainageDoesNotPromoteUnprovedVerticalOrWholeLayout"
+    "armOverHalfInchInventoryAndFallUnits",
+    "wholeGradeDirectionDoesNotPromoteUnprovedRelease"
   ],
-  "claim": "The corrected cross-main partitions into 34 uniquely directed edges after adding the four CMK edges, while the exact BL48/BL49 component partitions into 23 uniquely directed edges around its eight-edge fabricated loop. Rounded CMK and central-branch lengths reproduce their required minimum falls. Bounded drainage readiness does not promote unproved high-point Z, arm-over drainage, exact pipe-centerline Z, whole-plan grade direction, or proper-layout readiness.",
+  "claim": "The corrected cross-main partitions into 34 uniquely directed edges, the exact BL48/BL49 component partitions into 23 uniquely directed edges around its eight-edge fabricated loop, and six two-piece fabrication groups cover all 12 terminal arm-overs. Rounded main and branch lengths reproduce their required minimum falls; half-inch arm-over cut units reproduce the exact 0.5-inch-per-10-foot fall units. Whole-sheet relative grade readiness does not promote exact pipe-centerline Z, fabrication, field release, or proper-layout readiness.",
   "result": {
     "status": "verified",
-    "elapsedMs": 96,
+    "elapsedMs": 90,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

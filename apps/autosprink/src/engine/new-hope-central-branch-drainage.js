@@ -5,7 +5,8 @@
  * prove BL48.02 crosses CMI without a fitting or outlet. BL49 is a real loop:
  * the generated design selects its far fabricated merge as the relative high
  * junction and grades both arms back to the sole CMK feed. Absolute Z and the
- * four attached arm-over offsets remain intentionally unresolved.
+ * four attached arm-overs are delegated to the downstream threaded evidence
+ * gate. Absolute pipe-centerline Z remains intentionally unresolved.
  */
 
 const EXPECTED_PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut';

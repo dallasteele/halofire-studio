@@ -4,8 +4,9 @@
  * roles, and source-preserved low-point/grade annotations. The result validates
  * both complete source components, directs only their branch-line edges toward
  * low-point-02/03, and emits relative trunk-grade profiles. Arm-over drainage
- * and every absolute pipe elevation remain blocked because plan XY does not
- * prove their vertical offsets.
+ * are delegated to the downstream threaded arm-over evidence gate, while
+ * every absolute pipe elevation remains blocked because plan XY does not
+ * prove pipe-centerline Z.
  */
 
 const EXPECTED_PLAN_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5';

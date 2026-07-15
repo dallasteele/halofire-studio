@@ -1,8 +1,8 @@
 {
   "loop": "cross-main-and-central-loop-20260715",
   "stage": "VERIFY",
-  "status": "corrected-cross-main-and-central-loop-passed-armovers-z-open",
-  "iteration": 2,
+  "status": "whole-fp20-relative-grade-passed-exact-z-fittings-field-drains-open",
+  "iteration": 3,
   "brainPreflight": {
     "status": "passed",
     "topEpisodes": [148709, 148734, 148662, 148601, 148360]
@@ -44,8 +44,14 @@
     "centralBranchRelativeGradeProfilesReady": true,
     "centralLoopDirectionReady": true,
     "selectedLoopHighPointAbsoluteZReady": false,
-    "centralBranchArmOverDrainageReady": false,
-    "wholeFp20GradeDirectionReady": false,
+    "centralBranchArmOverDrainageReady": true,
+    "allTwelveArmOverDrainageReady": true,
+    "armOverSourceTopologyReady": true,
+    "armOverTerminalSprinklerBindingReady": true,
+    "armOverFabricationBindingReady": true,
+    "armOverCrossProjectMethodCalibrationReady": true,
+    "wholeFp20GradeDirectionReady": true,
+    "exactPipeCenterlineZReady": false,
     "properPipeLayoutReady": false,
     "fabricationReady": false,
     "fieldReleaseReady": false
@@ -78,7 +84,7 @@
     "cycleRank": 1,
     "loopCoreEdges": 8,
     "pathProfiles": 4,
-    "unresolvedArmOvers": 4,
+    "unresolvedArmOvers": 0,
     "browser": {
       "centralBranchArrows": 23,
       "relativeProfiles": 4,
@@ -87,9 +93,30 @@
     },
     "formalProof": "verified"
   },
+  "armOverEvidence": {
+    "sourceEdges": 12,
+    "terminalSprinklers": 12,
+    "fabricationGroups": 6,
+    "relativeGradeProfiles": 12,
+    "catchments": {
+      "cmk-riser-return": 4,
+      "riser-return": 4,
+      "low-point-02": 2,
+      "low-point-03": 2
+    },
+    "crossProjectMethodCalibrationOnly": true,
+    "browser": {
+      "actualPdfUnderlays": 8,
+      "armOverArrows": 12,
+      "relativeProfiles": 12,
+      "auditRows": 12,
+      "consoleWarningsOrErrors": 0
+    },
+    "formalProof": "verified"
+  },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 148885
+    "episodeId": 148985
   },
-  "nextAction": "Bind the exact vertical offset, orientation, and drainage catchment for the eight remaining arm-over edges from field/elevation/fabrication evidence, then propagate source-backed pipe centerline Z without using roof Z, hydraulic flow, nearest-low-point, or shortest-path shortcuts."
+  "nextAction": "Bind exact pipe centerline Z from architectural side views and coordinated source offsets, then resolve field drain routes and fitting identities without using roof Z, hydraulic flow, nearest-low-point, or shortest-path shortcuts."
 }
