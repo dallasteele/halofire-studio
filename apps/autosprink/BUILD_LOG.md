@@ -1,5 +1,14 @@
 # HaloFire Build Log
 
+## 2026-07-15 - New Hope CMI.09 low-point connector grade registration
+
+- Rendered and visually inspected the actual New Hope field-set FP2.0 low-point crop (`4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5`) beside fabrication-listing page 15 (`2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734`). The field set places CMI.09 at the LOW POINT TIE IN DRAIN; the listing identifies the 2-1/2-inch, 5-foot 4-1/2-inch piece, its 2-1/2 x 2 grooved outlet at 7 inches, and its upward 3/4-inch outlet at cumulative 2 feet 10 inches.
+- Bound CMI.09 to pipe-032/source-edges 052-054 and the actual canonical sequence low-point node 054 -> branch outlet node 059 -> head-017 node 058 -> pipe-038 junction node 057. Source-edge-054 now has one explicit relative drainage direction from node 059 high to node 054 low at the approved 0.5 inch per 10 feet, requiring 0.023917 inch minimum fall across the extracted 0.478339-foot plan run.
+- Preserved approved RA2-2 nodes 182 and 67 at their reported equal 18.375-foot elevations. That rounded table value does not erase the source-proved relative grade, but it also does not promote exact differential or absolute endpoint Z. Whole-sheet direction coverage advances from 140/143 to 141/143; only CML.01's two source-feed transition edges remain directionally unresolved.
+- Verified 118 New Hope/FP2.0 tests across 21 files, including eleven adversarial CMI.09 piece/page/station/orientation/topology/grade/hydraulic/false-Z mutations, plus syntax checks, loop/rules guards, no focused `.only`/`.skip`, `git diff --check`, and the production Vite build. GX10 Lean 4.13.0 verified theorem `newHopeLowPointRelativeGradeDoesNotPromoteExactZ` in 61 ms with return code 0.
+- In-app browser verification decoded all 10 actual PDF images, including the committed field-plan and fabrication-listing sources, with zero failed images and zero console warnings/errors. Machine gates report CMI.09 fabrication, station registration, and relative grade true while exact differential Z and proper layout remain false. The remaining acceptance blockers are source-feed 3D path, exact centerline Z, two field-routed drum drips, and the complete fitting/vertical-offset schedule.
+- Next: map the remaining line-piece fitting and vertical-offset identities from the New Hope field/listing/FAB/calculation corpus, while keeping non-calculated pipe Z and field-routed drain geometry fail-closed.
+
 ## 2026-07-15 - New Hope CML.01 source-feed fabrication registration
 
 - Rendered and visually inspected the exact field-set FP2.0 source (`4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5`) beside fabrication-listing page 20 (`2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734`). Both identify CML.01 as one 4-inch, 2-foot 11-1/2-inch piece with 2 feet 5-1/2 inches before and 6 inches after a 4 x 3 upward grooved outlet.

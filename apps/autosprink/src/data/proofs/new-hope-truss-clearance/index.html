@@ -80,6 +80,7 @@
         <div class="status"><b>All approved calc routes</b>RA2-1, RA2-2, and RA2-3 bind 32 plan-visible legs to exact approved-plan projections; physical flow reverses calculation-table accumulation order.</div>
         <div class="status"><b>Architectural vertical controls</b>A102 RCP, A103 roof, A201 elevations, A301 sections, and the coordinated DWGs bind one 4:12 pitched feature and its roof datums.</div>
         <div class="status"><b>Complete long-branch drainage</b>Two acyclic 14-head systems bind 44 canonical edges and 28 sprinklers to low-point-01 and low-point-04; 43 edges have explicit high-to-low direction and one edge is the low-point zone.</div>
+        <div class="status"><b>CMI.09 low-point connector</b>The actual field set, fabrication listing, plan topology, and RA2-2 jointly resolve source-edge-054 from node 059 high to low-point node 054 at 0.5 in / 10 ft. Equal rounded calculation labels remain separate from exact endpoint Z.</div>
         <div class="status"><b>Mirrored side-branch drainage</b>Two acyclic seven-head components bind 28 branch-line edges to low-point-02 and low-point-03. Their four terminal arm-overs are source-bound to those same catchments.</div>
         <div class="status"><b>Complete cross-main drainage</b>The corrected 35-node, 34-edge source tree includes fabricated CMK.01-.03 and is directed from three high points toward low-point-01, low-point-04, and the dry-valve/base-of-riser return at 0.25 inch per 10 feet.</div>
         <div class="status"><b>Central BL48/BL49 drainage</b>The exact 23-node, 23-edge component retains one eight-edge BL49 loop. A generated relative schedule grades both loop arms and both BL48 terminals toward the sole CMK.03 feed while preserving the non-connecting BL48.02/CMI crossing.</div>
@@ -88,12 +89,23 @@
         <div class="status"><b>Feasible deflector grade envelope</b>At 0.5 inch per 10 feet, the seven heads rise 1.8 inches across 36 feet while remaining inside the bound 19.375-19.875-foot TY4180 deflector band.</div>
         <div class="status closed"><b>Pipe centerline Z blocked</b>The building envelope is registered; the pipe-to-roof/truss offset and every non-calculated endpoint elevation are not yet source-proved.</div>
         <div class="status"><b>Whole-sheet grade direction passed</b>All source-visible gradeable branch, cross-main, central-loop, and 12 arm-over edges now have explicit high-to-low direction and bound drainage destinations.</div>
-        <div class="status"><b>Unified direction audit</b>140 of 143 canonical pipe edges have one conflict-free high-to-low assignment. The exceptions are the two supply-transition edges and the low-point-01 tie-in zone; they are explicitly classified rather than hidden.</div>
+        <div class="status"><b>Unified direction audit</b>141 of 143 canonical pipe edges have one conflict-free high-to-low assignment. Only the two supply-transition edges remain directionally unresolved; they are explicitly classified rather than hidden.</div>
         <div class="status"><b>Exact calculation elevation audit</b>32 exact Z ports bind 31 of 142 canonical plan nodes. Canonical node 142 preserves two ports at 20.5 and 21.5 feet as a real one-foot same-XY vertical leg.</div>
         <div class="status"><b>Finished-floor datum registered</b>FP0.1 defines pipe elevation above finished floor, A102 fixes finished floor at project elevation 100'-0", and all 32 approved calculation ports now carry both local and project elevation. FP2.0 retains six distinct ridge elevations; no global roof plane is permitted.</div>
         <div class="status closed"><b>Field drain routes blocked</b>Two one-inch drum-drip runs explicitly say FIELD ROUTE / LOCATE; exact fabrication geometry cannot be invented.</div>
-        <div class="status closed"><b>Proper layout blocked</b>Complete per-edge absolute Z, connector/fitting topology, obstruction/compliance checks, and field-resolved drains are not closed. Grade direction and the central loop are no longer blockers.</div>
+        <div class="status closed"><b>Proper layout blocked</b>Complete per-edge absolute Z, complete fitting/vertical-offset topology, obstruction/compliance checks, and field-resolved drains are not closed. Grade direction, the CMI.09 connector, and the central loop are no longer blockers.</div>
       </div>
+    </section>
+
+    <section class="evidence-grid" style="margin-top:22px">
+      <figure>
+        <div class="visual"><img src="field-cmi09-low-point.png" alt="Actual New Hope field install plan showing CMI.09 and the low-point drain callout"></div>
+        <figcaption><b>Actual field install plan, not a generated sketch.</b> CMI.09 begins at the LOW POINT TIE IN DRAIN and carries the visible 0'-7, 2'-3, and 2'-6½ station dimensions through its first branch outlet and sprinkler outlet.</figcaption>
+      </figure>
+      <figure>
+        <div class="visual"><img src="listing-cmi09-page15.png" alt="Actual AutoSPRINK fabrication listing page 15 showing CMI.09"></div>
+        <figcaption><b>Actual AutoSPRINK fabrication report.</b> CMI.09 is 2½-inch SCH 10, 5'-4½ long, with the 2½ × 2 GOL at 0'-7 and the 2½ × ¾ TOL at cumulative 2'-10. The machine gate checks these identities and orientations.</figcaption>
+      </figure>
     </section>
 
     <figure class="wide" style="margin-top:22px">
@@ -173,6 +185,7 @@
       <h2>Seven head-to-truss conditional envelopes</h2>
       <p class="loading" id="load-status">Loading sealed calibration...</p>
       <div class="table-wrap"><table><thead><tr><th>Head</th><th>Local X ft</th><th>S102 X pt</th><th>Nearest truss</th><th>Centerline distance in</th><th>Maximum truss face width preserving 6 in</th></tr></thead><tbody id="clearance-rows"></tbody></table></div>
+      <div class="legend"><span id="low-point-fabrication-status">loading CMI.09 low-point fabrication...</span></div>
     </section>
 
     <figure class="wide" style="margin-top:22px">

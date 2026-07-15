@@ -20,7 +20,6 @@ const EXPECTED_PLAN_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B69
 const EXPECTED_UNDIRECTED_EDGE_IDS = Object.freeze([
   'source-edge-001',
   'source-edge-002',
-  'source-edge-054',
 ])
 const EXPECTED_SUPPLY_EDGE_IDS = Object.freeze(['source-edge-001', 'source-edge-002'])
 const EXPECTED_LOW_POINT_ZONE_EDGE_IDS = Object.freeze(['source-edge-054'])
@@ -49,6 +48,7 @@ function directionalGroups(inputs) {
     ['cross-main', inputs.crossMainDrainage?.directedEdges || []],
     ['central-branch', inputs.centralBranchDrainage?.directedEdges || []],
     ['arm-over', inputs.armOverDrainage?.directedEdges || []],
+    ['low-point-connector', inputs.lowPointFabrication?.directedEdge ? [inputs.lowPointFabrication.directedEdge] : []],
   ]
 }
 
@@ -163,6 +163,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.architecturalVerticalControls - Evaluated A201/A301 controls.
  * @param {object} inputs.elevationDatum - Evaluated FP0.1/A102/calculation datum registration.
  * @param {object} inputs.sourceFeedFabrication - Evaluated CML.01 plan/listing/outlet registration.
+ * @param {object} inputs.lowPointFabrication - Evaluated CMI.09 low-point/listing/grade registration.
  * @param {object} inputs.operationalAnnotations - Source notes, grades, drains, and details.
  * @param {object} inputs.longBranchDrainage - Long-branch drainage schedule.
  * @param {object} inputs.sideBranchDrainage - Side-branch drainage schedule.
@@ -182,6 +183,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     architecturalVerticalControls,
     elevationDatum,
     sourceFeedFabrication,
+    lowPointFabrication,
     operationalAnnotations,
     longBranchDrainage,
     sideBranchDrainage,
@@ -198,6 +200,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     architecturalVerticalControls,
     elevationDatum,
     sourceFeedFabrication,
+    lowPointFabrication,
     operationalAnnotations,
   ].map((entry) => entry?.projectId)
   if (projectIds.some((projectId) => projectId !== EXPECTED_PROJECT_ID)) {
@@ -226,6 +229,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['architectural-vertical-controls', architecturalVerticalControls?.status],
     ['calculation-elevation-datum', elevationDatum?.status],
     ['source-feed-fabrication', sourceFeedFabrication?.status],
+    ['low-point-fabrication', lowPointFabrication?.status],
     ['long-branch-drainage', longBranchDrainage?.status],
     ['side-branch-drainage', sideBranchDrainage?.status],
     ['cross-main-drainage', crossMainDrainage?.status],
@@ -252,7 +256,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     issues.push(
       issue(
         'NH_PROPER_PIPE_DIRECTION_COVERAGE_DRIFT',
-        'The assembled layout must retain exactly the two unresolved source-feed edges and one unresolved low-point-zone edge.',
+        'The assembled layout must retain exactly the two unresolved source-feed edges.',
       ),
     )
   }
@@ -267,7 +271,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     issues.push(
       issue(
         'NH_PROPER_PIPE_LOW_POINT_ZONE_IDENTITY_INVALID',
-        'The sole undirected branch edge must remain the source-proved low-point-01 tie-in zone.',
+        'The long-branch root zone must remain the source-proved low-point-01 tie-in edge.',
       ),
     )
   }
@@ -358,11 +362,6 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
   const properPipeLayoutReady = false
   const acceptanceBlockers = [
     issue(
-      'NH_PROPER_PIPE_LOW_POINT_ZONE_GRADE_UNRESOLVED',
-      'The short low-point-01 connector has equal rounded calculation elevations; its installed high-to-low grade still needs source or field resolution.',
-      'source-edge-054',
-    ),
-    issue(
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
       'CML.01, its 4 x 3 upward outlet, and node-118 elevation are source-bound; endpoint Z, installed grade, and the concealed riser-room continuation remain unresolved.',
       'source-edge-001,source-edge-002',
@@ -400,7 +399,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         toNodeId: edge.toNodeId,
         classification: EXPECTED_SUPPLY_EDGE_IDS.includes(edge.id)
           ? 'source-feed-fabricated-plan-edge-endpoint-z-and-grade-unresolved'
-          : 'low-point-zone-grade-unresolved',
+          : 'unclassified-undirected-edge',
       })),
     exactElevationPorts: ports,
     multiElevationNodes,
@@ -451,7 +450,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       fieldDrainIntentCount: fieldRouteDrainIntents.length,
     },
     planTopologyReady: ready && canonicalEdges.length === 143,
-    wholeFp20RelativeGradeDirectionReady: ready && directionByEdgeId.size === 140,
+    wholeFp20RelativeGradeDirectionReady: ready && directionByEdgeId.size === 141,
     partialExactPipeElevationAnchorReady: ready && ports.length === 32,
     sameXyVerticalLegReady: ready && multiElevationNodes.length === 1,
     architecturalVerticalControlReady:
@@ -463,7 +462,16 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
           outlet: sourceFeedFabrication.outlet,
         }
       : null,
-    lowPointZoneGradeReady: false,
+    lowPointFabrication: lowPointFabrication
+      ? {
+          piece: lowPointFabrication.piece,
+          directedEdge: lowPointFabrication.directedEdge,
+          hydraulicEndpointReport: lowPointFabrication.hydraulicEndpointReport,
+        }
+      : null,
+    lowPointZoneGradeReady:
+      ready && lowPointFabrication?.lowPointRelativeGradeDirectionReady === true,
+    lowPointExactDifferentialZReady: false,
     sourceFeedPlanFabricationReady:
       ready && sourceFeedFabrication?.sourceFeedPlanFabricationReady === true,
     sourceFeedOutletTransitionReady:

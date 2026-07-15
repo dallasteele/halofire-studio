@@ -83,6 +83,43 @@
         "branchOutletEvidence": "CMK.03 has two 2-1/2 x 2 grooved outlets at 90 and 270 degrees on fabrication listing page 20"
       }
     ],
+    "lowPointPieceBindings": [
+      {
+        "id": "low-point-01-cmi09",
+        "lineName": "CMI",
+        "pieceId": "CMI.09",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2.5,
+        "cutLengthIn": 64.5,
+        "fabricationListingPage": 15,
+        "sourceSegmentId": "pipe-032",
+        "sourceEdgeIds": ["source-edge-052", "source-edge-053", "source-edge-054"],
+        "pieceStartCanonicalNodeId": "canonical-node-054",
+        "firstOutletCanonicalNodeId": "canonical-node-059",
+        "firstOutletFromPieceStartIn": 7,
+        "firstOutletFitting": "2-1/2 x 2 grooved outlet",
+        "firstOutletOrientation": "toward-87-degrees",
+        "firstOutletDownstreamSourceSegmentId": "pipe-035",
+        "secondOutletCanonicalNodeId": "canonical-node-058",
+        "secondOutletFromPieceStartIn": 34,
+        "secondOutletFitting": "2-1/2 x 3/4 threaded outlet",
+        "secondOutletOrientation": "up-0-degrees",
+        "secondOutletSprinklerId": "head-017",
+        "pieceFarEndCanonicalNodeId": "canonical-node-057",
+        "pieceFarEndConnectedSourceSegmentId": "pipe-038",
+        "lowPointId": "low-point-01",
+        "gradeRequirementId": "grade-branch-lines",
+        "highCanonicalNodeId": "canonical-node-059",
+        "lowCanonicalNodeId": "canonical-node-054",
+        "highCalculationNodeId": "182",
+        "lowCalculationNodeId": "67",
+        "reportedEndpointElevationFt": 18.375,
+        "reportedEndpointElevationStatus": "equal-rounded",
+        "exactDifferentialZStatus": "unresolved",
+        "maximumPlanStationResidualIn": 3,
+        "sourceEvidence": "Field-set FP2.0 labels CMI.09 as 2-1/2 inch by 5 feet 4-1/2 inches from the LOW POINT TIE IN DRAIN, with a 2-1/2 x 2 grooved outlet at 0 feet 7 inches and a 2-1/2 x 3/4 threaded outlet at cumulative 2 feet 10 inches; listing page 15 identifies their orientations as Toward:87 and Up:0."
+      }
+    ],
     "separatedCrossings": [
       {
         "canonicalNodeId": "canonical-node-022",

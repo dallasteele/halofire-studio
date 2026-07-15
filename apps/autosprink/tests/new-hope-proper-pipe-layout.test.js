@@ -9,6 +9,7 @@ import { evaluateNewHopeCentralBranchDrainage } from '../src/engine/new-hope-cen
 import { evaluateNewHopeCrossMainDrainage } from '../src/engine/new-hope-cross-main-drainage.js'
 import { evaluateNewHopeElevationDatum } from '../src/engine/new-hope-elevation-datum.js'
 import { evaluateNewHopeLongBranchDrainage } from '../src/engine/new-hope-long-branch-drainage.js'
+import { evaluateNewHopeLowPointFabrication } from '../src/engine/new-hope-low-point-fabrication.js'
 import { evaluateNewHopeProperPipeLayout } from '../src/engine/new-hope-proper-pipe-layout.js'
 import { evaluateNewHopeSideBranchDrainage } from '../src/engine/new-hope-side-branch-drainage.js'
 import { evaluateNewHopeSourceFeedFabrication } from '../src/engine/new-hope-source-feed-fabrication.js'
@@ -34,6 +35,12 @@ const architecturalVerticalControls =
   evaluateApprovedFp20ArchitecturalVerticalControls(architecturalSource)
 const elevationDatum = evaluateNewHopeElevationDatum(elevationDatumSource, hydraulicRoutes)
 const sourceFeedFabrication = evaluateNewHopeSourceFeedFabrication({
+  canonicalTopology,
+  governedSkeleton,
+  operationalAnnotations,
+  hydraulicRoutes,
+})
+const lowPointFabrication = evaluateNewHopeLowPointFabrication({
   canonicalTopology,
   governedSkeleton,
   operationalAnnotations,
@@ -84,6 +91,7 @@ const inputs = {
   architecturalVerticalControls,
   elevationDatum,
   sourceFeedFabrication,
+  lowPointFabrication,
   operationalAnnotations,
   longBranchDrainage,
   sideBranchDrainage,
@@ -99,15 +107,16 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.metrics).toEqual({
       canonicalNodeCount: 142,
       canonicalEdgeCount: 143,
-      directedEdgeCount: 140,
-      undirectedEdgeCount: 3,
-      directionCoverageRatio: 0.979021,
+      directedEdgeCount: 141,
+      undirectedEdgeCount: 2,
+      directionCoverageRatio: 0.986014,
       scheduleCounts: {
         'long-branch': 43,
         'side-branch': 28,
         'cross-main': 34,
         'central-branch': 23,
         'arm-over': 12,
+        'low-point-connector': 1,
       },
       exactElevationPortCount: 32,
       exactElevationCanonicalNodeCount: 31,
@@ -118,7 +127,6 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.undirectedEdges.map((edge) => [edge.edgeId, edge.classification])).toEqual([
       ['source-edge-001', 'source-feed-fabricated-plan-edge-endpoint-z-and-grade-unresolved'],
       ['source-edge-002', 'source-feed-fabricated-plan-edge-endpoint-z-and-grade-unresolved'],
-      ['source-edge-054', 'low-point-zone-grade-unresolved'],
     ])
     expect(result.wholeFp20RelativeGradeDirectionReady).toBe(true)
     expect(result.partialExactPipeElevationAnchorReady).toBe(true)
@@ -130,6 +138,14 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.sourceFeedEndpointElevationsReady).toBe(false)
     expect(result.sourceFeedInstalledGradeReady).toBe(false)
     expect(result.sourceFeedConcealedRiserContinuationReady).toBe(false)
+    expect(result.lowPointZoneGradeReady).toBe(true)
+    expect(result.lowPointExactDifferentialZReady).toBe(false)
+    expect(result.lowPointFabrication.directedEdge).toMatchObject({
+      edgeId: 'source-edge-054',
+      highNodeId: 'canonical-node-059',
+      lowNodeId: 'canonical-node-054',
+      requiredDropIn: 0.023917,
+    })
     expect(result.properPipeLayoutReady).toBe(false)
     expect(result.fabricationReady).toBe(false)
   })
@@ -157,7 +173,6 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
   it('names the engineering blockers instead of accepting a visually plausible overlay', () => {
     const result = evaluateNewHopeProperPipeLayout(inputs)
     expect(result.acceptanceBlockerCodes).toEqual([
-      'NH_PROPER_PIPE_LOW_POINT_ZONE_GRADE_UNRESOLVED',
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
       'NH_PROPER_PIPE_EXACT_Z_INCOMPLETE',
       'NH_PROPER_PIPE_FIELD_DRAIN_ROUTES_UNRESOLVED',
@@ -192,6 +207,11 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
   })
 
   it('fails closed when an upstream schedule is absent or a directed edge conflicts', () => {
+    const absentLowPoint = evaluateNewHopeProperPipeLayout({ ...inputs, lowPointFabrication: null })
+    expect(absentLowPoint.status).toBe('blocked')
+    expect(absentLowPoint.blockerCodes).toContain('NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED')
+    expect(absentLowPoint.blockerCodes).toContain('NH_PROPER_PIPE_DIRECTION_COVERAGE_DRIFT')
+
     const absent = evaluateNewHopeProperPipeLayout({ ...inputs, armOverDrainage: null })
     expect(absent.status).toBe('blocked')
     expect(absent.blockerCodes).toContain('NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED')
