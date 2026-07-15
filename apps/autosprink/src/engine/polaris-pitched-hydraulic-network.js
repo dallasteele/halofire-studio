@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 
+import { evaluatePipeLayoutSourceContinuity } from './pipe-layout-source-continuity.js';
+
 const round = (value, precision = 9) => Number(value.toFixed(precision));
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
 const pointAt = (pipe, t) => ({
@@ -877,6 +879,7 @@ export function buildPolarisPitchedHydraulicNetwork({
   belowCeilingReport,
   fireLineEvidence,
   fireLineRegistration,
+  sourceContinuityEvidence,
 }) {
   const graph = buildPhysicalPipeGraph(pipeCalibration.pipes);
   const semanticFittings = pipeCalibration.fittings.filter((fitting) => fitting.sourceAttributes?.['Sub Category']);
@@ -930,6 +933,7 @@ export function buildPolarisPitchedHydraulicNetwork({
     pipeCalibration,
     fireLineEvidence,
   });
+  const sourceContinuity = evaluatePipeLayoutSourceContinuity(sourceContinuityEvidence);
   const reportNodeIds = [...new Set(reports.flatMap((report) => report.nodes.map((node) => node.nodeId)))].sort((a, b) => Number(a) - Number(b));
   const labelNodeIds = [...new Set(pipeCalibration.hydraulicNodeLabels.map((label) => label.nodeId))].sort((a, b) => Number(a) - Number(b));
   const missingCadLabels = reportNodeIds.filter((nodeId) => !labelNodeIds.includes(nodeId));
@@ -1017,7 +1021,7 @@ export function buildPolarisPitchedHydraulicNetwork({
   }
   const geometricallyDrainableCount = geometricGrades.filter((grade) => grade.continuousNonRisingPathToMainDrainEntry).length;
   const packet = {
-    schema: 'halofire.polaris-pitched-hydraulic-network.v3',
+    schema: 'halofire.polaris-pitched-hydraulic-network.v4',
     projectId: pipeCalibration.projectId,
     sourceBoundary: {
       pipeCalibrationReceiptSha256: pipeCalibration.receiptSha256,
@@ -1025,6 +1029,7 @@ export function buildPolarisPitchedHydraulicNetwork({
       belowCeilingHydraulicReportSha256: belowCeilingReport.source.sha256,
       fireLineCad: fireLineEvidence,
       fireLineRegistration,
+      sourceContinuity,
       directionRule: 'Hydraulic flow uses report upstream-to-downstream columns. Source-root topology and geometric downhill are separately named and never substituted for report flow or drainage intent.',
     },
     hydraulicReports: reports.map((report) => ({
@@ -1055,8 +1060,10 @@ export function buildPolarisPitchedHydraulicNetwork({
         && exactCadNodeConnectionPoints.length === 59
         ? 'exact-source-glyph-leader-tips-ready-for-all-on-plan-nodes'
         : 'held-source-glyph-or-elevation-residual-invalid',
-      geometryBindingStatus: fireLineRegistration?.claims?.sprinklerCadToFireLineCoordinateRegistrationReady
-        ? 'exact-node-points-building-routes-and-cross-drawing-coordinate-frame-ready-hydraulic-source-pipe-and-drainage-held'
+      geometryBindingStatus: sourceContinuity.sameProjectSemanticSourceContinuityReady
+        ? 'exact-node-points-building-routes-and-semantic-source-chain-ready-exact-fire-line-endpoint-and-drainage-held'
+        : fireLineRegistration?.claims?.sprinklerCadToFireLineCoordinateRegistrationReady
+          ? 'exact-node-points-building-routes-and-cross-drawing-coordinate-frame-ready-hydraulic-source-pipe-and-drainage-held'
         : 'exact-node-points-and-building-rigid-routes-ready-riser-source-and-drainage-held',
       calculatedSprinklerLeafBindings,
       exactCalculatedSprinklerLeafCount: calculatedSprinklerLeafBindings
@@ -1143,6 +1150,8 @@ export function buildPolarisPitchedHydraulicNetwork({
         fireLineRegistration?.claims?.sprinklerCadToFireLineCoordinateRegistrationReady === true,
       hydraulicNodeToFireLinePipeBindingReady:
         fireLineRegistration?.claims?.hydraulicNodeToFireLinePipeBindingReady === true,
+      hydraulicSourceSemanticContinuityReady:
+        sourceContinuity.sameProjectSemanticSourceContinuityReady === true,
       exactPhysicalPipeGraphReady: rootComponent.pipeIds.length === 177,
       sourceRootedTopologicalDirectionReady: rootCycleRank === 0 && ambiguousRootEdges.length === 0,
       fullFittingIdentityReady: semanticFittings.length === pipeCalibration.fittings.length,
@@ -1167,7 +1176,11 @@ export function buildPolarisPitchedHydraulicNetwork({
       riserHydraulicSemanticBindingReady: riserHydraulicSemantics.hydraulicSemanticBindingReady === true,
       buildingRigidPipeSpanHydraulicDirectionReady,
       calculationNodeToDwgGeometryBindingReady: false,
-      wholeNetworkHydraulicFlowDirectionReady: false,
+      wholeNetworkHydraulicFlowDirectionReady: sourceContinuity.sameProjectSemanticSourceContinuityReady === true
+        && reports.every((report) => report.claims.hydraulicDirectionReady === true
+          && report.claims.sourceNodeClosureReady === true)
+        && buildingRigidPipeSpanHydraulicDirectionReady
+        && riserHydraulicSemantics.hydraulicSemanticBindingReady === true,
       drainageGradeSemanticsReady: false,
       continuousDrainPathReady: false,
       drainDestinationReady: mainDrainNote.leaderSegmentCount === 2,

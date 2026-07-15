@@ -13,6 +13,7 @@ export async function buildFromSources({
   fireLinePath,
   sitePlanPath,
   sourceCandidatePath,
+  sourceContinuityPath,
 }) {
   const [fireLineEvidence, fireLineRegistration] = await Promise.all([
     extractPolarisFireLineSource(fireLinePath),
@@ -24,6 +25,7 @@ export async function buildFromSources({
     belowCeilingReport: readJson(belowCeilingReportPath),
     fireLineEvidence,
     fireLineRegistration,
+    sourceContinuityEvidence: readJson(sourceContinuityPath),
   });
 }
 
@@ -35,10 +37,11 @@ if (import.meta.url === `file:///${process.argv[1]?.replaceAll('\\', '/')}`) {
     fireLinePath,
     sitePlanPath,
     sourceCandidatePath,
+    sourceContinuityPath,
     outputPath,
   ] = process.argv.slice(2);
   if (!outputPath) {
-    throw new Error('USAGE: build-polaris-pitched-hydraulic-network.mjs <pipe-calibration.json> <attic-report.json> <below-ceiling-report.json> <fire-line.dwg> <site-plan.dwg> <source-candidate.json> <output.json>');
+    throw new Error('USAGE: build-polaris-pitched-hydraulic-network.mjs <pipe-calibration.json> <attic-report.json> <below-ceiling-report.json> <fire-line.dwg> <site-plan.dwg> <source-candidate.json> <source-continuity.json> <output.json>');
   }
   const packet = await buildFromSources({
     pipeCalibrationPath,
@@ -47,6 +50,7 @@ if (import.meta.url === `file:///${process.argv[1]?.replaceAll('\\', '/')}`) {
     fireLinePath,
     sitePlanPath,
     sourceCandidatePath,
+    sourceContinuityPath,
   });
   fs.writeFileSync(outputPath, `${JSON.stringify(packet, null, 2)}\n`);
   process.stdout.write(`${JSON.stringify({ outputPath, receiptSha256: packet.receiptSha256, claims: packet.claims }, null, 2)}\n`);

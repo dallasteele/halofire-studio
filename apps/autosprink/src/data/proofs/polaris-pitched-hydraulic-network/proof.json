@@ -1,8 +1,12 @@
 {
-  "schema": "halofire.polaris-pitched-hydraulic-network-proof.v2",
+  "schema": "halofire.polaris-pitched-hydraulic-network-proof.v3",
   "projectId": "polaris-academy-mesa-az",
-  "networkReceiptSha256": "B475A4A5C6A545EE010D6BCBD7E1713B3226B62FBECC663BFC1F5B413349C3BE",
+  "networkReceiptSha256": "70E554662743B3DE1F97434D07240A968A870107574196F8D1F19AFC4B529F8C",
   "underlay": "../polaris-pitched-pipe-xyz/approved-fp2-pipe-overlay.png",
+  "sourceContinuityImages": [
+    "polaris-final-fl3-source-chain.png",
+    "polaris-asbuilt-fp1-riser-source-chain.png"
+  ],
   "counts": {
     "hydraulicReportSegments": 82,
     "calculationNodes": 61,
@@ -40,6 +44,7 @@
     "exactTerminalToggleVerified": true,
     "diagnosticLayersDefaultOff": true,
     "diagnosticToggleVerified": true,
+    "sourceContinuityImagesVisible": true,
     "browserErrorCount": 0
   },
   "claims": {
@@ -50,6 +55,7 @@
     "roofRelativePipeGradeGeometryReady": true,
     "sprinklerCadToFireLineCoordinateRegistrationReady": true,
     "hydraulicNodeToFireLinePipeBindingReady": false,
+    "hydraulicSourceSemanticContinuityReady": true,
     "exactHydraulicNodeConnectionPointsReady": true,
     "calculationNodeToDwgConnectionPointBindingReady": true,
     "loopInteriorPipeSpanDirectionReady": true,
@@ -62,7 +68,7 @@
     "buildingRigidPipeSpanHydraulicDirectionReady": true,
     "calculatedSprinklerLeafToDwgPipeBindingReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,
-    "wholeNetworkHydraulicFlowDirectionReady": false,
+    "wholeNetworkHydraulicFlowDirectionReady": true,
     "drainageGradeSemanticsReady": false,
     "properPipeLayoutReady": false,
     "fabricationReady": false,

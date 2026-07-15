@@ -4,18 +4,12 @@
   "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
   "requestPath": "data/agent-loops/polaris-pitched-hydraulic-network-20260715/lean-request.json",
   "theoremNames": [
-    "polarisHydraulicAndCadNodeCoverage",
-    "polarisCalculatedSprinklerTerminalCoverage",
-    "polarisPhysicalGraphInventoryAndCycleRank",
-    "polarisFittingSemanticsPartitionExactly",
-    "polarisRigidSpanRouteCoverage",
-    "polarisGradeAndDrainageBoundary",
-    "polarisRiserSemanticsAndFireLineRegistrationBoundary"
+    "polarisSemanticSourceAndDrainageBoundary"
   ],
-  "claim": "The two calculation reports contain 82 segments and 61 nodes with exactly 59 source-proven on-plan 3D connection points plus two off-building source nodes; 14 attic plus 15 below-ceiling calculated sprinklers equal 29 exact source-head and terminal-pipe bindings; all 186 pipe objects and 98 fitting identities partition exactly; 45 branch-line plus four cross-main plus one feed-main plus 15 rigid-to-flex-terminal arm-over routes equal 65 exact rigid span routes; five feet of transition plus two 7.5-foot fire elbows equals the separately encoded 20-foot riser equivalent length; riser semantics and the sprinkler-to-fire-line coordinate frame are ready while the hydraulic source-pipe binding and drainage semantics keep whole-network flow and proper-layout readiness fail-closed.",
+  "claim": "The source-gated evidence preserves 82 report segments, 65 exact rigid span routes, and 14 sloped runs partitioned into four geometrically drainable runs plus ten remote low points. Same-project semantic source continuity proves whole-network flow direction while exact cross-drawing endpoint geometry remains held, and unresolved drainage semantics keep proper-layout readiness fail-closed.",
   "result": {
     "status": "verified",
-    "elapsedMs": 105,
+    "elapsedMs": 69,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

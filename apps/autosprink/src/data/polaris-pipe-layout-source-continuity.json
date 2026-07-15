@@ -1,0 +1,120 @@
+{
+  "schema": "halofire.pipe-layout-source-continuity.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "sourceBindings": [
+    {
+      "role": "final-fire-line-plan",
+      "fileName": "Polaris Academy-Mesa AZ_FL3.pdf",
+      "sha256": "2870BD6FDCF13B8ED593E10B7B4D45D047A23F5C15D33033278EFDF883E716ED",
+      "physicalPages": [1],
+      "markers": ["NEW 4\" FIRE RISER CONNECTION POINT"]
+    },
+    {
+      "role": "completed-as-built-riser-and-plan-set",
+      "fileName": "As Built.pdf",
+      "sha256": "1442BE77DA8D08388084E6F56EE3DDFEA9565F08307022449267D065A504E81A",
+      "physicalPages": [1, 2],
+      "markers": [
+        "4\" UNDERGROUND FIRE LINE",
+        "FEEDS BUILDING (TOP WITH FLEXIBLE COUPLING)",
+        "TEST-AND-DRAIN VALVE",
+        "2\" MAIN DRAIN",
+        "UNDERGROUND FIRE LINE STUBS UP OUTSIDE, BUT IMMEDIATELY COMES INTO SIDE OF BUILDING"
+      ]
+    },
+    {
+      "role": "completed-sprinkler-source-cad",
+      "fileName": "Polaris Academy Fire Sprinkler CAD 2.DWG",
+      "sha256": "3B27B60D74C6058508789929AD0CA20DF490C28905828B5AC096183454154C2F",
+      "physicalPages": [1],
+      "markers": ["3\" RISER", "MAIN DRAIN"]
+    },
+    {
+      "role": "attic-hydraulic-report",
+      "fileName": "Polaris Academy - Hydraulic Calcs I.pdf",
+      "sha256": "7BFEDCD59CAB07DB2045D8E4BC7F23770D8B3991019163153737AE4C1A8FC846",
+      "physicalPages": [1],
+      "markers": ["source node 1", "underground node 2", "feed-riser node 116"]
+    },
+    {
+      "role": "below-ceiling-hydraulic-report",
+      "fileName": "Polaris Academy - Hydraulic Calcs II.pdf",
+      "sha256": "690BFA978E60A7B4704F0DCDFD9FAE4BA5A87EBD8E6C7C38BD62BF22D8D24EA9",
+      "physicalPages": [1],
+      "markers": ["source node 1", "underground node 2", "feed-riser node 116"]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "fl3-fire-riser-connection",
+      "kind": "fire-riser-connection",
+      "sourceRef": "FL3 physical page 1 explicit NEW 4 inch FIRE RISER CONNECTION POINT callout"
+    },
+    {
+      "id": "fp1-underground-inlet",
+      "kind": "underground-fire-line",
+      "sourceRef": "As Built FP1 physical page 1 rendered 4 inch UNDERGROUND FIRE LINE inlet"
+    },
+    {
+      "id": "fp1-riser-assembly",
+      "kind": "riser-assembly",
+      "sourceRef": "As Built FP1 physical page 1 rendered flange, flexible coupling, FDC check, flow switch, test-and-drain, and main-drain assembly"
+    },
+    {
+      "id": "fp1-building-feed",
+      "kind": "building-feed",
+      "sourceRef": "As Built FP1 physical page 1 FEEDS BUILDING callout"
+    },
+    {
+      "id": "hydraulic-node-116",
+      "kind": "hydraulic-source-node",
+      "sourceRef": "Both completed hydraulic reports bind feed-riser node 116 to source nodes 2 and 1; source DWG binds node 116 through the attributed riser assembly"
+    }
+  ],
+  "edges": [
+    {
+      "id": "fl3-to-underground-inlet",
+      "fromNodeId": "fl3-fire-riser-connection",
+      "toNodeId": "fp1-underground-inlet",
+      "evidenceMode": "same-project-sheet-transition",
+      "sourceRef": "Final FL3 connection-point callout plus completed FP1 underground inlet detail"
+    },
+    {
+      "id": "underground-inlet-to-riser",
+      "fromNodeId": "fp1-underground-inlet",
+      "toNodeId": "fp1-riser-assembly",
+      "evidenceMode": "drawn-detail-continuity",
+      "sourceRef": "Completed FP1 continuous rendered riser detail"
+    },
+    {
+      "id": "riser-to-building-feed",
+      "fromNodeId": "fp1-riser-assembly",
+      "toNodeId": "fp1-building-feed",
+      "evidenceMode": "explicit-callout-continuity",
+      "sourceRef": "Completed FP1 FEEDS BUILDING callout and FP2 underground/riser location note"
+    },
+    {
+      "id": "building-feed-to-hydraulic-source",
+      "fromNodeId": "fp1-building-feed",
+      "toNodeId": "hydraulic-node-116",
+      "evidenceMode": "hydraulic-report-continuity",
+      "sourceRef": "Completed source DWG riser components plus both hydraulic report source chains"
+    }
+  ],
+  "deviceBindings": {
+    "undergroundInlet": {
+      "sourceRef": "As Built FP1 physical page 1 4 inch UNDERGROUND FIRE LINE"
+    },
+    "buildingFeed": {
+      "sourceRef": "As Built FP1 physical page 1 FEEDS BUILDING"
+    },
+    "testAndDrain": {
+      "sourceRef": "As Built FP1 physical page 1 TEST-AND-DRAIN VALVE plus exact source CAD fitting"
+    },
+    "mainDrain": {
+      "sourceRef": "As Built FP1 physical page 1 2 inch MAIN DRAIN plus exact source CAD leader"
+    }
+  },
+  "exactCrossDrawingEndpointGeometryReady": false,
+  "projectSpecificTransferAllowed": false
+}

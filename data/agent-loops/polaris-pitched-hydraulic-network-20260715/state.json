@@ -1,5 +1,5 @@
 {
-  "iteration": 6,
+  "iteration": 7,
   "phase": "verify-and-bind",
   "status": "in_progress",
   "observations": [
@@ -20,7 +20,11 @@
     "The source riser components form an attributed fitting-bridged path from node 116 to node 13. The physical centerline remains 13.582466883 feet, while the report's 10.75-foot raw length is elevation-governed and its separate 20-foot equivalent length is exactly the 5-foot transition plus two 7.5-foot fire elbows; the -5 psi backflow term remains a fixed pressure change.",
     "The sprinkler plan is now registered into the fire-line coordinate frame through one unique 73-vertex building outline match with 0.158968546-inch RMS error, a 145.320482713-inch alternative-orientation margin, and 3,428 exact embedded-site geometry matches.",
     "Coordinate registration does not establish pipe connectivity: the nearest extracted fire-line pipe endpoint remains 718.821404366 inches from hydraulic node 116, so the source-pipe binding remains held.",
-    "No independent human-review gate is required; deterministic, adversarial, formal, visual, and browser loops provide acceptance."
+    "No independent human-review gate is required; deterministic, adversarial, formal, visual, and browser loops provide acceptance.",
+    "A completed Dallas dry-system bid proves the reusable source-chain pattern and role-specific slope/drain topology, but no Dallas dimensions, grades, or drain decisions are transferred into Polaris.",
+    "Polaris now has a same-project five-node semantic chain from the FL3 fire-riser connection through the FP1 underground inlet, riser assembly, and building feed to hydraulic source node 116.",
+    "The semantic source chain proves whole-network hydraulic direction while remaining explicitly separate from the still-unproven civil-to-sprinkler CAD endpoint geometry.",
+    "A current primary-source code basis was not sufficiently bound to classify the ten remote low points, so drainage semantics remain held instead of importing an unverified threshold."
   ],
   "attempts": [
     "Upgraded the read-only LibreDWG parser to 0.7.7 and extracted pipe, sprinkler, fitting, calculation-label, and source-note attributes with zero unknown entities.",
@@ -50,11 +54,15 @@
     "Rendered and visually inspected the latest completed FL-3 and FP2/as-built sources; the plan sources show the intended building connection, while deterministic DWG geometry still does not bind that endpoint to node 116.",
     "Playwright loaded the governed proof over HTTP 200, enabled both diagnostic graph layers alongside the exact span, terminal, grade, and device layers, verified the 718.821-inch source-binding hold and whole-network hold, and reported zero browser or page errors.",
     "Lean 4.13.0 verified the riser-equivalent-length arithmetic plus the coordinate-registration-versus-connectivity fail-closed boundary in 105 ms; 33 focused tests, the production build, JSON parsing, and the agentic-rule verifier also pass.",
-    "Brain postflight persisted the proper-layout separation of slope, direction, drainage intent, and source continuity as episode 149654."
+    "Brain postflight persisted the proper-layout separation of slope, direction, drainage intent, and source continuity as episode 149654.",
+    "Hash-gated the Polaris FL3, as-built FP1/FP2, sprinkler DWG, and both hydraulic reports into one directed semantic source-continuity receipt.",
+    "Adversarial tests reject a missing sheet transition, altered source hash, and missing main-drain device semantics while retaining the exact-endpoint hold.",
+    "Rendered the actual FL3 and FP1 source sheets beside the approved FP2 overlay; browser inspection proved both source images loaded, all six diagnostic layers toggled, and no page or browser errors.",
+    "Lean 4.13 verified the semantic-source-versus-exact-endpoint boundary in 69 ms; 38 focused tests, production build, rules, loop guard, syntax, JSON, and diff checks pass; brain postflight persisted the result as episode 149745."
   ],
   "blockers": [
-    "The cross-drawing coordinate frame is proven, but the extracted fire-line pipe endpoint is 718.821404366 inches from hydraulic node 116; the underground/source pipe binding is unproven and must not be inferred from registration alone.",
+    "The exact cross-drawing CAD endpoint remains unproven: the nearest extracted fire-line pipe endpoint is 718.821404366 inches from hydraulic node 116. This no longer blocks semantic hydraulic direction, but it must remain labeled as non-exact geometry.",
     "The ten remote geometric low points cannot be classified as acceptable trapped volume or auxiliary-drain requirements until completed-design system/drainage intent is bound."
   ],
-  "next_action": "Reconcile the completed FL-3 connection-point evidence with sprinkler hydraulic node 116, using another completed project with explicit civil-to-sprinkler endpoint continuity if Polaris omits the needed bridge; then classify each of the ten remote low points before promoting whole-network flow or proper-layout readiness."
+  "next_action": "Calculate trapped volume and catchment for each of the ten exact-source low points, then bind a project-edition rule and completed-design drain method/destination before promoting drainage semantics or proper-layout readiness; do not encode an unverified volume threshold."
 }

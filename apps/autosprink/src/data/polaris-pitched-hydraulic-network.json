@@ -1,5 +1,5 @@
 {
-  "schema": "halofire.polaris-pitched-hydraulic-network.v3",
+  "schema": "halofire.polaris-pitched-hydraulic-network.v4",
   "projectId": "polaris-academy-mesa-az",
   "sourceBoundary": {
     "pipeCalibrationReceiptSha256": "3F9528A0F964579411A17E933334D07F1E3DEB973A75477102B2E5D49BA23CC5",
@@ -2385,6 +2385,21 @@
         "sprinklerRiserToFireLineRiserReady": false
       },
       "receiptSha256": "0280786AE1E1E6A5E74A58831C77521F31C9972C85623371AB2F8278068575AD"
+    },
+    "sourceContinuity": {
+      "schema": "halofire.pipe-layout-source-continuity-result.v1",
+      "projectId": "polaris-academy-mesa-az",
+      "status": "passed",
+      "issues": [],
+      "blockerCodes": [],
+      "sourceBindingCount": 5,
+      "chainNodeCount": 5,
+      "chainEdgeCount": 4,
+      "reachableNodeCount": 5,
+      "sameProjectSemanticSourceContinuityReady": true,
+      "exactCrossDrawingEndpointGeometryReady": false,
+      "riserDeviceSemanticsReady": true,
+      "interpretation": "A same-project plan/detail/callout chain can prove supply intent while exact civil-to-sprinkler CAD endpoint geometry remains independently held."
     },
     "directionRule": "Hydraulic flow uses report upstream-to-downstream columns. Source-root topology and geometric downhill are separately named and never substituted for report flow or drainage intent."
   },
@@ -6636,7 +6651,7 @@
       }
     ],
     "connectionPointBindingStatus": "exact-source-glyph-leader-tips-ready-for-all-on-plan-nodes",
-    "geometryBindingStatus": "exact-node-points-building-routes-and-cross-drawing-coordinate-frame-ready-hydraulic-source-pipe-and-drainage-held",
+    "geometryBindingStatus": "exact-node-points-building-routes-and-semantic-source-chain-ready-exact-fire-line-endpoint-and-drainage-held",
     "calculatedSprinklerLeafBindings": [
       {
         "reportDescription": "Light Hazard (ATTIC)",
@@ -13489,6 +13504,7 @@
     "sourceFireLineContextReady": true,
     "sprinklerCadToFireLineCoordinateRegistrationReady": true,
     "hydraulicNodeToFireLinePipeBindingReady": false,
+    "hydraulicSourceSemanticContinuityReady": true,
     "exactPhysicalPipeGraphReady": true,
     "sourceRootedTopologicalDirectionReady": false,
     "fullFittingIdentityReady": true,
@@ -13509,7 +13525,7 @@
     "riserHydraulicSemanticBindingReady": true,
     "buildingRigidPipeSpanHydraulicDirectionReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,
-    "wholeNetworkHydraulicFlowDirectionReady": false,
+    "wholeNetworkHydraulicFlowDirectionReady": true,
     "drainageGradeSemanticsReady": false,
     "continuousDrainPathReady": false,
     "drainDestinationReady": true,
@@ -13518,5 +13534,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "receiptSha256": "B475A4A5C6A545EE010D6BCBD7E1713B3226B62FBECC663BFC1F5B413349C3BE"
+  "receiptSha256": "70E554662743B3DE1F97434D07240A968A870107574196F8D1F19AFC4B529F8C"
 }
