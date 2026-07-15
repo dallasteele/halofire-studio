@@ -1,0 +1,2610 @@
+{
+  "artifactType": "halofire.approved-fp20-pipe-vector-evidence.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "calibrationStatus": "answer-exposed-approved-plan-replay",
+  "source": {
+    "role": "approved-sprinkler-plan",
+    "sheet": "FP2.0",
+    "physicalPage": 5,
+    "sha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+    "pageBoxPdfPt": {
+      "width": 3024,
+      "height": 2160
+    }
+  },
+  "planRegistration": {
+    "pdfPtPerFt": 8.999890909,
+    "origin": {
+      "pdfPt": {
+        "x": 1198.657,
+        "y": 798.45
+      },
+      "localFt": {
+        "x": 0,
+        "y": 30.375
+      }
+    },
+    "yAxis": "pdf-down-local-positive"
+  },
+  "classification": {
+    "requiresWhiteMaskTwin": true,
+    "pipeStrokeClasses": {
+      "red-pipe": 40,
+      "black-pipe": 15,
+      "navy-arm-over": 12
+    },
+    "sprinklerSymbolClasses": {
+      "BB1": 58,
+      "SD1": 6,
+      "TY-FRB": 4
+    },
+    "maximumHeadToPipeDistancePdfPt": 1.5
+  },
+  "pipeSegments": [
+    {
+      "id": "pipe-001",
+      "drawingIndex": 3520,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 660.675,
+        "y": 1118.512
+      },
+      "toPdfPt": {
+        "x": 685.072,
+        "y": 1118.512
+      },
+      "lengthPdfPt": 24.398
+    },
+    {
+      "id": "pipe-002",
+      "drawingIndex": 3594,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 681.985,
+        "y": 1115.228
+      },
+      "toPdfPt": {
+        "x": 681.985,
+        "y": 1107.423
+      },
+      "lengthPdfPt": 7.804
+    },
+    {
+      "id": "pipe-003",
+      "drawingIndex": 3624,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 707.628,
+        "y": 1104.138
+      },
+      "toPdfPt": {
+        "x": 685.101,
+        "y": 1104.138
+      },
+      "lengthPdfPt": 22.527
+    },
+    {
+      "id": "pipe-004",
+      "drawingIndex": 3664,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 725.187,
+        "y": 1114.521
+      },
+      "toPdfPt": {
+        "x": 725.187,
+        "y": 1108.451
+      },
+      "lengthPdfPt": 6.07
+    },
+    {
+      "id": "pipe-005",
+      "drawingIndex": 3675,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 728.187,
+        "y": 1117.521
+      },
+      "toPdfPt": {
+        "x": 774.908,
+        "y": 1117.521
+      },
+      "lengthPdfPt": 46.721
+    },
+    {
+      "id": "pipe-006",
+      "drawingIndex": 3831,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 777.908,
+        "y": 1186.819
+      },
+      "toPdfPt": {
+        "x": 777.908,
+        "y": 1120.521
+      },
+      "lengthPdfPt": 66.298
+    },
+    {
+      "id": "pipe-007",
+      "drawingIndex": 3853,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 773.783,
+        "y": 1183.015
+      },
+      "toPdfPt": {
+        "x": 758.822,
+        "y": 1183.015
+      },
+      "lengthPdfPt": 14.961
+    },
+    {
+      "id": "pipe-008",
+      "drawingIndex": 3876,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 590.976,
+        "y": 1585.181
+      },
+      "toPdfPt": {
+        "x": 531.157,
+        "y": 1585.181
+      },
+      "lengthPdfPt": 59.819
+    },
+    {
+      "id": "pipe-009",
+      "drawingIndex": 3894,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 590.976,
+        "y": 851.067
+      },
+      "toPdfPt": {
+        "x": 531.157,
+        "y": 851.067
+      },
+      "lengthPdfPt": 59.819
+    },
+    {
+      "id": "pipe-010",
+      "drawingIndex": 4016,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 824.533,
+        "y": 1183.015
+      },
+      "toPdfPt": {
+        "x": 782.033,
+        "y": 1183.015
+      },
+      "lengthPdfPt": 42.5
+    },
+    {
+      "id": "pipe-011",
+      "drawingIndex": 4035,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 755.956,
+        "y": 1215.312
+      },
+      "toPdfPt": {
+        "x": 756.005,
+        "y": 1185.827
+      },
+      "lengthPdfPt": 29.484
+    },
+    {
+      "id": "pipe-012",
+      "drawingIndex": 4047,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 753.198,
+        "y": 1183.015
+      },
+      "toPdfPt": {
+        "x": 605.738,
+        "y": 1183.015
+      },
+      "lengthPdfPt": 147.459
+    },
+    {
+      "id": "pipe-013",
+      "drawingIndex": 4110,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1013.531,
+        "y": 1183.015
+      },
+      "toPdfPt": {
+        "x": 826.033,
+        "y": 1183.015
+      },
+      "lengthPdfPt": 187.498
+    },
+    {
+      "id": "pipe-014",
+      "drawingIndex": 4116,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1016.344,
+        "y": 1215.312
+      },
+      "toPdfPt": {
+        "x": 1016.344,
+        "y": 1185.827
+      },
+      "lengthPdfPt": 29.484
+    },
+    {
+      "id": "pipe-015",
+      "drawingIndex": 4181,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1184.126,
+        "y": 1183.015
+      },
+      "toPdfPt": {
+        "x": 1019.156,
+        "y": 1183.015
+      },
+      "lengthPdfPt": 164.969
+    },
+    {
+      "id": "pipe-016",
+      "drawingIndex": 4191,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1219.376,
+        "y": 1244.14
+      },
+      "toPdfPt": {
+        "x": 1188.86,
+        "y": 1244.14
+      },
+      "lengthPdfPt": 30.516
+    },
+    {
+      "id": "pipe-017",
+      "drawingIndex": 4193,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 561.786,
+        "y": 1244.14
+      },
+      "toPdfPt": {
+        "x": 601.004,
+        "y": 1244.14
+      },
+      "lengthPdfPt": 39.218
+    },
+    {
+      "id": "pipe-018",
+      "drawingIndex": 4195,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 602.926,
+        "y": 1247.89
+      },
+      "toPdfPt": {
+        "x": 602.926,
+        "y": 1185.827
+      },
+      "lengthPdfPt": 62.062
+    },
+    {
+      "id": "pipe-019",
+      "drawingIndex": 4198,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1186.938,
+        "y": 1247.89
+      },
+      "toPdfPt": {
+        "x": 1186.938,
+        "y": 1185.827
+      },
+      "lengthPdfPt": 62.062
+    },
+    {
+      "id": "pipe-020",
+      "drawingIndex": 4251,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1219.376,
+        "y": 1192.015
+      },
+      "toPdfPt": {
+        "x": 1188.86,
+        "y": 1192.015
+      },
+      "lengthPdfPt": 30.516
+    },
+    {
+      "id": "pipe-021",
+      "drawingIndex": 4252,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 561.786,
+        "y": 1192.015
+      },
+      "toPdfPt": {
+        "x": 601.004,
+        "y": 1192.015
+      },
+      "lengthPdfPt": 39.218
+    },
+    {
+      "id": "pipe-022",
+      "drawingIndex": 4378,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 593.976,
+        "y": 1540.582
+      },
+      "toPdfPt": {
+        "x": 593.976,
+        "y": 1582.272
+      },
+      "lengthPdfPt": 41.69
+    },
+    {
+      "id": "pipe-023",
+      "drawingIndex": 4379,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 593.976,
+        "y": 895.666
+      },
+      "toPdfPt": {
+        "x": 593.976,
+        "y": 853.976
+      },
+      "lengthPdfPt": 41.69
+    },
+    {
+      "id": "pipe-024",
+      "drawingIndex": 4440,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 711.28,
+        "y": 1537.674
+      },
+      "toPdfPt": {
+        "x": 596.976,
+        "y": 1537.674
+      },
+      "lengthPdfPt": 114.304
+    },
+    {
+      "id": "pipe-025",
+      "drawingIndex": 4442,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 711.28,
+        "y": 898.575
+      },
+      "toPdfPt": {
+        "x": 596.976,
+        "y": 898.575
+      },
+      "lengthPdfPt": 114.304
+    },
+    {
+      "id": "pipe-026",
+      "drawingIndex": 4579,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 753.198,
+        "y": 1218.124
+      },
+      "toPdfPt": {
+        "x": 605.348,
+        "y": 1218.124
+      },
+      "lengthPdfPt": 147.85
+    },
+    {
+      "id": "pipe-027",
+      "drawingIndex": 4682,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1170.119,
+        "y": 1218.124
+      },
+      "toPdfPt": {
+        "x": 1019.156,
+        "y": 1218.124
+      },
+      "lengthPdfPt": 150.963
+    },
+    {
+      "id": "pipe-028",
+      "drawingIndex": 4787,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 714.28,
+        "y": 1605.702
+      },
+      "toPdfPt": {
+        "x": 714.28,
+        "y": 1540.52
+      },
+      "lengthPdfPt": 65.182
+    },
+    {
+      "id": "pipe-029",
+      "drawingIndex": 4788,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 714.28,
+        "y": 830.546
+      },
+      "toPdfPt": {
+        "x": 714.28,
+        "y": 895.728
+      },
+      "lengthPdfPt": 65.182
+    },
+    {
+      "id": "pipe-030",
+      "drawingIndex": 4943,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 983.79,
+        "y": 1533.418
+      },
+      "toPdfPt": {
+        "x": 983.79,
+        "y": 1605.263
+      },
+      "lengthPdfPt": 71.845
+    },
+    {
+      "id": "pipe-031",
+      "drawingIndex": 4944,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 983.79,
+        "y": 902.83
+      },
+      "toPdfPt": {
+        "x": 983.79,
+        "y": 830.985
+      },
+      "lengthPdfPt": 71.845
+    },
+    {
+      "id": "pipe-032",
+      "drawingIndex": 5041,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1033.929,
+        "y": 1608.548
+      },
+      "toPdfPt": {
+        "x": 987.03,
+        "y": 1608.548
+      },
+      "lengthPdfPt": 46.899
+    },
+    {
+      "id": "pipe-033",
+      "drawingIndex": 5042,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1033.929,
+        "y": 827.7
+      },
+      "toPdfPt": {
+        "x": 987.03,
+        "y": 827.7
+      },
+      "lengthPdfPt": 46.899
+    },
+    {
+      "id": "pipe-034",
+      "drawingIndex": 5120,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 991.335,
+        "y": 823.627
+      },
+      "toPdfPt": {
+        "x": 991.335,
+        "y": 820.009
+      },
+      "lengthPdfPt": 3.617
+    },
+    {
+      "id": "pipe-035",
+      "drawingIndex": 5121,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 991.335,
+        "y": 1612.622
+      },
+      "toPdfPt": {
+        "x": 991.335,
+        "y": 1616.239
+      },
+      "lengthPdfPt": 3.617
+    },
+    {
+      "id": "pipe-036",
+      "drawingIndex": 5228,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 802.98,
+        "y": 1608.548
+      },
+      "toPdfPt": {
+        "x": 717.28,
+        "y": 1608.548
+      },
+      "lengthPdfPt": 85.7
+    },
+    {
+      "id": "pipe-037",
+      "drawingIndex": 5229,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 802.98,
+        "y": 827.7
+      },
+      "toPdfPt": {
+        "x": 717.28,
+        "y": 827.7
+      },
+      "lengthPdfPt": 85.7
+    },
+    {
+      "id": "pipe-038",
+      "drawingIndex": 5241,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1222.929,
+        "y": 1608.548
+      },
+      "toPdfPt": {
+        "x": 1035.429,
+        "y": 1608.548
+      },
+      "lengthPdfPt": 187.5
+    },
+    {
+      "id": "pipe-039",
+      "drawingIndex": 5242,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1222.929,
+        "y": 827.7
+      },
+      "toPdfPt": {
+        "x": 1035.429,
+        "y": 827.7
+      },
+      "lengthPdfPt": 187.5
+    },
+    {
+      "id": "pipe-040",
+      "drawingIndex": 5287,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 846.164,
+        "y": 1619.048
+      },
+      "toPdfPt": {
+        "x": 988.523,
+        "y": 1619.048
+      },
+      "lengthPdfPt": 142.359
+    },
+    {
+      "id": "pipe-041",
+      "drawingIndex": 5288,
+      "strokeClass": "black-pipe",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 846.164,
+        "y": 817.2
+      },
+      "toPdfPt": {
+        "x": 988.523,
+        "y": 817.2
+      },
+      "lengthPdfPt": 142.359
+    },
+    {
+      "id": "pipe-042",
+      "drawingIndex": 5463,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 805.98,
+        "y": 1530.644
+      },
+      "toPdfPt": {
+        "x": 805.98,
+        "y": 1605.549
+      },
+      "lengthPdfPt": 74.905
+    },
+    {
+      "id": "pipe-043",
+      "drawingIndex": 5464,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 805.98,
+        "y": 905.605
+      },
+      "toPdfPt": {
+        "x": 805.98,
+        "y": 830.699
+      },
+      "lengthPdfPt": 74.905
+    },
+    {
+      "id": "pipe-044",
+      "drawingIndex": 5719,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 960.675,
+        "y": 1532.488
+      },
+      "toPdfPt": {
+        "x": 960.613,
+        "y": 1591.799
+      },
+      "lengthPdfPt": 59.311
+    },
+    {
+      "id": "pipe-045",
+      "drawingIndex": 5720,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 960.675,
+        "y": 903.76
+      },
+      "toPdfPt": {
+        "x": 960.613,
+        "y": 844.449
+      },
+      "lengthPdfPt": 59.311
+    },
+    {
+      "id": "pipe-046",
+      "drawingIndex": 5823,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 829.163,
+        "y": 1529.766
+      },
+      "toPdfPt": {
+        "x": 829.128,
+        "y": 1591.847
+      },
+      "lengthPdfPt": 62.081
+    },
+    {
+      "id": "pipe-047",
+      "drawingIndex": 5828,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 829.163,
+        "y": 906.482
+      },
+      "toPdfPt": {
+        "x": 829.128,
+        "y": 844.401
+      },
+      "lengthPdfPt": 62.081
+    },
+    {
+      "id": "pipe-048",
+      "drawingIndex": 5862,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1225.929,
+        "y": 1634.912
+      },
+      "toPdfPt": {
+        "x": 1225.929,
+        "y": 1611.434
+      },
+      "lengthPdfPt": 23.477
+    },
+    {
+      "id": "pipe-049",
+      "drawingIndex": 5863,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1225.929,
+        "y": 801.336
+      },
+      "toPdfPt": {
+        "x": 1225.929,
+        "y": 824.814
+      },
+      "lengthPdfPt": 23.477
+    },
+    {
+      "id": "pipe-050",
+      "drawingIndex": 6005,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1375.737,
+        "y": 1637.798
+      },
+      "toPdfPt": {
+        "x": 1228.929,
+        "y": 1637.798
+      },
+      "lengthPdfPt": 146.808
+    },
+    {
+      "id": "pipe-051",
+      "drawingIndex": 6006,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1375.821,
+        "y": 798.45
+      },
+      "toPdfPt": {
+        "x": 1228.929,
+        "y": 798.45
+      },
+      "lengthPdfPt": 146.892
+    },
+    {
+      "id": "pipe-052",
+      "drawingIndex": 6106,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1564.737,
+        "y": 1637.798
+      },
+      "toPdfPt": {
+        "x": 1377.237,
+        "y": 1637.798
+      },
+      "lengthPdfPt": 187.5
+    },
+    {
+      "id": "pipe-053",
+      "drawingIndex": 6107,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 1564.821,
+        "y": 798.45
+      },
+      "toPdfPt": {
+        "x": 1377.321,
+        "y": 798.45
+      },
+      "lengthPdfPt": 187.5
+    },
+    {
+      "id": "pipe-054",
+      "drawingIndex": 6365,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 915.495,
+        "y": 1532.51
+      },
+      "toPdfPt": {
+        "x": 915.488,
+        "y": 1546.798
+      },
+      "lengthPdfPt": 14.288
+    },
+    {
+      "id": "pipe-055",
+      "drawingIndex": 6366,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 915.495,
+        "y": 903.738
+      },
+      "toPdfPt": {
+        "x": 915.488,
+        "y": 889.45
+      },
+      "lengthPdfPt": 14.288
+    },
+    {
+      "id": "pipe-056",
+      "drawingIndex": 6436,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 874.138,
+        "y": 1529.792
+      },
+      "toPdfPt": {
+        "x": 874.128,
+        "y": 1546.8
+      },
+      "lengthPdfPt": 17.008
+    },
+    {
+      "id": "pipe-057",
+      "drawingIndex": 6438,
+      "strokeClass": "navy-arm-over",
+      "strokeRgb": [
+        0.0,
+        0.0,
+        0.502
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 874.138,
+        "y": 906.456
+      },
+      "toPdfPt": {
+        "x": 874.128,
+        "y": 889.448
+      },
+      "lengthPdfPt": 17.008
+    },
+    {
+      "id": "pipe-058",
+      "drawingIndex": 6467,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 886.929,
+        "y": 1104.138
+      },
+      "toPdfPt": {
+        "x": 709.051,
+        "y": 1104.138
+      },
+      "lengthPdfPt": 177.878
+    },
+    {
+      "id": "pipe-059",
+      "drawingIndex": 6536,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 890.045,
+        "y": 1100.853
+      },
+      "toPdfPt": {
+        "x": 890.045,
+        "y": 1098.353
+      },
+      "lengthPdfPt": 2.5
+    },
+    {
+      "id": "pipe-060",
+      "drawingIndex": 6544,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 890.045,
+        "y": 1096.853
+      },
+      "toPdfPt": {
+        "x": 890.045,
+        "y": 909.355
+      },
+      "lengthPdfPt": 187.498
+    },
+    {
+      "id": "pipe-061",
+      "drawingIndex": 6592,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 890.045,
+        "y": 1107.423
+      },
+      "toPdfPt": {
+        "x": 890.045,
+        "y": 1148.849
+      },
+      "lengthPdfPt": 41.426
+    },
+    {
+      "id": "pipe-062",
+      "drawingIndex": 6605,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 890.045,
+        "y": 1150.349
+      },
+      "toPdfPt": {
+        "x": 890.045,
+        "y": 1337.894
+      },
+      "lengthPdfPt": 187.545
+    },
+    {
+      "id": "pipe-063",
+      "drawingIndex": 6636,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 893.263,
+        "y": 1530.177
+      },
+      "toPdfPt": {
+        "x": 980.573,
+        "y": 1530.135
+      },
+      "lengthPdfPt": 87.309
+    },
+    {
+      "id": "pipe-064",
+      "drawingIndex": 6637,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 893.263,
+        "y": 906.071
+      },
+      "toPdfPt": {
+        "x": 980.573,
+        "y": 906.113
+      },
+      "lengthPdfPt": 87.309
+    },
+    {
+      "id": "pipe-065",
+      "drawingIndex": 6638,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 881.303,
+        "y": 1527.687
+      },
+      "toPdfPt": {
+        "x": 808.909,
+        "y": 1527.645
+      },
+      "lengthPdfPt": 72.394
+    },
+    {
+      "id": "pipe-066",
+      "drawingIndex": 6639,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 881.303,
+        "y": 908.562
+      },
+      "toPdfPt": {
+        "x": 808.909,
+        "y": 908.603
+      },
+      "lengthPdfPt": 72.394
+    },
+    {
+      "id": "pipe-067",
+      "drawingIndex": 6666,
+      "strokeClass": "red-pipe",
+      "strokeRgb": [
+        0.753,
+        0.0,
+        0.0
+      ],
+      "strokeWidthPdfPt": 0.014,
+      "whiteMaskTwin": true,
+      "fromPdfPt": {
+        "x": 890.045,
+        "y": 1339.394
+      },
+      "toPdfPt": {
+        "x": 890.045,
+        "y": 1526.893
+      },
+      "lengthPdfPt": 187.5
+    }
+  ],
+  "sprinklers": [
+    {
+      "id": "head-001",
+      "drawingIndex": 4244,
+      "symbolType": "TY-FRB",
+      "symbolItemCount": 21,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 8.101
+      },
+      "centerPdfPt": {
+        "x": 1220.407,
+        "y": 1245.182
+      },
+      "nearestPipeSegmentId": "pipe-016",
+      "pipeDistancePdfPt": 1.466
+    },
+    {
+      "id": "head-002",
+      "drawingIndex": 4245,
+      "symbolType": "TY-FRB",
+      "symbolItemCount": 21,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 8.101
+      },
+      "centerPdfPt": {
+        "x": 560.755,
+        "y": 1245.182
+      },
+      "nearestPipeSegmentId": "pipe-017",
+      "pipeDistancePdfPt": 1.466
+    },
+    {
+      "id": "head-003",
+      "drawingIndex": 4255,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 534.907,
+        "y": 1585.181
+      },
+      "nearestPipeSegmentId": "pipe-008",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-004",
+      "drawingIndex": 4267,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 534.907,
+        "y": 851.067
+      },
+      "nearestPipeSegmentId": "pipe-009",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-005",
+      "drawingIndex": 4301,
+      "symbolType": "TY-FRB",
+      "symbolItemCount": 21,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 8.137
+      },
+      "centerPdfPt": {
+        "x": 1220.401,
+        "y": 1190.993
+      },
+      "nearestPipeSegmentId": "pipe-020",
+      "pipeDistancePdfPt": 1.448
+    },
+    {
+      "id": "head-006",
+      "drawingIndex": 4302,
+      "symbolType": "TY-FRB",
+      "symbolItemCount": 21,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 8.137
+      },
+      "centerPdfPt": {
+        "x": 560.76,
+        "y": 1190.993
+      },
+      "nearestPipeSegmentId": "pipe-021",
+      "pipeDistancePdfPt": 1.448
+    },
+    {
+      "id": "head-007",
+      "drawingIndex": 4525,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 665.409,
+        "y": 1537.674
+      },
+      "nearestPipeSegmentId": "pipe-024",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-008",
+      "drawingIndex": 4537,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 611.409,
+        "y": 1537.674
+      },
+      "nearestPipeSegmentId": "pipe-024",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-009",
+      "drawingIndex": 4549,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 611.409,
+        "y": 898.575
+      },
+      "nearestPipeSegmentId": "pipe-025",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-010",
+      "drawingIndex": 4561,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 665.409,
+        "y": 898.575
+      },
+      "nearestPipeSegmentId": "pipe-025",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-011",
+      "drawingIndex": 4617,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 717.101,
+        "y": 1218.124
+      },
+      "nearestPipeSegmentId": "pipe-026",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-012",
+      "drawingIndex": 4630,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 663.102,
+        "y": 1218.124
+      },
+      "nearestPipeSegmentId": "pipe-026",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-013",
+      "drawingIndex": 4644,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 609.103,
+        "y": 1218.124
+      },
+      "nearestPipeSegmentId": "pipe-026",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-014",
+      "drawingIndex": 4697,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 8.999,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1166.35,
+        "y": 1218.124
+      },
+      "nearestPipeSegmentId": "pipe-027",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-015",
+      "drawingIndex": 4709,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 8.999,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1058.349,
+        "y": 1218.124
+      },
+      "nearestPipeSegmentId": "pipe-027",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-016",
+      "drawingIndex": 4723,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 8.999,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1112.341,
+        "y": 1218.124
+      },
+      "nearestPipeSegmentId": "pipe-027",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-017",
+      "drawingIndex": 5469,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1011.911,
+        "y": 1608.548
+      },
+      "nearestPipeSegmentId": "pipe-032",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-018",
+      "drawingIndex": 5481,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1011.911,
+        "y": 827.7
+      },
+      "nearestPipeSegmentId": "pipe-033",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-019",
+      "drawingIndex": 5497,
+      "symbolType": "SD1",
+      "symbolItemCount": 23,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 849.914,
+        "y": 1619.048
+      },
+      "nearestPipeSegmentId": "pipe-040",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-020",
+      "drawingIndex": 5504,
+      "symbolType": "SD1",
+      "symbolItemCount": 23,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 903.914,
+        "y": 1619.048
+      },
+      "nearestPipeSegmentId": "pipe-040",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-021",
+      "drawingIndex": 5511,
+      "symbolType": "SD1",
+      "symbolItemCount": 23,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 957.914,
+        "y": 1619.048
+      },
+      "nearestPipeSegmentId": "pipe-040",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-022",
+      "drawingIndex": 5518,
+      "symbolType": "SD1",
+      "symbolItemCount": 23,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 957.914,
+        "y": 817.2
+      },
+      "nearestPipeSegmentId": "pipe-041",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-023",
+      "drawingIndex": 5525,
+      "symbolType": "SD1",
+      "symbolItemCount": 23,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 849.914,
+        "y": 817.2
+      },
+      "nearestPipeSegmentId": "pipe-041",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-024",
+      "drawingIndex": 5532,
+      "symbolType": "SD1",
+      "symbolItemCount": 23,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 903.914,
+        "y": 817.2
+      },
+      "nearestPipeSegmentId": "pipe-041",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-025",
+      "drawingIndex": 5541,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1065.91,
+        "y": 1608.548
+      },
+      "nearestPipeSegmentId": "pipe-038",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-026",
+      "drawingIndex": 5553,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1065.91,
+        "y": 827.7
+      },
+      "nearestPipeSegmentId": "pipe-039",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-027",
+      "drawingIndex": 5565,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 733.652,
+        "y": 1608.548
+      },
+      "nearestPipeSegmentId": "pipe-036",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-028",
+      "drawingIndex": 5577,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 733.652,
+        "y": 827.7
+      },
+      "nearestPipeSegmentId": "pipe-037",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-029",
+      "drawingIndex": 5589,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1119.91,
+        "y": 1608.548
+      },
+      "nearestPipeSegmentId": "pipe-038",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-030",
+      "drawingIndex": 5601,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1119.91,
+        "y": 827.7
+      },
+      "nearestPipeSegmentId": "pipe-039",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-031",
+      "drawingIndex": 5613,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1173.91,
+        "y": 1608.548
+      },
+      "nearestPipeSegmentId": "pipe-038",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-032",
+      "drawingIndex": 5625,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1173.91,
+        "y": 827.7
+      },
+      "nearestPipeSegmentId": "pipe-039",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-033",
+      "drawingIndex": 5641,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 787.651,
+        "y": 1608.548
+      },
+      "nearestPipeSegmentId": "pipe-036",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-034",
+      "drawingIndex": 5653,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 787.651,
+        "y": 827.7
+      },
+      "nearestPipeSegmentId": "pipe-037",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-035",
+      "drawingIndex": 5790,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 960.675,
+        "y": 1592.925
+      },
+      "nearestPipeSegmentId": "pipe-044",
+      "pipeDistancePdfPt": 1.128
+    },
+    {
+      "id": "head-036",
+      "drawingIndex": 5802,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 960.675,
+        "y": 843.323
+      },
+      "nearestPipeSegmentId": "pipe-045",
+      "pipeDistancePdfPt": 1.128
+    },
+    {
+      "id": "head-037",
+      "drawingIndex": 5875,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 829.127,
+        "y": 1592.925
+      },
+      "nearestPipeSegmentId": "pipe-046",
+      "pipeDistancePdfPt": 1.078
+    },
+    {
+      "id": "head-038",
+      "drawingIndex": 5887,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 829.127,
+        "y": 843.323
+      },
+      "nearestPipeSegmentId": "pipe-047",
+      "pipeDistancePdfPt": 1.078
+    },
+    {
+      "id": "head-039",
+      "drawingIndex": 6149,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1236.9,
+        "y": 1637.798
+      },
+      "nearestPipeSegmentId": "pipe-050",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-040",
+      "drawingIndex": 6161,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1236.9,
+        "y": 798.45
+      },
+      "nearestPipeSegmentId": "pipe-051",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-041",
+      "drawingIndex": 6175,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1290.9,
+        "y": 1637.798
+      },
+      "nearestPipeSegmentId": "pipe-050",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-042",
+      "drawingIndex": 6187,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1290.9,
+        "y": 798.45
+      },
+      "nearestPipeSegmentId": "pipe-051",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-043",
+      "drawingIndex": 6201,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1344.9,
+        "y": 1637.798
+      },
+      "nearestPipeSegmentId": "pipe-050",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-044",
+      "drawingIndex": 6213,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1344.9,
+        "y": 798.45
+      },
+      "nearestPipeSegmentId": "pipe-051",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-045",
+      "drawingIndex": 6227,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1398.9,
+        "y": 1637.798
+      },
+      "nearestPipeSegmentId": "pipe-052",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-046",
+      "drawingIndex": 6239,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1398.9,
+        "y": 798.45
+      },
+      "nearestPipeSegmentId": "pipe-053",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-047",
+      "drawingIndex": 6254,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1452.9,
+        "y": 1637.798
+      },
+      "nearestPipeSegmentId": "pipe-052",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-048",
+      "drawingIndex": 6266,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1452.9,
+        "y": 798.45
+      },
+      "nearestPipeSegmentId": "pipe-053",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-049",
+      "drawingIndex": 6278,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1506.899,
+        "y": 1637.798
+      },
+      "nearestPipeSegmentId": "pipe-052",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-050",
+      "drawingIndex": 6290,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1506.899,
+        "y": 798.45
+      },
+      "nearestPipeSegmentId": "pipe-053",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-051",
+      "drawingIndex": 6302,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1560.903,
+        "y": 1637.798
+      },
+      "nearestPipeSegmentId": "pipe-052",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-052",
+      "drawingIndex": 6314,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 1560.903,
+        "y": 798.45
+      },
+      "nearestPipeSegmentId": "pipe-053",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-053",
+      "drawingIndex": 6938,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 915.675,
+        "y": 1547.925
+      },
+      "nearestPipeSegmentId": "pipe-054",
+      "pipeDistancePdfPt": 1.143
+    },
+    {
+      "id": "head-054",
+      "drawingIndex": 6950,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 874.127,
+        "y": 1547.925
+      },
+      "nearestPipeSegmentId": "pipe-056",
+      "pipeDistancePdfPt": 1.125
+    },
+    {
+      "id": "head-055",
+      "drawingIndex": 6962,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 874.127,
+        "y": 888.323
+      },
+      "nearestPipeSegmentId": "pipe-057",
+      "pipeDistancePdfPt": 1.125
+    },
+    {
+      "id": "head-056",
+      "drawingIndex": 6974,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 915.675,
+        "y": 888.323
+      },
+      "nearestPipeSegmentId": "pipe-055",
+      "pipeDistancePdfPt": 1.142
+    },
+    {
+      "id": "head-057",
+      "drawingIndex": 7066,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1511.905
+      },
+      "nearestPipeSegmentId": "pipe-067",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-058",
+      "drawingIndex": 7078,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1457.905
+      },
+      "nearestPipeSegmentId": "pipe-067",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-059",
+      "drawingIndex": 7090,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1187.905
+      },
+      "nearestPipeSegmentId": "pipe-062",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-060",
+      "drawingIndex": 7102,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1133.905
+      },
+      "nearestPipeSegmentId": "pipe-061",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-061",
+      "drawingIndex": 7114,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1025.905
+      },
+      "nearestPipeSegmentId": "pipe-060",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-062",
+      "drawingIndex": 7126,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 971.905
+      },
+      "nearestPipeSegmentId": "pipe-060",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-063",
+      "drawingIndex": 7138,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1403.905
+      },
+      "nearestPipeSegmentId": "pipe-067",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-064",
+      "drawingIndex": 7150,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1349.905
+      },
+      "nearestPipeSegmentId": "pipe-067",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-065",
+      "drawingIndex": 7162,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1295.905
+      },
+      "nearestPipeSegmentId": "pipe-062",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-066",
+      "drawingIndex": 7174,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1241.905
+      },
+      "nearestPipeSegmentId": "pipe-062",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-067",
+      "drawingIndex": 7186,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 1079.905
+      },
+      "nearestPipeSegmentId": "pipe-060",
+      "pipeDistancePdfPt": 0.0
+    },
+    {
+      "id": "head-068",
+      "drawingIndex": 7198,
+      "symbolType": "BB1",
+      "symbolItemCount": 25,
+      "symbolStrokeWidthPdfPt": 0.4,
+      "symbolBoundsPdfPt": {
+        "width": 9.0,
+        "height": 9.0
+      },
+      "centerPdfPt": {
+        "x": 890.045,
+        "y": 917.905
+      },
+      "nearestPipeSegmentId": "pipe-060",
+      "pipeDistancePdfPt": 0.0
+    }
+  ]
+}

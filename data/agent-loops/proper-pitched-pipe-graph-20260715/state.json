@@ -1,8 +1,8 @@
 {
   "loop": "proper-pitched-pipe-graph-20260715",
   "stage": "ITERATE",
-  "status": "verified-contract-current-new-hope-graph-fails-closed",
-  "iteration": 2,
+  "status": "verified-full-fp20-source-vectors-graph-still-fails-closed",
+  "iteration": 3,
   "brainPreflight": {
     "status": "passed",
     "topEpisodes": [148034, 120030, 125723, 124864, 62935]
@@ -13,6 +13,8 @@
   },
   "implementation": {
     "productionGate": "apps/autosprink/src/engine/proper-pitched-pipe-graph.js",
+    "sourceVectorGate": "apps/autosprink/src/engine/approved-fp20-pipe-vectors.js",
+    "sourceVectorEvidence": "apps/autosprink/src/data/new-hope-approved-fp20-pipe-vectors.json",
     "visualProof": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
     "requirements": [
       "scaled plan XY",
@@ -29,6 +31,24 @@
       "hydraulic node identity",
       "whole-network connectivity"
     ]
+  },
+  "approvedFp20SourceExtraction": {
+    "status": "passed",
+    "sourceSha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+    "pipeVectorCount": 67,
+    "pipeStrokeClasses": {
+      "red-pipe": 40,
+      "black-pipe": 15,
+      "navy-arm-over": 12
+    },
+    "sprinklerCount": 68,
+    "sprinklerSymbolClasses": {
+      "BB1": 58,
+      "SD1": 6,
+      "TY-FRB": 4
+    },
+    "maximumHeadToPipeDistancePdfPt": 1.466,
+    "adversarialFinding": "A red-only color classifier misses approved black branches and navy arm-over or drop paths and is rejected."
   },
   "currentNewHopeAssessment": {
     "nodeCount": 7,
@@ -52,7 +72,7 @@
   },
   "verification": {
     "loopGuard": "passed",
-    "focusedTests": "14 passed across proper pipe graph, New Hope calibration, and actual-PDF proof",
+    "focusedTests": "13 passed across FP2.0 vector extraction, proper pipe graph, adversarial mutations, and actual-PDF proof",
     "productionBuild": "passed Vite build",
     "formalProof": {
       "status": "verified",
@@ -62,18 +82,20 @@
     },
     "browser": {
       "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
-      "actualPdfImagesDecoded": 4,
-      "machineBlockerRows": 7,
-      "viewport": "778x1270",
-      "horizontalOverflow": false,
-      "consoleWarningsOrErrors": 0
+      "proofReady": true,
+      "pipeVectorStatus": "passed",
+      "pipeGraphStatus": "blocked",
+      "overlayVectorCount": 67,
+      "overlayHeadCount": 68,
+      "approvedUnderlayPixels": "6048x4320",
+      "overlayViewBoxPdfPt": "3024x2160"
     },
     "agenticRules": "passed"
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 148076,
-    "title": "Proper pitched pipe layout is now a fail-closed graph contract"
+    "episodeId": 148147,
+    "title": "Approved FP2.0 vector replay closes all 67 pipe paths and 68 heads"
   },
   "claims": {
     "properPipeLayoutReady": false,
@@ -83,5 +105,5 @@
     "wholeNetworkReady": false,
     "fieldReleaseReady": false
   },
-  "nextAction": "Extract the full approved New Hope FP2.0 vector topology and bind grade arrows, pipe-size labels, low-point leaders, drum-drip destinations, fittings, riser feed, and hydraulic node labels. Then replay every edge through this gate and render the source-bound top, elevation, and 3D views."
+  "nextAction": "Promote the 67 accepted source vectors into one snapped topology and bind pipe-role and size labels, hydraulic flow, grade arrows, low-point leaders, drum-drip destinations, fittings, riser feed, hydraulic node labels, and source-derived elevations. Then replay every governed edge through the proper-pipe gate and render the source-bound top, elevation, and 3D views."
 }

@@ -26,9 +26,14 @@ describe('New Hope PDF-bound visual proof', () => {
   it('loads the sealed calibration and generates the S102 overlay from data', () => {
     const script = read('proof.js');
     expect(script).toContain('../../new-hope-truss-clearance-calibration.json');
+    expect(script).toContain('../../new-hope-approved-fp20-pipe-vectors.json');
     expect(script).toContain('calibration.trussLattice.centerlines');
     expect(script).toContain('calibration.branch.nodes');
+    expect(script).toContain('pipeVectors.pipeSegments');
+    expect(script).toContain('pipeVectors.sprinklers');
+    expect(script).toContain('evaluateApprovedFp20PipeVectors');
     expect(script).toContain("dataset.proofReady = 'true'");
+    expect(script).toContain('dataset.pipeVectorStatus = vectorAcceptance.status');
     expect(script).toContain('evaluateProperPitchedPipeGraph');
     expect(script).toContain('dataset.pipeGraphStatus = acceptance.status');
   });

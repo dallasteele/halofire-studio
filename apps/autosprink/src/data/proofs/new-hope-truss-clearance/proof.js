@@ -2,10 +2,13 @@ import {
   buildNewHopeProperPipeGraphCandidate,
   evaluateProperPitchedPipeGraph,
 } from '../../../engine/proper-pitched-pipe-graph.js';
+import { evaluateApprovedFp20PipeVectors } from '../../../engine/approved-fp20-pipe-vectors.js';
 
 const calibrationUrl = '../../new-hope-truss-clearance-calibration.json';
 const sourceUrl = '../../new-hope-truss-clearance-source.json';
+const pipeVectorUrl = '../../new-hope-approved-fp20-pipe-vectors.json';
 const svg = document.querySelector('#structural-overlay');
+const pipeSvg = document.querySelector('#fp20-pipe-overlay');
 const rows = document.querySelector('#clearance-rows');
 const status = document.querySelector('#load-status');
 const NS = 'http://www.w3.org/2000/svg';
@@ -17,10 +20,11 @@ function element(name, attributes = {}) {
 }
 
 try {
-  const [response, sourceResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl)]);
+  const [response, sourceResponse, pipeVectorResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl)]);
   if (!response.ok) throw new Error(`calibration fetch ${response.status}`);
   if (!sourceResponse.ok) throw new Error(`source fetch ${sourceResponse.status}`);
-  const [calibration, source] = await Promise.all([response.json(), sourceResponse.json()]);
+  if (!pipeVectorResponse.ok) throw new Error(`pipe vector fetch ${pipeVectorResponse.status}`);
+  const [calibration, source, pipeVectors] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json()]);
   const scale = 1.5;
   const branchY = 430;
 
@@ -44,6 +48,29 @@ try {
   }
   status.textContent = `Sealed replay loaded: ${calibration.trussLattice.detectedCount} trusses, ${calibration.branch.nodes.length} approved heads, receipt ${calibration.receiptSha256.slice(0, 16)}...`;
   status.classList.remove('loading');
+  const vectorAcceptance = evaluateApprovedFp20PipeVectors(pipeVectors);
+  if (!vectorAcceptance.vectorExtractionReady) throw new Error(`approved FP2.0 vector gate: ${vectorAcceptance.blockerCodes.join(', ')}`);
+  for (const segment of pipeVectors.pipeSegments) {
+    const line = element('line', {
+      class: `pipe-vector ${segment.strokeClass}`,
+      x1: segment.fromPdfPt.x,
+      y1: segment.fromPdfPt.y,
+      x2: segment.toPdfPt.x,
+      y2: segment.toPdfPt.y,
+    });
+    const title = element('title');
+    title.textContent = `${segment.id}: ${segment.strokeClass}, ${(segment.lengthPdfPt / pipeVectors.planRegistration.pdfPtPerFt).toFixed(2)} ft visible`;
+    line.append(title);
+    pipeSvg.append(line);
+  }
+  for (const head of pipeVectors.sprinklers) {
+    const circle = element('circle', { class: `pipe-head ${head.symbolType}`, cx: head.centerPdfPt.x, cy: head.centerPdfPt.y, r: 5.6 });
+    const title = element('title');
+    title.textContent = `${head.id}: ${head.symbolType}, route ${head.nearestPipeSegmentId}`;
+    circle.append(title);
+    pipeSvg.append(circle);
+  }
+  document.querySelector('#vector-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.pipeVectorCount} pipe vectors, ${vectorAcceptance.metrics.sprinklerCount} heads, ${vectorAcceptance.metrics.totalVisiblePipeLengthFt.toFixed(1)} visible ft`;
   const candidate = buildNewHopeProperPipeGraphCandidate(calibration, source);
   const acceptance = evaluateProperPitchedPipeGraph(candidate);
   document.querySelector('#graph-node-count').textContent = acceptance.metrics.nodeCount;
@@ -57,8 +84,9 @@ try {
     row.innerHTML = `<td style="color:#fda4af">${code}</td><td>${messages.get(code)}</td>`;
     blockerRows.append(row);
   }
-  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | exactHeadXyReady=true | conditionalTrussClearanceReady=true | pipeGraphNodes=${acceptance.metrics.nodeCount} | pipeGraphEdges=${acceptance.metrics.edgeCount} | machineBlockerCodes=${acceptance.blockerCodes.length} | properPipeLayoutReady=${acceptance.properPipeLayoutReady} | complianceReady=false | fabricationReady=false | fieldReleaseReady=${acceptance.fieldReleaseReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | fullApprovedVectorExtractionReady=${vectorAcceptance.vectorExtractionReady} | approvedPipeVectors=${vectorAcceptance.metrics.pipeVectorCount} | approvedSprinklers=${vectorAcceptance.metrics.sprinklerCount} | exactHeadXyReady=true | conditionalTrussClearanceReady=true | pipeGraphNodes=${acceptance.metrics.nodeCount} | pipeGraphEdges=${acceptance.metrics.edgeCount} | machineBlockerCodes=${acceptance.blockerCodes.length} | properPipeLayoutReady=${acceptance.properPipeLayoutReady} | branchGradeDirectionReady=false | endpointElevationsReady=false | drainDestinationReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=${acceptance.fieldReleaseReady}`;
   document.documentElement.dataset.proofReady = 'true';
+  document.documentElement.dataset.pipeVectorStatus = vectorAcceptance.status;
   document.documentElement.dataset.pipeGraphStatus = acceptance.status;
 } catch (error) {
   status.textContent = `Proof blocked: ${error.message}`;
