@@ -162,6 +162,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.hydraulicRouteSet - Evaluated calculation route set.
  * @param {object} inputs.architecturalVerticalControls - Evaluated A201/A301 controls.
  * @param {object} inputs.elevationDatum - Evaluated FP0.1/A102/calculation datum registration.
+ * @param {object} inputs.sourceFeedFabrication - Evaluated CML.01 plan/listing/outlet registration.
  * @param {object} inputs.operationalAnnotations - Source notes, grades, drains, and details.
  * @param {object} inputs.longBranchDrainage - Long-branch drainage schedule.
  * @param {object} inputs.sideBranchDrainage - Side-branch drainage schedule.
@@ -180,6 +181,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     hydraulicRouteSet,
     architecturalVerticalControls,
     elevationDatum,
+    sourceFeedFabrication,
     operationalAnnotations,
     longBranchDrainage,
     sideBranchDrainage,
@@ -195,6 +197,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     hydraulicRouteSet,
     architecturalVerticalControls,
     elevationDatum,
+    sourceFeedFabrication,
     operationalAnnotations,
   ].map((entry) => entry?.projectId)
   if (projectIds.some((projectId) => projectId !== EXPECTED_PROJECT_ID)) {
@@ -222,6 +225,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['hydraulic-route-set', hydraulicRouteSet?.status],
     ['architectural-vertical-controls', architecturalVerticalControls?.status],
     ['calculation-elevation-datum', elevationDatum?.status],
+    ['source-feed-fabrication', sourceFeedFabrication?.status],
     ['long-branch-drainage', longBranchDrainage?.status],
     ['side-branch-drainage', sideBranchDrainage?.status],
     ['cross-main-drainage', crossMainDrainage?.status],
@@ -360,7 +364,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
-      'The supply-feed transition is source-anchored in plan but does not yet have a complete side-view/3D path.',
+      'CML.01, its 4 x 3 upward outlet, and node-118 elevation are source-bound; endpoint Z, installed grade, and the concealed riser-room continuation remain unresolved.',
       'source-edge-001,source-edge-002',
     ),
     issue(
@@ -395,7 +399,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         fromNodeId: edge.fromNodeId,
         toNodeId: edge.toNodeId,
         classification: EXPECTED_SUPPLY_EDGE_IDS.includes(edge.id)
-          ? 'source-feed-3d-path-unresolved'
+          ? 'source-feed-fabricated-plan-edge-endpoint-z-and-grade-unresolved'
           : 'low-point-zone-grade-unresolved',
       })),
     exactElevationPorts: ports,
@@ -453,7 +457,22 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     architecturalVerticalControlReady:
       ready && architecturalVerticalControls?.architecturalVerticalControlReady === true,
     calculationToArchitecturalDatumRegistrationReady,
+    sourceFeedFabrication: sourceFeedFabrication
+      ? {
+          piece: sourceFeedFabrication.piece,
+          outlet: sourceFeedFabrication.outlet,
+        }
+      : null,
     lowPointZoneGradeReady: false,
+    sourceFeedPlanFabricationReady:
+      ready && sourceFeedFabrication?.sourceFeedPlanFabricationReady === true,
+    sourceFeedOutletTransitionReady:
+      ready && sourceFeedFabrication?.sourceFeedOutletTransitionReady === true,
+    sourceFeedOutletElevationReady:
+      ready && sourceFeedFabrication?.sourceFeedOutletElevationReady === true,
+    sourceFeedEndpointElevationsReady: false,
+    sourceFeedInstalledGradeReady: false,
+    sourceFeedConcealedRiserContinuationReady: false,
     sourceFeed3dPathReady: false,
     fieldDrainRoutesReady,
     drumDripDetailReady,

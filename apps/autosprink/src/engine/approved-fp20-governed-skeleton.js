@@ -50,6 +50,25 @@ function validateFabricationLineEvidence(annotations, issues) {
     || cmk?.systemConnectionCanonicalNodeId !== 'canonical-node-007') {
     issues.push(issue('FP20_CMK_LINE_BINDING_INVALID', 'CMK.01-.03 must bind pipe-004/005/006 as one 2.5-inch cross main from the system connection to its capped high end and branch outlets.', 'CMK'));
   }
+  const cml = evidence?.primaryLineBindings?.find((entry) => entry.lineName === 'CML');
+  if (cml?.systemRole !== 'source-feed'
+    || cml?.nominalDiameterIn !== 4
+    || JSON.stringify(cml?.sourceSegmentIds) !== JSON.stringify(['pipe-001'])
+    || JSON.stringify(cml?.sourceEdgeIds) !== JSON.stringify(['source-edge-001', 'source-edge-002'])
+    || JSON.stringify(cml?.pieceIds) !== JSON.stringify(['CML.01'])
+    || cml?.cutLengthIn !== 35.5
+    || cml?.outletCanonicalNodeId !== 'canonical-node-002'
+    || cml?.outletCalculationNodeId !== '118'
+    || cml?.outletFitting !== '4 x 3 grooved outlet'
+    || cml?.outletOrientation !== 'up-0-degrees'
+    || cml?.outletNominalDiameterIn !== 3
+    || cml?.outletFromPieceStartIn !== 29.5
+    || cml?.outletToPieceFarEndIn !== 6
+    || cml?.downstreamSourceSegmentId !== 'pipe-002'
+    || cml?.endpointElevationStatus !== 'unresolved'
+    || cml?.installedGradeStatus !== 'unresolved') {
+    issues.push(issue('FP20_CML_SOURCE_FEED_BINDING_INVALID', 'CML.01 must remain the exact 4-inch source-feed piece split around its 4 x 3 upward outlet; endpoint Z and installed grade must stay unresolved.', 'CML'));
+  }
   const crossing = evidence?.separatedCrossings?.find((entry) => entry.canonicalNodeId === 'canonical-node-022');
   if (crossing?.crossMainSourceSegmentId !== 'pipe-062'
     || crossing?.branchLineSourceSegmentId !== 'pipe-013'
@@ -217,7 +236,8 @@ export function evaluateApprovedFp20GovernedSkeleton(pipeEvidence, planGraph, an
     drainIntentReady: issues.length === 0,
     gradeMagnitudeReady: issues.length === 0,
     hydraulicCalculationCorpusReady: issues.length === 0,
-    fabricationLineRoleBindingReady: issues.length === 0 && lineBindingBySegmentId.size === 3,
+    fabricationLineRoleBindingReady: issues.length === 0 && lineBindingBySegmentId.size === 4,
+    sourceFeedFabricationBindingReady: issues.length === 0,
     separatedCrossingEvidenceReady: issues.length === 0,
     hydraulicNodeBindingReady: false,
     wholeSystemVectorExtractionReady: false,

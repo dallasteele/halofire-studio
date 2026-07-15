@@ -11,6 +11,7 @@ import { evaluateNewHopeElevationDatum } from '../src/engine/new-hope-elevation-
 import { evaluateNewHopeLongBranchDrainage } from '../src/engine/new-hope-long-branch-drainage.js'
 import { evaluateNewHopeProperPipeLayout } from '../src/engine/new-hope-proper-pipe-layout.js'
 import { evaluateNewHopeSideBranchDrainage } from '../src/engine/new-hope-side-branch-drainage.js'
+import { evaluateNewHopeSourceFeedFabrication } from '../src/engine/new-hope-source-feed-fabrication.js'
 
 const read = (name) =>
   JSON.parse(fs.readFileSync(new URL(`../src/data/${name}`, import.meta.url), 'utf8'))
@@ -32,6 +33,12 @@ const hydraulicRouteSet = bindApprovedFp20HydraulicRouteSet(canonicalTopology, h
 const architecturalVerticalControls =
   evaluateApprovedFp20ArchitecturalVerticalControls(architecturalSource)
 const elevationDatum = evaluateNewHopeElevationDatum(elevationDatumSource, hydraulicRoutes)
+const sourceFeedFabrication = evaluateNewHopeSourceFeedFabrication({
+  canonicalTopology,
+  governedSkeleton,
+  operationalAnnotations,
+  hydraulicRoutes,
+})
 const longBranchDrainage = evaluateNewHopeLongBranchDrainage({
   pipeVectors,
   canonicalTopology,
@@ -76,6 +83,7 @@ const inputs = {
   hydraulicRouteSet,
   architecturalVerticalControls,
   elevationDatum,
+  sourceFeedFabrication,
   operationalAnnotations,
   longBranchDrainage,
   sideBranchDrainage,
@@ -108,14 +116,20 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       fieldDrainIntentCount: 2,
     })
     expect(result.undirectedEdges.map((edge) => [edge.edgeId, edge.classification])).toEqual([
-      ['source-edge-001', 'source-feed-3d-path-unresolved'],
-      ['source-edge-002', 'source-feed-3d-path-unresolved'],
+      ['source-edge-001', 'source-feed-fabricated-plan-edge-endpoint-z-and-grade-unresolved'],
+      ['source-edge-002', 'source-feed-fabricated-plan-edge-endpoint-z-and-grade-unresolved'],
       ['source-edge-054', 'low-point-zone-grade-unresolved'],
     ])
     expect(result.wholeFp20RelativeGradeDirectionReady).toBe(true)
     expect(result.partialExactPipeElevationAnchorReady).toBe(true)
     expect(result.exactPipeCenterlineZReady).toBe(false)
     expect(result.calculationToArchitecturalDatumRegistrationReady).toBe(true)
+    expect(result.sourceFeedPlanFabricationReady).toBe(true)
+    expect(result.sourceFeedOutletTransitionReady).toBe(true)
+    expect(result.sourceFeedOutletElevationReady).toBe(true)
+    expect(result.sourceFeedEndpointElevationsReady).toBe(false)
+    expect(result.sourceFeedInstalledGradeReady).toBe(false)
+    expect(result.sourceFeedConcealedRiserContinuationReady).toBe(false)
     expect(result.properPipeLayoutReady).toBe(false)
     expect(result.fabricationReady).toBe(false)
   })

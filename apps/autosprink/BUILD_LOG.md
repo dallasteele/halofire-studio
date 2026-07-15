@@ -1,5 +1,14 @@
 # HaloFire Build Log
 
+## 2026-07-15 - New Hope CML.01 source-feed fabrication registration
+
+- Rendered and visually inspected the exact field-set FP2.0 source (`4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5`) beside fabrication-listing page 20 (`2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734`). Both identify CML.01 as one 4-inch, 2-foot 11-1/2-inch piece with 2 feet 5-1/2 inches before and 6 inches after a 4 x 3 upward grooved outlet.
+- Bound the two split `pipe-001` plan edges to CML.01, the outlet to canonical node 002 and downstream 3-inch `pipe-002`, and approved calculation node 118 to the outlet at local elevation 11.5 feet across RA2-1/2/3.
+- Kept the two CML.01 endpoint elevations, installed grade, and concealed continuation to the riser room unresolved. Source-feed plan fabrication, outlet transition, and outlet elevation are true; source-feed 3D, complete fitting schedule, fabrication, and field release remain false.
+- Verified 105 New Hope/FP2.0 tests across 20 files, including CML piece/outlet/plan-split/Z/false-grade adversarial mutations, plus the production Vite build. GX10 Lean 4.13.0 verified theorem `newHopeSourceFeed3dStaysBlocked` in 92 ms with return code 0.
+- In-app browser verification loaded all eight actual PDF underlay images, reported zero failed images and zero console warnings/errors, and exposed the three newly passed source-feed gates alongside the five remaining acceptance blockers.
+- Next: source-bind the low-point-01 connector grade and continue mapping listing/field-set fitting identities and vertical offsets without inferring non-calculated endpoint Z or field-routed drum-drip geometry.
+
 ## 2026-07-14 - MIT Riverside Building J roof/cricket and protection-plane elevation replay
 
 - Rehashed the protected 116.7 MB architectural bid set and Building J section E/F DWGs, then replayed physical roof-plan page 106 plus exact section handles `D81`, `9DC`, `115C`, and `115F` without modifying the Egnyte corpus.
