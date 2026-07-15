@@ -21,7 +21,7 @@ reference log entries by date; log entries reference commits by short hash.
 
 ## 2026-07-15
 
-### Entry 03 - Building J topology-aware placement v2 (commit pending)
+### Entry 03 - Building J topology-aware placement v2 (commit `aff59aa3`)
 
 - Replaced the rejected whole-region grid with transferable protected-source
   rules: every other real structural framing axis plus source-grid-centered
@@ -47,7 +47,8 @@ reference log entries by date; log entries reference commits by short hash.
 - GX10 Lean port 8810 remained unreachable and local Lean is absent; the exact
   theorem request and fail-closed prover-unavailable receipt are retained.
   Obsidian brain recall was attempted again and failed closed with
-  `HAL_BRAIN_TOKEN_UNAVAILABLE`; no recall is claimed.
+  `HAL_BRAIN_TOKEN_UNAVAILABLE`. Postflight writeback after commit failed with
+  the same exact infrastructure error; no recall or writeback is claimed.
 - Next: run this same sealed policy on a fresh pitched-roof project whose
   completed answer has not influenced the rule, then extract exact obstruction
   footprints/member depths and verify clearances before any production deploy.

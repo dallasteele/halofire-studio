@@ -79,8 +79,10 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "implementationCommit": null,
+  "implementationCommit": "aff59aa3",
   "brainPreflightStatus": "HAL_BRAIN_TOKEN_UNAVAILABLE",
   "brainPostflightEpisodeId": null,
+  "brainPostflightStatus": "HAL_BRAIN_TOKEN_UNAVAILABLE",
+  "brainPostflightDetail": "set HAL_BRAIN_TOKEN, HAL_BRAIN_TOKEN_FILE, or ensure /opt/hal9000/state/hal-brain/data/.token is reachable on GX10",
   "nextAction": "run the same source-topology placement policy on a fresh source-sealed pitched-roof project before any production promotion, then add exact obstruction footprints, member depths, and clearance verification"
 }
