@@ -1,0 +1,4 @@
+{
+  "theorem": "theorem mitBuildingJSourceGeneratedPlacementFailsClosed : And (((69 : Nat) - 68) = 1) (And ((15 : Nat) = 15) (And (((42 : Nat) * 100) < (68 * 90)) (And ((62 : Nat) <= 68) (And ((66 : Nat) <= 68) (And ((68 : Nat) = 68) (And ((false : Bool) = false) (And ((false : Bool) = false) ((false : Bool) = false)))))))) :=",
+  "proof": "by\n  decide"
+}

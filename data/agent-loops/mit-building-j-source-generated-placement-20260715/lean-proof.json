@@ -1,0 +1,41 @@
+{
+  "artifactType": "halofire.formal-proof-unavailable-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "theoremName": "mitBuildingJSourceGeneratedPlacementFailsClosed",
+  "claim": "The sealed architectural baseline generated 69 candidates for 68 completed heads, matched only 42 of 68 within two feet, and must keep placement verification, compliance, and fabrication false.",
+  "requestPath": "data/agent-loops/mit-building-j-source-generated-placement-20260715/lean-request.json",
+  "connectivity": {
+    "hostnameResolution": "gx10-name-resolution-failed",
+    "tailscaleIp": "100.116.75.108",
+    "tailscalePingSucceeded": true,
+    "tcpPort": 8810,
+    "tcpTestSucceeded": true
+  },
+  "attempts": [
+    {
+      "request": "full fail-closed theorem",
+      "timeoutSeconds": 20,
+      "httpResponseBytes": 0,
+      "result": "gateway-accepted-request-and-returned-no-response-before-client-timeout"
+    },
+    {
+      "request": "minimal True theorem control",
+      "timeoutSeconds": 20,
+      "httpResponseBytes": 0,
+      "result": "same gateway timeout, proving the failure is not theorem complexity"
+    }
+  ],
+  "localLeanInstalled": false,
+  "status": "unavailable-gateway-lean-worker-nonresponsive",
+  "fallbackVerification": {
+    "deterministicReplay": "passed",
+    "independentThresholdMatching": "passed",
+    "adversarialCasesRejected": 38,
+    "focusedBuildingJTestsPassed": 52,
+    "productionBuild": "passed",
+    "sourceGeneratedPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false
+  }
+}

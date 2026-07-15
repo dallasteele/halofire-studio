@@ -19,6 +19,37 @@ reference log entries by date; log entries reference commits by short hash.
 
 ---
 
+## 2026-07-15
+
+### Entry 01 - Building J source-only placement calibration (commit pending)
+
+- Implemented a source-only extraction and deterministic placement lane for the
+  MIT Riverside Building J protected architectural PDF and RCP evidence. The
+  generator cannot read the completed sprinkler answer; a separate scorer opens
+  the answer only after the candidate receipt is sealed.
+- Preserved the actual PDF roof plan, RCP, and section underlays in the proof.
+  The browser-inspected four-panel artifact shows generated versus completed
+  roof-plan and ceiling locations, pitched elevations, and the source plan
+  projected into the 3D view.
+- Calibration is honestly rejected: 69 generated versus 68 completed heads;
+  42/68 (61.765%) one-to-one matches within 2 ft against a 90% threshold;
+  62/68 (91.176%) within 4 ft; mean optimal distance 2.423 ft; one extra
+  generated upright. Compliance, hydraulics, fabrication, and release remain
+  fail-closed.
+- Verification: 52/52 focused Building J tests, 38/38 adversarial cases,
+  JavaScript syntax, Python compile, Vite build, agent-loop guard, and browser
+  image decode/console inspection passed. The broad suite produced 249 passing
+  files and six fixed-port browser/server harness failures; all six failed files
+  then passed sequentially in isolation (48/48 tests), confirming harness
+  concurrency rather than a feature regression.
+- Formal Lean evidence remains unavailable: the GX10 gateway TCP port accepts
+  connections but returned no response for valid requests, and local Lean is
+  not installed. The exact fail-closed request and receipt are retained in the
+  loop evidence.
+- Next: extract room/partition/open-to-structure and coordinated MEP obstruction
+  topology, seal a v2 candidate with the answer still inaccessible, run the
+  unchanged scorer, then validate on a fresh pitched-roof holdout.
+
 ## 2026-04-18
 
 ### Entry 01 — Fork + Scaffold (commit `2709edb`)

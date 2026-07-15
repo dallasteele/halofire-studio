@@ -1,0 +1,1741 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-generated-placement.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "sourceInputsReceiptSha256": "dba074f679fdee7e208c78339212493386dbb3a6f948399cd759e98eebf22021",
+  "generationMode": "sealed-protected-architectural-source-only-deterministic-centered-region-and-ceiling-component-grid",
+  "sequence": {
+    "sourceCandidateSealedBeforeAnswerOpen": true,
+    "answerArtifactRead": false,
+    "completedLayoutRead": false,
+    "historicalAnswerExposureDisclosed": true,
+    "freshProjectHoldoutRequired": true
+  },
+  "policy": {
+    "hazardAssumption": "ordinary",
+    "hazardAssumptionStatus": "internal-alpha-default-not-source-classified-not-code-compliance",
+    "maxAreaSqFt": 130,
+    "maxSpacingFt": 15,
+    "minSpacingFt": 6,
+    "ceilingComponentJoinToleranceFt": 0.8,
+    "ceilingVoidBridgeToleranceFt": 0.4,
+    "singletonSoffitMinimumWidthFt": 3,
+    "source": "existing deterministic HaloFire ordinary-hazard internal-alpha policy; empirical candidate only"
+  },
+  "openStructureLayouts": [
+    {
+      "regionId": "main-standing-seam",
+      "sourceAreaSqFt": 4362.17248,
+      "gridRows": 6,
+      "gridColumns": 6,
+      "spacingXFt": 10.67,
+      "spacingYFt": 11.36,
+      "coveragePerHeadSqFt": 121.17,
+      "candidateCount": 36
+    },
+    {
+      "regionId": "membrane-base",
+      "sourceAreaSqFt": 1972,
+      "gridRows": 3,
+      "gridColumns": 6,
+      "spacingXFt": 9.67,
+      "spacingYFt": 11.33,
+      "coveragePerHeadSqFt": 109.56,
+      "candidateCount": 18
+    }
+  ],
+  "ceilingComponentAudit": [
+    {
+      "id": "source-ceiling-component-01",
+      "ceilingZoneIds": [
+        "Slab_3-AE4",
+        "Slab_4-AEA"
+      ],
+      "boundsFt": {
+        "minX": 0.687625,
+        "minY": 65.500118,
+        "maxX": 17.000451,
+        "maxY": 89.150164,
+        "width": 16.312826,
+        "height": 23.650046
+      },
+      "ceilingControlId": "J101",
+      "ceilingHeightFt": 9,
+      "grid": {
+        "columns": 2,
+        "rows": 2
+      },
+      "candidateIds": [
+        "MIT-J-G-P-001",
+        "MIT-J-G-P-002",
+        "MIT-J-G-P-003",
+        "MIT-J-G-P-004"
+      ],
+      "excludedAsSlenderSingletonSoffit": false
+    },
+    {
+      "id": "source-ceiling-component-02",
+      "ceilingZoneIds": [
+        "Slab_2-ADD",
+        "Slab_14-B21"
+      ],
+      "boundsFt": {
+        "minX": 18.020841,
+        "minY": 84.556657,
+        "maxX": 36.990991,
+        "maxY": 99.146236,
+        "width": 18.97015,
+        "height": 14.589579
+      },
+      "ceilingControlId": "J103",
+      "ceilingHeightFt": 9,
+      "grid": {
+        "columns": 2,
+        "rows": 2
+      },
+      "candidateIds": [
+        "MIT-J-G-P-005",
+        "MIT-J-G-P-006",
+        "MIT-J-G-P-007"
+      ],
+      "excludedAsSlenderSingletonSoffit": false
+    },
+    {
+      "id": "source-ceiling-component-03",
+      "ceilingZoneIds": [
+        "Slab_5-AF0"
+      ],
+      "boundsFt": {
+        "minX": 36.386453,
+        "minY": 65.500118,
+        "maxX": 46.981771,
+        "maxY": 78.11801,
+        "width": 10.595318,
+        "height": 12.617892
+      },
+      "ceilingControlId": "J109",
+      "ceilingHeightFt": 10,
+      "grid": {
+        "columns": 1,
+        "rows": 2
+      },
+      "candidateIds": [
+        "MIT-J-G-P-008",
+        "MIT-J-G-P-009"
+      ],
+      "excludedAsSlenderSingletonSoffit": false
+    },
+    {
+      "id": "source-ceiling-component-04",
+      "ceilingZoneIds": [
+        "Slab_1-AD7",
+        "Slab_6-AF6",
+        "Slab_7-AFB",
+        "Slab_8-B01",
+        "Slab_9-B06",
+        "Slab_10-B0B",
+        "Slab_11-B10",
+        "Slab_12-B15",
+        "Slab_13-B1B",
+        "Slab_15-B26",
+        "Slab_16-B2B",
+        "Slab_17-B31",
+        "Slab_18-B36",
+        "Slab_27-31456"
+      ],
+      "boundsFt": {
+        "minX": 40.27072,
+        "minY": 82.148917,
+        "maxX": 70.764836,
+        "maxY": 96.147417,
+        "width": 30.494116,
+        "height": 13.9985
+      },
+      "ceilingControlId": "J104",
+      "ceilingHeightFt": 9,
+      "grid": {
+        "columns": 3,
+        "rows": 2
+      },
+      "candidateIds": [
+        "MIT-J-G-P-010",
+        "MIT-J-G-P-011",
+        "MIT-J-G-P-012",
+        "MIT-J-G-P-013",
+        "MIT-J-G-P-014",
+        "MIT-J-G-P-015"
+      ],
+      "excludedAsSlenderSingletonSoffit": false
+    },
+    {
+      "id": "source-ceiling-component-05",
+      "ceilingZoneIds": [
+        "Slab_28-3262D"
+      ],
+      "boundsFt": {
+        "minX": 73.0625,
+        "minY": 78.47224,
+        "maxX": 75.3125,
+        "maxY": 98.125804,
+        "width": 2.25,
+        "height": 19.653564
+      },
+      "ceilingControlId": "east-8ft-control",
+      "ceilingHeightFt": 8,
+      "grid": {
+        "columns": 1,
+        "rows": 2
+      },
+      "candidateIds": [],
+      "excludedAsSlenderSingletonSoffit": true
+    }
+  ],
+  "heads": [
+    {
+      "id": "MIT-J-G-U-001",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 4,
+        "y": 4.64
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 17.566666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-002",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 14.67,
+        "y": 4.64
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 17.566666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 0,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-003",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.33,
+        "y": 4.64
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 17.566666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 0,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-004",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 36,
+        "y": 4.64
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 17.566666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 0,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-005",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 46.67,
+        "y": 4.64
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 17.566666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 0,
+        "column": 4
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-006",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 57.33,
+        "y": 4.64
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 17.566666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 0,
+        "column": 5
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-007",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 4,
+        "y": 16
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 18.75,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 1,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-008",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 14.67,
+        "y": 16
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 18.75,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 1,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-009",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.33,
+        "y": 16
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 18.75,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 1,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-010",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 36,
+        "y": 16
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 18.75,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 1,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-011",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 46.67,
+        "y": 16
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 18.75,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 1,
+        "column": 4
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-012",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 57.33,
+        "y": 16
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 18.75,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 1,
+        "column": 5
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-013",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 4,
+        "y": 27.36
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 19.933333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 2,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-014",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 14.67,
+        "y": 27.36
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 19.933333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 2,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-015",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.33,
+        "y": 27.36
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 19.933333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 2,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-016",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 36,
+        "y": 27.36
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 19.933333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 2,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-017",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 46.67,
+        "y": 27.36
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 19.933333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 2,
+        "column": 4
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-018",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 57.33,
+        "y": 27.36
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 19.933333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 2,
+        "column": 5
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-019",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 4,
+        "y": 38.72
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 21.116666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 3,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-020",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 14.67,
+        "y": 38.72
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 21.116666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 3,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-021",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.33,
+        "y": 38.72
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 21.116666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 3,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-022",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 36,
+        "y": 38.72
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 21.116666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 3,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-023",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 46.67,
+        "y": 38.72
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 21.116666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 3,
+        "column": 4
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-024",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 57.33,
+        "y": 38.72
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 21.116666,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 3,
+        "column": 5
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-025",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 4,
+        "y": 50.08
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 22.3,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 4,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-026",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 14.67,
+        "y": 50.08
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 22.3,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 4,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-027",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.33,
+        "y": 50.08
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 22.3,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 4,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-028",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 36,
+        "y": 50.08
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 22.3,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 4,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-029",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 46.67,
+        "y": 50.08
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 22.3,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 4,
+        "column": 4
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-030",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 57.33,
+        "y": 50.08
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 22.3,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 4,
+        "column": 5
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-031",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 4,
+        "y": 61.44
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 23.483333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 5,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-032",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 14.67,
+        "y": 61.44
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 23.483333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 5,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-033",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 25.33,
+        "y": 61.44
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 23.483333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 5,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-034",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 36,
+        "y": 61.44
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 23.483333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 5,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-035",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 46.67,
+        "y": 61.44
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 23.483333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 5,
+        "column": 4
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-036",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 57.33,
+        "y": 61.44
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "main-standing-seam-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 23.483333,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "main-standing-seam",
+        "row": 5,
+        "column": 5
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-037",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 22.5,
+        "y": 71.17
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.885312,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-038",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 32.17,
+        "y": 71.17
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.885312,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 0,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-039",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 41.83,
+        "y": 71.17
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.885312,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 0,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-040",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 51.5,
+        "y": 71.17
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.885312,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 0,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-041",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 61.17,
+        "y": 71.17
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.885312,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 0,
+        "column": 4
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-042",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 70.83,
+        "y": 71.17
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.885312,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 0,
+        "column": 5
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-043",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 22.5,
+        "y": 82.5
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.53125,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 1,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-044",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 32.17,
+        "y": 82.5
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.53125,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 1,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-045",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 41.83,
+        "y": 82.5
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.53125,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 1,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-046",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 51.5,
+        "y": 82.5
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.53125,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 1,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-047",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 61.17,
+        "y": 82.5
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.53125,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 1,
+        "column": 4
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-048",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 70.83,
+        "y": 82.5
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.53125,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 1,
+        "column": 5
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-049",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 22.5,
+        "y": 93.83
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.177188,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 2,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-050",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 32.17,
+        "y": 93.83
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.177188,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 2,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-051",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 41.83,
+        "y": 93.83
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.177188,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 2,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-052",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 51.5,
+        "y": 93.83
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.177188,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 2,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-053",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 61.17,
+        "y": 93.83
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.177188,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 2,
+        "column": 4
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-U-054",
+      "kind": "upright",
+      "structuralLocalFt": {
+        "x": 70.83,
+        "y": 93.83
+      },
+      "sourceProtectionRegime": "open-structure-upright-source-protection-target",
+      "sourceProtectionPlaneId": "membrane-base-source-bottom-of-deck",
+      "sourceProtectionPlaneZFt": 12.177188,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "source-roof-region-centered-grid",
+        "regionId": "membrane-base",
+        "row": 2,
+        "column": 5
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-001",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 4.765831,
+        "y": 71.41263
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-01",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_3-AE4",
+          "Slab_4-AEA"
+        ],
+        "ceilingControlId": "J101",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-002",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 12.922245,
+        "y": 71.41263
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-01",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_3-AE4",
+          "Slab_4-AEA"
+        ],
+        "ceilingControlId": "J101",
+        "row": 0,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-003",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 4.765831,
+        "y": 83.237652
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-01",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_3-AE4",
+          "Slab_4-AEA"
+        ],
+        "ceilingControlId": "J101",
+        "row": 1,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-004",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 12.922245,
+        "y": 83.237652
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-01",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_3-AE4",
+          "Slab_4-AEA"
+        ],
+        "ceilingControlId": "J101",
+        "row": 1,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-005",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 32.248453,
+        "y": 88.204052
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-02",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_2-ADD",
+          "Slab_14-B21"
+        ],
+        "ceilingControlId": "J103",
+        "row": 0,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-006",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 22.763379,
+        "y": 95.498841
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-02",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_2-ADD",
+          "Slab_14-B21"
+        ],
+        "ceilingControlId": "J103",
+        "row": 1,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-007",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 32.248453,
+        "y": 95.498841
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-02",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_2-ADD",
+          "Slab_14-B21"
+        ],
+        "ceilingControlId": "J103",
+        "row": 1,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-008",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 41.684112,
+        "y": 68.654591
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-03",
+      "sourceProtectionPlaneZFt": 10,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_5-AF0"
+        ],
+        "ceilingControlId": "J109",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-009",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 41.684112,
+        "y": 74.963537
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-03",
+      "sourceProtectionPlaneZFt": 10,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_5-AF0"
+        ],
+        "ceilingControlId": "J109",
+        "row": 1,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-010",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 45.353073,
+        "y": 85.648542
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-04",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_1-AD7",
+          "Slab_6-AF6",
+          "Slab_7-AFB",
+          "Slab_8-B01",
+          "Slab_9-B06",
+          "Slab_10-B0B",
+          "Slab_11-B10",
+          "Slab_12-B15",
+          "Slab_13-B1B",
+          "Slab_15-B26",
+          "Slab_16-B2B",
+          "Slab_17-B31",
+          "Slab_18-B36",
+          "Slab_27-31456"
+        ],
+        "ceilingControlId": "J104",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-011",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 55.517778,
+        "y": 85.648542
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-04",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_1-AD7",
+          "Slab_6-AF6",
+          "Slab_7-AFB",
+          "Slab_8-B01",
+          "Slab_9-B06",
+          "Slab_10-B0B",
+          "Slab_11-B10",
+          "Slab_12-B15",
+          "Slab_13-B1B",
+          "Slab_15-B26",
+          "Slab_16-B2B",
+          "Slab_17-B31",
+          "Slab_18-B36",
+          "Slab_27-31456"
+        ],
+        "ceilingControlId": "J104",
+        "row": 0,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-012",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 65.682483,
+        "y": 85.648542
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-04",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_1-AD7",
+          "Slab_6-AF6",
+          "Slab_7-AFB",
+          "Slab_8-B01",
+          "Slab_9-B06",
+          "Slab_10-B0B",
+          "Slab_11-B10",
+          "Slab_12-B15",
+          "Slab_13-B1B",
+          "Slab_15-B26",
+          "Slab_16-B2B",
+          "Slab_17-B31",
+          "Slab_18-B36",
+          "Slab_27-31456"
+        ],
+        "ceilingControlId": "J104",
+        "row": 0,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-013",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 45.353073,
+        "y": 92.647792
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-04",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_1-AD7",
+          "Slab_6-AF6",
+          "Slab_7-AFB",
+          "Slab_8-B01",
+          "Slab_9-B06",
+          "Slab_10-B0B",
+          "Slab_11-B10",
+          "Slab_12-B15",
+          "Slab_13-B1B",
+          "Slab_15-B26",
+          "Slab_16-B2B",
+          "Slab_17-B31",
+          "Slab_18-B36",
+          "Slab_27-31456"
+        ],
+        "ceilingControlId": "J104",
+        "row": 1,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-014",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 55.517778,
+        "y": 92.647792
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-04",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_1-AD7",
+          "Slab_6-AF6",
+          "Slab_7-AFB",
+          "Slab_8-B01",
+          "Slab_9-B06",
+          "Slab_10-B0B",
+          "Slab_11-B10",
+          "Slab_12-B15",
+          "Slab_13-B1B",
+          "Slab_15-B26",
+          "Slab_16-B2B",
+          "Slab_17-B31",
+          "Slab_18-B36",
+          "Slab_27-31456"
+        ],
+        "ceilingControlId": "J104",
+        "row": 1,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "MIT-J-G-P-015",
+      "kind": "pendent",
+      "structuralLocalFt": {
+        "x": 65.682483,
+        "y": 92.647792
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "source-ceiling-component-04",
+      "sourceProtectionPlaneZFt": 9,
+      "headInstallationZFt": null,
+      "sourceDerivation": {
+        "method": "connected-ceiling-material-component-centered-grid",
+        "ceilingZoneIds": [
+          "Slab_1-AD7",
+          "Slab_6-AF6",
+          "Slab_7-AFB",
+          "Slab_8-B01",
+          "Slab_9-B06",
+          "Slab_10-B0B",
+          "Slab_11-B10",
+          "Slab_12-B15",
+          "Slab_13-B1B",
+          "Slab_15-B26",
+          "Slab_16-B2B",
+          "Slab_17-B31",
+          "Slab_18-B36",
+          "Slab_27-31456"
+        ],
+        "ceilingControlId": "J104",
+        "row": 1,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    }
+  ],
+  "counts": {
+    "total": 69,
+    "upright": 54,
+    "pendent": 15,
+    "mainOpenStructure": 36,
+    "membraneOpenStructure": 18,
+    "ceilingComponents": 5,
+    "excludedSlenderSingletonSoffits": 1
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic source roof-region and connected RCP ceiling-component replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "source polygon containment, spacing, coverage, ceiling-control, and protection-plane arithmetic checks"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "publication script requires all provenance, geometry, head, and false-promotion attacks to be rejected"
+    }
+  },
+  "sourceGeneratedCandidateReady": true,
+  "buildingJCalibrationScored": false,
+  "sourceGeneratedPlacementVerified": false,
+  "freshProjectPlacementVerified": false,
+  "obstructionInventoryReady": false,
+  "obstructionClearancesVerified": false,
+  "branchPipeTopologyReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "sealed-source-generated-empirical-building-j-candidate-awaiting-answer-only-score-not-code-compliance-hydraulics-fabrication-or-release",
+  "receiptSha256": "1517a104305c0d8f3ae20741513b401e6b194b2849efe6d504f1cb448ce40374"
+}

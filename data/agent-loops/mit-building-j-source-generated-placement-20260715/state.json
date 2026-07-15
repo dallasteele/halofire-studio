@@ -1,0 +1,109 @@
+{
+  "loop": "mit-building-j-source-generated-placement-20260715",
+  "stage": "VERIFY",
+  "status": "verified-calibration-rejection-with-protected-underlay-proof",
+  "iteration": 7,
+  "projectId": "mit-riverside-building-j",
+  "verificationDoctrine": [
+    "internal-primary",
+    "internal-independent",
+    "adversarial"
+  ],
+  "sourceInputReceiptSha256": "dba074f679fdee7e208c78339212493386dbb3a6f948399cd759e98eebf22021",
+  "sourceCandidateReceiptSha256": "1517a104305c0d8f3ae20741513b401e6b194b2849efe6d504f1cb448ce40374",
+  "scoreReceiptSha256": "81849dc1f4c97f5ec2188b12ce1f3a5f1c5323a0a39aafe443f1a11a20538633",
+  "sequence": {
+    "sourceCandidateSealedBeforeAnswerOpen": true,
+    "answerOpenedByGenerator": false,
+    "answerOpenedByScorer": true,
+    "sourceCandidateModifiedAfterAnswerOpen": false,
+    "historicalAnswerExposureDisclosed": true,
+    "freshProjectHoldoutRequired": true
+  },
+  "calibration": {
+    "generatedTotal": 69,
+    "completedTotal": 68,
+    "generatedUpright": 54,
+    "completedUpright": 53,
+    "generatedPendent": 15,
+    "completedPendent": 15,
+    "matchedWithin1Ft": 16,
+    "matchedWithin2Ft": 42,
+    "matchedWithin4Ft": 62,
+    "matchedWithin6Ft": 66,
+    "meanOptimalPairDistanceFt": 2.422992,
+    "p95OptimalPairDistanceFt": 8.51689,
+    "maximumOptimalPairDistanceFt": 12.910503,
+    "unmatchedGeneratedIds": [
+      "MIT-J-G-U-049"
+    ],
+    "unmatchedAnswerIds": [],
+    "sourceTargetZWithinHalfFoot": 68,
+    "acceptanceThreshold": "count and kind parity plus at least 90 percent one-to-one XY matches within 2 ft and no unmatched answer",
+    "accepted": false
+  },
+  "visualProof": {
+    "browserInspected": true,
+    "decodedImageCount": 4,
+    "consoleErrors": 0,
+    "protectedRoofPlanUnderlayVisible": true,
+    "protectedRcpUnderlayVisible": true,
+    "protectedSectionUnderlayVisible": true,
+    "protectedPlanProjectedInto3d": true,
+    "calibrationFailureVisiblyDisclosed": true,
+    "roofPlanSha256": "8af65a247173b4fcaf3084bd0f0d08fee8a9354a870cfdd0adaff84218d2c776",
+    "rcpSha256": "66d42127e40e86309bfa1dd447a399dd2c34e85ad34aac630d75d3a028dfa667",
+    "elevationSha256": "9ae7c929bad3012f95514c4e6e54c9adcead174bba0b75ec46573257913f3ecc",
+    "model3dSha256": "ba075c6002b5605f72238094bb3cbd40683af97cafb6b057e9920f618cf56906"
+  },
+  "verification": {
+    "focusedBuildingJTestFiles": 11,
+    "focusedBuildingJTestsPassed": 52,
+    "broadSuite": {
+      "testFilesPassed": 249,
+      "testFilesFailedUnderConcurrentFixedPortHarnesses": 6,
+      "testsPassed": 1999,
+      "testsFailedUnderConcurrentFixedPortHarnesses": 41,
+      "testsTotal": 2040
+    },
+    "isolatedBroadSuiteReruns": {
+      "testFilesPassed": 6,
+      "testFilesFailed": 0,
+      "testsPassed": 48,
+      "testsFailed": 0,
+      "classification": "broad-run fixed-port concurrency collapse; every failed file passed in its intended isolated harness"
+    },
+    "generatorAdversarialCasesRejected": 20,
+    "scorerAdversarialCasesRejected": 18,
+    "viteBuild": "passed",
+    "javascriptSyntax": "passed",
+    "pythonCompile": "passed",
+    "agentLoopGuard": "passed",
+    "browserInspection": "passed",
+    "formalProver": "unavailable-gateway-tcp-open-valid-lean-requests-nonresponsive-local-lean-not-installed",
+    "formalFallbackReceipt": "data/agent-loops/mit-building-j-source-generated-placement-20260715/lean-proof.json"
+  },
+  "claims": {
+    "sourceInputExtractionReady": true,
+    "sourceGeneratedCandidateReady": true,
+    "buildingJCalibrationScored": true,
+    "sourceGeneratedPlacementVerified": false,
+    "freshProjectPlacementVerified": false,
+    "obstructionInventoryReady": false,
+    "branchPipeTopologyReady": false,
+    "complianceReady": false,
+    "hydraulicCalculationReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "residualDiagnosis": [
+    "roof-region and ceiling-material geometry alone reproduces the main 36-head topology and exact 15-pendent count but not the membrane upright topology",
+    "architectural room partitions and door/open-to-structure relationships are not yet represented in the generator input",
+    "mechanical-electrical obstruction and coordinated penetration topology is not yet represented",
+    "ceiling-component grid orientation needs source branchline or room-axis evidence rather than a generic centered-grid tie-break",
+    "exact installed head Z remains unknown even though all source protection target elevations score within one-half foot"
+  ],
+  "implementationCommit": null,
+  "brainPostflightEpisodeId": null,
+  "nextAction": "extract Building J room/partition/open-to-structure and coordinated obstruction topology from the protected floor/RCP/MEP sources, add them to the sanitized generator input, seal a v2 candidate without answer access, and run the unchanged scorer before a second fresh pitched-roof holdout"
+}

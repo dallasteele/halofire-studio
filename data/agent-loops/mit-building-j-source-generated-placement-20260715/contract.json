@@ -1,0 +1,61 @@
+{
+  "name": "mit-building-j-source-generated-placement-20260715",
+  "owner": "codex",
+  "goal": "Generate a deterministic Building J sprinkler placement candidate from protected architectural floor, reflected-ceiling, roof, structural, elevation, and section sources before answer access; seal that candidate; then score it against the immutable completed-bid head registration without permitting the answer to alter generation.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-09-CODEX-MASTER-BUILD.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-13-CODEX-MASTER-BUILD-ADDENDUM-01-PLATFORM-SPINE.md",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-seal.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-spatial-boundaries.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-rcp-registration.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-structural-grid-correction.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-roof-plane-elevation.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-ceiling-installation-envelope.json",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ"
+  ],
+  "exit_criteria": [
+    "allowed generator inputs and forbidden answer-key inputs are explicit and hash-bound",
+    "generator code imports no approved, as-built, exact-head, or completed-layout artifact",
+    "source-only candidate includes deterministic XY, source-plane target Z, sprinkler regime, and derivation provenance",
+    "source candidate is receipt-sealed before the comparison module reads the completed answer",
+    "comparison cannot mutate or regenerate the sealed source candidate",
+    "count, regime, nearest-neighbor, matched, missed, extra, and displacement metrics are reported without hiding residuals",
+    "protected roof-plan, RCP, section, and projected-3D underlays visibly distinguish generated candidates, completed-answer heads, and residuals",
+    "browser inspection confirms real underlays render and proof is intelligible at normal zoom",
+    "primary replay, independent replay, adversarial mutation, focused regression, production build, formal proof or exact unavailability, and rules verification are recorded",
+    "code compliance, hydraulics, fabrication, field release, and fresh-project generalization remain false unless separately proven",
+    "brain postflight records the commit, receipts, scores, visual hashes, residuals, and next action"
+  ],
+  "verification_gates": [
+    "agent loop guard validation before production edits",
+    "protected source hash inventory",
+    "static forbidden-import and forbidden-read scan",
+    "deterministic source-only replay",
+    "independent geometry and spacing replay",
+    "sealed-candidate immutability check",
+    "answer-only scorer separation check",
+    "adversarial provenance, geometry, count, score, mutation, and false-promotion cases",
+    "focused Building J tests and production build",
+    "GX10 Lean 4 proof or exact prover-unavailable evidence",
+    "authoritative agentic-rule check",
+    "real-browser proof inspection with console and image decode checks",
+    "brain close writeback"
+  ],
+  "state_path": "data/agent-loops/mit-building-j-source-generated-placement-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/mit-riverside-building-j-source-generated-placement.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-generated-placement-score.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-source-generated-placement",
+    "data/agent-loops/mit-building-j-source-generated-placement-20260715/state.json",
+    "apps/autosprink/BUILD_LOG.md"
+  ],
+  "max_iterations": 12,
+  "max_tokens": 300000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
