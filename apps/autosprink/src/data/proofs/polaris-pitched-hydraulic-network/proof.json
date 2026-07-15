@@ -1,12 +1,13 @@
 {
   "schema": "halofire.polaris-pitched-hydraulic-network-proof.v1",
   "projectId": "polaris-academy-mesa-az",
-  "networkReceiptSha256": "B10DD80C5A2C3A484E068D5DE5A245164578BE51B3915E56A80024AE7F739C33",
+  "networkReceiptSha256": "FC7D22E2337A25A89B7C520207E36894F964968F3E3B4E205B59D443ECBBFC62",
   "underlay": "../polaris-pitched-pipe-xyz/approved-fp2-pipe-overlay.png",
   "counts": {
     "hydraulicReportSegments": 82,
     "calculationNodes": 61,
     "cadNodeLabels": 59,
+    "exactCalculatedSprinklerTerminalBindings": 29,
     "sourcePipes": 186,
     "buildingComponentPipes": 177,
     "attributedFittings": 98,
@@ -17,6 +18,7 @@
   },
   "defaultLayers": {
     "approvedFp2AndExactPipes": true,
+    "calculatedSprinklerTerminals": true,
     "geometricDownhillEndpoints": true,
     "riserAndDrainDevices": true,
     "atticCalculationGraphDiagnostic": false,
@@ -25,6 +27,8 @@
   "browserVerification": {
     "actualPdfUnderlayVisible": true,
     "exactPipeOverlayVisible": true,
+    "exactTerminalLayerVisible": true,
+    "exactTerminalToggleVerified": true,
     "diagnosticLayersDefaultOff": true,
     "diagnosticToggleVerified": true,
     "browserErrorCount": 0
@@ -35,6 +39,7 @@
     "fullFittingIdentityReady": true,
     "mainDrainCalloutReady": true,
     "roofRelativePipeGradeGeometryReady": true,
+    "calculatedSprinklerLeafToDwgPipeBindingReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,
     "wholeNetworkHydraulicFlowDirectionReady": false,
     "drainageGradeSemanticsReady": false,

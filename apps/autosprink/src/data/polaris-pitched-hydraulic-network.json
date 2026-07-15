@@ -1,5 +1,5 @@
 {
-  "schema": "halofire.polaris-pitched-hydraulic-network.v1",
+  "schema": "halofire.polaris-pitched-hydraulic-network.v2",
   "projectId": "polaris-academy-mesa-az",
   "sourceBoundary": {
     "pipeCalibrationReceiptSha256": "74B55A52AF6F16F0D9501EEFC12D55E739D2D373FF8C9D1553613A11B65E6CFA",
@@ -2937,7 +2937,834 @@
       "2"
     ],
     "missingCadLabelMeaning": "Only the off-building source and underground calculation nodes are absent from the sprinkler-plan CAD labels.",
-    "geometryBindingStatus": "held-annotation-offsets-require-topology-length-elevation-binding"
+    "geometryBindingStatus": "held-annotation-offsets-require-topology-length-elevation-binding",
+    "calculatedSprinklerLeafBindings": [
+      {
+        "reportDescription": "Light Hazard (ATTIC)",
+        "calculatedSprinklerNodeCount": 14,
+        "assignedSourceSprinklerCount": 14,
+        "minimumForcedAlternativeAssignmentMarginFt": 5.268647531,
+        "uniquenessMarginThresholdFt": 1.5,
+        "allKFactorsMatch": true,
+        "allTerminalConnectionsReady": true,
+        "exactLeafBindingReady": true,
+        "bindings": [
+          {
+            "nodeId": "164",
+            "reportElevationFt": 16.833333,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 13.960505353,
+              "y": 36.637514937
+            },
+            "sprinklerId": "sprinkler-2733",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 12.310377118,
+              "y": 34.166666667,
+              "z": 17.150730694
+            },
+            "annotationToSprinklerPlanDistanceFt": 2.971197463,
+            "forcedAlternativeAssignmentMarginFt": 10.900790358,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-12312",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0.061687566,
+              "sourceFittingOffsetResidualFt": 0.317708334,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "165",
+            "reportElevationFt": 16.833333,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 25.851547263,
+              "y": 36.554166512
+            },
+            "sprinklerId": "sprinkler-2701",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 24.310377118,
+              "y": 34.166666667,
+              "z": 17.149410642
+            },
+            "annotationToSprinklerPlanDistanceFt": 2.841717953,
+            "forcedAlternativeAssignmentMarginFt": 18.577839612,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-12312",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0.131235985,
+              "sourceFittingOffsetResidualFt": 0.317708333,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "166",
+            "reportElevationFt": 16.833333,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 39.310342169,
+              "y": 31.436936937
+            },
+            "sprinklerId": "sprinkler-2685",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 36.310377118,
+              "y": 34.166666667,
+              "z": 17.148090591
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.056009702,
+            "forcedAlternativeAssignmentMarginFt": 12.951519378,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-12312",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0.200784403,
+              "sourceFittingOffsetResidualFt": 0.317708334,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "167",
+            "reportElevationFt": 16.833333,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 46.52620116,
+              "y": 36.392871875
+            },
+            "sprinklerId": "sprinkler-2637",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 48.310377118,
+              "y": 34.166666667,
+              "z": 17.146770539
+            },
+            "annotationToSprinklerPlanDistanceFt": 2.852941198,
+            "forcedAlternativeAssignmentMarginFt": 11.109848512,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-12312",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0.270332821,
+              "sourceFittingOffsetResidualFt": 0.317708333,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "194",
+            "reportElevationFt": 14.083333,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 15.310342169,
+              "y": 20.436936937
+            },
+            "sprinklerId": "sprinkler-2749",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 12.311197981,
+              "y": 23.166666667,
+              "z": 14.406024606
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.055402601,
+            "forcedAlternativeAssignmentMarginFt": 11.190955141,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-3943",
+              "pipeNominalSizeInches": 1.5,
+              "pipeT": 0.061687566,
+              "sourceFittingOffsetResidualFt": 0.328125,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "195",
+            "reportElevationFt": 14.041667,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 27.310342169,
+              "y": 20.436936937
+            },
+            "sprinklerId": "sprinkler-2717",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 24.311197981,
+              "y": 23.166666667,
+              "z": 14.374726226
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.055402601,
+            "forcedAlternativeAssignmentMarginFt": 13.960560844,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-3943",
+              "pipeNominalSizeInches": 1.5,
+              "pipeT": 0.131235985,
+              "sourceFittingOffsetResidualFt": 0.328125,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "196",
+            "reportElevationFt": 14,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 39.310342169,
+              "y": 20.436936937
+            },
+            "sprinklerId": "sprinkler-2669",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 36.311197981,
+              "y": 23.166666667,
+              "z": 14.343427845
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.055402601,
+            "forcedAlternativeAssignmentMarginFt": 10.618925647,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-3943",
+              "pipeNominalSizeInches": 1.5,
+              "pipeT": 0.200784403,
+              "sourceFittingOffsetResidualFt": 0.328125,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "197",
+            "reportElevationFt": 14,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 51.310342169,
+              "y": 20.436936937
+            },
+            "sprinklerId": "sprinkler-2653",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 48.311197981,
+              "y": 23.166666667,
+              "z": 14.312129465
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.055402601,
+            "forcedAlternativeAssignmentMarginFt": 5.268647531,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-3943",
+              "pipeNominalSizeInches": 1.5,
+              "pipeT": 0.270332821,
+              "sourceFittingOffsetResidualFt": 0.328125,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "224",
+            "reportElevationFt": 13.875,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 10.310342169,
+              "y": 11.436936937
+            },
+            "sprinklerId": "sprinkler-2909",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 7.310342169,
+              "y": 14.159647322,
+              "z": 14.209680867
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.051314829,
+            "forcedAlternativeAssignmentMarginFt": 10.807914711,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-18285",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0.526676637,
+              "sourceFittingOffsetResidualFt": 0.317708334,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "225",
+            "reportElevationFt": 13.875,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 22.310342169,
+              "y": 11.436936937
+            },
+            "sprinklerId": "sprinkler-2893",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 19.310342169,
+              "y": 14.160170322,
+              "z": 14.193219162
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.051666332,
+            "forcedAlternativeAssignmentMarginFt": 11.852690162,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-17853",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0.526676649,
+              "sourceFittingOffsetResidualFt": 0.317708333,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "226",
+            "reportElevationFt": 13.875,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 34.310342169,
+              "y": 11.436936937
+            },
+            "sprinklerId": "sprinkler-2877",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 31.310342169,
+              "y": 14.160693375,
+              "z": 14.176756597
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.052017909,
+            "forcedAlternativeAssignmentMarginFt": 11.254804648,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-17523",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0.526676661,
+              "sourceFittingOffsetResidualFt": 0.317708334,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "251",
+            "reportElevationFt": 13.666667,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 10.506947945,
+              "y": 4.468110019
+            },
+            "sprinklerId": "sprinkler-2941",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 7.310342169,
+              "y": 4.166666667,
+              "z": 13.671059385
+            },
+            "annotationToSprinklerPlanDistanceFt": 3.210787533,
+            "forcedAlternativeAssignmentMarginFt": 10.807914711,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-18285",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0,
+              "sourceFittingOffsetResidualFt": 0,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "252",
+            "reportElevationFt": 13.666667,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 22.556583385,
+              "y": 3.20630748
+            },
+            "sprinklerId": "sprinkler-2957",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 19.310342169,
+              "y": 4.166666667,
+              "z": 13.671059385
+            },
+            "annotationToSprinklerPlanDistanceFt": 3.38531709,
+            "forcedAlternativeAssignmentMarginFt": 9.095626658,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-17853",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0,
+              "sourceFittingOffsetResidualFt": 0,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "253",
+            "reportElevationFt": 13.666667,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 27.172002398,
+              "y": 3.234090288
+            },
+            "sprinklerId": "sprinkler-2925",
+            "sprinklerCategory": "Upright",
+            "sprinklerPointFt": {
+              "x": 31.310342169,
+              "y": 4.166666667,
+              "z": 13.671059385
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.242116779,
+            "forcedAlternativeAssignmentMarginFt": 9.095626658,
+            "terminalConnection": {
+              "mode": "upright-source-head-to-exact-pipe-span",
+              "pipeId": "pipe-17523",
+              "pipeNominalSizeInches": 1.25,
+              "pipeT": 0,
+              "sourceFittingOffsetResidualFt": 0,
+              "topologyReady": true
+            }
+          }
+        ]
+      },
+      {
+        "reportDescription": "Light Hazard (BELOW CEILING)",
+        "calculatedSprinklerNodeCount": 15,
+        "assignedSourceSprinklerCount": 15,
+        "minimumForcedAlternativeAssignmentMarginFt": 1.726484086,
+        "uniquenessMarginThresholdFt": 1.5,
+        "allKFactorsMatch": true,
+        "allTerminalConnectionsReady": true,
+        "exactLeafBindingReady": true,
+        "bindings": [
+          {
+            "nodeId": "480",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 53.319097765,
+              "y": 27.224545169
+            },
+            "sprinklerId": "sprinkler-1594",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 50.84301221,
+              "y": 30.951761744,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.474722681,
+            "forcedAlternativeAssignmentMarginFt": 3.179292813,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-68737",
+              "flexDropPlanOffsetFt": 2.798238256,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-21628",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "481",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 19.291666667,
+              "y": 28.103603604
+            },
+            "sprinklerId": "sprinkler-874",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 16.291666667,
+              "y": 30.833333333,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.056035551,
+            "forcedAlternativeAssignmentMarginFt": 1.726484086,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-29209",
+              "flexDropPlanOffsetFt": 2.916666667,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-19584",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "484",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 26.705723524,
+              "y": 27.70644871
+            },
+            "sprinklerId": "sprinkler-1626",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 23.705723524,
+              "y": 30.43617844,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.056035552,
+            "forcedAlternativeAssignmentMarginFt": 2.401653038,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-29857",
+              "flexDropPlanOffsetFt": 3.31382156,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-19630",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "485",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 49.101750049,
+              "y": 27.449361093
+            },
+            "sprinklerId": "sprinkler-794",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 46.101750049,
+              "y": 30.179090823,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.056035552,
+            "forcedAlternativeAssignmentMarginFt": 3.179292813,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-26617",
+              "flexDropPlanOffsetFt": 3.570909177,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-19424",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "486",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 37.753363992,
+              "y": 26.77027027
+            },
+            "sprinklerId": "sprinkler-1690",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 34.753363992,
+              "y": 29.5,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.056035552,
+            "forcedAlternativeAssignmentMarginFt": 8.239302403,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-56425",
+              "flexDropPlanOffsetFt": 3.614208074,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-21376",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "487",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 9.796556974,
+              "y": 30.400274496
+            },
+            "sprinklerId": "sprinkler-858",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 6.708333333,
+              "y": 28.333333333,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 3.716096208,
+            "forcedAlternativeAssignmentMarginFt": 7.862815405,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-44761",
+              "flexDropPlanOffsetFt": 3.614208073,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-20572",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "488",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 21.859697946,
+              "y": 28.097388394
+            },
+            "sprinklerId": "sprinkler-1658",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 19.958333333,
+              "y": 24.666666667,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 3.922376698,
+            "forcedAlternativeAssignmentMarginFt": 1.726484086,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-43465",
+              "flexDropPlanOffsetFt": 1.083333334,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-20480",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "500",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 45.27250194,
+              "y": 20.306625927
+            },
+            "sprinklerId": "sprinkler-1610",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 46.652287372,
+              "y": 23.003568601,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 3.029407141,
+            "forcedAlternativeAssignmentMarginFt": 7.126587393,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-45409",
+              "flexDropPlanOffsetFt": 0.253568601,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-20618",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "512",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 36.173632254,
+              "y": 20.584454009
+            },
+            "sprinklerId": "sprinkler-1674",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 32.041666667,
+              "y": 19.854166667,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.196005149,
+            "forcedAlternativeAssignmentMarginFt": 9.74564814,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-27265",
+              "flexDropPlanOffsetFt": 0.314657832,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-19470",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "513",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 13.250500255,
+              "y": 15.105452709
+            },
+            "sprinklerId": "sprinkler-1642",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 14.916666667,
+              "y": 17.958333333,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 3.303791514,
+            "forcedAlternativeAssignmentMarginFt": 9.97000022,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-58369",
+              "flexDropPlanOffsetFt": 3.614208073,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-21490",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "514",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 24.254807536,
+              "y": 14.875086924
+            },
+            "sprinklerId": "sprinkler-762",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 20.666666667,
+              "y": 17.166666667,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.257474911,
+            "forcedAlternativeAssignmentMarginFt": 9.97000022,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-57721",
+              "flexDropPlanOffsetFt": 0.939657832,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-21444",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "515",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 3.818236871,
+              "y": 17.161380516
+            },
+            "sprinklerId": "sprinkler-746",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 6.708333333,
+              "y": 17.125,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 2.890325432,
+            "forcedAlternativeAssignmentMarginFt": 11.779678715,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-59665",
+              "flexDropPlanOffsetFt": 0.185342169,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-21582",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "536",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 27.255350822,
+              "y": 7.082009224
+            },
+            "sprinklerId": "sprinkler-714",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 30.414942745,
+              "y": 7.228431264,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 3.162982854,
+            "forcedAlternativeAssignmentMarginFt": 14.445045819,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-46705",
+              "flexDropPlanOffsetFt": 0.478732757,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-20710",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "537",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 3.651540022,
+              "y": 8.927250735
+            },
+            "sprinklerId": "sprinkler-730",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 6.75,
+              "y": 6.166666667,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 4.149852845,
+            "forcedAlternativeAssignmentMarginFt": 13.087822974,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-31153",
+              "flexDropPlanOffsetFt": 0.143675502,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-19722",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          },
+          {
+            "nodeId": "538",
+            "reportElevationFt": 10,
+            "reportKFactor": 5.6,
+            "cadLabelAlignmentPointFt": {
+              "x": 15.916492225,
+              "y": 8.304452785
+            },
+            "sprinklerId": "sprinkler-890",
+            "sprinklerCategory": "Pendent",
+            "sprinklerPointFt": {
+              "x": 18.583333333,
+              "y": 6.166666667,
+              "z": 10
+            },
+            "annotationToSprinklerPlanDistanceFt": 3.417919101,
+            "forcedAlternativeAssignmentMarginFt": 12.77201519,
+            "terminalConnection": {
+              "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
+              "flexDropFittingId": "fitting-28561",
+              "flexDropPlanOffsetFt": 0.310342169,
+              "flexDropForcedAlternativeMarginFt": null,
+              "pipeId": "pipe-19538",
+              "pipeNominalSizeInches": 1,
+              "pipeEndpoint": "end",
+              "pipePortResidualFt": 0.0625,
+              "topologyReady": true
+            }
+          }
+        ]
+      }
+    ],
+    "exactCalculatedSprinklerLeafCount": 29,
+    "calculatedSprinklerLeafBindingStatus": "exact-source-sprinkler-and-terminal-pipe-binding-ready"
   },
   "physicalNetwork": {
     "toleranceFt": 0.04,
@@ -5015,6 +5842,7 @@
     "inspectorTestDrainPipeBridgeReady": true,
     "mainDrainCalloutReady": true,
     "roofRelativePipeGradeGeometryReady": true,
+    "calculatedSprinklerLeafToDwgPipeBindingReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,
     "wholeNetworkHydraulicFlowDirectionReady": false,
     "drainageGradeSemanticsReady": false,
@@ -5025,5 +5853,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "receiptSha256": "B10DD80C5A2C3A484E068D5DE5A245164578BE51B3915E56A80024AE7F739C33"
+  "receiptSha256": "FC7D22E2337A25A89B7C520207E36894F964968F3E3B4E205B59D443ECBBFC62"
 }

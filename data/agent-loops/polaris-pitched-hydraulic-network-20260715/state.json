@@ -1,5 +1,5 @@
 {
-  "iteration": 2,
+  "iteration": 3,
   "phase": "verify-and-bind",
   "status": "in_progress",
   "observations": [
@@ -11,6 +11,8 @@
     "The final sprinkler DWG explicitly contains MAIN DRAIN and 3-inch RISER callouts with two-segment leaders.",
     "The same-project fire-line DWG explicitly contains a new 4-inch Class 350 fire line, backflow prevention assembly, city water context, and riser symbols.",
     "Four of 14 sloped plan runs have a continuous non-rising geometric path to the main-drain entry; ten terminate at geometric low points away from that entry and require intent/auxiliary-drain classification.",
+    "All 29 calculated sprinkler nodes are now bound one-to-one to exact source heads and exact terminal topology: 14 attic uprights bind pipe spans and 15 below-ceiling pendents bind 48-inch flex drops plus pipe endpoints.",
+    "The minimum forced-alternative assignment margin is 5.268647531 feet for attic heads and 1.726484086 feet for below-ceiling heads; the governed minimum is 1.5 feet.",
     "No independent human-review gate is required; deterministic, adversarial, formal, visual, and browser loops provide acceptance."
   ],
   "attempts": [
@@ -21,11 +23,15 @@
     "Rendered the actual approved FP2 proof with exact pipe geometry, downhill endpoints, and devices; provisional calculation-node graphs are diagnostic and off by default.",
     "Focused Vitest, adversarial mutations, browser interaction, and Lean 4 arithmetic/fail-closed invariants passed.",
     "Brain postflight persisted the hydraulic-direction, cycle, fitting, fire-line, grade, low-point, and visual-default rules as episode 149368."
+    ,"Added constrained minimum-cost source-head assignment with per-binding forced-alternative margins, exact upright pipe-span projections, and pendent flex-drop/pipe-port bridges.",
+    "Adversarial tests now reject duplicate source heads, missing calculation labels, and absent flex-drop terminal topology; 10 focused tests pass.",
+    "Rendered 29 exact terminal rings over the actual approved FP2 with provisional route arrows off by default; Playwright verified terminal-layer toggling and zero browser errors or warnings.",
+    "Lean 4 verified the 29-terminal coverage and fail-closed whole-graph boundary in 97 ms; brain postflight persisted the gate as episode 149428."
   ],
   "blockers": [
-    "Exact calculation-node-to-DWG-pipe-span binding remains open because CAD label annotations are offset from geometry and must be solved through topology, length, diameter, and elevation constraints.",
+    "The 29 calculated sprinkler terminals are exact, but the remaining non-terminal calculation nodes still require topology, length, diameter, and elevation propagation into DWG pipe spans.",
     "Three loop legs cannot receive truthful whole-network flow arrows until the calculated node graph is bound to the physical graph.",
     "The ten remote geometric low points cannot be classified as acceptable trapped volume or auxiliary-drain requirements until completed-design system/drainage intent is bound."
   ],
-  "next_action": "Bind unique calculated sprinkler leaves to exact source sprinklers, then propagate node assignments through pipe topology using report length, diameter, and elevation constraints; use that binding to resolve the three loop legs and classify each remote low point without inferring drainage intent."
+  "next_action": "Propagate inward from the 29 exact terminal anchors through report pipe length, internal-diameter-to-source-size mapping, elevation, and physical connectivity; resolve all three loop legs before promoting whole-network flow, then classify each remote low point without inferring drainage intent."
 }

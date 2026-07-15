@@ -24,6 +24,215 @@ function projectPointToPipe(value, pipe) {
   return { t, point: projected, distanceFt: distance(value, projected) };
 }
 
+function solveMinimumCostAssignment(matrix) {
+  const rowCount = matrix.length;
+  const columnCount = matrix[0]?.length ?? 0;
+  if (rowCount === 0) return { columnByRow: [], totalCost: 0 };
+  if (columnCount < rowCount) return null;
+  const blockedCost = 1e9;
+  const u = Array(rowCount + 1).fill(0);
+  const v = Array(columnCount + 1).fill(0);
+  const p = Array(columnCount + 1).fill(0);
+  const way = Array(columnCount + 1).fill(0);
+  for (let row = 1; row <= rowCount; row += 1) {
+    p[0] = row;
+    let column0 = 0;
+    const minValue = Array(columnCount + 1).fill(blockedCost);
+    const used = Array(columnCount + 1).fill(false);
+    do {
+      used[column0] = true;
+      const row0 = p[column0];
+      let delta = blockedCost;
+      let column1 = 0;
+      for (let column = 1; column <= columnCount; column += 1) {
+        if (used[column]) continue;
+        const sourceCost = matrix[row0 - 1][column - 1];
+        const finiteCost = Number.isFinite(sourceCost) ? sourceCost : blockedCost;
+        const current = finiteCost - u[row0] - v[column];
+        if (current < minValue[column]) {
+          minValue[column] = current;
+          way[column] = column0;
+        }
+        if (minValue[column] < delta) {
+          delta = minValue[column];
+          column1 = column;
+        }
+      }
+      for (let column = 0; column <= columnCount; column += 1) {
+        if (used[column]) {
+          u[p[column]] += delta;
+          v[column] -= delta;
+        } else {
+          minValue[column] -= delta;
+        }
+      }
+      column0 = column1;
+    } while (p[column0] !== 0);
+    do {
+      const column1 = way[column0];
+      p[column0] = p[column1];
+      column0 = column1;
+    } while (column0 !== 0);
+  }
+  const columnByRow = Array(rowCount).fill(-1);
+  for (let column = 1; column <= columnCount; column += 1) {
+    if (p[column] > 0) columnByRow[p[column] - 1] = column - 1;
+  }
+  const costs = columnByRow.map((column, row) => matrix[row][column]);
+  if (costs.some((value) => !Number.isFinite(value))) return null;
+  return { columnByRow, totalCost: costs.reduce((sum, value) => sum + value, 0) };
+}
+
+function assignWithForcedAlternativeMargins(rows, columns, costFor) {
+  const matrix = rows.map((row) => columns.map((column) => costFor(row, column)));
+  const best = solveMinimumCostAssignment(matrix);
+  if (!best) return null;
+  const assignments = best.columnByRow.map((columnIndex, rowIndex) => {
+    const alternativeMatrix = matrix.map((values) => [...values]);
+    alternativeMatrix[rowIndex][columnIndex] = Number.POSITIVE_INFINITY;
+    const alternative = solveMinimumCostAssignment(alternativeMatrix);
+    return {
+      row: rows[rowIndex],
+      column: columns[columnIndex],
+      cost: matrix[rowIndex][columnIndex],
+      forcedAlternativeMargin: alternative
+        ? alternative.totalCost - best.totalCost
+        : Number.POSITIVE_INFINITY,
+    };
+  });
+  return { assignments, totalCost: best.totalCost };
+}
+
+function reportSprinklerNodes(report) {
+  const values = new Map();
+  for (const segment of report.segments.filter((candidate) => candidate.downstreamKFactor !== null)) {
+    const current = values.get(segment.downstreamNode);
+    const value = {
+      nodeId: segment.downstreamNode,
+      elevationFt: segment.downstreamElevationFt,
+      kFactor: segment.downstreamKFactor,
+    };
+    if (current && (current.elevationFt !== value.elevationFt || current.kFactor !== value.kFactor)) {
+      throw new Error(`POLARIS_REPORT_SPRINKLER_NODE_CONFLICT:${value.nodeId}`);
+    }
+    values.set(value.nodeId, value);
+  }
+  return [...values.values()].sort((left, right) => Number(left.nodeId) - Number(right.nodeId));
+}
+
+function nearestPipeProjection(value, pipes) {
+  return pipes.reduce((best, pipe) => {
+    const projection = projectPointToPipe(value, pipe);
+    return !best || projection.distanceFt < best.distanceFt ? { pipe, ...projection } : best;
+  }, null);
+}
+
+function sprinklerKFactor(sprinkler) {
+  const match = sprinkler.sourceAttributes?.Description?.match(/(?:^|,\s*)(\d+(?:\.\d+)?)(?=,|\s|$)/g);
+  return match?.map((value) => Number(value.replace(/[^\d.]/g, ''))).find((value) => value === 5.6) ?? null;
+}
+
+export function bindCalculationSprinklerLeaves({ report, pipeCalibration }) {
+  const leaves = reportSprinklerNodes(report);
+  const labelByNode = new Map();
+  for (const label of pipeCalibration.hydraulicNodeLabels) {
+    if (labelByNode.has(label.nodeId)) throw new Error(`POLARIS_DUPLICATE_CAD_NODE_LABEL:${label.nodeId}`);
+    labelByNode.set(label.nodeId, label);
+  }
+  const leafRows = leaves.map((leaf) => {
+    const label = labelByNode.get(leaf.nodeId);
+    if (!label) throw new Error(`POLARIS_CALCULATED_SPRINKLER_LABEL_MISSING:${leaf.nodeId}`);
+    return { ...leaf, label };
+  });
+  const sourceSprinklers = pipeCalibration.sprinklers
+    .filter((sprinkler) => sprinklerKFactor(sprinkler) === 5.6)
+    .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true }));
+  const assignment = assignWithForcedAlternativeMargins(leafRows, sourceSprinklers, (leaf, sprinkler) => {
+    if (Math.abs(sprinkler.pointFt.z - leaf.elevationFt) > 0.6) return Number.POSITIVE_INFINITY;
+    return Math.hypot(
+      sprinkler.pointFt.x - leaf.label.alignmentPointFt.x,
+      sprinkler.pointFt.y - leaf.label.alignmentPointFt.y,
+    );
+  });
+  if (!assignment) throw new Error('POLARIS_CALCULATED_SPRINKLER_ASSIGNMENT_INFEASIBLE');
+
+  const pendentAssignments = assignment.assignments.filter(({ column }) => column.sourceAttributes['Sub Category'] === 'Pendent');
+  const flexDrops = pipeCalibration.fittings
+    .filter((fitting) => fitting.sourceAttributes?.['Sub Category'] === 'Flex Drop')
+    .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true }));
+  const flexAssignment = assignWithForcedAlternativeMargins(pendentAssignments, flexDrops, (binding, fitting) => {
+    const hoseLengthInches = Number(fitting.sourceAttributes.Description?.match(/(\d+)\"/)?.[1] ?? 0);
+    const planOffsetFt = Math.hypot(
+      binding.column.pointFt.x - fitting.pointFt.x,
+      binding.column.pointFt.y - fitting.pointFt.y,
+    );
+    return hoseLengthInches > 0 && planOffsetFt <= hoseLengthInches / 12 + 1e-7
+      ? planOffsetFt
+      : Number.POSITIVE_INFINITY;
+  });
+  if (pendentAssignments.length > 0 && !flexAssignment) throw new Error('POLARIS_FLEX_DROP_ASSIGNMENT_INFEASIBLE');
+  const flexBySprinklerId = new Map((flexAssignment?.assignments ?? []).map((value) => [value.row.column.id, value]));
+
+  const bindings = assignment.assignments.map(({ row, column, cost, forcedAlternativeMargin }) => {
+    const category = column.sourceAttributes['Sub Category'];
+    let terminalConnection;
+    if (category === 'Upright') {
+      const projection = nearestPipeProjection(column.pointFt, pipeCalibration.pipes);
+      terminalConnection = {
+        mode: 'upright-source-head-to-exact-pipe-span',
+        pipeId: projection.pipe.id,
+        pipeNominalSizeInches: projection.pipe.nominalSizeInches,
+        pipeT: round(projection.t),
+        sourceFittingOffsetResidualFt: round(projection.distanceFt),
+        topologyReady: projection.distanceFt <= 0.35,
+      };
+    } else if (category === 'Pendent') {
+      const flex = flexBySprinklerId.get(column.id);
+      const projection = nearestPipeProjection(flex.column.pointFt, pipeCalibration.pipes);
+      const atPipeEndpoint = projection.t <= 1e-7 || projection.t >= 1 - 1e-7;
+      terminalConnection = {
+        mode: 'pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint',
+        flexDropFittingId: flex.column.id,
+        flexDropPlanOffsetFt: round(flex.cost),
+        flexDropForcedAlternativeMarginFt: round(flex.forcedAlternativeMargin),
+        pipeId: projection.pipe.id,
+        pipeNominalSizeInches: projection.pipe.nominalSizeInches,
+        pipeEndpoint: projection.t <= 0.5 ? 'start' : 'end',
+        pipePortResidualFt: round(projection.distanceFt),
+        topologyReady: flex.cost <= 4 && atPipeEndpoint && projection.distanceFt <= 0.07,
+      };
+    } else {
+      terminalConnection = { mode: 'unsupported-source-sprinkler-category', topologyReady: false };
+    }
+    return {
+      nodeId: row.nodeId,
+      reportElevationFt: row.elevationFt,
+      reportKFactor: row.kFactor,
+      cadLabelAlignmentPointFt: row.label.alignmentPointFt,
+      sprinklerId: column.id,
+      sprinklerCategory: category,
+      sprinklerPointFt: column.pointFt,
+      annotationToSprinklerPlanDistanceFt: round(cost),
+      forcedAlternativeAssignmentMarginFt: round(forcedAlternativeMargin),
+      terminalConnection,
+    };
+  });
+  const minimumAlternativeMarginFt = Math.min(...bindings.map((binding) => binding.forcedAlternativeAssignmentMarginFt));
+  return {
+    reportDescription: report.identity.reportDescription,
+    calculatedSprinklerNodeCount: leaves.length,
+    assignedSourceSprinklerCount: bindings.length,
+    minimumForcedAlternativeAssignmentMarginFt: round(minimumAlternativeMarginFt),
+    uniquenessMarginThresholdFt: 1.5,
+    allKFactorsMatch: bindings.every((binding) => binding.reportKFactor === 5.6),
+    allTerminalConnectionsReady: bindings.every((binding) => binding.terminalConnection.topologyReady),
+    exactLeafBindingReady: bindings.length === leaves.length
+      && minimumAlternativeMarginFt >= 1.5
+      && bindings.every((binding) => binding.reportKFactor === 5.6 && binding.terminalConnection.topologyReady),
+    bindings,
+  };
+}
+
 function unionFind(size) {
   const parent = Array.from({ length: size }, (_, index) => index);
   const find = (index) => {
@@ -214,6 +423,10 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
   const ambiguousRootEdges = rootEdges.filter((edge) => edge.sourceRootDirection.startsWith('ambiguous'));
   const rootCycleRank = rootComponent.edgeIds.length - rootComponent.nodeIds.length + 1;
   const reports = [atticReport, belowCeilingReport];
+  const calculatedSprinklerLeafBindings = reports.map((report) => bindCalculationSprinklerLeaves({
+    report,
+    pipeCalibration,
+  }));
   const reportNodeIds = [...new Set(reports.flatMap((report) => report.nodes.map((node) => node.nodeId)))].sort((a, b) => Number(a) - Number(b));
   const labelNodeIds = [...new Set(pipeCalibration.hydraulicNodeLabels.map((label) => label.nodeId))].sort((a, b) => Number(a) - Number(b));
   const missingCadLabels = reportNodeIds.filter((nodeId) => !labelNodeIds.includes(nodeId));
@@ -281,7 +494,7 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
   }
   const geometricallyDrainableCount = geometricGrades.filter((grade) => grade.continuousNonRisingPathToMainDrainEntry).length;
   const packet = {
-    schema: 'halofire.polaris-pitched-hydraulic-network.v1',
+    schema: 'halofire.polaris-pitched-hydraulic-network.v2',
     projectId: pipeCalibration.projectId,
     sourceBoundary: {
       pipeCalibrationReceiptSha256: pipeCalibration.receiptSha256,
@@ -310,6 +523,12 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
         ? 'Only the off-building source and underground calculation nodes are absent from the sprinkler-plan CAD labels.'
         : 'Unexpected calculation nodes are absent from the sprinkler-plan CAD labels.',
       geometryBindingStatus: 'held-annotation-offsets-require-topology-length-elevation-binding',
+      calculatedSprinklerLeafBindings,
+      exactCalculatedSprinklerLeafCount: calculatedSprinklerLeafBindings
+        .reduce((sum, binding) => sum + binding.assignedSourceSprinklerCount, 0),
+      calculatedSprinklerLeafBindingStatus: calculatedSprinklerLeafBindings.every((binding) => binding.exactLeafBindingReady)
+        ? 'exact-source-sprinkler-and-terminal-pipe-binding-ready'
+        : 'held-nonunique-or-terminal-topology-unresolved',
     },
     physicalNetwork: {
       toleranceFt: graph.toleranceFt,
@@ -373,6 +592,8 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
       inspectorTestDrainPipeBridgeReady: testDrainBridge.connectedPipeEndpoints.length === 2,
       mainDrainCalloutReady: mainDrainNote.leaderSegmentCount === 2,
       roofRelativePipeGradeGeometryReady: geometricGrades.length === 14,
+      calculatedSprinklerLeafToDwgPipeBindingReady: calculatedSprinklerLeafBindings
+        .every((binding) => binding.exactLeafBindingReady),
       calculationNodeToDwgGeometryBindingReady: false,
       wholeNetworkHydraulicFlowDirectionReady: false,
       drainageGradeSemanticsReady: false,
