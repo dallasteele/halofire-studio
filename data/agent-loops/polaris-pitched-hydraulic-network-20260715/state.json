@@ -1,5 +1,5 @@
 {
-  "iteration": 3,
+  "iteration": 4,
   "phase": "verify-and-bind",
   "status": "in_progress",
   "observations": [
@@ -12,7 +12,9 @@
     "The same-project fire-line DWG explicitly contains a new 4-inch Class 350 fire line, backflow prevention assembly, city water context, and riser symbols.",
     "Four of 14 sloped plan runs have a continuous non-rising geometric path to the main-drain entry; ten terminate at geometric low points away from that entry and require intent/auxiliary-drain classification.",
     "All 29 calculated sprinkler nodes are now bound one-to-one to exact source heads and exact terminal topology: 14 attic uprights bind pipe spans and 15 below-ceiling pendents bind 48-inch flex drops plus pipe endpoints.",
-    "The minimum forced-alternative assignment margin is 5.268647531 feet for attic heads and 1.726484086 feet for below-ceiling heads; the governed minimum is 1.5 feet.",
+    "All 59 on-plan hydraulic nodes are now bound to the exact 3D leader tip of their source seven-line AutoSPRINK calculation glyph; the worst report-to-source elevation residual is 0.243616 inches.",
+    "Fifty report segments now route over exact rigid source spans with a worst accepted length residual of 0.024833257 feet: 45 branch-line, four cross-main, and one feed-main segment.",
+    "The exact rigid routes cover all three physical loop interiors, so their direction is report-proven instead of inferred from geometric slope or riser distance.",
     "No independent human-review gate is required; deterministic, adversarial, formal, visual, and browser loops provide acceptance."
   ],
   "attempts": [
@@ -27,11 +29,16 @@
     "Adversarial tests now reject duplicate source heads, missing calculation labels, and absent flex-drop terminal topology; 10 focused tests pass.",
     "Rendered 29 exact terminal rings over the actual approved FP2 with provisional route arrows off by default; Playwright verified terminal-layer toggling and zero browser errors or warnings.",
     "Lean 4 verified the 29-terminal coverage and fail-closed whole-graph boundary in 97 ms; brain postflight persisted the gate as episode 149428."
+    ,"Discovered and governed the source hydraulic-node connection primitive: six hexagon lines plus one leader line, with degree signature [1,2,2,2,2,2,3], including overlapping XY labels at distinct elevations.",
+    "Constrained Dijkstra routing now binds compatible internal-diameter classes, exact 3D node tips, fitting-port gaps, source topology, and report lengths to 50 rigid pipe-span routes.",
+    "An adversarial one-foot branch-length mutation reduces exact branch bindings from 45 to 44 and drops loop-interior readiness, proving the gate is evidence-sensitive.",
+    "Playwright rendered the 50 span routes over the actual approved FP2, verified the span-direction layer off and back on, and reported zero browser errors or warnings.",
+    "Lean 4 verified exact-node coverage, 45 + 4 + 1 = 50 rigid routes, loop-interior readiness, and the fail-closed whole-layout boundary in 118 ms; brain postflight persisted the rule as episode 149495."
   ],
   "blockers": [
-    "The 29 calculated sprinkler terminals are exact, but the remaining non-terminal calculation nodes still require topology, length, diameter, and elevation propagation into DWG pipe spans.",
-    "Three loop legs cannot receive truthful whole-network flow arrows until the calculated node graph is bound to the physical graph.",
+    "Fifteen flexible arm-over report segments have exact source head, flex-drop, and rigid-pipe endpoints, but the source export does not provide a truthful flexible-hose centerline.",
+    "Two feed-riser segments cross separated fitting bodies, and the two source nodes are off-building; continuous source-to-building geometry remains unproven.",
     "The ten remote geometric low points cannot be classified as acceptable trapped volume or auxiliary-drain requirements until completed-design system/drainage intent is bound."
   ],
-  "next_action": "Propagate inward from the 29 exact terminal anchors through report pipe length, internal-diameter-to-source-size mapping, elevation, and physical connectivity; resolve all three loop legs before promoting whole-network flow, then classify each remote low point without inferring drainage intent."
+  "next_action": "Bind the 15 arm-over endpoint routes without fabricating hose centerlines, bridge the separated riser fittings and same-project fire-line source registration, then classify each of the ten remote low points before promoting whole-network flow or proper-layout readiness."
 }

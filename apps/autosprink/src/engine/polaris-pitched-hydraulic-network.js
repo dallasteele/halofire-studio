@@ -142,6 +142,7 @@ export function bindCalculationSprinklerLeaves({ report, pipeCalibration }) {
   const leafRows = leaves.map((leaf) => {
     const label = labelByNode.get(leaf.nodeId);
     if (!label) throw new Error(`POLARIS_CALCULATED_SPRINKLER_LABEL_MISSING:${leaf.nodeId}`);
+    if (!label.connectionPointFt) throw new Error(`POLARIS_CALCULATED_SPRINKLER_CONNECTION_POINT_MISSING:${leaf.nodeId}`);
     return { ...leaf, label };
   });
   const sourceSprinklers = pipeCalibration.sprinklers
@@ -149,10 +150,7 @@ export function bindCalculationSprinklerLeaves({ report, pipeCalibration }) {
     .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true }));
   const assignment = assignWithForcedAlternativeMargins(leafRows, sourceSprinklers, (leaf, sprinkler) => {
     if (Math.abs(sprinkler.pointFt.z - leaf.elevationFt) > 0.6) return Number.POSITIVE_INFINITY;
-    return Math.hypot(
-      sprinkler.pointFt.x - leaf.label.alignmentPointFt.x,
-      sprinkler.pointFt.y - leaf.label.alignmentPointFt.y,
-    );
+    return distance(sprinkler.pointFt, leaf.label.connectionPointFt);
   });
   if (!assignment) throw new Error('POLARIS_CALCULATED_SPRINKLER_ASSIGNMENT_INFEASIBLE');
 
@@ -209,10 +207,15 @@ export function bindCalculationSprinklerLeaves({ report, pipeCalibration }) {
       reportElevationFt: row.elevationFt,
       reportKFactor: row.kFactor,
       cadLabelAlignmentPointFt: row.label.alignmentPointFt,
+      cadSourceNodeConnectionPointFt: row.label.connectionPointFt,
       sprinklerId: column.id,
       sprinklerCategory: category,
       sprinklerPointFt: column.pointFt,
-      annotationToSprinklerPlanDistanceFt: round(cost),
+      sourceNodeToSprinklerResidualFt: round(cost),
+      annotationToSprinklerPlanDistanceFt: round(Math.hypot(
+        column.pointFt.x - row.label.alignmentPointFt.x,
+        column.pointFt.y - row.label.alignmentPointFt.y,
+      )),
       forcedAlternativeAssignmentMarginFt: round(forcedAlternativeMargin),
       terminalConnection,
     };
@@ -395,6 +398,241 @@ function rootGraph(graph, rootPointFt, allowedNodeIds = null) {
   return { rootNodeId: rootNode.node.id, rootResidualFt: round(rootNode.distanceFt), distances, directedEdges };
 }
 
+const PHYSICAL_PIPE_CLASS_BY_INTERNAL_DIAMETER = new Map([
+  [1.049, { nominalSizeInches: 1, subCategory: 'Schedule 40' }],
+  [1.53, { nominalSizeInches: 1.25, subCategory: 'Eddy Flow' }],
+  [1.728, { nominalSizeInches: 1.5, subCategory: 'Eddy Flow' }],
+  [2.705, { nominalSizeInches: 2.5, subCategory: 'Eddy Flow' }],
+  [3.26, { nominalSizeInches: 3, subCategory: 'Schedule 10' }],
+  [3.334, { nominalSizeInches: 3, subCategory: 'Eddy Flow' }],
+  [4.22, { nominalSizeInches: 4, subCategory: 'underground-source-context' }],
+  [4.31, { nominalSizeInches: 4, subCategory: 'Eddy Flow' }],
+]);
+
+function physicalPipeClassForInternalDiameter(internalDiameterInches) {
+  const value = PHYSICAL_PIPE_CLASS_BY_INTERNAL_DIAMETER.get(internalDiameterInches);
+  if (!value) throw new Error(`POLARIS_REPORT_INTERNAL_DIAMETER_UNMAPPED:${internalDiameterInches}`);
+  return value;
+}
+
+function pipeMatchesPhysicalClass(pipe, physicalClass) {
+  return pipe.nominalSizeInches === physicalClass.nominalSizeInches
+    && (physicalClass.subCategory === 'underground-source-context'
+      || pipe.sourceAttributes?.['Sub Category'] === physicalClass.subCategory);
+}
+
+function attachmentsForPoint(graph, pipes, value, physicalClass, maximumPortResidualFt = 4.1) {
+  const edgesByPipeId = new Map();
+  for (const edge of graph.edges) {
+    const edges = edgesByPipeId.get(edge.pipeId) ?? [];
+    edges.push(edge);
+    edgesByPipeId.set(edge.pipeId, edges);
+  }
+  const attachments = [];
+  for (const pipe of pipes.filter((candidate) => pipeMatchesPhysicalClass(candidate, physicalClass))) {
+    const projection = projectPointToPipe(value, pipe);
+    if (projection.distanceFt > maximumPortResidualFt) continue;
+    for (const edge of edgesByPipeId.get(pipe.id) ?? []) {
+      if (projection.t < edge.fromT - 1e-7 || projection.t > edge.toT + 1e-7) continue;
+      for (const [nodeId, nodeT] of [[edge.fromNodeId, edge.fromT], [edge.toNodeId, edge.toT]]) {
+        attachments.push({
+          nodeId,
+          pipeId: pipe.id,
+          pipeT: projection.t,
+          projectedPointFt: projection.point,
+          portResidualFt: projection.distanceFt,
+          pipeTravelToNodeFt: pipe.length3dFt * Math.abs(projection.t - nodeT),
+          accessLengthFt: projection.distanceFt + pipe.length3dFt * Math.abs(projection.t - nodeT),
+          spanId: edge.id,
+        });
+      }
+    }
+  }
+  return attachments.sort((left, right) => left.accessLengthFt - right.accessLengthFt);
+}
+
+function shortestPhysicalClassPath(graph, pipeById, physicalClass, startAttachments, endAttachments, forbiddenEdgeId = null) {
+  const distances = new Map(graph.nodes.map((node) => [node.id, Number.POSITIVE_INFINITY]));
+  const previous = new Map();
+  const startByNode = new Map();
+  for (const attachment of startAttachments) {
+    if (attachment.accessLengthFt < distances.get(attachment.nodeId)) {
+      distances.set(attachment.nodeId, attachment.accessLengthFt);
+      startByNode.set(attachment.nodeId, attachment);
+    }
+  }
+  const pending = new Set(graph.nodes.map((node) => node.id));
+  while (pending.size) {
+    let current = null;
+    for (const nodeId of pending) {
+      if (current === null || distances.get(nodeId) < distances.get(current)) current = nodeId;
+    }
+    if (!Number.isFinite(distances.get(current))) break;
+    pending.delete(current);
+    for (const link of graph.adjacency.get(current)) {
+      if (link.edge.id === forbiddenEdgeId || !pipeMatchesPhysicalClass(pipeById.get(link.edge.pipeId), physicalClass)) continue;
+      const candidate = distances.get(current) + link.edge.lengthFt;
+      if (candidate < distances.get(link.nodeId)) {
+        distances.set(link.nodeId, candidate);
+        previous.set(link.nodeId, { nodeId: current, edge: link.edge });
+        startByNode.set(link.nodeId, startByNode.get(current));
+      }
+    }
+  }
+  let best = null;
+  for (const endAttachment of endAttachments) {
+    const graphDistanceFt = distances.get(endAttachment.nodeId);
+    if (!Number.isFinite(graphDistanceFt)) continue;
+    const lengthFt = graphDistanceFt + endAttachment.accessLengthFt;
+    if (!best || lengthFt < best.lengthFt) best = { lengthFt, endAttachment };
+  }
+  if (!best) return null;
+  const steps = [];
+  let current = best.endAttachment.nodeId;
+  while (previous.has(current)) {
+    const entry = previous.get(current);
+    steps.push({ edge: entry.edge, fromNodeId: entry.nodeId, toNodeId: current });
+    current = entry.nodeId;
+  }
+  steps.reverse();
+  return {
+    lengthFt: best.lengthFt,
+    startAttachment: startByNode.get(best.endAttachment.nodeId) ?? startByNode.get(current),
+    endAttachment: best.endAttachment,
+    edges: steps.map((step) => step.edge),
+    steps,
+  };
+}
+
+function directSameSpanRoute(pipeById, startAttachments, endAttachments) {
+  let best = null;
+  for (const start of startAttachments) {
+    for (const end of endAttachments) {
+      if (start.spanId !== end.spanId || start.pipeId !== end.pipeId) continue;
+      const pipe = pipeById.get(start.pipeId);
+      const lengthFt = start.portResidualFt + end.portResidualFt
+        + pipe.length3dFt * Math.abs(start.pipeT - end.pipeT);
+      if (!best || lengthFt < best.lengthFt) {
+        best = {
+          lengthFt,
+          startAttachment: start,
+          endAttachment: end,
+          edges: [],
+          steps: [],
+          directPipeId: pipe.id,
+        };
+      }
+    }
+  }
+  return best;
+}
+
+export function bindHydraulicReportSegmentsToPhysicalSpans({ pipeCalibration, reports, graph = null }) {
+  const physicalGraph = graph ?? buildPhysicalPipeGraph(pipeCalibration.pipes);
+  const pipeById = new Map(pipeCalibration.pipes.map((pipe) => [pipe.id, pipe]));
+  const sourcePointByNodeId = new Map(pipeCalibration.hydraulicNodeLabels
+    .map((label) => [label.nodeId, label.connectionPointFt]));
+  const segmentOccurrences = new Map();
+  for (const segment of reports.flatMap((report) => report.segments)) {
+    const key = [segment.upstreamNode, segment.downstreamNode, segment.diameterInternalInches, segment.lengthFt].join('|');
+    const value = segmentOccurrences.get(key) ?? { segment, occurrenceCount: 0 };
+    value.occurrenceCount += 1;
+    segmentOccurrences.set(key, value);
+  }
+  const routes = [...segmentOccurrences.values()].map(({ segment, occurrenceCount }) => {
+    const physicalClass = physicalPipeClassForInternalDiameter(segment.diameterInternalInches);
+    const startPointFt = sourcePointByNodeId.get(segment.upstreamNode);
+    const endPointFt = sourcePointByNodeId.get(segment.downstreamNode);
+    if (!startPointFt || !endPointFt) {
+      return {
+        upstreamNode: segment.upstreamNode,
+        downstreamNode: segment.downstreamNode,
+        hydraulicFlowDirection: segment.hydraulicFlowDirection,
+        reportLengthFt: segment.lengthFt,
+        pipeRole: segment.pipeRole,
+        diameterInternalInches: segment.diameterInternalInches,
+        physicalClass,
+        occurrenceCount,
+        bindingStatus: 'off-building-source-node-not-present-in-sprinkler-plan-cad',
+        exactPhysicalSpanRouteReady: false,
+      };
+    }
+    const startAttachments = attachmentsForPoint(physicalGraph, pipeCalibration.pipes, startPointFt, physicalClass);
+    const endAttachments = attachmentsForPoint(physicalGraph, pipeCalibration.pipes, endPointFt, physicalClass);
+    const graphRoute = shortestPhysicalClassPath(physicalGraph, pipeById, physicalClass, startAttachments, endAttachments);
+    const directRoute = directSameSpanRoute(pipeById, startAttachments, endAttachments);
+    const candidates = [graphRoute, directRoute].filter(Boolean)
+      .sort((left, right) => Math.abs(left.lengthFt - segment.lengthFt) - Math.abs(right.lengthFt - segment.lengthFt));
+    const route = candidates[0];
+    if (!route) {
+      return {
+        upstreamNode: segment.upstreamNode,
+        downstreamNode: segment.downstreamNode,
+        hydraulicFlowDirection: segment.hydraulicFlowDirection,
+        reportLengthFt: segment.lengthFt,
+        pipeRole: segment.pipeRole,
+        diameterInternalInches: segment.diameterInternalInches,
+        physicalClass,
+        occurrenceCount,
+        bindingStatus: 'no-compatible-source-pipe-path',
+        exactPhysicalSpanRouteReady: false,
+      };
+    }
+    const pipeIds = [...new Set([
+      route.startAttachment.pipeId,
+      ...route.edges.map((edge) => edge.pipeId),
+      route.endAttachment.pipeId,
+      route.directPipeId,
+    ].filter(Boolean))];
+    const reportLengthResidualFt = Math.abs(route.lengthFt - segment.lengthFt);
+    const physicalNodeById = new Map(physicalGraph.nodes.map((node) => [node.id, node]));
+    const physicalPathPolylineFt = [
+      startPointFt,
+      route.startAttachment.projectedPointFt,
+      ...route.steps.map((step) => physicalNodeById.get(step.toNodeId).pointFt),
+      route.endAttachment.projectedPointFt,
+      endPointFt,
+    ].filter((value, index, values) => index === 0 || distance(value, values[index - 1]) > 1e-7);
+    return {
+      upstreamNode: segment.upstreamNode,
+      downstreamNode: segment.downstreamNode,
+      hydraulicFlowDirection: segment.hydraulicFlowDirection,
+      reportLengthFt: segment.lengthFt,
+      pipeRole: segment.pipeRole,
+      diameterInternalInches: segment.diameterInternalInches,
+      physicalRouteLengthFt: round(route.lengthFt),
+      reportLengthResidualFt: round(reportLengthResidualFt),
+      physicalClass,
+      occurrenceCount,
+      startPortResidualFt: round(route.startAttachment.portResidualFt),
+      endPortResidualFt: round(route.endAttachment.portResidualFt),
+      pipeIds,
+      physicalSpanIds: route.edges.map((edge) => edge.id),
+      physicalPathPolylineFt,
+      bindingStatus: reportLengthResidualFt <= 0.25
+        ? 'exact-source-pipe-span-route-within-quarter-foot'
+        : 'held-report-length-residual-exceeds-quarter-foot',
+      exactPhysicalSpanRouteReady: reportLengthResidualFt <= 0.25,
+    };
+  });
+  const roleCounts = Object.fromEntries([...routes.reduce((counts, route) => {
+    const value = counts.get(route.pipeRole) ?? { total: 0, exactPhysicalSpanRouteReady: 0 };
+    value.total += 1;
+    if (route.exactPhysicalSpanRouteReady) value.exactPhysicalSpanRouteReady += 1;
+    counts.set(route.pipeRole, value);
+    return counts;
+  }, new Map())].sort(([left], [right]) => left.localeCompare(right)));
+  return {
+    uniqueReportSegmentCount: routes.length,
+    onPlanSegmentCount: routes.filter((route) => !route.bindingStatus.startsWith('off-building')).length,
+    exactPhysicalSpanRouteCount: routes.filter((route) => route.exactPhysicalSpanRouteReady).length,
+    maximumReadyRouteLengthResidualFt: Math.max(0, ...routes.filter((route) => route.exactPhysicalSpanRouteReady)
+      .map((route) => route.reportLengthResidualFt)),
+    roleCounts,
+    routes,
+  };
+}
+
 const countBy = (items, getter) => Object.fromEntries([...items.reduce((counts, item) => {
   const key = getter(item);
   counts.set(key, (counts.get(key) ?? 0) + 1);
@@ -423,6 +661,16 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
   const ambiguousRootEdges = rootEdges.filter((edge) => edge.sourceRootDirection.startsWith('ambiguous'));
   const rootCycleRank = rootComponent.edgeIds.length - rootComponent.nodeIds.length + 1;
   const reports = [atticReport, belowCeilingReport];
+  const physicalSpanBinding = bindHydraulicReportSegmentsToPhysicalSpans({
+    pipeCalibration,
+    reports,
+    graph,
+  });
+  const loopInteriorRoles = ['branch-line', 'cross-main', 'feed-main'];
+  const loopInteriorPipeSpanDirectionReady = loopInteriorRoles.every((role) => {
+    const counts = physicalSpanBinding.roleCounts[role];
+    return counts && counts.total > 0 && counts.exactPhysicalSpanRouteReady === counts.total;
+  });
   const calculatedSprinklerLeafBindings = reports.map((report) => bindCalculationSprinklerLeaves({
     report,
     pipeCalibration,
@@ -430,6 +678,26 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
   const reportNodeIds = [...new Set(reports.flatMap((report) => report.nodes.map((node) => node.nodeId)))].sort((a, b) => Number(a) - Number(b));
   const labelNodeIds = [...new Set(pipeCalibration.hydraulicNodeLabels.map((label) => label.nodeId))].sort((a, b) => Number(a) - Number(b));
   const missingCadLabels = reportNodeIds.filter((nodeId) => !labelNodeIds.includes(nodeId));
+  const reportNodeById = new Map();
+  for (const node of reports.flatMap((report) => report.nodes)) {
+    const current = reportNodeById.get(node.nodeId);
+    if (current && current.elevationFt !== node.elevationFt) throw new Error(`POLARIS_REPORT_NODE_ELEVATION_CONFLICT:${node.nodeId}`);
+    reportNodeById.set(node.nodeId, node);
+  }
+  const exactCadNodeConnectionPoints = pipeCalibration.hydraulicNodeLabels.map((label) => {
+    const reportNode = reportNodeById.get(label.nodeId);
+    if (!reportNode || !label.connectionPointFt) throw new Error(`POLARIS_CAD_NODE_CONNECTION_POINT_MISSING:${label.nodeId}`);
+    return {
+      nodeId: label.nodeId,
+      connectionPointFt: label.connectionPointFt,
+      reportElevationFt: reportNode.elevationFt,
+      elevationResidualInches: round(Math.abs(label.connectionPointFt.z - reportNode.elevationFt) * 12, 6),
+      sourceGlyphLineHandles: label.sourceGlyphLineHandles,
+      sourceGlyphTopologyDegreeSignature: label.sourceGlyphTopologyDegreeSignature,
+    };
+  });
+  const maximumCadNodeElevationResidualInches = Math.max(...exactCadNodeConnectionPoints
+    .map((binding) => binding.elevationResidualInches));
   const geometricGrades = pipeCalibration.pipes
     .filter((pipe) => pipe.geometryKind === 'sloped-plan-run')
     .map((pipe) => ({
@@ -494,7 +762,7 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
   }
   const geometricallyDrainableCount = geometricGrades.filter((grade) => grade.continuousNonRisingPathToMainDrainEntry).length;
   const packet = {
-    schema: 'halofire.polaris-pitched-hydraulic-network.v2',
+    schema: 'halofire.polaris-pitched-hydraulic-network.v3',
     projectId: pipeCalibration.projectId,
     sourceBoundary: {
       pipeCalibrationReceiptSha256: pipeCalibration.receiptSha256,
@@ -522,13 +790,28 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
       missingCadLabelMeaning: missingCadLabels.every((nodeId) => ['1', '2'].includes(nodeId))
         ? 'Only the off-building source and underground calculation nodes are absent from the sprinkler-plan CAD labels.'
         : 'Unexpected calculation nodes are absent from the sprinkler-plan CAD labels.',
-      geometryBindingStatus: 'held-annotation-offsets-require-topology-length-elevation-binding',
+      exactCadNodeConnectionPointCount: exactCadNodeConnectionPoints.length,
+      maximumCadNodeElevationResidualInches,
+      sourceGlyphTopologyReady: exactCadNodeConnectionPoints.every((binding) => binding.sourceGlyphLineHandles.length === 7
+        && JSON.stringify(binding.sourceGlyphTopologyDegreeSignature) === JSON.stringify([1, 2, 2, 2, 2, 2, 3])),
+      exactCadNodeConnectionPoints,
+      connectionPointBindingStatus: maximumCadNodeElevationResidualInches <= 0.25
+        && exactCadNodeConnectionPoints.length === 59
+        ? 'exact-source-glyph-leader-tips-ready-for-all-on-plan-nodes'
+        : 'held-source-glyph-or-elevation-residual-invalid',
+      geometryBindingStatus: 'exact-node-points-ready-segment-to-physical-pipe-span-routes-still-held',
       calculatedSprinklerLeafBindings,
       exactCalculatedSprinklerLeafCount: calculatedSprinklerLeafBindings
         .reduce((sum, binding) => sum + binding.assignedSourceSprinklerCount, 0),
       calculatedSprinklerLeafBindingStatus: calculatedSprinklerLeafBindings.every((binding) => binding.exactLeafBindingReady)
         ? 'exact-source-sprinkler-and-terminal-pipe-binding-ready'
         : 'held-nonunique-or-terminal-topology-unresolved',
+    },
+    physicalSpanRegistration: {
+      ...physicalSpanBinding,
+      loopInteriorRoles,
+      loopInteriorPipeSpanDirectionReady,
+      interpretation: 'Report upstream-to-downstream direction is promoted onto a physical span route only when source pipe material/nominal size, exact 3D node tips, connectivity, and report length agree within 0.25 ft.',
     },
     physicalNetwork: {
       toleranceFt: graph.toleranceFt,
@@ -594,6 +877,13 @@ export function buildPolarisPitchedHydraulicNetwork({ pipeCalibration, atticRepo
       roofRelativePipeGradeGeometryReady: geometricGrades.length === 14,
       calculatedSprinklerLeafToDwgPipeBindingReady: calculatedSprinklerLeafBindings
         .every((binding) => binding.exactLeafBindingReady),
+      exactHydraulicNodeConnectionPointsReady: exactCadNodeConnectionPoints.length === 59
+        && maximumCadNodeElevationResidualInches <= 0.25,
+      calculationNodeToDwgConnectionPointBindingReady: missingCadLabels.every((nodeId) => ['1', '2'].includes(nodeId))
+        && exactCadNodeConnectionPoints.length === 59
+        && maximumCadNodeElevationResidualInches <= 0.25,
+      loopInteriorPipeSpanDirectionReady,
+      buildingRigidPipeSpanHydraulicDirectionReady: loopInteriorPipeSpanDirectionReady,
       calculationNodeToDwgGeometryBindingReady: false,
       wholeNetworkHydraulicFlowDirectionReady: false,
       drainageGradeSemanticsReady: false,

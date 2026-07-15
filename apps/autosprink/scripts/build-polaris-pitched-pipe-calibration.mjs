@@ -103,6 +103,9 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
       x: round((label.alignmentPoint.x + XY_OFFSET_INCHES[0]) / 12),
       y: round((label.alignmentPoint.y + XY_OFFSET_INCHES[1]) / 12),
     },
+    connectionPointFt: projectPoint(label.connectionPoint),
+    sourceGlyphLineHandles: label.glyphLineHandles,
+    sourceGlyphTopologyDegreeSignature: label.glyphTopologyDegreeSignature,
   }));
   const sourceNotes = dwg.sourceNotes.map((note) => ({
     text: note.text,
@@ -125,7 +128,7 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
     return counts;
   }, new Map())].sort(([a], [b]) => Number(a) - Number(b)));
   const packet = {
-    schema: 'halofire.polaris-pitched-pipe-xyz-calibration.v1',
+    schema: 'halofire.polaris-pitched-pipe-xyz-calibration.v2',
     projectId: PROJECT_ID,
     sources: {
       nativeCad: {
@@ -179,6 +182,7 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
       ],
       fittingFamilyCounts: countBy(fittings, 'family'),
       hydraulicNodeLabelCount: hydraulicNodeLabels.length,
+      hydraulicNodeConnectionPointCount: hydraulicNodeLabels.filter((label) => label.connectionPointFt).length,
       attributedPipeCount: pipes.filter((pipe) => Object.keys(pipe.sourceAttributes).length > 0).length,
       attributedFittingCount: fittings.filter((fitting) => Object.keys(fitting.sourceAttributes).length > 0).length,
       sourceNoteCount: sourceNotes.length,
@@ -194,6 +198,9 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
       approvedAndAsBuiltRegistrationReady: true,
       planDirectionReady: true,
       roofRelativePipeGradeGeometryReady: true,
+      exactHydraulicNodeConnectionPointsReady: hydraulicNodeLabels.length === 59
+        && hydraulicNodeLabels.every((label) => label.connectionPointFt
+          && JSON.stringify(label.sourceGlyphTopologyDegreeSignature) === JSON.stringify([1, 2, 2, 2, 2, 2, 3])),
       hydraulicFlowDirectionReady: false,
       drainageGradeSemanticsReady: false,
       fullFittingIdentityReady: fittings.length > 0

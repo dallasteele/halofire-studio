@@ -1,8 +1,8 @@
 {
-  "schema": "halofire.polaris-pitched-hydraulic-network.v2",
+  "schema": "halofire.polaris-pitched-hydraulic-network.v3",
   "projectId": "polaris-academy-mesa-az",
   "sourceBoundary": {
-    "pipeCalibrationReceiptSha256": "74B55A52AF6F16F0D9501EEFC12D55E739D2D373FF8C9D1553613A11B65E6CFA",
+    "pipeCalibrationReceiptSha256": "3F9528A0F964579411A17E933334D07F1E3DEB973A75477102B2E5D49BA23CC5",
     "atticHydraulicReportSha256": "7BFEDCD59CAB07DB2045D8E4BC7F23770D8B3991019163153737AE4C1A8FC846",
     "belowCeilingHydraulicReportSha256": "690BFA978E60A7B4704F0DCDFD9FAE4BA5A87EBD8E6C7C38BD62BF22D8D24EA9",
     "fireLineCad": {
@@ -2937,13 +2937,1671 @@
       "2"
     ],
     "missingCadLabelMeaning": "Only the off-building source and underground calculation nodes are absent from the sprinkler-plan CAD labels.",
-    "geometryBindingStatus": "held-annotation-offsets-require-topology-length-elevation-binding",
+    "exactCadNodeConnectionPointCount": 59,
+    "maximumCadNodeElevationResidualInches": 0.243616,
+    "sourceGlyphTopologyReady": true,
+    "exactCadNodeConnectionPoints": [
+      {
+        "nodeId": "5",
+        "connectionPointFt": {
+          "x": 1.666666667,
+          "y": 56.166666667,
+          "z": 11.029280806
+        },
+        "reportElevationFt": 11.041667,
+        "elevationResidualInches": 0.148634,
+        "sourceGlyphLineHandles": [
+          "23520",
+          "23521",
+          "23522",
+          "23523",
+          "23524",
+          "23525",
+          "23527"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "8",
+        "connectionPointFt": {
+          "x": 174.208333333,
+          "y": 56.166666667,
+          "z": 14.369775119
+        },
+        "reportElevationFt": 14.375,
+        "elevationResidualInches": 0.062699,
+        "sourceGlyphLineHandles": [
+          "23528",
+          "23529",
+          "23530",
+          "23531",
+          "23532",
+          "23533",
+          "23535"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "9",
+        "connectionPointFt": {
+          "x": 1.665609317,
+          "y": 45.166666363,
+          "z": 11.01971478
+        },
+        "reportElevationFt": 11,
+        "elevationResidualInches": 0.236577,
+        "sourceGlyphLineHandles": [
+          "23536",
+          "23537",
+          "23538",
+          "23539",
+          "23540",
+          "23541",
+          "23543"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "11",
+        "connectionPointFt": {
+          "x": 174.208333333,
+          "y": 45.166666667,
+          "z": 14.369775119
+        },
+        "reportElevationFt": 14.375,
+        "elevationResidualInches": 0.062699,
+        "sourceGlyphLineHandles": [
+          "23544",
+          "23545",
+          "23546",
+          "23547",
+          "23548",
+          "23549",
+          "23551"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "13",
+        "connectionPointFt": {
+          "x": 174.208333333,
+          "y": 39.666666667,
+          "z": 11
+        },
+        "reportElevationFt": 11,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23552",
+          "23553",
+          "23554",
+          "23555",
+          "23556",
+          "23557",
+          "23559"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "14",
+        "connectionPointFt": {
+          "x": 174.208333333,
+          "y": 39.666666667,
+          "z": 14.369775119
+        },
+        "reportElevationFt": 14.375,
+        "elevationResidualInches": 0.062699,
+        "sourceGlyphLineHandles": [
+          "23560",
+          "23561",
+          "23562",
+          "23563",
+          "23564",
+          "23565",
+          "23567"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "15",
+        "connectionPointFt": {
+          "x": 1.664551967,
+          "y": 34.166666636,
+          "z": 11.010148754
+        },
+        "reportElevationFt": 11,
+        "elevationResidualInches": 0.121785,
+        "sourceGlyphLineHandles": [
+          "23568",
+          "23569",
+          "23570",
+          "23571",
+          "23572",
+          "23573",
+          "23575"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "17",
+        "connectionPointFt": {
+          "x": 174.208333333,
+          "y": 34.166666667,
+          "z": 11
+        },
+        "reportElevationFt": 11,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23576",
+          "23577",
+          "23578",
+          "23579",
+          "23580",
+          "23581",
+          "23583"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "21",
+        "connectionPointFt": {
+          "x": 7.310342169,
+          "y": 23.166666667,
+          "z": 14.090941714
+        },
+        "reportElevationFt": 14.083333,
+        "elevationResidualInches": 0.091305,
+        "sourceGlyphLineHandles": [
+          "23584",
+          "23585",
+          "23586",
+          "23587",
+          "23588",
+          "23589",
+          "23591"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "23",
+        "connectionPointFt": {
+          "x": 19.310342169,
+          "y": 23.166666667,
+          "z": 14.059643334
+        },
+        "reportElevationFt": 14.041667,
+        "elevationResidualInches": 0.215716,
+        "sourceGlyphLineHandles": [
+          "23592",
+          "23593",
+          "23594",
+          "23595",
+          "23596",
+          "23597",
+          "23599"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "25",
+        "connectionPointFt": {
+          "x": 31.310342169,
+          "y": 23.166666667,
+          "z": 14.028344953
+        },
+        "reportElevationFt": 14.041667,
+        "elevationResidualInches": 0.159865,
+        "sourceGlyphLineHandles": [
+          "23600",
+          "23601",
+          "23602",
+          "23603",
+          "23604",
+          "23605",
+          "23607"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "43",
+        "connectionPointFt": {
+          "x": 174.208333333,
+          "y": 23.166666667,
+          "z": 11
+        },
+        "reportElevationFt": 11,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23608",
+          "23609",
+          "23610",
+          "23611",
+          "23612",
+          "23613",
+          "23615"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "194",
+        "connectionPointFt": {
+          "x": 12.310342169,
+          "y": 23.166666667,
+          "z": 14.077900722
+        },
+        "reportElevationFt": 14.083333,
+        "elevationResidualInches": 0.065187,
+        "sourceGlyphLineHandles": [
+          "23616",
+          "23617",
+          "23618",
+          "23619",
+          "23620",
+          "23621",
+          "23623"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "195",
+        "connectionPointFt": {
+          "x": 24.310342169,
+          "y": 23.166666667,
+          "z": 14.046602342
+        },
+        "reportElevationFt": 14.041667,
+        "elevationResidualInches": 0.059224,
+        "sourceGlyphLineHandles": [
+          "23624",
+          "23625",
+          "23626",
+          "23627",
+          "23628",
+          "23629",
+          "23631"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "196",
+        "connectionPointFt": {
+          "x": 36.310342169,
+          "y": 23.166666667,
+          "z": 14.015303961
+        },
+        "reportElevationFt": 14,
+        "elevationResidualInches": 0.183648,
+        "sourceGlyphLineHandles": [
+          "23632",
+          "23633",
+          "23634",
+          "23635",
+          "23636",
+          "23637",
+          "23639"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "197",
+        "connectionPointFt": {
+          "x": 48.310342169,
+          "y": 23.166666667,
+          "z": 13.984005581
+        },
+        "reportElevationFt": 14,
+        "elevationResidualInches": 0.191933,
+        "sourceGlyphLineHandles": [
+          "23640",
+          "23641",
+          "23642",
+          "23643",
+          "23644",
+          "23645",
+          "23647"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "251",
+        "connectionPointFt": {
+          "x": 7.310342169,
+          "y": 4.166666667,
+          "z": 13.671059385
+        },
+        "reportElevationFt": 13.666667,
+        "elevationResidualInches": 0.052709,
+        "sourceGlyphLineHandles": [
+          "23648",
+          "23649",
+          "23650",
+          "23651",
+          "23652",
+          "23653",
+          "23655"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "252",
+        "connectionPointFt": {
+          "x": 19.310342169,
+          "y": 4.166666667,
+          "z": 13.671059385
+        },
+        "reportElevationFt": 13.666667,
+        "elevationResidualInches": 0.052709,
+        "sourceGlyphLineHandles": [
+          "23656",
+          "23657",
+          "23658",
+          "23659",
+          "23660",
+          "23661",
+          "23663"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "253",
+        "connectionPointFt": {
+          "x": 31.310342169,
+          "y": 4.166666667,
+          "z": 13.671059385
+        },
+        "reportElevationFt": 13.666667,
+        "elevationResidualInches": 0.052709,
+        "sourceGlyphLineHandles": [
+          "23664",
+          "23665",
+          "23666",
+          "23667",
+          "23668",
+          "23669",
+          "23671"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "164",
+        "connectionPointFt": {
+          "x": 12.310342169,
+          "y": 34.166666667,
+          "z": 16.833022362
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.003728,
+        "sourceGlyphLineHandles": [
+          "23673",
+          "23674",
+          "23675",
+          "23676",
+          "23677",
+          "23678",
+          "23680"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "165",
+        "connectionPointFt": {
+          "x": 24.310342169,
+          "y": 34.166666667,
+          "z": 16.831702311
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.019568,
+        "sourceGlyphLineHandles": [
+          "23681",
+          "23682",
+          "23683",
+          "23684",
+          "23685",
+          "23686",
+          "23688"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "166",
+        "connectionPointFt": {
+          "x": 36.310342169,
+          "y": 34.166666667,
+          "z": 16.830382259
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.035409,
+        "sourceGlyphLineHandles": [
+          "23689",
+          "23690",
+          "23691",
+          "23692",
+          "23693",
+          "23694",
+          "23696"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "167",
+        "connectionPointFt": {
+          "x": 48.310342169,
+          "y": 34.166666667,
+          "z": 16.829062208
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.05125,
+        "sourceGlyphLineHandles": [
+          "23697",
+          "23698",
+          "23699",
+          "23700",
+          "23701",
+          "23702",
+          "23704"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "224",
+        "connectionPointFt": {
+          "x": 7.310342169,
+          "y": 14.166666667,
+          "z": 13.892050085
+        },
+        "reportElevationFt": 13.875,
+        "elevationResidualInches": 0.204601,
+        "sourceGlyphLineHandles": [
+          "23705",
+          "23706",
+          "23707",
+          "23708",
+          "23709",
+          "23710",
+          "23712"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "225",
+        "connectionPointFt": {
+          "x": 19.310342169,
+          "y": 14.166666667,
+          "z": 13.875577253
+        },
+        "reportElevationFt": 13.875,
+        "elevationResidualInches": 0.006927,
+        "sourceGlyphLineHandles": [
+          "23713",
+          "23714",
+          "23715",
+          "23716",
+          "23717",
+          "23718",
+          "23720"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "226",
+        "connectionPointFt": {
+          "x": 31.310342169,
+          "y": 14.166666667,
+          "z": 13.859104421
+        },
+        "reportElevationFt": 13.875,
+        "elevationResidualInches": 0.190747,
+        "sourceGlyphLineHandles": [
+          "23721",
+          "23722",
+          "23723",
+          "23724",
+          "23725",
+          "23726",
+          "23728"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "35",
+        "connectionPointFt": {
+          "x": 1.666666667,
+          "y": 34.166666667,
+          "z": 16.834193212
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.010323,
+        "sourceGlyphLineHandles": [
+          "23729",
+          "23730",
+          "23731",
+          "23732",
+          "23733",
+          "23734",
+          "23736"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "171",
+        "connectionPointFt": {
+          "x": 1.663494618,
+          "y": 23.166666204,
+          "z": 11.000582727
+        },
+        "reportElevationFt": 11,
+        "elevationResidualInches": 0.006993,
+        "sourceGlyphLineHandles": [
+          "23737",
+          "23738",
+          "23739",
+          "23740",
+          "23741",
+          "23742",
+          "23744"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "106",
+        "connectionPointFt": {
+          "x": 16.291666667,
+          "y": 34.166666667,
+          "z": 16.832584399
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.008983,
+        "sourceGlyphLineHandles": [
+          "23757",
+          "23758",
+          "23759",
+          "23760",
+          "23761",
+          "23762",
+          "23764"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "107",
+        "connectionPointFt": {
+          "x": 23.705723524,
+          "y": 34.166666667,
+          "z": 16.831768821
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.01877,
+        "sourceGlyphLineHandles": [
+          "23765",
+          "23766",
+          "23767",
+          "23768",
+          "23769",
+          "23770",
+          "23772"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "109",
+        "connectionPointFt": {
+          "x": 34.753363992,
+          "y": 34.166666667,
+          "z": 16.830553534
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.033354,
+        "sourceGlyphLineHandles": [
+          "23773",
+          "23774",
+          "23775",
+          "23776",
+          "23777",
+          "23778",
+          "23780"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "111",
+        "connectionPointFt": {
+          "x": 46.101750049,
+          "y": 34.166666667,
+          "z": 16.829305162
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.048334,
+        "sourceGlyphLineHandles": [
+          "23781",
+          "23782",
+          "23783",
+          "23784",
+          "23785",
+          "23786",
+          "23788"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "113",
+        "connectionPointFt": {
+          "x": 50.84301221,
+          "y": 34.166666667,
+          "z": 16.828783603
+        },
+        "reportElevationFt": 16.833333,
+        "elevationResidualInches": 0.054593,
+        "sourceGlyphLineHandles": [
+          "23789",
+          "23790",
+          "23791",
+          "23792",
+          "23793",
+          "23794",
+          "23796"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "170",
+        "connectionPointFt": {
+          "x": 6.708333333,
+          "y": 23.166666667,
+          "z": 14.092511872
+        },
+        "reportElevationFt": 14.083333,
+        "elevationResidualInches": 0.110146,
+        "sourceGlyphLineHandles": [
+          "23797",
+          "23798",
+          "23799",
+          "23800",
+          "23801",
+          "23802",
+          "23804"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "173",
+        "connectionPointFt": {
+          "x": 19.958333333,
+          "y": 23.166666667,
+          "z": 14.057953244
+        },
+        "reportElevationFt": 14.041667,
+        "elevationResidualInches": 0.195435,
+        "sourceGlyphLineHandles": [
+          "23805",
+          "23806",
+          "23807",
+          "23808",
+          "23809",
+          "23810",
+          "23812"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "176",
+        "connectionPointFt": {
+          "x": 46.652287372,
+          "y": 23.166666667,
+          "z": 13.988330117
+        },
+        "reportElevationFt": 14,
+        "elevationResidualInches": 0.140039,
+        "sourceGlyphLineHandles": [
+          "23813",
+          "23814",
+          "23815",
+          "23816",
+          "23817",
+          "23818",
+          "23820"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "238",
+        "connectionPointFt": {
+          "x": 31.310342169,
+          "y": 19.854166667,
+          "z": 13.966055035
+        },
+        "reportElevationFt": 13.958333,
+        "elevationResidualInches": 0.092664,
+        "sourceGlyphLineHandles": [
+          "23821",
+          "23822",
+          "23823",
+          "23824",
+          "23825",
+          "23826",
+          "23828"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "243",
+        "connectionPointFt": {
+          "x": 19.310342169,
+          "y": 17.958333333,
+          "z": 13.953123611
+        },
+        "reportElevationFt": 13.958333,
+        "elevationResidualInches": 0.062513,
+        "sourceGlyphLineHandles": [
+          "23829",
+          "23830",
+          "23831",
+          "23832",
+          "23833",
+          "23834",
+          "23836"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "244",
+        "connectionPointFt": {
+          "x": 19.310342169,
+          "y": 17.166666667,
+          "z": 13.936932613
+        },
+        "reportElevationFt": 13.916667,
+        "elevationResidualInches": 0.243187,
+        "sourceGlyphLineHandles": [
+          "23837",
+          "23838",
+          "23839",
+          "23840",
+          "23841",
+          "23842",
+          "23844"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "249",
+        "connectionPointFt": {
+          "x": 7.310342169,
+          "y": 17.125,
+          "z": 13.9574265
+        },
+        "reportElevationFt": 13.958333,
+        "elevationResidualInches": 0.010878,
+        "sourceGlyphLineHandles": [
+          "23845",
+          "23846",
+          "23847",
+          "23848",
+          "23849",
+          "23850",
+          "23852"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "291",
+        "connectionPointFt": {
+          "x": 31.310342169,
+          "y": 7.228431264,
+          "z": 13.728634349
+        },
+        "reportElevationFt": 13.708333,
+        "elevationResidualInches": 0.243616,
+        "sourceGlyphLineHandles": [
+          "23853",
+          "23854",
+          "23855",
+          "23856",
+          "23857",
+          "23858",
+          "23860"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "294",
+        "connectionPointFt": {
+          "x": 7.310342169,
+          "y": 6.166666667,
+          "z": 13.715257525
+        },
+        "reportElevationFt": 13.708333,
+        "elevationResidualInches": 0.083094,
+        "sourceGlyphLineHandles": [
+          "23861",
+          "23862",
+          "23863",
+          "23864",
+          "23865",
+          "23866",
+          "23868"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "297",
+        "connectionPointFt": {
+          "x": 19.310342169,
+          "y": 6.166666667,
+          "z": 13.711962959
+        },
+        "reportElevationFt": 13.708333,
+        "elevationResidualInches": 0.04356,
+        "sourceGlyphLineHandles": [
+          "23869",
+          "23870",
+          "23871",
+          "23872",
+          "23873",
+          "23874",
+          "23876"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "480",
+        "connectionPointFt": {
+          "x": 50.84301221,
+          "y": 30.951761744,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23877",
+          "23878",
+          "23879",
+          "23880",
+          "23881",
+          "23882",
+          "23884"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "481",
+        "connectionPointFt": {
+          "x": 16.291666667,
+          "y": 30.833333333,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23885",
+          "23886",
+          "23887",
+          "23888",
+          "23889",
+          "23890",
+          "23892"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "484",
+        "connectionPointFt": {
+          "x": 23.705723524,
+          "y": 30.43617844,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23893",
+          "23894",
+          "23895",
+          "23896",
+          "23897",
+          "23898",
+          "23900"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "485",
+        "connectionPointFt": {
+          "x": 46.101750049,
+          "y": 30.179090823,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23901",
+          "23902",
+          "23903",
+          "23904",
+          "23905",
+          "23906",
+          "23908"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "486",
+        "connectionPointFt": {
+          "x": 34.753363992,
+          "y": 29.5,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23909",
+          "23910",
+          "23911",
+          "23912",
+          "23913",
+          "23914",
+          "23916"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "488",
+        "connectionPointFt": {
+          "x": 19.958333333,
+          "y": 24.666666667,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23917",
+          "23918",
+          "23919",
+          "23920",
+          "23921",
+          "23922",
+          "23924"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "500",
+        "connectionPointFt": {
+          "x": 46.652287372,
+          "y": 23.003568601,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23925",
+          "23926",
+          "23927",
+          "23928",
+          "23929",
+          "23930",
+          "23932"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "512",
+        "connectionPointFt": {
+          "x": 32.041666667,
+          "y": 19.854166667,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23933",
+          "23934",
+          "23935",
+          "23936",
+          "23937",
+          "23938",
+          "23940"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "513",
+        "connectionPointFt": {
+          "x": 14.916666667,
+          "y": 17.958333333,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23941",
+          "23942",
+          "23943",
+          "23944",
+          "23945",
+          "23946",
+          "23948"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "514",
+        "connectionPointFt": {
+          "x": 20.666666667,
+          "y": 17.166666667,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23949",
+          "23950",
+          "23951",
+          "23952",
+          "23953",
+          "23954",
+          "23956"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "515",
+        "connectionPointFt": {
+          "x": 6.708333333,
+          "y": 17.125,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23957",
+          "23958",
+          "23959",
+          "23960",
+          "23961",
+          "23962",
+          "23964"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "536",
+        "connectionPointFt": {
+          "x": 30.414942745,
+          "y": 7.228431264,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23965",
+          "23966",
+          "23967",
+          "23968",
+          "23969",
+          "23970",
+          "23972"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "537",
+        "connectionPointFt": {
+          "x": 6.75,
+          "y": 6.166666667,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23973",
+          "23974",
+          "23975",
+          "23976",
+          "23977",
+          "23978",
+          "23980"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "538",
+        "connectionPointFt": {
+          "x": 18.583333333,
+          "y": 6.166666667,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23981",
+          "23982",
+          "23983",
+          "23984",
+          "23985",
+          "23986",
+          "23988"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "116",
+        "connectionPointFt": {
+          "x": 177.598713214,
+          "y": 39.666666667,
+          "z": 0.436666667
+        },
+        "reportElevationFt": 0.416667,
+        "elevationResidualInches": 0.239996,
+        "sourceGlyphLineHandles": [
+          "23989",
+          "23990",
+          "23991",
+          "23992",
+          "23993",
+          "23994",
+          "23996"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      {
+        "nodeId": "487",
+        "connectionPointFt": {
+          "x": 6.708333333,
+          "y": 28.333333333,
+          "z": 10
+        },
+        "reportElevationFt": 10,
+        "elevationResidualInches": 0,
+        "sourceGlyphLineHandles": [
+          "23997",
+          "23998",
+          "23999",
+          "24000",
+          "24001",
+          "24002",
+          "24004"
+        ],
+        "sourceGlyphTopologyDegreeSignature": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          3
+        ]
+      }
+    ],
+    "connectionPointBindingStatus": "exact-source-glyph-leader-tips-ready-for-all-on-plan-nodes",
+    "geometryBindingStatus": "exact-node-points-ready-segment-to-physical-pipe-span-routes-still-held",
     "calculatedSprinklerLeafBindings": [
       {
         "reportDescription": "Light Hazard (ATTIC)",
         "calculatedSprinklerNodeCount": 14,
         "assignedSourceSprinklerCount": 14,
-        "minimumForcedAlternativeAssignmentMarginFt": 5.268647531,
+        "minimumForcedAlternativeAssignmentMarginFt": 11.086046744,
         "uniquenessMarginThresholdFt": 1.5,
         "allKFactorsMatch": true,
         "allTerminalConnectionsReady": true,
@@ -2957,6 +4615,11 @@
               "x": 13.960505353,
               "y": 36.637514937
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 12.310342169,
+              "y": 34.166666667,
+              "z": 16.833022362
+            },
             "sprinklerId": "sprinkler-2733",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -2964,8 +4627,9 @@
               "y": 34.166666667,
               "z": 17.150730694
             },
+            "sourceNodeToSprinklerResidualFt": 0.317708334,
             "annotationToSprinklerPlanDistanceFt": 2.971197463,
-            "forcedAlternativeAssignmentMarginFt": 10.900790358,
+            "forcedAlternativeAssignmentMarginFt": 11.682291723,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-12312",
@@ -2983,6 +4647,11 @@
               "x": 25.851547263,
               "y": 36.554166512
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 24.310342169,
+              "y": 34.166666667,
+              "z": 16.831702311
+            },
             "sprinklerId": "sprinkler-2701",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -2990,8 +4659,9 @@
               "y": 34.166666667,
               "z": 17.149410642
             },
+            "sourceNodeToSprinklerResidualFt": 0.317708333,
             "annotationToSprinklerPlanDistanceFt": 2.841717953,
-            "forcedAlternativeAssignmentMarginFt": 18.577839612,
+            "forcedAlternativeAssignmentMarginFt": 23.368788501,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-12312",
@@ -3009,6 +4679,11 @@
               "x": 39.310342169,
               "y": 31.436936937
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 36.310342169,
+              "y": 34.166666667,
+              "z": 16.830382259
+            },
             "sprinklerId": "sprinkler-2685",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3016,8 +4691,9 @@
               "y": 34.166666667,
               "z": 17.148090591
             },
+            "sourceNodeToSprinklerResidualFt": 0.317708334,
             "annotationToSprinklerPlanDistanceFt": 4.056009702,
-            "forcedAlternativeAssignmentMarginFt": 12.951519378,
+            "forcedAlternativeAssignmentMarginFt": 23.372993553,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-12312",
@@ -3035,6 +4711,11 @@
               "x": 46.52620116,
               "y": 36.392871875
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 48.310342169,
+              "y": 34.166666667,
+              "z": 16.829062208
+            },
             "sprinklerId": "sprinkler-2637",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3042,8 +4723,9 @@
               "y": 34.166666667,
               "z": 17.146770539
             },
+            "sourceNodeToSprinklerResidualFt": 0.317708333,
             "annotationToSprinklerPlanDistanceFt": 2.852941198,
-            "forcedAlternativeAssignmentMarginFt": 11.109848512,
+            "forcedAlternativeAssignmentMarginFt": 11.686496777,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-12312",
@@ -3061,6 +4743,11 @@
               "x": 15.310342169,
               "y": 20.436936937
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 12.310342169,
+              "y": 23.166666667,
+              "z": 14.077900722
+            },
             "sprinklerId": "sprinkler-2749",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3068,8 +4755,9 @@
               "y": 23.166666667,
               "z": 14.406024606
             },
+            "sourceNodeToSprinklerResidualFt": 0.328125,
             "annotationToSprinklerPlanDistanceFt": 4.055402601,
-            "forcedAlternativeAssignmentMarginFt": 11.190955141,
+            "forcedAlternativeAssignmentMarginFt": 11.671907111,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-3943",
@@ -3087,6 +4775,11 @@
               "x": 27.310342169,
               "y": 20.436936937
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 24.310342169,
+              "y": 23.166666667,
+              "z": 14.046602342
+            },
             "sprinklerId": "sprinkler-2717",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3094,8 +4787,9 @@
               "y": 23.166666667,
               "z": 14.374726226
             },
+            "sourceNodeToSprinklerResidualFt": 0.328125,
             "annotationToSprinklerPlanDistanceFt": 4.055402601,
-            "forcedAlternativeAssignmentMarginFt": 13.960560844,
+            "forcedAlternativeAssignmentMarginFt": 19.964657429,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-3943",
@@ -3113,6 +4807,11 @@
               "x": 39.310342169,
               "y": 20.436936937
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 36.310342169,
+              "y": 23.166666667,
+              "z": 14.015303961
+            },
             "sprinklerId": "sprinkler-2669",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3120,8 +4819,9 @@
               "y": 23.166666667,
               "z": 14.343427845
             },
+            "sourceNodeToSprinklerResidualFt": 0.328125,
             "annotationToSprinklerPlanDistanceFt": 4.055402601,
-            "forcedAlternativeAssignmentMarginFt": 10.618925647,
+            "forcedAlternativeAssignmentMarginFt": 19.674837389,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-3943",
@@ -3139,6 +4839,11 @@
               "x": 51.310342169,
               "y": 20.436936937
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 48.310342169,
+              "y": 23.166666667,
+              "z": 13.984005581
+            },
             "sprinklerId": "sprinkler-2653",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3146,8 +4851,9 @@
               "y": 23.166666667,
               "z": 14.312129465
             },
+            "sourceNodeToSprinklerResidualFt": 0.328125,
             "annotationToSprinklerPlanDistanceFt": 4.055402601,
-            "forcedAlternativeAssignmentMarginFt": 5.268647531,
+            "forcedAlternativeAssignmentMarginFt": 11.676401046,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-3943",
@@ -3165,6 +4871,11 @@
               "x": 10.310342169,
               "y": 11.436936937
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 7.310342169,
+              "y": 14.166666667,
+              "z": 13.892050085
+            },
             "sprinklerId": "sprinkler-2909",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3172,8 +4883,9 @@
               "y": 14.159647322,
               "z": 14.209680867
             },
+            "sourceNodeToSprinklerResidualFt": 0.317708333,
             "annotationToSprinklerPlanDistanceFt": 4.051314829,
-            "forcedAlternativeAssignmentMarginFt": 10.807914711,
+            "forcedAlternativeAssignmentMarginFt": 11.086046744,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-18285",
@@ -3191,6 +4903,11 @@
               "x": 22.310342169,
               "y": 11.436936937
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 19.310342169,
+              "y": 14.166666667,
+              "z": 13.875577253
+            },
             "sprinklerId": "sprinkler-2893",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3198,8 +4915,9 @@
               "y": 14.160170322,
               "z": 14.193219162
             },
+            "sourceNodeToSprinklerResidualFt": 0.317708333,
             "annotationToSprinklerPlanDistanceFt": 4.051666332,
-            "forcedAlternativeAssignmentMarginFt": 11.852690162,
+            "forcedAlternativeAssignmentMarginFt": 19.691518587,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-17853",
@@ -3217,6 +4935,11 @@
               "x": 34.310342169,
               "y": 11.436936937
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 31.310342169,
+              "y": 14.166666667,
+              "z": 13.859104421
+            },
             "sprinklerId": "sprinkler-2877",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3224,8 +4947,9 @@
               "y": 14.160693375,
               "z": 14.176756597
             },
+            "sourceNodeToSprinklerResidualFt": 0.317708333,
             "annotationToSprinklerPlanDistanceFt": 4.052017909,
-            "forcedAlternativeAssignmentMarginFt": 11.254804648,
+            "forcedAlternativeAssignmentMarginFt": 19.690872212,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-17523",
@@ -3243,6 +4967,11 @@
               "x": 10.506947945,
               "y": 4.468110019
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 7.310342169,
+              "y": 4.166666667,
+              "z": 13.671059385
+            },
             "sprinklerId": "sprinkler-2941",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3250,8 +4979,9 @@
               "y": 4.166666667,
               "z": 13.671059385
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 3.210787533,
-            "forcedAlternativeAssignmentMarginFt": 10.807914711,
+            "forcedAlternativeAssignmentMarginFt": 19.692219185,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-18285",
@@ -3269,6 +4999,11 @@
               "x": 22.556583385,
               "y": 3.20630748
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 19.310342169,
+              "y": 4.166666667,
+              "z": 13.671059385
+            },
             "sprinklerId": "sprinkler-2957",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3276,8 +5011,9 @@
               "y": 4.166666667,
               "z": 13.671059385
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 3.38531709,
-            "forcedAlternativeAssignmentMarginFt": 9.095626658,
+            "forcedAlternativeAssignmentMarginFt": 19.691518587,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-17853",
@@ -3295,6 +5031,11 @@
               "x": 27.172002398,
               "y": 3.234090288
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 31.310342169,
+              "y": 4.166666667,
+              "z": 13.671059385
+            },
             "sprinklerId": "sprinkler-2925",
             "sprinklerCategory": "Upright",
             "sprinklerPointFt": {
@@ -3302,8 +5043,9 @@
               "y": 4.166666667,
               "z": 13.671059385
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 4.242116779,
-            "forcedAlternativeAssignmentMarginFt": 9.095626658,
+            "forcedAlternativeAssignmentMarginFt": 19.690872212,
             "terminalConnection": {
               "mode": "upright-source-head-to-exact-pipe-span",
               "pipeId": "pipe-17523",
@@ -3319,7 +5061,7 @@
         "reportDescription": "Light Hazard (BELOW CEILING)",
         "calculatedSprinklerNodeCount": 15,
         "assignedSourceSprinklerCount": 15,
-        "minimumForcedAlternativeAssignmentMarginFt": 1.726484086,
+        "minimumForcedAlternativeAssignmentMarginFt": 9.503405117,
         "uniquenessMarginThresholdFt": 1.5,
         "allKFactorsMatch": true,
         "allTerminalConnectionsReady": true,
@@ -3333,6 +5075,11 @@
               "x": 53.319097765,
               "y": 27.224545169
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 50.84301221,
+              "y": 30.951761744,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-1594",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3340,8 +5087,9 @@
               "y": 30.951761744,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 4.474722681,
-            "forcedAlternativeAssignmentMarginFt": 3.179292813,
+            "forcedAlternativeAssignmentMarginFt": 9.503405117,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-68737",
@@ -3362,6 +5110,11 @@
               "x": 19.291666667,
               "y": 28.103603604
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 16.291666667,
+              "y": 30.833333333,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-874",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3369,8 +5122,9 @@
               "y": 30.833333333,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 4.056035551,
-            "forcedAlternativeAssignmentMarginFt": 1.726484086,
+            "forcedAlternativeAssignmentMarginFt": 11.466815043,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-29209",
@@ -3391,6 +5145,11 @@
               "x": 26.705723524,
               "y": 27.70644871
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 23.705723524,
+              "y": 30.43617844,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-1626",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3398,8 +5157,9 @@
               "y": 30.43617844,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 4.056035552,
-            "forcedAlternativeAssignmentMarginFt": 2.401653038,
+            "forcedAlternativeAssignmentMarginFt": 11.518889305,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-29857",
@@ -3420,6 +5180,11 @@
               "x": 49.101750049,
               "y": 27.449361093
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 46.101750049,
+              "y": 30.179090823,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-794",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3427,8 +5192,9 @@
               "y": 30.179090823,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 4.056035552,
-            "forcedAlternativeAssignmentMarginFt": 3.179292813,
+            "forcedAlternativeAssignmentMarginFt": 9.607619316,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-26617",
@@ -3449,6 +5215,11 @@
               "x": 37.753363992,
               "y": 26.77027027
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 34.753363992,
+              "y": 29.5,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-1690",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3456,8 +5227,9 @@
               "y": 29.5,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 4.056035552,
-            "forcedAlternativeAssignmentMarginFt": 8.239302403,
+            "forcedAlternativeAssignmentMarginFt": 12.002674423,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-56425",
@@ -3478,6 +5250,11 @@
               "x": 9.796556974,
               "y": 30.400274496
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 6.708333333,
+              "y": 28.333333333,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-858",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3485,8 +5262,9 @@
               "y": 28.333333333,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 3.716096208,
-            "forcedAlternativeAssignmentMarginFt": 7.862815405,
+            "forcedAlternativeAssignmentMarginFt": 13.168314771,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-44761",
@@ -3507,6 +5285,11 @@
               "x": 21.859697946,
               "y": 28.097388394
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 19.958333333,
+              "y": 24.666666667,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-1658",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3514,8 +5297,9 @@
               "y": 24.666666667,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 3.922376698,
-            "forcedAlternativeAssignmentMarginFt": 1.726484086,
+            "forcedAlternativeAssignmentMarginFt": 13.759389426,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-43465",
@@ -3536,6 +5320,11 @@
               "x": 45.27250194,
               "y": 20.306625927
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 46.652287372,
+              "y": 23.003568601,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-1610",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3543,8 +5332,9 @@
               "y": 23.003568601,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 3.029407141,
-            "forcedAlternativeAssignmentMarginFt": 7.126587393,
+            "forcedAlternativeAssignmentMarginFt": 11.349207455,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-45409",
@@ -3565,6 +5355,11 @@
               "x": 36.173632254,
               "y": 20.584454009
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 32.041666667,
+              "y": 19.854166667,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-1674",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3572,8 +5367,9 @@
               "y": 19.854166667,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 4.196005149,
-            "forcedAlternativeAssignmentMarginFt": 9.74564814,
+            "forcedAlternativeAssignmentMarginFt": 20.039501298,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-27265",
@@ -3594,6 +5390,11 @@
               "x": 13.250500255,
               "y": 15.105452709
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 14.916666667,
+              "y": 17.958333333,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-1642",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3601,8 +5402,9 @@
               "y": 17.958333333,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 3.303791514,
-            "forcedAlternativeAssignmentMarginFt": 9.97000022,
+            "forcedAlternativeAssignmentMarginFt": 11.608485881,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-58369",
@@ -3623,6 +5425,11 @@
               "x": 24.254807536,
               "y": 14.875086924
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 20.666666667,
+              "y": 17.166666667,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-762",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3630,8 +5437,9 @@
               "y": 17.166666667,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 4.257474911,
-            "forcedAlternativeAssignmentMarginFt": 9.97000022,
+            "forcedAlternativeAssignmentMarginFt": 11.608485881,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-57721",
@@ -3652,6 +5460,11 @@
               "x": 3.818236871,
               "y": 17.161380516
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 6.708333333,
+              "y": 17.125,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-746",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3659,8 +5472,9 @@
               "y": 17.125,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 2.890325432,
-            "forcedAlternativeAssignmentMarginFt": 11.779678715,
+            "forcedAlternativeAssignmentMarginFt": 16.501052156,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-59665",
@@ -3681,6 +5495,11 @@
               "x": 27.255350822,
               "y": 7.082009224
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 30.414942745,
+              "y": 7.228431264,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-714",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3688,8 +5507,9 @@
               "y": 7.228431264,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 3.162982854,
-            "forcedAlternativeAssignmentMarginFt": 14.445045819,
+            "forcedAlternativeAssignmentMarginFt": 23.174133884,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-46705",
@@ -3710,6 +5530,11 @@
               "x": 3.651540022,
               "y": 8.927250735
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 6.75,
+              "y": 6.166666667,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-730",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3717,8 +5542,9 @@
               "y": 6.166666667,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 4.149852845,
-            "forcedAlternativeAssignmentMarginFt": 13.087822974,
+            "forcedAlternativeAssignmentMarginFt": 21.916825094,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-31153",
@@ -3739,6 +5565,11 @@
               "x": 15.916492225,
               "y": 8.304452785
             },
+            "cadSourceNodeConnectionPointFt": {
+              "x": 18.583333333,
+              "y": 6.166666667,
+              "z": 10
+            },
             "sprinklerId": "sprinkler-890",
             "sprinklerCategory": "Pendent",
             "sprinklerPointFt": {
@@ -3746,8 +5577,9 @@
               "y": 6.166666667,
               "z": 10
             },
+            "sourceNodeToSprinklerResidualFt": 0,
             "annotationToSprinklerPlanDistanceFt": 3.417919101,
-            "forcedAlternativeAssignmentMarginFt": 12.77201519,
+            "forcedAlternativeAssignmentMarginFt": 22.39109446,
             "terminalConnection": {
               "mode": "pendent-source-head-via-48in-flex-drop-to-exact-pipe-endpoint",
               "flexDropFittingId": "fitting-28561",
@@ -3765,6 +5597,3098 @@
     ],
     "exactCalculatedSprinklerLeafCount": 29,
     "calculatedSprinklerLeafBindingStatus": "exact-source-sprinkler-and-terminal-pipe-binding-ready"
+  },
+  "physicalSpanRegistration": {
+    "uniqueReportSegmentCount": 68,
+    "onPlanSegmentCount": 66,
+    "exactPhysicalSpanRouteCount": 50,
+    "maximumReadyRouteLengthResidualFt": 0.024833257,
+    "roleCounts": {
+      "arm-over": {
+        "total": 15,
+        "exactPhysicalSpanRouteReady": 0
+      },
+      "branch-line": {
+        "total": 45,
+        "exactPhysicalSpanRouteReady": 45
+      },
+      "cross-main": {
+        "total": 4,
+        "exactPhysicalSpanRouteReady": 4
+      },
+      "feed-main": {
+        "total": 1,
+        "exactPhysicalSpanRouteReady": 1
+      },
+      "feed-riser": {
+        "total": 2,
+        "exactPhysicalSpanRouteReady": 0
+      },
+      "underground": {
+        "total": 1,
+        "exactPhysicalSpanRouteReady": 0
+      }
+    },
+    "routes": [
+      {
+        "upstreamNode": "225",
+        "downstreamNode": "252",
+        "hydraulicFlowDirection": "225-to-252",
+        "reportLengthFt": 10,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 10.002091157,
+        "reportLengthResidualFt": 0.002091157,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-17853"
+        ],
+        "physicalSpanIds": [
+          "pipe-17853:span-1"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.310342169,
+            "y": 14.166666667,
+            "z": 13.875577253
+          },
+          {
+            "x": 19.310342169,
+            "y": 4.166666667,
+            "z": 13.671059385
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "23",
+        "downstreamNode": "225",
+        "hydraulicFlowDirection": "23-to-225",
+        "reportLengthFt": 9,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 9.001882038,
+        "reportLengthResidualFt": 0.001882038,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.013020833,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-17853"
+        ],
+        "physicalSpanIds": [
+          "pipe-17853:span-3"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.310342169,
+            "y": 23.166666667,
+            "z": 14.059643334
+          },
+          {
+            "x": 19.310342169,
+            "y": 23.153648556,
+            "z": 14.05937709
+          },
+          {
+            "x": 19.310342169,
+            "y": 17.166666667,
+            "z": 13.936932613
+          },
+          {
+            "x": 19.310342169,
+            "y": 14.16666666700613,
+            "z": 13.875577252700294
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "194",
+        "downstreamNode": "23",
+        "hydraulicFlowDirection": "194-to-23",
+        "reportLengthFt": 7,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 7.00002381,
+        "reportLengthResidualFt": 0.00002381,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 1e-9,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 12.310342169,
+            "y": 23.166666667,
+            "z": 14.077900722
+          },
+          {
+            "x": 19.310342168998677,
+            "y": 23.166666667,
+            "z": 14.059643333494375
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "21",
+        "downstreamNode": "194",
+        "hydraulicFlowDirection": "21-to-194",
+        "reportLengthFt": 5,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 5.000017007,
+        "reportLengthResidualFt": 0.000017007,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 7.310342169,
+            "y": 23.166666667,
+            "z": 14.090941714
+          },
+          {
+            "x": 12.310342169000036,
+            "y": 23.166666667,
+            "z": 14.077900722013156
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "171",
+        "downstreamNode": "21",
+        "hydraulicFlowDirection": "171-to-21",
+        "reportLengthFt": 8.75,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 8.743844626,
+        "reportLengthResidualFt": 0.006155374,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 3.105076524,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 1.663494618,
+            "y": 23.166666204,
+            "z": 11.000582727
+          },
+          {
+            "x": 1.6715932459505585,
+            "y": 23.166666667,
+            "z": 14.10564868950486
+          },
+          {
+            "x": 7.31034216899951,
+            "y": 23.166666667,
+            "z": 14.090941713812292
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "15",
+        "downstreamNode": "171",
+        "hydraulicFlowDirection": "15-to-171",
+        "reportLengthFt": 11,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 2.705,
+        "physicalRouteLengthFt": 11.000004643,
+        "reportLengthResidualFt": 0.000004643,
+        "physicalClass": {
+          "nominalSizeInches": 2.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 1e-9,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-7661"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 1.664551967,
+            "y": 34.166666636,
+            "z": 11.010148754
+          },
+          {
+            "x": 1.6634946177550092,
+            "y": 23.166666204000208,
+            "z": 11.000582726780653
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "9",
+        "downstreamNode": "15",
+        "hydraulicFlowDirection": "9-to-15",
+        "reportLengthFt": 11,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 2.705,
+        "physicalRouteLengthFt": 11.000003938,
+        "reportLengthResidualFt": 0.000003938,
+        "physicalClass": {
+          "nominalSizeInches": 2.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 1e-9,
+        "pipeIds": [
+          "pipe-7661"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 1.665609317,
+            "y": 45.166666363,
+            "z": 11.01971478
+          },
+          {
+            "x": 1.6645519674879867,
+            "y": 34.16666663600024,
+            "z": 11.010148753675916
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "5",
+        "downstreamNode": "9",
+        "hydraulicFlowDirection": "5-to-9",
+        "reportLengthFt": 11,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 2.705,
+        "physicalRouteLengthFt": 11.000004515,
+        "reportLengthResidualFt": 0.000004515,
+        "physicalClass": {
+          "nominalSizeInches": 2.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 1e-9,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-7661"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 1.666666667,
+            "y": 56.166666667,
+            "z": 11.029280806
+          },
+          {
+            "x": 1.6656093171531976,
+            "y": 45.16666636300002,
+            "z": 11.019714779958083
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "8",
+        "downstreamNode": "5",
+        "hydraulicFlowDirection": "8-to-5",
+        "reportLengthFt": 176.25,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 176.269052808,
+        "reportLengthResidualFt": 0.019052808,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 0.013020833,
+        "endPortResidualFt": 0.013020833,
+        "pipeIds": [
+          "pipe-15307",
+          "pipe-8658",
+          "pipe-15736"
+        ],
+        "physicalSpanIds": [
+          "pipe-15307:span-1",
+          "pipe-15307:span-2",
+          "pipe-15307:span-3",
+          "pipe-15307:span-4",
+          "pipe-8658:span-1",
+          "pipe-15736:span-12",
+          "pipe-15736:span-11",
+          "pipe-15736:span-10",
+          "pipe-15736:span-9",
+          "pipe-15736:span-8",
+          "pipe-15736:span-7",
+          "pipe-15736:span-6",
+          "pipe-15736:span-5",
+          "pipe-15736:span-4",
+          "pipe-15736:span-3",
+          "pipe-15736:span-2",
+          "pipe-15736:span-1"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 56.166666667,
+            "z": 14.369775119
+          },
+          {
+            "x": 174.195312529,
+            "y": 56.166666667,
+            "z": 14.369802491
+          },
+          {
+            "x": 168.541666667,
+            "y": 56.166666667,
+            "z": 14.382465593
+          },
+          {
+            "x": 155.208333333,
+            "y": 56.166666667,
+            "z": 14.412329747
+          },
+          {
+            "x": 141.875,
+            "y": 56.166666667,
+            "z": 14.442193902
+          },
+          {
+            "x": 133.400599754,
+            "y": 56.166666667,
+            "z": 14.461174962
+          },
+          {
+            "x": 133.400599754,
+            "y": 56.166666667,
+            "z": 10.734221615
+          },
+          {
+            "x": 128.75,
+            "y": 56.166666667,
+            "z": 10.744638082
+          },
+          {
+            "x": 116.958333333,
+            "y": 56.166666667,
+            "z": 10.771049194
+          },
+          {
+            "x": 104.291666667,
+            "y": 56.166666667,
+            "z": 10.799420141
+          },
+          {
+            "x": 91.625,
+            "y": 56.166666667,
+            "z": 10.827791088
+          },
+          {
+            "x": 77.791666667,
+            "y": 56.166666667,
+            "z": 10.858775148
+          },
+          {
+            "x": 62.958333333,
+            "y": 56.166666667,
+            "z": 10.89199902
+          },
+          {
+            "x": 48.083333333,
+            "y": 56.166666667,
+            "z": 10.925316218
+          },
+          {
+            "x": 36.5,
+            "y": 56.166666667,
+            "z": 10.951260702
+          },
+          {
+            "x": 26.5,
+            "y": 56.166666667,
+            "z": 10.973658818
+          },
+          {
+            "x": 16.5,
+            "y": 56.166666667,
+            "z": 10.996056934
+          },
+          {
+            "x": 6.5,
+            "y": 56.166666667,
+            "z": 11.01845505
+          },
+          {
+            "x": 1.673177067,
+            "y": 56.16666728,
+            "z": 11.029266225
+          },
+          {
+            "x": 1.679687467,
+            "y": 56.166666667,
+            "z": 11.029251642
+          },
+          {
+            "x": 1.666666667,
+            "y": 56.166666667,
+            "z": 11.029280806
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "11",
+        "downstreamNode": "8",
+        "hydraulicFlowDirection": "11-to-8",
+        "reportLengthFt": 11,
+        "pipeRole": "cross-main",
+        "diameterInternalInches": 3.334,
+        "physicalRouteLengthFt": 11,
+        "reportLengthResidualFt": 0,
+        "physicalClass": {
+          "nominalSizeInches": 3,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3714"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 45.166666667,
+            "z": 14.369775119
+          },
+          {
+            "x": 174.208333333,
+            "y": 56.166666667,
+            "z": 14.369775119
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "14",
+        "downstreamNode": "11",
+        "hydraulicFlowDirection": "14-to-11",
+        "reportLengthFt": 5.5,
+        "pipeRole": "cross-main",
+        "diameterInternalInches": 3.334,
+        "physicalRouteLengthFt": 5.5,
+        "reportLengthResidualFt": 0,
+        "physicalClass": {
+          "nominalSizeInches": 3,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3714"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 14.369775119
+          },
+          {
+            "x": 174.208333333,
+            "y": 45.166666667,
+            "z": 14.369775119
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "13",
+        "downstreamNode": "14",
+        "hydraulicFlowDirection": "13-to-14",
+        "reportLengthFt": 3.375,
+        "pipeRole": "feed-main",
+        "diameterInternalInches": 3.26,
+        "physicalRouteLengthFt": 3.369775119,
+        "reportLengthResidualFt": 0.005224881,
+        "physicalClass": {
+          "nominalSizeInches": 3,
+          "subCategory": "Schedule 10"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 0.365,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-17499"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 11
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 11.365
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 14.369775119
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "116",
+        "downstreamNode": "13",
+        "hydraulicFlowDirection": "116-to-13",
+        "reportLengthFt": 10.75,
+        "pipeRole": "feed-riser",
+        "diameterInternalInches": 3.334,
+        "physicalClass": {
+          "nominalSizeInches": 3,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "bindingStatus": "no-compatible-source-pipe-path",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "2",
+        "downstreamNode": "116",
+        "hydraulicFlowDirection": "2-to-116",
+        "reportLengthFt": 5.5,
+        "pipeRole": "feed-riser",
+        "diameterInternalInches": 4.31,
+        "physicalClass": {
+          "nominalSizeInches": 4,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "bindingStatus": "off-building-source-node-not-present-in-sprinkler-plan-cad",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "1",
+        "downstreamNode": "2",
+        "hydraulicFlowDirection": "1-to-2",
+        "reportLengthFt": 64.416667,
+        "pipeRole": "underground",
+        "diameterInternalInches": 4.22,
+        "physicalClass": {
+          "nominalSizeInches": 4,
+          "subCategory": "underground-source-context"
+        },
+        "occurrenceCount": 2,
+        "bindingStatus": "off-building-source-node-not-present-in-sprinkler-plan-cad",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "226",
+        "downstreamNode": "253",
+        "hydraulicFlowDirection": "226-to-253",
+        "reportLengthFt": 10,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 10.001767891,
+        "reportLengthResidualFt": 0.001767891,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-17523"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 31.310342169,
+            "y": 14.166666667,
+            "z": 13.859104421
+          },
+          {
+            "x": 31.310342169,
+            "y": 4.166666667,
+            "z": 13.671059385
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "25",
+        "downstreamNode": "226",
+        "hydraulicFlowDirection": "25-to-226",
+        "reportLengthFt": 9,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 9.001591102,
+        "reportLengthResidualFt": 0.001591102,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.013020834,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-17523"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 31.310342169,
+            "y": 23.166666667,
+            "z": 14.028344953
+          },
+          {
+            "x": 31.310342169,
+            "y": 23.153648135,
+            "z": 14.028100146
+          },
+          {
+            "x": 31.310342169,
+            "y": 14.166666667003646,
+            "z": 13.859104420806178
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "196",
+        "downstreamNode": "25",
+        "hydraulicFlowDirection": "196-to-25",
+        "reportLengthFt": 5,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 5.000017007,
+        "reportLengthResidualFt": 0.000017007,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 36.310342169,
+            "y": 23.166666667,
+            "z": 14.015303961
+          },
+          {
+            "x": 31.310342169000453,
+            "y": 23.166666667,
+            "z": 14.028344953176452
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "197",
+        "downstreamNode": "196",
+        "hydraulicFlowDirection": "197-to-196",
+        "reportLengthFt": 12,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 12.000040817,
+        "reportLengthResidualFt": 0.000040817,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 48.310342169,
+            "y": 23.166666667,
+            "z": 13.984005581
+          },
+          {
+            "x": 36.31034216900099,
+            "y": 23.166666667,
+            "z": 14.015303961377318
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "43",
+        "downstreamNode": "197",
+        "hydraulicFlowDirection": "43-to-197",
+        "reportLengthFt": 128.541667,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 128.554057935,
+        "reportLengthResidualFt": 0.012390935,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 2.655638647,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [
+          "pipe-3943:span-22",
+          "pipe-3943:span-21",
+          "pipe-3943:span-20",
+          "pipe-3943:span-19",
+          "pipe-3943:span-18",
+          "pipe-3943:span-17",
+          "pipe-3943:span-16",
+          "pipe-3943:span-15",
+          "pipe-3943:span-14",
+          "pipe-3943:span-13",
+          "pipe-3943:span-12",
+          "pipe-3943:span-11",
+          "pipe-3943:span-10",
+          "pipe-3943:span-9",
+          "pipe-3943:span-8"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 23.166666667,
+            "z": 11
+          },
+          {
+            "x": 174.208333333,
+            "y": 23.166666667,
+            "z": 13.655638647
+          },
+          {
+            "x": 152.541666667,
+            "y": 23.166666667,
+            "z": 13.712149611
+          },
+          {
+            "x": 140,
+            "y": 23.166666667,
+            "z": 13.744860766
+          },
+          {
+            "x": 134.791666667,
+            "y": 23.166666667,
+            "z": 13.758445132
+          },
+          {
+            "x": 122.958333333,
+            "y": 23.166666667,
+            "z": 13.789308813
+          },
+          {
+            "x": 113.728131066,
+            "y": 23.166666667,
+            "z": 13.813383011
+          },
+          {
+            "x": 104.770833333,
+            "y": 23.166666667,
+            "z": 13.83674542
+          },
+          {
+            "x": 100.31034242,
+            "y": 23.160156961,
+            "z": 13.848282857
+          },
+          {
+            "x": 93.4375,
+            "y": 23.166666667,
+            "z": 13.866305002
+          },
+          {
+            "x": 88.31034231,
+            "y": 23.160157235,
+            "z": 13.879623673
+          },
+          {
+            "x": 82.104166667,
+            "y": 23.166666667,
+            "z": 13.895864583
+          },
+          {
+            "x": 76.310342502,
+            "y": 23.160157551,
+            "z": 13.910848476
+          },
+          {
+            "x": 70.520833333,
+            "y": 23.166666667,
+            "z": 13.926076214
+          },
+          {
+            "x": 64.310342553,
+            "y": 23.160157913,
+            "z": 13.9421273
+          },
+          {
+            "x": 59.810343869,
+            "y": 23.166666667,
+            "z": 13.954011296
+          },
+          {
+            "x": 52.310342365,
+            "y": 23.160158321,
+            "z": 13.973497611
+          },
+          {
+            "x": 48.31034216900015,
+            "y": 23.166666667,
+            "z": 13.984005581059401
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "17",
+        "downstreamNode": "43",
+        "hydraulicFlowDirection": "17-to-43",
+        "reportLengthFt": 11,
+        "pipeRole": "cross-main",
+        "diameterInternalInches": 3.334,
+        "physicalRouteLengthFt": 11,
+        "reportLengthResidualFt": 0,
+        "physicalClass": {
+          "nominalSizeInches": 3,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3279"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 34.166666667,
+            "z": 11
+          },
+          {
+            "x": 174.208333333,
+            "y": 23.166666667,
+            "z": 11
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "13",
+        "downstreamNode": "17",
+        "hydraulicFlowDirection": "13-to-17",
+        "reportLengthFt": 5.5,
+        "pipeRole": "cross-main",
+        "diameterInternalInches": 3.334,
+        "physicalRouteLengthFt": 5.5,
+        "reportLengthResidualFt": 0,
+        "physicalClass": {
+          "nominalSizeInches": 3,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 0.365,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3279"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 11
+          },
+          {
+            "x": 174.208333333,
+            "y": 39.301666667,
+            "z": 11
+          },
+          {
+            "x": 174.208333333,
+            "y": 34.166666667,
+            "z": 11
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "224",
+        "downstreamNode": "251",
+        "hydraulicFlowDirection": "224-to-251",
+        "reportLengthFt": 10,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 10.002441547,
+        "reportLengthResidualFt": 0.002441547,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-18285"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 7.310342169,
+            "y": 14.166666667,
+            "z": 13.892050085
+          },
+          {
+            "x": 7.310342169,
+            "y": 4.166666667,
+            "z": 13.671059385
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "21",
+        "downstreamNode": "224",
+        "hydraulicFlowDirection": "21-to-224",
+        "reportLengthFt": 9,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 9.002197392,
+        "reportLengthResidualFt": 0.002197392,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.013020833,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-18285"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 7.310342169,
+            "y": 23.166666667,
+            "z": 14.090941714
+          },
+          {
+            "x": 7.310342169,
+            "y": 23.153649012,
+            "z": 14.090654036
+          },
+          {
+            "x": 7.310342169,
+            "y": 14.16666666701083,
+            "z": 13.892050084509945
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "25",
+        "downstreamNode": "195",
+        "hydraulicFlowDirection": "25-to-195",
+        "reportLengthFt": 7,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 7.00002381,
+        "reportLengthResidualFt": 0.00002381,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 31.310342169,
+            "y": 23.166666667,
+            "z": 14.028344953
+          },
+          {
+            "x": 24.3103421689992,
+            "y": 23.166666667,
+            "z": 14.046602341695241
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "164",
+        "downstreamNode": "165",
+        "hydraulicFlowDirection": "164-to-165",
+        "reportLengthFt": 12,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 12.000000178,
+        "reportLengthResidualFt": 1.78e-7,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [
+          "pipe-12312:span-2"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 12.310342169,
+            "y": 34.166666667,
+            "z": 16.833022362
+          },
+          {
+            "x": 23.705723524,
+            "y": 34.166666667,
+            "z": 16.831768821
+          },
+          {
+            "x": 24.310342168999973,
+            "y": 34.166666667,
+            "z": 16.831702310755123
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "35",
+        "downstreamNode": "164",
+        "hydraulicFlowDirection": "35-to-164",
+        "reportLengthFt": 10.625,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 10.643675567,
+        "reportLengthResidualFt": 0.018675567,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 1.666666667,
+            "y": 34.166666667,
+            "z": 16.834193212
+          },
+          {
+            "x": 12.310342169000014,
+            "y": 34.166666667,
+            "z": 16.833022362128226
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "15",
+        "downstreamNode": "35",
+        "hydraulicFlowDirection": "15-to-35",
+        "reportLengthFt": 5.833333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 5.824044842,
+        "reportLengthResidualFt": 0.009288158,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 0.015625,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-15686"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 1.664551967,
+            "y": 34.166666636,
+            "z": 11.010148754
+          },
+          {
+            "x": 1.664557641,
+            "y": 34.166666808,
+            "z": 11.025773753
+          },
+          {
+            "x": 1.666666667,
+            "y": 34.166666667,
+            "z": 16.834193212
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "166",
+        "downstreamNode": "165",
+        "hydraulicFlowDirection": "166-to-165",
+        "reportLengthFt": 12,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 12.000000073,
+        "reportLengthResidualFt": 7.3e-8,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 36.310342169,
+            "y": 34.166666667,
+            "z": 16.830382259
+          },
+          {
+            "x": 24.310342168999973,
+            "y": 34.166666667,
+            "z": 16.831702310755123
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "167",
+        "downstreamNode": "166",
+        "hydraulicFlowDirection": "167-to-166",
+        "reportLengthFt": 12,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 12.000000073,
+        "reportLengthResidualFt": 7.3e-8,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 48.310342169,
+            "y": 34.166666667,
+            "z": 16.829062208
+          },
+          {
+            "x": 36.310342169000045,
+            "y": 34.166666667,
+            "z": 16.83038225938202
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "17",
+        "downstreamNode": "167",
+        "hydraulicFlowDirection": "17-to-167",
+        "reportLengthFt": 131.708333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 131.713220542,
+        "reportLengthResidualFt": 0.004887542,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.013036538,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-15636",
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [
+          "pipe-12312:span-16",
+          "pipe-12312:span-15",
+          "pipe-12312:span-14",
+          "pipe-12312:span-13",
+          "pipe-12312:span-12",
+          "pipe-12312:span-11",
+          "pipe-12312:span-10",
+          "pipe-12312:span-9",
+          "pipe-12312:span-8",
+          "pipe-12312:span-7",
+          "pipe-12312:span-6"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 34.166666667,
+            "z": 11
+          },
+          {
+            "x": 174.207695067,
+            "y": 34.166666667,
+            "z": 11.013020904
+          },
+          {
+            "x": 167.541666667,
+            "y": 34.166666667,
+            "z": 16.815946251
+          },
+          {
+            "x": 152.541666667,
+            "y": 34.166666667,
+            "z": 16.817596316
+          },
+          {
+            "x": 140,
+            "y": 34.166666667,
+            "z": 16.818975953
+          },
+          {
+            "x": 129.916666667,
+            "y": 34.166666667,
+            "z": 16.820085163
+          },
+          {
+            "x": 115.916666667,
+            "y": 34.166666667,
+            "z": 16.821625223
+          },
+          {
+            "x": 101.416666667,
+            "y": 34.166666667,
+            "z": 16.823220285
+          },
+          {
+            "x": 87.416666667,
+            "y": 34.166666667,
+            "z": 16.824760345
+          },
+          {
+            "x": 77.416666667,
+            "y": 34.166666667,
+            "z": 16.825860388
+          },
+          {
+            "x": 70.520833333,
+            "y": 34.166666667,
+            "z": 16.826618959
+          },
+          {
+            "x": 59.810342172,
+            "y": 34.166666667,
+            "z": 16.827797159
+          },
+          {
+            "x": 50.84301221,
+            "y": 34.166666667,
+            "z": 16.828783603
+          },
+          {
+            "x": 48.310342169,
+            "y": 34.166666667,
+            "z": 16.829062208008917
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "11",
+        "downstreamNode": "9",
+        "hydraulicFlowDirection": "11-to-9",
+        "reportLengthFt": 176.041667,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 176.047629011,
+        "reportLengthResidualFt": 0.005962011,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 2,
+        "startPortResidualFt": 0.013020833,
+        "endPortResidualFt": 3.508325542,
+        "pipeIds": [
+          "pipe-8683"
+        ],
+        "physicalSpanIds": [
+          "pipe-8683:span-18",
+          "pipe-8683:span-17",
+          "pipe-8683:span-16",
+          "pipe-8683:span-15",
+          "pipe-8683:span-14",
+          "pipe-8683:span-13",
+          "pipe-8683:span-12",
+          "pipe-8683:span-11",
+          "pipe-8683:span-10",
+          "pipe-8683:span-9",
+          "pipe-8683:span-8",
+          "pipe-8683:span-7",
+          "pipe-8683:span-6",
+          "pipe-8683:span-5",
+          "pipe-8683:span-4",
+          "pipe-8683:span-3",
+          "pipe-8683:span-2"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 45.166666667,
+            "z": 14.369775119
+          },
+          {
+            "x": 174.195312505,
+            "y": 45.166666667,
+            "z": 14.369787062
+          },
+          {
+            "x": 155.208333333,
+            "y": 45.166666667,
+            "z": 14.387203073
+          },
+          {
+            "x": 141.875,
+            "y": 45.166666667,
+            "z": 14.399433216
+          },
+          {
+            "x": 132.821904788,
+            "y": 45.166666667,
+            "z": 14.407737265
+          },
+          {
+            "x": 128.75,
+            "y": 45.166666667,
+            "z": 14.411472264
+          },
+          {
+            "x": 122.852484671,
+            "y": 45.166666667,
+            "z": 14.416881823
+          },
+          {
+            "x": 116.958333333,
+            "y": 45.166666667,
+            "z": 14.422288297
+          },
+          {
+            "x": 112.959196671,
+            "y": 45.166666667,
+            "z": 14.425956548
+          },
+          {
+            "x": 104.291666667,
+            "y": 45.166666667,
+            "z": 14.433906933
+          },
+          {
+            "x": 91.625,
+            "y": 45.166666667,
+            "z": 14.445525569
+          },
+          {
+            "x": 77.791666667,
+            "y": 45.166666667,
+            "z": 14.458214343
+          },
+          {
+            "x": 63.416666667,
+            "y": 45.166666667,
+            "z": 14.471399966
+          },
+          {
+            "x": 62.625000333,
+            "y": 45.166666667,
+            "z": 14.47212613
+          },
+          {
+            "x": 48.083333333,
+            "y": 45.166666667,
+            "z": 14.485464631
+          },
+          {
+            "x": 47.583333544,
+            "y": 45.166666667,
+            "z": 14.485923261
+          },
+          {
+            "x": 34.5,
+            "y": 45.166666667,
+            "z": 14.497924089
+          },
+          {
+            "x": 20.5,
+            "y": 45.166666667,
+            "z": 14.51076574
+          },
+          {
+            "x": 6.5,
+            "y": 45.166666667,
+            "z": 14.52360739
+          },
+          {
+            "x": 1.66910233,
+            "y": 45.166666667,
+            "z": 14.528038583
+          },
+          {
+            "x": 1.665609317,
+            "y": 45.166666363,
+            "z": 11.01971478
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "195",
+        "downstreamNode": "23",
+        "hydraulicFlowDirection": "195-to-23",
+        "reportLengthFt": 5,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 5.000017008,
+        "reportLengthResidualFt": 0.000017008,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 1e-9,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 24.310342169,
+            "y": 23.166666667,
+            "z": 14.046602342
+          },
+          {
+            "x": 19.310342168998677,
+            "y": 23.166666667,
+            "z": 14.059643333494375
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "297",
+        "downstreamNode": "538",
+        "hydraulicFlowDirection": "297-to-538",
+        "reportLengthFt": 3.125,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 4.141580259,
+        "reportLengthResidualFt": 1.016580259,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.416666667,
+        "endPortResidualFt": 3.724913592,
+        "pipeIds": [
+          "pipe-19538",
+          "pipe-19516"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.310342169,
+            "y": 6.166666667,
+            "z": 13.711962959
+          },
+          {
+            "x": 18.893675502,
+            "y": 6.166666667,
+            "z": 13.711962959
+          },
+          {
+            "x": 18.583333333,
+            "y": 6.166666667,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "244",
+        "downstreamNode": "297",
+        "hydraulicFlowDirection": "244-to-297",
+        "reportLengthFt": 11,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 11.002300275,
+        "reportLengthResidualFt": 0.002300275,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-17853"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.310342169,
+            "y": 17.166666667,
+            "z": 13.936932613
+          },
+          {
+            "x": 19.310342169,
+            "y": 6.1666666670094035,
+            "z": 13.711962958540225
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "243",
+        "downstreamNode": "244",
+        "hydraulicFlowDirection": "243-to-244",
+        "reportLengthFt": 0.791667,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 0.791832216,
+        "reportLengthResidualFt": 0.000165216,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-17853"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.310342169,
+            "y": 17.958333333,
+            "z": 13.953123611
+          },
+          {
+            "x": 19.310342169,
+            "y": 17.16666666699979,
+            "z": 13.936932613010216
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "23",
+        "downstreamNode": "243",
+        "hydraulicFlowDirection": "23-to-243",
+        "reportLengthFt": 5.208333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 5.20942248,
+        "reportLengthResidualFt": 0.00108948,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.013020833,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-17853"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.310342169,
+            "y": 23.166666667,
+            "z": 14.059643334
+          },
+          {
+            "x": 19.310342169,
+            "y": 23.153648556,
+            "z": 14.05937709
+          },
+          {
+            "x": 19.310342169,
+            "y": 17.958333333002937,
+            "z": 13.953123610856242
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "21",
+        "downstreamNode": "23",
+        "hydraulicFlowDirection": "21-to-23",
+        "reportLengthFt": 12,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 12.000040817,
+        "reportLengthResidualFt": 0.000040817,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 1e-9,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 7.310342169,
+            "y": 23.166666667,
+            "z": 14.090941714
+          },
+          {
+            "x": 19.310342168998677,
+            "y": 23.166666667,
+            "z": 14.059643333494375
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "170",
+        "downstreamNode": "21",
+        "hydraulicFlowDirection": "170-to-21",
+        "reportLengthFt": 0.583333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 0.602010884,
+        "reportLengthResidualFt": 0.018677884,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 6.708333333,
+            "y": 23.166666667,
+            "z": 14.092511872
+          },
+          {
+            "x": 7.31034216899951,
+            "y": 23.166666667,
+            "z": 14.090941713812292
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "171",
+        "downstreamNode": "170",
+        "hydraulicFlowDirection": "171-to-170",
+        "reportLengthFt": 8.166667,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 8.141833743,
+        "reportLengthResidualFt": 0.024833257,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 3.105076524,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 1.663494618,
+            "y": 23.166666204,
+            "z": 11.000582727
+          },
+          {
+            "x": 1.6715932459505585,
+            "y": 23.166666667,
+            "z": 14.10564868950486
+          },
+          {
+            "x": 6.708333333000706,
+            "y": 23.166666667,
+            "z": 14.092511872270945
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "244",
+        "downstreamNode": "514",
+        "hydraulicFlowDirection": "244-to-514",
+        "reportLengthFt": 3.333333,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 4.464183836,
+        "reportLengthResidualFt": 1.130850836,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.416666666,
+        "endPortResidualFt": 4.04751717,
+        "pipeIds": [
+          "pipe-21444",
+          "pipe-21422"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.310342169,
+            "y": 17.166666667,
+            "z": 13.936932613
+          },
+          {
+            "x": 19.727008835,
+            "y": 17.166666667,
+            "z": 13.936932613
+          },
+          {
+            "x": 20.666666667,
+            "y": 17.166666667,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "243",
+        "downstreamNode": "513",
+        "hydraulicFlowDirection": "243-to-513",
+        "reportLengthFt": 3.75,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 7.43723933,
+        "reportLengthResidualFt": 3.68723933,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 3.767148291,
+        "pipeIds": [
+          "pipe-21468",
+          "pipe-21490"
+        ],
+        "physicalSpanIds": [
+          "pipe-21490:span-1"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.310342169,
+            "y": 17.958333333,
+            "z": 13.953123611
+          },
+          {
+            "x": 18.53087474,
+            "y": 17.958333333,
+            "z": 11.0625
+          },
+          {
+            "x": 14.916666667,
+            "y": 17.958333333,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "294",
+        "downstreamNode": "537",
+        "hydraulicFlowDirection": "294-to-537",
+        "reportLengthFt": 3.125,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 4.134701246,
+        "reportLengthResidualFt": 1.009701246,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 3.718034579,
+        "pipeIds": [
+          "pipe-19700"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 7.310342169,
+            "y": 6.166666667,
+            "z": 13.715257525
+          },
+          {
+            "x": 6.893675502,
+            "y": 6.166666667,
+            "z": 13.715257525
+          },
+          {
+            "x": 6.75,
+            "y": 6.166666667,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "249",
+        "downstreamNode": "294",
+        "hydraulicFlowDirection": "249-to-294",
+        "reportLengthFt": 10.958333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 10.961008861,
+        "reportLengthResidualFt": 0.002675861,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-18285"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 7.310342169,
+            "y": 17.125,
+            "z": 13.9574265
+          },
+          {
+            "x": 7.310342169,
+            "y": 6.166666667002167,
+            "z": 13.715257524901988
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "21",
+        "downstreamNode": "249",
+        "hydraulicFlowDirection": "21-to-249",
+        "reportLengthFt": 6.041667,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 6.043141768,
+        "reportLengthResidualFt": 0.001474768,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.013020833,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-18285"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 7.310342169,
+            "y": 23.166666667,
+            "z": 14.090941714
+          },
+          {
+            "x": 7.310342169,
+            "y": 23.153649012,
+            "z": 14.090654036
+          },
+          {
+            "x": 7.310342169,
+            "y": 17.12500000000499,
+            "z": 13.957426499774073
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "249",
+        "downstreamNode": "515",
+        "hydraulicFlowDirection": "249-to-515",
+        "reportLengthFt": 3.375,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 4.378430949,
+        "reportLengthResidualFt": 1.003430949,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 3.961764282,
+        "pipeIds": [
+          "pipe-21560"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 7.310342169,
+            "y": 17.125,
+            "z": 13.9574265
+          },
+          {
+            "x": 6.893675502,
+            "y": 17.125,
+            "z": 13.9574265
+          },
+          {
+            "x": 6.708333333,
+            "y": 17.125,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "291",
+        "downstreamNode": "536",
+        "hydraulicFlowDirection": "291-to-536",
+        "reportLengthFt": 3.125,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 4.1759085,
+        "reportLengthResidualFt": 1.0509085,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.416666667,
+        "endPortResidualFt": 3.759241833,
+        "pipeIds": [
+          "pipe-20710",
+          "pipe-20688"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 31.310342169,
+            "y": 7.228431264,
+            "z": 13.728634349
+          },
+          {
+            "x": 30.893675502,
+            "y": 7.228431264,
+            "z": 13.728634349
+          },
+          {
+            "x": 30.414942745,
+            "y": 7.228431264,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "238",
+        "downstreamNode": "291",
+        "hydraulicFlowDirection": "238-to-291",
+        "reportLengthFt": 12.625,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 12.627967496,
+        "reportLengthResidualFt": 0.002967496,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 1e-9,
+        "pipeIds": [
+          "pipe-17523"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 31.310342169,
+            "y": 19.854166667,
+            "z": 13.966055035
+          },
+          {
+            "x": 31.310342169,
+            "y": 7.228431264012646,
+            "z": 13.728634348327512
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "25",
+        "downstreamNode": "238",
+        "hydraulicFlowDirection": "25-to-238",
+        "reportLengthFt": 3.333333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 3.313085614,
+        "reportLengthResidualFt": 0.020247386,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.013020834,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-17523"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 31.310342169,
+            "y": 23.166666667,
+            "z": 14.028344953
+          },
+          {
+            "x": 31.310342169,
+            "y": 23.153648135,
+            "z": 14.028100146
+          },
+          {
+            "x": 31.310342169,
+            "y": 19.854166667001486,
+            "z": 13.966055034920862
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "176",
+        "downstreamNode": "25",
+        "hydraulicFlowDirection": "176-to-25",
+        "reportLengthFt": 15.333333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 15.341997387,
+        "reportLengthResidualFt": 0.008664387,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 46.652287372,
+            "y": 23.166666667,
+            "z": 13.988330117
+          },
+          {
+            "x": 31.310342169000453,
+            "y": 23.166666667,
+            "z": 14.028344953176452
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "43",
+        "downstreamNode": "176",
+        "hydraulicFlowDirection": "43-to-176",
+        "reportLengthFt": 130.208333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 130.212118372,
+        "reportLengthResidualFt": 0.003785372,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 2.655638647,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [
+          "pipe-3943:span-22",
+          "pipe-3943:span-21",
+          "pipe-3943:span-20",
+          "pipe-3943:span-19",
+          "pipe-3943:span-18",
+          "pipe-3943:span-17",
+          "pipe-3943:span-16",
+          "pipe-3943:span-15",
+          "pipe-3943:span-14",
+          "pipe-3943:span-13",
+          "pipe-3943:span-12",
+          "pipe-3943:span-11",
+          "pipe-3943:span-10",
+          "pipe-3943:span-9",
+          "pipe-3943:span-8"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 23.166666667,
+            "z": 11
+          },
+          {
+            "x": 174.208333333,
+            "y": 23.166666667,
+            "z": 13.655638647
+          },
+          {
+            "x": 152.541666667,
+            "y": 23.166666667,
+            "z": 13.712149611
+          },
+          {
+            "x": 140,
+            "y": 23.166666667,
+            "z": 13.744860766
+          },
+          {
+            "x": 134.791666667,
+            "y": 23.166666667,
+            "z": 13.758445132
+          },
+          {
+            "x": 122.958333333,
+            "y": 23.166666667,
+            "z": 13.789308813
+          },
+          {
+            "x": 113.728131066,
+            "y": 23.166666667,
+            "z": 13.813383011
+          },
+          {
+            "x": 104.770833333,
+            "y": 23.166666667,
+            "z": 13.83674542
+          },
+          {
+            "x": 100.31034242,
+            "y": 23.160156961,
+            "z": 13.848282857
+          },
+          {
+            "x": 93.4375,
+            "y": 23.166666667,
+            "z": 13.866305002
+          },
+          {
+            "x": 88.31034231,
+            "y": 23.160157235,
+            "z": 13.879623673
+          },
+          {
+            "x": 82.104166667,
+            "y": 23.166666667,
+            "z": 13.895864583
+          },
+          {
+            "x": 76.310342502,
+            "y": 23.160157551,
+            "z": 13.910848476
+          },
+          {
+            "x": 70.520833333,
+            "y": 23.166666667,
+            "z": 13.926076214
+          },
+          {
+            "x": 64.310342553,
+            "y": 23.160157913,
+            "z": 13.9421273
+          },
+          {
+            "x": 59.810343869,
+            "y": 23.166666667,
+            "z": 13.954011296
+          },
+          {
+            "x": 52.310342365,
+            "y": 23.160158321,
+            "z": 13.973497611
+          },
+          {
+            "x": 46.65228737199964,
+            "y": 23.166666667,
+            "z": 13.988330116861441
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "238",
+        "downstreamNode": "512",
+        "hydraulicFlowDirection": "238-to-512",
+        "reportLengthFt": 3.375,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 4.395184241,
+        "reportLengthResidualFt": 1.020184241,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.416666666,
+        "endPortResidualFt": 3.978517575,
+        "pipeIds": [
+          "pipe-19470",
+          "pipe-19448"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 31.310342169,
+            "y": 19.854166667,
+            "z": 13.966055035
+          },
+          {
+            "x": 31.727008835,
+            "y": 19.854166667,
+            "z": 13.966055035
+          },
+          {
+            "x": 32.041666667,
+            "y": 19.854166667,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "173",
+        "downstreamNode": "488",
+        "hydraulicFlowDirection": "173-to-488",
+        "reportLengthFt": 3.458333,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 4.929524722,
+        "reportLengthResidualFt": 1.471191722,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.416666666,
+        "endPortResidualFt": 1.517404812,
+        "pipeIds": [
+          "pipe-20480"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.958333333,
+            "y": 23.166666667,
+            "z": 14.057953244
+          },
+          {
+            "x": 19.958333333,
+            "y": 23.583333333,
+            "z": 14.057953244
+          },
+          {
+            "x": 19.958333333,
+            "y": 23.583333333,
+            "z": 11.0625
+          },
+          {
+            "x": 19.958333333,
+            "y": 24.666666667,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "25",
+        "downstreamNode": "173",
+        "hydraulicFlowDirection": "25-to-173",
+        "reportLengthFt": 11.333333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 11.352047448,
+        "reportLengthResidualFt": 0.018714448,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 31.310342169,
+            "y": 23.166666667,
+            "z": 14.028344953
+          },
+          {
+            "x": 19.958333333000006,
+            "y": 23.166666667,
+            "z": 14.057953244003246
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "170",
+        "downstreamNode": "487",
+        "hydraulicFlowDirection": "170-to-487",
+        "reportLengthFt": 4.625,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 8.349618756,
+        "reportLengthResidualFt": 3.724618756,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 1.552458593,
+        "endPortResidualFt": 3.767148291,
+        "pipeIds": [
+          "pipe-20572"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 6.708333333,
+            "y": 23.166666667,
+            "z": 14.092511872
+          },
+          {
+            "x": 6.708333333,
+            "y": 24.71912526,
+            "z": 14.092511872
+          },
+          {
+            "x": 6.708333333,
+            "y": 24.71912526,
+            "z": 11.0625
+          },
+          {
+            "x": 6.708333333,
+            "y": 28.333333333,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "176",
+        "downstreamNode": "500",
+        "hydraulicFlowDirection": "176-to-500",
+        "reportLengthFt": 3.416667,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 4.151428183,
+        "reportLengthResidualFt": 0.734761183,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 3.988330117,
+        "pipeIds": [
+          "pipe-20596"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 46.652287372,
+            "y": 23.166666667,
+            "z": 13.988330117
+          },
+          {
+            "x": 46.652287372,
+            "y": 23.003568601,
+            "z": 13.988330117
+          },
+          {
+            "x": 46.652287372,
+            "y": 23.003568601,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "109",
+        "downstreamNode": "486",
+        "hydraulicFlowDirection": "109-to-486",
+        "reportLengthFt": 6.875,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 10.587660419,
+        "reportLengthResidualFt": 3.712660419,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 3.767148292,
+        "pipeIds": [
+          "pipe-21354",
+          "pipe-21376"
+        ],
+        "physicalSpanIds": [
+          "pipe-21376:span-1"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 34.753363992,
+            "y": 34.166666667,
+            "z": 16.830553534
+          },
+          {
+            "x": 34.753363992,
+            "y": 33.114208074,
+            "z": 11.0625
+          },
+          {
+            "x": 34.753363992,
+            "y": 29.5,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "111",
+        "downstreamNode": "109",
+        "hydraulicFlowDirection": "111-to-109",
+        "reportLengthFt": 11.333333,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 11.348386127,
+        "reportLengthResidualFt": 0.015053127,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 1e-9,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 46.101750049,
+            "y": 34.166666667,
+            "z": 16.829305162
+          },
+          {
+            "x": 34.75336399199996,
+            "y": 34.166666667,
+            "z": 16.830553533647056
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "113",
+        "downstreamNode": "111",
+        "hydraulicFlowDirection": "113-to-111",
+        "reportLengthFt": 4.75,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 4.741262301,
+        "reportLengthResidualFt": 0.008737699,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 1e-9,
+        "pipeIds": [
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 50.84301221,
+            "y": 34.166666667,
+            "z": 16.828783603
+          },
+          {
+            "x": 46.10175004900007,
+            "y": 34.166666667,
+            "z": 16.8293051625973
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "17",
+        "downstreamNode": "113",
+        "hydraulicFlowDirection": "17-to-113",
+        "reportLengthFt": 129.166667,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 129.180550486,
+        "reportLengthResidualFt": 0.013883486,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0.013036538,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-15636",
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [
+          "pipe-12312:span-16",
+          "pipe-12312:span-15",
+          "pipe-12312:span-14",
+          "pipe-12312:span-13",
+          "pipe-12312:span-12",
+          "pipe-12312:span-11",
+          "pipe-12312:span-10",
+          "pipe-12312:span-9",
+          "pipe-12312:span-8",
+          "pipe-12312:span-7",
+          "pipe-12312:span-6"
+        ],
+        "physicalPathPolylineFt": [
+          {
+            "x": 174.208333333,
+            "y": 34.166666667,
+            "z": 11
+          },
+          {
+            "x": 174.207695067,
+            "y": 34.166666667,
+            "z": 11.013020904
+          },
+          {
+            "x": 167.541666667,
+            "y": 34.166666667,
+            "z": 16.815946251
+          },
+          {
+            "x": 152.541666667,
+            "y": 34.166666667,
+            "z": 16.817596316
+          },
+          {
+            "x": 140,
+            "y": 34.166666667,
+            "z": 16.818975953
+          },
+          {
+            "x": 129.916666667,
+            "y": 34.166666667,
+            "z": 16.820085163
+          },
+          {
+            "x": 115.916666667,
+            "y": 34.166666667,
+            "z": 16.821625223
+          },
+          {
+            "x": 101.416666667,
+            "y": 34.166666667,
+            "z": 16.823220285
+          },
+          {
+            "x": 87.416666667,
+            "y": 34.166666667,
+            "z": 16.824760345
+          },
+          {
+            "x": 77.416666667,
+            "y": 34.166666667,
+            "z": 16.825860388
+          },
+          {
+            "x": 70.520833333,
+            "y": 34.166666667,
+            "z": 16.826618959
+          },
+          {
+            "x": 59.810342172,
+            "y": 34.166666667,
+            "z": 16.827797159
+          },
+          {
+            "x": 50.84301221,
+            "y": 34.166666667,
+            "z": 16.828783603
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "107",
+        "downstreamNode": "484",
+        "hydraulicFlowDirection": "107-to-484",
+        "reportLengthFt": 6.25,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 9.665923934,
+        "reportLengthResidualFt": 3.415923934,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 3.479988446,
+        "pipeIds": [
+          "pipe-19608",
+          "pipe-19630"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 23.705723524,
+            "y": 34.166666667,
+            "z": 16.831768821
+          },
+          {
+            "x": 23.705723524,
+            "y": 33.75,
+            "z": 11.0625
+          },
+          {
+            "x": 23.705723524,
+            "y": 30.43617844,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "106",
+        "downstreamNode": "107",
+        "hydraulicFlowDirection": "106-to-107",
+        "reportLengthFt": 7.416667,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 7.414056903,
+        "reportLengthResidualFt": 0.002610097,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 16.291666667,
+            "y": 34.166666667,
+            "z": 16.832584399
+          },
+          {
+            "x": 23.705723524000042,
+            "y": 34.166666667,
+            "z": 16.8317688213945
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "35",
+        "downstreamNode": "106",
+        "hydraulicFlowDirection": "35-to-106",
+        "reportLengthFt": 14.625,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 14.625000089,
+        "reportLengthResidualFt": 8.9e-8,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 1.666666667,
+            "y": 34.166666667,
+            "z": 16.834193212
+          },
+          {
+            "x": 16.291666667000047,
+            "y": 34.166666667,
+            "z": 16.83258439938903
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "106",
+        "downstreamNode": "481",
+        "hydraulicFlowDirection": "106-to-481",
+        "reportLengthFt": 6.25,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 9.290917733,
+        "reportLengthResidualFt": 3.040917733,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 3.104166667,
+        "pipeIds": [
+          "pipe-19562",
+          "pipe-19584"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 16.291666667,
+            "y": 34.166666667,
+            "z": 16.832584399
+          },
+          {
+            "x": 16.291666667,
+            "y": 33.75,
+            "z": 11.0625
+          },
+          {
+            "x": 16.291666667,
+            "y": 30.833333333,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "111",
+        "downstreamNode": "485",
+        "hydraulicFlowDirection": "111-to-485",
+        "reportLengthFt": 6.25,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 9.909099105,
+        "reportLengthResidualFt": 3.659099105,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 3.725627276,
+        "pipeIds": [
+          "pipe-19402",
+          "pipe-19424"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 46.101750049,
+            "y": 34.166666667,
+            "z": 16.829305162
+          },
+          {
+            "x": 46.101750049,
+            "y": 33.75,
+            "z": 11.0625
+          },
+          {
+            "x": 46.101750049,
+            "y": 30.179090823,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "113",
+        "downstreamNode": "480",
+        "hydraulicFlowDirection": "113-to-480",
+        "reportLengthFt": 6.25,
+        "pipeRole": "arm-over",
+        "diameterInternalInches": 1.049,
+        "physicalRouteLengthFt": 9.176116418,
+        "reportLengthResidualFt": 2.926116418,
+        "physicalClass": {
+          "nominalSizeInches": 1,
+          "subCategory": "Schedule 40"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 2.993166148,
+        "pipeIds": [
+          "pipe-21606",
+          "pipe-21628"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 50.84301221,
+            "y": 34.166666667,
+            "z": 16.828783603
+          },
+          {
+            "x": 50.84301221,
+            "y": 33.75,
+            "z": 11.0625
+          },
+          {
+            "x": 50.84301221,
+            "y": 30.951761744,
+            "z": 10
+          }
+        ],
+        "bindingStatus": "held-report-length-residual-exceeds-quarter-foot",
+        "exactPhysicalSpanRouteReady": false
+      },
+      {
+        "upstreamNode": "109",
+        "downstreamNode": "107",
+        "hydraulicFlowDirection": "109-to-107",
+        "reportLengthFt": 11.041667,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.53,
+        "physicalRouteLengthFt": 11.047640536,
+        "reportLengthResidualFt": 0.005973536,
+        "physicalClass": {
+          "nominalSizeInches": 1.25,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 0,
+        "pipeIds": [
+          "pipe-12312"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 34.753363992,
+            "y": 34.166666667,
+            "z": 16.830553534
+          },
+          {
+            "x": 23.705723524000042,
+            "y": 34.166666667,
+            "z": 16.8317688213945
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      },
+      {
+        "upstreamNode": "173",
+        "downstreamNode": "23",
+        "hydraulicFlowDirection": "173-to-23",
+        "reportLengthFt": 0.666667,
+        "pipeRole": "branch-line",
+        "diameterInternalInches": 1.728,
+        "physicalRouteLengthFt": 0.647993369,
+        "reportLengthResidualFt": 0.018673631,
+        "physicalClass": {
+          "nominalSizeInches": 1.5,
+          "subCategory": "Eddy Flow"
+        },
+        "occurrenceCount": 1,
+        "startPortResidualFt": 0,
+        "endPortResidualFt": 1e-9,
+        "pipeIds": [
+          "pipe-3943"
+        ],
+        "physicalSpanIds": [],
+        "physicalPathPolylineFt": [
+          {
+            "x": 19.958333333,
+            "y": 23.166666667,
+            "z": 14.057953244
+          },
+          {
+            "x": 19.310342168998677,
+            "y": 23.166666667,
+            "z": 14.059643333494375
+          }
+        ],
+        "bindingStatus": "exact-source-pipe-span-route-within-quarter-foot",
+        "exactPhysicalSpanRouteReady": true
+      }
+    ],
+    "loopInteriorRoles": [
+      "branch-line",
+      "cross-main",
+      "feed-main"
+    ],
+    "loopInteriorPipeSpanDirectionReady": true,
+    "interpretation": "Report upstream-to-downstream direction is promoted onto a physical span route only when source pipe material/nominal size, exact 3D node tips, connectivity, and report length agree within 0.25 ft."
   },
   "physicalNetwork": {
     "toleranceFt": 0.04,
@@ -5843,6 +10767,10 @@
     "mainDrainCalloutReady": true,
     "roofRelativePipeGradeGeometryReady": true,
     "calculatedSprinklerLeafToDwgPipeBindingReady": true,
+    "exactHydraulicNodeConnectionPointsReady": true,
+    "calculationNodeToDwgConnectionPointBindingReady": true,
+    "loopInteriorPipeSpanDirectionReady": true,
+    "buildingRigidPipeSpanHydraulicDirectionReady": true,
     "calculationNodeToDwgGeometryBindingReady": false,
     "wholeNetworkHydraulicFlowDirectionReady": false,
     "drainageGradeSemanticsReady": false,
@@ -5853,5 +10781,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "receiptSha256": "FC7D22E2337A25A89B7C520207E36894F964968F3E3B4E205B59D443ECBBFC62"
+  "receiptSha256": "0F7B05D3856D46AE300DE225CA25B010351B2DC1CCB1B2BE5AC8ED6B1DDB85F6"
 }

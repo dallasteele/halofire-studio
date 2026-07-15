@@ -46,6 +46,9 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       reportNodeCount: 61,
       cadLabelCount: 59,
       exactCadLabelCoverageCount: 59,
+      exactCadNodeConnectionPointCount: 59,
+      maximumCadNodeElevationResidualInches: 0.243616,
+      sourceGlyphTopologyReady: true,
       missingCadLabels: ['1', '2'],
     });
     expect(expected.claims).toMatchObject({
@@ -53,6 +56,8 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       reportSourceClosureReady: true,
       reportHydraulicFlowDirectionReady: true,
       calculatedSprinklerLeafToDwgPipeBindingReady: true,
+      exactHydraulicNodeConnectionPointsReady: true,
+      calculationNodeToDwgConnectionPointBindingReady: true,
       calculationNodeToDwgGeometryBindingReady: false,
     });
   });
@@ -68,8 +73,8 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       margin: binding.minimumForcedAlternativeAssignmentMarginFt,
       ready: binding.exactLeafBindingReady,
     }))).toEqual([
-      { description: 'Light Hazard (ATTIC)', count: 14, margin: 5.268647531, ready: true },
-      { description: 'Light Hazard (BELOW CEILING)', count: 15, margin: 1.726484086, ready: true },
+      { description: 'Light Hazard (ATTIC)', count: 14, margin: 11.086046744, ready: true },
+      { description: 'Light Hazard (BELOW CEILING)', count: 15, margin: 9.503405117, ready: true },
     ]);
     const bindings = expected.nodeRegistration.calculatedSprinklerLeafBindings.flatMap((binding) => binding.bindings);
     expect(new Set(bindings.map((binding) => binding.sprinklerId)).size).toBe(29);
@@ -146,6 +151,45 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
     });
   });
 
+  it('routes every loop-interior report segment over exact material-and-size-matched source spans', () => {
+    expect(expected.physicalSpanRegistration).toMatchObject({
+      uniqueReportSegmentCount: 68,
+      onPlanSegmentCount: 66,
+      exactPhysicalSpanRouteCount: 50,
+      maximumReadyRouteLengthResidualFt: 0.024833257,
+      roleCounts: {
+        'branch-line': { total: 45, exactPhysicalSpanRouteReady: 45 },
+        'cross-main': { total: 4, exactPhysicalSpanRouteReady: 4 },
+        'feed-main': { total: 1, exactPhysicalSpanRouteReady: 1 },
+        'arm-over': { total: 15, exactPhysicalSpanRouteReady: 0 },
+        'feed-riser': { total: 2, exactPhysicalSpanRouteReady: 0 },
+        underground: { total: 1, exactPhysicalSpanRouteReady: 0 },
+      },
+      loopInteriorPipeSpanDirectionReady: true,
+    });
+    expect(expected.physicalSpanRegistration.routes
+      .filter((route) => ['branch-line', 'cross-main', 'feed-main'].includes(route.pipeRole))
+      .every((route) => route.exactPhysicalSpanRouteReady && route.physicalPathPolylineFt.length >= 2)).toBe(true);
+    expect(expected.claims).toMatchObject({
+      loopInteriorPipeSpanDirectionReady: true,
+      buildingRigidPipeSpanHydraulicDirectionReady: true,
+      wholeNetworkHydraulicFlowDirectionReady: false,
+      properPipeLayoutReady: false,
+    });
+  });
+
+  it('holds loop direction when report length no longer agrees with the source span route', () => {
+    const attacked = structuredClone(atticReport);
+    attacked.segments.find((segment) => segment.upstreamNode === '225' && segment.downstreamNode === '252').lengthFt += 1;
+    const result = build({ atticReport: attacked });
+    expect(result.physicalSpanRegistration.roleCounts['branch-line']).toMatchObject({
+      total: 45,
+      exactPhysicalSpanRouteReady: 44,
+    });
+    expect(result.claims.loopInteriorPipeSpanDirectionReady).toBe(false);
+    expect(result.claims.wholeNetworkHydraulicFlowDirectionReady).toBe(false);
+  });
+
   it('rejects report direction and missing-drain attacks', () => {
     const reversed = structuredClone(atticReport);
     reversed.directionSemantics.hydraulicFlowDirection = 'downstream-to-upstream';
@@ -163,10 +207,13 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
     expect(html).toContain('82 calculated flow segments');
     expect(html).toContain('4 / 10');
     expect(html).toContain('29 exact sprinkler terminals');
-    expect(html).toContain('non-terminal nodes remain drawn between source annotations');
+    expect(html).toContain('exact 3D source leader tips');
     expect(html).toContain("data-proof-layer':'grade'");
     expect(html).toContain("data-proof-layer':'device'");
     expect(html).toContain("data-proof-layer':'terminal'");
+    expect(html).toContain("data-proof-layer':'span'");
+    expect(html).toContain('50 exact physical span routes');
+    expect(html).toContain('3 loop interiors resolved');
     expect(html).toContain('whole-network flow held');
     expect(html).toContain('Attic calculation graph (diagnostic)');
     expect(html).not.toContain('data-layer="attic" checked');
@@ -174,16 +221,24 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       networkReceiptSha256: expected.receiptSha256,
       counts: {
         hydraulicReportSegments: 82,
+        exactHydraulicNodeConnectionPoints: 59,
+        exactPhysicalSpanRoutes: 50,
+        exactBranchLineSpanRoutes: 45,
+        exactCrossMainSpanRoutes: 4,
+        exactFeedMainSpanRoutes: 1,
         exactCalculatedSprinklerTerminalBindings: 29,
         buildingComponentPipes: 177,
         slopedPlanRuns: 14,
       },
       defaultLayers: {
         atticCalculationGraphDiagnostic: false,
+        exactPhysicalSpanDirections: true,
         calculatedSprinklerTerminals: true,
         geometricDownhillEndpoints: true,
       },
       browserVerification: {
+        exactPhysicalSpanLayerVisible: true,
+        exactPhysicalSpanToggleVerified: true,
         exactTerminalLayerVisible: true,
         exactTerminalToggleVerified: true,
         diagnosticToggleVerified: true,
@@ -191,6 +246,10 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       },
       claims: {
         calculatedSprinklerLeafToDwgPipeBindingReady: true,
+        exactHydraulicNodeConnectionPointsReady: true,
+        calculationNodeToDwgConnectionPointBindingReady: true,
+        loopInteriorPipeSpanDirectionReady: true,
+        buildingRigidPipeSpanHydraulicDirectionReady: true,
         wholeNetworkHydraulicFlowDirectionReady: false,
         properPipeLayoutReady: false,
       },

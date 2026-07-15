@@ -17,6 +17,7 @@ describe('Polaris completed pitched-attic pipe XYZ calibration', () => {
       approvedAndAsBuiltRegistrationReady: true,
       planDirectionReady: true,
       roofRelativePipeGradeGeometryReady: true,
+      exactHydraulicNodeConnectionPointsReady: true,
       hydraulicFlowDirectionReady: false,
       drainageGradeSemanticsReady: false,
       drainDestinationReady: false,
@@ -43,6 +44,8 @@ describe('Polaris completed pitched-attic pipe XYZ calibration', () => {
       pipeCount: 186,
       headCount: 158,
       fittingCount: 98,
+      hydraulicNodeLabelCount: 59,
+      hydraulicNodeConnectionPointCount: 59,
       distinctEndpointElevations: 119,
       nominalSizeCounts: { 1: 152, 1.25: 17, 1.5: 4, 2: 3, 2.5: 1, 3: 7, 4: 2 },
       geometryKindCounts: { 'level-run': 86, 'sloped-plan-run': 14, 'vertical-transition': 86 },
@@ -60,10 +63,22 @@ describe('Polaris completed pitched-attic pipe XYZ calibration', () => {
     expect(longMain.endFt.z).toBeCloseTo(13.655639, 6);
   });
 
+  it('extracts each hydraulic node leader tip as exact 3D source geometry', () => {
+    expect(calibration.hydraulicNodeLabels).toHaveLength(59);
+    expect(calibration.hydraulicNodeLabels.every((label) => label.sourceGlyphLineHandles.length === 7
+      && JSON.stringify(label.sourceGlyphTopologyDegreeSignature) === JSON.stringify([1, 2, 2, 2, 2, 2, 3]))).toBe(true);
+    expect(calibration.hydraulicNodeLabels.find((label) => label.nodeId === '15')).toMatchObject({
+      connectionPointFt: { x: 1.664551967, y: 34.166666636, z: 11.010148754 },
+    });
+    expect(calibration.hydraulicNodeLabels.find((label) => label.nodeId === '35')).toMatchObject({
+      connectionPointFt: { x: 1.666666667, y: 34.166666667, z: 16.834193212 },
+    });
+  });
+
   it('rejects source, registration, inventory, coordinate, size, direction, grade, and promotion attacks', () => {
     expect(verifyPolarisPitchedPipeAdversarialLoop(calibration)).toMatchObject({
       status: 'passed',
-      attemptedCases: 13,
+      attemptedCases: 14,
       falsePromotionRejected: true,
     });
   });

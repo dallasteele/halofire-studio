@@ -61,6 +61,7 @@ function numericHandle(value) {
 }
 
 const stableHandle = (value) => String(numericHandle(value));
+const endpointKey = (value) => [value.x, value.y, value.z ?? 0].map((coordinate) => round(coordinate, 6)).join('|');
 
 function parseArguments(argv) {
   const [inputPath, ...rest] = argv;
@@ -143,15 +144,87 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
   const fittings = inserts
     .filter((entity) => entity.layer === 'AS_SPRINKLER SYSTEM_FITTINGS')
     .map((entity) => pointInsert(entity, 'fitting'));
+  const hydraulicAreaLines = database.entities.filter((entity) => entity.type === 'LINE'
+    && entity.layer === 'AS_SPRINKLER SYSTEM_AREAS');
+  const hydraulicLineIndicesByEndpoint = new Map();
+  hydraulicAreaLines.forEach((line, index) => {
+    for (const endpoint of [line.startPoint, line.endPoint]) {
+      const key = endpointKey(endpoint);
+      const indices = hydraulicLineIndicesByEndpoint.get(key) ?? [];
+      indices.push(index);
+      hydraulicLineIndicesByEndpoint.set(key, indices);
+    }
+  });
   const hydraulicNodeLabels = database.entities
     .filter((entity) => entity.type === 'TEXT'
       && entity.layer === 'AS_SPRINKLER SYSTEM_AREAS'
       && /^\d+$/.test(String(entity.text ?? '').trim()))
-    .map((entity) => ({
-      nodeId: String(entity.text).trim(),
-      labelPoint: point({ x: entity.startPoint.x, y: entity.startPoint.y, z: 0 }),
-      alignmentPoint: point({ x: entity.endPoint.x, y: entity.endPoint.y, z: 0 }),
-    }));
+    .map((entity) => {
+      const nearbySeedCandidates = hydraulicAreaLines.map((line, index) => ({
+        index,
+        distance: Math.min(
+          Math.hypot(line.startPoint.x - entity.startPoint.x, line.startPoint.y - entity.startPoint.y),
+          Math.hypot(line.startPoint.x - entity.endPoint.x, line.startPoint.y - entity.endPoint.y),
+          Math.hypot(line.endPoint.x - entity.startPoint.x, line.endPoint.y - entity.startPoint.y),
+          Math.hypot(line.endPoint.x - entity.endPoint.x, line.endPoint.y - entity.endPoint.y),
+        ),
+      })).filter((candidate) => candidate.distance <= 20);
+      const candidateComponents = new Map();
+      for (const seed of nearbySeedCandidates) {
+        const pendingLineIndices = [seed.index];
+        const lineIndices = new Set(pendingLineIndices);
+        while (pendingLineIndices.length) {
+          const currentIndex = pendingLineIndices.shift();
+          const line = hydraulicAreaLines[currentIndex];
+          for (const endpoint of [line.startPoint, line.endPoint]) {
+            for (const adjacentIndex of hydraulicLineIndicesByEndpoint.get(endpointKey(endpoint)) ?? []) {
+              if (!lineIndices.has(adjacentIndex)) {
+                lineIndices.add(adjacentIndex);
+                pendingLineIndices.push(adjacentIndex);
+              }
+            }
+          }
+        }
+        const key = [...lineIndices].sort((left, right) => left - right).join(',');
+        candidateComponents.set(key, lineIndices);
+      }
+      const validComponents = [...candidateComponents.values()].map((lineIndices) => {
+        const lines = [...lineIndices].map((index) => hydraulicAreaLines[index]);
+        const endpointCounts = new Map();
+        const endpointValues = new Map();
+        for (const line of lines) {
+          for (const endpoint of [line.startPoint, line.endPoint]) {
+            const key = endpointKey(endpoint);
+            endpointCounts.set(key, (endpointCounts.get(key) ?? 0) + 1);
+            endpointValues.set(key, endpoint);
+          }
+        }
+        const degreeSignature = [...endpointCounts.values()].sort((left, right) => left - right);
+        const leaderTips = [...endpointCounts.entries()]
+          .filter(([, count]) => count === 1)
+          .map(([key]) => endpointValues.get(key));
+        return {
+          lines,
+          degreeSignature,
+          leaderTips,
+          handleResidual: Math.min(...lines.map((line) => Math.abs(numericHandle(line.handle) - numericHandle(entity.handle)))),
+        };
+      }).filter((component) => JSON.stringify(component.degreeSignature) === JSON.stringify([1, 2, 2, 2, 2, 2, 3])
+        && component.leaderTips.length === 1)
+        .sort((left, right) => left.handleResidual - right.handleResidual);
+      if (validComponents.length === 0) {
+        throw new Error(`HYDRAULIC_NODE_GLYPH_TOPOLOGY:${String(entity.text).trim()}:no-valid-seven-line-component`);
+      }
+      const glyph = validComponents[0];
+      return {
+        nodeId: String(entity.text).trim(),
+        labelPoint: point({ x: entity.startPoint.x, y: entity.startPoint.y, z: 0 }),
+        alignmentPoint: point({ x: entity.endPoint.x, y: entity.endPoint.y, z: 0 }),
+        connectionPoint: point(glyph.leaderTips[0]),
+        glyphLineHandles: glyph.lines.map((line) => stableHandle(line.handle)).sort((left, right) => Number(left) - Number(right)),
+        glyphTopologyDegreeSignature: glyph.degreeSignature,
+      };
+    });
   const noteLines = database.entities.filter((entity) => entity.type === 'LINE'
     && entity.layer === 'AS_SPRINKLER SYSTEM_NOTES');
   const sourceNotes = database.entities
@@ -197,6 +270,7 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
       sprinklerSymbolCount: sprinklers.length,
       fittingSymbolCount: fittings.length,
       hydraulicNodeLabelCount: hydraulicNodeLabels.length,
+      hydraulicNodeConnectionPointCount: hydraulicNodeLabels.filter((label) => label.connectionPoint).length,
       sourceNoteCount: sourceNotes.length,
       distinctPipeElevationCount: elevations.length,
       pipeElevationRange: elevations.length ? [elevations[0], elevations.at(-1)] : null,

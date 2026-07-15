@@ -11,6 +11,7 @@ const EXPECTED = Object.freeze({
   pipeCount: 186,
   headCount: 158,
   fittingCount: 98,
+  hydraulicNodeCount: 59,
   distinctEndpointElevations: 119,
   nominalSizeCounts: { 1: 152, 1.25: 17, 1.5: 4, 2: 3, 2.5: 1, 3: 7, 4: 2 },
   geometryKindCounts: { 'level-run': 86, 'sloped-plan-run': 14, 'vertical-transition': 86 },
@@ -45,7 +46,7 @@ function expectedPlanDirection(pipe) {
 
 export function evaluatePolarisPitchedPipeCalibration(packet) {
   const issues = [];
-  if (packet?.schema !== 'halofire.polaris-pitched-pipe-xyz-calibration.v1' || packet?.projectId !== PROJECT_ID) {
+  if (packet?.schema !== 'halofire.polaris-pitched-pipe-xyz-calibration.v2' || packet?.projectId !== PROJECT_ID) {
     issues.push(issue('POLARIS_PIPE_IDENTITY_INVALID', 'The calibration schema or project identity changed.'));
   }
   const sources = packet?.sources ?? {};
@@ -76,6 +77,7 @@ export function evaluatePolarisPitchedPipeCalibration(packet) {
 
   const pipes = Array.isArray(packet?.pipes) ? packet.pipes : [];
   const fittings = Array.isArray(packet?.fittings) ? packet.fittings : [];
+  const hydraulicNodeLabels = Array.isArray(packet?.hydraulicNodeLabels) ? packet.hydraulicNodeLabels : [];
   if (pipes.length !== EXPECTED.pipeCount || fittings.length !== EXPECTED.fittingCount) {
     issues.push(issue('POLARIS_PIPE_INVENTORY_INVALID', 'The exact pipe or fitting inventory changed.'));
   }
@@ -120,12 +122,21 @@ export function evaluatePolarisPitchedPipeCalibration(packet) {
   if (fittings.some((fitting) => !pointFinite(fitting.pointFt) || typeof fitting.family !== 'string')) {
     issues.push(issue('POLARIS_FITTING_XYZ_INVALID', 'A fitting has invalid source geometry or family identity.'));
   }
+  if (hydraulicNodeLabels.length !== EXPECTED.hydraulicNodeCount
+    || new Set(hydraulicNodeLabels.map((label) => label.nodeId)).size !== EXPECTED.hydraulicNodeCount
+    || hydraulicNodeLabels.some((label) => !pointFinite(label.connectionPointFt)
+      || JSON.stringify(label.sourceGlyphTopologyDegreeSignature) !== JSON.stringify([1, 2, 2, 2, 2, 2, 3])
+      || label.sourceGlyphLineHandles?.length !== 7)) {
+    issues.push(issue('POLARIS_HYDRAULIC_NODE_CONNECTION_INVALID', 'A hydraulic node lacks a unique seven-line source glyph and exact 3D leader tip.'));
+  }
 
   const summary = packet?.summary ?? {};
   if (
     summary.pipeCount !== EXPECTED.pipeCount
     || summary.headCount !== EXPECTED.headCount
     || summary.fittingCount !== EXPECTED.fittingCount
+    || summary.hydraulicNodeLabelCount !== EXPECTED.hydraulicNodeCount
+    || summary.hydraulicNodeConnectionPointCount !== EXPECTED.hydraulicNodeCount
     || summary.distinctEndpointElevations !== EXPECTED.distinctEndpointElevations
     || !countsEqual(countsBy(pipes, 'nominalSizeInches'), EXPECTED.nominalSizeCounts)
     || !countsEqual(countsBy(pipes, 'geometryKind'), EXPECTED.geometryKindCounts)
@@ -144,6 +155,7 @@ export function evaluatePolarisPitchedPipeCalibration(packet) {
     approvedAndAsBuiltRegistrationReady: exactSourcePipeXyzReady,
     planDirectionReady: exactSourcePipeXyzReady,
     roofRelativePipeGradeGeometryReady: exactSourcePipeXyzReady,
+    exactHydraulicNodeConnectionPointsReady: exactSourcePipeXyzReady,
     hydraulicFlowDirectionReady: false,
     drainageGradeSemanticsReady: false,
     fullFittingIdentityReady: false,
@@ -170,6 +182,7 @@ export function verifyPolarisPitchedPipeAdversarialLoop(packet) {
     ['downhill-direction', (value) => { value.pipes.find((pipe) => pipe.downhillDirection !== 'level').downhillDirection = 'level'; }],
     ['grade', (value) => { value.pipes.find((pipe) => pipe.gradeInPer10Ft !== null).gradeInPer10Ft += 1; }],
     ['fitting-removal', (value) => { value.fittings.pop(); }],
+    ['hydraulic-node-tip', (value) => { value.hydraulicNodeLabels[0].connectionPointFt.z += 1; value.hydraulicNodeLabels[0].connectionPointFt = null; }],
   ];
   const rejectedCases = attacks.map(([name, mutate]) => {
     const value = structuredClone(packet);
