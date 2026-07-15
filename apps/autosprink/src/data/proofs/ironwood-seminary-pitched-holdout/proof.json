@@ -1,0 +1,53 @@
+{
+  "artifactType": "halofire.visual-proof.v1",
+  "projectId": "ironwood-seminary-annex",
+  "candidateReceiptSha256": "fb6f897b20f58fead2ea34235f398c7d08d111fd229d1cd54d4018407ff741c4",
+  "scoreReceiptSha256": "2ecf274cab69f57e03b4623365407e4072e0d75da85d85a133f7ba2ef06a7974",
+  "sourcePdfSha256": "b80b399aa219dd91344d68ad8637e22e165a87d7726427764348ead7ef21cba6",
+  "answerPdfSha256": "b255334e85905cb0694bdb697393eac5aae66647e67e4b5f5ba59d16811957d9",
+  "files": [
+    {
+      "file": "source-a101-generated-overlay.png",
+      "sha256": "c3208132ea094df0e89bd4229372dc99b1bebe62350f670859f53bfeebc53ee4"
+    },
+    {
+      "file": "source-a102-generated-overlay.png",
+      "sha256": "427a0b69b2bc8a7811558d73959cb3b0edeb93c041731d658679147285b54e03"
+    },
+    {
+      "file": "source-a201-elevation-overlay.png",
+      "sha256": "86732a3851552b43e59d096dba925d333121775ca5a4bcc9b31406132e52ef13"
+    },
+    {
+      "file": "completed-asbuilt-answer-and-schedule.png",
+      "sha256": "c06d52202b6ff086d4ca4f6c58e54aa8693e1e34408f520b25bf7df7aa644f60"
+    },
+    {
+      "file": "source-pdf-registered-3d.svg",
+      "sha256": "7d021c88ab5dd1c827b25cd54cf73809c88a4469e9ea34b9c7f5cd61a93150bb"
+    }
+  ],
+  "visualReview": {
+    "browserInspected": true,
+    "decodedImageCount": 5,
+    "consoleErrors": null,
+    "brokenImageCount": 0,
+    "normalZoomLayoutReadable": true,
+    "threeDimensionalConnectorMassReadable": true,
+    "actualPdfUnderlaysPresent": true,
+    "failureVisiblyDisclosed": true
+  },
+  "acceptance": {
+    "countParity": false,
+    "kindParity": false,
+    "xyWithin2FtAtLeast90Pct": false,
+    "xyScoreAvailable": false,
+    "accepted": false
+  },
+  "claimBoundary": {
+    "freshProjectPlacementVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

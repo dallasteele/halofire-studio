@@ -1,0 +1,31 @@
+{
+  "artifactType": "halofire.completed-answer-evidence.v1",
+  "projectId": "ironwood-seminary-annex",
+  "answerOpenedAfterCandidateCommit": "cb697e5e",
+  "primaryAnswer": {
+    "documentRole": "as-built fire sprinkler plan",
+    "sha256": "b255334e85905cb0694bdb697393eac5aae66647e67e4b5f5ba59d16811957d9",
+    "pageCount": 1
+  },
+  "secondaryAnswer": {
+    "documentRole": "approved fire sprinkler plan",
+    "sha256": "08b2fdbbd4cd0d29b72306442134da3ed11b2900a64e7254b7e5a85495b1798a",
+    "pageCount": 1
+  },
+  "headSchedule": {
+    "concealedPendent": 6,
+    "uprightAttic": 6,
+    "total": 12,
+    "maximumCoverageSqFt": {
+      "ordinaryHazard": 130,
+      "attic": 120,
+      "lightHazard": 225
+    }
+  },
+  "visualFinding": {
+    "completedPlanUsesPitchedAtticProtection": true,
+    "newAdditionRoomsHaveConcealedPendentHeads": true,
+    "connectorAtticAddsTwoUprightHeadsBeyondCandidate": true,
+    "sourceOnlyCandidateModifiedAfterAnswerOpen": false
+  }
+}

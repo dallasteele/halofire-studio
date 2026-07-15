@@ -1,0 +1,59 @@
+{
+  "artifactType": "halofire.fresh-pitched-answer-score.v1",
+  "projectId": "ironwood-seminary-annex",
+  "candidateCommit": "cb697e5e",
+  "candidateReceiptSha256": "fb6f897b20f58fead2ea34235f398c7d08d111fd229d1cd54d4018407ff741c4",
+  "primaryAnswerSha256": "b255334e85905cb0694bdb697393eac5aae66647e67e4b5f5ba59d16811957d9",
+  "secondaryAnswerSha256": "08b2fdbbd4cd0d29b72306442134da3ed11b2900a64e7254b7e5a85495b1798a",
+  "candidateCounts": {
+    "total": 10,
+    "pendent": 6,
+    "upright": 4
+  },
+  "completedCounts": {
+    "total": 12,
+    "pendent": 6,
+    "upright": 6
+  },
+  "delta": {
+    "total": -2,
+    "pendent": 0,
+    "upright": -2
+  },
+  "acceptance": {
+    "countParity": false,
+    "kindParity": false,
+    "xyWithin2FtAtLeast90Pct": false,
+    "xyScoreAvailable": false,
+    "accepted": false
+  },
+  "failureAnalysis": {
+    "classification": "fresh-holdout-failed-missed-connector-attic-volume",
+    "concealedPendentCountMatched": true,
+    "uprightAtticCountMatched": false,
+    "missingUprightAtticTargets": 2,
+    "sourceFinding": "The source roof/RCP topology contains a connector concealed volume that the sealed packet did not model.",
+    "policyFinding": "The completed plan uses a distinct 120 sq ft attic maximum while the frozen Building J packet carried a 130 sq ft ordinary-hazard default.",
+    "candidateRetunedAfterAnswer": false
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "as-built schedule count and kind comparison"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "approved-plan/as-built hash provenance plus visible symbol recount"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "receipt, count, acceptance, and false-promotion mutations rejected"
+    }
+  },
+  "freshProjectPlacementVerified": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "fresh-pitched-holdout-failed-two-attic-uprights-missing-xy-score-and-all-production-gates-remain-blocked",
+  "receiptSha256": "2ecf274cab69f57e03b4623365407e4072e0d75da85d85a133f7ba2ef06a7974"
+}
