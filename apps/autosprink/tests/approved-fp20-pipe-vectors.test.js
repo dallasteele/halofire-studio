@@ -25,8 +25,11 @@ describe('approved FP2.0 pipe-vector extraction', () => {
       maximumHeadToPipeDistancePdfPt: 1.466,
       connectedPipeVectorCount: 67,
       explicitMaskedTurnCount: 2,
+      pipeSizeAnnotationCount: 79,
+      pipeSizeClassCounts: { 1: 24, 2: 15, 2.5: 27, 3: 12, 4: 1 },
     });
     expect(result.sourceTopologyConnected).toBe(true);
+    expect(result.pipeSizeAnnotationExtractionReady).toBe(true);
     expect(result.properPipeLayoutReady).toBe(false);
     expect(result.fieldReleaseReady).toBe(false);
   });
@@ -94,5 +97,25 @@ describe('approved FP2.0 pipe-vector extraction', () => {
     }));
     expect(result.blockerCodes).toContain('FP20_TOPOLOGY_TOLERANCE_INVALID');
     expect(result.vectorExtractionReady).toBe(false);
+  });
+
+  it('rejects nominal-size text drift and a changed route association', () => {
+    const result = evaluateApprovedFp20PipeVectors(mutate((copy) => {
+      copy.pipeSizeAnnotations[0].decodedNominalDiameterIn = 3;
+      copy.pipeSizeAnnotations[1].nearestPipeSegmentId = 'pipe-067';
+    }));
+    expect(result.blockerCodes).toEqual(expect.arrayContaining([
+      'FP20_PIPE_SIZE_DECODE_INVALID',
+      'FP20_PIPE_SIZE_CLASS_COUNT_MISMATCH',
+      'FP20_PIPE_SIZE_NEAREST_ROUTE_MISMATCH',
+    ]));
+    expect(result.pipeSizeAnnotationExtractionReady).toBe(false);
+  });
+
+  it('rejects a nominal-size annotation without its exact source span reference', () => {
+    const result = evaluateApprovedFp20PipeVectors(mutate((copy) => {
+      delete copy.pipeSizeAnnotations[0].sourceTextRef.spanIndex;
+    }));
+    expect(result.blockerCodes).toContain('FP20_PIPE_SIZE_SOURCE_REF_MISSING');
   });
 });

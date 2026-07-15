@@ -11,7 +11,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('approved-ridge-branch-underlay.png');
     expect(html).toContain('approved-dry-pipe-note.png');
     expect(html).toContain('approved-fp20-full-underlay.png');
-    for (const image of ['s102-roof-framing-underlay.png', 'approved-ridge-branch-underlay.png', 'approved-dry-pipe-note.png', 'approved-fp20-full-underlay.png']) expect(fs.statSync(new URL(image, proof)).size).toBeGreaterThan(30_000);
+    for (const image of ['s102-roof-framing-underlay.png', 'approved-ridge-branch-underlay.png', 'approved-dry-pipe-note.png', 'approved-fp20-full-underlay.png', 'approved-fp20-pipe-size-overlay.png']) expect(fs.statSync(new URL(image, proof)).size).toBeGreaterThan(30_000);
   });
 
   it('states the missing pipe-layout facts instead of presenting a connector as a design', () => {
@@ -31,6 +31,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('calibration.branch.nodes');
     expect(script).toContain('pipeVectors.pipeSegments');
     expect(script).toContain('pipeVectors.sprinklers');
+    expect(script).toContain('pipeVectors.pipeSizeAnnotations');
     expect(script).toContain('evaluateApprovedFp20PipeVectors');
     expect(script).toContain("dataset.proofReady = 'true'");
     expect(script).toContain('dataset.pipeVectorStatus = vectorAcceptance.status');

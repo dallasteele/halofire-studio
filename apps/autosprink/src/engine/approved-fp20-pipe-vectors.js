@@ -9,6 +9,7 @@
 const EXPECTED_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5';
 const EXPECTED_PIPE_CLASSES = Object.freeze({ 'red-pipe': 40, 'black-pipe': 15, 'navy-arm-over': 12 });
 const EXPECTED_HEAD_CLASSES = Object.freeze({ BB1: 58, SD1: 6, 'TY-FRB': 4 });
+const EXPECTED_SIZE_CLASSES = Object.freeze({ 1: 24, 2: 15, 2.5: 27, 3: 12, 4: 1 });
 const EXPECTED_PIPE_STYLE = Object.freeze({
   'red-pipe': [0.753, 0, 0],
   'black-pipe': [0, 0, 0],
@@ -92,6 +93,34 @@ function compareCounts(actual, expected) {
   return Object.keys({ ...actual, ...expected }).every((key) => actual[key] === expected[key]);
 }
 
+function validatePipeSizeAnnotations(evidence, segments, issues) {
+  const annotations = Array.isArray(evidence?.pipeSizeAnnotations) ? evidence.pipeSizeAnnotations : [];
+  const segmentById = new Map(segments.map((segment) => [segment.id, segment]));
+  const counts = {};
+  const ids = new Set();
+  const rawToDiameter = new Map([['1', 1], ['2', 2], ['2\u00bd', 2.5], ['3', 3], ['4', 4]]);
+  for (const annotation of annotations) {
+    if (!annotation?.id || ids.has(annotation.id)) { issues.push(issue('FP20_PIPE_SIZE_ANNOTATION_ID_INVALID', 'Every approved pipe-size text span needs a unique identity.', annotation?.id)); continue; }
+    ids.add(annotation.id);
+    increment(counts, annotation.decodedNominalDiameterIn);
+    const expectedDiameter = rawToDiameter.get(annotation.rawText);
+    if (annotation.decodedNominalDiameterIn !== expectedDiameter) issues.push(issue('FP20_PIPE_SIZE_DECODE_INVALID', 'Nominal diameter must decode exactly from the approved PDF text span.', annotation.id));
+    if (annotation.font !== 'Arial-BoldMT' || annotation.textColor !== 0 || annotation.fontSizePdfPt < 7.8 || annotation.fontSizePdfPt > 8.6) issues.push(issue('FP20_PIPE_SIZE_TEXT_SIGNATURE_INVALID', 'Pipe-size annotation must preserve the approved typography and color signature.', annotation.id));
+    const box = annotation.bboxPdfPt;
+    if (![box?.x0, box?.y0, box?.x1, box?.y1].every(Number.isFinite) || box.x0 >= box.x1 || box.y0 >= box.y1 || box.x0 < 500 || box.x1 > 1600 || box.y0 < 750 || box.y1 > 1700) issues.push(issue('FP20_PIPE_SIZE_TEXT_BOUNDS_INVALID', 'Pipe-size annotation bounds must remain inside the FP2.0 plan region.', annotation.id));
+    const direction = annotation.writingDirection;
+    if (!Number.isFinite(direction?.x) || !Number.isFinite(direction?.y) || Math.abs(Math.hypot(direction.x, direction.y) - 1) > 0.002) issues.push(issue('FP20_PIPE_SIZE_WRITING_DIRECTION_INVALID', 'Pipe-size text direction must preserve its source rotation.', annotation.id));
+    if (![annotation.sourceTextRef?.blockIndex, annotation.sourceTextRef?.lineIndex, annotation.sourceTextRef?.spanIndex].every(Number.isInteger)) issues.push(issue('FP20_PIPE_SIZE_SOURCE_REF_MISSING', 'Pipe-size annotation needs its exact PDF block, line, and span indexes.', annotation.id));
+    const nearest = segmentById.get(annotation.nearestPipeSegmentId);
+    if (!nearest || !box) { issues.push(issue('FP20_PIPE_SIZE_NEAREST_ROUTE_INVALID', 'Pipe-size annotation needs a nearest source-vector diagnostic.', annotation.id)); continue; }
+    const center = { x: (box.x0 + box.x1) / 2, y: (box.y0 + box.y1) / 2 };
+    const ranked = segments.map((segment) => ({ segment, distance: pointToSegmentDistance(center, segment) })).sort((a, b) => a.distance - b.distance || a.segment.id.localeCompare(b.segment.id));
+    if (ranked[0]?.segment.id !== nearest.id || !Number.isFinite(annotation.nearestPipeDistancePdfPt) || Math.abs(ranked[0].distance - annotation.nearestPipeDistancePdfPt) > 0.002) issues.push(issue('FP20_PIPE_SIZE_NEAREST_ROUTE_MISMATCH', 'Stored pipe-size proximity must close against recomputed source geometry.', annotation.id));
+  }
+  if (annotations.length !== 79 || !compareCounts(counts, EXPECTED_SIZE_CLASSES)) issues.push(issue('FP20_PIPE_SIZE_CLASS_COUNT_MISMATCH', 'Approved FP2.0 must expose 79 nominal-size spans: 24 one-inch, 15 two-inch, 27 two-and-one-half-inch, 12 three-inch, and one four-inch.'));
+  return { annotationCount: annotations.length, sizeClassCounts: counts };
+}
+
 export function evaluateApprovedFp20PipeVectors(evidence) {
   const issues = [];
   const segments = Array.isArray(evidence?.pipeSegments) ? evidence.pipeSegments : [];
@@ -120,6 +149,7 @@ export function evaluateApprovedFp20PipeVectors(evidence) {
 
   if (!compareCounts(pipeClassCounts, EXPECTED_PIPE_CLASSES)) issues.push(issue('FP20_PIPE_CLASS_COUNT_MISMATCH', 'The approved extraction must contain 40 red, 15 black, and 12 navy arm-over vectors.'));
   const topology = topologyClosure(segments, evidence, issues);
+  const pipeSizes = validatePipeSizeAnnotations(evidence, segments, issues);
 
   for (const sprinkler of sprinklers) {
     increment(sprinklerClassCounts, sprinkler?.symbolType);
@@ -151,8 +181,11 @@ export function evaluateApprovedFp20PipeVectors(evidence) {
       maximumHeadToPipeDistancePdfPt: round(Math.max(0, ...sprinklers.map((head) => head.pipeDistancePdfPt || 0)), 3),
       connectedPipeVectorCount: topology.connectedPipeVectorCount,
       explicitMaskedTurnCount: topology.explicitMaskedTurnCount,
+      pipeSizeAnnotationCount: pipeSizes.annotationCount,
+      pipeSizeClassCounts: pipeSizes.sizeClassCounts,
     },
     vectorExtractionReady: issues.length === 0,
+    pipeSizeAnnotationExtractionReady: issues.length === 0 && pipeSizes.annotationCount === 79,
     sourceTopologyConnected: issues.length === 0 && topology.connectedPipeVectorCount === segments.length,
     properPipeLayoutReady: false,
     complianceReady: false,

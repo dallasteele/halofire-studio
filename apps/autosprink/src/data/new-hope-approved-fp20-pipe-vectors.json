@@ -59,6 +59,1983 @@
       }
     ]
   },
+  "pipeSizeAnnotations": [
+    {
+      "id": "size-001",
+      "rawText": "4",
+      "decodedNominalDiameterIn": 4.0,
+      "bboxPdfPt": {
+        "x0": 637.367,
+        "y0": 1079.824,
+        "x1": 641.988,
+        "y1": 1091.59
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 142,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-001",
+      "nearestPipeDistancePdfPt": 38.95
+    },
+    {
+      "id": "size-002",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 659.755,
+        "y0": 1070.411,
+        "x1": 671.52,
+        "y1": 1075.032
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 158,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-003",
+      "nearestPipeDistancePdfPt": 36.957
+    },
+    {
+      "id": "size-003",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 692.97,
+        "y0": 1092.718,
+        "x1": 697.354,
+        "y1": 1103.88
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 7.84,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 161,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-003",
+      "nearestPipeDistancePdfPt": 5.839
+    },
+    {
+      "id": "size-004",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 701.44,
+        "y0": 1121.473,
+        "x1": 713.205,
+        "y1": 1133.027
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 163,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-004",
+      "nearestPipeDistancePdfPt": 21.936
+    },
+    {
+      "id": "size-005",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 745.771,
+        "y0": 1105.757,
+        "x1": 757.325,
+        "y1": 1117.522
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 165,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-005",
+      "nearestPipeDistancePdfPt": 5.881
+    },
+    {
+      "id": "size-006",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 757.928,
+        "y0": 1135.671,
+        "x1": 769.693,
+        "y1": 1147.225
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 166,
+        "lineIndex": 2,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-006",
+      "nearestPipeDistancePdfPt": 14.097
+    },
+    {
+      "id": "size-007",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 804.498,
+        "y0": 1192.558,
+        "x1": 809.119,
+        "y1": 1204.323
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 168,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-010",
+      "nearestPipeDistancePdfPt": 15.426
+    },
+    {
+      "id": "size-008",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 558.811,
+        "y0": 1554.894,
+        "x1": 570.365,
+        "y1": 1566.659
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 171,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-008",
+      "nearestPipeDistancePdfPt": 24.404
+    },
+    {
+      "id": "size-009",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 758.972,
+        "y0": 1679.323,
+        "x1": 763.594,
+        "y1": 1691.088
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 174,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-036",
+      "nearestPipeDistancePdfPt": 76.657
+    },
+    {
+      "id": "size-010",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 512.822,
+        "y0": 1561.433,
+        "x1": 517.444,
+        "y1": 1573.198
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 175,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-008",
+      "nearestPipeDistancePdfPt": 23.999
+    },
+    {
+      "id": "size-011",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 513.726,
+        "y0": 1635.513,
+        "x1": 525.491,
+        "y1": 1640.135
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 176,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-008",
+      "nearestPipeDistancePdfPt": 53.895
+    },
+    {
+      "id": "size-012",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 541.917,
+        "y0": 1679.323,
+        "x1": 546.539,
+        "y1": 1691.088
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 178,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-008",
+      "nearestPipeDistancePdfPt": 100.024
+    },
+    {
+      "id": "size-013",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 539.838,
+        "y0": 1673.199,
+        "x1": 551.604,
+        "y1": 1677.82
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 179,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-008",
+      "nearestPipeDistancePdfPt": 90.329
+    },
+    {
+      "id": "size-014",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 513.726,
+        "y0": 796.114,
+        "x1": 525.491,
+        "y1": 800.735
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 183,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-009",
+      "nearestPipeDistancePdfPt": 53.894
+    },
+    {
+      "id": "size-015",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 540.811,
+        "y0": 810.304,
+        "x1": 545.433,
+        "y1": 822.07
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 185,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-009",
+      "nearestPipeDistancePdfPt": 34.88
+    },
+    {
+      "id": "size-016",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 558.288,
+        "y0": 820.829,
+        "x1": 569.842,
+        "y1": 832.595
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 185,
+        "lineIndex": 1,
+        "spanIndex": 2
+      },
+      "nearestPipeSegmentId": "pipe-009",
+      "nearestPipeDistancePdfPt": 24.355
+    },
+    {
+      "id": "size-017",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 627.174,
+        "y0": 1679.323,
+        "x1": 631.796,
+        "y1": 1691.088
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 190,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-008",
+      "nearestPipeDistancePdfPt": 107.181
+    },
+    {
+      "id": "size-018",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 811.055,
+        "y0": 1171.458,
+        "x1": 815.677,
+        "y1": 1183.223
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 197,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-010",
+      "nearestPipeDistancePdfPt": 5.675
+    },
+    {
+      "id": "size-019",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 744.419,
+        "y0": 1203.705,
+        "x1": 756.193,
+        "y1": 1208.346
+      },
+      "writingDirection": {
+        "x": 0.001694,
+        "y": -0.999999
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 198,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-011",
+      "nearestPipeDistancePdfPt": 5.666
+    },
+    {
+      "id": "size-020",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 918.503,
+        "y0": 1171.458,
+        "x1": 923.124,
+        "y1": 1183.223
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 200,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-013",
+      "nearestPipeDistancePdfPt": 5.675
+    },
+    {
+      "id": "size-021",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 677.157,
+        "y0": 1171.458,
+        "x1": 681.779,
+        "y1": 1183.223
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 201,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-012",
+      "nearestPipeDistancePdfPt": 5.675
+    },
+    {
+      "id": "size-022",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 1004.786,
+        "y0": 1206.613,
+        "x1": 1016.552,
+        "y1": 1211.235
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 202,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-014",
+      "nearestPipeDistancePdfPt": 5.675
+    },
+    {
+      "id": "size-023",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 1099.33,
+        "y0": 1171.458,
+        "x1": 1103.952,
+        "y1": 1183.223
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 205,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-015",
+      "nearestPipeDistancePdfPt": 5.675
+    },
+    {
+      "id": "size-024",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 1201.362,
+        "y0": 1232.996,
+        "x1": 1205.983,
+        "y1": 1244.761
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 206,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-016",
+      "nearestPipeDistancePdfPt": 5.261
+    },
+    {
+      "id": "size-025",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 579.53,
+        "y0": 1232.996,
+        "x1": 584.151,
+        "y1": 1244.761
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 206,
+        "lineIndex": 2,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-017",
+      "nearestPipeDistancePdfPt": 5.261
+    },
+    {
+      "id": "size-026",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 583.152,
+        "y0": 1227.696,
+        "x1": 594.918,
+        "y1": 1232.318
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 207,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-018",
+      "nearestPipeDistancePdfPt": 13.891
+    },
+    {
+      "id": "size-027",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 1167.165,
+        "y0": 1237.807,
+        "x1": 1178.93,
+        "y1": 1242.428
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 209,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-019",
+      "nearestPipeDistancePdfPt": 13.891
+    },
+    {
+      "id": "size-028",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 1201.362,
+        "y0": 1180.871,
+        "x1": 1205.984,
+        "y1": 1192.636
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 212,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-020",
+      "nearestPipeDistancePdfPt": 5.261
+    },
+    {
+      "id": "size-029",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 579.53,
+        "y0": 1180.871,
+        "x1": 584.151,
+        "y1": 1192.636
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 212,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-021",
+      "nearestPipeDistancePdfPt": 5.261
+    },
+    {
+      "id": "size-030",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 582.538,
+        "y0": 1555.826,
+        "x1": 593.946,
+        "y1": 1567.028
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.012,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 214,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-022",
+      "nearestPipeDistancePdfPt": 5.734
+    },
+    {
+      "id": "size-031",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 582.538,
+        "y0": 869.22,
+        "x1": 593.946,
+        "y1": 880.422
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.012,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 214,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-023",
+      "nearestPipeDistancePdfPt": 5.734
+    },
+    {
+      "id": "size-032",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 632.579,
+        "y0": 1517.693,
+        "x1": 644.133,
+        "y1": 1529.459
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 218,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-024",
+      "nearestPipeDistancePdfPt": 14.098
+    },
+    {
+      "id": "size-033",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 644.734,
+        "y0": 865.36,
+        "x1": 656.288,
+        "y1": 877.125
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 221,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-025",
+      "nearestPipeDistancePdfPt": 27.332
+    },
+    {
+      "id": "size-034",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 677.993,
+        "y0": 1198.351,
+        "x1": 682.615,
+        "y1": 1210.116
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 230,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-026",
+      "nearestPipeDistancePdfPt": 13.891
+    },
+    {
+      "id": "size-035",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 1091.296,
+        "y0": 1198.351,
+        "x1": 1095.917,
+        "y1": 1210.116
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.263,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 235,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-027",
+      "nearestPipeDistancePdfPt": 13.89
+    },
+    {
+      "id": "size-036",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 703.066,
+        "y0": 1573.838,
+        "x1": 714.228,
+        "y1": 1584.799
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 7.84,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 239,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-028",
+      "nearestPipeDistancePdfPt": 5.633
+    },
+    {
+      "id": "size-037",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 703.066,
+        "y0": 857.656,
+        "x1": 714.228,
+        "y1": 868.618
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 7.84,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 239,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-029",
+      "nearestPipeDistancePdfPt": 5.633
+    },
+    {
+      "id": "size-038",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 797.0,
+        "y0": 1084.502,
+        "x1": 801.385,
+        "y1": 1095.664
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 7.84,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 240,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-058",
+      "nearestPipeDistancePdfPt": 14.055
+    },
+    {
+      "id": "size-039",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1245.743,
+        "y0": 1591.999,
+        "x1": 1257.062,
+        "y1": 1603.115
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 7.951,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 242,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-048",
+      "nearestPipeDistancePdfPt": 29.008
+    },
+    {
+      "id": "size-040",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 992.309,
+        "y0": 1636.623,
+        "x1": 1004.061,
+        "y1": 1641.239
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.255,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 243,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-040",
+      "nearestPipeDistancePdfPt": 22.106
+    },
+    {
+      "id": "size-041",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 971.819,
+        "y0": 1567.03,
+        "x1": 983.585,
+        "y1": 1571.651
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 246,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-030",
+      "nearestPipeDistancePdfPt": 6.088
+    },
+    {
+      "id": "size-042",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 971.819,
+        "y0": 864.597,
+        "x1": 983.585,
+        "y1": 869.218
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 246,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-031",
+      "nearestPipeDistancePdfPt": 6.088
+    },
+    {
+      "id": "size-043",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 891.468,
+        "y0": 816.556,
+        "x1": 896.09,
+        "y1": 828.322
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 248,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-041",
+      "nearestPipeDistancePdfPt": 5.239
+    },
+    {
+      "id": "size-044",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 884.147,
+        "y0": 1586.197,
+        "x1": 888.768,
+        "y1": 1597.962
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 249,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-040",
+      "nearestPipeDistancePdfPt": 26.969
+    },
+    {
+      "id": "size-045",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1003.458,
+        "y0": 807.72,
+        "x1": 1015.012,
+        "y1": 819.485
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 258,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-033",
+      "nearestPipeDistancePdfPt": 14.098
+    },
+    {
+      "id": "size-046",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1027.819,
+        "y0": 1576.973,
+        "x1": 1039.373,
+        "y1": 1588.738
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 263,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-032",
+      "nearestPipeDistancePdfPt": 25.692
+    },
+    {
+      "id": "size-047",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 746.271,
+        "y0": 796.476,
+        "x1": 757.825,
+        "y1": 808.242
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 274,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-037",
+      "nearestPipeDistancePdfPt": 25.341
+    },
+    {
+      "id": "size-048",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 754.353,
+        "y0": 1577.441,
+        "x1": 765.906,
+        "y1": 1589.207
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 279,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-036",
+      "nearestPipeDistancePdfPt": 25.224
+    },
+    {
+      "id": "size-049",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1149.744,
+        "y0": 1588.568,
+        "x1": 1161.298,
+        "y1": 1600.333
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 282,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-038",
+      "nearestPipeDistancePdfPt": 14.097
+    },
+    {
+      "id": "size-050",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1147.834,
+        "y0": 807.72,
+        "x1": 1159.388,
+        "y1": 819.485
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 283,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-039",
+      "nearestPipeDistancePdfPt": 14.098
+    },
+    {
+      "id": "size-051",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 916.251,
+        "y0": 1599.275,
+        "x1": 920.873,
+        "y1": 1611.04
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 303,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-040",
+      "nearestPipeDistancePdfPt": 13.891
+    },
+    {
+      "id": "size-052",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 916.251,
+        "y0": 797.426,
+        "x1": 920.873,
+        "y1": 809.192
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 304,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-041",
+      "nearestPipeDistancePdfPt": 13.891
+    },
+    {
+      "id": "size-053",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 771.965,
+        "y0": 862.376,
+        "x1": 783.728,
+        "y1": 873.928
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.263,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 313,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-043",
+      "nearestPipeDistancePdfPt": 28.134
+    },
+    {
+      "id": "size-054",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 771.028,
+        "y0": 1555.059,
+        "x1": 782.791,
+        "y1": 1566.611
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.263,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 314,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-042",
+      "nearestPipeDistancePdfPt": 29.07
+    },
+    {
+      "id": "size-055",
+      "rawText": "2",
+      "decodedNominalDiameterIn": 2.0,
+      "bboxPdfPt": {
+        "x0": 989.177,
+        "y0": 795.855,
+        "x1": 1000.929,
+        "y1": 800.471
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.255,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 315,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-041",
+      "nearestPipeDistancePdfPt": 20.126
+    },
+    {
+      "id": "size-056",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 949.498,
+        "y0": 1559.212,
+        "x1": 961.269,
+        "y1": 1563.846
+      },
+      "writingDirection": {
+        "x": 0.001053,
+        "y": -0.999999
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 318,
+        "lineIndex": 2,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-044",
+      "nearestPipeDistancePdfPt": 5.261
+    },
+    {
+      "id": "size-057",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 949.498,
+        "y0": 872.403,
+        "x1": 961.269,
+        "y1": 877.036
+      },
+      "writingDirection": {
+        "x": -0.001053,
+        "y": -0.999999
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 318,
+        "lineIndex": 3,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-045",
+      "nearestPipeDistancePdfPt": 5.261
+    },
+    {
+      "id": "size-058",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 818.001,
+        "y0": 1567.344,
+        "x1": 829.769,
+        "y1": 1571.973
+      },
+      "writingDirection": {
+        "x": 0.00058,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 323,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-046",
+      "nearestPipeDistancePdfPt": 5.256
+    },
+    {
+      "id": "size-059",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 818.001,
+        "y0": 873.646,
+        "x1": 829.769,
+        "y1": 878.275
+      },
+      "writingDirection": {
+        "x": -0.00058,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 324,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-047",
+      "nearestPipeDistancePdfPt": 5.261
+    },
+    {
+      "id": "size-060",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 837.596,
+        "y0": 1496.847,
+        "x1": 848.885,
+        "y1": 1508.343
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.000578
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.07,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 335,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-065",
+      "nearestPipeDistancePdfPt": 25.07
+    },
+    {
+      "id": "size-061",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 941.003,
+        "y0": 1499.412,
+        "x1": 945.535,
+        "y1": 1510.939
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": -0.000483
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.095,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 335,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-063",
+      "nearestPipeDistancePdfPt": 24.977
+    },
+    {
+      "id": "size-062",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1295.431,
+        "y0": 1617.818,
+        "x1": 1306.985,
+        "y1": 1629.583
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 344,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-050",
+      "nearestPipeDistancePdfPt": 14.097
+    },
+    {
+      "id": "size-063",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1295.473,
+        "y0": 778.47,
+        "x1": 1307.027,
+        "y1": 790.235
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 345,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-051",
+      "nearestPipeDistancePdfPt": 14.098
+    },
+    {
+      "id": "size-064",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 934.658,
+        "y0": 886.124,
+        "x1": 939.191,
+        "y1": 897.651
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.000483
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.095,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 348,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-064",
+      "nearestPipeDistancePdfPt": 14.205
+    },
+    {
+      "id": "size-065",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1417.952,
+        "y0": 1603.588,
+        "x1": 1429.506,
+        "y1": 1615.353
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 356,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-052",
+      "nearestPipeDistancePdfPt": 28.327
+    },
+    {
+      "id": "size-066",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 839.454,
+        "y0": 888.851,
+        "x1": 850.743,
+        "y1": 900.347
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": -0.000578
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.07,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 359,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-066",
+      "nearestPipeDistancePdfPt": 13.984
+    },
+    {
+      "id": "size-067",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1457.916,
+        "y0": 778.47,
+        "x1": 1469.47,
+        "y1": 790.235
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 362,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-053",
+      "nearestPipeDistancePdfPt": 14.098
+    },
+    {
+      "id": "size-068",
+      "rawText": "2\u00bd",
+      "decodedNominalDiameterIn": 2.5,
+      "bboxPdfPt": {
+        "x0": 1242.167,
+        "y0": 834.057,
+        "x1": 1253.487,
+        "y1": 845.173
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 7.951,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 374,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-049",
+      "nearestPipeDistancePdfPt": 26.43
+    },
+    {
+      "id": "size-069",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 894.075,
+        "y0": 858.144,
+        "x1": 905.843,
+        "y1": 862.772
+      },
+      "writingDirection": {
+        "x": -0.000488,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 377,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-055",
+      "nearestPipeDistancePdfPt": 32.889
+    },
+    {
+      "id": "size-070",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 891.753,
+        "y0": 1553.192,
+        "x1": 903.52,
+        "y1": 1557.82
+      },
+      "writingDirection": {
+        "x": 0.000488,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 379,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-054",
+      "nearestPipeDistancePdfPt": 19.862
+    },
+    {
+      "id": "size-071",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 853.725,
+        "y0": 1563.334,
+        "x1": 865.493,
+        "y1": 1567.963
+      },
+      "writingDirection": {
+        "x": 0.00058,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 385,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-056",
+      "nearestPipeDistancePdfPt": 23.792
+    },
+    {
+      "id": "size-072",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 850.37,
+        "y0": 871.826,
+        "x1": 862.138,
+        "y1": 876.454
+      },
+      "writingDirection": {
+        "x": -0.00058,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 387,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-057",
+      "nearestPipeDistancePdfPt": 23.534
+    },
+    {
+      "id": "size-073",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 832.216,
+        "y0": 1077.711,
+        "x1": 843.981,
+        "y1": 1082.333
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 391,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-058",
+      "nearestPipeDistancePdfPt": 24.116
+    },
+    {
+      "id": "size-074",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 858.38,
+        "y0": 1131.585,
+        "x1": 870.146,
+        "y1": 1136.207
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 394,
+        "lineIndex": 1,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-061",
+      "nearestPipeDistancePdfPt": 25.782
+    },
+    {
+      "id": "size-075",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 1524.601,
+        "y0": 1601.666,
+        "x1": 1536.366,
+        "y1": 1606.287
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 396,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-052",
+      "nearestPipeDistancePdfPt": 33.822
+    },
+    {
+      "id": "size-076",
+      "rawText": "1",
+      "decodedNominalDiameterIn": 1.0,
+      "bboxPdfPt": {
+        "x0": 1544.974,
+        "y0": 1570.903,
+        "x1": 1549.595,
+        "y1": 1582.669
+      },
+      "writingDirection": {
+        "x": 1.0,
+        "y": 0.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 399,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-052",
+      "nearestPipeDistancePdfPt": 61.012
+    },
+    {
+      "id": "size-077",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 852.115,
+        "y0": 1269.919,
+        "x1": 863.88,
+        "y1": 1274.541
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 403,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-062",
+      "nearestPipeDistancePdfPt": 32.048
+    },
+    {
+      "id": "size-078",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 869.859,
+        "y0": 999.526,
+        "x1": 881.624,
+        "y1": 1004.147
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 406,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-060",
+      "nearestPipeDistancePdfPt": 14.304
+    },
+    {
+      "id": "size-079",
+      "rawText": "3",
+      "decodedNominalDiameterIn": 3.0,
+      "bboxPdfPt": {
+        "x0": 869.858,
+        "y0": 1432.1,
+        "x1": 881.624,
+        "y1": 1436.722
+      },
+      "writingDirection": {
+        "x": 0.0,
+        "y": -1.0
+      },
+      "font": "Arial-BoldMT",
+      "fontSizePdfPt": 8.264,
+      "textColor": 0,
+      "sourceTextRef": {
+        "blockIndex": 409,
+        "lineIndex": 0,
+        "spanIndex": 0
+      },
+      "nearestPipeSegmentId": "pipe-067",
+      "nearestPipeDistancePdfPt": 14.304
+    }
+  ],
   "pipeSegments": [
     {
       "id": "pipe-001",

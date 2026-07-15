@@ -1,8 +1,8 @@
 {
   "loop": "proper-pitched-pipe-graph-20260715",
   "stage": "ITERATE",
-  "status": "verified-connected-fp20-source-topology-graph-still-fails-closed",
-  "iteration": 4,
+  "status": "verified-fp20-source-size-labels-edge-assignment-still-fails-closed",
+  "iteration": 5,
   "brainPreflight": {
     "status": "passed",
     "topEpisodes": [148034, 120030, 125723, 124864, 62935]
@@ -58,6 +58,20 @@
         "pipe-066 to pipe-060 at 8.778 PDF points"
       ],
       "broadTenPointSnapAllowed": false
+    },
+    "pipeSizeAnnotations": {
+      "status": "extraction-passed-assignment-not-ready",
+      "annotationCount": 79,
+      "countsByNominalDiameterIn": {
+        "1": 24,
+        "2": 15,
+        "2.5": 27,
+        "3": 12,
+        "4": 1
+      },
+      "sourceSignature": "Arial-BoldMT black text at 7.8 through 8.6 PDF points with exact block line span refs",
+      "fabricationEdgeAssignmentReady": false,
+      "reason": "PDF strokes must be split at sprinklers, intersections, fittings, and size transitions before one nominal size can govern each edge."
     }
   },
   "currentNewHopeAssessment": {
@@ -82,12 +96,16 @@
   },
   "verification": {
     "loopGuard": "passed",
-    "focusedTests": "15 passed across FP2.0 vector extraction and topology, proper pipe graph, adversarial mutations, and actual-PDF proof",
+    "focusedTests": "17 passed across FP2.0 vector, topology, pipe-size extraction, proper pipe graph, adversarial mutations, and actual-PDF proof",
     "productionBuild": "passed Vite build",
     "formalProof": {
       "status": "verified",
       "prover": "Lean 4.13.0 on GX10",
-      "elapsedMs": 76,
+      "elapsedMs": 97,
+      "theorems": [
+        "approvedPipeSizeLabelInventoryCloses",
+        "extractedSizeLabelsDoNotImplyEdgeAssignment"
+      ],
       "receipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-proof.json"
     },
     "browser": {
@@ -97,15 +115,19 @@
       "pipeGraphStatus": "blocked",
       "overlayVectorCount": 67,
       "overlayHeadCount": 68,
+      "overlayPipeSizeLabelCount": 79,
       "approvedUnderlayPixels": "6048x4320",
-      "overlayViewBoxPdfPt": "3024x2160"
+      "overlayViewBoxPdfPt": "3024x2160",
+      "staticVisualProof": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/approved-fp20-pipe-size-overlay.png",
+      "visualInspection": "passed source boxes and decoded labels align with approved plan text; graph remains visibly fail-closed"
     },
     "agenticRules": "passed"
   },
   "brainPostflight": {
-    "status": "passed",
-    "episodeId": 148160,
-    "title": "FP2.0 source topology closes with two explicit masked turns"
+    "status": "blocked",
+    "lastSuccessfulEpisodeId": 148160,
+    "attemptedTitle": "Approved FP2.0 exposes 79 source-bound nominal pipe sizes",
+    "error": "HAL_BRAIN_TOKEN_UNAVAILABLE; GX10 SSH token recovery timed out on 100.116.75.108:22"
   },
   "claims": {
     "properPipeLayoutReady": false,
@@ -115,5 +137,5 @@
     "wholeNetworkReady": false,
     "fieldReleaseReady": false
   },
-  "nextAction": "Promote the 67 accepted source vectors into one snapped topology and bind pipe-role and size labels, hydraulic flow, grade arrows, low-point leaders, drum-drip destinations, fittings, riser feed, hydraulic node labels, and source-derived elevations. Then replay every governed edge through the proper-pipe gate and render the source-bound top, elevation, and 3D views."
+  "nextAction": "Split the connected source topology at sprinklers, intersections, fittings, and size transitions; then assign the 79 source diameters to fabrication edges and bind pipe roles, hydraulic flow, grade arrows, low-point drains, riser feed, hydraulic labels, and source-derived elevations before rendering governed top, elevation, and 3D views."
 }
