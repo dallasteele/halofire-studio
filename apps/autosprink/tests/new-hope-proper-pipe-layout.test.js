@@ -6,6 +6,7 @@ import { evaluateApprovedFp20GovernedSkeleton } from '../src/engine/approved-fp2
 import { bindApprovedFp20HydraulicRouteSet } from '../src/engine/approved-fp20-hydraulic-route-binding.js'
 import { evaluateNewHopeArmOverDrainage } from '../src/engine/new-hope-arm-over-drainage.js'
 import { evaluateNewHopeCentralBranchDrainage } from '../src/engine/new-hope-central-branch-drainage.js'
+import { evaluateNewHopeCmi06VerticalOutlet } from '../src/engine/new-hope-cmi06-vertical-outlet.js'
 import { evaluateNewHopeCrossMainDrainage } from '../src/engine/new-hope-cross-main-drainage.js'
 import { evaluateNewHopeElevationDatum } from '../src/engine/new-hope-elevation-datum.js'
 import { evaluateNewHopeLongBranchDrainage } from '../src/engine/new-hope-long-branch-drainage.js'
@@ -41,6 +42,13 @@ const sourceFeedFabrication = evaluateNewHopeSourceFeedFabrication({
   hydraulicRoutes,
 })
 const lowPointFabrication = evaluateNewHopeLowPointFabrication({
+  canonicalTopology,
+  governedSkeleton,
+  operationalAnnotations,
+  hydraulicRoutes,
+})
+const cmi06VerticalOutlet = evaluateNewHopeCmi06VerticalOutlet({
+  pipeVectors,
   canonicalTopology,
   governedSkeleton,
   operationalAnnotations,
@@ -92,6 +100,7 @@ const inputs = {
   elevationDatum,
   sourceFeedFabrication,
   lowPointFabrication,
+  cmi06VerticalOutlet,
   operationalAnnotations,
   longBranchDrainage,
   sideBranchDrainage,
@@ -122,6 +131,8 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       exactElevationCanonicalNodeCount: 31,
       exactElevationNodeCoverageRatio: 0.21831,
       sameXyVerticalLegCount: 1,
+      sourceBoundFabricationOutletCount: 8,
+      exactVerticalLegCount: 1,
       fieldDrainIntentCount: 2,
     })
     expect(result.undirectedEdges.map((edge) => [edge.edgeId, edge.classification])).toEqual([
@@ -140,6 +151,22 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.sourceFeedConcealedRiserContinuationReady).toBe(false)
     expect(result.lowPointZoneGradeReady).toBe(true)
     expect(result.lowPointExactDifferentialZReady).toBe(false)
+    expect(result.cmi06PieceFabricationReady).toBe(true)
+    expect(result.cmi06OutletScheduleReady).toBe(true)
+    expect(result.cmi06BranchOutletReady).toBe(true)
+    expect(result.head057OutletFittingReady).toBe(true)
+    expect(result.head057VerticalLegReady).toBe(true)
+    expect(result.head057ExactCarrierZReady).toBe(true)
+    expect(result.head057ExactSprinklerZReady).toBe(true)
+    expect(result.boundedVerticalOffsetScheduleReady).toBe(true)
+    expect(result.cmi06VerticalOutlet.exactVerticalLeg).toMatchObject({
+      canonicalNodeId: 'canonical-node-142',
+      sprinklerId: 'head-057',
+      fitting: '3 x 1 threaded outlet',
+      carrierLocalElevationFt: 20.5,
+      sprinklerLocalElevationFt: 21.5,
+      deltaZFt: 1,
+    })
     expect(result.lowPointFabrication.directedEdge).toMatchObject({
       edgeId: 'source-edge-054',
       highNodeId: 'canonical-node-059',
@@ -162,6 +189,7 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       },
     ])
     expect(result.sameXyVerticalLegReady).toBe(true)
+    expect(result.head057VerticalLegReady).toBe(true)
     expect(result.architecturalRegistration).toMatchObject({
       calculationAnchorRangeFt: { min: 11.5, max: 21.5 },
       architecturalProjectAnchorRangeFt: { min: 111.5, max: 121.5 },
@@ -207,6 +235,16 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
   })
 
   it('fails closed when an upstream schedule is absent or a directed edge conflicts', () => {
+    const absentVerticalOutlet = evaluateNewHopeProperPipeLayout({
+      ...inputs,
+      cmi06VerticalOutlet: null,
+    })
+    expect(absentVerticalOutlet.status).toBe('blocked')
+    expect(absentVerticalOutlet.blockerCodes).toContain(
+      'NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED',
+    )
+    expect(absentVerticalOutlet.head057VerticalLegReady).toBe(false)
+
     const absentLowPoint = evaluateNewHopeProperPipeLayout({ ...inputs, lowPointFabrication: null })
     expect(absentLowPoint.status).toBe('blocked')
     expect(absentLowPoint.blockerCodes).toContain('NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED')

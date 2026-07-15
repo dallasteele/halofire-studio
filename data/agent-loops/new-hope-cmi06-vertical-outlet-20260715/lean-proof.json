@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-cmi06-vertical-outlet-20260715/lean-request.json",
+  "theoremNames": [
+    "cmi06FabricationStationClosure",
+    "head057ExactVerticalDelta",
+    "boundedCmi06DoesNotPromoteWholeLayout"
+  ],
+  "claim": "CMI.06's four threaded outlet stations advance by exactly six feet, the grooved branch outlet remains 15 inches after the fourth threaded outlet and six inches before the 21-foot piece end, and the 20.5-foot carrier plus the one-foot vertical leg closes exactly at the 21.5-foot head-057 elevation. This bounded five-outlet and one-vertical-leg proof cannot promote the incomplete whole-system fitting, Z, drain, source-feed, proper-layout, or fabrication gates.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 83,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

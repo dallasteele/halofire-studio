@@ -164,6 +164,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.elevationDatum - Evaluated FP0.1/A102/calculation datum registration.
  * @param {object} inputs.sourceFeedFabrication - Evaluated CML.01 plan/listing/outlet registration.
  * @param {object} inputs.lowPointFabrication - Evaluated CMI.09 low-point/listing/grade registration.
+ * @param {object} inputs.cmi06VerticalOutlet - Evaluated CMI.06 outlet and head-057 vertical leg.
  * @param {object} inputs.operationalAnnotations - Source notes, grades, drains, and details.
  * @param {object} inputs.longBranchDrainage - Long-branch drainage schedule.
  * @param {object} inputs.sideBranchDrainage - Side-branch drainage schedule.
@@ -184,6 +185,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     elevationDatum,
     sourceFeedFabrication,
     lowPointFabrication,
+    cmi06VerticalOutlet,
     operationalAnnotations,
     longBranchDrainage,
     sideBranchDrainage,
@@ -201,6 +203,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     elevationDatum,
     sourceFeedFabrication,
     lowPointFabrication,
+    cmi06VerticalOutlet,
     operationalAnnotations,
   ].map((entry) => entry?.projectId)
   if (projectIds.some((projectId) => projectId !== EXPECTED_PROJECT_ID)) {
@@ -230,6 +233,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['calculation-elevation-datum', elevationDatum?.status],
     ['source-feed-fabrication', sourceFeedFabrication?.status],
     ['low-point-fabrication', lowPointFabrication?.status],
+    ['cmi06-vertical-outlet', cmi06VerticalOutlet?.status],
     ['long-branch-drainage', longBranchDrainage?.status],
     ['side-branch-drainage', sideBranchDrainage?.status],
     ['cross-main-drainage', crossMainDrainage?.status],
@@ -376,7 +380,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',
-      'A complete source-bound fitting and vertical-offset schedule is not yet assembled for every canonical edge.',
+      'CMI.06 and CMI.09 now have source-bound outlet identities, and head-057 has an exact vertical leg; a complete fitting and vertical-offset schedule is still not assembled for every canonical edge.',
     ),
   ]
   const ready = issues.length === 0
@@ -447,6 +451,12 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         ? round(portsByCanonicalNode.size / canonicalTopology.nodes.length)
         : 0,
       sameXyVerticalLegCount: multiElevationNodes.length,
+      sourceBoundFabricationOutletCount:
+        (cmi06VerticalOutlet?.outlets?.length || 0) +
+        (cmi06VerticalOutlet?.branchOutlet ? 1 : 0) +
+        (lowPointFabrication?.piece ? 2 : 0) +
+        (sourceFeedFabrication?.outlet ? 1 : 0),
+      exactVerticalLegCount: cmi06VerticalOutlet?.head057VerticalLegReady ? 1 : 0,
       fieldDrainIntentCount: fieldRouteDrainIntents.length,
     },
     planTopologyReady: ready && canonicalEdges.length === 143,
@@ -472,6 +482,30 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     lowPointZoneGradeReady:
       ready && lowPointFabrication?.lowPointRelativeGradeDirectionReady === true,
     lowPointExactDifferentialZReady: false,
+    cmi06VerticalOutlet: cmi06VerticalOutlet
+      ? {
+          piece: cmi06VerticalOutlet.piece,
+          outlets: cmi06VerticalOutlet.outlets,
+          branchOutlet: cmi06VerticalOutlet.branchOutlet,
+          exactVerticalLeg: cmi06VerticalOutlet.exactVerticalLeg,
+        }
+      : null,
+    cmi06PieceFabricationReady:
+      ready && cmi06VerticalOutlet?.cmi06PieceFabricationReady === true,
+    cmi06OutletScheduleReady:
+      ready && cmi06VerticalOutlet?.cmi06OutletScheduleReady === true,
+    cmi06BranchOutletReady:
+      ready && cmi06VerticalOutlet?.cmi06BranchOutletReady === true,
+    head057OutletFittingReady:
+      ready && cmi06VerticalOutlet?.head057OutletFittingReady === true,
+    head057VerticalLegReady:
+      ready && cmi06VerticalOutlet?.head057VerticalLegReady === true,
+    head057ExactCarrierZReady:
+      ready && cmi06VerticalOutlet?.head057ExactCarrierZReady === true,
+    head057ExactSprinklerZReady:
+      ready && cmi06VerticalOutlet?.head057ExactSprinklerZReady === true,
+    boundedVerticalOffsetScheduleReady:
+      ready && cmi06VerticalOutlet?.boundedVerticalOffsetScheduleReady === true,
     sourceFeedPlanFabricationReady:
       ready && sourceFeedFabrication?.sourceFeedPlanFabricationReady === true,
     sourceFeedOutletTransitionReady:

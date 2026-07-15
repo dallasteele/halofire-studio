@@ -1,0 +1,68 @@
+{
+  "loop": "new-hope-cmi06-vertical-outlet-20260715",
+  "stage": "VERIFY",
+  "status": "verified-ready-for-commit",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "recalledEpisodes": [120030, 126369, 125723, 150048, 145819]
+  },
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "cross-source", "adversarial", "browser", "formal"]
+  },
+  "sourceEvidence": {
+    "fieldSetSha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5",
+    "fabricationListingSha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734",
+    "fieldSheet": "FP2.0",
+    "fieldPhysicalPage": 4,
+    "listingPage": 15,
+    "pieceId": "CMI.06",
+    "sourceSegmentId": "pipe-067",
+    "sourceEdgeIds": ["source-edge-139", "source-edge-140", "source-edge-141", "source-edge-142", "source-edge-143"]
+  },
+  "claims": {
+    "cmi06PieceFabricationReady": true,
+    "cmi06OutletScheduleReady": true,
+    "cmi06BranchOutletReady": true,
+    "head057OutletFittingReady": true,
+    "head057VerticalLegReady": true,
+    "head057ExactCarrierZReady": true,
+    "head057ExactSprinklerZReady": true,
+    "boundedVerticalOffsetScheduleReady": true,
+    "completeFittingScheduleReady": false,
+    "exactWholeSystemZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "measurements": {
+    "pieceNominalDiameterIn": 3,
+    "pieceCutLengthIn": 252,
+    "listedOutletStationsIn": [15, 87, 159, 231],
+    "listedBranchOutletStationIn": 246,
+    "branchOutletCanonicalJunctionResidualIn": 4.001712,
+    "maximumOutletStationResidualIn": 0.985164,
+    "pieceLengthResidualIn": 1.998288,
+    "exactVerticalLegLengthFt": 1,
+    "verticalLegNominalDiameterIn": 1,
+    "carrierLocalElevationFt": 20.5,
+    "sprinklerLocalElevationFt": 21.5,
+    "deltaZFt": 1
+  },
+  "verification": {
+    "focusedTests": "132 passed across 22 New Hope/FP2.0 files",
+    "adversarialCases": 13,
+    "productionBuild": "passed",
+    "browser": "12 of 12 actual PDF images decoded; all CMI.06 gates true; four whole-layout blockers retained; zero console warnings/errors",
+    "formalProof": "verified: Lean 4.13.0, 83 ms, return code 0",
+    "rules": "agent loop guard, agentic rules verifier, JavaScript syntax, JSON parsing, focused-marker scan, and git diff check passed"
+  },
+  "remainingAcceptanceBlockers": [
+    "NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED",
+    "NH_PROPER_PIPE_EXACT_Z_INCOMPLETE",
+    "NH_PROPER_PIPE_FIELD_DRAIN_ROUTES_UNRESOLVED",
+    "NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE"
+  ],
+  "nextAction": "Continue source-binding remaining New Hope fitting and vertical-offset identities, then use exact calculation ports plus source-proved offsets to grow bounded centerline-Z paths without inventing field-routed drains or the concealed riser continuation."
+}

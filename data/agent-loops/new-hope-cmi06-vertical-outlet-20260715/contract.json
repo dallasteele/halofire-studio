@@ -1,0 +1,53 @@
+{
+  "name": "new-hope-cmi06-vertical-outlet-20260715",
+  "owner": "codex",
+  "goal": "Bind the actual New Hope CMI.06 fabrication piece and four upward threaded outlets to the approved plan, then promote only the independently calculated head-057 same-XY vertical leg and exact endpoint elevations.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/10-Field Set/24-052_NHCC_INSTALL PLAN.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
+    "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-pipe-vectors.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-2.json"
+  ],
+  "exit_criteria": [
+    "CMI.06 remains the source-bound 3-inch, 21-foot pipe-067 piece from canonical node 137 to 138",
+    "all four 3 x 1 threaded outlets retain Up:0 orientation, exact listing stations, and the matching plan sprinkler identities",
+    "plan stations and the full piece length reconcile to the listing within a declared bounded PDF tolerance",
+    "RA2-2 nodes 50 and 718 remain coincident at canonical node 142 and prove exactly one 1-foot 1-inch vertical leg",
+    "head-057 retains exact carrier local Z 20.5 feet and sprinkler local Z 21.5 feet",
+    "unproven outlet drops, whole-system fittings, whole-system centerline Z, field drains, fabrication, and release remain fail-closed",
+    "focused and adversarial tests, production build, PDF visual proof, browser proof, rules guard, formal invariant, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "protected source hash replay",
+    "field-plan to fabrication-listing station reconciliation",
+    "approved RA2-2 same-XY vertical-leg replay",
+    "adversarial source, piece, topology, station, fitting, orientation, calculation, Z, and sprinkler mutations",
+    "focused Vitest regression and AutoSprink production build",
+    "actual PDF visual and browser proof",
+    "Lean formal invariant receipt",
+    "agentic rules and brain postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-cmi06-vertical-outlet-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/new-hope-cmi06-vertical-outlet.js",
+    "apps/autosprink/tests/new-hope-cmi06-vertical-outlet.test.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js",
+    "apps/autosprink/tests/new-hope-proper-pipe-layout.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/field-cmi06-vertical-outlet.png",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/listing-cmi06-vertical-outlet.png",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "data/agent-loops/new-hope-cmi06-vertical-outlet-20260715/lean-proof.json",
+    "data/agent-loops/new-hope-cmi06-vertical-outlet-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 120000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

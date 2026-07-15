@@ -120,6 +120,52 @@
         "sourceEvidence": "Field-set FP2.0 labels CMI.09 as 2-1/2 inch by 5 feet 4-1/2 inches from the LOW POINT TIE IN DRAIN, with a 2-1/2 x 2 grooved outlet at 0 feet 7 inches and a 2-1/2 x 3/4 threaded outlet at cumulative 2 feet 10 inches; listing page 15 identifies their orientations as Toward:87 and Up:0."
       }
     ],
+    "verticalOutletBindings": [
+      {
+        "id": "cmi06-head057-vertical",
+        "lineName": "CMI",
+        "pieceId": "CMI.06",
+        "systemRole": "cross-main",
+        "nominalDiameterIn": 3,
+        "cutLengthIn": 252,
+        "fabricationListingPage": 15,
+        "sourceSegmentId": "pipe-067",
+        "sourceEdgeIds": ["source-edge-139", "source-edge-140", "source-edge-141", "source-edge-142", "source-edge-143"],
+        "pieceStartCanonicalNodeId": "canonical-node-137",
+        "pieceFarEndCanonicalNodeId": "canonical-node-138",
+        "outlets": [
+          {"canonicalNodeId": "canonical-node-139", "sprinklerId": "head-064", "fromPieceStartIn": 15, "fitting": "3 x 1 threaded outlet", "orientation": "up-0-degrees"},
+          {"canonicalNodeId": "canonical-node-140", "sprinklerId": "head-063", "fromPieceStartIn": 87, "fitting": "3 x 1 threaded outlet", "orientation": "up-0-degrees"},
+          {"canonicalNodeId": "canonical-node-141", "sprinklerId": "head-058", "fromPieceStartIn": 159, "fitting": "3 x 1 threaded outlet", "orientation": "up-0-degrees"},
+          {"canonicalNodeId": "canonical-node-142", "sprinklerId": "head-057", "fromPieceStartIn": 231, "fitting": "3 x 1 threaded outlet", "orientation": "up-0-degrees"}
+        ],
+        "branchOutlet": {
+          "canonicalNodeId": "canonical-node-138",
+          "fromPieceStartIn": 246,
+          "fitting": "3 x 2-1/2 grooved outlet",
+          "orientation": "toward-90-degrees",
+          "downstreamSourceSegmentId": "pipe-065",
+          "farEndContinuationSourceSegmentId": "pipe-063",
+          "toPieceFarEndIn": 6,
+          "maximumCanonicalJunctionResidualIn": 5
+        },
+        "exactVerticalLeg": {
+          "canonicalNodeId": "canonical-node-142",
+          "sprinklerId": "head-057",
+          "carrierCalculationNodeId": "50",
+          "sprinklerCalculationNodeId": "718",
+          "carrierLocalElevationFt": 20.5,
+          "sprinklerLocalElevationFt": 21.5,
+          "lengthFt": 1,
+          "nominalDiameterIn": 1,
+          "actualDiameterIn": 1.049,
+          "fittingEquivalentLengthFt": 3.583333,
+          "pathKind": "vertical-at-canonical-node"
+        },
+        "maximumPlanStationResidualIn": 2.1,
+        "sourceEvidence": "Field-set FP2.0 labels the pipe-067 run as CMI.06, 3 inch by 21 feet. Listing page 15 places four 3 x 1 threaded outlets Up:0 at cumulative stations 1 foot 3 inches, 7 feet 3 inches, 13 feet 3 inches, and 19 feet 3 inches, followed by a 3 x 2-1/2 grooved outlet Toward:90 at 20 feet 6 inches and 6 inches of pipe to the far end. Approved RA2-2 calculation nodes 50 and 718 share the final sprinkler plan point and prove a one-foot 1-inch vertical leg from local elevation 20.5 feet to head-057 at 21.5 feet."
+      }
+    ],
     "separatedCrossings": [
       {
         "canonicalNodeId": "canonical-node-022",
