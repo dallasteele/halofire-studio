@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   auditExposedSlopeSourceRegistration,
+  auditSourceProtectionEligibility,
   auditSourceTopologyCompleteness,
   buildSourceTopologyPlacementCandidate,
 } from '../src/engine/source-topology-placement-policy.js';
@@ -109,5 +110,42 @@ describe('transferable source-topology placement policy v2', () => {
     };
     expect(auditExposedSlopeSourceRegistration(packet)).toMatchObject({ status: 'blocked', issues: [{ code: 'SOURCE_EXPOSED_SLOPE_REGISTRATION_MISSING', sourceVolumeId: 'cross-registered-plane' }] });
     await expect(buildSourceTopologyPlacementCandidate(packet)).rejects.toThrow('SOURCE_EXPOSED_SLOPE_REGISTRATION_BLOCKED');
+  });
+
+  it('requires a source-declared protected floor intersection before roof-derived placement', async () => {
+    const volume = rectangle('eligible-slope', 10, 10, 30, 20, {
+      sourcePages: ['A1.1', 'A5.1', 'A6.1', 'A8.1'],
+      slopeAxis: 'x', slopeDirection: 1, lowEdgeCoordinateFt: 10, lowEdgeDatumZFt: 12, slopeRise: 1, slopeRun: 12,
+      protectionEligibility: { status: 'source-declared-protected', sourceFootprintIds: ['occupied-level-2'], sourcePages: ['A1.1'] },
+      sourceRegistration: {
+        featureId: 'eligible-slope',
+        plan: { page: 'A5.1', sourceFeatureId: 'eligible-slope', widthFt: 20, heightFt: 10, pdfBoundsPt: { x: 100, y: 100, width: 200, height: 100 }, pdfToLocalFtTransform: [0.1, 0, 0, 0.1, 0, 0] },
+        roof: { page: 'A5.1', sourceFeatureId: 'eligible-slope', slopeRise: 1, slopeRun: 12 },
+        rcp: { page: 'A6.1', sourceFeatureId: 'eligible-slope', ceilingRegime: 'open to structure' },
+        section: { page: 'A8.1', sourceFeatureId: 'eligible-slope', slopeRise: 1, slopeRun: 12, lowEdgeDatumZFt: 12 },
+      },
+    });
+    const packet = {
+      candidateIdPrefix: 'ELIGIBLE',
+      placementPolicy: { maxAreaSqFt: 130, maxSpacingFt: 15, minSpacingFt: 6 },
+      protectionEligibilityPolicy: { enforceSourceDeclaredFootprintIntersection: true },
+      sourceProtectedFloorFootprints: [rectangle('occupied-level-2', 0, 0, 25, 25, { sourcePage: 'A1.1', sourceDeclaration: 'occupied floor area' })],
+      finishedCeilingRooms: [], pitchedConcealedVolumes: [], exposedSlopedCeilingVolumes: [volume],
+    };
+    expect(auditSourceProtectionEligibility(packet)).toEqual({ status: 'passed', issues: [], eligibleVolumeIds: ['eligible-slope'], matchedFootprintIds: ['occupied-level-2'] });
+    await expect(buildSourceTopologyPlacementCandidate(packet)).resolves.toMatchObject({
+      counts: { total: 2, unresolved: 2 },
+      protectionEligibilityAudit: { status: 'passed', eligibleVolumeIds: ['eligible-slope'] },
+    });
+
+    const missingDeclaration = structuredClone(packet);
+    missingDeclaration.exposedSlopedCeilingVolumes[0].protectionEligibility.status = 'not-source-declared';
+    expect(auditSourceProtectionEligibility(missingDeclaration)).toMatchObject({ status: 'blocked', issues: [{ code: 'SOURCE_PROTECTION_ELIGIBILITY_DECLARATION_MISSING', sourceVolumeId: 'eligible-slope' }] });
+    await expect(buildSourceTopologyPlacementCandidate(missingDeclaration)).rejects.toThrow('SOURCE_PROTECTION_ELIGIBILITY_BLOCKED');
+
+    const nonIntersecting = structuredClone(packet);
+    nonIntersecting.sourceProtectedFloorFootprints[0].verticesFt = rectangle('far', 100, 100, 110, 110).verticesFt;
+    expect(auditSourceProtectionEligibility(nonIntersecting)).toMatchObject({ status: 'blocked', issues: [{ code: 'SOURCE_PROTECTION_FOOTPRINT_INTERSECTION_MISSING', sourceVolumeId: 'eligible-slope' }] });
+    await expect(buildSourceTopologyPlacementCandidate(nonIntersecting)).rejects.toThrow('SOURCE_PROTECTION_ELIGIBILITY_BLOCKED');
   });
 });

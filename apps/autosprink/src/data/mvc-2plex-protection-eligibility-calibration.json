@@ -1,0 +1,56 @@
+{
+  "artifactType": "halofire.answer-exposed-protection-eligibility-calibration.v1",
+  "projectId": "mvc-2plex-heber-city-ut",
+  "boundedScope": "Third-level grid C-D / 10-12 barrel-roof bay",
+  "sourceReceiptSha256": "88859b6d1092c4dd0a8afda7cb39413fac67970f28398ff8bf4563fc4783d9f4",
+  "frozenCandidateReceiptSha256": "45d97d683be74d15d19c08b5f4c9713f4f4af89c857d86c472860c8afbb7d762",
+  "answerEvidenceReceiptSha256": "17f8407f49cd9ac7354e62b2bf3e9e1331307cfd3a186ada996fb0c9f0ea093b",
+  "failedHoldoutScoreReceiptSha256": "8533a26367b661b3533232c59b95b9365bb0f27e46c80b259d6fc0573669edf4",
+  "calibrationStatus": "answer-exposed-not-fresh-holdout",
+  "sourceDecision": {
+    "geometryFeatureVerified": true,
+    "occupiedOrProtectedFloorDeclarationFound": false,
+    "intersectingProtectedFootprintCount": 0,
+    "eligibleForTargetGeneration": false
+  },
+  "protectionEligibilityAudit": {
+    "status": "blocked",
+    "issues": [
+      {
+        "code": "SOURCE_PROTECTION_ELIGIBILITY_DECLARATION_MISSING",
+        "sourceVolumeId": "third-level-c-d-10-12-barrel-bay"
+      }
+    ],
+    "eligibleVolumeIds": [],
+    "matchedFootprintIds": []
+  },
+  "replay": {
+    "frozenCandidateTargetCount": 2,
+    "excludedTargetCount": 2,
+    "calibratedTargetCount": 0,
+    "targets": []
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic source-declared footprint eligibility replay"
+    },
+    "crossSource": {
+      "status": "passed",
+      "method": "A107 floor plan checked against A109/A110/A302/S1.3 roof feature registration"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "eligibility, target-count, receipt, acceptance, and production-claim mutations rejected"
+    }
+  },
+  "freshProjectPlacementVerified": false,
+  "exactHeadElevationReady": false,
+  "obstructionClearanceReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "mvc-answer-exposed-calibration-now-fails-closed-before-target-generation-fourth-fresh-holdout-required",
+  "receiptSha256": "022d10157375bd285e6d7ddeaa5ca8b352f4a415d882acf02ac62b973ac6c986"
+}

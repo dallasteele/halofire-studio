@@ -15,6 +15,43 @@ function polygonVertices(entry) {
   return entry.verticesFt.map(({ x, y }) => [Number(x), Number(y)]);
 }
 
+function orientation(a, b, c) {
+  const cross = (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+  if (Math.abs(cross) <= 1e-9) return 0;
+  return cross > 0 ? 1 : -1;
+}
+
+function onSegment(a, b, point) {
+  return point[0] >= Math.min(a[0], b[0]) - 1e-9
+    && point[0] <= Math.max(a[0], b[0]) + 1e-9
+    && point[1] >= Math.min(a[1], b[1]) - 1e-9
+    && point[1] <= Math.max(a[1], b[1]) + 1e-9;
+}
+
+function segmentsIntersect(a, b, c, d) {
+  const abC = orientation(a, b, c);
+  const abD = orientation(a, b, d);
+  const cdA = orientation(c, d, a);
+  const cdB = orientation(c, d, b);
+  if (abC !== abD && cdA !== cdB) return true;
+  return (abC === 0 && onSegment(a, b, c))
+    || (abD === 0 && onSegment(a, b, d))
+    || (cdA === 0 && onSegment(c, d, a))
+    || (cdB === 0 && onSegment(c, d, b));
+}
+
+function polygonsIntersect(left, right) {
+  if (left.some((point) => pointInPolygon(point, right)) || right.some((point) => pointInPolygon(point, left))) return true;
+  for (let leftIndex = 0; leftIndex < left.length; leftIndex += 1) {
+    const leftNext = (leftIndex + 1) % left.length;
+    for (let rightIndex = 0; rightIndex < right.length; rightIndex += 1) {
+      const rightNext = (rightIndex + 1) % right.length;
+      if (segmentsIntersect(left[leftIndex], left[leftNext], right[rightIndex], right[rightNext])) return true;
+    }
+  }
+  return false;
+}
+
 function rectangularGrid(entry, policy) {
   const vertices = polygonVertices(entry);
   const bounds = boundingBox(vertices);
@@ -148,12 +185,72 @@ export function auditSourceTopologyCompleteness(packet) {
   };
 }
 
+/**
+ * A roof, RCP, or section feature proves geometry, not that the projected area
+ * is occupied or sprinkler protected. When enabled, every roof-derived volume
+ * must bind to a source-declared floor footprint and geometrically intersect it
+ * before the placement policy may emit targets.
+ */
+export function auditSourceProtectionEligibility(packet) {
+  const enforcement = packet.protectionEligibilityPolicy?.enforceSourceDeclaredFootprintIntersection === true;
+  if (!enforcement) return { status: 'not-enforced', issues: [], eligibleVolumeIds: [], matchedFootprintIds: [] };
+  const footprints = new Map((packet.sourceProtectedFloorFootprints || []).map((footprint) => [footprint.id, footprint]));
+  const volumes = [
+    ...(packet.pitchedConcealedVolumes || []),
+    ...(packet.exposedSlopedCeilingVolumes || []),
+    ...(packet.curvedCeilingVolumes || []),
+  ];
+  const issues = [];
+  const eligibleVolumeIds = [];
+  const matchedFootprintIds = new Set();
+  for (const volume of volumes) {
+    const binding = volume.protectionEligibility;
+    if (binding?.status !== 'source-declared-protected' || !Array.isArray(binding?.sourceFootprintIds) || !binding.sourceFootprintIds.length) {
+      issues.push({ code: 'SOURCE_PROTECTION_ELIGIBILITY_DECLARATION_MISSING', sourceVolumeId: volume.id });
+      continue;
+    }
+    const volumePolygon = Array.isArray(volume.verticesFt) && volume.verticesFt.length >= 3 ? polygonVertices(volume) : null;
+    const matched = [];
+    for (const footprintId of binding.sourceFootprintIds) {
+      const footprint = footprints.get(footprintId);
+      const validFootprint = footprint
+        && typeof footprint.sourcePage === 'string'
+        && footprint.sourcePage.trim()
+        && typeof footprint.sourceDeclaration === 'string'
+        && footprint.sourceDeclaration.trim()
+        && Array.isArray(footprint.verticesFt)
+        && footprint.verticesFt.length >= 3;
+      if (!validFootprint) {
+        issues.push({ code: 'SOURCE_PROTECTION_FOOTPRINT_INVALID', sourceVolumeId: volume.id, sourceFootprintId: footprintId });
+        continue;
+      }
+      const sourcePagesBound = Array.isArray(binding.sourcePages)
+        && binding.sourcePages.includes(footprint.sourcePage)
+        && volume.sourcePages?.includes(footprint.sourcePage);
+      if (!sourcePagesBound) {
+        issues.push({ code: 'SOURCE_PROTECTION_FOOTPRINT_SOURCE_BINDING_INVALID', sourceVolumeId: volume.id, sourceFootprintId: footprintId });
+        continue;
+      }
+      if (volumePolygon && polygonsIntersect(volumePolygon, polygonVertices(footprint))) matched.push(footprintId);
+    }
+    if (!volumePolygon || !matched.length) {
+      issues.push({ code: 'SOURCE_PROTECTION_FOOTPRINT_INTERSECTION_MISSING', sourceVolumeId: volume.id });
+      continue;
+    }
+    eligibleVolumeIds.push(volume.id);
+    matched.forEach((id) => matchedFootprintIds.add(id));
+  }
+  return { status: issues.length ? 'blocked' : 'passed', issues, eligibleVolumeIds, matchedFootprintIds: [...matchedFootprintIds] };
+}
+
 /** Apply a frozen spacing/area policy to a normalized protected-source packet. */
 export async function buildSourceTopologyPlacementCandidate(packet, options = {}) {
   const topologyCompletenessAudit = auditSourceTopologyCompleteness(packet);
   if (topologyCompletenessAudit.status === 'blocked') throw new Error('SOURCE_TOPOLOGY_COMPLETENESS_BLOCKED');
   const exposedSlopeRegistrationAudit = auditExposedSlopeSourceRegistration(packet);
   if (exposedSlopeRegistrationAudit.status === 'blocked' && options.allowLegacyUnregisteredExposedSlope !== true) throw new Error('SOURCE_EXPOSED_SLOPE_REGISTRATION_BLOCKED');
+  const protectionEligibilityAudit = auditSourceProtectionEligibility(packet);
+  if (protectionEligibilityAudit.status === 'blocked') throw new Error('SOURCE_PROTECTION_ELIGIBILITY_BLOCKED');
   const heads = [];
   const roomAudit = [];
   const roofAudit = [];
@@ -275,6 +372,7 @@ export async function buildSourceTopologyPlacementCandidate(packet, options = {}
     topologyCompletenessAudit,
     policyReceiptSha256: await sha256Hex(packet.placementPolicy),
   };
+  if (protectionEligibilityAudit.status !== 'not-enforced') result.protectionEligibilityAudit = protectionEligibilityAudit;
   if ((packet.exposedSlopedCeilingVolumes || []).length) {
     result.exposedSlopedAudit = exposedSlopedAudit;
     result.counts.unresolved = heads.filter((head) => head.kind === 'orientation-unresolved').length;
