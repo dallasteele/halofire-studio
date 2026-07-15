@@ -21,7 +21,7 @@ reference log entries by date; log entries reference commits by short hash.
 
 ## 2026-07-15
 
-### Entry 02 - Building J protected-source topology inventory (commit pending)
+### Entry 02 - Building J protected-source topology inventory (commit `e554eb52`)
 
 - Extracted 13 room-zone polygons, 105 wall-material polygons, 23 embedded
   door openings, and 11 explicit `O.T.S.` labels from the protected floor DWG
@@ -47,6 +47,8 @@ reference log entries by date; log entries reference commits by short hash.
   does not replace the passing product build. GX10 port 8810 was unreachable
   and local Lean is not installed, so the exact theorem and fail-closed formal
   receipt are retained.
+- Obsidian brain preflight and postflight were both attempted. Each failed
+  closed with `HAL_BRAIN_TOKEN_UNAVAILABLE`; no recall or writeback is claimed.
 - Next: consume the sanitized topology in v2 placement, align candidates to
   source framing evidence without treating label points as exact obstruction
   geometry, then seal before running the unchanged answer-only scorer.

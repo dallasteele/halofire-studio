@@ -71,8 +71,10 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "implementationCommit": null,
+  "implementationCommit": "e554eb52",
   "brainPreflightStatus": "HAL_BRAIN_TOKEN_UNAVAILABLE",
   "brainPostflightEpisodeId": null,
+  "brainPostflightStatus": "HAL_BRAIN_TOKEN_UNAVAILABLE",
+  "brainPostflightDetail": "set HAL_BRAIN_TOKEN, HAL_BRAIN_TOKEN_FILE, or ensure /opt/hal9000/state/hal-brain/data/.token is reachable on GX10",
   "nextAction": "consume this sanitized topology in a v2 generator, align open-structure candidates to source framing axes without treating label points as exact obstruction footprints, seal before answer access, and run the unchanged scorer"
 }
