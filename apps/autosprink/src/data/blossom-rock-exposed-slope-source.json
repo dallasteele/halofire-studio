@@ -1,0 +1,57 @@
+{
+  "artifactType": "halofire.blossom-rock-exposed-slope-source.v1",
+  "projectId": "blossom-rock-pool-pavilion-apache-junction-az",
+  "projectName": "Blossom Rock Pool Pavilion - Apache Junction AZ",
+  "boundedScope": "Lake Pump Room exposed single-slope protection plane",
+  "sealedAt": "2026-07-15T08:15:00Z",
+  "corpusRoot": "Y:\\Shared\\HaloOps\\02-Active jobs\\Red Rock\\Blossom Rock Pool Pavilion - Apache Junction AZ",
+  "selection": {
+    "status": "source-sealed-answer-unopened-and-unhashed",
+    "priorImplementationSearchHits": 0,
+    "reason": "Independent architectural floor, roof, RCP, elevation, section, structural framing, and mechanical sheets close a real exposed 1/4-inch-per-foot protection plane; completed approved fire plans exist separately."
+  },
+  "protectedSources": [
+    { "role": "architectural-floor-notation", "path": "1-Bid Documents\\Bid Documents\\Bid_Drawings\\Current\\Architectural\\A3.1-FLOOR-PLAN---NOTATION-Rev.0.pdf", "bytes": 939684, "sha256": "32c751100f51241b5bb24524806b9fdc2f9646f56ef0525e247a574e0956ac97" },
+    { "role": "architectural-floor-dimension", "path": "1-Bid Documents\\Bid Documents\\Bid_Drawings\\Current\\Architectural\\A3.2-FLOOR-PLAN---DIMENSION-Rev.0.pdf", "bytes": 957212, "sha256": "2db70b398eca43244e5e0a44e3f773a03def39b449a9d20c94f618082dfe4b84" },
+    { "role": "architectural-roof-plan", "path": "1-Bid Documents\\Bid Documents\\Bid_Drawings\\Current\\Architectural\\A5.1-ROOF-PLAN-Rev.0.pdf", "bytes": 884442, "sha256": "1f998ad75557402e6b17010cc6febbdf5da105ede5a7a012ddc9f4726826aff1" },
+    { "role": "architectural-rcp", "path": "1-Bid Documents\\Bid Documents\\Bid_Drawings\\Current\\Architectural\\A6.1-REFLECTED-CEILING-PLAN-Rev.0.pdf", "bytes": 877931, "sha256": "93dde254758ec42a612b935f2bd6e351106a99f452e1c7f092b518b78bb04b55" },
+    { "role": "architectural-elevations", "path": "1-Bid Documents\\Bid Documents\\Bid_Drawings\\Current\\Architectural\\A7.1-EXTERIOR-ELEVATIONS---B&W-Rev.0.pdf", "bytes": 1756483, "sha256": "81be9c87e510ec2c63f074bd9276c19f45853a11cce0b4a6a511fc895f23f68e" },
+    { "role": "architectural-sections", "path": "1-Bid Documents\\Bid Documents\\Bid_Drawings\\Current\\Architectural\\A8.1-BUILDING-SECTIONS-Rev.0.pdf", "bytes": 1148283, "sha256": "38a1838e4092bc89d43952d48b807a275ae9bb7a6660251c6b5b9695f579fe70" },
+    { "role": "structural-roof-framing", "path": "1-Bid Documents\\Bid Documents\\Bid_Drawings\\Current\\Structural\\S2.2-LOW-AND-HIGH-ROOF-FRAMING-PLAN-Rev.0.pdf", "bytes": 1036679, "sha256": "95e2e3575f3cb91c620290f059c1ed1c0dbf4f2d44e770f9bdc96846bf077594" },
+    { "role": "mechanical-floor-plan", "path": "1-Bid Documents\\Bid Documents\\Bid_Drawings\\Current\\Mechanical\\M2.0-MECHANICAL-FLOOR-PLAN-Rev.0.pdf", "bytes": 1583941, "sha256": "2c650271037a18ffcd8df810db026889b8b7e7803eb25077078c38a18e91fe96" }
+  ],
+  "answerKeyDenylist": [
+    { "role": "approved-fire-plan", "path": "2-Internal Ops\\01-Design\\08-AHJ Approval DWG & Permit\\Blossom Rock-Pool Pavilion_Approved Fire Plans.pdf", "bytes": 2829351, "sha256": null, "openedBeforeSourceSeal": false, "hashedBeforeSourceSeal": false }
+  ],
+  "sourceSequence": { "answerArtifactRead": false, "answerArtifactHashed": false, "completedLayoutRead": false, "sprinklerSymbolsConsumed": false },
+  "sourceObservations": {
+    "sheetScale": "1/8 inch = 1 foot",
+    "planDimensions": { "widthFt": 29.416667, "depthFt": 14 },
+    "slope": { "riseIn": 0.25, "runIn": 12, "source": "A5.1 and A8.1" },
+    "lowProtectionPlaneDatumZFt": 13.677083,
+    "lowProtectionPlaneDatumSource": "A8.1 T.O. PURLINS AT ROOF 1 equals 13 feet 8 1/8 inches",
+    "ceilingRegime": "A6.1 OPEN TO STRUCTURE with purlins and beams per structural",
+    "scopeExclusions": ["whole-building head layout", "finished-ceiling rooms", "outdoor open-to-below gathering area", "sprinkler orientation", "mechanical and structural obstruction clearance"]
+  },
+  "candidateIdPrefix": "BLOSSOM",
+  "placementPolicy": { "maxAreaSqFt": 130, "maxSpacingFt": 15, "minSpacingFt": 6, "status": "frozen empirical transfer policy only, not a code limit or compliance determination" },
+  "exposedSlopedPlacementPolicy": { "maxAreaSqFt": 130, "maxSpacingFt": 15 },
+  "finishedCeilingRooms": [],
+  "pitchedConcealedVolumes": [],
+  "exposedSlopedCeilingVolumes": [
+    {
+      "id": "lake-pump-room-exposed-single-slope",
+      "verticesFt": [{ "x": 0, "y": 0 }, { "x": 29.416667, "y": 0 }, { "x": 29.416667, "y": 14 }, { "x": 0, "y": 14 }],
+      "sourcePages": ["A3.2", "A5.1", "A6.1", "A7.1", "A8.1", "S2.2", "M2.0"],
+      "slopeAxis": "x",
+      "slopeDirection": 1,
+      "lowEdgeCoordinateFt": 0,
+      "lowEdgeDatumZFt": 13.677083,
+      "slopeRise": 0.25,
+      "slopeRun": 12,
+      "targetKind": "orientation-unresolved"
+    }
+  ],
+  "claims": { "sourceGeneratedCandidateReady": false, "freshProjectPlacementVerified": false, "wholeBuildingLayoutReady": false, "hydraulicCalculationReady": false, "complianceReady": false, "fabricationReady": false, "fieldReleaseReady": false },
+  "sourceReceiptSha256": "a2790b9eddc9b8b808bc63653743af6082177c00e89bd5d10285b5e902a2055e"
+}

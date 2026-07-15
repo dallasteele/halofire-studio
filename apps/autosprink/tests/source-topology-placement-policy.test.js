@@ -58,4 +58,32 @@ describe('transferable source-topology placement policy v2', () => {
     packet.pitchedConcealedVolumes = packet.pitchedConcealedVolumes.filter((volume) => volume.id !== 'connector-attic');
     await expect(buildSourceTopologyPlacementCandidate(packet)).rejects.toThrow('SOURCE_TOPOLOGY_COMPLETENESS_BLOCKED');
   });
+
+  it('places source-only targets on an exposed single-slope plane without inventing sprinkler orientation', async () => {
+    const packet = {
+      candidateIdPrefix: 'EXPOSED',
+      placementPolicy: { maxAreaSqFt: 130, maxSpacingFt: 15, minSpacingFt: 6 },
+      exposedSlopedPlacementPolicy: { maxAreaSqFt: 130, maxSpacingFt: 15 },
+      finishedCeilingRooms: [],
+      pitchedConcealedVolumes: [],
+      exposedSlopedCeilingVolumes: [
+        rectangle('mono-slope', 0, 0, 30, 20, {
+          sourcePages: ['A5.1', 'A6.1', 'A8.1'],
+          slopeAxis: 'y',
+          slopeDirection: 1,
+          lowEdgeCoordinateFt: 0,
+          lowEdgeDatumZFt: 10,
+          slopeRise: 1.5,
+          slopeRun: 12,
+        }),
+      ],
+    };
+    const result = await buildSourceTopologyPlacementCandidate(packet);
+    expect(result.counts).toEqual({ total: 6, pendent: 0, upright: 0, unresolved: 6 });
+    expect(result.exposedSlopedAudit).toEqual([
+      expect.objectContaining({ sourceVolumeId: 'mono-slope', columns: 3, rows: 2, targetKind: 'orientation-unresolved', candidateIds: expect.arrayContaining(['EXPOSED-S-001', 'EXPOSED-S-006']) }),
+    ]);
+    expect(result.heads.map((head) => head.sourceProtectionPlaneZFt)).toEqual([10.625, 10.625, 10.625, 11.875, 11.875, 11.875]);
+    expect(result.heads.every((head) => head.headInstallationZFt === null && head.sprinklerModel === null && head.obstructionClearanceVerified === false)).toBe(true);
+  });
 });

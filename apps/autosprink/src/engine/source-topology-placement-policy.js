@@ -50,6 +50,13 @@ function roofTargetZ(volume, point) {
   return round(volume.eaveDatumZFt + Math.max(0, rise - distance * volume.slopeRise / volume.slopeRun));
 }
 
+function exposedSlopeTargetZ(volume, point) {
+  const coordinate = volume.slopeAxis === 'x' ? point.x : point.y;
+  const direction = volume.slopeDirection === -1 ? -1 : 1;
+  const runFromLowEdgeFt = Math.max(0, (coordinate - volume.lowEdgeCoordinateFt) * direction);
+  return round(volume.lowEdgeDatumZFt + runFromLowEdgeFt * volume.slopeRise / volume.slopeRun);
+}
+
 /**
  * Fail closed when a v2 packet leaves a finished-ceiling component without a
  * declared concealed-volume relationship. This catches connector, vestibule,
@@ -89,6 +96,7 @@ export async function buildSourceTopologyPlacementCandidate(packet) {
   const heads = [];
   const roomAudit = [];
   const roofAudit = [];
+  const exposedSlopedAudit = [];
   for (const room of packet.finishedCeilingRooms) {
     const grid = rectangularGrid(room, packet.placementPolicy);
     const candidateIds = [];
@@ -140,7 +148,54 @@ export async function buildSourceTopologyPlacementCandidate(packet) {
     if (topologyCompletenessAudit.status !== 'not-enforced') Object.assign(audit, { coveredFinishedRoomIds: volume.coveredFinishedRoomIds || [], maxAreaSqFt: concealedPolicy.maxAreaSqFt, maxSpacingFt: concealedPolicy.maxSpacingFt });
     roofAudit.push(audit);
   }
-  return {
+  for (const volume of packet.exposedSlopedCeilingVolumes || []) {
+    const exposedPolicy = {
+      ...packet.placementPolicy,
+      maxAreaSqFt: volume.maxAreaSqFt ?? packet.exposedSlopedPlacementPolicy?.maxAreaSqFt ?? packet.placementPolicy.maxAreaSqFt,
+      maxSpacingFt: volume.maxSpacingFt ?? packet.exposedSlopedPlacementPolicy?.maxSpacingFt ?? packet.placementPolicy.maxSpacingFt,
+    };
+    const grid = rectangularGrid(volume, exposedPolicy);
+    const candidateIds = [];
+    for (const point of grid.points) {
+      const id = `${packet.candidateIdPrefix}-S-${String(heads.filter((head) => head.sourceProtectionRegime === 'exposed-sloped-source-protection-target').length + 1).padStart(3, '0')}`;
+      candidateIds.push(id);
+      heads.push({
+        id,
+        kind: volume.targetKind || 'orientation-unresolved',
+        localFt: { x: point.x, y: point.y },
+        sourceProtectionRegime: 'exposed-sloped-source-protection-target',
+        sourceProtectionPlaneId: volume.id,
+        sourceProtectionPlaneZFt: exposedSlopeTargetZ(volume, point),
+        headInstallationZFt: null,
+        sprinklerModel: null,
+        sourceDerivation: {
+          method: 'source-exposed-single-slope-centered-policy-grid',
+          sourceVolumeId: volume.id,
+          slopeAxis: volume.slopeAxis,
+          slopeDirection: volume.slopeDirection === -1 ? -1 : 1,
+          slope: `${volume.slopeRise}:${volume.slopeRun}`,
+          row: point.row,
+          column: point.column,
+        },
+        obstructionClearanceVerified: false,
+        hydraulicNodeAssigned: false,
+      });
+    }
+    exposedSlopedAudit.push({
+      sourceVolumeId: volume.id,
+      sourcePages: volume.sourcePages,
+      boundsFt: grid.bounds,
+      widthFt: grid.width,
+      heightFt: grid.height,
+      columns: grid.columns,
+      rows: grid.rows,
+      candidateIds,
+      targetKind: volume.targetKind || 'orientation-unresolved',
+      maxAreaSqFt: exposedPolicy.maxAreaSqFt,
+      maxSpacingFt: exposedPolicy.maxSpacingFt,
+    });
+  }
+  const result = {
     heads,
     roomAudit,
     roofAudit,
@@ -152,4 +207,9 @@ export async function buildSourceTopologyPlacementCandidate(packet) {
     topologyCompletenessAudit,
     policyReceiptSha256: await sha256Hex(packet.placementPolicy),
   };
+  if ((packet.exposedSlopedCeilingVolumes || []).length) {
+    result.exposedSlopedAudit = exposedSlopedAudit;
+    result.counts.unresolved = heads.filter((head) => head.kind === 'orientation-unresolved').length;
+  }
+  return result;
 }
