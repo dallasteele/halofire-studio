@@ -11,15 +11,16 @@
 const EXPECTED_PLAN_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5';
 const EXPECTED_CALC_SHA = 'D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719';
 const EXPECTED_PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut';
-const EXPECTED_SEGMENTS = ['pipe-002', 'pipe-003', 'pipe-030', 'pipe-031', 'pipe-058', 'pipe-059', 'pipe-060', 'pipe-061', 'pipe-062', 'pipe-063', 'pipe-064', 'pipe-067'];
-const EXPECTED_TERMINALS = ['canonical-node-002', 'canonical-node-054', 'canonical-node-056'];
-const EXPECTED_JUNCTION = 'canonical-node-125';
-const EXPECTED_HIGH_POINTS = Object.freeze({ lower: 'canonical-node-138', upper: 'canonical-node-131' });
+const EXPECTED_SEGMENTS = ['pipe-002', 'pipe-003', 'pipe-004', 'pipe-005', 'pipe-006', 'pipe-030', 'pipe-031', 'pipe-058', 'pipe-059', 'pipe-060', 'pipe-061', 'pipe-062', 'pipe-063', 'pipe-064', 'pipe-067'];
+const EXPECTED_TERMINALS = ['canonical-node-002', 'canonical-node-009', 'canonical-node-054', 'canonical-node-056'];
+const EXPECTED_JUNCTIONS = ['canonical-node-007', 'canonical-node-125'];
+const EXPECTED_HIGH_POINTS = Object.freeze({ lower: 'canonical-node-138', upper: 'canonical-node-131', cmk: 'canonical-node-009' });
 const EXPECTED_PATHS = Object.freeze([
   { id: 'lower-high-to-low-point-01', highNodeId: 'canonical-node-138', sinkNodeId: 'canonical-node-054', sinkId: 'low-point-01', expectedEdgeCount: 4 },
   { id: 'lower-high-to-riser-return', highNodeId: 'canonical-node-138', sinkNodeId: 'canonical-node-002', sinkId: 'riser-return', expectedEdgeCount: 16 },
   { id: 'upper-high-to-low-point-04', highNodeId: 'canonical-node-131', sinkNodeId: 'canonical-node-056', sinkId: 'low-point-04', expectedEdgeCount: 4 },
   { id: 'upper-high-to-riser-return', highNodeId: 'canonical-node-131', sinkNodeId: 'canonical-node-002', sinkId: 'riser-return', expectedEdgeCount: 10 },
+  { id: 'cmk-high-to-riser-return', highNodeId: 'canonical-node-009', sinkNodeId: 'canonical-node-002', sinkId: 'riser-return', expectedEdgeCount: 7 },
 ]);
 
 const issue = (code, message, entityId = null) => ({ severity: 'blocking', code, message, entityId });
@@ -135,6 +136,9 @@ export function evaluateNewHopeCrossMainDrainage({
   if (!governedSkeleton?.primaryPipeRoleAssignmentReady) {
     issues.push(issue('NH_CROSS_MAIN_ROLE_ASSIGNMENT_NOT_READY', 'Source segments must pass governed cross-main role assignment before drainage orientation.'));
   }
+  if (!governedSkeleton?.fabricationLineRoleBindingReady || !governedSkeleton?.separatedCrossingEvidenceReady) {
+    issues.push(issue('NH_CROSS_MAIN_FABRICATION_LINE_BINDING_INVALID', 'CMK and the BL48/CMI separated crossing require exact field-set and fabrication-listing evidence before cross-main topology is accepted.'));
+  }
   const crossMainGrade = operationalAnnotations?.gradeRequirements?.find((entry) => entry.id === 'grade-cross-mains');
   if (crossMainGrade?.pipeRole !== 'cross-main' || crossMainGrade?.riseInPer10Ft !== 0.25) {
     issues.push(issue('NH_CROSS_MAIN_GRADE_MAGNITUDE_INVALID', 'The approved cross-main grade must remain one-quarter inch every ten feet.'));
@@ -148,13 +152,13 @@ export function evaluateNewHopeCrossMainDrainage({
   const junctionNodeIds = sorted(component.nodeIds.filter((nodeId) => (crossMainGraph.adjacency.get(nodeId) || []).length === 3));
   const cycleRank = component.edges.length - component.nodeIds.length + 1;
   if (component.nodeIds.length === 0
-    || component.nodeIds.length !== 31
-    || component.edges.length !== 30
+    || component.nodeIds.length !== 35
+    || component.edges.length !== 34
     || cycleRank !== 0
     || JSON.stringify(sourceSegmentIds) !== JSON.stringify(sorted(EXPECTED_SEGMENTS))
     || JSON.stringify(terminalNodeIds) !== JSON.stringify(sorted(EXPECTED_TERMINALS))
-    || JSON.stringify(junctionNodeIds) !== JSON.stringify([EXPECTED_JUNCTION])) {
-    issues.push(issue('NH_CROSS_MAIN_COMPONENT_TOPOLOGY_INVALID', 'The cross main must remain the exact 31-node, 30-edge acyclic source tree with one three-way junction and three source terminals.'));
+    || JSON.stringify(junctionNodeIds) !== JSON.stringify(sorted(EXPECTED_JUNCTIONS))) {
+    issues.push(issue('NH_CROSS_MAIN_COMPONENT_TOPOLOGY_INVALID', 'The cross main must remain the exact 35-node, 34-edge acyclic source tree with CMK, two three-way junctions, and four source terminals.'));
   }
 
   const lowPointById = new Map((operationalAnnotations?.lowPointAnchors || []).map((entry) => [entry.id, entry]));
@@ -237,7 +241,7 @@ export function evaluateNewHopeCrossMainDrainage({
       absoluteEndpointElevationsReady: elevationByNodeId.has(expectedPath.highNodeId) && elevationByNodeId.has(expectedPath.sinkNodeId),
     });
   }
-  if (directedByEdgeId.size !== 30 || component.edges.some((edge) => !directedByEdgeId.has(edge.id))) {
+  if (directedByEdgeId.size !== 34 || component.edges.some((edge) => !directedByEdgeId.has(edge.id))) {
     issues.push(issue('NH_CROSS_MAIN_EDGE_COVERAGE_INCOMPLETE', 'Every cross-main edge must have one non-conflicting source-bound drainage direction.'));
   }
 
@@ -250,8 +254,9 @@ export function evaluateNewHopeCrossMainDrainage({
     blockerCodes: [...new Set(issues.map((entry) => entry.code))],
     sourceSegmentIds,
     terminalNodeIds,
-    junctionNodeId: junctionNodeIds[0] || null,
-    highPointNodeIds: [EXPECTED_HIGH_POINTS.lower, EXPECTED_HIGH_POINTS.upper],
+    junctionNodeId: 'canonical-node-125',
+    junctionNodeIds,
+    highPointNodeIds: [EXPECTED_HIGH_POINTS.lower, EXPECTED_HIGH_POINTS.upper, EXPECTED_HIGH_POINTS.cmk],
     directedEdges: [...directedByEdgeId.values()],
     pathProfiles,
     calculationElevationAnchors: [...exactElevationRequirements].map(([nodeId]) => ({ nodeId, elevationsFt: elevationByNodeId.get(nodeId) || [] })),
@@ -261,7 +266,7 @@ export function evaluateNewHopeCrossMainDrainage({
       directedEdgeCount: directedByEdgeId.size,
       sourceSegmentCount: sourceSegmentIds.length,
       terminalCount: terminalNodeIds.length,
-      highPointCount: 2,
+      highPointCount: 3,
       drainageOutletCount: 3,
       pathProfileCount: pathProfiles.length,
       calculationElevationAnchorCount: [...exactElevationRequirements].filter(([nodeId]) => elevationByNodeId.has(nodeId)).length,
@@ -273,6 +278,9 @@ export function evaluateNewHopeCrossMainDrainage({
     crossMainGradeMagnitudeReady: ready,
     crossMainGradeDirectionReady: ready,
     crossMainRelativeGradeProfilesReady: ready,
+    cmkLineBindingReady: ready,
+    cmkHighPointBindingReady: ready,
+    cmkHighPointAbsoluteZReady: false,
     upperHighPointAbsoluteZReady: false,
     exactPipeCenterlineZReady: false,
     centralLoopDirectionReady: false,

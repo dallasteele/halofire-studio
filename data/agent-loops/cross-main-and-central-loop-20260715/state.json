@@ -1,8 +1,8 @@
 {
   "loop": "cross-main-and-central-loop-20260715",
   "stage": "VERIFY",
-  "status": "cross-main-passed-central-loop-open",
-  "iteration": 1,
+  "status": "corrected-cross-main-and-central-loop-passed-armovers-z-open",
+  "iteration": 2,
   "brainPreflight": {
     "status": "passed",
     "topEpisodes": [148709, 148734, 148662, 148601, 148360]
@@ -12,15 +12,19 @@
     "loops": ["primary", "crossSource", "adversarial", "browser", "formal"]
   },
   "knownTopology": {
-    "crossMainNodeCount": 31,
-    "crossMainEdgeCount": 30,
+    "crossMainNodeCount": 35,
+    "crossMainEdgeCount": 34,
     "crossMainCycleRank": 0,
-    "crossMainTerminalCandidates": ["canonical-node-002", "canonical-node-054", "canonical-node-056"],
+    "crossMainTerminalCandidates": ["canonical-node-002", "canonical-node-009", "canonical-node-054", "canonical-node-056"],
     "sourceFeedCandidate": "canonical-node-002",
     "lowPointCandidates": ["low-point-01", "low-point-04"],
-    "centralBranchNodeCount": 31,
-    "centralBranchEdgeCount": 31,
-    "centralBranchCycleRank": 1
+    "centralBranchNodeCount": 23,
+    "centralBranchEdgeCount": 23,
+    "centralBranchCycleRank": 1,
+    "centralBranchLoopCoreEdgeCount": 8,
+    "centralBranchFeedNode": "canonical-node-010",
+    "centralBranchSelectedRelativeHighNode": "canonical-node-030",
+    "separatedPlanCrossingNode": "canonical-node-022"
   },
   "claims": {
     "crossMainSourceTopologyReady": true,
@@ -29,8 +33,18 @@
     "crossMainRiserReturnReady": true,
     "crossMainGradeDirectionReady": true,
     "crossMainRelativeGradeProfilesReady": true,
+    "cmkLineBindingReady": true,
+    "cmkHighPointBindingReady": true,
+    "cmkHighPointAbsoluteZReady": false,
     "upperHighPointAbsoluteZReady": false,
-    "centralLoopDirectionReady": false,
+    "centralBranchSourceTopologyReady": true,
+    "centralBranchFabricationLineBindingReady": true,
+    "centralBranchSeparatedCrossingReady": true,
+    "centralBranchGeneratedGradeDirectionReady": true,
+    "centralBranchRelativeGradeProfilesReady": true,
+    "centralLoopDirectionReady": true,
+    "selectedLoopHighPointAbsoluteZReady": false,
+    "centralBranchArmOverDrainageReady": false,
     "wholeFp20GradeDirectionReady": false,
     "properPipeLayoutReady": false,
     "fabricationReady": false,
@@ -38,15 +52,35 @@
   },
   "crossMainEvidence": {
     "sourcePlanSha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+    "fieldSetSha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5",
+    "fabricationListingSha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734",
+    "fabricationArchiveSha256": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9",
     "hydraulicCalculationSha256": "D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719",
-    "canonicalNodes": 31,
-    "canonicalEdges": 30,
-    "directedEdges": 30,
-    "pathProfiles": 4,
+    "canonicalNodes": 35,
+    "canonicalEdges": 34,
+    "directedEdges": 34,
+    "pathProfiles": 5,
     "calculationElevationAnchors": 4,
     "browser": {
-      "actualPdfUnderlays": 1,
-      "crossMainArrows": 30,
+      "actualPdfUnderlays": 8,
+      "fullApprovedFp20Underlays": 1,
+      "crossMainArrows": 34,
+      "relativeProfiles": 5,
+      "auditRows": 5,
+      "consoleWarningsOrErrors": 0
+    },
+    "formalProof": "verified"
+  },
+  "centralBranchEvidence": {
+    "canonicalNodes": 23,
+    "canonicalEdges": 23,
+    "directedEdges": 23,
+    "cycleRank": 1,
+    "loopCoreEdges": 8,
+    "pathProfiles": 4,
+    "unresolvedArmOvers": 4,
+    "browser": {
+      "centralBranchArrows": 23,
       "relativeProfiles": 4,
       "auditRows": 4,
       "consoleWarningsOrErrors": 0
@@ -55,7 +89,7 @@
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 148790
+    "episodeId": 148885
   },
-  "nextAction": "Split the 31-edge, cycle-rank-one central branch component only from explicit approved calculation or vertical evidence; do not use nearest-low-point, shortest-path, or hydraulic-flow shortcuts."
+  "nextAction": "Bind the exact vertical offset, orientation, and drainage catchment for the eight remaining arm-over edges from field/elevation/fabrication evidence, then propagate source-backed pipe centerline Z without using roof Z, hydraulic flow, nearest-low-point, or shortest-path shortcuts."
 }

@@ -1,7 +1,7 @@
 const EXPECTED_SOURCE_HASHES = Object.freeze({
   'approved-plan': '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5',
-  'field-set': '4A47F9A4DBB3A35CBA3915EE4F32AD4D4E17964FE7A54D2E7F4D5442300A02B5',
-  'as-built': 'ED00E953A7A6E711921CF4B282137F4F69A458479D31A9FD33BFD3496ED8F34B',
+  'field-set': '4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5',
+  'as-built': 'ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B',
 });
 
 const EXPECTED_OPERATIONAL_INDICES = Object.freeze([
@@ -19,7 +19,8 @@ const issue = (code, message, entityId = null) => ({ severity: 'blocking', code,
 const finitePoint = (value) => value && Number.isFinite(value.x) && Number.isFinite(value.y);
 const distance = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
 
-function expectedAssignment(segment) {
+function expectedAssignment(segment, lineBinding) {
+  if (lineBinding) return { nominalDiameterIn: lineBinding.nominalDiameterIn, systemRole: lineBinding.systemRole };
   if (segment.strokeClass === 'navy-arm-over') return { nominalDiameterIn: 1, systemRole: 'arm-over' };
   if (segment.strokeClass === 'black-pipe') return { nominalDiameterIn: 2, systemRole: 'branch-line' };
   if (CROSS_MAIN_IDS.has(segment.id)) {
@@ -27,6 +28,37 @@ function expectedAssignment(segment) {
     return { nominalDiameterIn, systemRole: segment.id === 'pipe-001' ? 'source-feed' : 'cross-main' };
   }
   return { nominalDiameterIn: 2.5, systemRole: 'branch-line' };
+}
+
+function validateFabricationLineEvidence(annotations, issues) {
+  const evidence = annotations?.fabricationLineEvidence;
+  if (evidence?.artifactType !== 'halofire.approved-fp20-fabrication-line-evidence.v1'
+    || evidence?.fieldSet?.sha256 !== EXPECTED_SOURCE_HASHES['field-set']
+    || evidence?.asBuilt?.sha256 !== EXPECTED_SOURCE_HASHES['as-built']
+    || evidence?.fabricationListing?.sha256 !== '2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734'
+    || evidence?.fabricationListing?.software !== 'AutoSPRINK 2023 v18.1.44.0'
+    || evidence?.fabricationArchive?.sha256 !== 'A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9') {
+    issues.push(issue('FP20_FABRICATION_LINE_SOURCE_INVALID', 'Field-set line names and fabricated main/branch identities must remain bound to the exact field set, as-built, AutoSPRINK listing, and FAB archive.'));
+  }
+  const cmk = evidence?.primaryLineBindings?.find((entry) => entry.lineName === 'CMK');
+  if (cmk?.systemRole !== 'cross-main'
+    || cmk?.nominalDiameterIn !== 2.5
+    || JSON.stringify(cmk?.sourceSegmentIds) !== JSON.stringify(['pipe-004', 'pipe-005', 'pipe-006'])
+    || JSON.stringify(cmk?.pieceIds) !== JSON.stringify(['CMK.01', 'CMK.02', 'CMK.03'])
+    || cmk?.terminalCanonicalNodeId !== 'canonical-node-009'
+    || cmk?.branchOutletCanonicalNodeId !== 'canonical-node-010'
+    || cmk?.systemConnectionCanonicalNodeId !== 'canonical-node-007') {
+    issues.push(issue('FP20_CMK_LINE_BINDING_INVALID', 'CMK.01-.03 must bind pipe-004/005/006 as one 2.5-inch cross main from the system connection to its capped high end and branch outlets.', 'CMK'));
+  }
+  const crossing = evidence?.separatedCrossings?.find((entry) => entry.canonicalNodeId === 'canonical-node-022');
+  if (crossing?.crossMainSourceSegmentId !== 'pipe-062'
+    || crossing?.branchLineSourceSegmentId !== 'pipe-013'
+    || crossing?.branchPieceId !== 'BL48.02'
+    || crossing?.branchPieceLength !== "21'-0"
+    || crossing?.branchPieceOutletCount !== 0) {
+    issues.push(issue('FP20_FABRICATION_CROSSING_SEPARATION_INVALID', 'BL48.02 must remain a continuous no-outlet branch piece crossing CMI at canonical-node-022 without becoming a false tee.', 'canonical-node-022'));
+  }
+  return new Map((evidence?.primaryLineBindings || []).flatMap((binding) => (binding.sourceSegmentIds || []).map((sourceSegmentId) => [sourceSegmentId, binding])));
 }
 
 function validateSources(annotations, issues) {
@@ -58,13 +90,15 @@ function validateHydraulicCalculationCorpus(annotations, issues) {
   }
 }
 
-function validatePrimaryAssignments(pipeEvidence, issues) {
+function validatePrimaryAssignments(pipeEvidence, lineBindingBySegmentId, issues) {
   const segments = Array.isArray(pipeEvidence?.pipeSegments) ? pipeEvidence.pipeSegments : [];
   const assignments = segments.map((segment) => ({
     sourceSegmentId: segment.id,
     strokeClass: segment.strokeClass,
-    ...expectedAssignment(segment),
-    assignmentBasis: `approved FP2.0 stroke class and diameter callout continuity; drawing index ${segment.drawingIndex}`,
+    ...expectedAssignment(segment, lineBindingBySegmentId.get(segment.id)),
+    assignmentBasis: lineBindingBySegmentId.has(segment.id)
+      ? `exact field-set line label plus AutoSPRINK fabrication listing and FAB archive; ${lineBindingBySegmentId.get(segment.id).lineName}`
+      : `approved FP2.0 stroke class and diameter callout continuity; drawing index ${segment.drawingIndex}`,
   }));
   if (segments.length !== 67) issues.push(issue('FP20_PRIMARY_SEGMENT_COUNT_INVALID', 'The governed primary assignment requires all 67 source-extracted main, branch, and arm-over segments.'));
   if (assignments.some((entry) => ![1, 2, 2.5, 3, 4].includes(entry.nominalDiameterIn) || !entry.systemRole)) {
@@ -121,7 +155,8 @@ export function evaluateApprovedFp20GovernedSkeleton(pipeEvidence, planGraph, an
   }
   validateSources(annotations, issues);
   validateHydraulicCalculationCorpus(annotations, issues);
-  const primaryAssignments = validatePrimaryAssignments(pipeEvidence, issues);
+  const lineBindingBySegmentId = validateFabricationLineEvidence(annotations, issues);
+  const primaryAssignments = validatePrimaryAssignments(pipeEvidence, lineBindingBySegmentId, issues);
   const operationalReferenceVectors = validateOperationalReferences(annotations, issues);
   validateOperationalFeatures(annotations, planGraph, issues);
 
@@ -171,6 +206,7 @@ export function evaluateApprovedFp20GovernedSkeleton(pipeEvidence, planGraph, an
       fieldDrainIntentCount: annotations?.fieldRouteDrainIntents?.length || 0,
       gradeRequirementCount: annotations?.gradeRequirements?.length || 0,
       fp20HydraulicRemoteAreaCount: annotations?.hydraulicCalculationSources?.calculationReport?.remoteAreas?.filter((entry) => entry.sheet === 'FP2.0').length || 0,
+      fabricationLineBoundSegmentCount: lineBindingBySegmentId.size,
     },
     primaryPipeVectorExtractionReady: issues.length === 0 && primaryAssignments.length === 67,
     primaryPipeSizeAssignmentReady: issues.length === 0 && primaryAssignments.length === 67,
@@ -181,6 +217,8 @@ export function evaluateApprovedFp20GovernedSkeleton(pipeEvidence, planGraph, an
     drainIntentReady: issues.length === 0,
     gradeMagnitudeReady: issues.length === 0,
     hydraulicCalculationCorpusReady: issues.length === 0,
+    fabricationLineRoleBindingReady: issues.length === 0 && lineBindingBySegmentId.size === 3,
+    separatedCrossingEvidenceReady: issues.length === 0,
     hydraulicNodeBindingReady: false,
     wholeSystemVectorExtractionReady: false,
     hydraulicFlowReady: false,

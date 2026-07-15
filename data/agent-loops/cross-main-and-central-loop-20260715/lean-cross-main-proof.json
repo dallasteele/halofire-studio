@@ -4,14 +4,14 @@
   "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
   "requestPath": "data/agent-loops/cross-main-and-central-loop-20260715/lean-cross-main-request.json",
   "theoremNames": [
-    "completeCrossMainTreePartition",
-    "crossMainMinimumFallArithmetic",
-    "crossMainDrainageDoesNotPromoteUnprovedVerticalOrWholeLayout"
+    "correctedCrossMainAndCentralCoverage",
+    "correctedDrainageMinimumFallArithmetic",
+    "correctedDrainageDoesNotPromoteUnprovedVerticalOrWholeLayout"
   ],
-  "claim": "The exact cross-main tree partitions into 30 uniquely directed edges. Rounded path lengths reproduce the 0.25-inch-per-10-foot minimum falls. Cross-main readiness does not promote the unproved upper absolute Z, central-loop direction, exact pipe-centerline Z, whole-plan grade direction, or proper-layout readiness.",
+  "claim": "The corrected cross-main partitions into 34 uniquely directed edges after adding the four CMK edges, while the exact BL48/BL49 component partitions into 23 uniquely directed edges around its eight-edge fabricated loop. Rounded CMK and central-branch lengths reproduce their required minimum falls. Bounded drainage readiness does not promote unproved high-point Z, arm-over drainage, exact pipe-centerline Z, whole-plan grade direction, or proper-layout readiness.",
   "result": {
     "status": "verified",
-    "elapsedMs": 70,
+    "elapsedMs": 96,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

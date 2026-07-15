@@ -12,15 +12,90 @@
       "role": "field-set",
       "sheet": "FP2.0",
       "physicalPage": 4,
-      "sha256": "4A47F9A4DBB3A35CBA3915EE4F32AD4D4E17964FE7A54D2E7F4D5442300A02B5"
+      "sha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5"
     },
     {
       "role": "as-built",
       "sheet": "FP2.0",
       "physicalPage": 4,
-      "sha256": "ED00E953A7A6E711921CF4B282137F4F69A458479D31A9FD33BFD3496ED8F34B"
+      "sha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B"
     }
   ],
+  "fabricationLineEvidence": {
+    "artifactType": "halofire.approved-fp20-fabrication-line-evidence.v1",
+    "fieldSet": {
+      "sheet": "FP2.0",
+      "physicalPage": 4,
+      "sha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5"
+    },
+    "asBuilt": {
+      "sheet": "FP2.0",
+      "physicalPage": 4,
+      "sha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B"
+    },
+    "fabricationListing": {
+      "fileName": "24-052_NHCC_LIST.PDF",
+      "sha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734",
+      "software": "AutoSPRINK 2023 v18.1.44.0",
+      "lineReportPage": 20
+    },
+    "fabricationArchive": {
+      "fileName": "NEW HOPE CRISIS CENTER_NHCC List.FAB",
+      "sha256": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9"
+    },
+    "primaryLineBindings": [
+      {
+        "lineName": "CMK",
+        "systemRole": "cross-main",
+        "nominalDiameterIn": 2.5,
+        "sourceSegmentIds": ["pipe-004", "pipe-005", "pipe-006"],
+        "pieceIds": ["CMK.01", "CMK.02", "CMK.03"],
+        "cutLengths": ["0'-10", "5'-4", "7'-6"],
+        "sourceFieldSetLabels": ["CMK.01", "CMK.02", "CMK.03"],
+        "terminalCanonicalNodeId": "canonical-node-009",
+        "branchOutletCanonicalNodeId": "canonical-node-010",
+        "systemConnectionCanonicalNodeId": "canonical-node-007",
+        "terminalCondition": "capped-high-end",
+        "drainageDestination": "riser-return",
+        "branchOutletEvidence": "CMK.03 has two 2-1/2 x 2 grooved outlets at 90 and 270 degrees on fabrication listing page 20"
+      }
+    ],
+    "separatedCrossings": [
+      {
+        "canonicalNodeId": "canonical-node-022",
+        "crossMainSourceSegmentId": "pipe-062",
+        "branchLineSourceSegmentId": "pipe-013",
+        "branchLineName": "BL48",
+        "branchPieceId": "BL48.02",
+        "branchPieceLength": "21'-0",
+        "branchPieceOutletCount": 0,
+        "reason": "BL48.02 is a continuous no-fitting/no-outlet fabricated piece across the CMI plan crossing"
+      }
+    ],
+    "centralBranchLines": [
+      {
+        "lineName": "BL48",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2,
+        "sourceSegmentIds": ["pipe-010", "pipe-013", "pipe-014", "pipe-015", "pipe-019", "pipe-027"],
+        "pieceIds": ["BL48.01", "BL48.02", "BL48.03", "BL48.04", "BL48.05", "BL48.06", "BL48.07"],
+        "feedCanonicalNodeId": "canonical-node-010",
+        "terminalCanonicalNodeIds": ["canonical-node-032", "canonical-node-047"]
+      },
+      {
+        "lineName": "BL49",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2,
+        "sourceSegmentIds": ["pipe-007", "pipe-011", "pipe-012", "pipe-018", "pipe-026"],
+        "pieceIds": ["BL49.01", "BL49.02", "BL49.03", "BL49.04", "BL49.05", "BL49.06"],
+        "feedCanonicalNodeId": "canonical-node-010",
+        "lowJunctionCanonicalNodeId": "canonical-node-011",
+        "selectedHighJunctionCanonicalNodeId": "canonical-node-030",
+        "terminalCanonicalNodeIds": ["canonical-node-029"],
+        "gradeSelectionBasis": "generated relative schedule rises away from the sole CMK feed through both loop arms; no auxiliary loop drain is shown"
+      }
+    ]
+  },
   "hydraulicCalculationSources": {
     "calculationReport": {
       "role": "approved-autosprink-hydraulic-calculations",

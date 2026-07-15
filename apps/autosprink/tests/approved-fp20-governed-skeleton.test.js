@@ -19,6 +19,10 @@ describe('approved FP2.0 governed pipe skeleton', () => {
     expect(result.primaryPipeRoleAssignmentReady).toBe(true);
     expect(result.primaryAssignments.find((entry) => entry.sourceSegmentId === 'pipe-001')).toMatchObject({ nominalDiameterIn: 4, systemRole: 'source-feed' });
     expect(result.primaryAssignments.find((entry) => entry.sourceSegmentId === 'pipe-059')).toMatchObject({ nominalDiameterIn: 3, systemRole: 'cross-main' });
+    for (const id of ['pipe-004', 'pipe-005', 'pipe-006']) expect(result.primaryAssignments.find((entry) => entry.sourceSegmentId === id)).toMatchObject({ nominalDiameterIn: 2.5, systemRole: 'cross-main' });
+    expect(result.metrics.fabricationLineBoundSegmentCount).toBe(3);
+    expect(result.fabricationLineRoleBindingReady).toBe(true);
+    expect(result.separatedCrossingEvidenceReady).toBe(true);
     expect(result.primaryAssignments.filter((entry) => entry.systemRole === 'arm-over')).toHaveLength(12);
   });
 
@@ -68,6 +72,17 @@ describe('approved FP2.0 governed pipe skeleton', () => {
     }));
     expect(result.blockerCodes).toContain('FP20_HYDRAULIC_CALCULATION_SOURCE_INVALID');
     expect(result.hydraulicCalculationCorpusReady).toBe(false);
+  });
+
+  it('rejects fabricated-main line and separated-crossing evidence drift', () => {
+    const badLine = evaluateApprovedFp20GovernedSkeleton(pipeEvidence, planGraph, mutate((copy) => {
+      copy.fabricationLineEvidence.primaryLineBindings[0].sourceSegmentIds = ['pipe-004'];
+    }));
+    expect(badLine.blockerCodes).toContain('FP20_CMK_LINE_BINDING_INVALID');
+    const badCrossing = evaluateApprovedFp20GovernedSkeleton(pipeEvidence, planGraph, mutate((copy) => {
+      copy.fabricationLineEvidence.separatedCrossings[0].branchPieceOutletCount = 1;
+    }));
+    expect(badCrossing.blockerCodes).toContain('FP20_FABRICATION_CROSSING_SEPARATION_INVALID');
   });
 
   it('rejects omission of a governed low-point callout', () => {
