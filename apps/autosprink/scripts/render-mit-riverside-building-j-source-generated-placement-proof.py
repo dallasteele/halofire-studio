@@ -105,7 +105,7 @@ def banner(draw: ImageDraw.ImageDraw, width: int, title: str, subtitle: str, sta
     draw.text((42, 100), status, font=font(17, True), fill=(255, 190, 70, 255))
 
 
-def render_plan_overlay(base_path: Path, pairs: list[dict[str, Any]], unmatched: list[dict[str, Any]], mapper: Callable[[dict[str, float]], tuple[float, float]], destination: Path, title: str, subtitle: str) -> dict[str, Any]:
+def render_plan_overlay(base_path: Path, pairs: list[dict[str, Any]], unmatched: list[dict[str, Any]], mapper: Callable[[dict[str, float]], tuple[float, float]], destination: Path, title: str, subtitle: str, status: str) -> dict[str, Any]:
     """Draw generated candidates and exact residuals over a protected plan raster."""
     image = Image.open(base_path).convert("RGBA")
     layer = Image.new("RGBA", image.size, (0, 0, 0, 0))
@@ -120,7 +120,7 @@ def render_plan_overlay(base_path: Path, pairs: list[dict[str, Any]], unmatched:
         point = mapper(candidate["structuralLocalFt"])
         draw_cross(draw, point, RED, 11)
         draw.text((point[0] + 13, point[1] - 12), "EXTRA", font=font(14, True), fill=RED)
-    banner(draw, image.width, title, subtitle, "FAILED 2-ft calibration gate — residuals intentionally visible; not compliance or fabrication proof")
+    banner(draw, image.width, title, subtitle, status)
     output = Image.alpha_composite(image, layer).convert("RGB")
     output.save(destination, quality=94)
     return {"file": destination.name, "bytes": destination.stat().st_size, "sha256": file_sha256(destination), "width": output.width, "height": output.height}
@@ -164,7 +164,7 @@ def render_elevation(base_path: Path, pairs: list[dict[str, Any]], destination: 
     return {"file": destination.name, "bytes": destination.stat().st_size, "sha256": file_sha256(destination), "width": canvas.width, "height": canvas.height}
 
 
-def render_model3d(base_plan: Path, inputs: dict[str, Any], pairs: list[dict[str, Any]], unmatched: list[dict[str, Any]], destination: Path) -> dict[str, Any]:
+def render_model3d(base_plan: Path, inputs: dict[str, Any], score: dict[str, Any], pairs: list[dict[str, Any]], unmatched: list[dict[str, Any]], destination: Path) -> dict[str, Any]:
     """Project the same protected plan, answer targets, candidates, and residuals into 3D."""
     matrix = (0.42, -0.16, 0.22, 0.18, 70, 490)
     z_scale = 8.0
@@ -189,6 +189,13 @@ def render_model3d(base_plan: Path, inputs: dict[str, Any], pairs: list[dict[str
         candidate_svg.append(f'<path d="M {point[0]-8:.2f} {point[1]-8:.2f} L {point[0]+8:.2f} {point[1]+8:.2f} M {point[0]+8:.2f} {point[1]-8:.2f} L {point[0]-8:.2f} {point[1]+8:.2f}" class="extra"><title>{escape(candidate["id"])}</title></path>')
 
     underlay_data = base64.b64encode(base_plan.read_bytes()).decode("ascii")
+    generated_count = score["counts"]["generated"]["total"]
+    answer_count = score["counts"]["answer"]["total"]
+    within_two = next(entry["matched"] for entry in score["xyScore"]["thresholdMatches"] if entry["thresholdFt"] == 2)
+    maximum_distance = score["xyScore"]["maximumDistanceFt"]
+    accepted = score["acceptance"]["accepted"]
+    gate_label = "CALIBRATION GATE PASSED" if accepted else "CALIBRATION REJECTED"
+    gate_detail = "fresh-project holdout, exact obstruction clearances, compliance, hydraulics, and fabrication remain blocked" if accepted else "source rules require another sealed correction before holdout"
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="930" viewBox="0 0 1420 930">
 <style>.bg{{fill:#07111f}}.generated{{fill:none;stroke:#23ff78;stroke-width:3}}.answer{{fill:#fff;stroke:#0f172a;stroke-width:1.2}}.extra{{fill:none;stroke:#ef4444;stroke-width:4}}.title{{fill:#f8fafc;font:700 25px system-ui}}.fact{{fill:#cbd5e1;font:16px system-ui}}.warn{{fill:#fbbf24;font:700 16px system-ui}}</style>
 <rect class="bg" width="1420" height="930"/>
@@ -197,20 +204,27 @@ def render_model3d(base_plan: Path, inputs: dict[str, Any], pairs: list[dict[str
 <image href="data:image/png;base64,{underlay_data}" width="1860" height="2410" opacity=".72" transform="matrix(.42 -.16 .22 .18 70 490)"/>
 {''.join(residual_svg)}{''.join(answer_svg)}{''.join(candidate_svg)}
 <rect x="26" y="834" width="1368" height="70" rx="12" fill="#07111f" fill-opacity=".94" stroke="#f59e0b"/>
-<text x="46" y="861" class="fact">69 generated vs 68 completed | 42 within 2 ft | 62 within 4 ft | 66 within 6 ft | one extra generated upright</text>
-<text x="46" y="889" class="warn">CALIBRATION REJECTED — room partitions / obstruction topology must be source-extracted before production promotion</text>
+<text x="46" y="861" class="fact">{generated_count} generated vs {answer_count} completed | {within_two} within 2 ft | maximum residual {maximum_distance:.3f} ft | no hidden underlay</text>
+<text x="46" y="889" class="warn">{gate_label} — {gate_detail}</text>
 </svg>'''
     destination.write_text(svg, encoding="utf-8", newline="\n")
-    return {"file": destination.name, "bytes": destination.stat().st_size, "sha256": file_sha256(destination), "protectedPdfPlanProjectedInto3d": True, "generatedCandidateCount": 69, "completedAnswerCount": 68}
+    return {"file": destination.name, "bytes": destination.stat().st_size, "sha256": file_sha256(destination), "protectedPdfPlanProjectedInto3d": True, "generatedCandidateCount": generated_count, "completedAnswerCount": answer_count}
 
 
 def render_index(manifest: dict[str, Any], destination: Path) -> None:
-    """Write an inspectable four-panel proof page with an explicit failed gate."""
+    """Write an inspectable four-panel proof page with the exact calibration gate."""
     score = manifest["score"]
+    thresholds = {entry["thresholdFt"]: entry for entry in score["thresholdMatches"]}
+    accepted = score["accepted"]
+    gate_label = "CALIBRATION GATE PASSED" if accepted else "CALIBRATION REJECTED"
+    gate_detail = "Count, kind, and 2-foot XY calibration passed. Fresh-project holdout, obstruction clearance, compliance, hydraulics, fabrication, and release remain blocked." if accepted else "The system did not meet the 2-foot placement gate. Residuals remain visible rather than being presented as accepted work."
+    generated_count = score["generatedCount"]
+    answer_count = score["answerCount"]
+    source_target_count = score["sourceTargetWithinHalfFoot"]
     html = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Building J source-generated placement proof</title><style>
-body{{margin:0;background:#07111f;color:#f8fafc;font:16px system-ui}}main{{max-width:1500px;margin:auto;padding:28px}}h1{{margin:0 0 8px}}.status{{padding:16px 20px;border:2px solid #f59e0b;border-radius:14px;background:#1e293b;margin:18px 0}}.bad{{color:#fbbf24;font-weight:800}}.metrics{{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:12px;margin:18px 0}}.metric{{background:#111c2f;border:1px solid #334155;border-radius:12px;padding:14px}}.metric b{{display:block;font-size:24px;color:#23ff78}}.grid{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}figure{{margin:0;background:#0f172a;border:1px solid #334155;border-radius:14px;overflow:hidden}}img{{display:block;width:100%;height:auto;background:#fff}}figcaption{{padding:12px 16px;color:#cbd5e1}}code{{color:#a7f3d0}}@media(max-width:900px){{.grid{{grid-template-columns:1fr}}.metrics{{grid-template-columns:1fr 1fr}}}}
-</style></head><body><main><h1>MIT Riverside Building J — source-generated placement proof</h1><p>Protected architectural PDF underlay + sealed generated candidate + immutable completed-bid answer.</p><div class="status"><span class="bad">CALIBRATION REJECTED</span> — the system did not meet the 2-ft placement gate. This page exposes the residuals instead of presenting a nonsensical or falsely accepted drawing.</div><section class="metrics">
-<div class="metric"><b>69 / 68</b>generated / completed</div><div class="metric"><b>42</b>matched within 2 ft</div><div class="metric"><b>62</b>matched within 4 ft</div><div class="metric"><b>66</b>matched within 6 ft</div><div class="metric"><b>68 / 68</b>target Z within 0.5 ft</div></section><section class="grid">
+body{{margin:0;background:#07111f;color:#f8fafc;font:16px system-ui}}main{{max-width:1500px;margin:auto;padding:28px}}h1{{margin:0 0 8px}}.status{{padding:16px 20px;border:2px solid #22c55e;border-radius:14px;background:#1e293b;margin:18px 0}}.gate{{color:#86efac;font-weight:800}}.metrics{{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:12px;margin:18px 0}}.metric{{background:#111c2f;border:1px solid #334155;border-radius:12px;padding:14px}}.metric b{{display:block;font-size:24px;color:#23ff78}}.grid{{display:grid;grid-template-columns:1fr 1fr;gap:18px}}figure{{margin:0;background:#0f172a;border:1px solid #334155;border-radius:14px;overflow:hidden}}img{{display:block;width:100%;height:auto;background:#fff}}figcaption{{padding:12px 16px;color:#cbd5e1}}code{{color:#a7f3d0}}@media(max-width:900px){{.grid{{grid-template-columns:1fr}}.metrics{{grid-template-columns:1fr 1fr}}}}
+</style></head><body><main><h1>MIT Riverside Building J — topology-aware source placement proof</h1><p>Actual protected architectural PDF underlay + sealed source-only generated candidate + immutable completed-bid answer.</p><div class="status"><span class="gate">{gate_label}</span> — {gate_detail}</div><section class="metrics">
+<div class="metric"><b>{generated_count} / {answer_count}</b>generated / completed</div><div class="metric"><b>{thresholds[2]['matched']}</b>matched within 2 ft</div><div class="metric"><b>{score['meanDistanceFt']:.3f} ft</b>mean XY residual</div><div class="metric"><b>{score['maximumDistanceFt']:.3f} ft</b>maximum XY residual</div><div class="metric"><b>{source_target_count} / {answer_count}</b>target Z within 0.5 ft</div></section><section class="grid">
 <figure><img src="{escape(manifest['roofPlan']['file'])}" alt="Protected roof plan with generated and completed sprinkler layouts"><figcaption>Top view: lime crosses are generated candidates; existing orange/cyan circles are completed heads; colored lines show exact XY residuals.</figcaption></figure>
 <figure><img src="{escape(manifest['rcp']['file'])}" alt="Protected RCP with generated and completed sprinkler layouts"><figcaption>RCP: the same generated-vs-completed comparison over actual ceiling and room graphics.</figcaption></figure>
 <figure><img src="{escape(manifest['elevation']['file'])}" alt="Protected source sections and source target elevation comparison"><figcaption>Elevation: actual E/F source sections plus generated vs completed source protection target elevations. Installed head Z is still unknown.</figcaption></figure>
@@ -236,26 +250,27 @@ def main() -> None:
     inputs = load_json(args.inputs)
     candidate = load_json(args.candidate)
     score = load_json(args.score)
-    if score["sequence"]["sourceCandidateReceiptSha256"] != candidate["receiptSha256"] or score["acceptance"]["accepted"] is not False:
+    if score["sequence"]["sourceCandidateReceiptSha256"] != candidate["receiptSha256"] or not isinstance(score["acceptance"]["accepted"], bool):
         raise RuntimeError("MIT_J_GENERATED_PROOF_SCORE_BINDING_INVALID")
     candidate_by_id = {entry["id"]: entry for entry in candidate["heads"]}
     unmatched = [candidate_by_id[entry] for entry in score["xyScore"]["unmatchedGeneratedIds"]]
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    roof = render_plan_overlay(base_dir / "source-pdf-roof-plan-overlay.png", score["residualPairs"], unmatched, roof_pixel, output_dir / "generated-vs-completed-roof-plan.png", "PROTECTED PDF ROOF PLAN — GENERATED VS COMPLETED", "lime cross: generated | existing circle: completed | line: exact residual")
-    rcp = render_plan_overlay(base_dir / "source-pdf-rcp-ceiling-envelope-overlay.png", score["residualPairs"], unmatched, rcp_pixel, output_dir / "generated-vs-completed-rcp.png", "PROTECTED PDF RCP — GENERATED VS COMPLETED", "same structural-local placement on actual room / ceiling graphics")
+    status_text = "PASSED 2-ft calibration gate — fresh holdout and all compliance/release gates remain blocked" if score["acceptance"]["accepted"] else "FAILED 2-ft calibration gate — residuals intentionally visible; not compliance or fabrication proof"
+    roof = render_plan_overlay(base_dir / "source-pdf-roof-plan-overlay.png", score["residualPairs"], unmatched, roof_pixel, output_dir / "generated-vs-completed-roof-plan.png", "PROTECTED PDF ROOF PLAN — GENERATED VS COMPLETED", "lime cross: generated | existing circle: completed | line: exact residual", status_text)
+    rcp = render_plan_overlay(base_dir / "source-pdf-rcp-ceiling-envelope-overlay.png", score["residualPairs"], unmatched, rcp_pixel, output_dir / "generated-vs-completed-rcp.png", "PROTECTED PDF RCP — GENERATED VS COMPLETED", "same structural-local placement on actual room / ceiling graphics", status_text)
     elevation = render_elevation(base_dir / "source-pdf-section-overlay.png", score["residualPairs"], output_dir / "generated-vs-completed-elevation.png")
-    model3d = render_model3d(base_dir / "source-pdf-roof-plan-overlay.png", inputs, score["residualPairs"], unmatched, output_dir / "generated-vs-completed-3d.svg")
+    model3d = render_model3d(base_dir / "source-pdf-roof-plan-overlay.png", inputs, score, score["residualPairs"], unmatched, output_dir / "generated-vs-completed-3d.svg")
     manifest = {
-        "artifactType": "halofire.mit-riverside-building-j-source-generated-placement-visual-proof.v1",
+        "artifactType": "halofire.mit-riverside-building-j-source-generated-placement-visual-proof.v2" if candidate.get("generationVersion") == "source-topology-v2" else "halofire.mit-riverside-building-j-source-generated-placement-visual-proof.v1",
         "parentProtectedUnderlayProof": {"sourcePdf": parent["sourcePdf"], "proofSha256": file_sha256(base_dir / "proof.json")},
-        "score": {"candidateReceiptSha256": candidate["receiptSha256"], "scoreReceiptSha256": score["receiptSha256"], "accepted": False, "thresholdMatches": score["xyScore"]["thresholdMatches"]},
+        "score": {"candidateReceiptSha256": candidate["receiptSha256"], "scoreReceiptSha256": score["receiptSha256"], "accepted": score["acceptance"]["accepted"], "thresholdMatches": score["xyScore"]["thresholdMatches"], "generatedCount": score["counts"]["generated"]["total"], "answerCount": score["counts"]["answer"]["total"], "meanDistanceFt": score["xyScore"]["meanDistanceFt"], "maximumDistanceFt": score["xyScore"]["maximumDistanceFt"], "sourceTargetWithinHalfFoot": score["sourceTargetZScore"]["withinHalfFoot"]},
         "roofPlan": {**roof, "actualProtectedPdfUnderlayVisible": True},
         "rcp": {**rcp, "actualProtectedPdfUnderlayVisible": True},
         "elevation": {**elevation, "actualProtectedPdfUnderlayVisible": True, "exactInstalledHeadZReady": False},
         "model3d": model3d,
         "visualReview": {"browserInspected": False, "decodedImageCount": 0, "consoleErrors": None},
-        "claimBoundary": {"buildingJCalibrationScored": True, "sourceGeneratedPlacementVerified": False, "freshProjectPlacementVerified": False, "complianceReady": False, "fabricationReady": False, "fieldReleaseReady": False},
+        "claimBoundary": {"buildingJCalibrationScored": True, "sourceGeneratedPlacementVerified": score["sourceGeneratedPlacementVerified"], "freshProjectPlacementVerified": False, "obstructionClearancesVerified": False, "complianceReady": False, "fabricationReady": False, "fieldReleaseReady": False},
     }
     manifest_path = output_dir / "proof.json"
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")

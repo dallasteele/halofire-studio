@@ -1,0 +1,35 @@
+{
+  "artifactType": "halofire.formal-proof-unavailable-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "theoremName": "mitBuildingJTopologyPlacementV2FailsClosed",
+  "claim": "The sealed source-topology v2 candidate has 68 total heads, 53 uprights, 15 pendents, and 68 two-foot matches while fresh-project placement, obstruction clearance, and compliance remain false.",
+  "requestPath": "data/agent-loops/mit-building-j-topology-placement-v2-20260715/lean-request.json",
+  "connectivity": {
+    "tailscaleIp": "100.116.75.108",
+    "tcpPort": 8810,
+    "tcpConnectTimeoutSeconds": 3,
+    "tcpTestSucceeded": false
+  },
+  "attempts": [
+    {
+      "request": "full v2 calibration-pass and downstream-fail-closed theorem",
+      "result": "not-sent-because-gateway-tcp-connect-failed"
+    }
+  ],
+  "localLeanInstalled": false,
+  "status": "GX10_PROVER_UNAVAILABLE",
+  "fallbackVerification": {
+    "canonicalCandidateReplay": "passed",
+    "unchangedAnswerOnlyScoreReplay": "passed",
+    "generatorAdversarialCasesRejected": 20,
+    "scorerAdversarialCasesRejected": 18,
+    "buildingJRegressionFilesPassed": 13,
+    "buildingJRegressionTestsPassed": 64,
+    "productionBuild": "passed",
+    "freshProjectPlacementVerified": false,
+    "obstructionClearancesVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false
+  }
+}

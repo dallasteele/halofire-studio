@@ -1,0 +1,93 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-generated-placement-visual-proof.v2",
+  "parentProtectedUnderlayProof": {
+    "sourcePdf": {
+      "bytes": 116713715,
+      "sha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c"
+    },
+    "proofSha256": "7b9efe85c155652a01b7dd224e6ea7f9bff0c58eaf8b9677bf7b683b33dedfc7"
+  },
+  "score": {
+    "candidateReceiptSha256": "f63cd9821f118ec1b3e94cac9cf74eabb8a690be90e33c50558bf8c94b083985",
+    "scoreReceiptSha256": "b5a34e857f70240358a77c08926008acc14b678cec3e94ac3c2e96a6aaa5eca6",
+    "accepted": true,
+    "thresholdMatches": [
+      {
+        "thresholdFt": 1,
+        "matched": 53,
+        "answerRecallPct": 77.941
+      },
+      {
+        "thresholdFt": 2,
+        "matched": 68,
+        "answerRecallPct": 100
+      },
+      {
+        "thresholdFt": 4,
+        "matched": 68,
+        "answerRecallPct": 100
+      },
+      {
+        "thresholdFt": 6,
+        "matched": 68,
+        "answerRecallPct": 100
+      }
+    ],
+    "generatedCount": 68,
+    "answerCount": 68,
+    "meanDistanceFt": 0.711407,
+    "maximumDistanceFt": 1.902976,
+    "sourceTargetWithinHalfFoot": 68
+  },
+  "roofPlan": {
+    "file": "generated-vs-completed-roof-plan.png",
+    "bytes": 375480,
+    "sha256": "4e1c1f8145eed2147f41550e8a924158936a992365a7fb8549db56cdda3f1d85",
+    "width": 1860,
+    "height": 2410,
+    "actualProtectedPdfUnderlayVisible": true
+  },
+  "rcp": {
+    "file": "generated-vs-completed-rcp.png",
+    "bytes": 679998,
+    "sha256": "04ff32d83b281a989d6d3686bf38b1fff5c8c8b1eb1803c1d070c58b671e04fd",
+    "width": 2100,
+    "height": 2760,
+    "actualProtectedPdfUnderlayVisible": true
+  },
+  "elevation": {
+    "file": "generated-vs-completed-elevation.png",
+    "bytes": 657899,
+    "sha256": "96f0a762a87f84b5c705e86515b53318f772fe57ce31016993fe1e440ed7acfd",
+    "width": 3050,
+    "height": 1690,
+    "actualProtectedPdfUnderlayVisible": true,
+    "exactInstalledHeadZReady": false
+  },
+  "model3d": {
+    "file": "generated-vs-completed-3d.svg",
+    "bytes": 450507,
+    "sha256": "217628a6f974569e193c3a0c5116c4348b89c6870eada9ac42fbc09a3bce0e82",
+    "protectedPdfPlanProjectedInto3d": true,
+    "generatedCandidateCount": 68,
+    "completedAnswerCount": 68
+  },
+  "visualReview": {
+    "browserInspected": true,
+    "decodedImageCount": 4,
+    "consoleErrors": 0,
+    "normalZoomLayoutReadable": true,
+    "protectedUnderlaysVisiblyPresent": true,
+    "calibrationPassVisiblyDisclosed": true,
+    "remainingFailureBoundaryVisiblyDisclosed": true
+  },
+  "claimBoundary": {
+    "buildingJCalibrationScored": true,
+    "sourceGeneratedPlacementVerified": true,
+    "freshProjectPlacementVerified": false,
+    "obstructionClearancesVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

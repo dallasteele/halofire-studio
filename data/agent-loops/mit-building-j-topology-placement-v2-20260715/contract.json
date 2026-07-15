@@ -1,0 +1,59 @@
+{
+  "name": "mit-building-j-topology-placement-v2-20260715",
+  "owner": "codex",
+  "goal": "Generate a sealed Building J v2 sprinkler placement from protected architectural placement inputs and protected-source topology only, then run the unchanged answer-only scorer and render the result on the actual PDF plan, RCP, sections, and projected 3D underlay.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-09-CODEX-MASTER-BUILD.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-13-CODEX-MASTER-BUILD-ADDENDUM-01-PLATFORM-SPINE.md",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-placement-inputs.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-topology-inputs.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-roof-plane-elevation.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-head-coordinate-registration.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-ceiling-installation-envelope.json"
+  ],
+  "exit_criteria": [
+    "candidate generation reads only the sealed source placement and source topology packets",
+    "main open-structure placement binds every other protected structural framing axis and protected structural grid rows",
+    "membrane placement partitions by protected O.T.S. room polygons and local labels",
+    "pendent placement binds protected ceiling components and source ceiling controls",
+    "candidate is sealed before the registered completed answer is opened",
+    "unchanged answer-only score enforces count parity, kind parity, at least 90 percent within 2 feet, and no unmatched answer",
+    "actual protected PDF plan, RCP, pitched-roof sections, and projected 3D underlay are browser inspected",
+    "fresh-project placement, exact obstruction clearances, compliance, hydraulics, fabrication, and release remain false",
+    "deterministic replay, adversarial mutation, Building J regression, syntax, production build, formal proof or exact unavailability, rules verification, and brain gate are recorded"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source placement and topology receipt replay",
+    "static forbidden-answer path scan on the generator",
+    "twenty adversarial generator attacks",
+    "unchanged answer-only score after candidate sealing",
+    "eighteen adversarial scorer attacks",
+    "thirteen-file Building J regression suite",
+    "JavaScript syntax, Python compile, and AutoSprink Vite production build",
+    "GX10 Lean 4 proof or exact prover-unavailable receipt",
+    "authoritative agentic-rule verification",
+    "real-browser proof inspection and four-image decode",
+    "brain preflight and postflight or exact HAL brain infrastructure failure"
+  ],
+  "state_path": "data/agent-loops/mit-building-j-topology-placement-v2-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/mit-riverside-building-j-topology-placement-v2.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-topology-placement-v2-score.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-topology-placement-v2",
+    "apps/autosprink/src/engine/mit-riverside-building-j-topology-placement-v2.js",
+    "apps/autosprink/src/engine/mit-riverside-building-j-topology-placement-v2-score.js",
+    "apps/autosprink/tests/mit-riverside-building-j-topology-placement-v2.test.js",
+    "data/agent-loops/mit-building-j-topology-placement-v2-20260715/state.json",
+    "BUILD_LOG.md"
+  ],
+  "max_iterations": 12,
+  "max_tokens": 300000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

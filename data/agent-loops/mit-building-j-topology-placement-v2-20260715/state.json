@@ -1,0 +1,86 @@
+{
+  "loop": "mit-building-j-topology-placement-v2-20260715",
+  "stage": "VERIFY",
+  "status": "building-j-calibration-passed-fresh-holdout-and-downstream-gates-blocked",
+  "iteration": 7,
+  "projectId": "mit-riverside-building-j",
+  "sourceInputsReceiptSha256": "dba074f679fdee7e208c78339212493386dbb3a6f948399cd759e98eebf22021",
+  "sourceTopologyReceiptSha256": "53291d7f0354b925fbd3975da73bcee549539b5c1b67a3458e755b7a7575f771",
+  "candidateReceiptSha256": "f63cd9821f118ec1b3e94cac9cf74eabb8a690be90e33c50558bf8c94b083985",
+  "scoreReceiptSha256": "b5a34e857f70240358a77c08926008acc14b678cec3e94ac3c2e96a6aaa5eca6",
+  "counts": {
+    "generated": 68,
+    "answer": 68,
+    "uprightGenerated": 53,
+    "uprightAnswer": 53,
+    "pendentGenerated": 15,
+    "pendentAnswer": 15,
+    "mainOpenStructure": 36,
+    "membraneOpenStructure": 17
+  },
+  "xyScore": {
+    "withinOneFoot": 53,
+    "withinTwoFeet": 68,
+    "withinTwoFeetRecallPct": 100,
+    "meanDistanceFt": 0.711407,
+    "p95DistanceFt": 1.704202,
+    "maximumDistanceFt": 1.902976,
+    "unmatchedGenerated": 0,
+    "unmatchedAnswer": 0
+  },
+  "sourceTargetZScore": {
+    "paired": 68,
+    "withinHalfFoot": 68,
+    "meanAbsoluteDeltaFt": 0.019757,
+    "exactInstalledHeadZCompared": false
+  },
+  "sequence": {
+    "candidateSealedBeforeAnswerOpen": true,
+    "candidateModifiedAfterAnswerOpen": false,
+    "answerOpenedByScorerOnly": true,
+    "scorerCanGenerateCandidates": false,
+    "historicalAnswerExposureDisclosed": true,
+    "freshProjectHoldoutRequired": true
+  },
+  "visualProof": {
+    "browserInspected": true,
+    "decodedImageCount": 4,
+    "consoleErrors": 0,
+    "normalZoomLayoutReadable": true,
+    "protectedRoofPlanUnderlayVisible": true,
+    "protectedRcpUnderlayVisible": true,
+    "protectedPitchedRoofSectionsVisible": true,
+    "protectedPlanProjectedInto3d": true,
+    "calibrationPassVisiblyDisclosed": true,
+    "remainingFailureBoundaryVisiblyDisclosed": true
+  },
+  "verification": {
+    "focusedV2TestsPassed": 7,
+    "buildingJRegressionFilesPassed": 13,
+    "buildingJRegressionTestsPassed": 64,
+    "generatorAdversarialCasesRejected": 20,
+    "scorerAdversarialCasesRejected": 18,
+    "javascriptSyntax": "passed",
+    "pythonCompile": "passed",
+    "viteBuild": "passed",
+    "agenticRules": "passed",
+    "formalProver": "GX10_PROVER_UNAVAILABLE-tcp-8810-connect-failed-local-lean-not-installed",
+    "formalFallbackReceipt": "data/agent-loops/mit-building-j-topology-placement-v2-20260715/lean-proof.json"
+  },
+  "claims": {
+    "buildingJCalibrationScored": true,
+    "sourceGeneratedPlacementVerified": true,
+    "freshProjectPlacementVerified": false,
+    "exactMechanicalObstructionFootprintsReady": false,
+    "exactStructuralMemberDepthsReady": false,
+    "obstructionClearancesVerified": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "implementationCommit": null,
+  "brainPreflightStatus": "HAL_BRAIN_TOKEN_UNAVAILABLE",
+  "brainPostflightEpisodeId": null,
+  "nextAction": "run the same source-topology placement policy on a fresh source-sealed pitched-roof project before any production promotion, then add exact obstruction footprints, member depths, and clearance verification"
+}

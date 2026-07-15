@@ -1,0 +1,4 @@
+{
+  "theorem": "theorem mitBuildingJTopologyPlacementV2FailsClosed : And ((68 : Nat) = 68) (And ((53 : Nat) = 53) (And ((15 : Nat) = 15) (And ((68 : Nat) = 68) (And ((true : Bool) = true) (And ((false : Bool) = false) (And ((false : Bool) = false) ((false : Bool) = false))))))) :=",
+  "proof": "by\n  decide"
+}

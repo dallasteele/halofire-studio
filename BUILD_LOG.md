@@ -21,6 +21,37 @@ reference log entries by date; log entries reference commits by short hash.
 
 ## 2026-07-15
 
+### Entry 03 - Building J topology-aware placement v2 (commit pending)
+
+- Replaced the rejected whole-region grid with transferable protected-source
+  rules: every other real structural framing axis plus source-grid-centered
+  rows in the main bay, polygon-contained O.T.S. room placement in the membrane
+  area, and source ceiling-component placement for pendents. The generator has
+  no completed-answer dependency and sealed receipt
+  `f63cd9821f118ec1b3e94cac9cf74eabb8a690be90e33c50558bf8c94b083985`
+  before the scorer opened the registered completed bid.
+- The candidate has exact count and kind parity: 68 total, 53 upright, and 15
+  pendent. The unchanged answer-only scorer matched all 68 within two feet,
+  53 within one foot, with 0.711407-foot mean, 1.704202-foot p95, and
+  1.902976-foot maximum XY residual. All 68 source protection target Z values
+  are within half a foot; exact installed head Z remains unknown.
+- Produced and browser-inspected top, RCP, pitched-roof section/elevation, and
+  projected-3D proof views. All four decoded at normal zoom and visibly retain
+  the actual protected PDF underlay. The page explicitly separates the passed
+  Building J calibration from the still-blocked fresh holdout, obstruction,
+  compliance, hydraulic, fabrication, and release gates.
+- Verification passed 7/7 focused v2 tests, all 64/64 Building J regression
+  tests across 13 files, 20/20 adversarial generator attacks, 18/18 adversarial
+  scorer attacks, JavaScript syntax, Python compilation, AutoSprink Vite
+  production build, and authoritative agentic-rule verification.
+- GX10 Lean port 8810 remained unreachable and local Lean is absent; the exact
+  theorem request and fail-closed prover-unavailable receipt are retained.
+  Obsidian brain recall was attempted again and failed closed with
+  `HAL_BRAIN_TOKEN_UNAVAILABLE`; no recall is claimed.
+- Next: run this same sealed policy on a fresh pitched-roof project whose
+  completed answer has not influenced the rule, then extract exact obstruction
+  footprints/member depths and verify clearances before any production deploy.
+
 ### Entry 02 - Building J protected-source topology inventory (commit `e554eb52`)
 
 - Extracted 13 room-zone polygons, 105 wall-material polygons, 23 embedded

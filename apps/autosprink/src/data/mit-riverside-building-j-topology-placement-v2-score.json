@@ -1,0 +1,1538 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-generated-placement-score.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "sequence": {
+    "sourceCandidateReceiptSha256": "f63cd9821f118ec1b3e94cac9cf74eabb8a690be90e33c50558bf8c94b083985",
+    "sourceCandidateSealedBeforeAnswerOpen": true,
+    "sourceCandidateModifiedAfterAnswerOpen": false,
+    "answerOpenedByScorerOnly": true,
+    "scorerCanGenerateCandidates": false
+  },
+  "answerBindings": {
+    "headCoordinateReceiptSha256": "9aaf2c5b5136f6d961505a683e3718b61f758785d5cae7d9d301e94341d9830b",
+    "sourceProtectionTargetReceiptSha256": "dabb807d19c4aa5f59ea24fbb2c0d87d97508f655d168a7601eec94c73de86b5"
+  },
+  "counts": {
+    "generated": {
+      "total": 68,
+      "upright": 53,
+      "pendent": 15,
+      "mainOpenStructure": 36,
+      "membraneOpenStructure": 17,
+      "ceilingComponents": 5,
+      "excludedSlenderSingletonSoffits": 1
+    },
+    "answer": {
+      "pendent": 15,
+      "upright": 53,
+      "total": 68
+    },
+    "deltaTotal": 0,
+    "deltaUpright": 0,
+    "deltaPendent": 0
+  },
+  "xyScore": {
+    "method": "exact maximum bipartite threshold counts plus exact minimum-total-distance Hungarian residual ledger by sprinkler kind",
+    "thresholdMatches": [
+      {
+        "thresholdFt": 1,
+        "matched": 53,
+        "answerRecallPct": 77.941
+      },
+      {
+        "thresholdFt": 2,
+        "matched": 68,
+        "answerRecallPct": 100
+      },
+      {
+        "thresholdFt": 4,
+        "matched": 68,
+        "answerRecallPct": 100
+      },
+      {
+        "thresholdFt": 6,
+        "matched": 68,
+        "answerRecallPct": 100
+      }
+    ],
+    "pairedCount": 68,
+    "meanDistanceFt": 0.711407,
+    "medianDistanceFt": 0.530892,
+    "p95DistanceFt": 1.704202,
+    "maximumDistanceFt": 1.902976,
+    "unmatchedGeneratedIds": [],
+    "unmatchedAnswerIds": []
+  },
+  "sourceTargetZScore": {
+    "pairedTargetCount": 68,
+    "withinHalfFoot": 68,
+    "meanAbsoluteDeltaFt": 0.019757,
+    "p95AbsoluteDeltaFt": 0.053479,
+    "exactInstalledHeadZCompared": false
+  },
+  "residualPairs": [
+    {
+      "candidateId": "MIT-J-V2-P-001",
+      "answerId": "MIT-J-P-001",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 4.765831,
+        "y": 71.41263
+      },
+      "answerStructuralLocalFt": {
+        "x": 4.320688,
+        "y": 71.272828
+      },
+      "deltaFt": {
+        "x": 0.445143,
+        "y": 0.139802
+      },
+      "distanceFt": 0.46658,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-002",
+      "answerId": "MIT-J-P-002",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 12.922245,
+        "y": 71.41263
+      },
+      "answerStructuralLocalFt": {
+        "x": 13.321731,
+        "y": 71.272828
+      },
+      "deltaFt": {
+        "x": -0.399486,
+        "y": 0.139802
+      },
+      "distanceFt": 0.423242,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-008",
+      "answerId": "MIT-J-P-003",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 39.035283,
+        "y": 71.809064
+      },
+      "answerStructuralLocalFt": {
+        "x": 37.777866,
+        "y": 71.272835
+      },
+      "deltaFt": {
+        "x": 1.257417,
+        "y": 0.536229
+      },
+      "distanceFt": 1.366982,
+      "candidateSourceProtectionPlaneZFt": 10,
+      "answerSourceProtectionPlaneZFt": 10,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-009",
+      "answerId": "MIT-J-P-004",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 44.332942,
+        "y": 71.809064
+      },
+      "answerStructuralLocalFt": {
+        "x": 45.778793,
+        "y": 71.272835
+      },
+      "deltaFt": {
+        "x": -1.445851,
+        "y": 0.536229
+      },
+      "distanceFt": 1.542085,
+      "candidateSourceProtectionPlaneZFt": 10,
+      "answerSourceProtectionPlaneZFt": 10,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-003",
+      "answerId": "MIT-J-P-005",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 4.765831,
+        "y": 83.237652
+      },
+      "answerStructuralLocalFt": {
+        "x": 4.320702,
+        "y": 83.275255
+      },
+      "deltaFt": {
+        "x": 0.445129,
+        "y": -0.037603
+      },
+      "distanceFt": 0.446714,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-004",
+      "answerId": "MIT-J-P-006",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 12.922245,
+        "y": 83.237652
+      },
+      "answerStructuralLocalFt": {
+        "x": 13.321744,
+        "y": 83.275255
+      },
+      "deltaFt": {
+        "x": -0.399499,
+        "y": -0.037603
+      },
+      "distanceFt": 0.401265,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-010",
+      "answerId": "MIT-J-P-007",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 41.27052,
+        "y": 83.148717
+      },
+      "answerStructuralLocalFt": {
+        "x": 41.298317,
+        "y": 83.461959
+      },
+      "deltaFt": {
+        "x": -0.027797,
+        "y": -0.313242
+      },
+      "distanceFt": 0.314473,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-011",
+      "answerId": "MIT-J-P-008",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 53.27052,
+        "y": 83.148717
+      },
+      "answerStructuralLocalFt": {
+        "x": 53.299705,
+        "y": 83.461959
+      },
+      "deltaFt": {
+        "x": -0.029185,
+        "y": -0.313242
+      },
+      "distanceFt": 0.314599,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-012",
+      "answerId": "MIT-J-P-009",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 65.27052,
+        "y": 83.148717
+      },
+      "answerStructuralLocalFt": {
+        "x": 65.301092,
+        "y": 83.461959
+      },
+      "deltaFt": {
+        "x": -0.030572,
+        "y": -0.313242
+      },
+      "distanceFt": 0.31473,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-005",
+      "answerId": "MIT-J-P-010",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 32.248453,
+        "y": 88.204052
+      },
+      "answerStructuralLocalFt": {
+        "x": 32.2706,
+        "y": 86.835973
+      },
+      "deltaFt": {
+        "x": -0.022147,
+        "y": 1.368079
+      },
+      "distanceFt": 1.368258,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-006",
+      "answerId": "MIT-J-P-011",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 22.763379,
+        "y": 95.498841
+      },
+      "answerStructuralLocalFt": {
+        "x": 23.629577,
+        "y": 94.81092
+      },
+      "deltaFt": {
+        "x": -0.866198,
+        "y": 0.687921
+      },
+      "distanceFt": 1.106135,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-007",
+      "answerId": "MIT-J-P-012",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 32.248453,
+        "y": 95.498841
+      },
+      "answerStructuralLocalFt": {
+        "x": 32.270607,
+        "y": 94.837591
+      },
+      "deltaFt": {
+        "x": -0.022154,
+        "y": 0.66125
+      },
+      "distanceFt": 0.661621,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-013",
+      "answerId": "MIT-J-P-013",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 41.27052,
+        "y": 95.147617
+      },
+      "answerStructuralLocalFt": {
+        "x": 41.298345,
+        "y": 94.970959
+      },
+      "deltaFt": {
+        "x": -0.027825,
+        "y": 0.176658
+      },
+      "distanceFt": 0.178836,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-014",
+      "answerId": "MIT-J-P-014",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 53.27052,
+        "y": 95.147617
+      },
+      "answerStructuralLocalFt": {
+        "x": 53.299732,
+        "y": 94.970959
+      },
+      "deltaFt": {
+        "x": -0.029212,
+        "y": 0.176658
+      },
+      "distanceFt": 0.179057,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-P-015",
+      "answerId": "MIT-J-P-015",
+      "kind": "pendent",
+      "candidateStructuralLocalFt": {
+        "x": 65.27052,
+        "y": 95.147617
+      },
+      "answerStructuralLocalFt": {
+        "x": 65.30112,
+        "y": 94.970959
+      },
+      "deltaFt": {
+        "x": -0.0306,
+        "y": 0.176658
+      },
+      "distanceFt": 0.179289,
+      "candidateSourceProtectionPlaneZFt": 9,
+      "answerSourceProtectionPlaneZFt": 9,
+      "sourceTargetZDeltaFt": 0
+    },
+    {
+      "candidateId": "MIT-J-V2-U-001",
+      "answerId": "MIT-J-U-001",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 5.402778
+      },
+      "answerStructuralLocalFt": {
+        "x": 5.240791,
+        "y": 5.53954
+      },
+      "deltaFt": {
+        "x": -0.018569,
+        "y": -0.136762
+      },
+      "distanceFt": 0.138017,
+      "candidateSourceProtectionPlaneZFt": 17.646122,
+      "answerSourceProtectionPlaneZFt": 17.660368,
+      "sourceTargetZDeltaFt": -0.014246
+    },
+    {
+      "candidateId": "MIT-J-V2-U-002",
+      "answerId": "MIT-J-U-002",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 5.402778
+      },
+      "answerStructuralLocalFt": {
+        "x": 15.241941,
+        "y": 5.53954
+      },
+      "deltaFt": {
+        "x": 0.424726,
+        "y": -0.136762
+      },
+      "distanceFt": 0.446202,
+      "candidateSourceProtectionPlaneZFt": 17.646122,
+      "answerSourceProtectionPlaneZFt": 17.660368,
+      "sourceTargetZDeltaFt": -0.014246
+    },
+    {
+      "candidateId": "MIT-J-V2-U-003",
+      "answerId": "MIT-J-U-003",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 5.402778
+      },
+      "answerStructuralLocalFt": {
+        "x": 25.243092,
+        "y": 5.53954
+      },
+      "deltaFt": {
+        "x": 0.422454,
+        "y": -0.136762
+      },
+      "distanceFt": 0.44404,
+      "candidateSourceProtectionPlaneZFt": 17.646122,
+      "answerSourceProtectionPlaneZFt": 17.660368,
+      "sourceTargetZDeltaFt": -0.014246
+    },
+    {
+      "candidateId": "MIT-J-V2-U-004",
+      "answerId": "MIT-J-U-004",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 5.402778
+      },
+      "answerStructuralLocalFt": {
+        "x": 35.244242,
+        "y": 5.53954
+      },
+      "deltaFt": {
+        "x": 0.420846,
+        "y": -0.136762
+      },
+      "distanceFt": 0.44251,
+      "candidateSourceProtectionPlaneZFt": 17.646122,
+      "answerSourceProtectionPlaneZFt": 17.660368,
+      "sourceTargetZDeltaFt": -0.014246
+    },
+    {
+      "candidateId": "MIT-J-V2-U-005",
+      "answerId": "MIT-J-U-005",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 5.402778
+      },
+      "answerStructuralLocalFt": {
+        "x": 45.245393,
+        "y": 5.53954
+      },
+      "deltaFt": {
+        "x": 0.421274,
+        "y": -0.136762
+      },
+      "distanceFt": 0.442917,
+      "candidateSourceProtectionPlaneZFt": 17.646122,
+      "answerSourceProtectionPlaneZFt": 17.660368,
+      "sourceTargetZDeltaFt": -0.014246
+    },
+    {
+      "candidateId": "MIT-J-V2-U-006",
+      "answerId": "MIT-J-U-006",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 5.402778
+      },
+      "answerStructuralLocalFt": {
+        "x": 55.246544,
+        "y": 5.53954
+      },
+      "deltaFt": {
+        "x": 0.866462,
+        "y": -0.136762
+      },
+      "distanceFt": 0.877189,
+      "candidateSourceProtectionPlaneZFt": 17.646122,
+      "answerSourceProtectionPlaneZFt": 17.660368,
+      "sourceTargetZDeltaFt": -0.014246
+    },
+    {
+      "candidateId": "MIT-J-V2-U-007",
+      "answerId": "MIT-J-U-007",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 16.208333
+      },
+      "answerStructuralLocalFt": {
+        "x": 5.240791,
+        "y": 16.208364
+      },
+      "deltaFt": {
+        "x": -0.018569,
+        "y": -0.000031
+      },
+      "distanceFt": 0.018569,
+      "candidateSourceProtectionPlaneZFt": 18.771701,
+      "answerSourceProtectionPlaneZFt": 18.771704,
+      "sourceTargetZDeltaFt": -0.000003
+    },
+    {
+      "candidateId": "MIT-J-V2-U-008",
+      "answerId": "MIT-J-U-008",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 16.208333
+      },
+      "answerStructuralLocalFt": {
+        "x": 15.241941,
+        "y": 16.208364
+      },
+      "deltaFt": {
+        "x": 0.424726,
+        "y": -0.000031
+      },
+      "distanceFt": 0.424726,
+      "candidateSourceProtectionPlaneZFt": 18.771701,
+      "answerSourceProtectionPlaneZFt": 18.771704,
+      "sourceTargetZDeltaFt": -0.000003
+    },
+    {
+      "candidateId": "MIT-J-V2-U-009",
+      "answerId": "MIT-J-U-009",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 16.208333
+      },
+      "answerStructuralLocalFt": {
+        "x": 25.243092,
+        "y": 16.208364
+      },
+      "deltaFt": {
+        "x": 0.422454,
+        "y": -0.000031
+      },
+      "distanceFt": 0.422454,
+      "candidateSourceProtectionPlaneZFt": 18.771701,
+      "answerSourceProtectionPlaneZFt": 18.771704,
+      "sourceTargetZDeltaFt": -0.000003
+    },
+    {
+      "candidateId": "MIT-J-V2-U-010",
+      "answerId": "MIT-J-U-010",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 16.208333
+      },
+      "answerStructuralLocalFt": {
+        "x": 35.244242,
+        "y": 16.208364
+      },
+      "deltaFt": {
+        "x": 0.420846,
+        "y": -0.000031
+      },
+      "distanceFt": 0.420846,
+      "candidateSourceProtectionPlaneZFt": 18.771701,
+      "answerSourceProtectionPlaneZFt": 18.771704,
+      "sourceTargetZDeltaFt": -0.000003
+    },
+    {
+      "candidateId": "MIT-J-V2-U-011",
+      "answerId": "MIT-J-U-011",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 16.208333
+      },
+      "answerStructuralLocalFt": {
+        "x": 45.245393,
+        "y": 16.208364
+      },
+      "deltaFt": {
+        "x": 0.421274,
+        "y": -0.000031
+      },
+      "distanceFt": 0.421274,
+      "candidateSourceProtectionPlaneZFt": 18.771701,
+      "answerSourceProtectionPlaneZFt": 18.771704,
+      "sourceTargetZDeltaFt": -0.000003
+    },
+    {
+      "candidateId": "MIT-J-V2-U-012",
+      "answerId": "MIT-J-U-012",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 16.208333
+      },
+      "answerStructuralLocalFt": {
+        "x": 55.246544,
+        "y": 16.208364
+      },
+      "deltaFt": {
+        "x": 0.866462,
+        "y": -0.000031
+      },
+      "distanceFt": 0.866462,
+      "candidateSourceProtectionPlaneZFt": 18.771701,
+      "answerSourceProtectionPlaneZFt": 18.771704,
+      "sourceTargetZDeltaFt": -0.000003
+    },
+    {
+      "candidateId": "MIT-J-V2-U-013",
+      "answerId": "MIT-J-U-013",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 27.013889
+      },
+      "answerStructuralLocalFt": {
+        "x": 5.240791,
+        "y": 26.877188
+      },
+      "deltaFt": {
+        "x": -0.018569,
+        "y": 0.136701
+      },
+      "distanceFt": 0.137956,
+      "candidateSourceProtectionPlaneZFt": 19.89728,
+      "answerSourceProtectionPlaneZFt": 19.88304,
+      "sourceTargetZDeltaFt": 0.01424
+    },
+    {
+      "candidateId": "MIT-J-V2-U-014",
+      "answerId": "MIT-J-U-014",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 27.013889
+      },
+      "answerStructuralLocalFt": {
+        "x": 15.241941,
+        "y": 26.877188
+      },
+      "deltaFt": {
+        "x": 0.424726,
+        "y": 0.136701
+      },
+      "distanceFt": 0.446183,
+      "candidateSourceProtectionPlaneZFt": 19.89728,
+      "answerSourceProtectionPlaneZFt": 19.88304,
+      "sourceTargetZDeltaFt": 0.01424
+    },
+    {
+      "candidateId": "MIT-J-V2-U-015",
+      "answerId": "MIT-J-U-015",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 27.013889
+      },
+      "answerStructuralLocalFt": {
+        "x": 25.243092,
+        "y": 26.877188
+      },
+      "deltaFt": {
+        "x": 0.422454,
+        "y": 0.136701
+      },
+      "distanceFt": 0.444021,
+      "candidateSourceProtectionPlaneZFt": 19.89728,
+      "answerSourceProtectionPlaneZFt": 19.88304,
+      "sourceTargetZDeltaFt": 0.01424
+    },
+    {
+      "candidateId": "MIT-J-V2-U-016",
+      "answerId": "MIT-J-U-016",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 27.013889
+      },
+      "answerStructuralLocalFt": {
+        "x": 35.244242,
+        "y": 26.877188
+      },
+      "deltaFt": {
+        "x": 0.420846,
+        "y": 0.136701
+      },
+      "distanceFt": 0.442491,
+      "candidateSourceProtectionPlaneZFt": 19.89728,
+      "answerSourceProtectionPlaneZFt": 19.88304,
+      "sourceTargetZDeltaFt": 0.01424
+    },
+    {
+      "candidateId": "MIT-J-V2-U-017",
+      "answerId": "MIT-J-U-017",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 27.013889
+      },
+      "answerStructuralLocalFt": {
+        "x": 45.245393,
+        "y": 26.877188
+      },
+      "deltaFt": {
+        "x": 0.421274,
+        "y": 0.136701
+      },
+      "distanceFt": 0.442898,
+      "candidateSourceProtectionPlaneZFt": 19.89728,
+      "answerSourceProtectionPlaneZFt": 19.88304,
+      "sourceTargetZDeltaFt": 0.01424
+    },
+    {
+      "candidateId": "MIT-J-V2-U-018",
+      "answerId": "MIT-J-U-018",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 27.013889
+      },
+      "answerStructuralLocalFt": {
+        "x": 55.246544,
+        "y": 26.877188
+      },
+      "deltaFt": {
+        "x": 0.866462,
+        "y": 0.136701
+      },
+      "distanceFt": 0.877179,
+      "candidateSourceProtectionPlaneZFt": 19.89728,
+      "answerSourceProtectionPlaneZFt": 19.88304,
+      "sourceTargetZDeltaFt": 0.01424
+    },
+    {
+      "candidateId": "MIT-J-V2-U-019",
+      "answerId": "MIT-J-U-019",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 37.819444
+      },
+      "answerStructuralLocalFt": {
+        "x": 5.240791,
+        "y": 38.332839
+      },
+      "deltaFt": {
+        "x": -0.018569,
+        "y": -0.513395
+      },
+      "distanceFt": 0.513731,
+      "candidateSourceProtectionPlaneZFt": 21.022858,
+      "answerSourceProtectionPlaneZFt": 21.076337,
+      "sourceTargetZDeltaFt": -0.053479
+    },
+    {
+      "candidateId": "MIT-J-V2-U-020",
+      "answerId": "MIT-J-U-020",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 37.819444
+      },
+      "answerStructuralLocalFt": {
+        "x": 15.241941,
+        "y": 38.332839
+      },
+      "deltaFt": {
+        "x": 0.424726,
+        "y": -0.513395
+      },
+      "distanceFt": 0.666308,
+      "candidateSourceProtectionPlaneZFt": 21.022858,
+      "answerSourceProtectionPlaneZFt": 21.076337,
+      "sourceTargetZDeltaFt": -0.053479
+    },
+    {
+      "candidateId": "MIT-J-V2-U-021",
+      "answerId": "MIT-J-U-021",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 37.819444
+      },
+      "answerStructuralLocalFt": {
+        "x": 25.243092,
+        "y": 38.332839
+      },
+      "deltaFt": {
+        "x": 0.422454,
+        "y": -0.513395
+      },
+      "distanceFt": 0.664862,
+      "candidateSourceProtectionPlaneZFt": 21.022858,
+      "answerSourceProtectionPlaneZFt": 21.076337,
+      "sourceTargetZDeltaFt": -0.053479
+    },
+    {
+      "candidateId": "MIT-J-V2-U-022",
+      "answerId": "MIT-J-U-022",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 37.819444
+      },
+      "answerStructuralLocalFt": {
+        "x": 35.244242,
+        "y": 38.332839
+      },
+      "deltaFt": {
+        "x": 0.420846,
+        "y": -0.513395
+      },
+      "distanceFt": 0.663842,
+      "candidateSourceProtectionPlaneZFt": 21.022858,
+      "answerSourceProtectionPlaneZFt": 21.076337,
+      "sourceTargetZDeltaFt": -0.053479
+    },
+    {
+      "candidateId": "MIT-J-V2-U-023",
+      "answerId": "MIT-J-U-023",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 37.819444
+      },
+      "answerStructuralLocalFt": {
+        "x": 45.245393,
+        "y": 38.332839
+      },
+      "deltaFt": {
+        "x": 0.421274,
+        "y": -0.513395
+      },
+      "distanceFt": 0.664113,
+      "candidateSourceProtectionPlaneZFt": 21.022858,
+      "answerSourceProtectionPlaneZFt": 21.076337,
+      "sourceTargetZDeltaFt": -0.053479
+    },
+    {
+      "candidateId": "MIT-J-V2-U-024",
+      "answerId": "MIT-J-U-024",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 37.819444
+      },
+      "answerStructuralLocalFt": {
+        "x": 55.246544,
+        "y": 38.332839
+      },
+      "deltaFt": {
+        "x": 0.866462,
+        "y": -0.513395
+      },
+      "distanceFt": 1.00714,
+      "candidateSourceProtectionPlaneZFt": 21.022858,
+      "answerSourceProtectionPlaneZFt": 21.076337,
+      "sourceTargetZDeltaFt": -0.053479
+    },
+    {
+      "candidateId": "MIT-J-V2-U-025",
+      "answerId": "MIT-J-U-025",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 48.625
+      },
+      "answerStructuralLocalFt": {
+        "x": 5.240791,
+        "y": 49.001663
+      },
+      "deltaFt": {
+        "x": -0.018569,
+        "y": -0.376663
+      },
+      "distanceFt": 0.37712,
+      "candidateSourceProtectionPlaneZFt": 22.148437,
+      "answerSourceProtectionPlaneZFt": 22.187673,
+      "sourceTargetZDeltaFt": -0.039236
+    },
+    {
+      "candidateId": "MIT-J-V2-U-026",
+      "answerId": "MIT-J-U-026",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 48.625
+      },
+      "answerStructuralLocalFt": {
+        "x": 15.241941,
+        "y": 49.001663
+      },
+      "deltaFt": {
+        "x": 0.424726,
+        "y": -0.376663
+      },
+      "distanceFt": 0.567686,
+      "candidateSourceProtectionPlaneZFt": 22.148437,
+      "answerSourceProtectionPlaneZFt": 22.187673,
+      "sourceTargetZDeltaFt": -0.039236
+    },
+    {
+      "candidateId": "MIT-J-V2-U-027",
+      "answerId": "MIT-J-U-027",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 48.625
+      },
+      "answerStructuralLocalFt": {
+        "x": 25.243092,
+        "y": 49.001663
+      },
+      "deltaFt": {
+        "x": 0.422454,
+        "y": -0.376663
+      },
+      "distanceFt": 0.565988,
+      "candidateSourceProtectionPlaneZFt": 22.148437,
+      "answerSourceProtectionPlaneZFt": 22.187673,
+      "sourceTargetZDeltaFt": -0.039236
+    },
+    {
+      "candidateId": "MIT-J-V2-U-028",
+      "answerId": "MIT-J-U-028",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 48.625
+      },
+      "answerStructuralLocalFt": {
+        "x": 35.244242,
+        "y": 49.001663
+      },
+      "deltaFt": {
+        "x": 0.420846,
+        "y": -0.376663
+      },
+      "distanceFt": 0.564789,
+      "candidateSourceProtectionPlaneZFt": 22.148437,
+      "answerSourceProtectionPlaneZFt": 22.187673,
+      "sourceTargetZDeltaFt": -0.039236
+    },
+    {
+      "candidateId": "MIT-J-V2-U-029",
+      "answerId": "MIT-J-U-029",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 48.625
+      },
+      "answerStructuralLocalFt": {
+        "x": 45.245393,
+        "y": 49.001663
+      },
+      "deltaFt": {
+        "x": 0.421274,
+        "y": -0.376663
+      },
+      "distanceFt": 0.565108,
+      "candidateSourceProtectionPlaneZFt": 22.148437,
+      "answerSourceProtectionPlaneZFt": 22.187673,
+      "sourceTargetZDeltaFt": -0.039236
+    },
+    {
+      "candidateId": "MIT-J-V2-U-030",
+      "answerId": "MIT-J-U-030",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 48.625
+      },
+      "answerStructuralLocalFt": {
+        "x": 55.246544,
+        "y": 49.001663
+      },
+      "deltaFt": {
+        "x": 0.866462,
+        "y": -0.376663
+      },
+      "distanceFt": 0.944792,
+      "candidateSourceProtectionPlaneZFt": 22.148437,
+      "answerSourceProtectionPlaneZFt": 22.187673,
+      "sourceTargetZDeltaFt": -0.039236
+    },
+    {
+      "candidateId": "MIT-J-V2-U-031",
+      "answerId": "MIT-J-U-031",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 59.430555
+      },
+      "answerStructuralLocalFt": {
+        "x": 5.240791,
+        "y": 59.670487
+      },
+      "deltaFt": {
+        "x": -0.018569,
+        "y": -0.239932
+      },
+      "distanceFt": 0.240649,
+      "candidateSourceProtectionPlaneZFt": 23.274016,
+      "answerSourceProtectionPlaneZFt": 23.299009,
+      "sourceTargetZDeltaFt": -0.024993
+    },
+    {
+      "candidateId": "MIT-J-V2-U-032",
+      "answerId": "MIT-J-U-032",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 59.430555
+      },
+      "answerStructuralLocalFt": {
+        "x": 15.241941,
+        "y": 59.670487
+      },
+      "deltaFt": {
+        "x": 0.424726,
+        "y": -0.239932
+      },
+      "distanceFt": 0.487811,
+      "candidateSourceProtectionPlaneZFt": 23.274016,
+      "answerSourceProtectionPlaneZFt": 23.299009,
+      "sourceTargetZDeltaFt": -0.024993
+    },
+    {
+      "candidateId": "MIT-J-V2-U-033",
+      "answerId": "MIT-J-U-033",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 59.430555
+      },
+      "answerStructuralLocalFt": {
+        "x": 25.243092,
+        "y": 59.670487
+      },
+      "deltaFt": {
+        "x": 0.422454,
+        "y": -0.239932
+      },
+      "distanceFt": 0.485834,
+      "candidateSourceProtectionPlaneZFt": 23.274016,
+      "answerSourceProtectionPlaneZFt": 23.299009,
+      "sourceTargetZDeltaFt": -0.024993
+    },
+    {
+      "candidateId": "MIT-J-V2-U-034",
+      "answerId": "MIT-J-U-034",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 59.430555
+      },
+      "answerStructuralLocalFt": {
+        "x": 35.244242,
+        "y": 59.670487
+      },
+      "deltaFt": {
+        "x": 0.420846,
+        "y": -0.239932
+      },
+      "distanceFt": 0.484436,
+      "candidateSourceProtectionPlaneZFt": 23.274016,
+      "answerSourceProtectionPlaneZFt": 23.299009,
+      "sourceTargetZDeltaFt": -0.024993
+    },
+    {
+      "candidateId": "MIT-J-V2-U-035",
+      "answerId": "MIT-J-U-035",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 59.430555
+      },
+      "answerStructuralLocalFt": {
+        "x": 45.245393,
+        "y": 59.670487
+      },
+      "deltaFt": {
+        "x": 0.421274,
+        "y": -0.239932
+      },
+      "distanceFt": 0.484808,
+      "candidateSourceProtectionPlaneZFt": 23.274016,
+      "answerSourceProtectionPlaneZFt": 23.299009,
+      "sourceTargetZDeltaFt": -0.024993
+    },
+    {
+      "candidateId": "MIT-J-V2-U-036",
+      "answerId": "MIT-J-U-036",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 59.430555
+      },
+      "answerStructuralLocalFt": {
+        "x": 55.246544,
+        "y": 59.670487
+      },
+      "deltaFt": {
+        "x": 0.866462,
+        "y": -0.239932
+      },
+      "distanceFt": 0.899068,
+      "candidateSourceProtectionPlaneZFt": 23.274016,
+      "answerSourceProtectionPlaneZFt": 23.299009,
+      "sourceTargetZDeltaFt": -0.024993
+    },
+    {
+      "candidateId": "MIT-J-V2-U-049",
+      "answerId": "MIT-J-U-037",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 68.874437,
+        "y": 67.143026
+      },
+      "answerStructuralLocalFt": {
+        "x": 68.634745,
+        "y": 68.965701
+      },
+      "deltaFt": {
+        "x": 0.239692,
+        "y": -1.822675
+      },
+      "distanceFt": 1.838368,
+      "candidateSourceProtectionPlaneZFt": 13.011155,
+      "answerSourceProtectionPlaneZFt": 12.94889,
+      "sourceTargetZDeltaFt": 0.062265
+    },
+    {
+      "candidateId": "MIT-J-V2-U-037",
+      "answerId": "MIT-J-U-038",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 20.664424,
+        "y": 71.107639
+      },
+      "answerStructuralLocalFt": {
+        "x": 19.709116,
+        "y": 71.966308
+      },
+      "deltaFt": {
+        "x": 0.955308,
+        "y": -0.858669
+      },
+      "distanceFt": 1.284494,
+      "candidateSourceProtectionPlaneZFt": 12.887261,
+      "answerSourceProtectionPlaneZFt": 12.851267,
+      "sourceTargetZDeltaFt": 0.035994
+    },
+    {
+      "candidateId": "MIT-J-V2-U-053",
+      "answerId": "MIT-J-U-039",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 30.735785,
+        "y": 71.78178
+      },
+      "answerStructuralLocalFt": {
+        "x": 30.216992,
+        "y": 71.966308
+      },
+      "deltaFt": {
+        "x": 0.518793,
+        "y": -0.184528
+      },
+      "distanceFt": 0.550633,
+      "candidateSourceProtectionPlaneZFt": 12.866194,
+      "answerSourceProtectionPlaneZFt": 12.851267,
+      "sourceTargetZDeltaFt": 0.014927
+    },
+    {
+      "candidateId": "MIT-J-V2-U-051",
+      "answerId": "MIT-J-U-040",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 50.28586,
+        "y": 71.807822
+      },
+      "answerStructuralLocalFt": {
+        "x": 49.219178,
+        "y": 71.966308
+      },
+      "deltaFt": {
+        "x": 1.066682,
+        "y": -0.158486
+      },
+      "distanceFt": 1.078392,
+      "candidateSourceProtectionPlaneZFt": 12.865381,
+      "answerSourceProtectionPlaneZFt": 12.851267,
+      "sourceTargetZDeltaFt": 0.014114
+    },
+    {
+      "candidateId": "MIT-J-V2-U-052",
+      "answerId": "MIT-J-U-041",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 56.081682,
+        "y": 71.807822
+      },
+      "answerStructuralLocalFt": {
+        "x": 56.219983,
+        "y": 71.966308
+      },
+      "deltaFt": {
+        "x": -0.138301,
+        "y": -0.158486
+      },
+      "distanceFt": 0.210345,
+      "candidateSourceProtectionPlaneZFt": 12.865381,
+      "answerSourceProtectionPlaneZFt": 12.851267,
+      "sourceTargetZDeltaFt": 0.014114
+    },
+    {
+      "candidateId": "MIT-J-V2-U-050",
+      "answerId": "MIT-J-U-042",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 62.682468,
+        "y": 71.984905
+      },
+      "answerStructuralLocalFt": {
+        "x": 64.220904,
+        "y": 71.966308
+      },
+      "deltaFt": {
+        "x": -1.538436,
+        "y": 0.018597
+      },
+      "distanceFt": 1.538548,
+      "candidateSourceProtectionPlaneZFt": 12.859847,
+      "answerSourceProtectionPlaneZFt": 12.851267,
+      "sourceTargetZDeltaFt": 0.00858
+    },
+    {
+      "candidateId": "MIT-J-V2-U-048",
+      "answerId": "MIT-J-U-043",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 68.698057,
+        "y": 72.873454
+      },
+      "answerStructuralLocalFt": {
+        "x": 68.634745,
+        "y": 71.966308
+      },
+      "deltaFt": {
+        "x": 0.063312,
+        "y": 0.907146
+      },
+      "distanceFt": 0.909353,
+      "candidateSourceProtectionPlaneZFt": 12.83208,
+      "answerSourceProtectionPlaneZFt": 12.851267,
+      "sourceTargetZDeltaFt": -0.019187
+    },
+    {
+      "candidateId": "MIT-J-V2-U-038",
+      "answerId": "MIT-J-U-044",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 20.664424,
+        "y": 82.322917
+      },
+      "answerStructuralLocalFt": {
+        "x": 19.709116,
+        "y": 83.968731
+      },
+      "deltaFt": {
+        "x": 0.955308,
+        "y": -1.645814
+      },
+      "distanceFt": 1.902976,
+      "candidateSourceProtectionPlaneZFt": 12.536784,
+      "answerSourceProtectionPlaneZFt": 12.460778,
+      "sourceTargetZDeltaFt": 0.076006
+    },
+    {
+      "candidateId": "MIT-J-V2-U-039",
+      "answerId": "MIT-J-U-045",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 30.666667,
+        "y": 82.322917
+      },
+      "answerStructuralLocalFt": {
+        "x": 30.216992,
+        "y": 83.968731
+      },
+      "deltaFt": {
+        "x": 0.449675,
+        "y": -1.645814
+      },
+      "distanceFt": 1.706139,
+      "candidateSourceProtectionPlaneZFt": 12.536784,
+      "answerSourceProtectionPlaneZFt": 12.460778,
+      "sourceTargetZDeltaFt": 0.076006
+    },
+    {
+      "candidateId": "MIT-J-V2-U-040",
+      "answerId": "MIT-J-U-046",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 41.839181,
+        "y": 83.677879
+      },
+      "answerStructuralLocalFt": {
+        "x": 40.218142,
+        "y": 83.968734
+      },
+      "deltaFt": {
+        "x": 1.621039,
+        "y": -0.290855
+      },
+      "distanceFt": 1.646926,
+      "candidateSourceProtectionPlaneZFt": 12.494441,
+      "answerSourceProtectionPlaneZFt": 12.460777,
+      "sourceTargetZDeltaFt": 0.033664
+    },
+    {
+      "candidateId": "MIT-J-V2-U-041",
+      "answerId": "MIT-J-U-047",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 50.807748,
+        "y": 83.677879
+      },
+      "answerStructuralLocalFt": {
+        "x": 50.219293,
+        "y": 83.968734
+      },
+      "deltaFt": {
+        "x": 0.588455,
+        "y": -0.290855
+      },
+      "distanceFt": 0.656411,
+      "candidateSourceProtectionPlaneZFt": 12.494441,
+      "answerSourceProtectionPlaneZFt": 12.460777,
+      "sourceTargetZDeltaFt": 0.033664
+    },
+    {
+      "candidateId": "MIT-J-V2-U-042",
+      "answerId": "MIT-J-U-048",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 59.776315,
+        "y": 83.677879
+      },
+      "answerStructuralLocalFt": {
+        "x": 60.220443,
+        "y": 83.968734
+      },
+      "deltaFt": {
+        "x": -0.444128,
+        "y": -0.290855
+      },
+      "distanceFt": 0.530892,
+      "candidateSourceProtectionPlaneZFt": 12.494441,
+      "answerSourceProtectionPlaneZFt": 12.460777,
+      "sourceTargetZDeltaFt": 0.033664
+    },
+    {
+      "candidateId": "MIT-J-V2-U-043",
+      "answerId": "MIT-J-U-049",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 68.744882,
+        "y": 83.677879
+      },
+      "answerStructuralLocalFt": {
+        "x": 70.221594,
+        "y": 83.968734
+      },
+      "deltaFt": {
+        "x": -1.476712,
+        "y": -0.290855
+      },
+      "distanceFt": 1.505083,
+      "candidateSourceProtectionPlaneZFt": 12.494441,
+      "answerSourceProtectionPlaneZFt": 12.460777,
+      "sourceTargetZDeltaFt": 0.033664
+    },
+    {
+      "candidateId": "MIT-J-V2-U-044",
+      "answerId": "MIT-J-U-050",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 41.839181,
+        "y": 93.989849
+      },
+      "answerStructuralLocalFt": {
+        "x": 40.218142,
+        "y": 93.463981
+      },
+      "deltaFt": {
+        "x": 1.621039,
+        "y": 0.525868
+      },
+      "distanceFt": 1.704202,
+      "candidateSourceProtectionPlaneZFt": 12.172192,
+      "answerSourceProtectionPlaneZFt": 12.169584,
+      "sourceTargetZDeltaFt": 0.002608
+    },
+    {
+      "candidateId": "MIT-J-V2-U-045",
+      "answerId": "MIT-J-U-051",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 50.807748,
+        "y": 93.989849
+      },
+      "answerStructuralLocalFt": {
+        "x": 50.219293,
+        "y": 93.463981
+      },
+      "deltaFt": {
+        "x": 0.588455,
+        "y": 0.525868
+      },
+      "distanceFt": 0.789187,
+      "candidateSourceProtectionPlaneZFt": 12.172192,
+      "answerSourceProtectionPlaneZFt": 12.169584,
+      "sourceTargetZDeltaFt": 0.002608
+    },
+    {
+      "candidateId": "MIT-J-V2-U-046",
+      "answerId": "MIT-J-U-052",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 59.776315,
+        "y": 93.989849
+      },
+      "answerStructuralLocalFt": {
+        "x": 60.220443,
+        "y": 93.463981
+      },
+      "deltaFt": {
+        "x": -0.444128,
+        "y": 0.525868
+      },
+      "distanceFt": 0.688322,
+      "candidateSourceProtectionPlaneZFt": 12.172192,
+      "answerSourceProtectionPlaneZFt": 12.169584,
+      "sourceTargetZDeltaFt": 0.002608
+    },
+    {
+      "candidateId": "MIT-J-V2-U-047",
+      "answerId": "MIT-J-U-053",
+      "kind": "upright",
+      "candidateStructuralLocalFt": {
+        "x": 68.744882,
+        "y": 93.989849
+      },
+      "answerStructuralLocalFt": {
+        "x": 70.221594,
+        "y": 93.463981
+      },
+      "deltaFt": {
+        "x": -1.476712,
+        "y": 0.525868
+      },
+      "distanceFt": 1.567551,
+      "candidateSourceProtectionPlaneZFt": 12.172192,
+      "answerSourceProtectionPlaneZFt": 12.169584,
+      "sourceTargetZDeltaFt": 0.002608
+    }
+  ],
+  "acceptance": {
+    "policy": "calibration score only: require count parity, kind parity, at least 90 percent exact one-to-one XY matches within 2 ft, and no unmatched answer before placement verification",
+    "countParity": true,
+    "kindParity": true,
+    "xyWithin2FtAtLeast90Pct": true,
+    "noUnmatchedAnswer": true,
+    "accepted": true
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "sealed-candidate versus exact completed-plan registered XY score"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "maximum bipartite threshold replay separate from residual-pair greedy ledger"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "publication requires candidate, answer, target, score, mutation, and false-promotion attacks"
+    }
+  },
+  "buildingJCalibrationScored": true,
+  "sourceGeneratedPlacementVerified": true,
+  "freshProjectPlacementVerified": false,
+  "obstructionClearancesVerified": false,
+  "branchPipeTopologyReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "requiredNextLoop": "run the unchanged placement policy on a fresh source-sealed pitched-roof project before any production promotion",
+  "claimStatus": "building-j-calibration-threshold-passed-not-fresh-holdout-code-compliance-hydraulics-fabrication-or-release",
+  "receiptSha256": "b5a34e857f70240358a77c08926008acc14b678cec3e94ac3c2e96a6aaa5eca6"
+}
