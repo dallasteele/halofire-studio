@@ -1,0 +1,50 @@
+{
+  "artifactType": "halofire.answer-exposed-new-hope-truss-clearance-source.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "calibrationStatus": "answer-exposed-not-fresh",
+  "sources": {
+    "s102": { "sheet": "S102", "sha256": "2f695364975d6ddccd13e41b14db96f4d927e60ba23accda57bead7d3b9e4f5a", "bytes": 717235, "finding": "pre-manufactured trusses at 24 inches on center" },
+    "approvedFp20": { "sheet": "FP2.0", "page": 5, "sha256": "5a770222363228c2766605a695fee9b6cb1f7b49c296204e09b691100253d9d5", "finding": "seven vector sprinkler symbols and six visible six-foot ridge segments" },
+    "tfp610": { "document": "TFP610", "revision": "December 2024", "sha256": "ef738cdc5271e38bd978b8f5932514bcbf1d84e83e778ca9fe5a32dbed1978ca", "finding": "TY4180 BB1 six-inch minimum from truss face and seven-head dry demand" }
+  },
+  "feature": { "id": "north-east-occupied-wing-gable-core", "ridgeCoordinateFt": 30.375, "ridgeDatumZFt": 21.208333 },
+  "structuralRegistration": {
+    "grid": { "start": "D.1", "end": "E", "startCenterPdfPt": 1019.5045, "endCenterPdfPt": 1385.9565, "physicalSpanFt": 41.25 },
+    "featureLengthFt": 43,
+    "trussCenterlinesPdfPt": [1031.2, 1048.8, 1066.4, 1084, 1101.6, 1119.2, 1137.2, 1154.8, 1172.8, 1189.6, 1207.2, 1224.8, 1242.4, 1260.4, 1278, 1295.6, 1313.2, 1330.8, 1348.8, 1366, 1384, 1401.6],
+    "extraction": { "method": "2.5x raster line-center detection constrained by D.1-to-E vector grid controls", "sourcePageWidthPdfPt": 1728, "renderScale": 1.5 }
+  },
+  "approvedRegistration": {
+    "grid": { "start": "D", "end": "E", "startCenterPdfPt": 1198.657, "endCenterPdfPt": 1569.9025, "physicalSpanFt": 41.25 },
+    "ridgeCenterPdfY": 798.45,
+    "headCentersPdfPt": [{ "x": 1236.9, "y": 798.45 }, { "x": 1290.9, "y": 798.45 }, { "x": 1344.9, "y": 798.45 }, { "x": 1398.9, "y": 798.45 }, { "x": 1452.9, "y": 798.45 }, { "x": 1506.899, "y": 798.45 }, { "x": 1560.903, "y": 798.45 }],
+    "extraction": { "method": "vector 9-by-9 sprinkler symbol center detection", "sourcePageWidthPdfPt": 3024 }
+  },
+  "clearanceCriteria": { "document": "TFP610", "sin": "TY4180", "minimumFromTrussFaceIn": 6, "projectSpecificMemberFaceWidthIn": null },
+  "hydraulicEvidence": {
+    "pipeSizeIn": 2.5,
+    "pipeRole": "ridge-branch-line",
+    "planDirection": "D.1-to-E/east-west",
+    "visibleHydraulicFlowDirection": "D.1-to-E/west-to-east-from-visible-network-connection",
+    "dryPipeSlopeNote": { "branchLinesRiseInPer10Ft": 0.5, "crossMainsRiseInPer10Ft": 0.25, "sourceSheet": "FP2.0" },
+    "boundedBranchGradeDirectionReady": false,
+    "boundedBranchEndpointElevationsReady": false,
+    "boundedBranchDrainDestinationReady": false,
+    "visibleSegmentLengthsFt": [6, 6, 6, 6, 6, 6],
+    "manufacturerDemandHeadCount": 7,
+    "manufacturerMinimumFlowPerHeadGpm": 38,
+    "manufacturerMinimumPressurePsi": 22.6,
+    "completedPlanRemoteAreaIdentityAssigned": false,
+    "completedPlanRemoteAreaTables": [
+      { "label": "unassigned-seven-head-table-a", "actualAreaFt2": 414, "totalHeadsFlowing": 7, "waterRequiredGpm": 379.5, "pressureRequiredPsi": 67.9 },
+      { "label": "remote-area-2-1-unassigned-to-this-branch", "actualAreaFt2": 412, "totalHeadsFlowing": 7, "waterRequiredGpm": 371.5, "pressureRequiredPsi": 73.6 }
+    ]
+  },
+  "corpusSearch": {
+    "projectSpecificMemberFaceWidthFound": false,
+    "searched": ["New Hope active job", "New Hope R&O bid archive", "HaloOps filenames matching New Hope or Brigham with truss, shop, or submittal"],
+    "boundary": "member face width remains delegated to the truss manufacturer and cannot be inferred from 24-inch center spacing"
+  },
+  "claims": { "freshProjectPlacementVerified": false, "obstructionClearanceReady": false, "properPipeLayoutReady": false, "hydraulicCalculationReady": false, "complianceReady": false, "fabricationReady": false, "fieldReleaseReady": false },
+  "sourceReceiptSha256": "34068476a485d98f6587029935d3d37c126a75ada3373937141815c74748c9b3"
+}

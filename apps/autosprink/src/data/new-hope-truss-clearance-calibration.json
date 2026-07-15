@@ -1,0 +1,125 @@
+{
+  "artifactType": "halofire.answer-exposed-new-hope-truss-clearance-calibration.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "sourceReceiptSha256": "34068476a485d98f6587029935d3d37c126a75ada3373937141815c74748c9b3",
+  "coordinateRegistration": {
+    "structuralGrid": { "start": "D.1", "end": "E", "startCenterPdfPt": 1019.5045, "endCenterPdfPt": 1385.9565, "physicalSpanFt": 41.25 },
+    "structuralScalePdfPtPerFt": 8.883684848,
+    "approvedGrid": { "start": "D", "end": "E", "startCenterPdfPt": 1198.657, "endCenterPdfPt": 1569.9025, "physicalSpanFt": 41.25 },
+    "approvedScalePdfPtPerFt": 8.999890909,
+    "approvedRidgeCenterPdfY": 798.45,
+    "xRegistrationReady": true,
+    "structuralRidgeYRegistrationReady": false
+  },
+  "trussLattice": {
+    "sourceSheet": "S102",
+    "detectedCount": 22,
+    "nominalSpacingIn": 24,
+    "fittedSpacingIn": 23.818462,
+    "regression": { "interceptPdfPt": 1031.144664032, "spacingPdfPt": 17.63297572, "maxAbsResidualPdfPt": 0.591530209, "rmsResidualPdfPt": 0.214824537 },
+    "centerlines": [
+      { "id": "NH-S102-TRUSS-01", "pdfX": 1031.2, "localXFt": 1.316515 },
+      { "id": "NH-S102-TRUSS-02", "pdfX": 1048.8, "localXFt": 3.297674 },
+      { "id": "NH-S102-TRUSS-03", "pdfX": 1066.4, "localXFt": 5.278834 },
+      { "id": "NH-S102-TRUSS-04", "pdfX": 1084, "localXFt": 7.259994 },
+      { "id": "NH-S102-TRUSS-05", "pdfX": 1101.6, "localXFt": 9.241154 },
+      { "id": "NH-S102-TRUSS-06", "pdfX": 1119.2, "localXFt": 11.222314 },
+      { "id": "NH-S102-TRUSS-07", "pdfX": 1137.2, "localXFt": 13.2485 },
+      { "id": "NH-S102-TRUSS-08", "pdfX": 1154.8, "localXFt": 15.22966 },
+      { "id": "NH-S102-TRUSS-09", "pdfX": 1172.8, "localXFt": 17.255846 },
+      { "id": "NH-S102-TRUSS-10", "pdfX": 1189.6, "localXFt": 19.146953 },
+      { "id": "NH-S102-TRUSS-11", "pdfX": 1207.2, "localXFt": 21.128113 },
+      { "id": "NH-S102-TRUSS-12", "pdfX": 1224.8, "localXFt": 23.109273 },
+      { "id": "NH-S102-TRUSS-13", "pdfX": 1242.4, "localXFt": 25.090433 },
+      { "id": "NH-S102-TRUSS-14", "pdfX": 1260.4, "localXFt": 27.116619 },
+      { "id": "NH-S102-TRUSS-15", "pdfX": 1278, "localXFt": 29.097779 },
+      { "id": "NH-S102-TRUSS-16", "pdfX": 1295.6, "localXFt": 31.078939 },
+      { "id": "NH-S102-TRUSS-17", "pdfX": 1313.2, "localXFt": 33.060099 },
+      { "id": "NH-S102-TRUSS-18", "pdfX": 1330.8, "localXFt": 35.041259 },
+      { "id": "NH-S102-TRUSS-19", "pdfX": 1348.8, "localXFt": 37.067445 },
+      { "id": "NH-S102-TRUSS-20", "pdfX": 1366, "localXFt": 39.003579 },
+      { "id": "NH-S102-TRUSS-21", "pdfX": 1384, "localXFt": 41.029765 },
+      { "id": "NH-S102-TRUSS-22", "pdfX": 1401.6, "localXFt": 43.010925 }
+    ],
+    "projectSpecificMemberFaceWidthIn": null,
+    "exactTrussFacePolygonsReady": false
+  },
+  "branch": {
+    "sourceSheet": "FP2.0",
+    "pipeSizeIn": 2.5,
+    "pipeRole": "ridge-branch-line",
+    "planDirection": "D.1-to-E/east-west",
+    "visibleHydraulicFlowDirection": "D.1-to-E/west-to-east-from-visible-network-connection",
+    "ridgeCoordinateFt": 30.375,
+    "ridgeDatumZFt": 21.208333,
+    "nodes": [
+      { "id": "NH-BB1-001", "approvedPdfCenter": { "x": 1236.9, "y": 798.45 }, "localFt": { "x": 4.249274, "y": 30.375 }, "structuralPdfX": 1057.253709, "nearestTrussId": "NH-S102-TRUSS-02", "nearestTrussCenterlineDistanceIn": 11.419192, "maximumTrussFaceWidthForSixInClearanceIn": 10.838384, "exactTrussFaceClearanceVerified": false, "obstructionClearanceVerified": false, "hydraulicNodeAssigned": false },
+      { "id": "NH-BB1-002", "approvedPdfCenter": { "x": 1290.9, "y": 798.45 }, "localFt": { "x": 10.249346, "y": 30.375 }, "structuralPdfX": 1110.556464, "nearestTrussId": "NH-S102-TRUSS-06", "nearestTrussCenterlineDistanceIn": 11.675609, "maximumTrussFaceWidthForSixInClearanceIn": 11.351219, "exactTrussFaceClearanceVerified": false, "obstructionClearanceVerified": false, "hydraulicNodeAssigned": false },
+      { "id": "NH-BB1-003", "approvedPdfCenter": { "x": 1344.9, "y": 798.45 }, "localFt": { "x": 16.249419, "y": 30.375 }, "structuralPdfX": 1163.859219, "nearestTrussId": "NH-S102-TRUSS-09", "nearestTrussCenterlineDistanceIn": 12.077125, "maximumTrussFaceWidthForSixInClearanceIn": 12.15425, "exactTrussFaceClearanceVerified": false, "obstructionClearanceVerified": false, "hydraulicNodeAssigned": false },
+      { "id": "NH-BB1-004", "approvedPdfCenter": { "x": 1398.9, "y": 798.45 }, "localFt": { "x": 22.249492, "y": 30.375 }, "structuralPdfX": 1217.161974, "nearestTrussId": "NH-S102-TRUSS-12", "nearestTrussCenterlineDistanceIn": 10.317375, "maximumTrussFaceWidthForSixInClearanceIn": 8.63475, "exactTrussFaceClearanceVerified": false, "obstructionClearanceVerified": false, "hydraulicNodeAssigned": false },
+      { "id": "NH-BB1-005", "approvedPdfCenter": { "x": 1452.9, "y": 798.45 }, "localFt": { "x": 28.249565, "y": 30.375 }, "structuralPdfX": 1270.464729, "nearestTrussId": "NH-S102-TRUSS-15", "nearestTrussCenterlineDistanceIn": 10.178574, "maximumTrussFaceWidthForSixInClearanceIn": 8.357149, "exactTrussFaceClearanceVerified": false, "obstructionClearanceVerified": false, "hydraulicNodeAssigned": false },
+      { "id": "NH-BB1-006", "approvedPdfCenter": { "x": 1506.899, "y": 798.45 }, "localFt": { "x": 34.249526, "y": 30.375 }, "structuralPdfX": 1323.766497, "nearestTrussId": "NH-S102-TRUSS-18", "nearestTrussCenterlineDistanceIn": 9.500791, "maximumTrussFaceWidthForSixInClearanceIn": 7.001581, "exactTrussFaceClearanceVerified": false, "obstructionClearanceVerified": false, "hydraulicNodeAssigned": false },
+      { "id": "NH-BB1-007", "approvedPdfCenter": { "x": 1560.903, "y": 798.45 }, "localFt": { "x": 40.250043, "y": 30.375 }, "structuralPdfX": 1377.073201, "nearestTrussId": "NH-S102-TRUSS-21", "nearestTrussCenterlineDistanceIn": 9.356657, "maximumTrussFaceWidthForSixInClearanceIn": 6.713313, "exactTrussFaceClearanceVerified": false, "obstructionClearanceVerified": false, "hydraulicNodeAssigned": false }
+    ],
+    "edges": [
+      { "id": "NH-RIDGE-EDGE-01", "from": "NH-BB1-001", "to": "NH-BB1-002", "lengthFt": 6, "pipeSizeIn": 2.5 },
+      { "id": "NH-RIDGE-EDGE-02", "from": "NH-BB1-002", "to": "NH-BB1-003", "lengthFt": 6, "pipeSizeIn": 2.5 },
+      { "id": "NH-RIDGE-EDGE-03", "from": "NH-BB1-003", "to": "NH-BB1-004", "lengthFt": 6, "pipeSizeIn": 2.5 },
+      { "id": "NH-RIDGE-EDGE-04", "from": "NH-BB1-004", "to": "NH-BB1-005", "lengthFt": 6, "pipeSizeIn": 2.5 },
+      { "id": "NH-RIDGE-EDGE-05", "from": "NH-BB1-005", "to": "NH-BB1-006", "lengthFt": 6, "pipeSizeIn": 2.5 },
+      { "id": "NH-RIDGE-EDGE-06", "from": "NH-BB1-006", "to": "NH-BB1-007", "lengthFt": 6, "pipeSizeIn": 2.5 }
+    ],
+    "visibleTopologyReady": true,
+    "wholeNetworkTopologyReady": false,
+    "grade": {
+      "branchLinesRiseInPer10Ft": 0.5,
+      "branchGradePercent": 0.416667,
+      "crossMainsRiseInPer10Ft": 0.25,
+      "crossMainGradePercent": 0.208333,
+      "boundedBranchGradeDirectionReady": false,
+      "startElevationFt": null,
+      "endElevationFt": null
+    },
+    "drainage": { "boundedBranchDrainDestinationReady": false, "lowPointNodeId": null, "drumDripNodeId": null },
+    "fittingsReady": false,
+    "properPipeLayoutReady": false
+  },
+  "conditionalClearance": {
+    "minimumFromTrussFaceIn": 6,
+    "allSevenPassIfMemberFaceWidthAtMostIn": 6.713313,
+    "conditionalTrussClearanceReady": true,
+    "exactTrussFaceClearanceReady": false,
+    "reason": "S102 fixes the 24-inch truss centerline lattice, but the delegated truss manufacturer member face width is absent from the recovered corpus."
+  },
+  "hydraulics": {
+    "manufacturer": "Tyco", "sin": "TY4180", "kFactor": 8,
+    "manufacturerDemandHeadCount": 7,
+    "minimumPerHeadFlowGpm": 38,
+    "minimumPerHeadPressurePsi": 22.6,
+    "minimumManufacturerDemandGpm": 266,
+    "completedPlanRemoteAreaTables": [
+      { "label": "unassigned-seven-head-table-a", "actualAreaFt2": 414, "totalHeadsFlowing": 7, "waterRequiredGpm": 379.5, "pressureRequiredPsi": 67.9 },
+      { "label": "remote-area-2-1-unassigned-to-this-branch", "actualAreaFt2": 412, "totalHeadsFlowing": 7, "waterRequiredGpm": 371.5, "pressureRequiredPsi": 73.6 }
+    ],
+    "completedPlanRemoteAreaIdentityAssigned": false,
+    "actualNetworkCalculationReady": false
+  },
+  "internalVerification": {
+    "primary": { "status": "passed", "method": "deterministic S102 lattice fit and approved FP2.0 vector-center transform" },
+    "crossSource": { "status": "passed", "method": "S102 structural plan plus approved FP2.0 branch plus TFP610 manufacturer criteria" },
+    "adversarial": { "status": "passed", "method": "receipt, hash, grid, coordinate, width, topology, hydraulic, and false-promotion mutations rejected" }
+  },
+  "answerExposedCalibration": true,
+  "freshProjectPlacementVerified": false,
+  "exactHeadXyReady": true,
+  "conditionalTrussClearanceReady": true,
+  "obstructionClearanceReady": false,
+  "hydraulicTopologyReady": true,
+  "properPipeLayoutReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "answer-exposed-coordinate-and-conditional-clearance-calibration-only",
+  "receiptSha256": "e7c5401da7afe45a50aa80f26bd77a4008f50fb18eb1f711b3bed46365df071c"
+}

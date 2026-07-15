@@ -1,0 +1,3 @@
+{
+  "theorem": "def pipeGate (nodes edges demand branchGradeDenominator crossMainGradeDenominator : Nat) (properLayoutReady : Bool) : Bool :=\n  nodes == 7 && edges == 6 && demand == 266 && branchGradeDenominator == 240 && crossMainGradeDenominator == 480 && !properLayoutReady\n\ntheorem newHopeVisiblePipeTopologyAndGradeBoundary :\n    (pipeGate 7 6 (7 * 38) (2 * 120) (4 * 120) false &&\n     (6713313 <= 10838384) &&\n     (6713313 <= 11351219) &&\n     (6713313 <= 12154250) &&\n     (6713313 <= 8634750) &&\n     (6713313 <= 8357149) &&\n     (6713313 <= 7001581) &&\n     (6713313 <= 6713313)) = true :=\nby native_decide"
+}

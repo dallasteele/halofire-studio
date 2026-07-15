@@ -1,0 +1,54 @@
+{
+  "name": "new-hope-truss-clearance-hydraulic-20260715",
+  "owner": "codex",
+  "goal": "Register the exact approved New Hope seven-head ridge branch to the S102 24-inch truss lattice, compute a source-bound conditional truss-face clearance envelope, and expose the pipe role, plan direction, flow direction, grade rule, drainage boundary, topology, and manufacturer demand that the completed sources actually prove.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "apps/autosprink/src/data/new-hope-attic-specific-application-source.json",
+    "apps/autosprink/src/data/new-hope-attic-specific-application-calibration.json",
+    "apps/autosprink/src/data/new-hope-pitched-holdout-answer-evidence.json",
+    "Y:/Shared/HaloOps/01-Bids/R&O/Boys and Girls Club - Brigham City UT/1-Bid Documents/GC - Bid Plans/Building/New Building for New Hope Crisis Center/NB_014_S102_ROOF_FRAMING_PLAN.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Crisis Center - Approved/Approved Plans.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Crisis Center - Approved/New Hope Product Submittal.pdf"
+  ],
+  "exit_criteria": [
+    "the S102 D.1-to-E feature registration exposes every detected 24-inch truss centerline with spacing residuals",
+    "the seven approved FP2.0 vector head centers are preserved without rounding to nominal four-foot offsets",
+    "approved head coordinates are transformed into structural and local feet coordinate spaces",
+    "each head reports centerline distance, six-inch face-clearance demand, and the maximum truss-face width that would preserve clearance",
+    "exact clearance remains false unless the project-specific truss manufacturer member face width is sourced",
+    "one seven-node ridge branch and manufacturer demand are emitted without claiming a network hydraulic calculation",
+    "the actual FP2.0 dry-pipe branch and cross-main grade notes are encoded separately from roof pitch",
+    "pipe plan direction and visible feed direction are exposed while endpoint elevations, grade direction, drainage destination, full fittings, and proper whole-network layout remain closed until source-proved",
+    "primary replay, cross-source checks, adversarial mutations, focused tests, production build, visual source proof, formal proof or exact unavailability, rules verification, and brain postflight are recorded"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "S102 source hash and structural grid registration",
+    "approved FP2.0 source hash and exact vector center replay",
+    "truss spacing residual and head-to-member conditional clearance calculations",
+    "adversarial source, coordinate, spacing, width, clearance, hydraulic, and false-promotion mutations",
+    "focused Vitest regression and AutoSprink production build",
+    "actual S102 and approved PDF underlay browser proof",
+    "GX10 Lean proof or exact prover-unavailable receipt",
+    "authoritative agentic-rule verification",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-truss-clearance-hydraulic-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-truss-clearance-source.json",
+    "apps/autosprink/src/data/new-hope-truss-clearance-calibration.json",
+    "apps/autosprink/src/engine/new-hope-truss-clearance.js",
+    "apps/autosprink/tests/new-hope-truss-clearance.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance",
+    "data/agent-loops/new-hope-truss-clearance-hydraulic-20260715/state.json"
+  ],
+  "max_iterations": 10,
+  "max_tokens": 200000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

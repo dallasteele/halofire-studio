@@ -1,0 +1,24 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "gatewayHealth": {
+    "status": "ok",
+    "gatewayVersion": "0.1.0",
+    "leanStatus": "ok",
+    "coqStatus": "ok"
+  },
+  "requestPath": "data/agent-loops/new-hope-truss-clearance-hydraulic-20260715/lean-request.json",
+  "theoremName": "newHopeVisiblePipeTopologyAndGradeBoundary",
+  "claim": "Seven visible heads form six internal branch edges; seven times 38 gpm is 266 gpm; the approved half-inch-per-ten-foot branch grade is 1/240 and quarter-inch-per-ten-foot cross-main grade is 1/480; the sealed 6.713313-inch conditional face-width minimum does not exceed any of the seven per-head thresholds; proper pipe layout remains false.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 404,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  },
+  "notes": [
+    "The first request used the stale source key and was rejected with missing theorem; the corrected theorem-key request verified.",
+    "The proof covers arithmetic and fail-closed boolean invariants, not missing project-specific truss member widths, pipe endpoint elevations, drainage destinations, hydraulics, compliance, fabrication, or release."
+  ]
+}

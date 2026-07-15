@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>New Hope PDF-bound truss and pipe proof</title>
+  <style>
+    :root{color-scheme:dark;--bg:#071019;--glass:#102638e8;--line:#31536c;--cyan:#22d3ee;--amber:#fbbf24;--rose:#fb7185;--text:#eef8ff;--muted:#abc1d0}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 6% 0,#164e63 0,transparent 30%),radial-gradient(circle at 94% 0,#7c2d12 0,transparent 25%),var(--bg);color:var(--text);font-family:Inter,Segoe UI,sans-serif}header{padding:48px 5vw 38px;border-bottom:1px solid #ffffff18}.badge{display:inline-flex;padding:9px 14px;border-radius:999px;background:#4c1d24;color:#fecdd3;font-weight:900}.eyebrow{color:var(--cyan);font-weight:800;letter-spacing:.14em;text-transform:uppercase}h1{font-size:clamp(38px,5.6vw,76px);line-height:.98;letter-spacing:-.04em;margin:12px 0;max-width:1450px}.lede{max-width:1280px;color:#d3e0e9;font-size:19px;line-height:1.55}main{max-width:1780px;margin:auto;padding:28px 4vw 90px}.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}.metric,.card,figure{background:var(--glass);border:1px solid var(--line);border-radius:22px;box-shadow:0 24px 70px #0008}.metric{padding:17px}.metric strong{display:block;font-size:26px}.metric small{color:var(--muted)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}figure{margin:0;overflow:hidden}.wide{grid-column:1/-1}.visual{position:relative;background:#fff;line-height:0}.visual img{display:block;width:100%;height:auto}.visual svg{position:absolute;inset:0;width:100%;height:100%}.truss{stroke:#0ea5e9;stroke-width:3;opacity:.82}.branch{stroke:#f59e0b;stroke-width:7;stroke-linecap:round}.head{fill:#071019;stroke:#22d3ee;stroke-width:6}.gridline{stroke:#f97316;stroke-width:4;stroke-dasharray:16 12}.unresolved{fill:#4c1d24dd;stroke:#fb7185;stroke-width:3}.svgtext{fill:white;font:800 25px Segoe UI,sans-serif}figcaption{padding:18px 22px;color:#d3e0e9;line-height:1.55}figcaption b{color:white}.card{padding:23px;margin-top:22px}.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.status{padding:15px;border:1px solid #ffffff18;border-radius:16px;background:#ffffff08}.status b{display:block;color:var(--cyan);margin-bottom:5px}.status.closed{border-color:#fb718577;background:#4c1d2455}.status.closed b{color:#fda4af}.source-note{background:white;padding:15px}.source-note img{width:100%;display:block}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:900px}th,td{text-align:left;padding:12px;border-bottom:1px solid #ffffff1c}th{color:#67e8f9;font-size:13px;text-transform:uppercase;letter-spacing:.07em}td{font-family:ui-monospace,Consolas,monospace}.gate{color:#fecdd3;font-family:ui-monospace,Consolas,monospace;overflow-wrap:anywhere}.full-plan{max-height:780px;overflow:auto;background:#fff}.full-plan img{display:block;width:180%;max-width:none}.loading{color:var(--amber)}@media(max-width:1050px){.metrics{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.wide{grid-column:auto}.status-grid{grid-template-columns:1fr}.full-plan img{width:260%}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Actual S102 + actual approved FP2.0</div>
+    <span class="badge">NOT A PROPER WHOLE-SYSTEM PIPE LAYOUT - CALIBRATION ONLY</span>
+    <h1>The PDFs stay visible. Pipe direction and grade are separate governed facts.</h1>
+    <p class="lede">This proof does not replace the drawings with a synthetic diagram. The actual S102 roof-framing PDF is the structural underlay, the actual approved FP2.0 is the pipe-layout answer, and the computed overlay only registers the seven approved vector head centers to the 22 detected truss centerlines. The approved dry-pipe note is reproduced directly below. Grade direction, endpoint elevations, drainage destination, fittings, full network connectivity, hydraulics, and field release remain closed.</p>
+  </header>
+  <main>
+    <section class="metrics">
+      <div class="metric"><strong>Actual S102</strong><small>roof-framing PDF underlay</small></div>
+      <div class="metric"><strong>Actual FP2.0</strong><small>approved pipe-layout underlay</small></div>
+      <div class="metric"><strong>22 trusses</strong><small>23.818-inch fitted raster spacing</small></div>
+      <div class="metric"><strong>7 heads / 2.5 in</strong><small>approved ridge branch evidence</small></div>
+      <div class="metric"><strong style="color:var(--rose)">Pipe layout closed</strong><small>directional grade and drainage unresolved</small></div>
+    </section>
+
+    <section class="grid">
+      <figure class="wide">
+        <div class="visual">
+          <img src="s102-roof-framing-underlay.png" alt="Actual S102 roof framing PDF page underlay">
+          <svg id="structural-overlay" viewBox="0 0 2592 1728" aria-label="Approved head X coordinates registered to S102 truss centerlines"></svg>
+        </div>
+        <figcaption><b>Actual S102 underlay with computed X registration.</b> Blue lines are the 22 detected truss centerlines between D.1 and E. Cyan rings are the approved FP2.0 vector head centers transformed through the two PDF grid scales. The amber line is only a plan-X comparison guide: S102 does not independently register the ridge Y, so the overlay states that limitation instead of pretending to have a complete pipe elevation.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="visual"><img src="approved-ridge-branch-underlay.png" alt="Actual approved FP2.0 ridge branch crop"></div>
+        <figcaption><b>Actual approved ridge branch.</b> The 2-1/2-inch labels, seven sprinkler symbols, six 6-foot segments, west network connection, ridge datum, and plan direction are visible on the PDF itself.</figcaption>
+      </figure>
+
+      <figure>
+        <div class="source-note"><img src="approved-dry-pipe-note.png" alt="Actual approved FP2.0 dry pipe grade note"></div>
+        <figcaption><b>Actual approved dry-pipe grade note.</b> Branch lines require 1/2 inch every 10 feet; cross mains require 1/4 inch every 10 feet. This is pipe grade, not roof pitch. The note proves magnitude but does not by itself prove this bounded branch's high point, low point, or drain destination.</figcaption>
+      </figure>
+    </section>
+
+    <section class="card">
+      <h2>Pipe-layout contract exposed by the proof</h2>
+      <div class="status-grid">
+        <div class="status"><b>Plan role and direction</b>Ridge branch line; D.1-to-E / west-to-east plan axis.</div>
+        <div class="status"><b>Visible feed direction</b>West network connection toward the east terminal, as exposed on approved FP2.0.</div>
+        <div class="status"><b>Grade magnitude</b>Branch 0.5 in / 10 ft (0.416667%); cross main 0.25 in / 10 ft (0.208333%).</div>
+        <div class="status closed"><b>Grade direction closed</b>Start/end pipe elevations are not yet registered to this branch.</div>
+        <div class="status closed"><b>Drainage closed</b>No source-proved low-point node or drum-drip destination is assigned to the bounded branch.</div>
+        <div class="status closed"><b>Proper layout closed</b>Full mains, branches, fittings, riser path, drains, elevations, and hydraulic node identities are not reconstructed yet.</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Seven head-to-truss conditional envelopes</h2>
+      <p class="loading" id="load-status">Loading sealed calibration...</p>
+      <div class="table-wrap"><table><thead><tr><th>Head</th><th>Local X ft</th><th>S102 X pt</th><th>Nearest truss</th><th>Centerline distance in</th><th>Maximum truss face width preserving 6 in</th></tr></thead><tbody id="clearance-rows"></tbody></table></div>
+    </section>
+
+    <figure class="wide" style="margin-top:22px">
+      <div class="full-plan"><img src="approved-fp20-full-underlay.png" alt="Full actual approved FP2.0 attic fire sprinkler layout"></div>
+      <figcaption><b>Full actual approved FP2.0 sheet.</b> This is what a proper result ultimately has to reconstruct: supply from riser, cross mains, branches, fittings, pitch arrows, low-point tie-in drains, drum-drip detail, remote areas, pipe sizes, dimensions, and roof/ridge context. A seven-node connector is not equivalent to this sheet.</figcaption>
+    </figure>
+
+    <section class="card" style="border-color:#fb7185;background:#4c1d2455">
+      <h2>Acceptance boundary</h2>
+      <p class="gate">actualPdfUnderlays=true | exactHeadXyReady=true | conditionalTrussClearanceReady=true | hydraulicTopologyReady=true | properPipeLayoutReady=false | branchGradeDirectionReady=false | endpointElevationsReady=false | drainDestinationReady=false | obstructionClearanceReady=false | hydraulicCalculationReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=false</p>
+    </section>
+  </main>
+  <script type="module" src="proof.js"></script>
+</body>
+</html>

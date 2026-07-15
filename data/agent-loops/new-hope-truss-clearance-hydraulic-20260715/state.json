@@ -1,0 +1,76 @@
+{
+  "loop": "new-hope-truss-clearance-hydraulic-20260715",
+  "stage": "ITERATE",
+  "status": "verified-pdf-bound-conditional-clearance-and-visible-pipe-topology-proper-layout-remains-closed",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [120030, 124864, 145819, 126369, 125723]
+  },
+  "sourceEvidence": {
+    "s102Sha256": "2f695364975d6ddccd13e41b14db96f4d927e60ba23accda57bead7d3b9e4f5a",
+    "approvedFp20Sha256": "5a770222363228c2766605a695fee9b6cb1f7b49c296204e09b691100253d9d5",
+    "tfp610PacketSha256": "ef738cdc5271e38bd978b8f5932514bcbf1d84e83e778ca9fe5a32dbed1978ca",
+    "hashRecheck": "passed against current Y drive files",
+    "s102TrussCenterlineCount": 22,
+    "approvedVectorHeadCount": 7,
+    "approvedPipeSizeIn": 2.5,
+    "approvedVisibleSixFootSegments": 6,
+    "approvedDryPipeBranchRiseInPer10Ft": 0.5,
+    "approvedDryPipeCrossMainRiseInPer10Ft": 0.25,
+    "projectSpecificTrussMemberFaceWidthFound": false,
+    "trussShopDrawingSearchScope": [
+      "New Hope active job",
+      "New Hope R&O bid archive",
+      "HaloOps filenames matching New Hope or Brigham with truss, shop, or submittal"
+    ]
+  },
+  "calibrationEvidence": {
+    "structuralScalePdfPtPerFt": 8.883684848,
+    "approvedScalePdfPtPerFt": 8.999890909,
+    "fittedTrussSpacingIn": 23.818462,
+    "maxTrussFitResidualPdfPt": 0.591530209,
+    "minimumConditionalMemberFaceWidthIn": 6.713313,
+    "manufacturerMinimumDemandGpm": 266,
+    "properPipeLayoutBoundary": "The approved sheet proves plan role, plan direction, visible feed direction, grade magnitudes, and a seven-node branch. It does not yet provide a reconstructed full network with exact grade direction, endpoint elevations, low-point and drum-drip node identities, fittings, or whole-network hydraulics."
+  },
+  "verification": {
+    "loopGuard": "passed",
+    "focusedTests": "14 passed across New Hope clearance, PDF proof, and prior calibration proof",
+    "productionBuild": "passed Vite build",
+    "adversarialCases": "26 of 26 rejected without an independent reviewer gate",
+    "formalProof": {
+      "status": "verified",
+      "prover": "Lean 4.13.0 on GX10",
+      "theorem": "newHopeVisiblePipeTopologyAndGradeBoundary",
+      "receipt": "data/agent-loops/new-hope-truss-clearance-hydraulic-20260715/lean-proof.json"
+    },
+    "browser": {
+      "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+      "actualPdfImagesDecoded": 4,
+      "trussOverlayLines": 22,
+      "headOverlayMarkers": 7,
+      "clearanceRows": 7,
+      "horizontalOverflow": false,
+      "consoleWarningsOrErrors": 0,
+      "visualInspection": "passed actual S102 underlay, actual approved ridge branch, enlarged approved dry-pipe grade note, and full approved FP2.0 sheet"
+    },
+    "agenticRules": "passed"
+  },
+  "claims": {
+    "actualPdfUnderlaysReady": true,
+    "exactHeadXyReady": true,
+    "conditionalTrussClearanceReady": true,
+    "obstructionClearanceReady": false,
+    "hydraulicTopologyReady": true,
+    "properPipeLayoutReady": false,
+    "branchGradeDirectionReady": false,
+    "endpointElevationsReady": false,
+    "drainDestinationReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "nextAction": "Use completed Halo Fire projects with explicit dry-system slope arrows, low-point drains, drum drips, riser feeds, pipe size transitions, fittings, and hydraulic node labels to build the full source-bound pipe graph contract. Then replay it on New Hope and a fresh sealed project; do not promote properPipeLayoutReady until plan direction, grade direction, endpoint elevations, drainage, fittings, connectivity, and hydraulic identities all close."
+}
