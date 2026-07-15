@@ -1,0 +1,49 @@
+{
+  "artifactType": "halofire.answer-exposed-pitched-roof-visual-calibration-proof.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "calibrationReceiptSha256": "3c5714fe3f5cb8e6d55ccd6fc242f6e46de278b5cf6855dc8cff921ebefb9fcb",
+  "sourceArchitecturalPdfSha256": "9f9f8b97cfb35931474566156f35d97520ae993052dac046efacb408f32ea0a7",
+  "approvedFp20PdfSha256": "5a770222363228c2766605a695fee9b6cb1f7b49c296204e09b691100253d9d5",
+  "presentationBoundary": {
+    "employeeFacingCalibrationContainsFailedCandidate": false,
+    "failed24HeadCandidateRetainedAsInternalHoldoutEvidence": true,
+    "answerExposedCalibration": true
+  },
+  "visualReview": {
+    "actualPdfUnderlaysPresent": true,
+    "sourceA103Present": true,
+    "sourceA301ElevationPresent": true,
+    "approvedFp20Present": true,
+    "approvedFp20TextureUsedBy3dModel": true,
+    "browserInspected": true,
+    "decodedDomImageCount": 3,
+    "brokenImageCount": 0,
+    "webglModelReady": true,
+    "browserErrorCount": 0,
+    "horizontalOverflow": false
+  },
+  "geometry": {
+    "featureSizeFt": { "width": 43, "depth": 60.75 },
+    "roofPitch": { "rise": 4, "run": 12 },
+    "ridgeZFt": 21.208333,
+    "headCount": 7,
+    "ridgeSpacingFt": 6,
+    "exactInstallationZAssigned": false
+  },
+  "claimBoundary": {
+    "freshProjectPlacementVerified": false,
+    "exactHeadElevationReady": false,
+    "obstructionClearanceReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "files": [
+    { "file": "a103-source-underlay.png", "bytes": 1260903, "sha256": "fd9e88b44f4c8e35ff97758f98f67e3b5c2271d0494e167ed76e1c803d6e1adb" },
+    { "file": "a301-source-elevation-underlay.png", "bytes": 2364482, "sha256": "f18e745e85682c00dfcf2c886ba0cb5d838e0e5a275a02e6c8d138eefb4b8587" },
+    { "file": "approved-fp20-underlay.png", "bytes": 2743603, "sha256": "e646fed3604bcf91a748075e3ab95e22d7a683bdb8a78caa269330bfbe508826" },
+    { "file": "approved-fp20-feature-underlay.png", "bytes": 95043, "sha256": "a109ddbe65b7db58cb51f52b3533975fa0b90a41ddab85f03405e7ae7223bead" },
+    { "file": "model.json", "bytes": 2989, "sha256": "6f796676dcf91e9b7410c95697e7cc9ba4bbba005edf7773d125a4ffb0bae639" }
+  ]
+}

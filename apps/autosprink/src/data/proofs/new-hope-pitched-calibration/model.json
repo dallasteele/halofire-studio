@@ -1,0 +1,62 @@
+{
+  "artifactType": "halofire.answer-exposed-pitched-roof-3d-calibration-model.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "coordinateSystem": {
+    "units": "feet",
+    "x": "ridge-axis-west-to-east",
+    "y": "cross-slope-south-to-north",
+    "z": "elevation"
+  },
+  "underlay": {
+    "role": "approved-answer-calibration-only",
+    "sheet": "FP2.0",
+    "pdfPageNumber": 5,
+    "pdfSha256": "5a770222363228c2766605a695fee9b6cb1f7b49c296204e09b691100253d9d5",
+    "image": "approved-fp20-feature-underlay.png",
+    "featureBoundsPx": { "x": 2400, "y": 1035, "width": 775, "height": 1090 },
+    "featureSizeFt": { "width": 43, "depth": 60.75 }
+  },
+  "roof": {
+    "widthFt": 43,
+    "depthFt": 60.75,
+    "ridgeCoordinateFt": 30.375,
+    "pitch": { "rise": 4, "run": 12 },
+    "eaveZFt": 11.083333,
+    "ridgeZFt": 21.208333,
+    "planes": [
+      { "id": "south-plane", "verticesFt": [[0, 0, 11.083333], [43, 0, 11.083333], [43, 30.375, 21.208333], [0, 30.375, 21.208333]] },
+      { "id": "north-plane", "verticesFt": [[0, 30.375, 21.208333], [43, 30.375, 21.208333], [43, 60.75, 11.083333], [0, 60.75, 11.083333]] }
+    ]
+  },
+  "branchline": {
+    "topology": "single-ridge-line",
+    "startFt": { "x": 4, "y": 30.375 },
+    "endFt": { "x": 40, "y": 30.375 },
+    "visualizationZFt": 19.625,
+    "visualizationZStatus": "midpoint-of-manufacturer-permitted-band-not-installation-elevation"
+  },
+  "heads": [
+    { "id": "NH-BB1-001", "xFt": 4, "yFt": 30.375, "permittedZFt": { "min": 19.375, "max": 19.875 }, "installationZFt": null },
+    { "id": "NH-BB1-002", "xFt": 10, "yFt": 30.375, "permittedZFt": { "min": 19.375, "max": 19.875 }, "installationZFt": null },
+    { "id": "NH-BB1-003", "xFt": 16, "yFt": 30.375, "permittedZFt": { "min": 19.375, "max": 19.875 }, "installationZFt": null },
+    { "id": "NH-BB1-004", "xFt": 22, "yFt": 30.375, "permittedZFt": { "min": 19.375, "max": 19.875 }, "installationZFt": null },
+    { "id": "NH-BB1-005", "xFt": 28, "yFt": 30.375, "permittedZFt": { "min": 19.375, "max": 19.875 }, "installationZFt": null },
+    { "id": "NH-BB1-006", "xFt": 34, "yFt": 30.375, "permittedZFt": { "min": 19.375, "max": 19.875 }, "installationZFt": null },
+    { "id": "NH-BB1-007", "xFt": 40, "yFt": 30.375, "permittedZFt": { "min": 19.375, "max": 19.875 }, "installationZFt": null }
+  ],
+  "verification": {
+    "primary": "deterministic model replay matches seven-head calibration data",
+    "crossSource": "A103 and approved FP2.0 are both shown; S102/S301 and TFP610 bind structure and manufacturer rules",
+    "adversarial": "exact-Z, obstruction, hydraulics, compliance, fabrication, and release remain fail-closed"
+  },
+  "claims": {
+    "answerExposedCalibration": true,
+    "freshProjectPlacementVerified": false,
+    "exactHeadElevationReady": false,
+    "obstructionClearanceReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}
