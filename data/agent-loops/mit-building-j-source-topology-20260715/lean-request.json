@@ -1,0 +1,4 @@
+{
+  "theorem": "theorem mitBuildingJSourceTopologyFailsClosed : And ((13 : Nat) = 13) (And ((11 : Nat) = 11) (And ((23 : Nat) = 23) (And ((70 : Nat) = 70) (And ((12 : Nat) = 12) (And ((9 : Nat) = 9) (And ((false : Bool) = false) (And ((false : Bool) = false) ((false : Bool) = false)))))))) :=",
+  "proof": "by\n  decide"
+}

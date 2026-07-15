@@ -1,0 +1,78 @@
+{
+  "loop": "mit-building-j-source-topology-20260715",
+  "stage": "VERIFY",
+  "status": "source-topology-verified-input-only-not-obstruction-clearance",
+  "iteration": 5,
+  "projectId": "mit-riverside-building-j",
+  "sourceTopologyReceiptSha256": "53291d7f0354b925fbd3975da73bcee549539b5c1b67a3458e755b7a7575f771",
+  "counts": {
+    "rooms": 13,
+    "openToStructureLabels": 11,
+    "wallMaterialPolygons": 105,
+    "doorOpenings": 23,
+    "structuralBeamLines": 70,
+    "sourcePlacementAxes": 17,
+    "mechanicalEquipmentLabels": 12,
+    "mechanicalDuctSizeLabels": 9
+  },
+  "mechanicalRegistration": {
+    "commonRoomLabels": 13,
+    "inlierRoomLabels": 10,
+    "outlierRoomIds": ["J100", "J105", "J106"],
+    "maximumInlierResidualPt": 0.099589,
+    "maximumAllResidualPt": 27.785287
+  },
+  "sequence": {
+    "answerArtifactRead": false,
+    "completedLayoutRead": false,
+    "approvedFireSprinklerPlanRead": false,
+    "asBuiltFireSprinklerPlanRead": false,
+    "historicalAnswerExposureDisclosed": true,
+    "freshProjectHoldoutRequired": true
+  },
+  "visualProof": {
+    "browserInspected": true,
+    "decodedImageCount": 1,
+    "consoleErrors": 0,
+    "normalZoomLayoutReadable": true,
+    "protectedRcpUnderlayVisible": true,
+    "protectedMechanicalUnderlayVisible": true,
+    "protectedStructuralUnderlayVisible": true,
+    "failureBoundaryVisiblyDisclosed": true,
+    "imageSha256": "9ea6e740aef804dbc5907f9cc3607e31aa134fca68ba9b4c9f682b1101aaf40f"
+  },
+  "verification": {
+    "focusedTestsPassed": 5,
+    "buildingJRegressionFilesPassed": 12,
+    "buildingJRegressionTestsPassed": 57,
+    "adversarialCasesRejected": 20,
+    "javascriptSyntax": "passed",
+    "pythonCompile": "passed",
+    "agentLoopGuard": "passed",
+    "viteBuild": "passed",
+    "rootTurboBuild": "unavailable-turbo-executable-not-installed-in-worktree",
+    "agenticRules": "passed",
+    "formalProver": "GX10_PROVER_UNAVAILABLE-tcp-8810-connect-failed-local-lean-not-installed",
+    "formalFallbackReceipt": "data/agent-loops/mit-building-j-source-topology-20260715/lean-proof.json"
+  },
+  "claims": {
+    "roomPartitionTopologyReady": true,
+    "doorOpeningTopologyReady": true,
+    "openStructureLabelTopologyReady": true,
+    "structuralFramingInventoryReady": true,
+    "mechanicalObstructionLabelInventoryReady": true,
+    "exactMechanicalObstructionFootprintsReady": false,
+    "exactStructuralMemberDepthsReady": false,
+    "obstructionClearancesVerified": false,
+    "sourceGeneratedPlacementVerified": false,
+    "freshProjectPlacementVerified": false,
+    "complianceReady": false,
+    "hydraulicCalculationReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "implementationCommit": null,
+  "brainPreflightStatus": "HAL_BRAIN_TOKEN_UNAVAILABLE",
+  "brainPostflightEpisodeId": null,
+  "nextAction": "consume this sanitized topology in a v2 generator, align open-structure candidates to source framing axes without treating label points as exact obstruction footprints, seal before answer access, and run the unchanged scorer"
+}

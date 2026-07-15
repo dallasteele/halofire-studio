@@ -1,0 +1,49 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-topology-visual-proof.v1",
+  "topologyReceiptSha256": "53291d7f0354b925fbd3975da73bcee549539b5c1b67a3458e755b7a7575f771",
+  "sourcePdfSha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c",
+  "sourcePages": {
+    "rcp": 105,
+    "mechanical": 119,
+    "structuralRoofFraming": 84
+  },
+  "image": {
+    "file": "source-topology-proof.png",
+    "bytes": 686323,
+    "sha256": "9ea6e740aef804dbc5907f9cc3607e31aa134fca68ba9b4c9f682b1101aaf40f",
+    "width": 2300,
+    "height": 1580
+  },
+  "counts": {
+    "rooms": 13,
+    "doors": 23,
+    "openToStructureLabels": 11,
+    "structuralBeamLines": 70,
+    "mechanicalEquipmentLabels": 12,
+    "mechanicalDuctSizeLabels": 9
+  },
+  "visualReview": {
+    "browserInspected": true,
+    "decodedImageCount": 1,
+    "consoleErrors": 0,
+    "normalZoomLayoutReadable": true,
+    "protectedUnderlaysVisiblyPresent": true,
+    "failureBoundaryVisiblyDisclosed": true
+  },
+  "claims": {
+    "roomPartitionTopologyReady": true,
+    "doorOpeningTopologyReady": true,
+    "openStructureLabelTopologyReady": true,
+    "structuralFramingInventoryReady": true,
+    "mechanicalObstructionLabelInventoryReady": true,
+    "exactMechanicalObstructionFootprintsReady": false,
+    "exactStructuralMemberDepthsReady": false,
+    "obstructionClearancesVerified": false,
+    "sourceGeneratedPlacementVerified": false,
+    "freshProjectPlacementVerified": false,
+    "complianceReady": false,
+    "hydraulicCalculationReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "artifactType": "halofire.formal-proof-unavailable-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "theoremName": "mitBuildingJSourceTopologyFailsClosed",
+  "claim": "The source topology contains the sealed room, O.T.S., opening, framing, equipment-label, and duct-label counts while exact obstruction footprints, clearances, and compliance remain false.",
+  "requestPath": "data/agent-loops/mit-building-j-source-topology-20260715/lean-request.json",
+  "connectivity": {
+    "tailscaleIp": "100.116.75.108",
+    "tcpPort": 8810,
+    "tcpConnectTimeoutSeconds": 3,
+    "tcpTestSucceeded": false
+  },
+  "attempts": [
+    {
+      "request": "full fail-closed topology theorem",
+      "result": "not-sent-because-gateway-tcp-connect-failed"
+    }
+  ],
+  "localLeanInstalled": false,
+  "status": "GX10_PROVER_UNAVAILABLE",
+  "fallbackVerification": {
+    "canonicalReceiptReplay": "passed",
+    "sourceZoneContainment": "passed",
+    "mechanicalRegistration": "passed-with-three-disclosed-annotation-outliers",
+    "adversarialCasesRejected": 20,
+    "focusedTestsPassed": 5,
+    "productionBuild": "passed",
+    "obstructionClearancesVerified": false,
+    "complianceReady": false,
+    "fabricationReady": false
+  }
+}

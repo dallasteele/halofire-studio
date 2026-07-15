@@ -1,0 +1,59 @@
+{
+  "name": "mit-building-j-source-topology-20260715",
+  "owner": "codex",
+  "goal": "Extract and validate Building J room partitions, door openings, explicit open-to-structure controls, mechanical labels, duct labels, and structural roof-framing axes from protected source drawings without reading any completed sprinkler answer.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-09-CODEX-MASTER-BUILD.md",
+    "E:/ClaudeBot/halofire-studio/docs/handoffs/2026-07-13-CODEX-MASTER-BUILD-ADDENDUM-01-PLATFORM-SPINE.md",
+    "apps/autosprink/src/data/mit-riverside-building-j-source-placement-inputs.json",
+    "apps/autosprink/src/data/mit-riverside-building-j-roof-plane-elevation.json",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Bid Files/18_434 Riverside Bid Set 050820-1.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/CAD Files/18_434 Riverside MIT Phase 2 Floor plans.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/CAD Files/19PHX009 - OWP - Riverside MIT Phase 2-Sheet - S2-1 - ROOF FRAMING PLANS.dwg"
+  ],
+  "exit_criteria": [
+    "protected architectural, floor-plan, and structural source files are byte and SHA-256 bound",
+    "thirteen Building J room zones and their source labels are extracted from the floor DWG",
+    "door openings and wall material polygons are extracted from embedded wall blocks",
+    "eleven O.T.S. labels are registered from A-102 and assigned only by source-zone polygon containment",
+    "M-101 equipment and duct labels are registered through same-room source labels with residuals disclosed",
+    "S2.1 roof-framing beam lines and source placement axes are registered to structural-local feet",
+    "exact MEP footprints, member depths, obstruction clearances, compliance, hydraulics, fabrication, and release remain false",
+    "protected A-102, M-101, and S2.1 underlays and normalized topology are visibly inspectable",
+    "deterministic receipt replay, adversarial mutation, focused regression, syntax, build, formal proof or exact unavailability, and rules verification are recorded",
+    "brain preflight and postflight succeed or their exact infrastructure failure is recorded"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "protected source hash validation",
+    "static forbidden-answer path scan",
+    "canonical topology receipt replay",
+    "room and O.T.S. source-zone containment checks",
+    "mechanical registration inlier and outlier disclosure",
+    "structural framing coordinate replay",
+    "twenty adversarial topology and false-promotion attacks",
+    "focused tests, JavaScript syntax, Python compile, and production build",
+    "GX10 Lean 4 proof or exact prover-unavailable receipt",
+    "authoritative agentic-rule verification",
+    "real-browser proof inspection, image decode, and normal-zoom readability",
+    "brain close writeback or exact HAL brain infrastructure failure"
+  ],
+  "state_path": "data/agent-loops/mit-building-j-source-topology-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/mit-riverside-building-j-source-topology-inputs.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-source-topology",
+    "apps/autosprink/src/engine/mit-riverside-building-j-source-topology.js",
+    "apps/autosprink/tests/mit-riverside-building-j-source-topology.test.js",
+    "data/agent-loops/mit-building-j-source-topology-20260715/state.json",
+    "BUILD_LOG.md"
+  ],
+  "max_iterations": 12,
+  "max_tokens": 300000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

@@ -1,0 +1,5607 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-source-topology-inputs.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "generationMode": "protected-floor-dwg-plus-architectural-rcp-plus-mechanical-m101-plus-structural-roof-framing-no-sprinkler-answer",
+  "sources": {
+    "architecturalBidSet": {
+      "bytes": 116713715,
+      "sha256": "08515f43642de408ed1f9fc5ebd35115083b023d62412d5d9bc4301cf146c93c",
+      "rcpPageIndex": 104,
+      "mechanicalPageIndex": 118
+    },
+    "floorDwg": {
+      "bytes": 6418563,
+      "sha256": "4310609e80ef25af2abbb164a623de1fe749fb37b04d165699acc4fc4f6297e5"
+    },
+    "floorDump": {
+      "bytes": 7974588,
+      "sha256": "3213dba9a44b5266e55a019e44923f37301e403dc29bc0ed67773f5f0d6fa05b",
+      "unknownEntityCount": 0
+    },
+    "roofFramingDwg": {
+      "bytes": 701676,
+      "sha256": "94ee255614f7b403de5185622018eaaad8f80ebe253592418bc7e3b6d993c9aa"
+    },
+    "roofFramingDump": {
+      "bytes": 7858995,
+      "sha256": "d181874ed4b57bbfed2b1daa7b6fde8e100fe8394d2ba3f89931677fb93fddce",
+      "unknownEntityCount": 0
+    }
+  },
+  "coordinateSystem": "exact-structural-roof-local-feet",
+  "mechanicalPlanRegistration": {
+    "method": "median same-room-label translation from mechanical M-101 to architectural RCP A-102",
+    "commonRoomIds": [
+      "J100",
+      "J101",
+      "J102",
+      "J103",
+      "J104",
+      "J105",
+      "J106",
+      "J107",
+      "J108",
+      "J109",
+      "J110",
+      "J111",
+      "J112"
+    ],
+    "inlierRoomIds": [
+      "J101",
+      "J102",
+      "J103",
+      "J104",
+      "J107",
+      "J108",
+      "J109",
+      "J110",
+      "J111",
+      "J112"
+    ],
+    "outlierRoomIds": [
+      "J100",
+      "J105",
+      "J106"
+    ],
+    "mechanicalToRcpTranslationPt": {
+      "x": -1013.689514,
+      "y": 811.129059
+    },
+    "maximumInlierRoomLabelResidualPt": 0.099589,
+    "maximumAllRoomLabelResidualPt": 27.785287
+  },
+  "rooms": [
+    {
+      "id": "J100",
+      "name": "HALL",
+      "sourceZoneHandle": "C22",
+      "sourceLabelHandle": "C28",
+      "areaSqFt": 315.439453,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.03283,
+          "y": 65.5
+        },
+        {
+          "x": 17.666595,
+          "y": 65.5
+        },
+        {
+          "x": 17.666595,
+          "y": 99.145834
+        },
+        {
+          "x": 25.03283,
+          "y": 99.145834
+        },
+        {
+          "x": 25.03283,
+          "y": 84.146894
+        },
+        {
+          "x": 36.948776,
+          "y": 84.146894
+        },
+        {
+          "x": 36.948776,
+          "y": 78.469811
+        },
+        {
+          "x": 25.03283,
+          "y": 78.469811
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 28.143312,
+        "y": 83.402821
+      },
+      "openToStructureLabelIds": [
+        "mit-j-ots-980",
+        "mit-j-ots-981"
+      ],
+      "ceilingRegime": "explicit-open-to-structure"
+    },
+    {
+      "id": "J101",
+      "name": "WOMEN'S R.R.",
+      "sourceZoneHandle": "C36",
+      "sourceLabelHandle": "C3C",
+      "areaSqFt": 181.445411,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.687625,
+          "y": 89.145834
+        },
+        {
+          "x": 12.263242,
+          "y": 89.145834
+        },
+        {
+          "x": 12.263242,
+          "y": 83.631656
+        },
+        {
+          "x": 12.669565,
+          "y": 83.631656
+        },
+        {
+          "x": 12.669565,
+          "y": 89.145834
+        },
+        {
+          "x": 17.000451,
+          "y": 89.145834
+        },
+        {
+          "x": 17.000451,
+          "y": 77.885417
+        },
+        {
+          "x": 0.687625,
+          "y": 77.885417
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 3.281389,
+        "y": 86.227715
+      },
+      "openToStructureLabelIds": [],
+      "ceilingRegime": "finished-ceiling-or-source-unclassified"
+    },
+    {
+      "id": "J102",
+      "name": "MEN'S R.R.",
+      "sourceZoneHandle": "C2C",
+      "sourceLabelHandle": "C32",
+      "areaSqFt": 181.445411,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.687625,
+          "y": 65.854166
+        },
+        {
+          "x": 0.687625,
+          "y": 77.114583
+        },
+        {
+          "x": 17.000451,
+          "y": 77.114583
+        },
+        {
+          "x": 17.000451,
+          "y": 65.854166
+        },
+        {
+          "x": 12.669565,
+          "y": 65.854166
+        },
+        {
+          "x": 12.669565,
+          "y": 71.368344
+        },
+        {
+          "x": 12.263242,
+          "y": 71.368344
+        },
+        {
+          "x": 12.263242,
+          "y": 65.854166
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 3.866863,
+        "y": 69.711218
+      },
+      "openToStructureLabelIds": [],
+      "ceilingRegime": "finished-ceiling-or-source-unclassified"
+    },
+    {
+      "id": "J103",
+      "name": "OFFICE",
+      "sourceZoneHandle": "5DC",
+      "sourceLabelHandle": "5E2",
+      "areaSqFt": 169.344202,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.387076,
+          "y": 84.553144
+        },
+        {
+          "x": 25.387076,
+          "y": 99.145834
+        },
+        {
+          "x": 36.990991,
+          "y": 99.145834
+        },
+        {
+          "x": 36.990991,
+          "y": 84.553144
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 30.463781,
+        "y": 91.755282
+      },
+      "openToStructureLabelIds": [],
+      "ceilingRegime": "finished-ceiling-or-source-unclassified"
+    },
+    {
+      "id": "J104",
+      "name": "LOUNGE",
+      "sourceZoneHandle": "5C8",
+      "sourceLabelHandle": "5CE",
+      "areaSqFt": 716.11262,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 37.354897,
+          "y": 84.125
+        },
+        {
+          "x": 38.385821,
+          "y": 84.125
+        },
+        {
+          "x": 38.385821,
+          "y": 99.145834
+        },
+        {
+          "x": 73.229166,
+          "y": 99.140093
+        },
+        {
+          "x": 73.229166,
+          "y": 87.473427
+        },
+        {
+          "x": 72.802385,
+          "y": 87.47199
+        },
+        {
+          "x": 72.812368,
+          "y": 84.50869
+        },
+        {
+          "x": 72.061254,
+          "y": 84.506159
+        },
+        {
+          "x": 72.081415,
+          "y": 78.521894
+        },
+        {
+          "x": 37.354897,
+          "y": 78.521894
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 56.349863,
+        "y": 88.833864
+      },
+      "openToStructureLabelIds": [
+        "mit-j-ots-978"
+      ],
+      "ceilingRegime": "explicit-open-to-structure"
+    },
+    {
+      "id": "J105",
+      "name": "ELECT.",
+      "sourceZoneHandle": "3395A",
+      "sourceLabelHandle": "33960",
+      "areaSqFt": 67.98549,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 66.385416,
+          "y": 78.115644
+        },
+        {
+          "x": 75.3125,
+          "y": 78.115644
+        },
+        {
+          "x": 75.3125,
+          "y": 70.5
+        },
+        {
+          "x": 66.385416,
+          "y": 70.5
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 70.971433,
+        "y": 74.824398
+      },
+      "openToStructureLabelIds": [
+        "mit-j-ots-971"
+      ],
+      "ceilingRegime": "explicit-open-to-structure"
+    },
+    {
+      "id": "J106",
+      "name": "F.R.",
+      "sourceZoneHandle": "33950",
+      "sourceLabelHandle": "33956",
+      "areaSqFt": 39.027669,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 66.385416,
+          "y": 70.09375
+        },
+        {
+          "x": 75.3125,
+          "y": 70.09375
+        },
+        {
+          "x": 75.3125,
+          "y": 65.854166
+        },
+        {
+          "x": 73.0,
+          "y": 65.854166
+        },
+        {
+          "x": 73.0,
+          "y": 65.5
+        },
+        {
+          "x": 69.666666,
+          "y": 65.5
+        },
+        {
+          "x": 69.666666,
+          "y": 65.854166
+        },
+        {
+          "x": 66.385416,
+          "y": 65.854166
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 73.519433,
+        "y": 67.410405
+      },
+      "openToStructureLabelIds": [
+        "mit-j-ots-970"
+      ],
+      "ceilingRegime": "explicit-open-to-structure"
+    },
+    {
+      "id": "J107",
+      "name": "CUST.",
+      "sourceZoneHandle": "5F0",
+      "sourceLabelHandle": "5F6",
+      "areaSqFt": 80.849117,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 59.38577,
+          "y": 78.115644
+        },
+        {
+          "x": 65.979166,
+          "y": 78.115644
+        },
+        {
+          "x": 65.979166,
+          "y": 65.854166
+        },
+        {
+          "x": 59.38577,
+          "y": 65.854166
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 62.843053,
+        "y": 71.493021
+      },
+      "openToStructureLabelIds": [
+        "mit-j-ots-969"
+      ],
+      "ceilingRegime": "explicit-open-to-structure"
+    },
+    {
+      "id": "J108",
+      "name": "TOOL STOR.",
+      "sourceZoneHandle": "5E6",
+      "sourceLabelHandle": "5EC",
+      "areaSqFt": 146.262624,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 47.387948,
+          "y": 78.115644
+        },
+        {
+          "x": 58.979594,
+          "y": 78.115644
+        },
+        {
+          "x": 58.979594,
+          "y": 65.5
+        },
+        {
+          "x": 47.387948,
+          "y": 65.5
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 53.388289,
+        "y": 71.493021
+      },
+      "openToStructureLabelIds": [
+        "mit-j-ots-968"
+      ],
+      "ceilingRegime": "explicit-open-to-structure"
+    },
+    {
+      "id": "J109",
+      "name": "CHEMICAL STR.",
+      "sourceZoneHandle": "3393C",
+      "sourceLabelHandle": "33942",
+      "areaSqFt": 133.095222,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.43852,
+          "y": 78.063561
+        },
+        {
+          "x": 47.033845,
+          "y": 78.063561
+        },
+        {
+          "x": 47.033845,
+          "y": 65.5
+        },
+        {
+          "x": 36.43852,
+          "y": 65.5
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 41.785209,
+        "y": 71.120563
+      },
+      "openToStructureLabelIds": [],
+      "ceilingRegime": "finished-ceiling-or-source-unclassified"
+    },
+    {
+      "id": "J110",
+      "name": "MDF",
+      "sourceZoneHandle": "33946",
+      "sourceLabelHandle": "3394C",
+      "areaSqFt": 133.095222,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.032398,
+          "y": 78.063561
+        },
+        {
+          "x": 36.032398,
+          "y": 65.5
+        },
+        {
+          "x": 25.439171,
+          "y": 65.5
+        },
+        {
+          "x": 25.439171,
+          "y": 78.063561
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 30.597336,
+        "y": 71.295104
+      },
+      "openToStructureLabelIds": [
+        "mit-j-ots-975"
+      ],
+      "ceilingRegime": "explicit-open-to-structure"
+    },
+    {
+      "id": "J111",
+      "name": "BUS BAY",
+      "sourceZoneHandle": "5D2",
+      "sourceLabelHandle": "5D8",
+      "areaSqFt": 1713.778794,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.333394,
+          "y": 32.833334
+        },
+        {
+          "x": 0.333394,
+          "y": 48.833333
+        },
+        {
+          "x": 0.333394,
+          "y": 60.833333
+        },
+        {
+          "x": 0.333394,
+          "y": 64.833333
+        },
+        {
+          "x": 61.00006,
+          "y": 64.833333
+        },
+        {
+          "x": 61.00006,
+          "y": 60.833333
+        },
+        {
+          "x": 61.00006,
+          "y": 48.833333
+        },
+        {
+          "x": 61.00006,
+          "y": 43.5
+        },
+        {
+          "x": 39.666667,
+          "y": 43.501061
+        },
+        {
+          "x": 39.667363,
+          "y": 32.833334
+        },
+        {
+          "x": 23.407466,
+          "y": 32.832273
+        },
+        {
+          "x": 23.407466,
+          "y": 32.833334
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 34.139291,
+        "y": 55.554991
+      },
+      "openToStructureLabelIds": [
+        "mit-j-ots-967",
+        "mit-j-ots-984"
+      ],
+      "ceilingRegime": "explicit-open-to-structure"
+    },
+    {
+      "id": "J112",
+      "name": "TIRE STOR.",
+      "sourceZoneHandle": "33964",
+      "sourceLabelHandle": "3396A",
+      "areaSqFt": 206.688589,
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.00006,
+          "y": 42.834394
+        },
+        {
+          "x": 61.00006,
+          "y": 32.833334
+        },
+        {
+          "x": 40.33365,
+          "y": 32.833334
+        },
+        {
+          "x": 40.33365,
+          "y": 42.834394
+        }
+      ],
+      "sourceFloorLabelLocalFt": {
+        "x": 49.229145,
+        "y": 37.519433
+      },
+      "openToStructureLabelIds": [
+        "mit-j-ots-982"
+      ],
+      "ceilingRegime": "explicit-open-to-structure"
+    }
+  ],
+  "openToStructureLabels": [
+    {
+      "id": "mit-j-ots-967",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        631.948364,
+        1331.147461,
+        652.469849,
+        1342.319458
+      ],
+      "structuralLocalFt": {
+        "x": 19.043312,
+        "y": 51.161078
+      },
+      "roomId": "J111",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J111",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-968",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        947.430725,
+        1481.361328,
+        967.952209,
+        1492.533325
+      ],
+      "structuralLocalFt": {
+        "x": 55.005541,
+        "y": 67.976151
+      },
+      "roomId": "J108",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J108",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-969",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        1030.94812,
+        1478.909302,
+        1051.469727,
+        1490.081299
+      ],
+      "structuralLocalFt": {
+        "x": 63.376401,
+        "y": 67.692459
+      },
+      "roomId": "J107",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J107",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-970",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        1080.429688,
+        1468.509033,
+        1100.951294,
+        1479.68103
+      ],
+      "structuralLocalFt": {
+        "x": 68.874437,
+        "y": 66.489177
+      },
+      "roomId": "J106",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J106",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-971",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        1078.842285,
+        1511.292358,
+        1099.363892,
+        1522.464355
+      ],
+      "structuralLocalFt": {
+        "x": 68.698057,
+        "y": 71.439085
+      },
+      "roomId": "J105",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J105",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-975",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        715.978699,
+        1481.361328,
+        736.500183,
+        1492.533325
+      ],
+      "structuralLocalFt": {
+        "x": 28.382042,
+        "y": 67.976151
+      },
+      "roomId": "J110",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J110",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-978",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        994.732605,
+        1588.485596,
+        1015.254089,
+        1599.657593
+      ],
+      "structuralLocalFt": {
+        "x": 59.601209,
+        "y": 80.37012
+      },
+      "roomId": "J104",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J104",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-980",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        665.598511,
+        1554.285522,
+        686.119995,
+        1565.45752
+      ],
+      "structuralLocalFt": {
+        "x": 22.783029,
+        "y": 76.41327
+      },
+      "roomId": "J100",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J100",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-981",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        731.747925,
+        1580.367065,
+        752.269409,
+        1591.539062
+      ],
+      "structuralLocalFt": {
+        "x": 30.134559,
+        "y": 79.43083
+      },
+      "roomId": "J100",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J100",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-982",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        854.465576,
+        1181.803955,
+        874.987061,
+        1192.975952
+      ],
+      "structuralLocalFt": {
+        "x": 45.973405,
+        "y": 34.567273
+      },
+      "roomId": "J112",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J112",
+      "nearestRoomCentroidDistanceFt": 0
+    },
+    {
+      "id": "mit-j-ots-984",
+      "text": "O.T.S.",
+      "sourcePageIndex": 104,
+      "sourceBboxPt": [
+        901.019043,
+        1331.147461,
+        921.540527,
+        1342.319458
+      ],
+      "structuralLocalFt": {
+        "x": 50.496361,
+        "y": 51.161078
+      },
+      "roomId": "J111",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J111",
+      "nearestRoomCentroidDistanceFt": 0
+    }
+  ],
+  "wallMaterialPolygons": [
+    {
+      "id": "Wall_102-7FB9-7F62-0",
+      "wallBlockName": "Wall_102",
+      "wallInsertHandle": "7FB9",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7F62",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": -0.333394,
+          "y": 32.833334
+        },
+        {
+          "x": 0.333394,
+          "y": 32.833334
+        },
+        {
+          "x": -0.333394,
+          "y": 32.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_102-7FB9-7F64-0",
+      "wallBlockName": "Wall_102",
+      "wallInsertHandle": "7FB9",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7F64",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": -0.333394,
+          "y": 32.833334
+        },
+        {
+          "x": -0.333394,
+          "y": 42.166667
+        },
+        {
+          "x": 0.333394,
+          "y": 42.166667
+        },
+        {
+          "x": 0.333394,
+          "y": 32.833334
+        }
+      ]
+    },
+    {
+      "id": "Wall_102-7FB9-7F66-0",
+      "wallBlockName": "Wall_102",
+      "wallInsertHandle": "7FB9",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7F66",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": -0.333394,
+          "y": 46.833333
+        },
+        {
+          "x": 0.333394,
+          "y": 46.833333
+        },
+        {
+          "x": 0.333394,
+          "y": 44.833333
+        },
+        {
+          "x": -0.333394,
+          "y": 44.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_102-7FB9-7F68-0",
+      "wallBlockName": "Wall_102",
+      "wallInsertHandle": "7FB9",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7F68",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": -0.333394,
+          "y": 58.833333
+        },
+        {
+          "x": -0.333394,
+          "y": 60.833333
+        },
+        {
+          "x": 0.333394,
+          "y": 60.833333
+        },
+        {
+          "x": 0.333394,
+          "y": 58.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_102-7FB9-7F6A-0",
+      "wallBlockName": "Wall_102",
+      "wallInsertHandle": "7FB9",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7F6A",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": -0.333394,
+          "y": 90.833334
+        },
+        {
+          "x": 0.333394,
+          "y": 90.833334
+        },
+        {
+          "x": 0.333394,
+          "y": 63.5
+        },
+        {
+          "x": -0.333394,
+          "y": 63.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_102-7FB9-7FB7-0",
+      "wallBlockName": "Wall_102",
+      "wallInsertHandle": "7FB9",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7FB7",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": -0.333394,
+          "y": 32.166667
+        },
+        {
+          "x": 0.333394,
+          "y": 32.833334
+        },
+        {
+          "x": 0.333394,
+          "y": 32.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_103-7FEC-7FC7-0",
+      "wallBlockName": "Wall_103",
+      "wallInsertHandle": "7FEC",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7FC7",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 76.333333,
+          "y": 99.5
+        },
+        {
+          "x": 75.666666,
+          "y": 99.5
+        },
+        {
+          "x": 76.333333,
+          "y": 100.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_103-7FEC-7FC9-0",
+      "wallBlockName": "Wall_103",
+      "wallInsertHandle": "7FEC",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7FC9",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 75.666666,
+          "y": 65.5
+        },
+        {
+          "x": 75.666666,
+          "y": 99.5
+        },
+        {
+          "x": 76.333333,
+          "y": 99.5
+        },
+        {
+          "x": 76.333333,
+          "y": 65.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_103-7FEC-7FCB-0",
+      "wallBlockName": "Wall_103",
+      "wallInsertHandle": "7FEC",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7FCB",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 76.333333,
+          "y": 64.833333
+        },
+        {
+          "x": 75.666666,
+          "y": 65.5
+        },
+        {
+          "x": 76.333333,
+          "y": 65.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_103-7FEC-7FDE-0",
+      "wallBlockName": "Wall_103",
+      "wallInsertHandle": "7FEC",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7FDE",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 76.333333,
+          "y": 100.166667
+        },
+        {
+          "x": 75.666666,
+          "y": 99.5
+        },
+        {
+          "x": 75.666666,
+          "y": 100.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_103-7FEC-7FE7-0",
+      "wallBlockName": "Wall_103",
+      "wallInsertHandle": "7FEC",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7FE7",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 75.666666,
+          "y": 64.833333
+        },
+        {
+          "x": 75.666666,
+          "y": 65.5
+        },
+        {
+          "x": 76.333333,
+          "y": 64.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_104-8019-7FF1-0",
+      "wallBlockName": "Wall_104",
+      "wallInsertHandle": "8019",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7FF1",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.666666,
+          "y": 64.833333
+        },
+        {
+          "x": 61.666666,
+          "y": 58.833333
+        },
+        {
+          "x": 61.00006,
+          "y": 58.833333
+        },
+        {
+          "x": 61.00006,
+          "y": 64.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_104-8019-7FF3-0",
+      "wallBlockName": "Wall_104",
+      "wallInsertHandle": "8019",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7FF3",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.00006,
+          "y": 32.833334
+        },
+        {
+          "x": 61.00006,
+          "y": 46.833333
+        },
+        {
+          "x": 61.666666,
+          "y": 46.833333
+        },
+        {
+          "x": 61.666666,
+          "y": 32.833334
+        }
+      ]
+    },
+    {
+      "id": "Wall_104-8019-7FF5-0",
+      "wallBlockName": "Wall_104",
+      "wallInsertHandle": "8019",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "7FF5",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.666666,
+          "y": 32.166667
+        },
+        {
+          "x": 61.00006,
+          "y": 32.833334
+        },
+        {
+          "x": 61.666666,
+          "y": 32.833334
+        }
+      ]
+    },
+    {
+      "id": "Wall_104-8019-8013-0",
+      "wallBlockName": "Wall_104",
+      "wallInsertHandle": "8019",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "8013",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.00006,
+          "y": 65.5
+        },
+        {
+          "x": 61.666666,
+          "y": 65.5
+        },
+        {
+          "x": 61.00006,
+          "y": 64.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_104-8019-8017-0",
+      "wallBlockName": "Wall_104",
+      "wallInsertHandle": "8019",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "8017",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.00006,
+          "y": 32.166667
+        },
+        {
+          "x": 61.00006,
+          "y": 32.833334
+        },
+        {
+          "x": 61.666666,
+          "y": 32.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_105-850F-801E-0",
+      "wallBlockName": "Wall_105",
+      "wallInsertHandle": "850F",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "801E",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 75.3125,
+          "y": 65.854166
+        },
+        {
+          "x": 75.3125,
+          "y": 99.5
+        },
+        {
+          "x": 75.364583,
+          "y": 99.5
+        },
+        {
+          "x": 75.364583,
+          "y": 65.854166
+        }
+      ]
+    },
+    {
+      "id": "Wall_106-9EEF-8516-0",
+      "wallBlockName": "Wall_106",
+      "wallInsertHandle": "9EEF",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "8516",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 18.020841,
+          "y": 99.145833
+        },
+        {
+          "x": 18.020841,
+          "y": 99.197917
+        },
+        {
+          "x": 26.335205,
+          "y": 99.197917
+        },
+        {
+          "x": 26.335205,
+          "y": 99.145833
+        }
+      ]
+    },
+    {
+      "id": "Wall_106-9EEF-8518-0",
+      "wallBlockName": "Wall_106",
+      "wallInsertHandle": "9EEF",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "8518",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 29.669286,
+          "y": 99.145833
+        },
+        {
+          "x": 29.669286,
+          "y": 99.197917
+        },
+        {
+          "x": 39.000211,
+          "y": 99.197917
+        },
+        {
+          "x": 39.000211,
+          "y": 99.145834
+        }
+      ]
+    },
+    {
+      "id": "Wall_106-9EEF-851A-0",
+      "wallBlockName": "Wall_106",
+      "wallInsertHandle": "9EEF",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "851A",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 42.334598,
+          "y": 99.197917
+        },
+        {
+          "x": 51.001875,
+          "y": 99.197917
+        },
+        {
+          "x": 51.001875,
+          "y": 99.145834
+        },
+        {
+          "x": 42.334598,
+          "y": 99.145834
+        }
+      ]
+    },
+    {
+      "id": "Wall_106-9EEF-851C-0",
+      "wallBlockName": "Wall_106",
+      "wallInsertHandle": "9EEF",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "851C",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 66.333333,
+          "y": 99.145834
+        },
+        {
+          "x": 66.333333,
+          "y": 99.197917
+        },
+        {
+          "x": 75.666666,
+          "y": 99.197917
+        },
+        {
+          "x": 75.666666,
+          "y": 99.145833
+        }
+      ]
+    },
+    {
+      "id": "Wall_107-9F7C-9EFE-0",
+      "wallBlockName": "Wall_107",
+      "wallInsertHandle": "9F7C",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "9EFE",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.666595,
+          "y": 99.5
+        },
+        {
+          "x": 17.000451,
+          "y": 100.166667
+        },
+        {
+          "x": 17.666595,
+          "y": 100.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_107-9F7C-9F00-0",
+      "wallBlockName": "Wall_107",
+      "wallInsertHandle": "9F7C",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "9F00",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 26.335205,
+          "y": 99.5
+        },
+        {
+          "x": 17.666595,
+          "y": 99.5
+        },
+        {
+          "x": 17.666595,
+          "y": 100.166667
+        },
+        {
+          "x": 26.335205,
+          "y": 100.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_107-9F7C-9F02-0",
+      "wallBlockName": "Wall_107",
+      "wallInsertHandle": "9F7C",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "9F02",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 39.000211,
+          "y": 99.5
+        },
+        {
+          "x": 29.669286,
+          "y": 99.5
+        },
+        {
+          "x": 29.669286,
+          "y": 100.166667
+        },
+        {
+          "x": 39.000211,
+          "y": 100.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_107-9F7C-9F04-0",
+      "wallBlockName": "Wall_107",
+      "wallInsertHandle": "9F7C",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "9F04",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 47.387948,
+          "y": 99.5
+        },
+        {
+          "x": 42.334598,
+          "y": 99.5
+        },
+        {
+          "x": 42.334598,
+          "y": 100.166667
+        },
+        {
+          "x": 47.387948,
+          "y": 100.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_107-9F7C-9F77-0",
+      "wallBlockName": "Wall_107",
+      "wallInsertHandle": "9F7C",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "9F77",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.000451,
+          "y": 100.166667
+        },
+        {
+          "x": 17.666595,
+          "y": 99.5
+        },
+        {
+          "x": 17.000451,
+          "y": 99.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_108-9FE7-9F81-0",
+      "wallBlockName": "Wall_108",
+      "wallInsertHandle": "9FE7",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "9F81",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.333394,
+          "y": 32.833334
+        },
+        {
+          "x": 18.333411,
+          "y": 32.833334
+        },
+        {
+          "x": 18.333411,
+          "y": 32.166667
+        },
+        {
+          "x": 0.333394,
+          "y": 32.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_108-9FE7-9F83-0",
+      "wallBlockName": "Wall_108",
+      "wallInsertHandle": "9FE7",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "9F83",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 43.668588,
+          "y": 32.166667
+        },
+        {
+          "x": 23.001124,
+          "y": 32.166667
+        },
+        {
+          "x": 23.001124,
+          "y": 32.833334
+        },
+        {
+          "x": 43.668588,
+          "y": 32.833334
+        }
+      ]
+    },
+    {
+      "id": "Wall_108-9FE7-9F85-0",
+      "wallBlockName": "Wall_108",
+      "wallInsertHandle": "9FE7",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "9F85",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.00006,
+          "y": 32.166667
+        },
+        {
+          "x": 45.669535,
+          "y": 32.166667
+        },
+        {
+          "x": 45.669535,
+          "y": 32.833334
+        },
+        {
+          "x": 61.00006,
+          "y": 32.833334
+        }
+      ]
+    },
+    {
+      "id": "Wall_109-A866-9FEB-0",
+      "wallBlockName": "Wall_109",
+      "wallInsertHandle": "A866",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "9FEB",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.708462,
+          "y": 89.125
+        },
+        {
+          "x": 0.708462,
+          "y": 77.90625
+        },
+        {
+          "x": 0.677206,
+          "y": 77.90625
+        },
+        {
+          "x": 0.677206,
+          "y": 89.125
+        }
+      ]
+    },
+    {
+      "id": "Wall_109-A866-9FED-0",
+      "wallBlockName": "Wall_109",
+      "wallInsertHandle": "A866",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "9FED",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.677206,
+          "y": 89.15625
+        },
+        {
+          "x": 0.677206,
+          "y": 77.90625
+        },
+        {
+          "x": 0.635532,
+          "y": 77.90625
+        },
+        {
+          "x": 0.635532,
+          "y": 89.15625
+        }
+      ]
+    },
+    {
+      "id": "Wall_110-ADF6-A86B-0",
+      "wallBlockName": "Wall_110",
+      "wallInsertHandle": "ADF6",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "A86B",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.708462,
+          "y": 77.90625
+        },
+        {
+          "x": 17.000451,
+          "y": 77.90625
+        },
+        {
+          "x": 17.000451,
+          "y": 77.875
+        },
+        {
+          "x": 0.708462,
+          "y": 77.875
+        }
+      ]
+    },
+    {
+      "id": "Wall_110-ADF6-A86F-0",
+      "wallBlockName": "Wall_110",
+      "wallInsertHandle": "ADF6",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "A86F",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.677206,
+          "y": 77.875
+        },
+        {
+          "x": 17.000451,
+          "y": 77.875
+        },
+        {
+          "x": 17.000451,
+          "y": 77.833333
+        },
+        {
+          "x": 0.677206,
+          "y": 77.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_110-ADF6-A871-0",
+      "wallBlockName": "Wall_110",
+      "wallInsertHandle": "ADF6",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "A871",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.708462,
+          "y": 77.125
+        },
+        {
+          "x": 17.000451,
+          "y": 77.125
+        },
+        {
+          "x": 17.000451,
+          "y": 77.09375
+        },
+        {
+          "x": 0.708462,
+          "y": 77.09375
+        }
+      ]
+    },
+    {
+      "id": "Wall_110-ADF6-A875-0",
+      "wallBlockName": "Wall_110",
+      "wallInsertHandle": "ADF6",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "A875",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.677206,
+          "y": 77.166667
+        },
+        {
+          "x": 17.000451,
+          "y": 77.166667
+        },
+        {
+          "x": 17.000451,
+          "y": 77.125
+        },
+        {
+          "x": 0.677206,
+          "y": 77.125
+        }
+      ]
+    },
+    {
+      "id": "Wall_117-AEB2-AE95-0",
+      "wallBlockName": "Wall_117",
+      "wallInsertHandle": "AEB2",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "AE95",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 12.075707,
+          "y": 83.704572
+        },
+        {
+          "x": 12.075707,
+          "y": 89.145834
+        },
+        {
+          "x": 12.117382,
+          "y": 89.145834
+        },
+        {
+          "x": 12.117382,
+          "y": 83.704572
+        }
+      ]
+    },
+    {
+      "id": "Wall_117-AEB2-AE98-0",
+      "wallBlockName": "Wall_117",
+      "wallInsertHandle": "AEB2",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "AE98",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 12.41952,
+          "y": 89.145834
+        },
+        {
+          "x": 12.461194,
+          "y": 89.145834
+        },
+        {
+          "x": 12.461194,
+          "y": 83.662906
+        },
+        {
+          "x": 12.41952,
+          "y": 83.662906
+        }
+      ]
+    },
+    {
+      "id": "Wall_118-AEDF-AEB8-0",
+      "wallBlockName": "Wall_118",
+      "wallInsertHandle": "AEDF",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "AEB8",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 12.075707,
+          "y": 65.875
+        },
+        {
+          "x": 12.075707,
+          "y": 71.295428
+        },
+        {
+          "x": 12.117382,
+          "y": 71.295428
+        },
+        {
+          "x": 12.117382,
+          "y": 65.875
+        }
+      ]
+    },
+    {
+      "id": "Wall_118-AEDF-AEBB-0",
+      "wallBlockName": "Wall_118",
+      "wallInsertHandle": "AEDF",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "AEBB",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 12.41952,
+          "y": 71.337094
+        },
+        {
+          "x": 12.461194,
+          "y": 71.337094
+        },
+        {
+          "x": 12.461194,
+          "y": 65.875
+        },
+        {
+          "x": 12.41952,
+          "y": 65.875
+        }
+      ]
+    },
+    {
+      "id": "Wall_119-AF92-AEE4-0",
+      "wallBlockName": "Wall_119",
+      "wallInsertHandle": "AF92",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "AEE4",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.333394,
+          "y": 65.5
+        },
+        {
+          "x": 18.329607,
+          "y": 65.5
+        },
+        {
+          "x": 18.329607,
+          "y": 64.833333
+        },
+        {
+          "x": 0.333394,
+          "y": 64.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_119-AF92-AEE6-0",
+      "wallBlockName": "Wall_119",
+      "wallInsertHandle": "AF92",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "AEE6",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 41.660843,
+          "y": 64.833333
+        },
+        {
+          "x": 24.330953,
+          "y": 64.833333
+        },
+        {
+          "x": 24.330953,
+          "y": 65.5
+        },
+        {
+          "x": 41.660843,
+          "y": 65.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_119-AF92-AEE8-0",
+      "wallBlockName": "Wall_119",
+      "wallInsertHandle": "AF92",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "AEE8",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 51.662963,
+          "y": 64.833333
+        },
+        {
+          "x": 44.995757,
+          "y": 64.833333
+        },
+        {
+          "x": 44.995757,
+          "y": 65.5
+        },
+        {
+          "x": 51.662963,
+          "y": 65.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_119-AF92-AEEA-0",
+      "wallBlockName": "Wall_119",
+      "wallInsertHandle": "AF92",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "AEEA",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 56.328783,
+          "y": 65.5
+        },
+        {
+          "x": 61.666666,
+          "y": 65.5
+        },
+        {
+          "x": 61.666666,
+          "y": 64.833333
+        },
+        {
+          "x": 56.328783,
+          "y": 64.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_120-AFAA-AF9A-0",
+      "wallBlockName": "Wall_120",
+      "wallInsertHandle": "AFAA",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "AF9A",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.333394,
+          "y": 90.166667
+        },
+        {
+          "x": 17.000451,
+          "y": 90.166667
+        },
+        {
+          "x": 17.000451,
+          "y": 89.5
+        },
+        {
+          "x": 0.333394,
+          "y": 89.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_121-B2F6-AFB0-0",
+      "wallBlockName": "Wall_121",
+      "wallInsertHandle": "B2F6",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "AFB0",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.000451,
+          "y": 89.15625
+        },
+        {
+          "x": 12.466403,
+          "y": 89.15625
+        },
+        {
+          "x": 12.466403,
+          "y": 89.197917
+        },
+        {
+          "x": 17.000451,
+          "y": 89.197917
+        }
+      ]
+    },
+    {
+      "id": "Wall_122-B365-B2FB-0",
+      "wallBlockName": "Wall_122",
+      "wallInsertHandle": "B365",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "B2FB",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.000451,
+          "y": 66.166666
+        },
+        {
+          "x": 17.666595,
+          "y": 66.166666
+        },
+        {
+          "x": 17.666595,
+          "y": 65.5
+        },
+        {
+          "x": 17.000451,
+          "y": 65.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_122-B365-B2FD-0",
+      "wallBlockName": "Wall_122",
+      "wallInsertHandle": "B365",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "B2FD",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.000451,
+          "y": 69.5
+        },
+        {
+          "x": 17.000451,
+          "y": 85.5
+        },
+        {
+          "x": 17.666595,
+          "y": 85.5
+        },
+        {
+          "x": 17.666595,
+          "y": 69.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_122-B365-B2FF-0",
+      "wallBlockName": "Wall_122",
+      "wallInsertHandle": "B365",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "B2FF",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.000451,
+          "y": 90.166667
+        },
+        {
+          "x": 17.666595,
+          "y": 90.166667
+        },
+        {
+          "x": 17.666595,
+          "y": 88.833334
+        },
+        {
+          "x": 17.000451,
+          "y": 88.833334
+        }
+      ]
+    },
+    {
+      "id": "Wall_123-B660-B36A-0",
+      "wallBlockName": "Wall_123",
+      "wallInsertHandle": "B660",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "B36A",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 18.020841,
+          "y": 89.5
+        },
+        {
+          "x": 18.020841,
+          "y": 88.833334
+        },
+        {
+          "x": 17.968746,
+          "y": 88.833334
+        },
+        {
+          "x": 17.968746,
+          "y": 89.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_123-B660-B3ED-0",
+      "wallBlockName": "Wall_123",
+      "wallInsertHandle": "B660",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "B3ED",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 18.020841,
+          "y": 98.166667
+        },
+        {
+          "x": 17.968746,
+          "y": 98.166667
+        },
+        {
+          "x": 17.968746,
+          "y": 99.145834
+        },
+        {
+          "x": 18.020841,
+          "y": 99.145834
+        }
+      ]
+    },
+    {
+      "id": "Wall_123-B660-B3EF-0",
+      "wallBlockName": "Wall_123",
+      "wallInsertHandle": "B660",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "B3EF",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.968746,
+          "y": 91.5
+        },
+        {
+          "x": 18.020841,
+          "y": 91.5
+        },
+        {
+          "x": 18.020841,
+          "y": 89.90625
+        },
+        {
+          "x": 17.968746,
+          "y": 89.90625
+        }
+      ]
+    },
+    {
+      "id": "Wall_123-B660-B617-0",
+      "wallBlockName": "Wall_123",
+      "wallInsertHandle": "B660",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "B617",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.968746,
+          "y": 89.854167
+        },
+        {
+          "x": 18.020841,
+          "y": 89.854167
+        },
+        {
+          "x": 18.020841,
+          "y": 89.552084
+        },
+        {
+          "x": 17.968746,
+          "y": 89.552084
+        }
+      ]
+    },
+    {
+      "id": "Wall_124-BF47-B667-0",
+      "wallBlockName": "Wall_124",
+      "wallInsertHandle": "BF47",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "B667",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.03283,
+          "y": 84.198978
+        },
+        {
+          "x": 25.03283,
+          "y": 91.5
+        },
+        {
+          "x": 25.084925,
+          "y": 91.5
+        },
+        {
+          "x": 25.084925,
+          "y": 84.198978
+        }
+      ]
+    },
+    {
+      "id": "Wall_124-BF47-B669-0",
+      "wallBlockName": "Wall_124",
+      "wallInsertHandle": "BF47",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "B669",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.03283,
+          "y": 99.145834
+        },
+        {
+          "x": 25.084925,
+          "y": 99.145834
+        },
+        {
+          "x": 25.084925,
+          "y": 94.5
+        },
+        {
+          "x": 25.03283,
+          "y": 94.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_124-BF47-B66D-0",
+      "wallBlockName": "Wall_124",
+      "wallInsertHandle": "BF47",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "B66D",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.387076,
+          "y": 91.5
+        },
+        {
+          "x": 25.439171,
+          "y": 91.5
+        },
+        {
+          "x": 25.439171,
+          "y": 84.553144
+        },
+        {
+          "x": 25.387076,
+          "y": 84.553144
+        }
+      ]
+    },
+    {
+      "id": "Wall_124-BF47-B66F-0",
+      "wallBlockName": "Wall_124",
+      "wallInsertHandle": "BF47",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "B66F",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.387076,
+          "y": 99.145834
+        },
+        {
+          "x": 25.439171,
+          "y": 99.145834
+        },
+        {
+          "x": 25.439171,
+          "y": 94.5
+        },
+        {
+          "x": 25.387076,
+          "y": 94.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_125-CAA0-BF4C-0",
+      "wallBlockName": "Wall_125",
+      "wallInsertHandle": "CAA0",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "BF4C",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.948776,
+          "y": 83.636478
+        },
+        {
+          "x": 36.948776,
+          "y": 99.145834
+        },
+        {
+          "x": 37.000842,
+          "y": 99.145834
+        },
+        {
+          "x": 37.000842,
+          "y": 83.636478
+        }
+      ]
+    },
+    {
+      "id": "Wall_125-CAA0-BF4E-0",
+      "wallBlockName": "Wall_125",
+      "wallInsertHandle": "CAA0",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "BF4E",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 37.30283,
+          "y": 83.636478
+        },
+        {
+          "x": 37.30283,
+          "y": 99.145834
+        },
+        {
+          "x": 37.354897,
+          "y": 99.145834
+        },
+        {
+          "x": 37.354897,
+          "y": 83.636478
+        }
+      ]
+    },
+    {
+      "id": "Wall_126-D0E9-CAA5-0",
+      "wallBlockName": "Wall_126",
+      "wallInsertHandle": "D0E9",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "CAA5",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.084925,
+          "y": 84.146894
+        },
+        {
+          "x": 25.084925,
+          "y": 84.198978
+        },
+        {
+          "x": 33.460856,
+          "y": 84.198978
+        },
+        {
+          "x": 33.460856,
+          "y": 84.146894
+        }
+      ]
+    },
+    {
+      "id": "Wall_126-D0E9-CAA7-0",
+      "wallBlockName": "Wall_126",
+      "wallInsertHandle": "D0E9",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "CAA7",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.64735,
+          "y": 84.146894
+        },
+        {
+          "x": 36.64735,
+          "y": 84.198978
+        },
+        {
+          "x": 36.948776,
+          "y": 84.198978
+        },
+        {
+          "x": 36.948776,
+          "y": 84.146894
+        }
+      ]
+    },
+    {
+      "id": "Wall_126-D0E9-CAA9-0",
+      "wallBlockName": "Wall_126",
+      "wallInsertHandle": "D0E9",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "CAA9",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 33.460856,
+          "y": 84.501061
+        },
+        {
+          "x": 25.439171,
+          "y": 84.501061
+        },
+        {
+          "x": 25.439171,
+          "y": 84.553144
+        },
+        {
+          "x": 33.460856,
+          "y": 84.553144
+        }
+      ]
+    },
+    {
+      "id": "Wall_126-D0E9-CAAB-0",
+      "wallBlockName": "Wall_126",
+      "wallInsertHandle": "D0E9",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "CAAB",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.948776,
+          "y": 84.501061
+        },
+        {
+          "x": 36.64735,
+          "y": 84.501061
+        },
+        {
+          "x": 36.64735,
+          "y": 84.553144
+        },
+        {
+          "x": 36.948776,
+          "y": 84.553144
+        }
+      ]
+    },
+    {
+      "id": "Wall_127-D6DE-D0EE-0",
+      "wallBlockName": "Wall_127",
+      "wallInsertHandle": "D6DE",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "D0EE",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.439171,
+          "y": 78.063561
+        },
+        {
+          "x": 25.439171,
+          "y": 78.115644
+        },
+        {
+          "x": 26.043477,
+          "y": 78.115644
+        },
+        {
+          "x": 26.043477,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_127-D6DE-D0F0-0",
+      "wallBlockName": "Wall_127",
+      "wallInsertHandle": "D6DE",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "D0F0",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 29.231692,
+          "y": 78.115644
+        },
+        {
+          "x": 36.032398,
+          "y": 78.115644
+        },
+        {
+          "x": 36.032398,
+          "y": 78.063561
+        },
+        {
+          "x": 29.231692,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_127-D6DE-D0F4-0",
+      "wallBlockName": "Wall_127",
+      "wallInsertHandle": "D6DE",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "D0F4",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.084925,
+          "y": 78.417727
+        },
+        {
+          "x": 25.084925,
+          "y": 78.469811
+        },
+        {
+          "x": 26.043477,
+          "y": 78.469811
+        },
+        {
+          "x": 26.043477,
+          "y": 78.417727
+        }
+      ]
+    },
+    {
+      "id": "Wall_127-D6DE-D0F6-0",
+      "wallBlockName": "Wall_127",
+      "wallInsertHandle": "D6DE",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "D0F6",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 29.231692,
+          "y": 78.469811
+        },
+        {
+          "x": 36.032398,
+          "y": 78.469811
+        },
+        {
+          "x": 36.032398,
+          "y": 78.417727
+        },
+        {
+          "x": 29.231692,
+          "y": 78.417727
+        }
+      ]
+    },
+    {
+      "id": "Wall_128-D722-D6E3-0",
+      "wallBlockName": "Wall_128",
+      "wallInsertHandle": "D722",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "D6E3",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.084465,
+          "y": 78.417727
+        },
+        {
+          "x": 36.084465,
+          "y": 65.5
+        },
+        {
+          "x": 36.032398,
+          "y": 65.5
+        },
+        {
+          "x": 36.032398,
+          "y": 78.417727
+        }
+      ]
+    },
+    {
+      "id": "Wall_128-D722-D6E8-0",
+      "wallBlockName": "Wall_128",
+      "wallInsertHandle": "D722",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "D6E8",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.43852,
+          "y": 78.063561
+        },
+        {
+          "x": 36.43852,
+          "y": 65.5
+        },
+        {
+          "x": 36.386453,
+          "y": 65.5
+        },
+        {
+          "x": 36.386453,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_129-D784-D72C-0",
+      "wallBlockName": "Wall_129",
+      "wallInsertHandle": "D784",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "D72C",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 61.666666,
+          "y": 64.833333
+        },
+        {
+          "x": 61.666666,
+          "y": 65.5
+        },
+        {
+          "x": 69.666666,
+          "y": 65.5
+        },
+        {
+          "x": 69.666666,
+          "y": 64.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_129-D784-D72E-0",
+      "wallBlockName": "Wall_129",
+      "wallInsertHandle": "D784",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "D72E",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 73.0,
+          "y": 64.833333
+        },
+        {
+          "x": 73.0,
+          "y": 65.5
+        },
+        {
+          "x": 75.666666,
+          "y": 65.5
+        },
+        {
+          "x": 75.666666,
+          "y": 64.833333
+        }
+      ]
+    },
+    {
+      "id": "Wall_130-DC55-D789-0",
+      "wallBlockName": "Wall_130",
+      "wallInsertHandle": "DC55",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "D789",
+      "patternName": "Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 59.333696,
+          "y": 65.854166
+        },
+        {
+          "x": 66.03125,
+          "y": 65.854166
+        },
+        {
+          "x": 66.03125,
+          "y": 65.802083
+        },
+        {
+          "x": 59.333696,
+          "y": 65.802083
+        }
+      ]
+    },
+    {
+      "id": "Wall_131-E54B-DC5A-0",
+      "wallBlockName": "Wall_131",
+      "wallInsertHandle": "E54B",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "DC5A",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 59.031667,
+          "y": 65.5
+        },
+        {
+          "x": 59.031667,
+          "y": 78.063561
+        },
+        {
+          "x": 59.083741,
+          "y": 78.063561
+        },
+        {
+          "x": 59.083741,
+          "y": 65.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_131-E54B-DC5C-0",
+      "wallBlockName": "Wall_131",
+      "wallInsertHandle": "E54B",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "DC5C",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 59.437844,
+          "y": 78.063561
+        },
+        {
+          "x": 59.437844,
+          "y": 65.5
+        },
+        {
+          "x": 59.38577,
+          "y": 65.5
+        },
+        {
+          "x": 59.38577,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_132-EE43-E550-0",
+      "wallBlockName": "Wall_132",
+      "wallInsertHandle": "EE43",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "E550",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 66.03125,
+          "y": 65.5
+        },
+        {
+          "x": 66.03125,
+          "y": 78.063561
+        },
+        {
+          "x": 66.083333,
+          "y": 78.063561
+        },
+        {
+          "x": 66.083333,
+          "y": 65.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_132-EE43-E552-0",
+      "wallBlockName": "Wall_132",
+      "wallInsertHandle": "EE43",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "E552",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 66.4375,
+          "y": 78.063561
+        },
+        {
+          "x": 66.4375,
+          "y": 65.5
+        },
+        {
+          "x": 66.385416,
+          "y": 65.5
+        },
+        {
+          "x": 66.385416,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_133-F4A3-EE48-0",
+      "wallBlockName": "Wall_133",
+      "wallInsertHandle": "F4A3",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "EE48",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 66.4375,
+          "y": 70.5
+        },
+        {
+          "x": 75.3125,
+          "y": 70.5
+        },
+        {
+          "x": 75.3125,
+          "y": 70.447916
+        },
+        {
+          "x": 66.4375,
+          "y": 70.447916
+        }
+      ]
+    },
+    {
+      "id": "Wall_133-F4A3-EE4A-0",
+      "wallBlockName": "Wall_133",
+      "wallInsertHandle": "F4A3",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "EE4A",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 75.3125,
+          "y": 70.09375
+        },
+        {
+          "x": 66.4375,
+          "y": 70.09375
+        },
+        {
+          "x": 66.4375,
+          "y": 70.145833
+        },
+        {
+          "x": 75.3125,
+          "y": 70.145833
+        }
+      ]
+    },
+    {
+      "id": "Wall_134-FDA7-F4A8-0",
+      "wallBlockName": "Wall_134",
+      "wallInsertHandle": "FDA7",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "F4A8",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.084925,
+          "y": 78.417727
+        },
+        {
+          "x": 25.084925,
+          "y": 65.5
+        },
+        {
+          "x": 25.03283,
+          "y": 65.5
+        },
+        {
+          "x": 25.03283,
+          "y": 78.417727
+        }
+      ]
+    },
+    {
+      "id": "Wall_134-FDA7-F4AA-0",
+      "wallBlockName": "Wall_134",
+      "wallInsertHandle": "FDA7",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "F4AA",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 25.439171,
+          "y": 78.063561
+        },
+        {
+          "x": 25.439171,
+          "y": 65.5
+        },
+        {
+          "x": 25.387076,
+          "y": 65.5
+        },
+        {
+          "x": 25.387076,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_136-FE32-FE11-0",
+      "wallBlockName": "Wall_136",
+      "wallInsertHandle": "FE32",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "FE11",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 51.001875,
+          "y": 99.5
+        },
+        {
+          "x": 47.387948,
+          "y": 99.5
+        },
+        {
+          "x": 47.387948,
+          "y": 100.166667
+        },
+        {
+          "x": 51.001875,
+          "y": 100.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_136-FE32-FE13-0",
+      "wallBlockName": "Wall_136",
+      "wallInsertHandle": "FE32",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "FE13",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 66.333333,
+          "y": 99.5
+        },
+        {
+          "x": 66.333333,
+          "y": 100.166667
+        },
+        {
+          "x": 75.666666,
+          "y": 100.166667
+        },
+        {
+          "x": 75.666666,
+          "y": 99.5
+        }
+      ]
+    },
+    {
+      "id": "Wall_137-FE9E-FE3C-0",
+      "wallBlockName": "Wall_137",
+      "wallInsertHandle": "FE9E",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "FE3C",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.000451,
+          "y": 99.5
+        },
+        {
+          "x": 17.666595,
+          "y": 99.5
+        },
+        {
+          "x": 17.666595,
+          "y": 98.166667
+        },
+        {
+          "x": 17.000451,
+          "y": 98.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_137-FE9E-FE3E-0",
+      "wallBlockName": "Wall_137",
+      "wallInsertHandle": "FE9E",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "FE3E",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 17.000451,
+          "y": 91.5
+        },
+        {
+          "x": 17.666595,
+          "y": 91.5
+        },
+        {
+          "x": 17.666595,
+          "y": 90.166667
+        },
+        {
+          "x": 17.000451,
+          "y": 90.166667
+        }
+      ]
+    },
+    {
+      "id": "Wall_138-FEE0-FEA3-0",
+      "wallBlockName": "Wall_138",
+      "wallInsertHandle": "FEE0",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FEA3",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 47.085919,
+          "y": 78.063561
+        },
+        {
+          "x": 47.085919,
+          "y": 65.5
+        },
+        {
+          "x": 47.033845,
+          "y": 65.5
+        },
+        {
+          "x": 47.033845,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_138-FEE0-FEA7-0",
+      "wallBlockName": "Wall_138",
+      "wallInsertHandle": "FEE0",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FEA7",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 47.440021,
+          "y": 78.417727
+        },
+        {
+          "x": 47.440021,
+          "y": 65.5
+        },
+        {
+          "x": 47.387948,
+          "y": 65.5
+        },
+        {
+          "x": 47.387948,
+          "y": 78.417727
+        }
+      ]
+    },
+    {
+      "id": "Wall_139-FF0B-FEE5-0",
+      "wallBlockName": "Wall_139",
+      "wallInsertHandle": "FF0B",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FEE5",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.43852,
+          "y": 78.115644
+        },
+        {
+          "x": 47.033845,
+          "y": 78.115644
+        },
+        {
+          "x": 47.033845,
+          "y": 78.063561
+        },
+        {
+          "x": 36.43852,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_139-FF0B-FEE7-0",
+      "wallBlockName": "Wall_139",
+      "wallInsertHandle": "FF0B",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FEE7",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 36.084465,
+          "y": 78.469811
+        },
+        {
+          "x": 47.387948,
+          "y": 78.469811
+        },
+        {
+          "x": 47.387948,
+          "y": 78.417727
+        },
+        {
+          "x": 36.084465,
+          "y": 78.417727
+        }
+      ]
+    },
+    {
+      "id": "Wall_140-10EE3-FF10-0",
+      "wallBlockName": "Wall_140",
+      "wallInsertHandle": "10EE3",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FF10",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 47.440021,
+          "y": 78.063561
+        },
+        {
+          "x": 47.440021,
+          "y": 78.115644
+        },
+        {
+          "x": 59.98884,
+          "y": 78.115644
+        },
+        {
+          "x": 59.98884,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_140-10EE3-FF12-0",
+      "wallBlockName": "Wall_140",
+      "wallInsertHandle": "10EE3",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FF12",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 63.176096,
+          "y": 78.063561
+        },
+        {
+          "x": 63.176096,
+          "y": 78.115644
+        },
+        {
+          "x": 66.739583,
+          "y": 78.115644
+        },
+        {
+          "x": 66.739583,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_140-10EE3-FF14-0",
+      "wallBlockName": "Wall_140",
+      "wallInsertHandle": "10EE3",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FF14",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 69.927083,
+          "y": 78.115644
+        },
+        {
+          "x": 75.3125,
+          "y": 78.115644
+        },
+        {
+          "x": 75.3125,
+          "y": 78.063561
+        },
+        {
+          "x": 69.927083,
+          "y": 78.063561
+        }
+      ]
+    },
+    {
+      "id": "Wall_140-10EE3-FF16-0",
+      "wallBlockName": "Wall_140",
+      "wallInsertHandle": "10EE3",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FF16",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 47.440021,
+          "y": 78.417728
+        },
+        {
+          "x": 47.440021,
+          "y": 78.469811
+        },
+        {
+          "x": 59.98884,
+          "y": 78.469811
+        },
+        {
+          "x": 59.98884,
+          "y": 78.417728
+        }
+      ]
+    },
+    {
+      "id": "Wall_140-10EE3-FF18-0",
+      "wallBlockName": "Wall_140",
+      "wallInsertHandle": "10EE3",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FF18",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 63.176096,
+          "y": 78.417727
+        },
+        {
+          "x": 63.176096,
+          "y": 78.469811
+        },
+        {
+          "x": 66.739583,
+          "y": 78.469811
+        },
+        {
+          "x": 66.739583,
+          "y": 78.417727
+        }
+      ]
+    },
+    {
+      "id": "Wall_140-10EE3-FF1A-0",
+      "wallBlockName": "Wall_140",
+      "wallInsertHandle": "10EE3",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "FF1A",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 69.927083,
+          "y": 78.469811
+        },
+        {
+          "x": 75.3125,
+          "y": 78.469811
+        },
+        {
+          "x": 75.3125,
+          "y": 78.417727
+        },
+        {
+          "x": 69.927083,
+          "y": 78.417727
+        }
+      ]
+    },
+    {
+      "id": "Wall_177-14D64-1494A-0",
+      "wallBlockName": "Wall_177",
+      "wallInsertHandle": "14D64",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "1494A",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 69.666666,
+          "y": 65.802083
+        },
+        {
+          "x": 66.4375,
+          "y": 65.802083
+        },
+        {
+          "x": 66.4375,
+          "y": 65.854166
+        },
+        {
+          "x": 69.666666,
+          "y": 65.854166
+        }
+      ]
+    },
+    {
+      "id": "Wall_177-14D64-1494C-0",
+      "wallBlockName": "Wall_177",
+      "wallInsertHandle": "14D64",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "1494C",
+      "patternName": "09___Gypsum_Board",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 73.0,
+          "y": 65.854166
+        },
+        {
+          "x": 75.3125,
+          "y": 65.854166
+        },
+        {
+          "x": 75.3125,
+          "y": 65.802083
+        },
+        {
+          "x": 73.0,
+          "y": 65.802083
+        }
+      ]
+    },
+    {
+      "id": "Wall_178-155DE-14D69-0",
+      "wallBlockName": "Wall_178",
+      "wallInsertHandle": "155DE",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "14D69",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.677206,
+          "y": 65.875
+        },
+        {
+          "x": 0.677206,
+          "y": 77.09375
+        },
+        {
+          "x": 0.708462,
+          "y": 77.09375
+        },
+        {
+          "x": 0.708462,
+          "y": 65.875
+        }
+      ]
+    },
+    {
+      "id": "Wall_178-155DE-14D6D-0",
+      "wallBlockName": "Wall_178",
+      "wallInsertHandle": "155DE",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "14D6D",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.635532,
+          "y": 65.84375
+        },
+        {
+          "x": 0.635532,
+          "y": 77.09375
+        },
+        {
+          "x": 0.677206,
+          "y": 77.09375
+        },
+        {
+          "x": 0.677206,
+          "y": 65.84375
+        }
+      ]
+    },
+    {
+      "id": "Wall_179-15E4D-155E4-0",
+      "wallBlockName": "Wall_179",
+      "wallInsertHandle": "15E4D",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "155E4",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 0.677206,
+          "y": 89.197917
+        },
+        {
+          "x": 12.466403,
+          "y": 89.197917
+        },
+        {
+          "x": 12.466403,
+          "y": 89.15625
+        },
+        {
+          "x": 0.677206,
+          "y": 89.15625
+        }
+      ]
+    },
+    {
+      "id": "Wall_183-17931-16D6D-0",
+      "wallBlockName": "Wall_183",
+      "wallInsertHandle": "17931",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "16D6D",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 12.49245,
+          "y": 65.875
+        },
+        {
+          "x": 17.000451,
+          "y": 65.875
+        },
+        {
+          "x": 17.000451,
+          "y": 65.84375
+        },
+        {
+          "x": 12.49245,
+          "y": 65.84375
+        }
+      ]
+    },
+    {
+      "id": "Wall_183-17931-16D6E-0",
+      "wallBlockName": "Wall_183",
+      "wallInsertHandle": "17931",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "16D6E",
+      "patternName": "SOLID",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 12.044452,
+          "y": 65.84375
+        },
+        {
+          "x": 0.708462,
+          "y": 65.84375
+        },
+        {
+          "x": 0.708462,
+          "y": 65.875
+        },
+        {
+          "x": 12.044452,
+          "y": 65.875
+        }
+      ]
+    },
+    {
+      "id": "Wall_183-17931-16D70-0",
+      "wallBlockName": "Wall_183",
+      "wallInsertHandle": "17931",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "16D70",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 12.117382,
+          "y": 65.84375
+        },
+        {
+          "x": 17.000451,
+          "y": 65.84375
+        },
+        {
+          "x": 17.000451,
+          "y": 65.802083
+        },
+        {
+          "x": 12.117382,
+          "y": 65.802083
+        }
+      ]
+    },
+    {
+      "id": "Wall_183-17931-16D74-0",
+      "wallBlockName": "Wall_183",
+      "wallInsertHandle": "17931",
+      "wallClassLayer": "New_A-WALL-INTR.3D",
+      "sourceGeometryHandle": "16D74",
+      "patternName": "01___Stipple_Random",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 12.075707,
+          "y": 65.802083
+        },
+        {
+          "x": 0.708462,
+          "y": 65.802083
+        },
+        {
+          "x": 0.708462,
+          "y": 65.84375
+        },
+        {
+          "x": 12.075707,
+          "y": 65.84375
+        }
+      ]
+    },
+    {
+      "id": "Wall_7-A75-A35-0",
+      "wallBlockName": "Wall_7",
+      "wallInsertHandle": "A75",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "A35",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 45.002529,
+          "y": 42.834394
+        },
+        {
+          "x": 39.666667,
+          "y": 42.834394
+        },
+        {
+          "x": 39.666667,
+          "y": 43.501061
+        },
+        {
+          "x": 45.002529,
+          "y": 43.501061
+        }
+      ]
+    },
+    {
+      "id": "Wall_7-A75-A37-0",
+      "wallBlockName": "Wall_7",
+      "wallInsertHandle": "A75",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "A37",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 51.668421,
+          "y": 43.501061
+        },
+        {
+          "x": 61.00006,
+          "y": 43.501061
+        },
+        {
+          "x": 61.00006,
+          "y": 42.834394
+        },
+        {
+          "x": 51.668421,
+          "y": 42.834394
+        }
+      ]
+    },
+    {
+      "id": "Wall_8-A7D-A7A-0",
+      "wallBlockName": "Wall_8",
+      "wallInsertHandle": "A7D",
+      "wallClassLayer": "New_A-WALL-EXTR.3D",
+      "sourceGeometryHandle": "A7A",
+      "patternName": "04___Block_Masonry",
+      "structuralLocalVerticesFt": [
+        {
+          "x": 40.33365,
+          "y": 42.834394
+        },
+        {
+          "x": 40.33365,
+          "y": 32.833334
+        },
+        {
+          "x": 39.666667,
+          "y": 32.833334
+        },
+        {
+          "x": 39.666667,
+          "y": 42.834394
+        }
+      ]
+    }
+  ],
+  "doorOpenings": [
+    {
+      "id": "Wall_102-7FB9-7FB1",
+      "wallBlockName": "Wall_102",
+      "wallInsertHandle": "7FB9",
+      "sourceDoorHandle": "7FB1",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "Overhead Coiling Door_3",
+      "structuralLocalCenterFt": {
+        "x": -0.333394,
+        "y": 52.833333
+      },
+      "rotationRadians": 1.570796
+    },
+    {
+      "id": "Wall_104-8019-800D",
+      "wallBlockName": "Wall_104",
+      "wallInsertHandle": "8019",
+      "sourceDoorHandle": "800D",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "Overhead Coiling Door_3",
+      "structuralLocalCenterFt": {
+        "x": 61.666666,
+        "y": 52.833333
+      },
+      "rotationRadians": 4.712389
+    },
+    {
+      "id": "Wall_106-9EEF-9EBE",
+      "wallBlockName": "Wall_106",
+      "wallInsertHandle": "9EEF",
+      "sourceDoorHandle": "9EBE",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "Simple Door Opening",
+      "structuralLocalCenterFt": {
+        "x": 58.66715,
+        "y": 99.145834
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_108-9FE7-9FE2",
+      "wallBlockName": "Wall_108",
+      "wallInsertHandle": "9FE7",
+      "sourceDoorHandle": "9FE2",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_2",
+      "structuralLocalCenterFt": {
+        "x": 20.667268,
+        "y": 32.166667
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_112-AE2A-AE29",
+      "wallBlockName": "Wall_112",
+      "wallInsertHandle": "AE2A",
+      "sourceDoorHandle": "AE29",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_3",
+      "structuralLocalCenterFt": {
+        "x": 4.038152,
+        "y": 72.010261
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_114-AE80-AE60",
+      "wallBlockName": "Wall_114",
+      "wallInsertHandle": "AE80",
+      "sourceDoorHandle": "AE60",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_3",
+      "structuralLocalCenterFt": {
+        "x": 4.038199,
+        "y": 82.994462
+      },
+      "rotationRadians": 3.141593
+    },
+    {
+      "id": "Wall_114-AE80-AE7E",
+      "wallBlockName": "Wall_114",
+      "wallInsertHandle": "AE80",
+      "sourceDoorHandle": "AE7E",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_4",
+      "structuralLocalCenterFt": {
+        "x": 7.181274,
+        "y": 82.911128
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_119-AF92-AF28",
+      "wallBlockName": "Wall_119",
+      "wallInsertHandle": "AF92",
+      "sourceDoorHandle": "AF28",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_5",
+      "structuralLocalCenterFt": {
+        "x": 43.3283,
+        "y": 64.833333
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_119-AF92-AF53",
+      "wallBlockName": "Wall_119",
+      "wallInsertHandle": "AF92",
+      "sourceDoorHandle": "AF53",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_6",
+      "structuralLocalCenterFt": {
+        "x": 53.995873,
+        "y": 64.833333
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_119-AF92-AF8D",
+      "wallBlockName": "Wall_119",
+      "wallInsertHandle": "AF92",
+      "sourceDoorHandle": "AF8D",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Combi Commercial 22",
+      "structuralLocalCenterFt": {
+        "x": 21.33028,
+        "y": 65.166666
+      },
+      "rotationRadians": 3.141593
+    },
+    {
+      "id": "Wall_122-B365-B335",
+      "wallBlockName": "Wall_122",
+      "wallInsertHandle": "B365",
+      "sourceDoorHandle": "B335",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_7",
+      "structuralLocalCenterFt": {
+        "x": 17.000451,
+        "y": 67.833333
+      },
+      "rotationRadians": 1.570796
+    },
+    {
+      "id": "Wall_122-B365-B360",
+      "wallBlockName": "Wall_122",
+      "wallInsertHandle": "B365",
+      "sourceDoorHandle": "B360",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_7",
+      "structuralLocalCenterFt": {
+        "x": 17.000451,
+        "y": 87.166667
+      },
+      "rotationRadians": 1.570796
+    },
+    {
+      "id": "Wall_123-B660-B5EC",
+      "wallBlockName": "Wall_123",
+      "wallInsertHandle": "B660",
+      "sourceDoorHandle": "B5EC",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "Simple Door Opening",
+      "structuralLocalCenterFt": {
+        "x": 18.020841,
+        "y": 94.833334
+      },
+      "rotationRadians": 4.712389
+    },
+    {
+      "id": "Wall_125-CAA0-CA9B",
+      "wallBlockName": "Wall_125",
+      "wallInsertHandle": "CAA0",
+      "sourceDoorHandle": "CA9B",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Combi Commercial 22_2",
+      "structuralLocalCenterFt": {
+        "x": 37.021669,
+        "y": 81.053144
+      },
+      "rotationRadians": 1.570796
+    },
+    {
+      "id": "Wall_126-D0E9-D0E4",
+      "wallBlockName": "Wall_126",
+      "wallInsertHandle": "D0E9",
+      "sourceDoorHandle": "D0E4",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_8",
+      "structuralLocalCenterFt": {
+        "x": 35.054103,
+        "y": 84.553144
+      },
+      "rotationRadians": 3.141593
+    },
+    {
+      "id": "Wall_127-D6DE-D6B2",
+      "wallBlockName": "Wall_127",
+      "wallInsertHandle": "D6DE",
+      "sourceDoorHandle": "D6B2",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_9",
+      "structuralLocalCenterFt": {
+        "x": 27.637584,
+        "y": 78.063561
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_129-D784-D77F",
+      "wallBlockName": "Wall_129",
+      "wallInsertHandle": "D784",
+      "sourceDoorHandle": "D77F",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_10",
+      "structuralLocalCenterFt": {
+        "x": 71.333333,
+        "y": 64.708333
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_137-FE9E-FE9A",
+      "wallBlockName": "Wall_137",
+      "wallInsertHandle": "FE9E",
+      "sourceDoorHandle": "FE9A",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Combi Commercial 22_3",
+      "structuralLocalCenterFt": {
+        "x": 16.875674,
+        "y": 94.833334
+      },
+      "rotationRadians": 1.570796
+    },
+    {
+      "id": "Wall_140-10EE3-10EB1",
+      "wallBlockName": "Wall_140",
+      "wallInsertHandle": "10EE3",
+      "sourceDoorHandle": "10EB1",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_9",
+      "structuralLocalCenterFt": {
+        "x": 61.582346,
+        "y": 78.063561
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_140-10EE3-10EDE",
+      "wallBlockName": "Wall_140",
+      "wallInsertHandle": "10EE3",
+      "sourceDoorHandle": "10EDE",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D1 Commercial 22_9",
+      "structuralLocalCenterFt": {
+        "x": 68.333333,
+        "y": 78.063561
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_177-14D64-14D63",
+      "wallBlockName": "Wall_177",
+      "wallInsertHandle": "14D64",
+      "sourceDoorHandle": "14D63",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "Simple Door Opening",
+      "structuralLocalCenterFt": {
+        "x": 71.333333,
+        "y": 65.854166
+      },
+      "rotationRadians": 0.0
+    },
+    {
+      "id": "Wall_222-24882-2487D",
+      "wallBlockName": "Wall_222",
+      "wallInsertHandle": "24882",
+      "sourceDoorHandle": "2487D",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "Rectangular Door Opening 22",
+      "structuralLocalCenterFt": {
+        "x": 52.711318,
+        "y": 98.791667
+      },
+      "rotationRadians": 3.141593
+    },
+    {
+      "id": "Wall_7-A75-A6E",
+      "wallBlockName": "Wall_7",
+      "wallInsertHandle": "A75",
+      "sourceDoorHandle": "A6E",
+      "sourceLayer": "New_ARCHICAD Doors",
+      "doorType": "D2 Metal 22",
+      "structuralLocalCenterFt": {
+        "x": 48.335692,
+        "y": 43.167728
+      },
+      "rotationRadians": 3.141593
+    }
+  ],
+  "structuralBeamLines": [
+    {
+      "id": "mit-j-structural-beam-797",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 30.666667,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": 30.666667,
+        "y": 31.420707
+      },
+      "lengthFt": 30.50404,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-798",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 31.420707
+      },
+      "lengthFt": 30.50404,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-799",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 31.420707
+      },
+      "lengthFt": 30.50404,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-800",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": -0.0,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": -0.0,
+        "y": 31.802783
+      },
+      "lengthFt": 30.886116,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-801",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-802",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 10.444445,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 10.444445,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-803",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 20.664424,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 20.664424,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-804",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-805",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-806",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 40.664297,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 40.664297,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-807",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 50.892679,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 50.892679,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-808",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-834",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 0.916833,
+        "y": 0.0
+      },
+      "endStructuralLocalFt": {
+        "x": 14.749834,
+        "y": 0.0
+      },
+      "lengthFt": 13.833001,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-835",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 61.333333,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": 61.333333,
+        "y": 31.420303
+      },
+      "lengthFt": 30.503636,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-841",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 90.166667
+      },
+      "endStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 89.5
+      },
+      "lengthFt": 0.666667,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-842",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 67.119849
+      },
+      "endStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 66.201171
+      },
+      "lengthFt": 0.918678,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-843",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 100.247578
+      },
+      "endStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 90.166667
+      },
+      "lengthFt": 10.080911,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-844",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 89.5
+      },
+      "endStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 67.119849
+      },
+      "lengthFt": 22.380151,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-845",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 67.119849
+      },
+      "endStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 66.268302
+      },
+      "lengthFt": 0.851547,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-846",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 100.247598
+      },
+      "endStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 97.72481
+      },
+      "lengthFt": 2.522788,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-847",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 90.166667
+      },
+      "endStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 89.5
+      },
+      "lengthFt": 0.666667,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-848",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 97.72481
+      },
+      "endStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 90.166667
+      },
+      "lengthFt": 7.558143,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-849",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 89.5
+      },
+      "endStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 67.119849
+      },
+      "lengthFt": 22.380151,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-850",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 67.119849
+      },
+      "endStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 66.201171
+      },
+      "lengthFt": 0.918678,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-851",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 90.166667
+      },
+      "endStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 89.5
+      },
+      "lengthFt": 0.666667,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-852",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 100.247578
+      },
+      "endStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 90.166667
+      },
+      "lengthFt": 10.080911,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-853",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 89.5
+      },
+      "endStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 67.119849
+      },
+      "lengthFt": 22.380151,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-854",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 90.166667
+      },
+      "endStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 89.5
+      },
+      "lengthFt": 0.666667,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-855",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 67.119849
+      },
+      "endStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 66.201171
+      },
+      "lengthFt": 0.918678,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-856",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 100.247578
+      },
+      "endStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 90.166667
+      },
+      "lengthFt": 10.080911,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-857",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 89.5
+      },
+      "endStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 67.119849
+      },
+      "lengthFt": 22.380151,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-858",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 16.581692,
+        "y": 0.0
+      },
+      "endStructuralLocalFt": {
+        "x": 29.749795,
+        "y": 0.0
+      },
+      "lengthFt": 13.168103,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-859",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 31.583044,
+        "y": 0.0
+      },
+      "endStructuralLocalFt": {
+        "x": 44.749566,
+        "y": 0.0
+      },
+      "lengthFt": 13.166522,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-860",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 46.583167,
+        "y": 0.0
+      },
+      "endStructuralLocalFt": {
+        "x": 60.416833,
+        "y": 0.0
+      },
+      "lengthFt": 13.833666,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-861",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 0.745521,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 4.46756,
+        "y": 10.722222
+      },
+      "lengthFt": 3.722039,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-862",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 0.740346,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 4.462684,
+        "y": 22.550953
+      },
+      "lengthFt": 3.722338,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-863",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 5.972358,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 9.694309,
+        "y": 10.722222
+      },
+      "lengthFt": 3.721951,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-864",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 11.194815,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 14.916766,
+        "y": 10.722222
+      },
+      "lengthFt": 3.721951,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-865",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 16.415079,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 19.914011,
+        "y": 10.722222
+      },
+      "lengthFt": 3.498932,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-866",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 21.414592,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 24.915377,
+        "y": 10.722222
+      },
+      "lengthFt": 3.500785,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-867",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 26.420439,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 30.665839,
+        "y": 10.722222
+      },
+      "lengthFt": 4.2454,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-868",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 31.416185,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 34.91508,
+        "y": 10.722222
+      },
+      "lengthFt": 3.498895,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-869",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 36.414851,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 39.913941,
+        "y": 10.722222
+      },
+      "lengthFt": 3.49909,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-870",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 41.414897,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 44.916557,
+        "y": 10.722222
+      },
+      "lengthFt": 3.50166,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-871",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 46.421014,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 50.664974,
+        "y": 10.722222
+      },
+      "lengthFt": 4.24396,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-872",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 51.647266,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 55.890943,
+        "y": 10.722222
+      },
+      "lengthFt": 4.243677,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-873",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 56.867593,
+        "y": 10.722222
+      },
+      "endStructuralLocalFt": {
+        "x": 61.111271,
+        "y": 10.722222
+      },
+      "lengthFt": 4.243678,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-874",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 5.972358,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 9.694309,
+        "y": 22.550953
+      },
+      "lengthFt": 3.721951,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-875",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 11.194609,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 14.916559,
+        "y": 22.550953
+      },
+      "lengthFt": 3.72195,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-876",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 16.415295,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 19.914227,
+        "y": 22.550953
+      },
+      "lengthFt": 3.498932,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-877",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 21.414592,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 24.915377,
+        "y": 22.550953
+      },
+      "lengthFt": 3.500785,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-878",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 26.425523,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 30.664928,
+        "y": 22.550953
+      },
+      "lengthFt": 4.239405,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-879",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 31.416401,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 34.915296,
+        "y": 22.550953
+      },
+      "lengthFt": 3.498895,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-880",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 36.414851,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 39.913941,
+        "y": 22.550953
+      },
+      "lengthFt": 3.49909,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-881",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 41.414681,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 44.91634,
+        "y": 22.550953
+      },
+      "lengthFt": 3.501659,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-882",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 46.426309,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 50.664026,
+        "y": 22.550953
+      },
+      "lengthFt": 4.237717,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-883",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 51.652348,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 55.890033,
+        "y": 22.550953
+      },
+      "lengthFt": 4.237685,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-884",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 56.872675,
+        "y": 22.550953
+      },
+      "endStructuralLocalFt": {
+        "x": 61.11036,
+        "y": 22.550953
+      },
+      "lengthFt": 4.237685,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-885",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 1.458655,
+        "y": 93.608537
+      },
+      "endStructuralLocalFt": {
+        "x": 5.301313,
+        "y": 93.608537
+      },
+      "lengthFt": 3.842658,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-886",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 1.458626,
+        "y": 97.383741
+      },
+      "endStructuralLocalFt": {
+        "x": 5.301284,
+        "y": 97.383741
+      },
+      "lengthFt": 3.842658,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-887",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": -1.125195,
+        "y": 93.608537
+      },
+      "endStructuralLocalFt": {
+        "x": -0.041679,
+        "y": 93.608537
+      },
+      "lengthFt": 1.083516,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-888",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": -1.041828,
+        "y": 97.383741
+      },
+      "endStructuralLocalFt": {
+        "x": -0.041688,
+        "y": 97.383741
+      },
+      "lengthFt": 1.00014,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-889",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": -1.264527,
+        "y": 100.992278
+      },
+      "endStructuralLocalFt": {
+        "x": 2.658961,
+        "y": 100.992278
+      },
+      "lengthFt": 3.923488,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-890",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 2.658961,
+        "y": 100.992278
+      },
+      "endStructuralLocalFt": {
+        "x": 15.986485,
+        "y": 100.992278
+      },
+      "lengthFt": 13.327524,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-891",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 54.752614,
+        "y": 103.817651
+      },
+      "endStructuralLocalFt": {
+        "x": 54.752614,
+        "y": 100.296818
+      },
+      "lengthFt": 3.520833,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-892",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 58.66857,
+        "y": 103.811181
+      },
+      "endStructuralLocalFt": {
+        "x": 58.66857,
+        "y": 100.317651
+      },
+      "lengthFt": 3.49353,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-893",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 62.584753,
+        "y": 103.734318
+      },
+      "endStructuralLocalFt": {
+        "x": 62.584753,
+        "y": 100.296818
+      },
+      "lengthFt": 3.4375,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-894",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 50.919976,
+        "y": 103.894977
+      },
+      "endStructuralLocalFt": {
+        "x": 66.418086,
+        "y": 103.894977
+      },
+      "lengthFt": 15.49811,
+      "angleDeg": 0.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-895",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 66.418086,
+        "y": 103.645834
+      },
+      "endStructuralLocalFt": {
+        "x": 66.418086,
+        "y": 100.291667
+      },
+      "lengthFt": 3.354167,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-896",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 50.919976,
+        "y": 103.79081
+      },
+      "endStructuralLocalFt": {
+        "x": 50.919976,
+        "y": 100.311644
+      },
+      "lengthFt": 3.479166,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    }
+  ],
+  "sourcePlacementAxes": [
+    {
+      "id": "mit-j-structural-beam-797",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 30.666667,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": 30.666667,
+        "y": 31.420707
+      },
+      "lengthFt": 30.50404,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-798",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": 45.666667,
+        "y": 31.420707
+      },
+      "lengthFt": 30.50404,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-799",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": 15.666667,
+        "y": 31.420707
+      },
+      "lengthFt": 30.50404,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-800",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": -0.0,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": -0.0,
+        "y": 31.802783
+      },
+      "lengthFt": 30.886116,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-801",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 5.222222,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-802",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 10.444445,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 10.444445,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-803",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 20.664424,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 20.664424,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-804",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 25.665546,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-805",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 35.665088,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-806",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 40.664297,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 40.664297,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-807",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 50.892679,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 50.892679,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-808",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 0.746254
+      },
+      "endStructuralLocalFt": {
+        "x": 56.113006,
+        "y": 31.420691
+      },
+      "lengthFt": 30.674437,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-835",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 61.333333,
+        "y": 0.916667
+      },
+      "endStructuralLocalFt": {
+        "x": 61.333333,
+        "y": 31.420303
+      },
+      "lengthFt": 30.503636,
+      "angleDeg": 90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-844",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 89.5
+      },
+      "endStructuralLocalFt": {
+        "x": 6.051392,
+        "y": 67.119849
+      },
+      "lengthFt": 22.380151,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-849",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 89.5
+      },
+      "endStructuralLocalFt": {
+        "x": 0.708462,
+        "y": 67.119849
+      },
+      "lengthFt": 22.380151,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-853",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 89.5
+      },
+      "endStructuralLocalFt": {
+        "x": 11.394323,
+        "y": 67.119849
+      },
+      "lengthFt": 22.380151,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    },
+    {
+      "id": "mit-j-structural-beam-857",
+      "sourceLayer": "S-BEAM",
+      "startStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 89.5
+      },
+      "endStructuralLocalFt": {
+        "x": 16.735142,
+        "y": 67.119849
+      },
+      "lengthFt": 22.380151,
+      "angleDeg": -90.0,
+      "exactMemberDepthReady": false
+    }
+  ],
+  "mechanicalEquipmentLabels": [
+    {
+      "id": "mit-j-mechanical-equipment-153",
+      "equipmentTag": "CEF-1",
+      "equipmentClass": "CEF",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        2034.599121,
+        660.924622,
+        2048.512939,
+        669.20459
+      ],
+      "structuralLocalFt": {
+        "x": 61.893889,
+        "y": 66.731983
+      },
+      "roomId": "J107",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J107",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-155",
+      "equipmentTag": "OU-3",
+      "equipmentClass": "OU",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1728.959229,
+        791.124573,
+        1740.150879,
+        799.404541
+      ],
+      "structuralLocalFt": {
+        "x": 27.784813,
+        "y": 81.795743
+      },
+      "roomId": "J100",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J100",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-157",
+      "equipmentTag": "IU-3",
+      "equipmentClass": "IU",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1701.119263,
+        748.164612,
+        1709.550903,
+        756.44458
+      ],
+      "structuralLocalFt": {
+        "x": 24.537445,
+        "y": 76.825399
+      },
+      "roomId": "J100",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J100",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-159",
+      "equipmentTag": "EF-2",
+      "equipmentClass": "EF",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1652.399292,
+        805.524597,
+        1661.393066,
+        813.804565
+      ],
+      "structuralLocalFt": {
+        "x": 19.154176,
+        "y": 83.461784
+      },
+      "roomId": "J100",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J100",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-161",
+      "equipmentTag": "EC-2",
+      "equipmentClass": "EC",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1769.039307,
+        677.004578,
+        1778.575562,
+        685.284546
+      ],
+      "structuralLocalFt": {
+        "x": 32.146383,
+        "y": 68.592388
+      },
+      "roomId": "J110",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J110",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-163",
+      "equipmentTag": "EF-4",
+      "equipmentClass": "EF",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        2003.15918,
+        678.684509,
+        2012.152954,
+        686.964478
+      ],
+      "structuralLocalFt": {
+        "x": 58.529888,
+        "y": 68.786751
+      },
+      "roomId": "J108",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J108",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-165",
+      "equipmentTag": "AC-2",
+      "equipmentClass": "AC",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1845.239258,
+        797.964539,
+        1855.139526,
+        806.244507
+      ],
+      "structuralLocalFt": {
+        "x": 41.20977,
+        "y": 82.587107
+      },
+      "roomId": "J104",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J104",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-168",
+      "equipmentTag": "AC-1",
+      "equipmentClass": "AC",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1819.439209,
+        840.564392,
+        1829.339478,
+        848.84436
+      ],
+      "structuralLocalFt": {
+        "x": 37.764959,
+        "y": 87.515788
+      },
+      "roomId": null,
+      "roomAssignmentMethod": "nearest-centroid-reference-not-promoted",
+      "nearestRoomId": "J103",
+      "nearestRoomCentroidDistanceFt": 7.875517,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-171",
+      "equipmentTag": "EF-5",
+      "equipmentClass": "EF",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        2072.398926,
+        590.364563,
+        2081.392822,
+        598.644531
+      ],
+      "structuralLocalFt": {
+        "x": 65.820598,
+        "y": 58.816688
+      },
+      "roomId": null,
+      "roomAssignmentMethod": "nearest-centroid-reference-not-promoted",
+      "nearestRoomId": "J106",
+      "nearestRoomCentroidDistanceFt": 9.587495,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-173",
+      "equipmentTag": "EF-3",
+      "equipmentClass": "EF",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        2003.15918,
+        771.684509,
+        2012.152954,
+        779.964478
+      ],
+      "structuralLocalFt": {
+        "x": 58.529888,
+        "y": 79.546583
+      },
+      "roomId": "J104",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J104",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-189",
+      "equipmentTag": "EC-3",
+      "equipmentClass": "EC",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1837.439209,
+        676.164612,
+        1846.975464,
+        684.44458
+      ],
+      "structuralLocalFt": {
+        "x": 39.790694,
+        "y": 68.495206
+      },
+      "roomId": "J109",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J109",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    },
+    {
+      "id": "mit-j-mechanical-equipment-205",
+      "equipmentTag": "EF-7",
+      "equipmentClass": "EF",
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        2147.638916,
+        678.684509,
+        2156.632812,
+        686.964478
+      ],
+      "structuralLocalFt": {
+        "x": 74.180726,
+        "y": 68.786751
+      },
+      "roomId": "J106",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J106",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactFootprintReady": false
+    }
+  ],
+  "mechanicalDuctSizeLabels": [
+    {
+      "id": "mit-j-mechanical-duct-label-195",
+      "sizeLabel": "14x14",
+      "widthIn": 14,
+      "depthIn": 14,
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1681.679321,
+        832.88446,
+        1703.840332,
+        841.164429
+      ],
+      "structuralLocalFt": {
+        "x": 23.139891,
+        "y": 86.627242
+      },
+      "roomId": "J100",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J100",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactRunGeometryReady": false
+    },
+    {
+      "id": "mit-j-mechanical-duct-label-196",
+      "sizeLabel": "20x14",
+      "widthIn": 20,
+      "depthIn": 14,
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1942.439087,
+        843.804382,
+        1964.600098,
+        852.084351
+      ],
+      "structuralLocalFt": {
+        "x": 53.270197,
+        "y": 87.890645
+      },
+      "roomId": "J104",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J104",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactRunGeometryReady": false
+    },
+    {
+      "id": "mit-j-mechanical-duct-label-197",
+      "sizeLabel": "8x8",
+      "widthIn": 8,
+      "depthIn": 8,
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1948.919189,
+        752.244568,
+        1962.080078,
+        760.524536
+      ],
+      "structuralLocalFt": {
+        "x": 53.46257,
+        "y": 77.297438
+      },
+      "roomId": "J108",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J108",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactRunGeometryReady": false
+    },
+    {
+      "id": "mit-j-mechanical-duct-label-198",
+      "sizeLabel": "12x6",
+      "widthIn": 12,
+      "depthIn": 6,
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        2120.00293,
+        798.519653,
+        2128.282959,
+        816.120605
+      ],
+      "structuralLocalFt": {
+        "x": 71.070353,
+        "y": 83.190538
+      },
+      "roomId": "J104",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J104",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactRunGeometryReady": false
+    },
+    {
+      "id": "mit-j-mechanical-duct-label-199",
+      "sizeLabel": "12x8",
+      "widthIn": 12,
+      "depthIn": 8,
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1549.679443,
+        787.284607,
+        1567.280396,
+        795.564575
+      ],
+      "structuralLocalFt": {
+        "x": 9.495879,
+        "y": 81.35147
+      },
+      "roomId": "J101",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J101",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactRunGeometryReady": false
+    },
+    {
+      "id": "mit-j-mechanical-duct-label-200",
+      "sizeLabel": "12x6",
+      "widthIn": 12,
+      "depthIn": 6,
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1760.003296,
+        799.239624,
+        1768.283203,
+        816.840576
+      ],
+      "structuralLocalFt": {
+        "x": 31.072897,
+        "y": 83.273836
+      },
+      "roomId": "J100",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J100",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactRunGeometryReady": false
+    },
+    {
+      "id": "mit-j-mechanical-duct-label-201",
+      "sizeLabel": "14x6",
+      "widthIn": 14,
+      "depthIn": 6,
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1795.643311,
+        789.759644,
+        1803.923218,
+        807.360596
+      ],
+      "structuralLocalFt": {
+        "x": 35.031746,
+        "y": 82.17703
+      },
+      "roomId": "J100",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J100",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactRunGeometryReady": false
+    },
+    {
+      "id": "mit-j-mechanical-duct-label-204",
+      "sizeLabel": "8x4",
+      "widthIn": 8,
+      "depthIn": 4,
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        2042.123047,
+        811.359741,
+        2050.403076,
+        824.52063
+      ],
+      "structuralLocalFt": {
+        "x": 62.4169,
+        "y": 84.419248
+      },
+      "roomId": "J104",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J104",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactRunGeometryReady": false
+    },
+    {
+      "id": "mit-j-mechanical-duct-label-208",
+      "sizeLabel": "20x18",
+      "widthIn": 20,
+      "depthIn": 18,
+      "sourcePageIndex": 118,
+      "sourceBboxPt": [
+        1872.323242,
+        872.559448,
+        1880.603149,
+        894.720459
+      ],
+      "structuralLocalFt": {
+        "x": 45.783694,
+        "y": 91.784534
+      },
+      "roomId": "J104",
+      "roomAssignmentMethod": "source-zone-polygon-containment",
+      "nearestRoomId": "J104",
+      "nearestRoomCentroidDistanceFt": 0,
+      "exactRunGeometryReady": false
+    }
+  ],
+  "sequence": {
+    "answerArtifactRead": false,
+    "completedLayoutRead": false,
+    "approvedFireSprinklerPlanRead": false,
+    "asBuiltFireSprinklerPlanRead": false,
+    "historicalAnswerExposureDisclosed": true,
+    "freshProjectHoldoutRequired": true
+  },
+  "claims": {
+    "roomPartitionTopologyReady": true,
+    "doorOpeningTopologyReady": true,
+    "openStructureLabelTopologyReady": true,
+    "structuralFramingInventoryReady": true,
+    "mechanicalObstructionLabelInventoryReady": true,
+    "exactMechanicalObstructionFootprintsReady": false,
+    "exactStructuralMemberDepthsReady": false,
+    "obstructionClearancesVerified": false,
+    "sourceGeneratedPlacementVerified": false,
+    "freshProjectPlacementVerified": false,
+    "complianceReady": false,
+    "hydraulicCalculationReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "53291d7f0354b925fbd3975da73bcee549539b5c1b67a3458e755b7a7575f771"
+}

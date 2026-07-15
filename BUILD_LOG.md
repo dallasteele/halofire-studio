@@ -21,6 +21,36 @@ reference log entries by date; log entries reference commits by short hash.
 
 ## 2026-07-15
 
+### Entry 02 - Building J protected-source topology inventory (commit pending)
+
+- Extracted 13 room-zone polygons, 105 wall-material polygons, 23 embedded
+  door openings, and 11 explicit `O.T.S.` labels from the protected floor DWG
+  and A-102 RCP. Every open-to-structure label is assigned by source-zone
+  polygon containment rather than nearest-label guessing.
+- Registered the protected M-101 mechanical plan through 13 common room labels.
+  Ten labels agree within 0.1 PDF point; three shifted annotation labels are
+  retained as disclosed outliers. The sanitized packet inventories 12 equipment
+  labels and nine duct-size labels without promoting them to exact footprints.
+- Registered 70 Building J structural beam lines and 17 long placement axes from
+  the protected S2.1 roof-framing DWG. Exact member depths remain unknown.
+- Produced and browser-inspected a four-panel proof containing the actual A-102,
+  M-101, and S2.1 underlays plus a normalized coordinate replay. The image
+  decoded at 2300 by 1580, is readable at normal zoom, and visibly states that
+  exact obstruction footprints, member depths, and clearance verification are
+  not ready.
+- Verification includes 5/5 focused topology tests, all 57/57 Building J
+  regression tests across 12 files, and 20/20 adversarial source, geometry,
+  registration, false-precision, and false-promotion cases,
+  JavaScript syntax, Python compilation, loop guard, AutoSprink Vite production
+  build, and authoritative agentic-rule verification. The root Turbo build is
+  separately unavailable because the worktree has no `turbo` executable; this
+  does not replace the passing product build. GX10 port 8810 was unreachable
+  and local Lean is not installed, so the exact theorem and fail-closed formal
+  receipt are retained.
+- Next: consume the sanitized topology in v2 placement, align candidates to
+  source framing evidence without treating label points as exact obstruction
+  geometry, then seal before running the unchanged answer-only scorer.
+
 ### Entry 01 - Building J source-only placement calibration (commit `8182c64a`)
 
 - Implemented a source-only extraction and deterministic placement lane for the
