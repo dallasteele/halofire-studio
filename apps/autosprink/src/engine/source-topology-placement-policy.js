@@ -50,8 +50,42 @@ function roofTargetZ(volume, point) {
   return round(volume.eaveDatumZFt + Math.max(0, rise - distance * volume.slopeRise / volume.slopeRun));
 }
 
+/**
+ * Fail closed when a v2 packet leaves a finished-ceiling component without a
+ * declared concealed-volume relationship. This catches connector, vestibule,
+ * canopy, and transition volumes that a pair of obvious gables can hide.
+ */
+export function auditSourceTopologyCompleteness(packet) {
+  const enforcement = packet.topologyCompletenessPolicy?.enforceFinishedCeilingToConcealedVolumeMapping === true;
+  if (!enforcement) return { status: 'not-enforced', issues: [], mappedRoomIds: [], concealedVolumeIds: [] };
+  const volumes = new Map(packet.pitchedConcealedVolumes.map((volume) => [volume.id, volume]));
+  const issues = [];
+  const mappedRoomIds = [];
+  for (const room of packet.finishedCeilingRooms) {
+    if (!room.concealedSpaceExpected) continue;
+    if (!room.concealedVolumeId || !volumes.has(room.concealedVolumeId)) {
+      issues.push({ code: 'SOURCE_TOPOLOGY_CONCEALED_VOLUME_MISSING', sourceRoomId: room.id, concealedVolumeId: room.concealedVolumeId || null });
+      continue;
+    }
+    const volume = volumes.get(room.concealedVolumeId);
+    if (!volume.coveredFinishedRoomIds?.includes(room.id)) {
+      issues.push({ code: 'SOURCE_TOPOLOGY_CONCEALED_VOLUME_REVERSE_BINDING_MISSING', sourceRoomId: room.id, concealedVolumeId: volume.id });
+      continue;
+    }
+    mappedRoomIds.push(room.id);
+  }
+  return {
+    status: issues.length ? 'blocked' : 'passed',
+    issues,
+    mappedRoomIds,
+    concealedVolumeIds: [...volumes.keys()],
+  };
+}
+
 /** Apply a frozen spacing/area policy to a normalized protected-source packet. */
 export async function buildSourceTopologyPlacementCandidate(packet) {
+  const topologyCompletenessAudit = auditSourceTopologyCompleteness(packet);
+  if (topologyCompletenessAudit.status === 'blocked') throw new Error('SOURCE_TOPOLOGY_COMPLETENESS_BLOCKED');
   const heads = [];
   const roomAudit = [];
   const roofAudit = [];
@@ -78,7 +112,12 @@ export async function buildSourceTopologyPlacementCandidate(packet) {
     roomAudit.push({ sourceRoomId: room.id, sourcePage: room.sourcePage, boundsFt: grid.bounds, widthFt: grid.width, heightFt: grid.height, columns: grid.columns, rows: grid.rows, candidateIds });
   }
   for (const volume of packet.pitchedConcealedVolumes) {
-    const grid = rectangularGrid(volume, packet.placementPolicy);
+    const concealedPolicy = {
+      ...packet.placementPolicy,
+      maxAreaSqFt: volume.maxAreaSqFt ?? packet.concealedSpacePlacementPolicy?.maxAreaSqFt ?? packet.placementPolicy.maxAreaSqFt,
+      maxSpacingFt: volume.maxSpacingFt ?? packet.concealedSpacePlacementPolicy?.maxSpacingFt ?? packet.placementPolicy.maxSpacingFt,
+    };
+    const grid = rectangularGrid(volume, concealedPolicy);
     const candidateIds = [];
     for (const point of grid.points) {
       const id = `${packet.candidateIdPrefix}-U-${String(heads.filter((head) => head.kind === 'upright').length + 1).padStart(3, '0')}`;
@@ -97,7 +136,9 @@ export async function buildSourceTopologyPlacementCandidate(packet) {
         hydraulicNodeAssigned: false,
       });
     }
-    roofAudit.push({ sourceVolumeId: volume.id, sourcePages: volume.sourcePages, boundsFt: grid.bounds, widthFt: grid.width, heightFt: grid.height, columns: grid.columns, rows: grid.rows, candidateIds });
+    const audit = { sourceVolumeId: volume.id, sourcePages: volume.sourcePages, boundsFt: grid.bounds, widthFt: grid.width, heightFt: grid.height, columns: grid.columns, rows: grid.rows, candidateIds };
+    if (topologyCompletenessAudit.status !== 'not-enforced') Object.assign(audit, { coveredFinishedRoomIds: volume.coveredFinishedRoomIds || [], maxAreaSqFt: concealedPolicy.maxAreaSqFt, maxSpacingFt: concealedPolicy.maxSpacingFt });
+    roofAudit.push(audit);
   }
   return {
     heads,
@@ -108,6 +149,7 @@ export async function buildSourceTopologyPlacementCandidate(packet) {
       pendent: heads.filter((head) => head.kind === 'pendent').length,
       upright: heads.filter((head) => head.kind === 'upright').length,
     },
+    topologyCompletenessAudit,
     policyReceiptSha256: await sha256Hex(packet.placementPolicy),
   };
 }
