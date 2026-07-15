@@ -1,8 +1,8 @@
 {
   "loop": "proper-pitched-pipe-graph-20260715",
   "stage": "ITERATE",
-  "status": "verified-two-complete-long-branch-drainage-trees-and-relative-profiles-exact-z-and-whole-fp20-still-fail-closed",
-  "iteration": 11,
+  "status": "verified-four-complete-branch-systems-side-arm-overs-exact-z-and-whole-fp20-still-fail-closed",
+  "iteration": 12,
   "brainPreflight": {
     "status": "passed",
     "topEpisodes": [148441, 124864, 148034]
@@ -20,6 +20,7 @@
     "architecturalVerticalControlEngine": "apps/autosprink/src/engine/approved-fp20-architectural-vertical-controls.js",
     "boundedRidgeBranchGradeEngine": "apps/autosprink/src/engine/new-hope-ridge-branch-grade-envelope.js",
     "completeLongBranchDrainageEngine": "apps/autosprink/src/engine/new-hope-long-branch-drainage.js",
+    "mirroredSideBranchDrainageEngine": "apps/autosprink/src/engine/new-hope-side-branch-drainage.js",
     "hydraulicRouteEvidence": [
       "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-1.json",
       "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-2.json",
@@ -135,8 +136,47 @@
     "wholeFp20GradeDirectionReady": false,
     "properPipeLayoutReady": false
   },
+  "mirroredSideBranchDrainage": {
+    "status": "passed",
+    "systemCount": 2,
+    "componentEdgeCount": 32,
+    "directedBranchLineEdgeCount": 28,
+    "unresolvedArmOverEdgeCount": 4,
+    "sprinklerCount": 14,
+    "systems": [
+      {
+        "id": "lower-side-branch-system",
+        "lowPoint": "low-point-02",
+        "rootCanonicalNode": "canonical-node-014",
+        "trunkTerminalCanonicalNode": "canonical-node-138",
+        "planRunFt": 57.111139,
+        "requiredRiseIn": 2.855557,
+        "branchLineEdgeCount": 14,
+        "unresolvedArmOverEdgeCount": 2
+      },
+      {
+        "id": "upper-side-branch-system",
+        "lowPoint": "low-point-03",
+        "rootCanonicalNode": "canonical-node-017",
+        "trunkTerminalCanonicalNode": "canonical-node-131",
+        "planRunFt": 57.11125,
+        "requiredRiseIn": 2.855563,
+        "branchLineEdgeCount": 14,
+        "unresolvedArmOverEdgeCount": 2
+      }
+    ],
+    "sideBranchSourceTopologyReady": true,
+    "sideBranchLowPointBindingReady": true,
+    "sideBranchLineGradeDirectionReady": true,
+    "sideBranchRelativeGradeProfilesReady": true,
+    "sideBranchArmOverDrainageReady": false,
+    "exactPipeCenterlineZReady": false,
+    "wholeFp20GradeDirectionReady": false,
+    "properPipeLayoutReady": false
+  },
   "remainingLayoutBlockers": [
-    "FP20_REMAINING_BRANCH_COMPONENTS_AWAIT_DIRECTION_BINDING",
+    "FP20_CENTRAL_LOOPED_BRANCH_COMPONENT_AWAITS_DIRECTION_BINDING",
+    "FP20_SIDE_ARM_OVER_VERTICAL_OFFSETS_UNRESOLVED",
     "FP20_CROSS_MAINS_AWAIT_DIRECTION_AND_CATCHMENT_BINDING",
     "FP20_WHOLE_SYSTEM_DRAINAGE_GRADE_REQUIRES_ELEVATION_BINDING",
     "FP20_WHOLE_SYSTEM_GRADE_DIRECTION_UNRESOLVED",
@@ -145,7 +185,7 @@
     "FP20_FITTING_IDENTITY_UNRESOLVED"
   ],
   "verification": {
-    "focusedTests": "39 passed across complete long-branch drainage, bounded ridge-branch grade, all three hydraulic route bindings, architectural vertical controls, governed/canonical topology, actual-PDF proof, and adversarial mutations",
+    "focusedTests": "42 passed across mirrored side-branch drainage, complete long-branch drainage, bounded ridge-branch grade, all three hydraulic route bindings, architectural vertical controls, governed/canonical topology, actual-PDF proof, and adversarial mutations",
     "productionBuild": "passed Vite build",
     "formalProof": {
       "status": "verified",
@@ -153,7 +193,9 @@
       "elapsedMs": 133,
       "receipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-proof.json",
       "longBranchReceipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-long-branch-proof.json",
-      "longBranchElapsedMs": 71
+      "longBranchElapsedMs": 71,
+      "sideBranchReceipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-side-branch-proof.json",
+      "sideBranchElapsedMs": 88
     },
     "browser": {
       "url": "http://127.0.0.1:3312/src/data/proofs/new-hope-truss-clearance/index.html",
@@ -175,6 +217,14 @@
       "longBranchGradeVectorCount": 43,
       "longBranchRelativeProfileCount": 4,
       "longBranchAuditRowCount": 4,
+      "sideBranchSourceTopologyReady": true,
+      "sideBranchLowPointBindingReady": true,
+      "sideBranchLineGradeDirectionReady": true,
+      "sideBranchRelativeGradeProfilesReady": true,
+      "sideBranchArmOverDrainageReady": false,
+      "sideBranchGradeVectorCount": 28,
+      "sideBranchRelativeProfileCount": 2,
+      "sideBranchAuditRowCount": 2,
       "exactDeflectorElevationsReady": false,
       "exactPipeCenterlineZReady": false,
       "route21FlowOverlayVectorCount": 36,
@@ -182,20 +232,22 @@
       "route23FlowOverlayVectorCount": 31,
       "properPipeLayoutReady": false,
       "consoleErrorsOrWarnings": 0,
-      "visualInspection": "passed actual A102 RCP, A103 roof, A201 elevations, A301 sections, S102 framing, approved FP2.0 PDF underlay, 43 lime high-to-low long-branch plan vectors, orange bounded ridge vectors, four separated relative elevation profiles, and the bounded deflector grade envelope"
+      "visualInspection": "passed actual A102 RCP, A103 roof, A201 elevations, A301 sections, S102 framing, approved FP2.0 PDF underlay, 43 lime long-branch vectors, 28 cyan side-branch vectors, orange bounded ridge vectors, six separated relative elevation profiles, explicit four-arm-over blockers, and the bounded deflector grade envelope"
     },
     "agenticRules": "passed"
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 148709,
-    "title": "New Hope complete long branch drainage trees verified"
+    "episodeId": 148734,
+    "title": "New Hope mirrored side branch drainage verified"
   },
   "claims": {
     "properPipeLayoutReady": false,
     "wholeFp20HydraulicFlowReady": false,
     "boundedRidgeBranchGradeDirectionReady": true,
     "completeLongBranchGradeDirectionReady": true,
+    "mirroredSideBranchLineGradeDirectionReady": true,
+    "sideBranchArmOverDrainageReady": false,
     "wholeFp20GradeDirectionReady": false,
     "endpointElevationsReady": false,
     "pipeCenterlineOffsetReady": false,
@@ -203,5 +255,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "nextAction": "Classify and bind the remaining branch components and cross-main segments by source topology, explicit drain catchment, and high/low endpoint evidence. Keep exact pipe centerline Z and FIELD ROUTE drains blocked until fitting geometry and field-resolved endpoints are source-bound."
+  "nextAction": "Resolve the 30-edge cross-main tree against its two source low-point terminals and split the central 31-edge looped branch component by approved calculation/vertical evidence. Keep the four side arm-overs, exact pipe centerline Z, and FIELD ROUTE drains blocked until vertical offsets, fittings, and field-resolved endpoints are source-bound."
 }

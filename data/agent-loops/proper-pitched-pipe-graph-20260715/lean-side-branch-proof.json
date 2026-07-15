@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-side-branch-request.json",
+  "theoremNames": [
+    "mirroredSideBranchInventory",
+    "mirroredSideBranchRelativeRiseArithmetic",
+    "sideBranchLinesDoNotPromoteArmOversOrWholeLayout"
+  ],
+  "claim": "Two mirrored seven-head source components contain 14 sprinklers and 32 edges. Twenty-eight branch-line edges are directed toward low-point-02/03 and four arm-over edges remain unresolved. Both rounded 57.11-foot trunk profiles require 2.8555 inches of rise at 0.5 inch per 10 feet. Branch-line readiness does not promote arm-over drainage, exact pipe centerline Z, whole-FP2.0 grade direction, or proper-layout readiness.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 88,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

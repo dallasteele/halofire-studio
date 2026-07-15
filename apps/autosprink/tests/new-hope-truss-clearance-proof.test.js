@@ -20,7 +20,7 @@ describe('New Hope PDF-bound visual proof', () => {
 
   it('states the missing pipe-layout facts instead of presenting a connector as a design', () => {
     const html = read('index.html');
-    expect(html).toContain('BOUND RIDGE-BRANCH GRADE DIRECTION READY');
+    expect(html).toContain('FOUR COMPLETE BRANCH DRAINAGE SYSTEMS BOUND');
     expect(html).toContain('primaryPipeVectorExtractionReady=false');
     expect(html).toContain('wholeSystemVectorExtractionReady=false');
     expect(html).toContain('primaryPipeSizeAssignmentReady=false');
@@ -34,6 +34,11 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('longBranchLowPointBindingReady=false');
     expect(html).toContain('longBranchGradeDirectionReady=false');
     expect(html).toContain('longBranchRelativeGradeProfilesReady=false');
+    expect(html).toContain('sideBranchSourceTopologyReady=false');
+    expect(html).toContain('sideBranchLowPointBindingReady=false');
+    expect(html).toContain('sideBranchLineGradeDirectionReady=false');
+    expect(html).toContain('sideBranchRelativeGradeProfilesReady=false');
+    expect(html).toContain('sideBranchArmOverDrainageReady=false');
     expect(html).toContain('boundedRidgeBranchGradeDirectionReady=false');
     expect(html).toContain('boundedRidgeBranchDrainCatchmentReady=false');
     expect(html).toContain('boundedDeflectorGradeEnvelopeReady=false');
@@ -63,6 +68,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('../../new-hope-pitched-holdout-answer-evidence.json');
     expect(script).toContain('evaluateNewHopeRidgeBranchGradeEnvelope');
     expect(script).toContain('evaluateNewHopeLongBranchDrainage');
+    expect(script).toContain('evaluateNewHopeSideBranchDrainage');
     expect(script).toContain('calibration.trussLattice.centerlines');
     expect(script).toContain('calibration.branch.nodes');
     expect(script).toContain('pipeVectors.pipeSegments');
@@ -81,6 +87,11 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.longBranchLowPointBindingReady = String(longBranchDrainage.longBranchLowPointBindingReady)');
     expect(script).toContain('dataset.longBranchGradeDirectionReady = String(longBranchDrainage.longBranchGradeDirectionReady)');
     expect(script).toContain('dataset.longBranchRelativeGradeProfilesReady = String(longBranchDrainage.longBranchRelativeGradeProfilesReady)');
+    expect(script).toContain('dataset.sideBranchSourceTopologyReady = String(sideBranchDrainage.sideBranchSourceTopologyReady)');
+    expect(script).toContain('dataset.sideBranchLowPointBindingReady = String(sideBranchDrainage.sideBranchLowPointBindingReady)');
+    expect(script).toContain('dataset.sideBranchLineGradeDirectionReady = String(sideBranchDrainage.sideBranchLineGradeDirectionReady)');
+    expect(script).toContain('dataset.sideBranchRelativeGradeProfilesReady = String(sideBranchDrainage.sideBranchRelativeGradeProfilesReady)');
+    expect(script).toContain('dataset.sideBranchArmOverDrainageReady = String(sideBranchDrainage.sideBranchArmOverDrainageReady)');
     expect(script).toContain('dataset.boundedRidgeBranchGradeDirectionReady = String(ridgeGrade.boundedBranchGradeDirectionReady)');
     expect(script).toContain('dataset.boundedRidgeBranchDrainCatchmentReady = String(ridgeGrade.boundedBranchDrainCatchmentReady)');
     expect(script).toContain('dataset.boundedDeflectorGradeEnvelopeReady = String(ridgeGrade.boundedDeflectorGradeEnvelopeReady)');
@@ -90,6 +101,8 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('bounded-grade-profile');
     expect(script).toContain('long-branch-grade-vector');
     expect(script).toContain('long-branch-relative-profile');
+    expect(script).toContain('side-branch-grade-vector');
+    expect(script).toContain('side-branch-relative-profile');
     expect(script).toContain('dataset.pipeVectorStatus = vectorAcceptance.status');
     expect(script).toContain('dataset.primaryPipeSizeAssignmentReady = String(governedSkeleton.primaryPipeSizeAssignmentReady)');
     expect(script).toContain('dataset.primaryPipeRoleAssignmentReady = String(governedSkeleton.primaryPipeRoleAssignmentReady)');
