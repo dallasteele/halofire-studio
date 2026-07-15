@@ -24,6 +24,12 @@ describe('approved FP2.0 hydraulic route 2-1 binding', () => {
     expect(result.physicalFlowNodeIds).toEqual(['1', '25', '554', '560', '414', '118', '67', '1046', '1047', '1048', '1049', '1050', '1051', '1052']);
     expect(result.physicalFlowLegs[0]).toMatchObject({ fromCalculationNodeId: '1', toCalculationNodeId: '25', calculationTableOrderReversed: true });
     expect(result.planRouteLegs).toHaveLength(8);
+    expect(result.planRouteLegs.every((leg) => leg.routeSelectionMethod === 'explicit-approved-plan-and-hydraulic-table-binding')).toBe(true);
+    expect(result.planRouteLegs.at(-1)).toMatchObject({
+      calculationFromNodeId: '67',
+      calculationToNodeId: '118',
+      edgeIds: ['source-edge-050', 'source-edge-129', 'source-edge-128', 'source-edge-127', 'source-edge-143', 'source-edge-142', 'source-edge-141', 'source-edge-140', 'source-edge-139', 'source-edge-126', 'source-edge-125', 'source-edge-124', 'source-edge-123', 'source-edge-018', 'source-edge-014', 'source-edge-008', 'source-edge-006', 'source-edge-005', 'source-edge-113', 'source-edge-004', 'source-edge-003'],
+    });
     expect(result.wholeFp20HydraulicFlowReady).toBe(false);
     expect(result.gradeDirectionReady).toBe(false);
     expect(result.properPipeLayoutReady).toBe(false);
@@ -50,5 +56,28 @@ describe('approved FP2.0 hydraulic route 2-1 binding', () => {
   it('rejects omission of fitting and device evidence from a calculation leg', () => {
     const result = bindApprovedFp20HydraulicRoute(topology, mutate((copy) => { copy.pipeTableLegs[8].notes = ''; }));
     expect(result.blockerCodes).toContain('FP20_HYDRAULIC_PIPE_TABLE_FIELD_MISSING');
+  });
+
+  it('rejects a non-reviewed alternative through a loop even when the endpoints remain connected', () => {
+    const result = bindApprovedFp20HydraulicRoute(topology, mutate((copy) => {
+      copy.planLegBindings[6].canonicalEdgeIds = ['source-edge-093', 'source-edge-088'];
+      copy.planLegBindings[6].canonicalNodeIds = ['canonical-node-102', 'canonical-node-097', 'canonical-node-071'];
+    }));
+    expect(result.blockerCodes).toContain('FP20_HYDRAULIC_PLAN_PATH_ENDPOINT_MISMATCH');
+    expect(result.route21HydraulicNodeBindingReady).toBe(false);
+  });
+
+  it('rejects an out-of-order explicit edge sequence instead of finding a replacement path', () => {
+    const result = bindApprovedFp20HydraulicRoute(topology, mutate((copy) => {
+      copy.planLegBindings[7].canonicalEdgeIds[1] = 'source-edge-066';
+    }));
+    expect(result.blockerCodes).toContain('FP20_HYDRAULIC_PLAN_PATH_DISCONTINUOUS');
+  });
+
+  it('rejects a persisted node sequence that does not match the reviewed edge traversal', () => {
+    const result = bindApprovedFp20HydraulicRoute(topology, mutate((copy) => {
+      copy.planLegBindings[0].canonicalNodeIds = ['canonical-node-108', 'canonical-node-001'];
+    }));
+    expect(result.blockerCodes).toContain('FP20_HYDRAULIC_PLAN_NODE_SEQUENCE_MISMATCH');
   });
 });

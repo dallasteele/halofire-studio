@@ -11,9 +11,9 @@
 <body>
   <header>
     <div class="eyebrow">Actual S102 + actual approved FP2.0</div>
-    <span class="badge">RA2-1 CALC FLOW BOUND / WHOLE-SYSTEM GRADE DIRECTION AND Z STILL BLOCKED</span>
+    <span class="badge">RA2-1 EXPLICIT PLAN PATH BOUND / WHOLE-SYSTEM GRADE DIRECTION AND Z STILL BLOCKED</span>
     <h1>This is a governed pipe skeleton plus one verified calc route—not yet a proper installable layout.</h1>
-    <p class="lede">The actual S102 roof-framing PDF remains the structural underlay and the actual approved FP2.0 remains the pipe-layout answer. The overlay separates 67 primary main, branch, and arm-over vectors from 17 drain and inspector-test reference vectors; binds every primary segment to a nominal size and role; and now binds remote area 2-1's nine visible calculation nodes and 13 calculation-table legs. Blue arrows show physical source-to-terminal hydraulic flow, explicitly reversed from AutoSPRINK's remote-to-source accumulation order. Drainage grade direction is separate and remains blocked until high/low endpoints and elevation views close.</p>
+    <p class="lede">The actual S102 roof-framing PDF remains the structural underlay and the actual approved FP2.0 remains the pipe-layout answer. The overlay separates 67 primary main, branch, and arm-over vectors from 17 drain and inspector-test reference vectors; binds every primary segment to a nominal size and role; and binds remote area 2-1's nine visible calculation nodes and 13 calculation-table legs. Its eight plan-visible legs now use persisted approved-plan edge sequences; no shortest-path fallback is allowed through the two source loops. Blue arrows show physical source-to-terminal hydraulic flow, explicitly reversed from AutoSPRINK's remote-to-source accumulation order. Drainage grade direction is separate and remains blocked until high/low endpoints, drain destinations, and elevation views close.</p>
   </header>
   <main>
     <section class="metrics">
@@ -50,8 +50,8 @@
         <div class="status"><b>Primary size and role</b>67/67 source segments classified as source feed, cross main, branch line, or arm-over at 1–4 inches.</div>
         <div class="status"><b>Supply and low points</b>Riser-room supply anchor plus four source-proved low-point drain tie-ins are bound.</div>
         <div class="status"><b>Grade magnitude</b>Branch 0.5 in / 10 ft (0.416667%); cross main 0.25 in / 10 ft (0.208333%).</div>
-        <div class="status"><b>RA2-1 hydraulic direction</b>Calculation nodes 1 â†’ 25 â†’ 554 â†’ 560 â†’ 414 â†’ 118 â†’ 67 â†’ 1046â€“1052 are bound source-to-terminal.</div>
-        <div class="status closed"><b>Grade direction blocked</b>The source proves magnitude, but high-to-low direction needs hydraulic orientation plus start/end elevations.</div>
+        <div class="status"><b>RA2-1 explicit route direction</b>Eight plan-visible legs are bound to exact approved-plan edge sequences; physical hydraulic flow is the reverse of the calculation-table accumulation order.</div>
+        <div class="status closed"><b>Grade direction blocked</b>The source proves magnitude, but drainage direction is independent of hydraulic flow and requires source-bound high/low endpoint elevations plus the intended drain destination.</div>
         <div class="status closed"><b>Field drain routes blocked</b>Two one-inch drum-drip runs explicitly say FIELD ROUTE / LOCATE; exact fabrication geometry cannot be invented.</div>
         <div class="status closed"><b>Proper layout blocked</b>RA2-2/2-3 flow, connector/fitting topology, per-edge grade direction, Z, and field-resolved drains are not closed.</div>
       </div>
@@ -84,7 +84,7 @@
 
     <section class="card" style="border-color:#fb7185;background:#4c1d2455">
       <h2>Acceptance boundary</h2>
-      <p class="gate" id="machine-acceptance-boundary">actualPdfUnderlays=true | primaryPipeVectorExtractionReady=false | wholeSystemVectorExtractionReady=false | primaryPipeSizeAssignmentReady=false | primaryPipeRoleAssignmentReady=false | operationalReferenceExtractionReady=false | supplySourceAnchorReady=false | lowPointIntentReady=false | drainIntentReady=false | gradeMagnitudeReady=false | route21HydraulicNodeBindingReady=false | route21HydraulicFlowDirectionReady=false | wholeFp20HydraulicNodeBindingReady=false | fieldDrainRouteResolved=false | hydraulicFlowReady=false | properPipeLayoutReady=false | branchGradeDirectionReady=false | endpointElevationsReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=false</p>
+      <p class="gate" id="machine-acceptance-boundary">actualPdfUnderlays=true | primaryPipeVectorExtractionReady=false | wholeSystemVectorExtractionReady=false | primaryPipeSizeAssignmentReady=false | primaryPipeRoleAssignmentReady=false | operationalReferenceExtractionReady=false | supplySourceAnchorReady=false | lowPointIntentReady=false | drainIntentReady=false | gradeMagnitudeReady=false | route21ExplicitPlanPathReady=false | route21HydraulicNodeBindingReady=false | route21HydraulicFlowDirectionReady=false | wholeFp20HydraulicNodeBindingReady=false | fieldDrainRouteResolved=false | hydraulicFlowReady=false | properPipeLayoutReady=false | branchGradeDirectionReady=false | endpointElevationsReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=false</p>
     </section>
   </main>
   <script type="module" src="proof.js"></script>

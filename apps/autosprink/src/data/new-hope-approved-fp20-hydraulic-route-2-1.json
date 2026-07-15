@@ -1,5 +1,5 @@
 {
-  "artifactType": "halofire.approved-fp20-hydraulic-route-binding.v1",
+  "artifactType": "halofire.approved-fp20-hydraulic-route-binding.v2",
   "projectId": "new-hope-crisis-center-brigham-city-ut",
   "remoteAreaId": "2-1",
   "sourceBindings": {
@@ -32,6 +32,16 @@
     { "calculationNodeId": "118", "canonicalNodeId": "canonical-node-002", "leaderTargetPdfPt": { "x": 678.087, "y": 1118.512 }, "sourceTextRef": { "blockIndex": 137, "lineIndex": 0, "wordIndex": 0 }, "sourceLeaderDrawingIndex": 3543 }
   ],
   "externalRiserNodeIds": ["414", "560", "554", "25", "1"],
+  "planLegBindings": [
+    { "calculationFromNodeId": "1052", "calculationToNodeId": "1051", "canonicalNodeIds": ["canonical-node-108", "canonical-node-109"], "canonicalEdgeIds": ["source-edge-099"] },
+    { "calculationFromNodeId": "1051", "calculationToNodeId": "1050", "canonicalNodeIds": ["canonical-node-109", "canonical-node-110"], "canonicalEdgeIds": ["source-edge-100"] },
+    { "calculationFromNodeId": "1050", "calculationToNodeId": "1049", "canonicalNodeIds": ["canonical-node-110", "canonical-node-111"], "canonicalEdgeIds": ["source-edge-101"] },
+    { "calculationFromNodeId": "1049", "calculationToNodeId": "1048", "canonicalNodeIds": ["canonical-node-111", "canonical-node-099", "canonical-node-100"], "canonicalEdgeIds": ["source-edge-102", "source-edge-090"] },
+    { "calculationFromNodeId": "1048", "calculationToNodeId": "1047", "canonicalNodeIds": ["canonical-node-100", "canonical-node-101"], "canonicalEdgeIds": ["source-edge-091"] },
+    { "calculationFromNodeId": "1047", "calculationToNodeId": "1046", "canonicalNodeIds": ["canonical-node-101", "canonical-node-102"], "canonicalEdgeIds": ["source-edge-092"] },
+    { "calculationFromNodeId": "1046", "calculationToNodeId": "67", "canonicalNodeIds": ["canonical-node-102", "canonical-node-097", "canonical-node-071", "canonical-node-072", "canonical-node-073", "canonical-node-074", "canonical-node-057", "canonical-node-058", "canonical-node-059", "canonical-node-054"], "canonicalEdgeIds": ["source-edge-093", "source-edge-088", "source-edge-066", "source-edge-067", "source-edge-068", "source-edge-069", "source-edge-052", "source-edge-053", "source-edge-054"] },
+    { "calculationFromNodeId": "67", "calculationToNodeId": "118", "canonicalNodeIds": ["canonical-node-054", "canonical-node-053", "canonical-node-089", "canonical-node-117", "canonical-node-138", "canonical-node-142", "canonical-node-141", "canonical-node-140", "canonical-node-139", "canonical-node-137", "canonical-node-136", "canonical-node-135", "canonical-node-134", "canonical-node-022", "canonical-node-018", "canonical-node-010", "canonical-node-008", "canonical-node-006", "canonical-node-007", "canonical-node-005", "canonical-node-004", "canonical-node-002"], "canonicalEdgeIds": ["source-edge-050", "source-edge-129", "source-edge-128", "source-edge-127", "source-edge-143", "source-edge-142", "source-edge-141", "source-edge-140", "source-edge-139", "source-edge-126", "source-edge-125", "source-edge-124", "source-edge-123", "source-edge-018", "source-edge-014", "source-edge-008", "source-edge-006", "source-edge-005", "source-edge-113", "source-edge-004", "source-edge-003"] }
+  ],
   "pipeTableLegs": [
     { "node1": "1052", "node2": "1051", "elevation1Ft": 19.416667, "elevation2Ft": 19.416667, "nominalDiameterIn": 2.5, "actualDiameterIn": 2.635, "flowAddedGpm": 38, "totalFlowGpm": 38, "lengthFt": 6, "cFactor": 100, "fittingEquivalentLengthFt": 0, "notes": "Sprinkler" },
     { "node1": "1051", "node2": "1050", "elevation1Ft": 19.416667, "elevation2Ft": 19.375, "nominalDiameterIn": 2.5, "actualDiameterIn": 2.635, "flowAddedGpm": 38, "totalFlowGpm": 76, "lengthFt": 6, "cFactor": 100, "fittingEquivalentLengthFt": 0, "notes": "Sprinkler" },

@@ -26,6 +26,8 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('endpointElevationsReady=false');
     expect(html).toContain('route21HydraulicNodeBindingReady=false');
     expect(html).toContain('route21HydraulicFlowDirectionReady=false');
+    expect(html).toContain('route21ExplicitPlanPathReady=false');
+    expect(html).toContain('no shortest-path fallback is allowed');
   });
 
   it('loads the sealed calibration and generates the S102 overlay from data', () => {
@@ -54,6 +56,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.branchGradeDirectionReady = String(governedSkeleton.gradeDirectionReady)');
     expect(script).toContain('dataset.endpointElevationsReady = String(governedSkeleton.endpointElevationsReady)');
     expect(script).toContain('dataset.route21HydraulicNodeBindingReady = String(hydraulicRoute21.route21HydraulicNodeBindingReady)');
+    expect(script).toContain('dataset.route21ExplicitPlanPathReady = String(hydraulicRoute21.route21ExplicitPlanPathReady)');
     expect(script).toContain("dataset.drainDestinationReady = 'false'");
     expect(script).toContain('evaluateProperPitchedPipeGraph');
     expect(script).toContain("dataset.pipeGraphStatus = governedSkeleton.properPipeLayoutReady ? 'passed' : 'blocked'");
