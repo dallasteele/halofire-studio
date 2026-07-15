@@ -4,15 +4,14 @@
   "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
   "requestPath": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-request.json",
   "theoremNames": [
-    "approvedRemoteAreaSetInventoryCloses",
-    "sameXyVerticalLegPreservesCalculationElevationDelta",
-    "architecturalEnvelopeDoesNotImplyPipeCenterlineOrGrade",
-    "approvedRemoteAreaFlowDoesNotPromoteProperLayout"
+    "boundedRidgeBranchGradeArithmetic",
+    "manufacturerBandContainsBoundedGradeEnvelope",
+    "boundedGradeDoesNotPromoteExactOrWholeLayout"
   ],
-  "claim": "The three approved FP2.0 remote areas close at 12 routes, 39 unique calculation nodes, 51 pipe-table legs, 32 plan-visible legs, and 56 mapped calculated canonical edges. The same-XY 718-to-50 leg preserves its one-foot calculation elevation delta. Registered architectural roof and section controls do not imply pipe centerline offset, whole-network endpoint Z, drainage grade, or proper-layout release.",
+  "claim": "The bounded seven-head ridge branch has six 6-foot segments over 36 feet. At 0.5 inch per 10 feet, each segment rises 0.3 inch and the branch rises 1.8 inches. The 6-inch manufacturer deflector band contains that rise with 4.2 inches of baseline freedom. Bounded plan path, grade direction, low-point catchment, and deflector-envelope readiness do not promote exact deflector Z, pipe centerline Z, exact drain route, whole-FP2.0 grade direction, or proper-layout release.",
   "result": {
     "status": "verified",
-    "elapsedMs": 89,
+    "elapsedMs": 133,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

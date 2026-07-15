@@ -20,23 +20,27 @@ describe('New Hope PDF-bound visual proof', () => {
 
   it('states the missing pipe-layout facts instead of presenting a connector as a design', () => {
     const html = read('index.html');
-    expect(html).toContain('GRADE DIRECTION AND Z STILL BLOCKED');
+    expect(html).toContain('BOUND RIDGE-BRANCH GRADE DIRECTION READY');
     expect(html).toContain('primaryPipeVectorExtractionReady=false');
     expect(html).toContain('wholeSystemVectorExtractionReady=false');
     expect(html).toContain('primaryPipeSizeAssignmentReady=false');
     expect(html).toContain('fieldDrainRouteResolved=false');
     expect(html).toContain('properPipeLayoutReady=false');
-    expect(html).toContain('branchGradeDirectionReady=false');
     expect(html).toContain('endpointElevationsReady=false');
     expect(html).toContain('architecturalSourceRegistrationReady=false');
     expect(html).toContain('architecturalVerticalControlReady=false');
     expect(html).toContain('pipeCenterlineOffsetReady=false');
+    expect(html).toContain('boundedRidgeBranchGradeDirectionReady=false');
+    expect(html).toContain('boundedRidgeBranchDrainCatchmentReady=false');
+    expect(html).toContain('boundedDeflectorGradeEnvelopeReady=false');
+    expect(html).toContain('exactDeflectorElevationsReady=false');
+    expect(html).toContain('exactPipeCenterlineZReady=false');
+    expect(html).toContain('wholeFp20GradeDirectionReady=false');
     expect(html).toContain('approvedRemoteAreaSetReady=false');
     expect(html).toContain('approvedRemoteAreaHydraulicFlowReady=false');
     expect(html).toContain('route21ExplicitPlanPathReady=false');
     expect(html).toContain('route22ExplicitPlanPathReady=false');
     expect(html).toContain('route23ExplicitPlanPathReady=false');
-    expect(html).toContain('same-XY vertical evidence instead of a fake horizontal connector');
   });
 
   it('loads the sealed calibration and generates the S102 overlay from data', () => {
@@ -50,6 +54,10 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-3.json');
     expect(script).toContain('../../new-hope-pitched-holdout-source.json');
     expect(script).toContain('evaluateApprovedFp20ArchitecturalVerticalControls');
+    expect(script).toContain('../../new-hope-attic-specific-application-source.json');
+    expect(script).toContain('../../new-hope-attic-specific-application-calibration.json');
+    expect(script).toContain('../../new-hope-pitched-holdout-answer-evidence.json');
+    expect(script).toContain('evaluateNewHopeRidgeBranchGradeEnvelope');
     expect(script).toContain('calibration.trussLattice.centerlines');
     expect(script).toContain('calibration.branch.nodes');
     expect(script).toContain('pipeVectors.pipeSegments');
@@ -64,6 +72,13 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.architecturalSourceRegistrationReady = String(architecturalValidation.sourceRegistrationReady)');
     expect(script).toContain('dataset.architecturalVerticalControlReady = String(architecturalVerticalControlReady)');
     expect(script).toContain('dataset.pipeCenterlineOffsetReady = String(pipeCenterlineOffsetReady)');
+    expect(script).toContain('dataset.boundedRidgeBranchGradeDirectionReady = String(ridgeGrade.boundedBranchGradeDirectionReady)');
+    expect(script).toContain('dataset.boundedRidgeBranchDrainCatchmentReady = String(ridgeGrade.boundedBranchDrainCatchmentReady)');
+    expect(script).toContain('dataset.boundedDeflectorGradeEnvelopeReady = String(ridgeGrade.boundedDeflectorGradeEnvelopeReady)');
+    expect(script).toContain('dataset.exactDeflectorElevationsReady = String(ridgeGrade.exactDeflectorElevationsReady)');
+    expect(script).toContain('dataset.exactPipeCenterlineZReady = String(ridgeGrade.exactPipeCenterlineZReady)');
+    expect(script).toContain('bounded-grade-vector');
+    expect(script).toContain('bounded-grade-profile');
     expect(script).toContain('dataset.pipeVectorStatus = vectorAcceptance.status');
     expect(script).toContain('dataset.primaryPipeSizeAssignmentReady = String(governedSkeleton.primaryPipeSizeAssignmentReady)');
     expect(script).toContain('dataset.primaryPipeRoleAssignmentReady = String(governedSkeleton.primaryPipeRoleAssignmentReady)');
