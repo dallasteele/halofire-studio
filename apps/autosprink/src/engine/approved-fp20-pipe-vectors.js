@@ -31,6 +31,59 @@ function pointToSegmentDistance(point, segment) {
   return Math.hypot(point.x - (a.x + t * dx), point.y - (a.y + t * dy));
 }
 
+function segmentDistance(a, b) {
+  return Math.min(
+    pointToSegmentDistance(a.fromPdfPt, b),
+    pointToSegmentDistance(a.toPdfPt, b),
+    pointToSegmentDistance(b.fromPdfPt, a),
+    pointToSegmentDistance(b.toPdfPt, a),
+  );
+}
+
+function topologyClosure(segments, evidence, issues) {
+  const configuredTolerance = evidence?.topologyClosure?.automaticJoinTolerancePdfPt;
+  const links = Array.isArray(evidence?.topologyClosure?.explicitMaskedTurnLinks) ? evidence.topologyClosure.explicitMaskedTurnLinks : [];
+  if (configuredTolerance !== 6) issues.push(issue('FP20_TOPOLOGY_TOLERANCE_INVALID', 'Automatic source-vector joining is fixed at 6 PDF points; broad snapping can fabricate pipe connections.'));
+  const expectedLinks = new Map([
+    ['lower-central-main-turn', ['pipe-065', 'pipe-067']],
+    ['upper-central-main-turn', ['pipe-066', 'pipe-060']],
+  ]);
+  const parent = segments.map((_, index) => index);
+  const find = (value) => {
+    let root = value;
+    while (parent[root] !== root) root = parent[root];
+    while (parent[value] !== value) { const next = parent[value]; parent[value] = root; value = next; }
+    return root;
+  };
+  const union = (a, b) => {
+    const rootA = find(a);
+    const rootB = find(b);
+    if (rootA !== rootB) parent[rootB] = rootA;
+  };
+  const indexById = new Map(segments.map((segment, index) => [segment.id, index]));
+  if (configuredTolerance === 6) {
+    for (let i = 0; i < segments.length; i += 1) {
+      for (let j = 0; j < i; j += 1) if (segmentDistance(segments[i], segments[j]) <= configuredTolerance) union(i, j);
+    }
+  }
+  if (links.length !== 2) issues.push(issue('FP20_TOPOLOGY_EXPLICIT_LINK_COUNT_INVALID', 'Exactly two source-proved masked central turns are required; generic gap filling is forbidden.'));
+  for (const link of links) {
+    const expected = expectedLinks.get(link?.id);
+    const fromIndex = indexById.get(link?.fromSegmentId);
+    const toIndex = indexById.get(link?.toSegmentId);
+    if (!expected || !expected.includes(link?.fromSegmentId) || !expected.includes(link?.toSegmentId) || link.fromSegmentId === link.toSegmentId || !Number.isInteger(fromIndex) || !Number.isInteger(toIndex) || !link.sourceRef) {
+      issues.push(issue('FP20_TOPOLOGY_EXPLICIT_LINK_INVALID', 'Masked-turn links must bind the exact approved central segment pairs with source references.', link?.id));
+      continue;
+    }
+    const measuredGap = segmentDistance(segments[fromIndex], segments[toIndex]);
+    if (!Number.isFinite(link.gapPdfPt) || Math.abs(measuredGap - link.gapPdfPt) > 0.002 || measuredGap <= 6 || measuredGap > 9) issues.push(issue('FP20_TOPOLOGY_EXPLICIT_GAP_MISMATCH', 'Explicit masked-turn gap must close against the approved endpoints and stay outside automatic tolerance.', link.id));
+    union(fromIndex, toIndex);
+  }
+  const connectedPipeVectorCount = segments.length ? segments.filter((_, index) => find(index) === find(0)).length : 0;
+  if (connectedPipeVectorCount !== segments.length) issues.push(issue('FP20_SOURCE_TOPOLOGY_DISCONNECTED', 'Every extracted approved pipe vector must close into one source topology.'));
+  return { connectedPipeVectorCount, explicitMaskedTurnCount: links.length };
+}
+
 function increment(counts, key) {
   counts[key] = (counts[key] || 0) + 1;
 }
@@ -66,6 +119,7 @@ export function evaluateApprovedFp20PipeVectors(evidence) {
   }
 
   if (!compareCounts(pipeClassCounts, EXPECTED_PIPE_CLASSES)) issues.push(issue('FP20_PIPE_CLASS_COUNT_MISMATCH', 'The approved extraction must contain 40 red, 15 black, and 12 navy arm-over vectors.'));
+  const topology = topologyClosure(segments, evidence, issues);
 
   for (const sprinkler of sprinklers) {
     increment(sprinklerClassCounts, sprinkler?.symbolType);
@@ -95,8 +149,11 @@ export function evaluateApprovedFp20PipeVectors(evidence) {
       sprinklerClassCounts,
       totalVisiblePipeLengthFt: round(totalLengthPdfPt / evidence?.planRegistration?.pdfPtPerFt, 3),
       maximumHeadToPipeDistancePdfPt: round(Math.max(0, ...sprinklers.map((head) => head.pipeDistancePdfPt || 0)), 3),
+      connectedPipeVectorCount: topology.connectedPipeVectorCount,
+      explicitMaskedTurnCount: topology.explicitMaskedTurnCount,
     },
     vectorExtractionReady: issues.length === 0,
+    sourceTopologyConnected: issues.length === 0 && topology.connectedPipeVectorCount === segments.length,
     properPipeLayoutReady: false,
     complianceReady: false,
     fabricationReady: false,
@@ -111,4 +168,3 @@ export function pdfPointToRegisteredPlanFt(evidence, point) {
     yFt: round(registration.origin.localFt.y + (point.y - registration.origin.pdfPt.y) / registration.pdfPtPerFt),
   };
 }
-

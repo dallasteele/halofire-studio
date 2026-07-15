@@ -40,6 +40,25 @@
     },
     "maximumHeadToPipeDistancePdfPt": 1.5
   },
+  "topologyClosure": {
+    "automaticJoinTolerancePdfPt": 6.0,
+    "explicitMaskedTurnLinks": [
+      {
+        "id": "lower-central-main-turn",
+        "fromSegmentId": "pipe-065",
+        "toSegmentId": "pipe-067",
+        "gapPdfPt": 8.778,
+        "sourceRef": "FP2.0 approved lower central red turn between drawing indices 6638 and 6666"
+      },
+      {
+        "id": "upper-central-main-turn",
+        "fromSegmentId": "pipe-066",
+        "toSegmentId": "pipe-060",
+        "gapPdfPt": 8.778,
+        "sourceRef": "FP2.0 approved upper central red turn between drawing indices 6639 and 6544"
+      }
+    ]
+  },
   "pipeSegments": [
     {
       "id": "pipe-001",

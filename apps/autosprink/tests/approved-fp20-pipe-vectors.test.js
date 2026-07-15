@@ -23,7 +23,10 @@ describe('approved FP2.0 pipe-vector extraction', () => {
       pipeClassCounts: { 'red-pipe': 40, 'black-pipe': 15, 'navy-arm-over': 12 },
       sprinklerClassCounts: { BB1: 58, SD1: 6, 'TY-FRB': 4 },
       maximumHeadToPipeDistancePdfPt: 1.466,
+      connectedPipeVectorCount: 67,
+      explicitMaskedTurnCount: 2,
     });
+    expect(result.sourceTopologyConnected).toBe(true);
     expect(result.properPipeLayoutReady).toBe(false);
     expect(result.fieldReleaseReady).toBe(false);
   });
@@ -73,5 +76,23 @@ describe('approved FP2.0 pipe-vector extraction', () => {
     }));
     expect(result.blockerCodes).toContain('FP20_HEAD_CLASS_COUNT_MISMATCH');
   });
-});
 
+  it('rejects a missing masked turn instead of silently disconnecting an approved branch', () => {
+    const result = evaluateApprovedFp20PipeVectors(mutate((copy) => {
+      copy.topologyClosure.explicitMaskedTurnLinks.pop();
+    }));
+    expect(result.blockerCodes).toEqual(expect.arrayContaining([
+      'FP20_TOPOLOGY_EXPLICIT_LINK_COUNT_INVALID',
+      'FP20_SOURCE_TOPOLOGY_DISCONNECTED',
+    ]));
+    expect(result.sourceTopologyConnected).toBe(false);
+  });
+
+  it('rejects broad snapping even though a ten-point tolerance would make the page look connected', () => {
+    const result = evaluateApprovedFp20PipeVectors(mutate((copy) => {
+      copy.topologyClosure.automaticJoinTolerancePdfPt = 10;
+    }));
+    expect(result.blockerCodes).toContain('FP20_TOPOLOGY_TOLERANCE_INVALID');
+    expect(result.vectorExtractionReady).toBe(false);
+  });
+});

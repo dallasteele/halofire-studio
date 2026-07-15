@@ -70,7 +70,7 @@ try {
     circle.append(title);
     pipeSvg.append(circle);
   }
-  document.querySelector('#vector-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.pipeVectorCount} pipe vectors, ${vectorAcceptance.metrics.sprinklerCount} heads, ${vectorAcceptance.metrics.totalVisiblePipeLengthFt.toFixed(1)} visible ft`;
+  document.querySelector('#vector-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.connectedPipeVectorCount}/${vectorAcceptance.metrics.pipeVectorCount} connected source vectors, ${vectorAcceptance.metrics.sprinklerCount} heads, ${vectorAcceptance.metrics.totalVisiblePipeLengthFt.toFixed(1)} visible ft`;
   const candidate = buildNewHopeProperPipeGraphCandidate(calibration, source);
   const acceptance = evaluateProperPitchedPipeGraph(candidate);
   document.querySelector('#graph-node-count').textContent = acceptance.metrics.nodeCount;
@@ -84,7 +84,7 @@ try {
     row.innerHTML = `<td style="color:#fda4af">${code}</td><td>${messages.get(code)}</td>`;
     blockerRows.append(row);
   }
-  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | fullApprovedVectorExtractionReady=${vectorAcceptance.vectorExtractionReady} | approvedPipeVectors=${vectorAcceptance.metrics.pipeVectorCount} | approvedSprinklers=${vectorAcceptance.metrics.sprinklerCount} | exactHeadXyReady=true | conditionalTrussClearanceReady=true | pipeGraphNodes=${acceptance.metrics.nodeCount} | pipeGraphEdges=${acceptance.metrics.edgeCount} | machineBlockerCodes=${acceptance.blockerCodes.length} | properPipeLayoutReady=${acceptance.properPipeLayoutReady} | branchGradeDirectionReady=false | endpointElevationsReady=false | drainDestinationReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=${acceptance.fieldReleaseReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | fullApprovedVectorExtractionReady=${vectorAcceptance.vectorExtractionReady} | sourceTopologyConnected=${vectorAcceptance.sourceTopologyConnected} | approvedPipeVectors=${vectorAcceptance.metrics.pipeVectorCount} | approvedSprinklers=${vectorAcceptance.metrics.sprinklerCount} | exactHeadXyReady=true | conditionalTrussClearanceReady=true | pipeGraphNodes=${acceptance.metrics.nodeCount} | pipeGraphEdges=${acceptance.metrics.edgeCount} | machineBlockerCodes=${acceptance.blockerCodes.length} | properPipeLayoutReady=${acceptance.properPipeLayoutReady} | branchGradeDirectionReady=false | endpointElevationsReady=false | drainDestinationReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=${acceptance.fieldReleaseReady}`;
   document.documentElement.dataset.proofReady = 'true';
   document.documentElement.dataset.pipeVectorStatus = vectorAcceptance.status;
   document.documentElement.dataset.pipeGraphStatus = acceptance.status;

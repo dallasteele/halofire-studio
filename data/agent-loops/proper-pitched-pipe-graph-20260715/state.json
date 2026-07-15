@@ -1,8 +1,8 @@
 {
   "loop": "proper-pitched-pipe-graph-20260715",
   "stage": "ITERATE",
-  "status": "verified-full-fp20-source-vectors-graph-still-fails-closed",
-  "iteration": 3,
+  "status": "verified-connected-fp20-source-topology-graph-still-fails-closed",
+  "iteration": 4,
   "brainPreflight": {
     "status": "passed",
     "topEpisodes": [148034, 120030, 125723, 124864, 62935]
@@ -48,7 +48,17 @@
       "TY-FRB": 4
     },
     "maximumHeadToPipeDistancePdfPt": 1.466,
-    "adversarialFinding": "A red-only color classifier misses approved black branches and navy arm-over or drop paths and is rejected."
+    "adversarialFinding": "A red-only color classifier misses approved black branches and navy arm-over or drop paths and is rejected.",
+    "sourceTopology": {
+      "status": "connected",
+      "automaticJoinTolerancePdfPt": 6.0,
+      "connectedPipeVectorCount": 67,
+      "explicitMaskedTurns": [
+        "pipe-065 to pipe-067 at 8.778 PDF points",
+        "pipe-066 to pipe-060 at 8.778 PDF points"
+      ],
+      "broadTenPointSnapAllowed": false
+    }
   },
   "currentNewHopeAssessment": {
     "nodeCount": 7,
@@ -72,7 +82,7 @@
   },
   "verification": {
     "loopGuard": "passed",
-    "focusedTests": "13 passed across FP2.0 vector extraction, proper pipe graph, adversarial mutations, and actual-PDF proof",
+    "focusedTests": "15 passed across FP2.0 vector extraction and topology, proper pipe graph, adversarial mutations, and actual-PDF proof",
     "productionBuild": "passed Vite build",
     "formalProof": {
       "status": "verified",
@@ -94,8 +104,8 @@
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 148147,
-    "title": "Approved FP2.0 vector replay closes all 67 pipe paths and 68 heads"
+    "episodeId": 148160,
+    "title": "FP2.0 source topology closes with two explicit masked turns"
   },
   "claims": {
     "properPipeLayoutReady": false,
