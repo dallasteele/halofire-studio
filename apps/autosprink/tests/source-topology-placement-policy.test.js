@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  auditExposedSlopeSourceRegistration,
   auditSourceTopologyCompleteness,
   buildSourceTopologyPlacementCandidate,
 } from '../src/engine/source-topology-placement-policy.js';
@@ -75,15 +76,38 @@ describe('transferable source-topology placement policy v2', () => {
           lowEdgeDatumZFt: 10,
           slopeRise: 1.5,
           slopeRun: 12,
+          sourceRegistration: {
+            featureId: 'mono-slope',
+            plan: { page: 'A5.1', sourceFeatureId: 'mono-slope', widthFt: 30, heightFt: 20, pdfBoundsPt: { x: 100, y: 200, width: 300, height: 200 }, pdfToLocalFtTransform: [0.1, 0, 0, 0.1, -10, -20] },
+            roof: { page: 'A5.1', sourceFeatureId: 'mono-slope', slopeRise: 1.5, slopeRun: 12 },
+            rcp: { page: 'A6.1', sourceFeatureId: 'mono-slope', ceilingRegime: 'open to structure' },
+            section: { page: 'A8.1', sourceFeatureId: 'mono-slope', slopeRise: 1.5, slopeRun: 12, lowEdgeDatumZFt: 10 },
+          },
         }),
       ],
     };
     const result = await buildSourceTopologyPlacementCandidate(packet);
+    expect(auditExposedSlopeSourceRegistration(packet)).toMatchObject({ status: 'passed', registeredVolumeIds: ['mono-slope'] });
+    expect(result.exposedSlopeRegistrationAudit).toMatchObject({ status: 'passed', registeredVolumeIds: ['mono-slope'] });
     expect(result.counts).toEqual({ total: 6, pendent: 0, upright: 0, unresolved: 6 });
     expect(result.exposedSlopedAudit).toEqual([
       expect.objectContaining({ sourceVolumeId: 'mono-slope', columns: 3, rows: 2, targetKind: 'orientation-unresolved', candidateIds: expect.arrayContaining(['EXPOSED-S-001', 'EXPOSED-S-006']) }),
     ]);
     expect(result.heads.map((head) => head.sourceProtectionPlaneZFt)).toEqual([10.625, 10.625, 10.625, 11.875, 11.875, 11.875]);
     expect(result.heads.every((head) => head.headInstallationZFt === null && head.sprinklerModel === null && head.obstructionClearanceVerified === false)).toBe(true);
+  });
+
+  it('blocks an exposed-slope packet without one PDF-registered feature identity', async () => {
+    const packet = {
+      candidateIdPrefix: 'BAD',
+      placementPolicy: { maxAreaSqFt: 130, maxSpacingFt: 15, minSpacingFt: 6 },
+      finishedCeilingRooms: [],
+      pitchedConcealedVolumes: [],
+      exposedSlopedCeilingVolumes: [rectangle('cross-registered-plane', 0, 0, 29.416667, 14, {
+        sourcePages: ['A3.2', 'A5.1', 'A6.1', 'A8.1'], slopeAxis: 'x', slopeDirection: 1, lowEdgeCoordinateFt: 0, lowEdgeDatumZFt: 13.677083, slopeRise: 0.25, slopeRun: 12,
+      })],
+    };
+    expect(auditExposedSlopeSourceRegistration(packet)).toMatchObject({ status: 'blocked', issues: [{ code: 'SOURCE_EXPOSED_SLOPE_REGISTRATION_MISSING', sourceVolumeId: 'cross-registered-plane' }] });
+    await expect(buildSourceTopologyPlacementCandidate(packet)).rejects.toThrow('SOURCE_EXPOSED_SLOPE_REGISTRATION_BLOCKED');
   });
 });

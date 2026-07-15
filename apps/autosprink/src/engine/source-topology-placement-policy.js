@@ -57,6 +57,65 @@ function exposedSlopeTargetZ(volume, point) {
   return round(volume.lowEdgeDatumZFt + runFromLowEdgeFt * volume.slopeRise / volume.slopeRun);
 }
 
+const finiteNumber = (value) => Number.isFinite(Number(value));
+const sameNumber = (left, right, tolerance = 0.001) => finiteNumber(left) && finiteNumber(right) && Math.abs(Number(left) - Number(right)) <= tolerance;
+
+/**
+ * Exposed-slope inputs are especially vulnerable to cross-registering a room
+ * boundary, roof arrow, and section datum that belong to different features.
+ * Require one feature identity plus a real PDF-to-local transform before the
+ * production policy may place any target on the plane.
+ */
+export function auditExposedSlopeSourceRegistration(packet) {
+  const volumes = packet.exposedSlopedCeilingVolumes || [];
+  if (!volumes.length) return { status: 'not-applicable', issues: [], registeredVolumeIds: [] };
+  const issues = [];
+  const registeredVolumeIds = [];
+  for (const volume of volumes) {
+    const registration = volume.sourceRegistration;
+    if (!registration) {
+      issues.push({ code: 'SOURCE_EXPOSED_SLOPE_REGISTRATION_MISSING', sourceVolumeId: volume.id });
+      continue;
+    }
+    const evidence = [registration.plan, registration.roof, registration.rcp, registration.section];
+    const sameFeature = registration.featureId === volume.id
+      && evidence.every((entry) => entry?.sourceFeatureId === registration.featureId && typeof entry?.page === 'string' && volume.sourcePages?.includes(entry.page));
+    if (!sameFeature) {
+      issues.push({ code: 'SOURCE_EXPOSED_SLOPE_FEATURE_BINDING_INVALID', sourceVolumeId: volume.id });
+      continue;
+    }
+    const bounds = boundingBox(polygonVertices(volume));
+    const widthFt = bounds.maxX - bounds.minX;
+    const heightFt = bounds.maxY - bounds.minY;
+    const plan = registration.plan;
+    const transformValid = Array.isArray(plan.pdfToLocalFtTransform)
+      && plan.pdfToLocalFtTransform.length === 6
+      && plan.pdfToLocalFtTransform.every(finiteNumber)
+      && plan.pdfBoundsPt
+      && ['x', 'y', 'width', 'height'].every((key) => finiteNumber(plan.pdfBoundsPt[key]))
+      && Number(plan.pdfBoundsPt.width) > 0
+      && Number(plan.pdfBoundsPt.height) > 0;
+    if (!transformValid || !sameNumber(plan.widthFt, widthFt) || !sameNumber(plan.heightFt, heightFt)) {
+      issues.push({ code: 'SOURCE_EXPOSED_SLOPE_PLAN_TRANSFORM_INVALID', sourceVolumeId: volume.id });
+      continue;
+    }
+    const slopeMatches = sameNumber(registration.roof.slopeRise, volume.slopeRise)
+      && sameNumber(registration.roof.slopeRun, volume.slopeRun)
+      && sameNumber(registration.section.slopeRise, volume.slopeRise)
+      && sameNumber(registration.section.slopeRun, volume.slopeRun);
+    if (!slopeMatches) {
+      issues.push({ code: 'SOURCE_EXPOSED_SLOPE_SLOPE_EVIDENCE_CONFLICT', sourceVolumeId: volume.id });
+      continue;
+    }
+    if (!sameNumber(registration.section.lowEdgeDatumZFt, volume.lowEdgeDatumZFt) || typeof registration.rcp.ceilingRegime !== 'string' || !registration.rcp.ceilingRegime.trim()) {
+      issues.push({ code: 'SOURCE_EXPOSED_SLOPE_VERTICAL_EVIDENCE_CONFLICT', sourceVolumeId: volume.id });
+      continue;
+    }
+    registeredVolumeIds.push(volume.id);
+  }
+  return { status: issues.length ? 'blocked' : 'passed', issues, registeredVolumeIds };
+}
+
 /**
  * Fail closed when a v2 packet leaves a finished-ceiling component without a
  * declared concealed-volume relationship. This catches connector, vestibule,
@@ -90,9 +149,11 @@ export function auditSourceTopologyCompleteness(packet) {
 }
 
 /** Apply a frozen spacing/area policy to a normalized protected-source packet. */
-export async function buildSourceTopologyPlacementCandidate(packet) {
+export async function buildSourceTopologyPlacementCandidate(packet, options = {}) {
   const topologyCompletenessAudit = auditSourceTopologyCompleteness(packet);
   if (topologyCompletenessAudit.status === 'blocked') throw new Error('SOURCE_TOPOLOGY_COMPLETENESS_BLOCKED');
+  const exposedSlopeRegistrationAudit = auditExposedSlopeSourceRegistration(packet);
+  if (exposedSlopeRegistrationAudit.status === 'blocked' && options.allowLegacyUnregisteredExposedSlope !== true) throw new Error('SOURCE_EXPOSED_SLOPE_REGISTRATION_BLOCKED');
   const heads = [];
   const roomAudit = [];
   const roofAudit = [];
@@ -210,6 +271,7 @@ export async function buildSourceTopologyPlacementCandidate(packet) {
   if ((packet.exposedSlopedCeilingVolumes || []).length) {
     result.exposedSlopedAudit = exposedSlopedAudit;
     result.counts.unresolved = heads.filter((head) => head.kind === 'orientation-unresolved').length;
+    if (options.allowLegacyUnregisteredExposedSlope !== true) result.exposedSlopeRegistrationAudit = exposedSlopeRegistrationAudit;
   }
   return result;
 }

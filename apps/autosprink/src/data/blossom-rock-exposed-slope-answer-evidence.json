@@ -1,0 +1,41 @@
+{
+  "artifactType": "halofire.completed-answer-evidence.v1",
+  "projectId": "blossom-rock-pool-pavilion-apache-junction-az",
+  "answerOpenedAfterCandidateCommit": "c1d915a6",
+  "primaryAnswer": {
+    "documentRole": "AHJ-approved fire sprinkler plan",
+    "sha256": "df8624f88afc39842a208636676479208aef058ba7a59f8fca4aedd3dd1308b4",
+    "pageCount": 1,
+    "sheet": "FP2"
+  },
+  "headSchedule": {
+    "pendent": 8,
+    "upright": 15,
+    "total": 23
+  },
+  "boundedCompletedLayout": {
+    "space": "Lake Pump Room",
+    "upright": 8,
+    "pendent": 0,
+    "total": 8,
+    "visiblePattern": "four columns by two rows"
+  },
+  "sourceRegistrationAudit": {
+    "candidateWidthFt": 29.416667,
+    "candidateDepthFt": 14,
+    "candidateSlope": "0.25:12",
+    "candidateDatumZFt": 13.677083,
+    "candidatePdfToLocalTransformSealed": false,
+    "floorPlanFinding": "The A3.1/A3.2 Lake Pump Room footprint is visibly larger than the sealed 29 feet 5 inches by 14 feet rectangle; the candidate dimensions were cross-registered from another feature.",
+    "roofPlanFinding": "A5.1/M2.0 show the Lake Pump Room under the larger sloped roof regime rather than the quarter-inch-per-foot plane used by the candidate.",
+    "sectionFinding": "The candidate bound the Roof 1 purlin datum to the Lake Pump Room even though A8.1 identifies the Lake Pump Room with the Roof 3 section.",
+    "exactXyComparisonEligible": false,
+    "exactElevationComparisonEligible": false
+  },
+  "visualFinding": {
+    "completedPlanUsesUprightHeadsInLakePumpRoom": true,
+    "completedLakePumpRoomHeadCount": 8,
+    "sourceOnlyCandidateHeadCount": 6,
+    "sourceOnlyCandidateModifiedAfterAnswerOpen": false
+  }
+}

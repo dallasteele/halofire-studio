@@ -45,7 +45,10 @@ export async function validateBlossomRockSource(value) {
 
 export async function buildBlossomRockSourceCandidate(source) {
   if ((await validateBlossomRockSource(source)).status !== 'passed') throw new Error('BLOSSOM_SOURCE_BLOCKED');
-  const generated = await buildSourceTopologyPlacementCandidate(source);
+  // Preserve the already-sealed pre-answer artifact exactly for scoring. The
+  // production policy now rejects this unregistered legacy packet; this replay
+  // exception cannot be used by normal generation.
+  const generated = await buildSourceTopologyPlacementCandidate(source, { allowLegacyUnregisteredExposedSlope: true });
   const draft = {
     artifactType: 'halofire.fresh-exposed-slope-source-candidate.v1',
     projectId: source.projectId,

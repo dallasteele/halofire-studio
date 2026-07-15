@@ -1,0 +1,45 @@
+{
+  "artifactType": "halofire.actual-pdf-exposed-slope-visual-proof.v1",
+  "projectId": "blossom-rock-pool-pavilion-apache-junction-az",
+  "candidateCommit": "c1d915a6",
+  "candidateReceiptSha256": "ddb18ae5fa26521084153583f0ea50ea5ed9bc1946e20be4586b914a045e2947",
+  "scoreReceiptSha256": "333b77bccbf97b52c83a24110b4161daea13b2a850483de3bded1be915b8ccfa",
+  "approvedAnswerSha256": "df8624f88afc39842a208636676479208aef058ba7a59f8fca4aedd3dd1308b4",
+  "sourceUnderlays": ["A3.2", "A5.1", "A6.1", "A8.1", "M2.0"],
+  "visualReview": {
+    "browserInspected": true,
+    "decodedImageCount": 7,
+    "brokenImageCount": 0,
+    "normalZoomLayoutReadable": true,
+    "horizontalOverflow": false,
+    "actualPdfUnderlaysPresent": true,
+    "approvedAnswerCropPresent": true,
+    "failureVisiblyDisclosed": true,
+    "threeDimensionalFailureReadable": true
+  },
+  "acceptance": {
+    "sourceFeatureRegistrationValid": false,
+    "countParity": false,
+    "kindParity": false,
+    "xyScoreAvailable": false,
+    "elevationScoreAvailable": false,
+    "accepted": false
+  },
+  "claimBoundary": {
+    "freshProjectPlacementVerified": false,
+    "obstructionClearanceReady": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "files": [
+    { "file": "completed-approved-lake-room-evidence.png", "sha256": "b3ee473ddd20e935bba5eec5962c9616aa7f49fd46f3d3633e99ca4af89cddd2", "bytes": 82566 },
+    { "file": "source-a3-2-sealed-candidate-diagnostic-overlay.png", "sha256": "2c42fb8ff4a5bf3991b61249e772f9e1f2d1ecbfcf003000ddf0e6cf5858c143", "bytes": 207457 },
+    { "file": "source-a5-1-lake-roof-underlay.png", "sha256": "12c79b1a68bb328f47add335a01f22b9cafaff469bc64568bb3e67c04bcabf82", "bytes": 157574 },
+    { "file": "source-a6-1-lake-room-rcp-underlay.png", "sha256": "38fb9e227c831a4f04c346d726a28a725985e19971fa1b9f3a7c48a3f669cb3a", "bytes": 163135 },
+    { "file": "source-a8-1-lake-room-section-underlay.png", "sha256": "c720352bef18db33d8ccf217fb9c36ff25835400f540c37fcca9b91f179d973e", "bytes": 206583 },
+    { "file": "source-m2-0-lake-roof-slope-underlay.png", "sha256": "714f7a2cbf4defe6a11f47abd2f8629a86b8e3f8ecda9145325d0d7764d377d2", "bytes": 235544 },
+    { "file": "source-registration-diagnostic-3d.svg", "sha256": "17b3a1452f2b894b325cbdb528c76986ee521cc90c8627a4d2753dd75046983d", "bytes": 6207 }
+  ]
+}
