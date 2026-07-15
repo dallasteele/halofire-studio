@@ -39,6 +39,13 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('sideBranchLineGradeDirectionReady=false');
     expect(html).toContain('sideBranchRelativeGradeProfilesReady=false');
     expect(html).toContain('sideBranchArmOverDrainageReady=false');
+    expect(html).toContain('crossMainSourceTopologyReady=false');
+    expect(html).toContain('crossMainHighPointBindingReady=false');
+    expect(html).toContain('crossMainLowPointBindingReady=false');
+    expect(html).toContain('crossMainRiserReturnReady=false');
+    expect(html).toContain('crossMainGradeDirectionReady=false');
+    expect(html).toContain('crossMainRelativeGradeProfilesReady=false');
+    expect(html).toContain('upperHighPointAbsoluteZReady=false');
     expect(html).toContain('boundedRidgeBranchGradeDirectionReady=false');
     expect(html).toContain('boundedRidgeBranchDrainCatchmentReady=false');
     expect(html).toContain('boundedDeflectorGradeEnvelopeReady=false');
@@ -69,6 +76,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('evaluateNewHopeRidgeBranchGradeEnvelope');
     expect(script).toContain('evaluateNewHopeLongBranchDrainage');
     expect(script).toContain('evaluateNewHopeSideBranchDrainage');
+    expect(script).toContain('evaluateNewHopeCrossMainDrainage');
     expect(script).toContain('calibration.trussLattice.centerlines');
     expect(script).toContain('calibration.branch.nodes');
     expect(script).toContain('pipeVectors.pipeSegments');
@@ -92,6 +100,13 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.sideBranchLineGradeDirectionReady = String(sideBranchDrainage.sideBranchLineGradeDirectionReady)');
     expect(script).toContain('dataset.sideBranchRelativeGradeProfilesReady = String(sideBranchDrainage.sideBranchRelativeGradeProfilesReady)');
     expect(script).toContain('dataset.sideBranchArmOverDrainageReady = String(sideBranchDrainage.sideBranchArmOverDrainageReady)');
+    expect(script).toContain('dataset.crossMainSourceTopologyReady = String(crossMainDrainage.crossMainSourceTopologyReady)');
+    expect(script).toContain('dataset.crossMainHighPointBindingReady = String(crossMainDrainage.crossMainHighPointBindingReady)');
+    expect(script).toContain('dataset.crossMainLowPointBindingReady = String(crossMainDrainage.crossMainLowPointBindingReady)');
+    expect(script).toContain('dataset.crossMainRiserReturnReady = String(crossMainDrainage.crossMainRiserReturnReady)');
+    expect(script).toContain('dataset.crossMainGradeDirectionReady = String(crossMainDrainage.crossMainGradeDirectionReady)');
+    expect(script).toContain('dataset.crossMainRelativeGradeProfilesReady = String(crossMainDrainage.crossMainRelativeGradeProfilesReady)');
+    expect(script).toContain('dataset.upperHighPointAbsoluteZReady = String(crossMainDrainage.upperHighPointAbsoluteZReady)');
     expect(script).toContain('dataset.boundedRidgeBranchGradeDirectionReady = String(ridgeGrade.boundedBranchGradeDirectionReady)');
     expect(script).toContain('dataset.boundedRidgeBranchDrainCatchmentReady = String(ridgeGrade.boundedBranchDrainCatchmentReady)');
     expect(script).toContain('dataset.boundedDeflectorGradeEnvelopeReady = String(ridgeGrade.boundedDeflectorGradeEnvelopeReady)');
@@ -103,6 +118,8 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('long-branch-relative-profile');
     expect(script).toContain('side-branch-grade-vector');
     expect(script).toContain('side-branch-relative-profile');
+    expect(script).toContain('cross-main-grade-vector');
+    expect(script).toContain('cross-main-relative-profile');
     expect(script).toContain('dataset.pipeVectorStatus = vectorAcceptance.status');
     expect(script).toContain('dataset.primaryPipeSizeAssignmentReady = String(governedSkeleton.primaryPipeSizeAssignmentReady)');
     expect(script).toContain('dataset.primaryPipeRoleAssignmentReady = String(governedSkeleton.primaryPipeRoleAssignmentReady)');

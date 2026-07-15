@@ -1,0 +1,61 @@
+{
+  "loop": "cross-main-and-central-loop-20260715",
+  "stage": "VERIFY",
+  "status": "cross-main-passed-central-loop-open",
+  "iteration": 1,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [148709, 148734, 148662, 148601, 148360]
+  },
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "browser", "formal"]
+  },
+  "knownTopology": {
+    "crossMainNodeCount": 31,
+    "crossMainEdgeCount": 30,
+    "crossMainCycleRank": 0,
+    "crossMainTerminalCandidates": ["canonical-node-002", "canonical-node-054", "canonical-node-056"],
+    "sourceFeedCandidate": "canonical-node-002",
+    "lowPointCandidates": ["low-point-01", "low-point-04"],
+    "centralBranchNodeCount": 31,
+    "centralBranchEdgeCount": 31,
+    "centralBranchCycleRank": 1
+  },
+  "claims": {
+    "crossMainSourceTopologyReady": true,
+    "crossMainHighPointReady": true,
+    "crossMainLowPointBindingReady": true,
+    "crossMainRiserReturnReady": true,
+    "crossMainGradeDirectionReady": true,
+    "crossMainRelativeGradeProfilesReady": true,
+    "upperHighPointAbsoluteZReady": false,
+    "centralLoopDirectionReady": false,
+    "wholeFp20GradeDirectionReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "crossMainEvidence": {
+    "sourcePlanSha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+    "hydraulicCalculationSha256": "D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719",
+    "canonicalNodes": 31,
+    "canonicalEdges": 30,
+    "directedEdges": 30,
+    "pathProfiles": 4,
+    "calculationElevationAnchors": 4,
+    "browser": {
+      "actualPdfUnderlays": 1,
+      "crossMainArrows": 30,
+      "relativeProfiles": 4,
+      "auditRows": 4,
+      "consoleWarningsOrErrors": 0
+    },
+    "formalProof": "verified"
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 148790
+  },
+  "nextAction": "Split the 31-edge, cycle-rank-one central branch component only from explicit approved calculation or vertical evidence; do not use nearest-low-point, shortest-path, or hydraulic-flow shortcuts."
+}

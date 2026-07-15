@@ -1,0 +1,51 @@
+{
+  "name": "cross-main-and-central-loop-20260715",
+  "owner": "codex",
+  "goal": "Bind the approved FP2.0 cross-main tree and central looped branch component to explicit source topology, riser/high-point evidence, low-point catchments, calculation elevations, grade direction, and truthful unresolved vertical conditions without deriving drainage from hydraulic flow.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Crisis Center - Approved/Approved Plans.PDF",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-1.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-2.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-3.json",
+    "data/agent-loops/proper-pitched-pipe-graph-20260715/state.json"
+  ],
+  "exit_criteria": [
+    "the 30-edge cross-main source component is replayed as one exact acyclic tree with source-feed and low-point terminals",
+    "cross-main grade direction is bound only where riser/high-point and low-point/catchment evidence agree",
+    "the 0.25-inch-per-10-foot cross-main grade is represented independently from hydraulic flow",
+    "the central 31-edge looped branch component is split by explicit approved calculation or vertical evidence rather than shortest path",
+    "unknown endpoint Z, arm-over offsets, field drains, or loop decisions remain typed fail-closed blockers",
+    "actual-PDF top-down and relative elevation proof render without obscuring the source",
+    "focused tests, adversarial mutations, production build, formal proof, rules verification, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source hash and project identity replay",
+    "cross-main role and exact terminal topology",
+    "source-feed and low-point binding",
+    "calculation elevation and drainage-direction independence",
+    "adversarial source, topology, grade, catchment, and false-promotion mutations",
+    "focused Vitest regression and AutoSprink production build",
+    "actual PDF underlay browser proof",
+    "Lean formal invariant receipt",
+    "agentic rules and brain postflight"
+  ],
+  "state_path": "data/agent-loops/cross-main-and-central-loop-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/new-hope-cross-main-drainage.js",
+    "apps/autosprink/tests/new-hope-cross-main-drainage.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "data/agent-loops/cross-main-and-central-loop-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 160000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

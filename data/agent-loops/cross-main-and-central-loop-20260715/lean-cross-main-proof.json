@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/cross-main-and-central-loop-20260715/lean-cross-main-request.json",
+  "theoremNames": [
+    "completeCrossMainTreePartition",
+    "crossMainMinimumFallArithmetic",
+    "crossMainDrainageDoesNotPromoteUnprovedVerticalOrWholeLayout"
+  ],
+  "claim": "The exact cross-main tree partitions into 30 uniquely directed edges. Rounded path lengths reproduce the 0.25-inch-per-10-foot minimum falls. Cross-main readiness does not promote the unproved upper absolute Z, central-loop direction, exact pipe-centerline Z, whole-plan grade direction, or proper-layout readiness.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 70,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}
