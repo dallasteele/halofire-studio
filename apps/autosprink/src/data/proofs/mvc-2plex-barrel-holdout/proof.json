@@ -1,0 +1,17 @@
+{
+  "artifactType": "halofire.fresh-curved-roof-holdout-visual-proof.v1",
+  "projectId": "mvc-2plex-heber-city-ut",
+  "candidateCommitBeforeAnswerOpen": "3e824883",
+  "candidateReceiptSha256": "45d97d683be74d15d19c08b5f4c9713f4f4af89c857d86c472860c8afbb7d762",
+  "scoreReceiptSha256": "8533a26367b661b3533232c59b95b9365bb0f27e46c80b259d6fc0573669edf4",
+  "approvedAnswerSha256": "c486a6c8676a146802ebbf5a64516cc47281976405de8a873a46e3d9f0e3362b",
+  "comparison": { "candidateTargets": 2, "approvedTargets": 0, "falsePositiveTargets": 2, "accepted": false, "classification": "fresh-holdout-failed-unprotected-barrel-roof-projection" },
+  "visualReview": { "actualPdfUnderlaysPresent": true, "sourceA109Present": true, "sourceA110Present": true, "sourceA302Present": true, "approvedFp2Present": true, "browserInspected": true, "decodedImageCount": 4, "brokenImageCount": 0, "horizontalOverflow": false },
+  "claimBoundary": { "freshProjectPlacementVerified": false, "exactHeadElevationReady": false, "obstructionClearanceReady": false, "hydraulicCalculationReady": false, "complianceReady": false, "fabricationReady": false, "fieldReleaseReady": false },
+  "files": [
+    { "file": "approved-fp2.png", "bytes": 1100581, "sha256": "0b073c34538451be96ea99cd7793396980095c6b237b9c18bacd610dc3422331" },
+    { "file": "source-a109-roof-plan.png", "bytes": 759604, "sha256": "7fe67d5d2ff73fe1af982302ebec76c76178dea528c2f881f35585cff6dce31c" },
+    { "file": "source-a110-rcp.png", "bytes": 597295, "sha256": "373ed4cd23878e144d374bf1cd5858461136d1d7097b645073fd44f0815c3ba1" },
+    { "file": "source-a302-section.png", "bytes": 535492, "sha256": "582e9ae807ab0f51c18b50747d8fe9da13fefb91a0e6a4e6547ff99c736fa35c" }
+  ]
+}

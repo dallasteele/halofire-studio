@@ -1,0 +1,12 @@
+{
+  "artifactType": "halofire.fresh-curved-roof-holdout-answer-evidence.v1",
+  "projectId": "mvc-2plex-heber-city-ut",
+  "boundedScope": "Third-level grid C-D / 10-12 barrel-roof bay",
+  "approvedAnswer": { "sheet": "FP2", "sha256": "c486a6c8676a146802ebbf5a64516cc47281976405de8a873a46e3d9f0e3362b", "bytes": 2102185, "pageCount": 1 },
+  "sequence": { "answerExposedAfterCandidateCommit": true, "candidateCommitBeforeAnswerOpen": "3e824883", "candidateReceiptSha256": "45d97d683be74d15d19c08b5f4c9713f4f4af89c857d86c472860c8afbb7d762", "candidateRetunedAfterAnswer": false },
+  "answerRegistration": { "coordinateSpace": "rotated-pdf-points", "gridBounds": { "x": 2108.9, "y": 743, "width": 269.7, "height": 72 }, "widthFt": 30, "depthFt": 8, "sourceFeatureId": "third-level-c-d-10-12-barrel-bay" },
+  "boundedObservation": { "approvedHeadCount": 0, "approvedBranchLineCount": 0, "candidateTargetCount": 2, "falsePositiveTargets": 2, "visualFinding": "FP2 shows roof framing in grid C-D / 10-12 but no sprinkler head, branch line, or protected floor area in the bounded projection." },
+  "sourceObservableResidual": { "classification": "roof-projection-misclassified-as-protected-occupied-volume", "missingSourceGate": "A roof/RCP/section feature must intersect a source-declared occupied or protected floor polygon before target generation.", "availableBeforeAnswer": ["A107 has no occupied tenant-space label in C-D / 10-12", "A109 classifies the feature as RF8 barrel roof", "A110 supplies a variable follow-roof RCP note but no protected-use declaration", "S1.3 supplies roof framing only"] },
+  "claims": { "freshProjectPlacementVerified": false, "exactHeadElevationReady": false, "obstructionClearanceReady": false, "hydraulicCalculationReady": false, "complianceReady": false, "fabricationReady": false, "fieldReleaseReady": false },
+  "receiptSha256": "17f8407f49cd9ac7354e62b2bf3e9e1331307cfd3a186ada996fb0c9f0ea093b"
+}
