@@ -1,0 +1,51 @@
+{
+  "name": "polaris-pitched-hydraulic-network-20260715",
+  "owner": "codex",
+  "goal": "Bind the completed Polaris pitched-attic and below-ceiling AutoSPRINK pipe model to source-proven hydraulic upstream/downstream direction, pipe roles, calculation nodes, exact per-instance fitting identities, drainage devices, and riser/source closure without transferring unsupported project-specific facts to New Hope or promoting fabrication and field release.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/05-CAD Files/FP1 Polaris Academy.cad",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/05-CAD Files/Polaris Academy Fire Sprinkler CAD 2.DWG",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/05-CAD Files/Polaris Academy Fire Line CAD.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/07-AHJ Submittals/05-01-24-R4/Polaris Academy - Hydraulic Calcs I.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/07-AHJ Submittals/05-01-24-R4/Polaris Academy - Hydraulic Calcs II.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/07-AHJ Submittals/05-20-24-R5/Polaris Academy - Mesa AZ_FP2.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/CRE Options/Polaris Academy - Mesa AZ/2-Internal Ops/01-Design/11-As-Built Set/As Built.pdf",
+    "apps/autosprink/src/data/polaris-pitched-pipe-xyz-calibration.json",
+    "apps/autosprink/src/engine/proper-pitched-pipe-graph.js"
+  ],
+  "exit_criteria": [
+    "Both final hydraulic reports are hash-gated and deterministically parsed into report identity, nodes, routes, upstream/downstream segment direction, pipe roles, diameters, flow, elevations, and calculation fittings.",
+    "DWG hydraulic-node labels and per-instance pipe/fitting attributes are extracted from the same hash-gated completed export.",
+    "Every promoted calculated segment is bound to same-project DWG geometry through node, topology, diameter, elevation, and length evidence with explicit residuals and no duplicate geometry assignment.",
+    "The 4-inch riser/source path closes to source node 1 and promoted hydraulic direction follows the report's explicit upstream-to-downstream semantics.",
+    "Every one of the 98 DWG fitting instances has its source attribute identity preserved; inspector test-and-drain and other drainage devices retain exact source coordinates and descriptions.",
+    "Drainage direction and drain destination are promoted only where the completed source explicitly identifies both; roof-relative geometric downhill remains distinct from hydraulic flow and drainage intent.",
+    "Primary, cross-source, topology, adversarial, formal, visual, and browser verification pass without an independent human-review gate.",
+    "New Hope proper-layout, fabrication, compliance, permit, and field-release readiness remain fail-closed until same-project evidence closes their own gates."
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/polaris-pitched-hydraulic-network-20260715/contract.json",
+    "Deterministic replay of both hydraulic PDF extractors against exact SHA-256 inputs",
+    "Focused Vitest for report parsing, DWG attributes, network binding, and adversarial mutation rejection",
+    "Lean proof for route direction, source closure, inventory partition, and fail-closed promotion",
+    "Production build and agentic-rule verifier",
+    "Browser inspection of approved-plan hydraulic-direction, drainage-device, elevation, and 3D overlays",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/brain_sync_session.py close writeback"
+  ],
+  "state_path": "data/agent-loops/polaris-pitched-hydraulic-network-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/polaris-hydraulic-calcs-below-ceiling.json",
+    "apps/autosprink/src/data/polaris-hydraulic-calcs-attic.json",
+    "apps/autosprink/src/data/polaris-pitched-hydraulic-network.json",
+    "apps/autosprink/src/data/proofs/polaris-pitched-hydraulic-network/proof.json",
+    "data/agent-loops/polaris-pitched-hydraulic-network-20260715/lean-proof.json"
+  ],
+  "max_iterations": 10,
+  "max_tokens": 500000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

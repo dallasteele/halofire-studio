@@ -1,0 +1,19 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/polaris-pitched-hydraulic-network-20260715/lean-request.json",
+  "theoremNames": [
+    "polarisHydraulicAndCadNodeCoverage",
+    "polarisPhysicalGraphInventoryAndCycleRank",
+    "polarisFittingSemanticsPartitionExactly",
+    "polarisGradeAndDrainageBoundary"
+  ],
+  "claim": "The two calculation reports contain 82 segments and 61 nodes with exactly 59 CAD labels plus two off-building source nodes; all 186 pipe objects partition across the physical components; the building graph has cycle rank three; all 98 fitting identities partition exactly; and four geometrically drainable plus ten low-point-away sloped runs cannot promote node-to-pipe, whole-network flow, drainage-semantics, or proper-layout readiness.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 90,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

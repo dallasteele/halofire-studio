@@ -1,0 +1,31 @@
+{
+  "iteration": 2,
+  "phase": "verify-and-bind",
+  "status": "in_progress",
+  "observations": [
+    "The exact XYZ calibration is complete, but roof-relative geometric slope is not hydraulic flow direction or drainage intent.",
+    "Hydraulic Calcs I and II deterministically provide 82 scenario segments, 61 unique nodes, explicit upstream-to-downstream direction, and source-node-1 closure.",
+    "The completed sprinkler DWG contains 59 of the 61 calculation labels; the only missing plan labels are off-building source nodes 1 and 2.",
+    "All 186 pipe objects are preserved. The largest exact centerline component contains 177 pipes and has cycle rank 3; fitting bodies bridge the separate riser assembly.",
+    "All 98 fitting instances retain exact source attributes. The source tee binds pipe-22275, pipe-3279, and pipe-17499; the inspector test-and-drain binds pipe-22402 and pipe-22468.",
+    "The final sprinkler DWG explicitly contains MAIN DRAIN and 3-inch RISER callouts with two-segment leaders.",
+    "The same-project fire-line DWG explicitly contains a new 4-inch Class 350 fire line, backflow prevention assembly, city water context, and riser symbols.",
+    "Four of 14 sloped plan runs have a continuous non-rising geometric path to the main-drain entry; ten terminate at geometric low points away from that entry and require intent/auxiliary-drain classification.",
+    "No independent human-review gate is required; deterministic, adversarial, formal, visual, and browser loops provide acceptance."
+  ],
+  "attempts": [
+    "Upgraded the read-only LibreDWG parser to 0.7.7 and extracted pipe, sprinkler, fitting, calculation-label, and source-note attributes with zero unknown entities.",
+    "Hash-gated and parsed both final hydraulic reports; malformed legend/route-header interpretations were rejected before the deterministic replay passed.",
+    "Built endpoint-to-segment physical topology at 0.04-foot tolerance so the source 0.528-inch short pipe remains distinct while branch connections into mains resolve.",
+    "Bound source tee and test-and-drain ports from exact fitting coordinates and preserved the three loop conditions rather than inventing whole-network flow.",
+    "Rendered the actual approved FP2 proof with exact pipe geometry, downhill endpoints, and devices; provisional calculation-node graphs are diagnostic and off by default.",
+    "Focused Vitest, adversarial mutations, browser interaction, and Lean 4 arithmetic/fail-closed invariants passed.",
+    "Brain postflight persisted the hydraulic-direction, cycle, fitting, fire-line, grade, low-point, and visual-default rules as episode 149368."
+  ],
+  "blockers": [
+    "Exact calculation-node-to-DWG-pipe-span binding remains open because CAD label annotations are offset from geometry and must be solved through topology, length, diameter, and elevation constraints.",
+    "Three loop legs cannot receive truthful whole-network flow arrows until the calculated node graph is bound to the physical graph.",
+    "The ten remote geometric low points cannot be classified as acceptable trapped volume or auxiliary-drain requirements until completed-design system/drainage intent is bound."
+  ],
+  "next_action": "Bind unique calculated sprinkler leaves to exact source sprinklers, then propagate node assignments through pipe topology using report length, diameter, and elevation constraints; use that binding to resolve the three loop legs and classify each remote low point without inferring drainage intent."
+}

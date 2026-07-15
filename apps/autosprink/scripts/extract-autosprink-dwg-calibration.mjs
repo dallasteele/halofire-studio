@@ -53,6 +53,15 @@ function sourceSha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex').toUpperCase();
 }
 
+function numericHandle(value) {
+  if (typeof value === 'bigint') return Number(value);
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string' && /^[0-9A-F]+$/i.test(value)) return Number.parseInt(value, 16);
+  return Number(value);
+}
+
+const stableHandle = (value) => String(numericHandle(value));
+
 function parseArguments(argv) {
   const [inputPath, ...rest] = argv;
   if (!inputPath) throw new Error('USAGE: extract-autosprink-dwg-calibration.mjs <source.dwg> [--expected-sha256 HASH]');
@@ -71,9 +80,24 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
   const wasmRoot = path.resolve('node_modules/@mlightcad/libredwg-web/wasm/').replaceAll('\\', '/');
   const libredwg = await LibreDwg.create(`${wasmRoot}/`);
   const raw = libredwg.dwg_read_data(bytes, Dwg_File_Type.DWG);
-  const database = libredwg.convert(raw);
+  const converted = libredwg.convertEx(raw);
+  const database = converted.database;
   const blocks = new Map(database.tables.BLOCK_RECORD.entries.map((block) => [block.name, block]));
   const inserts = database.entities.filter((entity) => entity.type === 'INSERT');
+  const attributesByInsertHandle = new Map();
+  for (const attribute of database.entities.filter((entity) => entity.type === 'ATTRIB')) {
+    const ownerHandle = numericHandle(attribute.ownerBlockRecordSoftId);
+    if (!Number.isFinite(ownerHandle)) continue;
+    const values = attributesByInsertHandle.get(ownerHandle) ?? [];
+    values.push(attribute);
+    attributesByInsertHandle.set(ownerHandle, values);
+  }
+
+  const insertAttributes = (entity) => Object.fromEntries((entity.attribs?.length
+    ? entity.attribs
+    : attributesByInsertHandle.get(numericHandle(entity.handle)) ?? [])
+    .map((attribute) => [attribute.tag, typeof attribute.text === 'string' ? attribute.text : attribute.text?.text])
+    .filter(([tag, value]) => tag && value));
 
   const pipes = inserts
     .filter((entity) => entity.layer === 'AS_SPRINKLER SYSTEM_PIPES' && entity.name?.startsWith('Pipe'))
@@ -93,7 +117,7 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
       const planLength = Math.hypot(end.x - start.x, end.y - start.y);
       const length3d = Math.hypot(end.x - start.x, end.y - start.y, end.z - start.z);
       return {
-        id: `pipe-${String(entity.handle)}`,
+        id: `pipe-${stableHandle(entity.handle)}`,
         blockName: entity.name,
         layer: entity.layer,
         start: point(start),
@@ -102,14 +126,16 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
         length3d: round(length3d),
         deltaZ: round(end.z - start.z),
         maxSectionRadius: sectionRadii.length ? round(Math.max(...sectionRadii)) : null,
+        attributes: insertAttributes(entity),
       };
     });
 
   const pointInsert = (entity, prefix) => ({
-    id: `${prefix}-${String(entity.handle)}`,
+    id: `${prefix}-${stableHandle(entity.handle)}`,
     blockName: entity.name,
     layer: entity.layer,
     point: point(ocsPointToWcs(entity.insertionPoint, entity.extrusionDirection)),
+    attributes: insertAttributes(entity),
   });
   const sprinklers = inserts
     .filter((entity) => entity.layer === 'AS_SPRINKLER SYSTEM_SPRINKLERS' && entity.name?.startsWith('Fitting'))
@@ -117,6 +143,37 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
   const fittings = inserts
     .filter((entity) => entity.layer === 'AS_SPRINKLER SYSTEM_FITTINGS')
     .map((entity) => pointInsert(entity, 'fitting'));
+  const hydraulicNodeLabels = database.entities
+    .filter((entity) => entity.type === 'TEXT'
+      && entity.layer === 'AS_SPRINKLER SYSTEM_AREAS'
+      && /^\d+$/.test(String(entity.text ?? '').trim()))
+    .map((entity) => ({
+      nodeId: String(entity.text).trim(),
+      labelPoint: point({ x: entity.startPoint.x, y: entity.startPoint.y, z: 0 }),
+      alignmentPoint: point({ x: entity.endPoint.x, y: entity.endPoint.y, z: 0 }),
+    }));
+  const noteLines = database.entities.filter((entity) => entity.type === 'LINE'
+    && entity.layer === 'AS_SPRINKLER SYSTEM_NOTES');
+  const sourceNotes = database.entities
+    .filter((entity) => entity.type === 'TEXT'
+      && entity.layer === 'AS_SPRINKLER SYSTEM_NOTES'
+      && /^(?:MAIN DRAIN|3" RISER)$/i.test(String(entity.text ?? '').trim()))
+    .map((entity) => {
+      const firstLeader = noteLines.find((line) => Math.abs(line.startPoint.x - entity.startPoint.x) <= 1e-6
+        && Math.abs(line.startPoint.y - entity.startPoint.y) <= entity.textHeight);
+      const secondLeader = firstLeader && noteLines.find((line) => line !== firstLeader
+        && Math.hypot(
+          line.startPoint.x - firstLeader.endPoint.x,
+          line.startPoint.y - firstLeader.endPoint.y,
+          (line.startPoint.z ?? 0) - (firstLeader.endPoint.z ?? 0),
+        ) <= 1e-6);
+      return {
+        text: String(entity.text).trim(),
+        labelPoint: point({ x: entity.startPoint.x, y: entity.startPoint.y, z: 0 }),
+        leaderTip: secondLeader ? point(secondLeader.endPoint) : null,
+        leaderSegmentCount: secondLeader ? 2 : firstLeader ? 1 : 0,
+      };
+    });
 
   const elevations = [...new Set(pipes.flatMap((pipe) => [pipe.start.z, pipe.end.z]))].sort((a, b) => a - b);
   const result = {
@@ -125,7 +182,8 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
       fileName: path.basename(inputPath),
       byteLength: bytes.length,
       sha256,
-      parser: '@mlightcad/libredwg-web@0.4.2 (LibreDWG)',
+      parser: '@mlightcad/libredwg-web@0.7.7 (LibreDWG)',
+      unknownEntityCount: converted.stats.unknownEntityCount,
       parserScope: 'read-only development intake; not included in the production browser bundle',
     },
     coordinateSystem: {
@@ -138,12 +196,16 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
       pipeCount: pipes.length,
       sprinklerSymbolCount: sprinklers.length,
       fittingSymbolCount: fittings.length,
+      hydraulicNodeLabelCount: hydraulicNodeLabels.length,
+      sourceNoteCount: sourceNotes.length,
       distinctPipeElevationCount: elevations.length,
       pipeElevationRange: elevations.length ? [elevations[0], elevations.at(-1)] : null,
     },
     pipes,
     sprinklers,
     fittings,
+    hydraulicNodeLabels,
+    sourceNotes,
     claims: {
       sourceArchiveHashVerified: Boolean(expectedSha256),
       exactSourceDrawingXyzReady: pipes.length > 0 && sprinklers.length > 0 && fittings.length > 0,

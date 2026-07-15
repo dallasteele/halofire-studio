@@ -67,6 +67,7 @@ function buildPipe(pipe) {
     downhillDirection: absDeltaZInches <= 1e-6 ? 'level' : pipe.deltaZ < 0 ? 'start-to-end' : 'end-to-start',
     planDirection: planDirection(start, end, pipe.planLength),
     geometryKind,
+    sourceAttributes: pipe.attributes,
   };
 }
 
@@ -84,6 +85,30 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
       ? 'Flex Drop'
       : fitting.blockName.match(/^Fitting(\d+)/)?.[0] ?? 'Fitting',
     pointFt: projectPoint(fitting.point),
+    sourceAttributes: fitting.attributes,
+  }));
+  const sprinklers = dwg.sprinklers.map((sprinkler) => ({
+    id: sprinkler.id,
+    sourceBlockName: sprinkler.blockName,
+    pointFt: projectPoint(sprinkler.point),
+    sourceAttributes: sprinkler.attributes,
+  }));
+  const hydraulicNodeLabels = dwg.hydraulicNodeLabels.map((label) => ({
+    nodeId: label.nodeId,
+    labelPointFt: {
+      x: round((label.labelPoint.x + XY_OFFSET_INCHES[0]) / 12),
+      y: round((label.labelPoint.y + XY_OFFSET_INCHES[1]) / 12),
+    },
+    alignmentPointFt: {
+      x: round((label.alignmentPoint.x + XY_OFFSET_INCHES[0]) / 12),
+      y: round((label.alignmentPoint.y + XY_OFFSET_INCHES[1]) / 12),
+    },
+  }));
+  const sourceNotes = dwg.sourceNotes.map((note) => ({
+    text: note.text,
+    labelPointFt: projectPoint(note.labelPoint),
+    leaderTipFt: note.leaderTip ? projectPoint(note.leaderTip) : null,
+    leaderSegmentCount: note.leaderSegmentCount,
   }));
   const headResiduals = dwg.sprinklers.map((sprinkler, index) => {
     const actual = projectPoint(sprinkler.point);
@@ -153,9 +178,16 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
         Math.max(...pipes.flatMap((pipe) => [pipe.startFt.z, pipe.endFt.z])),
       ],
       fittingFamilyCounts: countBy(fittings, 'family'),
+      hydraulicNodeLabelCount: hydraulicNodeLabels.length,
+      attributedPipeCount: pipes.filter((pipe) => Object.keys(pipe.sourceAttributes).length > 0).length,
+      attributedFittingCount: fittings.filter((fitting) => Object.keys(fitting.sourceAttributes).length > 0).length,
+      sourceNoteCount: sourceNotes.length,
     },
     pipes,
+    sprinklers,
     fittings,
+    hydraulicNodeLabels,
+    sourceNotes,
     claims: {
       exactSourcePipeXyzReady: true,
       sourceUnitConversionReady: true,
@@ -164,7 +196,10 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
       roofRelativePipeGradeGeometryReady: true,
       hydraulicFlowDirectionReady: false,
       drainageGradeSemanticsReady: false,
-      fullFittingIdentityReady: false,
+      fullFittingIdentityReady: fittings.length > 0
+        && fittings.every((fitting) => fitting.sourceAttributes['Sub Category']
+          && fitting.sourceAttributes.Description
+          && fitting.sourceAttributes.Size),
       drainDestinationReady: false,
       nativeElementGeometryRecordDecodeReady: false,
       newHopeExactPipeCenterlineZReady: false,

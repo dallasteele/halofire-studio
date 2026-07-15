@@ -1,0 +1,45 @@
+{
+  "schema": "halofire.polaris-pitched-hydraulic-network-proof.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "networkReceiptSha256": "B10DD80C5A2C3A484E068D5DE5A245164578BE51B3915E56A80024AE7F739C33",
+  "underlay": "../polaris-pitched-pipe-xyz/approved-fp2-pipe-overlay.png",
+  "counts": {
+    "hydraulicReportSegments": 82,
+    "calculationNodes": 61,
+    "cadNodeLabels": 59,
+    "sourcePipes": 186,
+    "buildingComponentPipes": 177,
+    "attributedFittings": 98,
+    "slopedPlanRuns": 14,
+    "geometricallyDrainableSlopedRuns": 4,
+    "lowPointAwaySlopedRuns": 10,
+    "physicalCycleRank": 3
+  },
+  "defaultLayers": {
+    "approvedFp2AndExactPipes": true,
+    "geometricDownhillEndpoints": true,
+    "riserAndDrainDevices": true,
+    "atticCalculationGraphDiagnostic": false,
+    "belowCeilingCalculationGraphDiagnostic": false
+  },
+  "browserVerification": {
+    "actualPdfUnderlayVisible": true,
+    "exactPipeOverlayVisible": true,
+    "diagnosticLayersDefaultOff": true,
+    "diagnosticToggleVerified": true,
+    "browserErrorCount": 0
+  },
+  "claims": {
+    "exactHydraulicReportGraphReady": true,
+    "exactPhysicalPipeGraphReady": true,
+    "fullFittingIdentityReady": true,
+    "mainDrainCalloutReady": true,
+    "roofRelativePipeGradeGeometryReady": true,
+    "calculationNodeToDwgGeometryBindingReady": false,
+    "wholeNetworkHydraulicFlowDirectionReady": false,
+    "drainageGradeSemanticsReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

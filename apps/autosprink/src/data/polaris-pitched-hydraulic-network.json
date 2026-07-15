@@ -1,0 +1,5029 @@
+{
+  "schema": "halofire.polaris-pitched-hydraulic-network.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "sourceBoundary": {
+    "pipeCalibrationReceiptSha256": "74B55A52AF6F16F0D9501EEFC12D55E739D2D373FF8C9D1553613A11B65E6CFA",
+    "atticHydraulicReportSha256": "7BFEDCD59CAB07DB2045D8E4BC7F23770D8B3991019163153737AE4C1A8FC846",
+    "belowCeilingHydraulicReportSha256": "690BFA978E60A7B4704F0DCDFD9FAE4BA5A87EBD8E6C7C38BD62BF22D8D24EA9",
+    "fireLineCad": {
+      "schema": "halofire.polaris-fireline-source.v1",
+      "source": {
+        "fileName": "Polaris Academy Fire Line CAD.dwg",
+        "byteLength": 633976,
+        "sha256": "EE9B22E5235AC137882BDB680A0295AFF87C53D444ED939E28CDA0A7EAAB9C9A",
+        "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+        "unknownEntityCount": 0
+      },
+      "evidence": {
+        "newFireLineNotes": [
+          {
+            "id": "text-28703",
+            "type": "MTEXT",
+            "layer": "G-ANNO-TTLB",
+            "text": "NEW 4\" CLASS 350 FIRELINE"
+          }
+        ],
+        "backflowNotes": [
+          {
+            "id": "text-29864",
+            "type": "MTEXT",
+            "layer": "G-ANNO-TTLB",
+            "text": "NEW BACKFLOW PREVENTION ASSEMBLY PER DETAIL M-31.06"
+          }
+        ],
+        "cityWaterNotes": [
+          {
+            "id": "text-24760",
+            "type": "TEXT",
+            "layer": "NOTE",
+            "text": "EXISTING 12\" CITY WATER MAIN"
+          },
+          {
+            "id": "text-24762",
+            "type": "TEXT",
+            "layer": "NOTE",
+            "text": "EXISTING 8\" CITY WATER MAIN"
+          },
+          {
+            "id": "text-28548",
+            "type": "TEXT",
+            "layer": "NOTE",
+            "text": "EXISTING 8\" CITY WATER MAIN"
+          },
+          {
+            "id": "text-28553",
+            "type": "TEXT",
+            "layer": "NOTE",
+            "text": "EXISTING 8\" CITY WATER MAIN"
+          },
+          {
+            "id": "text-28560",
+            "type": "TEXT",
+            "layer": "NOTE",
+            "text": "EXISTING 12\" CITY WATER MAIN"
+          },
+          {
+            "id": "text-28621",
+            "type": "TEXT",
+            "layer": "NOTE",
+            "text": "EXISTING 12\" CITY WATER MAIN"
+          },
+          {
+            "id": "text-28707",
+            "type": "TEXT",
+            "layer": "NOTE",
+            "text": "EXISTING 8\" CITY WATER MAIN"
+          }
+        ],
+        "risers": [
+          {
+            "id": "riser-24671",
+            "layer": "pipefitt",
+            "insertionPoint": {
+              "x": -750.5364661922997,
+              "y": 6234.992312226061,
+              "z": 0
+            }
+          },
+          {
+            "id": "riser-28556",
+            "layer": "pipefitt",
+            "insertionPoint": {
+              "x": -451.51183381503967,
+              "y": 7419.8036966508525,
+              "z": 0
+            }
+          },
+          {
+            "id": "riser-29682",
+            "layer": "pipefitt",
+            "insertionPoint": {
+              "x": -805.2784987149037,
+              "y": 6051.626254587287,
+              "z": 0
+            }
+          },
+          {
+            "id": "riser-29683",
+            "layer": "pipefitt",
+            "insertionPoint": {
+              "x": -796.2855947022301,
+              "y": 6074.023539537853,
+              "z": 0
+            }
+          },
+          {
+            "id": "riser-30234",
+            "layer": "pipefitt",
+            "insertionPoint": {
+              "x": -743.7018085015135,
+              "y": 6206.600932306291,
+              "z": 0
+            }
+          }
+        ],
+        "fireLinePolylines": [
+          {
+            "id": "polyline-24734",
+            "lineType": "HIDDEN",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -1297.4177842770791,
+                "y": 6451.488171782586,
+                "bulge": 0
+              },
+              {
+                "x": -762.2468110671284,
+                "y": 6239.349393976516,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-24738",
+            "lineType": "continuous",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -444.6095238991268,
+                "y": 7437.486033482074,
+                "bulge": 0
+              },
+              {
+                "x": -447.15673871705854,
+                "y": 7431.049884746716,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-24743",
+            "lineType": "continuous",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -739.4216722933346,
+                "y": 6230.312039094766,
+                "bulge": 0
+              },
+              {
+                "x": -728.2756115117455,
+                "y": 6225.9007968516435,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-28511",
+            "lineType": "DASHDOT",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -1011.6951199545119,
+                "y": 6941.729527715719,
+                "bulge": 0
+              },
+              {
+                "x": 23.543061390175353,
+                "y": 6524.229490098679,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-28525",
+            "lineType": "DASHDOT",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": 57.67430077627819,
+                "y": 6510.464741092702,
+                "bulge": 0
+              },
+              {
+                "x": 1196.5989410987067,
+                "y": 6051.149108471857,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-28547",
+            "lineType": "HIDDEN",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -1255.4745915915757,
+                "y": 6434.88844323173,
+                "bulge": 0
+              },
+              {
+                "x": -1380.238716527972,
+                "y": 6119.641979025206,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-28549",
+            "lineType": "HIDDEN",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -1380.238716527972,
+                "y": 6119.641979025206,
+                "bulge": 0
+              },
+              {
+                "x": -1864.567512080801,
+                "y": 3469.4859480150626,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-28551",
+            "lineType": "continuous",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -1281.088927348797,
+                "y": 6375.365117581507,
+                "bulge": 0
+              },
+              {
+                "x": -1249.1534082099222,
+                "y": 6362.726095254072,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-28554",
+            "lineType": "HIDDEN",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -745.8661102573637,
+                "y": 7556.713427428951,
+                "bulge": 0
+              },
+              {
+                "x": 1471.137755524536,
+                "y": 6679.2966164550535,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-28557",
+            "lineType": "continuous",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -451.8956495734206,
+                "y": 7419.674192948471,
+                "bulge": 0
+              },
+              {
+                "x": -451.2862233581271,
+                "y": 7419.433002206948,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-28558",
+            "lineType": "continuous",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -451.5698691643575,
+                "y": 7419.899052964724,
+                "bulge": 0
+              },
+              {
+                "x": -451.6909272752334,
+                "y": 7419.593170633272,
+                "bulge": 0
+              }
+            ]
+          },
+          {
+            "id": "polyline-28559",
+            "lineType": "HIDDEN",
+            "elevation": 0,
+            "vertices": [
+              {
+                "x": -456.0497661011225,
+                "y": 7408.630032499513,
+                "bulge": 0
+              },
+              {
+                "x": -901.070968416177,
+                "y": 6295.582890425047,
+                "bulge": 0
+              }
+            ]
+          }
+        ]
+      },
+      "summary": {
+        "newFireLineNoteCount": 1,
+        "backflowNoteCount": 1,
+        "cityWaterNoteCount": 7,
+        "riserCount": 5,
+        "fireLinePolylineCount": 12
+      },
+      "claims": {
+        "sourceHashVerified": true,
+        "sourceFireLineContextReady": true,
+        "fireLineToSprinklerCadRegistrationReady": false,
+        "undergroundInvertElevationReady": false,
+        "fabricationReady": false,
+        "fieldReleaseReady": false
+      }
+    },
+    "directionRule": "Hydraulic flow uses report upstream-to-downstream columns. Source-root topology and geometric downhill are separately named and never substituted for report flow or drainage intent."
+  },
+  "hydraulicReports": [
+    {
+      "description": "Light Hazard (ATTIC)",
+      "sourceSha256": "7BFEDCD59CAB07DB2045D8E4BC7F23770D8B3991019163153737AE4C1A8FC846",
+      "routeCount": 3,
+      "segmentCount": 33,
+      "nodeCount": 31,
+      "sourceNode": "1",
+      "sourceClosureReady": true,
+      "pipeRoleCounts": {
+        "branch-line": 25,
+        "cross-main": 4,
+        "feed-main": 1,
+        "feed-riser": 2,
+        "underground": 1
+      },
+      "segments": [
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 22.5,
+          "velocityFps": 3.93,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.025748,
+          "lengthRaw": "10'-0",
+          "lengthFt": 10,
+          "pressureFrictionPsi": 0.258,
+          "downstreamNode": "252",
+          "downstreamElevationRaw": "13'-8",
+          "downstreamElevationFt": 13.666667,
+          "downstreamDischargeGpm": 22.5,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 16.143,
+          "downstreamFittings": "Sprinkler",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.089,
+          "upstreamNode": "225",
+          "upstreamElevationRaw": "13'-10½",
+          "upstreamElevationFt": 13.875,
+          "upstreamPressurePsi": 16.312,
+          "upstreamFittings": null,
+          "totalLengthRaw": "10'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "225-to-252"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 45.12,
+          "velocityFps": 7.87,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.09327,
+          "lengthRaw": "9'-0",
+          "lengthFt": 9,
+          "pressureFrictionPsi": 1.765,
+          "downstreamNode": "225",
+          "downstreamElevationRaw": "13'-10½",
+          "downstreamElevationFt": 13.875,
+          "downstreamDischargeGpm": 22.62,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 16.312,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "9'-11",
+          "pressureElevationPsi": -0.08,
+          "upstreamNode": "23",
+          "upstreamElevationRaw": "14'-0½",
+          "upstreamElevationFt": 14.041667,
+          "upstreamPressurePsi": 17.997,
+          "upstreamFittings": "PO(9'-11)",
+          "totalLengthRaw": "18'-11",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "23-to-225"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 42.01,
+          "velocityFps": 5.75,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.045187,
+          "lengthRaw": "7'-0",
+          "lengthFt": 7,
+          "pressureFrictionPsi": 0.316,
+          "downstreamNode": "23",
+          "downstreamElevationRaw": "14'-0½",
+          "downstreamElevationFt": 14.041667,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 17.997,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.008,
+          "upstreamNode": "194",
+          "upstreamElevationRaw": "14'-1",
+          "upstreamElevationFt": 14.083333,
+          "upstreamPressurePsi": 18.305,
+          "upstreamFittings": null,
+          "totalLengthRaw": "7'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "194-to-23"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 65.97,
+          "velocityFps": 9.02,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.104135,
+          "lengthRaw": "5'-0",
+          "lengthFt": 5,
+          "pressureFrictionPsi": 0.521,
+          "downstreamNode": "194",
+          "downstreamElevationRaw": "14'-1",
+          "downstreamElevationFt": 14.083333,
+          "downstreamDischargeGpm": 23.96,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 18.305,
+          "downstreamFittings": "Sprinkler",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.006,
+          "upstreamNode": "21",
+          "upstreamElevationRaw": "14'-1",
+          "upstreamElevationFt": 14.083333,
+          "upstreamPressurePsi": 18.82,
+          "upstreamFittings": null,
+          "totalLengthRaw": "5'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "21-to-194"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 112.12,
+          "velocityFps": 15.34,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.2778,
+          "lengthRaw": "8'-9",
+          "lengthFt": 8.75,
+          "pressureFrictionPsi": 7.135,
+          "downstreamNode": "21",
+          "downstreamElevationRaw": "14'-1",
+          "downstreamElevationFt": 14.083333,
+          "downstreamDischargeGpm": 46.15,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 18.82,
+          "downstreamFittings": "Flow (q) from Route 3",
+          "equivalentLengthRaw": "16'-11",
+          "pressureElevationPsi": 1.34,
+          "upstreamNode": "171",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 27.295,
+          "upstreamFittings": "E(5'-7½), PO(11'-3½)",
+          "totalLengthRaw": "25'-8",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "171-to-21"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 2.705,
+          "flowGpm": 112.12,
+          "velocityFps": 6.26,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.031327,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 0.345,
+          "downstreamNode": "171",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 27.295,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.004,
+          "upstreamNode": "15",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 27.635,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "15-to-171"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 2.705,
+          "flowGpm": 141.01,
+          "velocityFps": 7.87,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.047878,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 1.423,
+          "downstreamNode": "15",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": 28.89,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 27.635,
+          "downstreamFittings": "Flow (q) from Route 5",
+          "equivalentLengthRaw": "18'-8½",
+          "pressureElevationPsi": -0.004,
+          "upstreamNode": "9",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 29.054,
+          "upstreamFittings": "PO(18'-8½)",
+          "totalLengthRaw": "29'-8½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "9-to-15"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 2.705,
+          "flowGpm": 69.68,
+          "velocityFps": 3.89,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.012995,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 0.629,
+          "downstreamNode": "9",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 29.054,
+          "downstreamFittings": "PO(18'-8½)",
+          "equivalentLengthRaw": "37'-5",
+          "pressureElevationPsi": -0.004,
+          "upstreamNode": "5",
+          "upstreamElevationRaw": "11'-0½",
+          "upstreamElevationFt": 11.041667,
+          "upstreamPressurePsi": 29.679,
+          "upstreamFittings": "PO(18'-8½)",
+          "totalLengthRaw": "48'-5",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "5-to-9"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 69.68,
+          "velocityFps": 12.16,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.208442,
+          "lengthRaw": "176'-3",
+          "lengthFt": 176.25,
+          "pressureFrictionPsi": 40.876,
+          "downstreamNode": "5",
+          "downstreamElevationRaw": "11'-0½",
+          "downstreamElevationFt": 11.041667,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 29.679,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "19'-10",
+          "pressureElevationPsi": -1.448,
+          "upstreamNode": "8",
+          "upstreamElevationRaw": "14'-4½",
+          "upstreamElevationFt": 14.375,
+          "upstreamPressurePsi": 69.107,
+          "upstreamFittings": "2E(4'-11½), PO(9'-11)",
+          "totalLengthRaw": "196'-1",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "8-to-5"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "CM",
+          "pipeRole": "cross-main",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 69.68,
+          "velocityFps": 2.56,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.004695,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 0.052,
+          "downstreamNode": "8",
+          "downstreamElevationRaw": "14'-4½",
+          "downstreamElevationFt": 14.375,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 69.107,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": null,
+          "upstreamNode": "11",
+          "upstreamElevationRaw": "14'-4½",
+          "upstreamElevationFt": 14.375,
+          "upstreamPressurePsi": 69.159,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "11-to-8"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "CM",
+          "pipeRole": "cross-main",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 141.01,
+          "velocityFps": 5.18,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.017296,
+          "lengthRaw": "5'-6",
+          "lengthFt": 5.5,
+          "pressureFrictionPsi": 0.277,
+          "downstreamNode": "11",
+          "downstreamElevationRaw": "14'-4½",
+          "downstreamElevationFt": 14.375,
+          "downstreamDischargeGpm": 71.33,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 69.159,
+          "downstreamFittings": "Flow (q) from Route 7",
+          "equivalentLengthRaw": "10'-6",
+          "pressureElevationPsi": null,
+          "upstreamNode": "14",
+          "upstreamElevationRaw": "14'-4½",
+          "upstreamElevationFt": 14.375,
+          "upstreamPressurePsi": 69.435,
+          "upstreamFittings": "E(10'-6)",
+          "totalLengthRaw": "16'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "14-to-11"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "FM",
+          "pipeRole": "feed-main",
+          "diameterInternalInches": 3.26,
+          "flowGpm": 141.01,
+          "velocityFps": 5.42,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.019294,
+          "lengthRaw": "3'-4½",
+          "lengthFt": 3.375,
+          "pressureFrictionPsi": 0.161,
+          "downstreamNode": "14",
+          "downstreamElevationRaw": "14'-4½",
+          "downstreamElevationFt": 14.375,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 69.435,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "5'-0",
+          "pressureElevationPsi": 1.461,
+          "upstreamNode": "13",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 71.058,
+          "upstreamFittings": "Tr(5'-0)",
+          "totalLengthRaw": "8'-4½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "13-to-14"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "FR",
+          "pipeRole": "feed-riser",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 345.65,
+          "velocityFps": 12.7,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.090845,
+          "lengthRaw": "10'-9",
+          "lengthFt": 10.75,
+          "pressureFrictionPsi": 7.791,
+          "downstreamNode": "13",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": 204.64,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 71.058,
+          "downstreamFittings": "Flow (q) from Route 2",
+          "equivalentLengthRaw": "20'-0",
+          "pressureElevationPsi": 4.579,
+          "upstreamNode": "116",
+          "upstreamElevationRaw": "0'-5",
+          "upstreamElevationFt": 0.416667,
+          "upstreamPressurePsi": 83.429,
+          "upstreamFittings": "Tr(5'-0), BFP(-5.000), 2fE(7'-6)",
+          "totalLengthRaw": "30'-8½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "116-to-13"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "FR",
+          "pipeRole": "feed-riser",
+          "diameterInternalInches": 4.31,
+          "flowGpm": 345.65,
+          "velocityFps": 7.6,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.026016,
+          "lengthRaw": "5'-6",
+          "lengthFt": 5.5,
+          "pressureFrictionPsi": 0.506,
+          "downstreamNode": "116",
+          "downstreamElevationRaw": "0'-5",
+          "downstreamElevationFt": 0.416667,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 83.429,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "13'-11",
+          "pressureElevationPsi": 2.384,
+          "upstreamNode": "2",
+          "upstreamElevationRaw": "-5'-1",
+          "upstreamElevationFt": -5.083333,
+          "upstreamPressurePsi": 86.319,
+          "upstreamFittings": "E(13'-11)",
+          "totalLengthRaw": "19'-5",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "2-to-116"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "UG",
+          "pipeRole": "underground",
+          "diameterInternalInches": 4.22,
+          "flowGpm": 345.65,
+          "velocityFps": 7.93,
+          "hazenWilliamsC": 140,
+          "frictionLossPsiPerFt": 0.021678,
+          "lengthRaw": "64'-5",
+          "lengthFt": 64.416667,
+          "pressureFrictionPsi": 1.759,
+          "downstreamNode": "2",
+          "downstreamElevationRaw": "-5'-1",
+          "downstreamElevationFt": -5.083333,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 86.319,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "16'-8½",
+          "pressureElevationPsi": null,
+          "upstreamNode": "1",
+          "upstreamElevationRaw": "-5'-1",
+          "upstreamElevationFt": -5.083333,
+          "upstreamPressurePsi": 88.078,
+          "upstreamFittings": "S",
+          "totalLengthRaw": "81'-1½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "1-to-2"
+        },
+        {
+          "page": 6,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 22.59,
+          "velocityFps": 3.94,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.025933,
+          "lengthRaw": "10'-0",
+          "lengthFt": 10,
+          "pressureFrictionPsi": 0.259,
+          "downstreamNode": "253",
+          "downstreamElevationRaw": "13'-8",
+          "downstreamElevationFt": 13.666667,
+          "downstreamDischargeGpm": 22.59,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 16.269,
+          "downstreamFittings": "Sprinkler",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.082,
+          "upstreamNode": "226",
+          "upstreamElevationRaw": "13'-10½",
+          "upstreamElevationFt": 13.875,
+          "upstreamPressurePsi": 16.446,
+          "upstreamFittings": null,
+          "totalLengthRaw": "10'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "226-to-253"
+        },
+        {
+          "page": 6,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 45.3,
+          "velocityFps": 7.9,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.09396,
+          "lengthRaw": "9'-0",
+          "lengthFt": 9,
+          "pressureFrictionPsi": 1.778,
+          "downstreamNode": "226",
+          "downstreamElevationRaw": "13'-10½",
+          "downstreamElevationFt": 13.875,
+          "downstreamDischargeGpm": 22.71,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 16.446,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "9'-11",
+          "pressureElevationPsi": -0.073,
+          "upstreamNode": "25",
+          "upstreamElevationRaw": "14'-0½",
+          "upstreamElevationFt": 14.041667,
+          "upstreamPressurePsi": 18.151,
+          "upstreamFittings": "PO(9'-11)",
+          "totalLengthRaw": "18'-11",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "25-to-226"
+        },
+        {
+          "page": 6,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 72.17,
+          "velocityFps": 9.87,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.122953,
+          "lengthRaw": "5'-0",
+          "lengthFt": 5,
+          "pressureFrictionPsi": 0.615,
+          "downstreamNode": "25",
+          "downstreamElevationRaw": "14'-0½",
+          "downstreamElevationFt": 14.041667,
+          "downstreamDischargeGpm": 26.87,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 18.151,
+          "downstreamFittings": "Flow (q) from Route 4",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.006,
+          "upstreamNode": "196",
+          "upstreamElevationRaw": "14'-0",
+          "upstreamElevationFt": 14,
+          "upstreamPressurePsi": 18.771,
+          "upstreamFittings": null,
+          "totalLengthRaw": "5'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "196-to-25"
+        },
+        {
+          "page": 6,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 96.43,
+          "velocityFps": 13.19,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.210184,
+          "lengthRaw": "12'-0",
+          "lengthFt": 12,
+          "pressureFrictionPsi": 2.522,
+          "downstreamNode": "196",
+          "downstreamElevationRaw": "14'-0",
+          "downstreamElevationFt": 14,
+          "downstreamDischargeGpm": 24.26,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 18.771,
+          "downstreamFittings": "Sprinkler",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.014,
+          "upstreamNode": "197",
+          "upstreamElevationRaw": "14'-0",
+          "upstreamElevationFt": 14,
+          "upstreamPressurePsi": 21.307,
+          "upstreamFittings": null,
+          "totalLengthRaw": "12'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "197-to-196"
+        },
+        {
+          "page": 6,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 122.28,
+          "velocityFps": 16.73,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.326145,
+          "lengthRaw": "128'-6½",
+          "lengthFt": 128.541667,
+          "pressureFrictionPsi": 47.45,
+          "downstreamNode": "197",
+          "downstreamElevationRaw": "14'-0",
+          "downstreamElevationFt": 14,
+          "downstreamDischargeGpm": 25.85,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 21.307,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "16'-11",
+          "pressureElevationPsi": 1.294,
+          "upstreamNode": "43",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 70.051,
+          "upstreamFittings": "E(5'-7½), PO(11'-3½)",
+          "totalLengthRaw": "145'-6",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "43-to-197"
+        },
+        {
+          "page": 6,
+          "route": 2,
+          "pipeType": "CM",
+          "pipeRole": "cross-main",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 122.28,
+          "velocityFps": 4.49,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.013286,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 0.146,
+          "downstreamNode": "43",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 70.051,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": null,
+          "upstreamNode": "17",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 70.197,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "17-to-43"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "CM",
+          "pipeRole": "cross-main",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 204.64,
+          "velocityFps": 7.52,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.034446,
+          "lengthRaw": "5'-6",
+          "lengthFt": 5.5,
+          "pressureFrictionPsi": 0.861,
+          "downstreamNode": "17",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": 82.36,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 70.197,
+          "downstreamFittings": "Flow (q) from Route 6",
+          "equivalentLengthRaw": "19'-6",
+          "pressureElevationPsi": null,
+          "upstreamNode": "13",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 71.058,
+          "upstreamFittings": "fT(19'-6)",
+          "totalLengthRaw": "25'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "13-to-17"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 23.02,
+          "velocityFps": 4.02,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.026853,
+          "lengthRaw": "10'-0",
+          "lengthFt": 10,
+          "pressureFrictionPsi": 0.269,
+          "downstreamNode": "251",
+          "downstreamElevationRaw": "13'-8",
+          "downstreamElevationFt": 13.666667,
+          "downstreamDischargeGpm": 23.02,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 16.894,
+          "downstreamFittings": "Sprinkler",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.096,
+          "upstreamNode": "224",
+          "upstreamElevationRaw": "13'-10½",
+          "upstreamElevationFt": 13.875,
+          "upstreamPressurePsi": 17.066,
+          "upstreamFittings": null,
+          "totalLengthRaw": "10'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "224-to-251"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 46.15,
+          "velocityFps": 8.05,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.097263,
+          "lengthRaw": "9'-0",
+          "lengthFt": 9,
+          "pressureFrictionPsi": 1.84,
+          "downstreamNode": "224",
+          "downstreamElevationRaw": "13'-10½",
+          "downstreamElevationFt": 13.875,
+          "downstreamDischargeGpm": 23.13,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 17.066,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "9'-11",
+          "pressureElevationPsi": -0.086,
+          "upstreamNode": "21",
+          "upstreamElevationRaw": "14'-1",
+          "upstreamElevationFt": 14.083333,
+          "upstreamPressurePsi": 18.82,
+          "upstreamFittings": "PO(9'-11)",
+          "totalLengthRaw": "18'-11",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "21-to-224"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 26.87,
+          "velocityFps": 3.68,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.019767,
+          "lengthRaw": "7'-0",
+          "lengthFt": 7,
+          "pressureFrictionPsi": 0.138,
+          "downstreamNode": "195",
+          "downstreamElevationRaw": "14'-0½",
+          "downstreamElevationFt": 14.041667,
+          "downstreamDischargeGpm": 3.11,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 18.004,
+          "downstreamFittings": "Sprinkler, Flow (q) from Route 8",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.008,
+          "upstreamNode": "25",
+          "upstreamElevationRaw": "14'-0½",
+          "upstreamElevationFt": 14.041667,
+          "upstreamPressurePsi": 18.151,
+          "upstreamFittings": null,
+          "totalLengthRaw": "7'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "25-to-195"
+        },
+        {
+          "page": 7,
+          "route": 5,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 1.41,
+          "velocityFps": 0.25,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.000153,
+          "lengthRaw": "12'-0",
+          "lengthFt": 12,
+          "pressureFrictionPsi": 0.002,
+          "downstreamNode": "165",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 27.48,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 24.085,
+          "downstreamFittings": "Sprinkler",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.001,
+          "upstreamNode": "164",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 24.086,
+          "upstreamFittings": null,
+          "totalLengthRaw": "12'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "164-to-165"
+        },
+        {
+          "page": 7,
+          "route": 5,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 28.89,
+          "velocityFps": 5.04,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.040899,
+          "lengthRaw": "10'-7½",
+          "lengthFt": 10.625,
+          "pressureFrictionPsi": 0.638,
+          "downstreamNode": "164",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 27.48,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 24.086,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "4'-11½",
+          "pressureElevationPsi": -0.001,
+          "upstreamNode": "35",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 24.723,
+          "upstreamFittings": "E(4'-11½)",
+          "totalLengthRaw": "15'-7",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "35-to-164"
+        },
+        {
+          "page": 7,
+          "route": 5,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 28.89,
+          "velocityFps": 3.95,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.022611,
+          "lengthRaw": "5'-10",
+          "lengthFt": 5.833333,
+          "pressureFrictionPsi": 0.387,
+          "downstreamNode": "35",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 24.723,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "11'-3½",
+          "pressureElevationPsi": 2.525,
+          "upstreamNode": "15",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 27.635,
+          "upstreamFittings": "PO(11'-3½)",
+          "totalLengthRaw": "17'-1½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "15-to-35"
+        },
+        {
+          "page": 7,
+          "route": 5,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 26.07,
+          "velocityFps": 4.55,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.033815,
+          "lengthRaw": "12'-0",
+          "lengthFt": 12,
+          "pressureFrictionPsi": 0.406,
+          "downstreamNode": "165",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 27.48,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 24.085,
+          "downstreamFittings": "Sprinkler",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.001,
+          "upstreamNode": "166",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 24.491,
+          "upstreamFittings": null,
+          "totalLengthRaw": "12'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "166-to-165"
+        },
+        {
+          "page": 7,
+          "route": 5,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 53.78,
+          "velocityFps": 9.39,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.1291,
+          "lengthRaw": "12'-0",
+          "lengthFt": 12,
+          "pressureFrictionPsi": 1.549,
+          "downstreamNode": "166",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 27.71,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 24.491,
+          "downstreamFittings": "Sprinkler",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.001,
+          "upstreamNode": "167",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 26.041,
+          "upstreamFittings": null,
+          "totalLengthRaw": "12'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "167-to-166"
+        },
+        {
+          "page": 7,
+          "route": 5,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 82.36,
+          "velocityFps": 14.37,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.283987,
+          "lengthRaw": "131'-8½",
+          "lengthFt": 131.708333,
+          "pressureFrictionPsi": 41.629,
+          "downstreamNode": "167",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 28.58,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 26.041,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "14'-10½",
+          "pressureElevationPsi": 2.527,
+          "upstreamNode": "17",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 70.197,
+          "upstreamFittings": "E(4'-11½), PO(9'-11)",
+          "totalLengthRaw": "146'-7",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "17-to-167"
+        },
+        {
+          "page": 7,
+          "route": 5,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 71.33,
+          "velocityFps": 12.45,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.217664,
+          "lengthRaw": "176'-0½",
+          "lengthFt": 176.041667,
+          "pressureFrictionPsi": 41.557,
+          "downstreamNode": "9",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": 69.68,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 29.054,
+          "downstreamFittings": "Flow (q) from Route 1",
+          "equivalentLengthRaw": "14'-10½",
+          "pressureElevationPsi": -1.452,
+          "upstreamNode": "11",
+          "upstreamElevationRaw": "14'-4½",
+          "upstreamElevationFt": 14.375,
+          "upstreamPressurePsi": 69.159,
+          "upstreamFittings": "E(4'-11½), PO(9'-11)",
+          "totalLengthRaw": "190'-11",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "11-to-9"
+        },
+        {
+          "page": 7,
+          "route": 5,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 3.11,
+          "velocityFps": 0.43,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.000365,
+          "lengthRaw": "5'-0",
+          "lengthFt": 5,
+          "pressureFrictionPsi": 0.002,
+          "downstreamNode": "23",
+          "downstreamElevationRaw": "14'-0½",
+          "downstreamElevationFt": 14.041667,
+          "downstreamDischargeGpm": 42.01,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 17.997,
+          "downstreamFittings": "Flow (q) from Route 1",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.006,
+          "upstreamNode": "195",
+          "upstreamElevationRaw": "14'-0½",
+          "upstreamElevationFt": 14.041667,
+          "upstreamPressurePsi": 18.004,
+          "upstreamFittings": null,
+          "totalLengthRaw": "5'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "195-to-23"
+        }
+      ]
+    },
+    {
+      "description": "Light Hazard (BELOW CEILING)",
+      "sourceSha256": "690BFA978E60A7B4704F0DCDFD9FAE4BA5A87EBD8E6C7C38BD62BF22D8D24EA9",
+      "routeCount": 4,
+      "segmentCount": 49,
+      "nodeCount": 47,
+      "sourceNode": "1",
+      "sourceClosureReady": true,
+      "pipeRoleCounts": {
+        "arm-over": 15,
+        "branch-line": 26,
+        "cross-main": 4,
+        "feed-main": 1,
+        "feed-riser": 2,
+        "underground": 1
+      },
+      "segments": [
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 21,
+          "velocityFps": 7.8,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.142424,
+          "lengthRaw": "3'-1½",
+          "lengthFt": 3.125,
+          "pressureFrictionPsi": 4.861,
+          "downstreamNode": "538",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 21,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 14.063,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.609,
+          "upstreamNode": "297",
+          "upstreamElevationRaw": "13'-8½",
+          "upstreamElevationFt": 13.708333,
+          "upstreamPressurePsi": 17.314,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "34'-1½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "297-to-538"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 21,
+          "velocityFps": 3.66,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.022663,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 0.249,
+          "downstreamNode": "297",
+          "downstreamElevationRaw": "13'-8½",
+          "downstreamElevationFt": 13.708333,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 17.314,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.098,
+          "upstreamNode": "244",
+          "upstreamElevationRaw": "13'-11",
+          "upstreamElevationFt": 13.916667,
+          "upstreamPressurePsi": 17.466,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "244-to-297"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 42.12,
+          "velocityFps": 7.35,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.08214,
+          "lengthRaw": "0'-9½",
+          "lengthFt": 0.791667,
+          "pressureFrictionPsi": 0.065,
+          "downstreamNode": "244",
+          "downstreamElevationRaw": "13'-11",
+          "downstreamElevationFt": 13.916667,
+          "downstreamDischargeGpm": 21.12,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 17.466,
+          "downstreamFittings": "Flow (q) from Route 2",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.007,
+          "upstreamNode": "243",
+          "upstreamElevationRaw": "13'-11½",
+          "upstreamElevationFt": 13.958333,
+          "upstreamPressurePsi": 17.524,
+          "upstreamFittings": null,
+          "totalLengthRaw": "0'-9½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "243-to-244"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 63.25,
+          "velocityFps": 11.04,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.174251,
+          "lengthRaw": "5'-2½",
+          "lengthFt": 5.208333,
+          "pressureFrictionPsi": 2.636,
+          "downstreamNode": "243",
+          "downstreamElevationRaw": "13'-11½",
+          "downstreamElevationFt": 13.958333,
+          "downstreamDischargeGpm": 21.13,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 17.524,
+          "downstreamFittings": "Flow (q) from Route 3",
+          "equivalentLengthRaw": "9'-11",
+          "pressureElevationPsi": -0.046,
+          "upstreamNode": "23",
+          "upstreamElevationRaw": "14'-0½",
+          "upstreamElevationFt": 14.041667,
+          "upstreamPressurePsi": 20.113,
+          "upstreamFittings": "PO(9'-11)",
+          "totalLengthRaw": "15'-1½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "23-to-243"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 35.91,
+          "velocityFps": 4.91,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.033806,
+          "lengthRaw": "12'-0",
+          "lengthFt": 12,
+          "pressureFrictionPsi": 0.406,
+          "downstreamNode": "23",
+          "downstreamElevationRaw": "14'-0½",
+          "downstreamElevationFt": 14.041667,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 20.113,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.014,
+          "upstreamNode": "21",
+          "upstreamElevationRaw": "14'-1",
+          "upstreamElevationFt": 14.083333,
+          "upstreamPressurePsi": 20.506,
+          "upstreamFittings": null,
+          "totalLengthRaw": "12'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "21-to-23"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 79.88,
+          "velocityFps": 10.93,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.148376,
+          "lengthRaw": "0'-7",
+          "lengthFt": 0.583333,
+          "pressureFrictionPsi": 0.089,
+          "downstreamNode": "21",
+          "downstreamElevationRaw": "14'-1",
+          "downstreamElevationFt": 14.083333,
+          "downstreamDischargeGpm": 43.97,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 20.506,
+          "downstreamFittings": "Flow (q) from Route 4",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.001,
+          "upstreamNode": "170",
+          "upstreamElevationRaw": "14'-1",
+          "upstreamElevationFt": 14.083333,
+          "upstreamPressurePsi": 20.594,
+          "upstreamFittings": null,
+          "totalLengthRaw": "0'-7",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "170-to-21"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 102.62,
+          "velocityFps": 14.04,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.235837,
+          "lengthRaw": "8'-2",
+          "lengthFt": 8.166667,
+          "pressureFrictionPsi": 5.915,
+          "downstreamNode": "170",
+          "downstreamElevationRaw": "14'-1",
+          "downstreamElevationFt": 14.083333,
+          "downstreamDischargeGpm": 22.74,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 20.594,
+          "downstreamFittings": "Flow (q) from Route 9",
+          "equivalentLengthRaw": "16'-11",
+          "pressureElevationPsi": 1.34,
+          "upstreamNode": "171",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 27.85,
+          "upstreamFittings": "E(5'-7½), PO(11'-3½)",
+          "totalLengthRaw": "25'-1",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "171-to-170"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 2.705,
+          "flowGpm": 102.62,
+          "velocityFps": 5.73,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.026595,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 0.293,
+          "downstreamNode": "171",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 27.85,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.004,
+          "upstreamNode": "15",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 28.138,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "15-to-171"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 2.705,
+          "flowGpm": 141.55,
+          "velocityFps": 7.9,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.048215,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 1.433,
+          "downstreamNode": "15",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": 38.93,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 28.138,
+          "downstreamFittings": "Flow (q) from Route 12",
+          "equivalentLengthRaw": "18'-8½",
+          "pressureElevationPsi": -0.004,
+          "upstreamNode": "9",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 29.567,
+          "upstreamFittings": "PO(18'-8½)",
+          "totalLengthRaw": "29'-8½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "9-to-15"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 2.705,
+          "flowGpm": 69.95,
+          "velocityFps": 3.91,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.013086,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 0.634,
+          "downstreamNode": "9",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 29.567,
+          "downstreamFittings": "PO(18'-8½)",
+          "equivalentLengthRaw": "37'-5",
+          "pressureElevationPsi": -0.004,
+          "upstreamNode": "5",
+          "upstreamElevationRaw": "11'-0½",
+          "upstreamElevationFt": 11.041667,
+          "upstreamPressurePsi": 30.197,
+          "upstreamFittings": "PO(18'-8½)",
+          "totalLengthRaw": "48'-5",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "5-to-9"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 69.95,
+          "velocityFps": 12.21,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.209908,
+          "lengthRaw": "176'-3",
+          "lengthFt": 176.25,
+          "pressureFrictionPsi": 41.164,
+          "downstreamNode": "5",
+          "downstreamElevationRaw": "11'-0½",
+          "downstreamElevationFt": 11.041667,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 30.197,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "19'-10",
+          "pressureElevationPsi": -1.448,
+          "upstreamNode": "8",
+          "upstreamElevationRaw": "14'-4½",
+          "upstreamElevationFt": 14.375,
+          "upstreamPressurePsi": 69.912,
+          "upstreamFittings": "2E(4'-11½), PO(9'-11)",
+          "totalLengthRaw": "196'-1",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "8-to-5"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "CM",
+          "pipeRole": "cross-main",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 69.95,
+          "velocityFps": 2.57,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.004728,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 0.052,
+          "downstreamNode": "8",
+          "downstreamElevationRaw": "14'-4½",
+          "downstreamElevationFt": 14.375,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 69.912,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": null,
+          "upstreamNode": "11",
+          "upstreamElevationRaw": "14'-4½",
+          "upstreamElevationFt": 14.375,
+          "upstreamPressurePsi": 69.964,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "11-to-8"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "CM",
+          "pipeRole": "cross-main",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 141.55,
+          "velocityFps": 5.2,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.017418,
+          "lengthRaw": "5'-6",
+          "lengthFt": 5.5,
+          "pressureFrictionPsi": 0.279,
+          "downstreamNode": "11",
+          "downstreamElevationRaw": "14'-4½",
+          "downstreamElevationFt": 14.375,
+          "downstreamDischargeGpm": 71.6,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 69.964,
+          "downstreamFittings": "Flow (q) from Route 16",
+          "equivalentLengthRaw": "10'-6",
+          "pressureElevationPsi": null,
+          "upstreamNode": "14",
+          "upstreamElevationRaw": "14'-4½",
+          "upstreamElevationFt": 14.375,
+          "upstreamPressurePsi": 70.243,
+          "upstreamFittings": "E(10'-6)",
+          "totalLengthRaw": "16'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "14-to-11"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "FM",
+          "pipeRole": "feed-main",
+          "diameterInternalInches": 3.26,
+          "flowGpm": 141.55,
+          "velocityFps": 5.44,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.01943,
+          "lengthRaw": "3'-4½",
+          "lengthFt": 3.375,
+          "pressureFrictionPsi": 0.163,
+          "downstreamNode": "14",
+          "downstreamElevationRaw": "14'-4½",
+          "downstreamElevationFt": 14.375,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 70.243,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "5'-0",
+          "pressureElevationPsi": 1.461,
+          "upstreamNode": "13",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 71.866,
+          "upstreamFittings": "Tr(5'-0)",
+          "totalLengthRaw": "8'-4½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "13-to-14"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "FR",
+          "pipeRole": "feed-riser",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 345.69,
+          "velocityFps": 12.7,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.090861,
+          "lengthRaw": "10'-9",
+          "lengthFt": 10.75,
+          "pressureFrictionPsi": 7.792,
+          "downstreamNode": "13",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": 204.14,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 71.866,
+          "downstreamFittings": "Flow (q) from Route 6",
+          "equivalentLengthRaw": "20'-0",
+          "pressureElevationPsi": 4.579,
+          "upstreamNode": "116",
+          "upstreamElevationRaw": "0'-5",
+          "upstreamElevationFt": 0.416667,
+          "upstreamPressurePsi": 84.237,
+          "upstreamFittings": "Tr(5'-0), BFP(-5.000), 2fE(7'-6)",
+          "totalLengthRaw": "30'-8½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "116-to-13"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "FR",
+          "pipeRole": "feed-riser",
+          "diameterInternalInches": 4.31,
+          "flowGpm": 345.69,
+          "velocityFps": 7.6,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.026021,
+          "lengthRaw": "5'-6",
+          "lengthFt": 5.5,
+          "pressureFrictionPsi": 0.506,
+          "downstreamNode": "116",
+          "downstreamElevationRaw": "0'-5",
+          "downstreamElevationFt": 0.416667,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 84.237,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "13'-11",
+          "pressureElevationPsi": 2.384,
+          "upstreamNode": "2",
+          "upstreamElevationRaw": "-5'-1",
+          "upstreamElevationFt": -5.083333,
+          "upstreamPressurePsi": 87.128,
+          "upstreamFittings": "E(13'-11)",
+          "totalLengthRaw": "19'-5",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "2-to-116"
+        },
+        {
+          "page": 6,
+          "route": 1,
+          "pipeType": "UG",
+          "pipeRole": "underground",
+          "diameterInternalInches": 4.22,
+          "flowGpm": 345.69,
+          "velocityFps": 7.93,
+          "hazenWilliamsC": 140,
+          "frictionLossPsiPerFt": 0.021682,
+          "lengthRaw": "64'-5",
+          "lengthFt": 64.416667,
+          "pressureFrictionPsi": 1.759,
+          "downstreamNode": "2",
+          "downstreamElevationRaw": "-5'-1",
+          "downstreamElevationFt": -5.083333,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 87.128,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "16'-8½",
+          "pressureElevationPsi": null,
+          "upstreamNode": "1",
+          "upstreamElevationRaw": "-5'-1",
+          "upstreamElevationFt": -5.083333,
+          "upstreamPressurePsi": 88.887,
+          "upstreamFittings": "S",
+          "totalLengthRaw": "81'-1½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "1-to-2"
+        },
+        {
+          "page": 6,
+          "route": 2,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 21.12,
+          "velocityFps": 7.84,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.143963,
+          "lengthRaw": "3'-4",
+          "lengthFt": 3.333333,
+          "pressureFrictionPsi": 4.946,
+          "downstreamNode": "514",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 21.12,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 14.227,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.707,
+          "upstreamNode": "244",
+          "upstreamElevationRaw": "13'-11",
+          "upstreamElevationFt": 13.916667,
+          "upstreamPressurePsi": 17.466,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "34'-4",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "244-to-514"
+        },
+        {
+          "page": 6,
+          "route": 2,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 21.13,
+          "velocityFps": 7.84,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.144037,
+          "lengthRaw": "3'-9",
+          "lengthFt": 3.75,
+          "pressureFrictionPsi": 5.003,
+          "downstreamNode": "513",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 21.13,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 14.235,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.714,
+          "upstreamNode": "243",
+          "upstreamElevationRaw": "13'-11½",
+          "upstreamElevationFt": 13.958333,
+          "upstreamPressurePsi": 17.524,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "34'-9",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "243-to-513"
+        },
+        {
+          "page": 6,
+          "route": 2,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 21.92,
+          "velocityFps": 8.14,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.154227,
+          "lengthRaw": "3'-1½",
+          "lengthFt": 3.125,
+          "pressureFrictionPsi": 5.264,
+          "downstreamNode": "537",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 21.92,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 15.327,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.611,
+          "upstreamNode": "294",
+          "upstreamElevationRaw": "13'-8½",
+          "upstreamElevationFt": 13.708333,
+          "upstreamPressurePsi": 18.98,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "34'-1½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "294-to-537"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 21.92,
+          "velocityFps": 3.83,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.024541,
+          "lengthRaw": "10'-11½",
+          "lengthFt": 10.958333,
+          "pressureFrictionPsi": 0.269,
+          "downstreamNode": "294",
+          "downstreamElevationRaw": "13'-8½",
+          "downstreamElevationFt": 13.708333,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 18.98,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.105,
+          "upstreamNode": "249",
+          "upstreamElevationRaw": "13'-11½",
+          "upstreamElevationFt": 13.958333,
+          "upstreamPressurePsi": 19.144,
+          "upstreamFittings": null,
+          "totalLengthRaw": "10'-11½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "249-to-294"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 43.97,
+          "velocityFps": 7.67,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.088938,
+          "lengthRaw": "6'-0½",
+          "lengthFt": 6.041667,
+          "pressureFrictionPsi": 1.419,
+          "downstreamNode": "249",
+          "downstreamElevationRaw": "13'-11½",
+          "downstreamElevationFt": 13.958333,
+          "downstreamDischargeGpm": 22.05,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 19.144,
+          "downstreamFittings": "Flow (q) from Route 5",
+          "equivalentLengthRaw": "9'-11",
+          "pressureElevationPsi": -0.058,
+          "upstreamNode": "21",
+          "upstreamElevationRaw": "14'-1",
+          "upstreamElevationFt": 14.083333,
+          "upstreamPressurePsi": 20.506,
+          "upstreamFittings": "PO(9'-11)",
+          "totalLengthRaw": "15'-11½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "21-to-249"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 22.05,
+          "velocityFps": 8.19,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.15586,
+          "lengthRaw": "3'-4½",
+          "lengthFt": 3.375,
+          "pressureFrictionPsi": 5.358,
+          "downstreamNode": "515",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 22.05,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 15.502,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.716,
+          "upstreamNode": "249",
+          "upstreamElevationRaw": "13'-11½",
+          "upstreamElevationFt": 13.958333,
+          "upstreamPressurePsi": 19.144,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "34'-4½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "249-to-515"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 22.18,
+          "velocityFps": 8.23,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.157613,
+          "lengthRaw": "3'-1½",
+          "lengthFt": 3.125,
+          "pressureFrictionPsi": 5.382,
+          "downstreamNode": "536",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 22.18,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 15.691,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.616,
+          "upstreamNode": "291",
+          "upstreamElevationRaw": "13'-8½",
+          "upstreamElevationFt": 13.708333,
+          "upstreamPressurePsi": 19.456,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "34'-1½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "291-to-536"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 22.18,
+          "velocityFps": 3.87,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.02508,
+          "lengthRaw": "12'-7½",
+          "lengthFt": 12.625,
+          "pressureFrictionPsi": 0.317,
+          "downstreamNode": "291",
+          "downstreamElevationRaw": "13'-8½",
+          "downstreamElevationFt": 13.708333,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 19.456,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": -0.103,
+          "upstreamNode": "238",
+          "upstreamElevationRaw": "13'-11½",
+          "upstreamElevationFt": 13.958333,
+          "upstreamPressurePsi": 19.67,
+          "upstreamFittings": null,
+          "totalLengthRaw": "12'-7½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "238-to-291"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 44.51,
+          "velocityFps": 7.77,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.090975,
+          "lengthRaw": "3'-4",
+          "lengthFt": 3.333333,
+          "pressureFrictionPsi": 1.204,
+          "downstreamNode": "238",
+          "downstreamElevationRaw": "13'-11½",
+          "downstreamElevationFt": 13.958333,
+          "downstreamDischargeGpm": 22.33,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 19.67,
+          "downstreamFittings": "Flow (q) from Route 7",
+          "equivalentLengthRaw": "9'-11",
+          "pressureElevationPsi": -0.027,
+          "upstreamNode": "25",
+          "upstreamElevationRaw": "14'-0½",
+          "upstreamElevationFt": 14.041667,
+          "upstreamPressurePsi": 20.846,
+          "upstreamFittings": "PO(9'-11)",
+          "totalLengthRaw": "13'-3",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "25-to-238"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 94.44,
+          "velocityFps": 12.92,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.202234,
+          "lengthRaw": "15'-4",
+          "lengthFt": 15.333333,
+          "pressureFrictionPsi": 3.103,
+          "downstreamNode": "25",
+          "downstreamElevationRaw": "14'-0½",
+          "downstreamElevationFt": 14.041667,
+          "downstreamDischargeGpm": 49.93,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 20.846,
+          "downstreamFittings": "Flow (q) from Route 8",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.017,
+          "upstreamNode": "176",
+          "upstreamElevationRaw": "14'-0",
+          "upstreamElevationFt": 14,
+          "upstreamPressurePsi": 23.966,
+          "upstreamFittings": null,
+          "totalLengthRaw": "15'-4",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "176-to-25"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 118.96,
+          "velocityFps": 16.27,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.309953,
+          "lengthRaw": "130'-2½",
+          "lengthFt": 130.208333,
+          "pressureFrictionPsi": 45.609,
+          "downstreamNode": "176",
+          "downstreamElevationRaw": "14'-0",
+          "downstreamElevationFt": 14,
+          "downstreamDischargeGpm": 24.52,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 23.966,
+          "downstreamFittings": "Flow (q) from Route 10",
+          "equivalentLengthRaw": "16'-11",
+          "pressureElevationPsi": 1.296,
+          "upstreamNode": "43",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 70.87,
+          "upstreamFittings": "E(5'-7½), PO(11'-3½)",
+          "totalLengthRaw": "147'-2",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "43-to-176"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "CM",
+          "pipeRole": "cross-main",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 118.96,
+          "velocityFps": 4.37,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.012627,
+          "lengthRaw": "11'-0",
+          "lengthFt": 11,
+          "pressureFrictionPsi": 0.139,
+          "downstreamNode": "43",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 70.87,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": null,
+          "upstreamNode": "17",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 71.009,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "17-to-43"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "CM",
+          "pipeRole": "cross-main",
+          "diameterInternalInches": 3.334,
+          "flowGpm": 204.14,
+          "velocityFps": 7.5,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.03429,
+          "lengthRaw": "5'-6",
+          "lengthFt": 5.5,
+          "pressureFrictionPsi": 0.857,
+          "downstreamNode": "17",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": 85.18,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 71.009,
+          "downstreamFittings": "Flow (q) from Route 11",
+          "equivalentLengthRaw": "19'-6",
+          "pressureElevationPsi": null,
+          "upstreamNode": "13",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 71.866,
+          "upstreamFittings": "fT(19'-6)",
+          "totalLengthRaw": "25'-0",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "13-to-17"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 22.33,
+          "velocityFps": 8.29,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.159579,
+          "lengthRaw": "3'-4½",
+          "lengthFt": 3.375,
+          "pressureFrictionPsi": 5.487,
+          "downstreamNode": "512",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 22.33,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 15.902,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.719,
+          "upstreamNode": "238",
+          "upstreamElevationRaw": "13'-11½",
+          "upstreamElevationFt": 13.958333,
+          "upstreamPressurePsi": 19.67,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "34'-4½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "238-to-512"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 22.59,
+          "velocityFps": 8.38,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.162973,
+          "lengthRaw": "3'-5½",
+          "lengthFt": 3.458333,
+          "pressureFrictionPsi": 5.618,
+          "downstreamNode": "488",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 22.59,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 16.268,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.759,
+          "upstreamNode": "173",
+          "upstreamElevationRaw": "14'-0½",
+          "upstreamElevationFt": 14.041667,
+          "upstreamPressurePsi": 20.127,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "34'-5½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "173-to-488"
+        },
+        {
+          "page": 7,
+          "route": 2,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 49.93,
+          "velocityFps": 6.83,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.06219,
+          "lengthRaw": "11'-4",
+          "lengthFt": 11.333333,
+          "pressureFrictionPsi": 0.706,
+          "downstreamNode": "173",
+          "downstreamElevationRaw": "14'-0½",
+          "downstreamElevationFt": 14.041667,
+          "downstreamDischargeGpm": 27.34,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 20.127,
+          "downstreamFittings": "Flow (q) from Route 18",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.013,
+          "upstreamNode": "25",
+          "upstreamElevationRaw": "14'-0½",
+          "upstreamElevationFt": 14.041667,
+          "upstreamPressurePsi": 20.846,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-4",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "25-to-173"
+        },
+        {
+          "page": 7,
+          "route": 9,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 22.74,
+          "velocityFps": 8.44,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.164999,
+          "lengthRaw": "4'-7½",
+          "lengthFt": 4.625,
+          "pressureFrictionPsi": 5.881,
+          "downstreamNode": "487",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 22.74,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 16.487,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.774,
+          "upstreamNode": "170",
+          "upstreamElevationRaw": "14'-1",
+          "upstreamElevationFt": 14.083333,
+          "upstreamPressurePsi": 20.594,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "35'-7½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "170-to-487"
+        },
+        {
+          "page": 7,
+          "route": 9,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 24.52,
+          "velocityFps": 9.1,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.189685,
+          "lengthRaw": "3'-5",
+          "lengthFt": 3.416667,
+          "pressureFrictionPsi": 6.526,
+          "downstreamNode": "500",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 24.52,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 19.169,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -1.729,
+          "upstreamNode": "176",
+          "upstreamElevationRaw": "14'-0",
+          "upstreamElevationFt": 14,
+          "upstreamPressurePsi": 23.966,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "34'-5",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "176-to-500"
+        },
+        {
+          "page": 7,
+          "route": 9,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 24.59,
+          "velocityFps": 9.13,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.190666,
+          "lengthRaw": "6'-10½",
+          "lengthFt": 6.875,
+          "pressureFrictionPsi": 7.223,
+          "downstreamNode": "486",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 24.59,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 19.276,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -2.961,
+          "upstreamNode": "109",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 23.538,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "37'-10½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "109-to-486"
+        },
+        {
+          "page": 7,
+          "route": 9,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 34.92,
+          "velocityFps": 6.09,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.058069,
+          "lengthRaw": "11'-4",
+          "lengthFt": 11.333333,
+          "pressureFrictionPsi": 0.659,
+          "downstreamNode": "109",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 10.34,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 23.538,
+          "downstreamFittings": "Flow (q) from Route 17",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.001,
+          "upstreamNode": "111",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 24.198,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-4",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "111-to-109"
+        },
+        {
+          "page": 7,
+          "route": 9,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 59.88,
+          "velocityFps": 10.45,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.15745,
+          "lengthRaw": "4'-9",
+          "lengthFt": 4.75,
+          "pressureFrictionPsi": 0.747,
+          "downstreamNode": "111",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 24.96,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 24.198,
+          "downstreamFittings": "Flow (q) from Route 14",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0,
+          "upstreamNode": "113",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 24.944,
+          "upstreamFittings": null,
+          "totalLengthRaw": "4'-9",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "113-to-111"
+        },
+        {
+          "page": 7,
+          "route": 9,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 85.18,
+          "velocityFps": 14.86,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.302228,
+          "lengthRaw": "129'-2",
+          "lengthFt": 129.166667,
+          "pressureFrictionPsi": 43.538,
+          "downstreamNode": "113",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 25.3,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 24.944,
+          "downstreamFittings": "Flow (q) from Route 15",
+          "equivalentLengthRaw": "14'-10½",
+          "pressureElevationPsi": 2.527,
+          "upstreamNode": "17",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 71.009,
+          "upstreamFittings": "E(4'-11½), PO(9'-11)",
+          "totalLengthRaw": "144'-0½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "17-to-113"
+        },
+        {
+          "page": 7,
+          "route": 9,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 24.61,
+          "velocityFps": 9.14,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.191031,
+          "lengthRaw": "6'-3",
+          "lengthFt": 6.25,
+          "pressureFrictionPsi": 7.116,
+          "downstreamNode": "484",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 24.61,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 19.316,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -2.962,
+          "upstreamNode": "107",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 23.47,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "37'-3",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "107-to-484"
+        },
+        {
+          "page": 8,
+          "route": 9,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 14.28,
+          "velocityFps": 2.49,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.011099,
+          "lengthRaw": "7'-5",
+          "lengthFt": 7.416667,
+          "pressureFrictionPsi": 0.082,
+          "downstreamNode": "107",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 23.47,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0,
+          "upstreamNode": "106",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 23.552,
+          "upstreamFittings": null,
+          "totalLengthRaw": "7'-5",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "106-to-107"
+        },
+        {
+          "page": 8,
+          "route": 9,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 38.93,
+          "velocityFps": 6.79,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.070989,
+          "lengthRaw": "14'-7½",
+          "lengthFt": 14.625,
+          "pressureFrictionPsi": 1.39,
+          "downstreamNode": "106",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 24.65,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 23.552,
+          "downstreamFittings": "Flow (q) from Route 13",
+          "equivalentLengthRaw": "4'-11½",
+          "pressureElevationPsi": -0.001,
+          "upstreamNode": "35",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 24.942,
+          "upstreamFittings": "E(4'-11½)",
+          "totalLengthRaw": "19'-7",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "35-to-106"
+        },
+        {
+          "page": 8,
+          "route": 9,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 38.93,
+          "velocityFps": 5.33,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.039246,
+          "lengthRaw": "5'-10",
+          "lengthFt": 5.833333,
+          "pressureFrictionPsi": 0.672,
+          "downstreamNode": "35",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": null,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 24.942,
+          "downstreamFittings": null,
+          "equivalentLengthRaw": "11'-3½",
+          "pressureElevationPsi": 2.525,
+          "upstreamNode": "15",
+          "upstreamElevationRaw": "11'-0",
+          "upstreamElevationFt": 11,
+          "upstreamPressurePsi": 28.138,
+          "upstreamFittings": "PO(11'-3½)",
+          "totalLengthRaw": "17'-1½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "15-to-35"
+        },
+        {
+          "page": 8,
+          "route": 9,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 24.65,
+          "velocityFps": 9.15,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.191592,
+          "lengthRaw": "6'-3",
+          "lengthFt": 6.25,
+          "pressureFrictionPsi": 7.137,
+          "downstreamNode": "481",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 24.65,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 19.378,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -2.962,
+          "upstreamNode": "106",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 23.552,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "37'-3",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "106-to-481"
+        },
+        {
+          "page": 8,
+          "route": 9,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 24.96,
+          "velocityFps": 9.26,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.195987,
+          "lengthRaw": "6'-3",
+          "lengthFt": 6.25,
+          "pressureFrictionPsi": 7.3,
+          "downstreamNode": "485",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 24.96,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 19.859,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -2.961,
+          "upstreamNode": "111",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 24.198,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "37'-3",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "111-to-485"
+        },
+        {
+          "page": 8,
+          "route": 9,
+          "pipeType": "AO",
+          "pipeRole": "arm-over",
+          "diameterInternalInches": 1.049,
+          "flowGpm": 25.3,
+          "velocityFps": 9.39,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.20107,
+          "lengthRaw": "6'-3",
+          "lengthFt": 6.25,
+          "pressureFrictionPsi": 7.489,
+          "downstreamNode": "480",
+          "downstreamElevationRaw": "10'-0",
+          "downstreamElevationFt": 10,
+          "downstreamDischargeGpm": 25.3,
+          "downstreamKFactor": 5.6,
+          "downstreamPressurePsi": 20.416,
+          "downstreamFittings": "Sprinkler,",
+          "equivalentLengthRaw": "31'-0",
+          "pressureElevationPsi": -2.96,
+          "upstreamNode": "113",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 24.944,
+          "upstreamFittings": "E(2'-0), PO(5'-0), fd(24'-0)",
+          "totalLengthRaw": "37'-3",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "113-to-480"
+        },
+        {
+          "page": 8,
+          "route": 9,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 71.6,
+          "velocityFps": 12.5,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.219195,
+          "lengthRaw": "176'-0½",
+          "lengthFt": 176.041667,
+          "pressureFrictionPsi": 41.849,
+          "downstreamNode": "9",
+          "downstreamElevationRaw": "11'-0",
+          "downstreamElevationFt": 11,
+          "downstreamDischargeGpm": 69.95,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 29.567,
+          "downstreamFittings": "Flow (q) from Route 1",
+          "equivalentLengthRaw": "14'-10½",
+          "pressureElevationPsi": -1.452,
+          "upstreamNode": "11",
+          "upstreamElevationRaw": "14'-4½",
+          "upstreamElevationFt": 14.375,
+          "upstreamPressurePsi": 69.964,
+          "upstreamFittings": "E(4'-11½), PO(9'-11)",
+          "totalLengthRaw": "190'-11",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "11-to-9"
+        },
+        {
+          "page": 8,
+          "route": 9,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.53,
+          "flowGpm": 10.34,
+          "velocityFps": 1.8,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.006105,
+          "lengthRaw": "11'-0½",
+          "lengthFt": 11.041667,
+          "pressureFrictionPsi": 0.067,
+          "downstreamNode": "107",
+          "downstreamElevationRaw": "16'-10",
+          "downstreamElevationFt": 16.833333,
+          "downstreamDischargeGpm": 14.28,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 23.47,
+          "downstreamFittings": "Flow (q) from Route 12",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.001,
+          "upstreamNode": "109",
+          "upstreamElevationRaw": "16'-10",
+          "upstreamElevationFt": 16.833333,
+          "upstreamPressurePsi": 23.538,
+          "upstreamFittings": null,
+          "totalLengthRaw": "11'-0½",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "109-to-107"
+        },
+        {
+          "page": 8,
+          "route": 18,
+          "pipeType": "BL",
+          "pipeRole": "branch-line",
+          "diameterInternalInches": 1.728,
+          "flowGpm": 27.34,
+          "velocityFps": 3.74,
+          "hazenWilliamsC": 120,
+          "frictionLossPsiPerFt": 0.020411,
+          "lengthRaw": "0'-8",
+          "lengthFt": 0.666667,
+          "pressureFrictionPsi": 0.013,
+          "downstreamNode": "23",
+          "downstreamElevationRaw": "14'-0½",
+          "downstreamElevationFt": 14.041667,
+          "downstreamDischargeGpm": 35.91,
+          "downstreamKFactor": null,
+          "downstreamPressurePsi": 20.113,
+          "downstreamFittings": "Flow (q) from Route 1",
+          "equivalentLengthRaw": null,
+          "pressureElevationPsi": 0.001,
+          "upstreamNode": "173",
+          "upstreamElevationRaw": "14'-0½",
+          "upstreamElevationFt": 14.041667,
+          "upstreamPressurePsi": 20.127,
+          "upstreamFittings": null,
+          "totalLengthRaw": "0'-8",
+          "pressureVelocityPsi": null,
+          "hydraulicFlowDirection": "173-to-23"
+        }
+      ]
+    }
+  ],
+  "nodeRegistration": {
+    "reportNodeCount": 61,
+    "cadLabelCount": 59,
+    "exactCadLabelCoverageCount": 59,
+    "missingCadLabels": [
+      "1",
+      "2"
+    ],
+    "missingCadLabelMeaning": "Only the off-building source and underground calculation nodes are absent from the sprinkler-plan CAD labels.",
+    "geometryBindingStatus": "held-annotation-offsets-require-topology-length-elevation-binding"
+  },
+  "physicalNetwork": {
+    "toleranceFt": 0.04,
+    "pipeCount": 186,
+    "componentCount": 9,
+    "componentPipeCounts": [
+      177,
+      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "rootFittingId": "fitting-69852",
+    "rootFittingDescription": "No. 002, FireLock® Short Radius Tee, DI, Org",
+    "rootNodeId": "physical-node-102",
+    "rootResidualFt": 0.365,
+    "rootComponentPipeCount": 177,
+    "rootComponentNodeCount": 273,
+    "rootComponentEdgeCount": 275,
+    "rootComponentCycleRank": 3,
+    "sourceRootDirectedEdgeCount": 275,
+    "ambiguousSourceRootEdgeCount": 0,
+    "sourceRootDirectionStatus": "root-distance-orientation-only-cycles-require-calculation-node-binding"
+  },
+  "fittingSemantics": {
+    "attributedFittingCount": 98,
+    "subCategoryCounts": {
+      "Check": 1,
+      "Elbow": 6,
+      "Flange": 1,
+      "Flex Drop": 70,
+      "Flexible Coupling": 2,
+      "Inspectors Test & Drain": 1,
+      "Reducer/Adapter": 1,
+      "Rigid Coupling": 12,
+      "Switch/Sensor": 1,
+      "Tee": 2,
+      "Two-Way Inlet": 1
+    },
+    "inspectorTestDrain": {
+      "fittingId": "fitting-72473",
+      "pointFt": {
+        "x": 174.208333333,
+        "y": 40.840954932,
+        "z": 6.99
+      },
+      "manufacturer": "Generic",
+      "description": "Inspectors Test & Drain Valve, No PRV, T-T",
+      "size": "2",
+      "elevation": "7'-0"
+    },
+    "mainDrainCallout": {
+      "text": "MAIN DRAIN",
+      "labelPointFt": {
+        "x": 181.160969569,
+        "y": 43.442509106,
+        "z": -0.931250925
+      },
+      "leaderTipFt": {
+        "x": 175.998573915,
+        "y": 41.152377458,
+        "z": -0.931250925
+      },
+      "leaderSegmentCount": 2
+    },
+    "sourceEndpointBridgeAudit": [
+      {
+        "fittingId": "fitting-24025",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19242",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 141.291666667,
+              "y": 10.097132742,
+              "z": 11
+            },
+            "residualFt": 0.0625
+          },
+          {
+            "pipeId": "pipe-19242",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 141.291666667,
+              "y": 9.742966075,
+              "z": 11
+            },
+            "residualFt": 0.416666667
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-24673",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19286",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 132.821904788,
+              "y": 43.32863145,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-25321",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19332",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 63.416666667,
+              "y": 43.754416701,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-25969",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19378",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 20.5,
+              "y": 44.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-26617",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19424",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 46.101750049,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-27265",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19470",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 31.727008835,
+              "y": 19.854166667,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-27913",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19494",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 168.456208065,
+              "y": 9.747768601,
+              "z": 11
+            },
+            "residualFt": 0.0625
+          },
+          {
+            "pipeId": "pipe-19494",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 168.810342169,
+              "y": 9.742966075,
+              "z": 11
+            },
+            "residualFt": 0.416666667
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-28561",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19538",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 18.893675502,
+              "y": 6.166666667,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-29209",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19584",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 16.291666667,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-29857",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19630",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 23.705723524,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-30505",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19676",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 167.541666667,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-31153",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19722",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 6.893675502,
+              "y": 6.166666667,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-31801",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19768",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 52.727008835,
+              "y": 13.428051432,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-32449",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19814",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 155.208333333,
+              "y": 55.75,
+              "z": 13.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-33097",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19860",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 75.1147682,
+              "y": 11.666566762,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-33745",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19906",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 59.892251674,
+              "y": 33.600209822,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-35041",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19952",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 99.935525971,
+              "y": 11.484612283,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-35689",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-19998",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 93.4375,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-36337",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20044",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 104.291666667,
+              "y": 44.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-36985",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20090",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 140,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-37633",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20114",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 134.791666667,
+              "y": 9.388799408,
+              "z": 11
+            },
+            "residualFt": 0.0625
+          },
+          {
+            "pipeId": "pipe-20114",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 134.791666667,
+              "y": 9.742966075,
+              "z": 11
+            },
+            "residualFt": 0.416666667
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-38281",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20158",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 115.916666667,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-38929",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20204",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 48.083333333,
+              "y": 45.583333333,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-39577",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20250",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 87.416666667,
+              "y": 34.583333333,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-40873",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20296",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 112.959196671,
+              "y": 43.419989991,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-41521",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20342",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 47.583333544,
+              "y": 43.657033318,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-42169",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20388",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 6.5,
+              "y": 44.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-42817",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20412",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 6.5,
+              "y": 55.75,
+              "z": 11.01845505
+            },
+            "residualFt": 0.01845505
+          },
+          {
+            "pipeId": "pipe-20434",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 6.5,
+              "y": 55.75,
+              "z": 11.01845505
+            },
+            "residualFt": 0.01845505
+          },
+          {
+            "pipeId": "pipe-20434",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 6.5,
+              "y": 55.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          },
+          {
+            "pipeId": "pipe-20412",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 6.5,
+              "y": 56.166666667,
+              "z": 11.01845505
+            },
+            "residualFt": 0.417075173
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-43465",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20480",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 19.958333333,
+              "y": 23.583333333,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-44113",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20526",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 152.541666667,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-44761",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20572",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 6.708333333,
+              "y": 24.71912526,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-45409",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20618",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 46.652287372,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-46057",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20664",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 141.875,
+              "y": 44.75,
+              "z": 13.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-46705",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20710",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 30.893675502,
+              "y": 7.228431264,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-47353",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22226",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 64.246532462,
+              "y": 11.254787348,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-48001",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20778",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 155.208333333,
+              "y": 44.75,
+              "z": 13.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-48649",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20824",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 82.104166667,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-49297",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20870",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 70.520833333,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-49945",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20916",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 167.541666667,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-50593",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-20962",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 116.958333333,
+              "y": 45.583333333,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-51241",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21008",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 128.75,
+              "y": 45.583333333,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-51889",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21054",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 87.48970444,
+              "y": 11.66659104,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-52537",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21100",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 140,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-53185",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21146",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 122.852484671,
+              "y": 43.568354667,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-53833",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21192",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 101.416666667,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-54481",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21238",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 77.416666667,
+              "y": 34.583333333,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-55129",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21284",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 34.5,
+              "y": 44.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-55777",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21330",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 113.728131066,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-56425",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21376",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 34.753363992,
+              "y": 33.114208074,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-57073",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21400",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 154.791666667,
+              "y": 10.097132742,
+              "z": 11
+            },
+            "residualFt": 0.0625
+          },
+          {
+            "pipeId": "pipe-21400",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 154.791666667,
+              "y": 9.742966075,
+              "z": 11
+            },
+            "residualFt": 0.416666667
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-57721",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21444",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 19.727008835,
+              "y": 17.166666667,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-58369",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21490",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 18.53087474,
+              "y": 17.958333333,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-59017",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21536",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 152.541666667,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-59665",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21582",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 6.893675502,
+              "y": 17.125,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-60313",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21674",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 141.875,
+              "y": 55.75,
+              "z": 13.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-60961",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21720",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 59.905319134,
+              "y": 22.760968737,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-61609",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21766",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 168.541666667,
+              "y": 44.75,
+              "z": 13.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-62257",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21790",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 122.958333333,
+              "y": 9.388799408,
+              "z": 11
+            },
+            "residualFt": 0.0625
+          },
+          {
+            "pipeId": "pipe-21790",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 122.958333333,
+              "y": 9.742966075,
+              "z": 11
+            },
+            "residualFt": 0.416666667
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-62905",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21834",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 70.520833333,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-63553",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21880",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 168.541666667,
+              "y": 55.75,
+              "z": 13.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-64201",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21926",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 104.770833333,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-64849",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21972",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 91.625,
+              "y": 44.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-65497",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22018",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 134.791666667,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-66145",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22064",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 77.791666667,
+              "y": 45.583333333,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-66793",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22110",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 129.916666667,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-67441",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22156",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 122.958333333,
+              "y": 22.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-68089",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22202",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 62.663593365,
+              "y": 45.581542177,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-68737",
+        "subCategory": "Flex Drop",
+        "description": "AH2-CC, F-FireLock IGS (Org), 48\" Braided Flex Drop",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-21628",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 50.84301221,
+              "y": 33.75,
+              "z": 11.0625
+            },
+            "residualFt": 0.0625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-69385",
+        "subCategory": "Flexible Coupling",
+        "description": "Style 75, Flexible Coupling, Org, E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-23024",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 1.578333333
+            },
+            "residualFt": 0.078333333
+          },
+          {
+            "pipeId": "pipe-22492",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.573333333,
+              "y": 39.666666667,
+              "z": 1.218333333
+            },
+            "residualFt": 0.461043503
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-69616",
+        "subCategory": "Flange",
+        "description": "Slip-On Weld, Slip Reducing Flange, CI",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22515",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 177.598713214,
+              "y": 39.666666667,
+              "z": 0.415833333
+            },
+            "residualFt": 0.020833334
+          },
+          {
+            "pipeId": "pipe-22250",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 177.598713214,
+              "y": 39.666666667,
+              "z": 0.55125
+            },
+            "residualFt": 0.114583333
+          },
+          {
+            "pipeId": "pipe-22250",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 177.598713214,
+              "y": 39.666666667,
+              "z": 0.853333333
+            },
+            "residualFt": 0.416666666
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-69835",
+        "subCategory": "Flexible Coupling",
+        "description": "Style 75, Flexible Coupling, Org, E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22275",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 10.64
+            },
+            "residualFt": 0.078333333
+          },
+          {
+            "pipeId": "pipe-3279",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.301666667,
+              "z": 11
+            },
+            "residualFt": 0.461043503
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-69852",
+        "subCategory": "Tee",
+        "description": "No. 002, FireLock® Short Radius Tee, DI, Org",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22275",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 10.64
+            },
+            "residualFt": 0.36
+          },
+          {
+            "pipeId": "pipe-3279",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.301666667,
+              "z": 11
+            },
+            "residualFt": 0.365
+          },
+          {
+            "pipeId": "pipe-17499",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 11.365
+            },
+            "residualFt": 0.365
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-71128",
+        "subCategory": "Rigid Coupling",
+        "description": "Style 009N, Push On Rigid Coupling, Install-Ready, Org, Vic-Plus E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-17499",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 11.365
+            },
+            "residualFt": 0.083333333
+          },
+          {
+            "pipeId": "pipe-3279",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.301666667,
+              "z": 11
+            },
+            "residualFt": 0.461043503
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-71338",
+        "subCategory": "Rigid Coupling",
+        "description": "Style 009N, Push On Rigid Coupling, Install-Ready, Org, Vic-Plus E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-3279",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.301666667,
+              "z": 11
+            },
+            "residualFt": 0.083333333
+          },
+          {
+            "pipeId": "pipe-22275",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 10.64
+            },
+            "residualFt": 0.457095298
+          },
+          {
+            "pipeId": "pipe-17499",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 11.365
+            },
+            "residualFt": 0.461043503
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-71354",
+        "subCategory": "Tee",
+        "description": "No. 002, FireLock® Short Radius Tee, DI, Org",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22275",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 4.521666667
+            },
+            "residualFt": 0.365
+          },
+          {
+            "pipeId": "pipe-23024",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 3.791666667
+            },
+            "residualFt": 0.365
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-71371",
+        "subCategory": "Elbow",
+        "description": "No. 001, FireLock® Short Radius, 90° Elbow, DI, Org",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22446",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.63125,
+              "y": 38.749166667,
+              "z": 3.291666667
+            },
+            "residualFt": 0.422916667
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-72229",
+        "subCategory": "Rigid Coupling",
+        "description": "Style 009N, Push On Rigid Coupling, Install-Ready, Org, Vic-Plus E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22275",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 4.521666667
+            },
+            "residualFt": 0.461043503
+          },
+          {
+            "pipeId": "pipe-23024",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 3.791666667
+            },
+            "residualFt": 0.461043503
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-72456",
+        "subCategory": "Rigid Coupling",
+        "description": "Style 009N, Push On Rigid Coupling, Install-Ready, Org, Vic-Plus E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22446",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.63125,
+              "y": 38.749166667,
+              "z": 3.291666667
+            },
+            "residualFt": 0.089583333
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-72473",
+        "subCategory": "Inspectors Test & Drain",
+        "description": "Inspectors Test & Drain Valve, No PRV, T-T",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22402",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 40.622204932,
+              "z": 6.99
+            },
+            "residualFt": 0.21875
+          },
+          {
+            "pipeId": "pipe-22468",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 40.840954932,
+              "z": 6.667083333
+            },
+            "residualFt": 0.322916667
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-73684",
+        "subCategory": "Rigid Coupling",
+        "description": "Style 009N, Push On Rigid Coupling, Install-Ready, Org, Vic-Plus E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22275",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 4.521666667
+            },
+            "residualFt": 0.078125
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-73716",
+        "subCategory": "Rigid Coupling",
+        "description": "Style 009N, Push On Rigid Coupling, Install-Ready, Org, Vic-Plus E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-23024",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 3.791666667
+            },
+            "residualFt": 0.083333333
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-73733",
+        "subCategory": "Elbow",
+        "description": "Threaded, 45° Elbow, CI, Galv",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22424",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 175.850528505,
+              "y": 40.840954932,
+              "z": 1.677059048
+            },
+            "residualFt": 0.140625
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-74585",
+        "subCategory": "Elbow",
+        "description": "Threaded, 90° Elbow, CI",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22424",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.395833333,
+              "y": 40.840954932,
+              "z": 1.677059048
+            },
+            "residualFt": 0.1875
+          },
+          {
+            "pipeId": "pipe-22468",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 40.840954932,
+              "z": 1.864559048
+            },
+            "residualFt": 0.1875
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-75663",
+        "subCategory": "Switch/Sensor",
+        "description": "Waterflow Detector",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22275",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 4.521666667
+            },
+            "residualFt": 0.489166666
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-75693",
+        "subCategory": "Two-Way Inlet",
+        "description": "FDC, Exposed, Two-Way, Single Clapper, RB, Back",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22446",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 175.699486839,
+              "y": 38.749166667,
+              "z": 3.291666667
+            },
+            "residualFt": 0.291666666
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-78774",
+        "subCategory": "Elbow",
+        "description": "No. 001, FireLock® Short Radius, 90° Elbow, DI, Org",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-23024",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 1.578333333
+            },
+            "residualFt": 0.36
+          },
+          {
+            "pipeId": "pipe-22492",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.573333333,
+              "y": 39.666666667,
+              "z": 1.218333333
+            },
+            "residualFt": 0.365
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-78790",
+        "subCategory": "Rigid Coupling",
+        "description": "Style 009N, Push On Rigid Coupling, Install-Ready, Org, Vic-Plus E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22492",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 174.573333333,
+              "y": 39.666666667,
+              "z": 1.218333333
+            },
+            "residualFt": 0.083333333
+          },
+          {
+            "pipeId": "pipe-23024",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 174.208333333,
+              "y": 39.666666667,
+              "z": 1.578333333
+            },
+            "residualFt": 0.457095298
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-78806",
+        "subCategory": "Elbow",
+        "description": "No. 001, FireLock® Short Radius, 90° Elbow, DI, Org",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22250",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 177.598713214,
+              "y": 39.666666667,
+              "z": 0.853333333
+            },
+            "residualFt": 0.365
+          },
+          {
+            "pipeId": "pipe-22492",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 177.233713214,
+              "y": 39.666666667,
+              "z": 1.218333333
+            },
+            "residualFt": 0.365
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-78822",
+        "subCategory": "Rigid Coupling",
+        "description": "Style 009N, Push On Rigid Coupling, Install-Ready, Org, Vic-Plus E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22250",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 177.598713214,
+              "y": 39.666666667,
+              "z": 0.853333333
+            },
+            "residualFt": 0.083333334
+          },
+          {
+            "pipeId": "pipe-22250",
+            "endpoint": "start",
+            "pointFt": {
+              "x": 177.598713214,
+              "y": 39.666666667,
+              "z": 0.55125
+            },
+            "residualFt": 0.385416667
+          },
+          {
+            "pipeId": "pipe-22492",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 177.233713214,
+              "y": 39.666666667,
+              "z": 1.218333333
+            },
+            "residualFt": 0.461043502
+          }
+        ]
+      },
+      {
+        "fittingId": "fitting-78838",
+        "subCategory": "Rigid Coupling",
+        "description": "Style 009N, Push On Rigid Coupling, Install-Ready, Org, Vic-Plus E Gasket",
+        "connectedPipeEndpoints": [
+          {
+            "pipeId": "pipe-22492",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 177.233713214,
+              "y": 39.666666667,
+              "z": 1.218333333
+            },
+            "residualFt": 0.083333333
+          },
+          {
+            "pipeId": "pipe-22250",
+            "endpoint": "end",
+            "pointFt": {
+              "x": 177.598713214,
+              "y": 39.666666667,
+              "z": 0.853333333
+            },
+            "residualFt": 0.461043503
+          }
+        ]
+      }
+    ],
+    "supplyTeeConnectedPipeIds": [
+      "pipe-22275",
+      "pipe-3279",
+      "pipe-17499"
+    ],
+    "inspectorTestDrainConnectedPipeIds": [
+      "pipe-22402",
+      "pipe-22468"
+    ]
+  },
+  "gradeAndDrainage": {
+    "slopedPlanRunCount": 14,
+    "geometricGrades": [
+      {
+        "pipeId": "pipe-3943",
+        "gradeInPer10Ft": 0.312984,
+        "geometricDownhillDirection": "start-to-end",
+        "drainageIntentStatus": "geometrically-drainable-to-source-main-drain-entry-intent-not-inferred",
+        "downhillEndpointFt": {
+          "x": 174.208333333,
+          "y": 23.166666667,
+          "z": 13.655638647
+        },
+        "continuousNonRisingPathToMainDrainEntry": true
+      },
+      {
+        "pipeId": "pipe-7661",
+        "gradeInPer10Ft": 0.104357,
+        "geometricDownhillDirection": "start-to-end",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 1.663430536,
+          "y": 22.5,
+          "z": 11.000002968
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      },
+      {
+        "pipeId": "pipe-8683",
+        "gradeInPer10Ft": 0.110071,
+        "geometricDownhillDirection": "start-to-end",
+        "drainageIntentStatus": "geometrically-drainable-to-source-main-drain-entry-intent-not-inferred",
+        "downhillEndpointFt": {
+          "x": 174.195312505,
+          "y": 45.166666667,
+          "z": 14.369787062
+        },
+        "continuousNonRisingPathToMainDrainEntry": true
+      },
+      {
+        "pipeId": "pipe-12312",
+        "gradeInPer10Ft": 0.013201,
+        "geometricDownhillDirection": "start-to-end",
+        "drainageIntentStatus": "geometrically-drainable-to-source-main-drain-entry-intent-not-inferred",
+        "downhillEndpointFt": {
+          "x": 174.208333333,
+          "y": 34.166666667,
+          "z": 16.81521289
+        },
+        "continuousNonRisingPathToMainDrainEntry": true
+      },
+      {
+        "pipeId": "pipe-15307",
+        "gradeInPer10Ft": 0.268777,
+        "geometricDownhillDirection": "end-to-start",
+        "drainageIntentStatus": "geometrically-drainable-to-source-main-drain-entry-intent-not-inferred",
+        "downhillEndpointFt": {
+          "x": 174.195312529,
+          "y": 56.166666667,
+          "z": 14.369802491
+        },
+        "continuousNonRisingPathToMainDrainEntry": true
+      },
+      {
+        "pipeId": "pipe-15736",
+        "gradeInPer10Ft": 0.268777,
+        "geometricDownhillDirection": "start-to-end",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 133.400599754,
+          "y": 56.166666667,
+          "z": 10.734221615
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      },
+      {
+        "pipeId": "pipe-17523",
+        "gradeInPer10Ft": 2.25654,
+        "geometricDownhillDirection": "end-to-start",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 31.310342169,
+          "y": 4.166666667,
+          "z": 13.671059385
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      },
+      {
+        "pipeId": "pipe-17853",
+        "gradeInPer10Ft": 2.454214,
+        "geometricDownhillDirection": "end-to-start",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 19.310342169,
+          "y": 4.166666667,
+          "z": 13.671059385
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      },
+      {
+        "pipeId": "pipe-18285",
+        "gradeInPer10Ft": 2.651888,
+        "geometricDownhillDirection": "end-to-start",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 7.310342169,
+          "y": 4.166666667,
+          "z": 13.671059385
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      },
+      {
+        "pipeId": "pipe-18615",
+        "gradeInPer10Ft": 3.026914,
+        "geometricDownhillDirection": "end-to-start",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 52.310342169,
+          "y": 11.166666667,
+          "z": 13.671059385
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      },
+      {
+        "pipeId": "pipe-18740",
+        "gradeInPer10Ft": 2.71215,
+        "geometricDownhillDirection": "end-to-start",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 64.310342169,
+          "y": 11.166666667,
+          "z": 13.671059385
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      },
+      {
+        "pipeId": "pipe-18866",
+        "gradeInPer10Ft": 2.087368,
+        "geometricDownhillDirection": "end-to-start",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 88.310342169,
+          "y": 11.166666667,
+          "z": 13.671059385
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      },
+      {
+        "pipeId": "pipe-18991",
+        "gradeInPer10Ft": 2.399218,
+        "geometricDownhillDirection": "end-to-start",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 76.310342169,
+          "y": 11.166666667,
+          "z": 13.671059385
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      },
+      {
+        "pipeId": "pipe-19116",
+        "gradeInPer10Ft": 1.773194,
+        "geometricDownhillDirection": "end-to-start",
+        "drainageIntentStatus": "geometric-low-point-does-not-reach-source-main-drain-entry-without-rise",
+        "downhillEndpointFt": {
+          "x": 100.310342169,
+          "y": 11.166666667,
+          "z": 13.671059385
+        },
+        "continuousNonRisingPathToMainDrainEntry": false
+      }
+    ],
+    "explicitDrainDeviceCount": 1,
+    "explicitMainDrainCalloutCount": 1,
+    "mainDrainEntryNodeIds": [
+      "physical-node-1",
+      "physical-node-102"
+    ],
+    "geometricallyDrainableSlopedRunCount": 4,
+    "slopedRunLowPointAwayFromMainDrainCount": 10,
+    "drainageAcceptanceRule": "A lower endpoint is geometric evidence only. Drainage requires an explicit drain destination and a continuous non-rising path with no trapped low point.",
+    "drainageIntentStatus": "held"
+  },
+  "claims": {
+    "exactHydraulicReportGraphReady": true,
+    "reportSourceClosureReady": true,
+    "reportHydraulicFlowDirectionReady": true,
+    "sourceFireLineContextReady": true,
+    "exactPhysicalPipeGraphReady": true,
+    "sourceRootedTopologicalDirectionReady": false,
+    "fullFittingIdentityReady": true,
+    "inspectorTestDrainDeviceReady": true,
+    "supplyTeePipeBridgeReady": true,
+    "inspectorTestDrainPipeBridgeReady": true,
+    "mainDrainCalloutReady": true,
+    "roofRelativePipeGradeGeometryReady": true,
+    "calculationNodeToDwgGeometryBindingReady": false,
+    "wholeNetworkHydraulicFlowDirectionReady": false,
+    "drainageGradeSemanticsReady": false,
+    "continuousDrainPathReady": false,
+    "drainDestinationReady": true,
+    "newHopeTransferReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "receiptSha256": "B10DD80C5A2C3A484E068D5DE5A245164578BE51B3915E56A80024AE7F739C33"
+}
