@@ -1,0 +1,66 @@
+{
+  "artifactType": "halofire.fresh-pitched-roof-holdout-score.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "boundedScope": "North-east 4:12 gable core over occupied family-unit wing",
+  "sourceReceiptSha256": "4315d611055eeb50907ddc241421f67dcf04fbe2ebbe0a8d1265f9da33d44e45",
+  "candidateReceiptSha256": "24830919a5bb579fb102eb542f0e3f4e1c767b1e5aa452839e6031f8eb7f440d",
+  "answerEvidenceReceiptSha256": "0254b0ea5c294a574367cff3c5262bbf0b6b80c455c7244c1ac8e0bd74664215",
+  "approvedAnswerSha256": "5a770222363228c2766605a695fee9b6cb1f7b49c296204e09b691100253d9d5",
+  "fieldSetSha256": "4a47f9a45256debb9e5185396bc15526532a3ef420bcbf40ec0bcc0dc5f902b5",
+  "asBuiltSha256": "ed00e9530c02217bc50ead2fc3391938e731253949b728b31ed1336f8000f34b",
+  "sequence": {
+    "answerExposedAfterCandidateCommit": true,
+    "candidateCommitBeforeAnswerOpen": "58afdc14",
+    "candidateReceiptSha256": "24830919a5bb579fb102eb542f0e3f4e1c767b1e5aa452839e6031f8eb7f440d",
+    "candidateRetunedAfterAnswer": false
+  },
+  "score": {
+    "candidateTargets": 24,
+    "approvedTargets": 7,
+    "truePositiveTargets": 0,
+    "falsePositiveTargets": 24,
+    "falseNegativeTargets": 7,
+    "precision": 0,
+    "recall": 0,
+    "exactCountMatch": false,
+    "exactXyMatch": false,
+    "topologyMatch": false,
+    "kindMatch": false,
+    "exactMatchToleranceFt": 0.5
+  },
+  "acceptance": {
+    "accepted": false,
+    "classification": "fresh-holdout-failed-area-grid-instead-of-ridge-line-topology",
+    "reason": "The frozen candidate generated a 4 by 6 area grid while approved, field, and as-built FP2.0 show seven attic uprights on one ridge branch line."
+  },
+  "failureAnalysis": {
+    "residualClass": "pitched-concealed-volume-missing-ridge-truss-member-topology",
+    "sourceObservableBeforeAnswer": true,
+    "missingGate": "Pitched concealed volumes require source-registered ridge, truss/member, obstruction, and branch-line topology before target generation; a generic area grid is forbidden.",
+    "candidateRetunedAfterAnswer": false
+  },
+  "requiredNextLoop": "Extract exact roof-truss/member geometry from structural sheets and sections, generate ridge/member-aware candidate topology, calibrate on New Hope without promoting acceptance, then run another untouched pitched-roof project.",
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "frozen 24-target candidate versus approved seven-head ridge-row replay"
+    },
+    "crossSource": {
+      "status": "passed",
+      "method": "approved, field-set, and as-built FP2.0 independently show the same seven-head ridge row"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "receipt, sequence, count, topology, score, and false-promotion mutations rejected"
+    }
+  },
+  "freshProjectPlacementVerified": false,
+  "exactHeadElevationReady": false,
+  "obstructionClearanceReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "fresh-pitched-roof-holdout-failed-twenty-four-grid-targets-versus-seven-ridge-heads-and-all-production-gates-remain-blocked",
+  "receiptSha256": "b2049344654ecf829fdb6a29dbaf80291f3d46a12e38e0980c2dd7346a606c06"
+}

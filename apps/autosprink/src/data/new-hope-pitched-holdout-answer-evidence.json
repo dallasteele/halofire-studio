@@ -1,0 +1,23 @@
+{
+  "artifactType": "halofire.fresh-pitched-roof-holdout-answer-evidence.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "boundedScope": "North-east 4:12 gable core over occupied family-unit wing",
+  "approvedAnswer": { "sheet": "FP2.0", "pdfPageNumber": 5, "sha256": "5a770222363228c2766605a695fee9b6cb1f7b49c296204e09b691100253d9d5", "bytes": 19600086, "pageCount": 5 },
+  "fieldSet": { "sheet": "FP2.0", "pdfPageNumber": 4, "sha256": "4a47f9a45256debb9e5185396bc15526532a3ef420bcbf40ec0bcc0dc5f902b5", "bytes": 18843274, "pageCount": 4 },
+  "asBuilt": { "sheet": "FP2.0", "pdfPageNumber": 4, "sha256": "ed00e9530c02217bc50ead2fc3391938e731253949b728b31ed1336f8000f34b", "bytes": 19209229, "pageCount": 4 },
+  "sequence": { "answerExposedAfterCandidateCommit": true, "candidateCommitBeforeAnswerOpen": "58afdc14", "candidateReceiptSha256": "24830919a5bb579fb102eb542f0e3f4e1c767b1e5aa452839e6031f8eb7f440d", "candidateRetunedAfterAnswer": false },
+  "answerRegistration": { "coordinateSpace": "approved-pdf-render-pixels", "approvedPdfRender": { "widthPx": 6048, "heightPx": 4320, "featureBoundsPx": { "x": 2400, "y": 1035, "width": 775, "height": 1090 } }, "widthFt": 43, "depthFt": 60.75, "ridgeCoordinateFt": 30.375, "sourceFeatureId": "north-east-occupied-wing-gable-core" },
+  "answerHeads": [
+    { "id": "NH-A-001", "kind": "attic-upright", "localFt": { "x": 4, "y": 30.375 } },
+    { "id": "NH-A-002", "kind": "attic-upright", "localFt": { "x": 10, "y": 30.375 } },
+    { "id": "NH-A-003", "kind": "attic-upright", "localFt": { "x": 16, "y": 30.375 } },
+    { "id": "NH-A-004", "kind": "attic-upright", "localFt": { "x": 22, "y": 30.375 } },
+    { "id": "NH-A-005", "kind": "attic-upright", "localFt": { "x": 28, "y": 30.375 } },
+    { "id": "NH-A-006", "kind": "attic-upright", "localFt": { "x": 34, "y": 30.375 } },
+    { "id": "NH-A-007", "kind": "attic-upright", "localFt": { "x": 40, "y": 30.375 } }
+  ],
+  "boundedObservation": { "approvedHeadCount": 7, "fieldSetHeadCount": 7, "asBuiltHeadCount": 7, "approvedBranchLineCount": 1, "candidateTargetCount": 24, "falsePositiveTargets": 24, "falseNegativeTargets": 7, "topology": "seven-attic-uprights-on-one-ridge-line", "visualFinding": "Approved, field-set, and as-built FP2.0 each show seven attic heads at six-foot spacing on one branch line at the 21-foot 2.5-inch ridge; the frozen candidate is a 4-by-6 area grid." },
+  "sourceObservableResidual": { "classification": "pitched-concealed-volume-missing-ridge-truss-member-topology", "missingSourceGate": "Pitched concealed volumes require source-registered ridge, truss/member, obstruction, and branch-line topology before target generation; a generic area grid is forbidden.", "availableBeforeAnswer": ["A103 registers the 4:12 gable ridge and 21-foot 2.5-inch ridge datum", "A301 identifies pre-manufactured roof trusses and flat ceilings below", "structural roof framing sheets are required to resolve member and obstruction topology"] },
+  "claims": { "freshProjectPlacementVerified": false, "exactHeadElevationReady": false, "obstructionClearanceReady": false, "hydraulicCalculationReady": false, "complianceReady": false, "fabricationReady": false, "fieldReleaseReady": false },
+  "receiptSha256": "0254b0ea5c294a574367cff3c5262bbf0b6b80c455c7244c1ac8e0bd74664215"
+}
