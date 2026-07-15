@@ -194,7 +194,8 @@ export function auditSourceTopologyCompleteness(packet) {
 export function auditSourceProtectionEligibility(packet) {
   const enforcement = packet.protectionEligibilityPolicy?.enforceSourceDeclaredFootprintIntersection === true;
   if (!enforcement) return { status: 'not-enforced', issues: [], eligibleVolumeIds: [], matchedFootprintIds: [] };
-  const footprints = new Map((packet.sourceProtectedFloorFootprints || []).map((footprint) => [footprint.id, footprint]));
+  const sourceFootprints = packet.sourceOccupiedOrProtectedFloorFootprints ?? packet.sourceProtectedFloorFootprints ?? [];
+  const footprints = new Map(sourceFootprints.map((footprint) => [footprint.id, footprint]));
   const volumes = [
     ...(packet.pitchedConcealedVolumes || []),
     ...(packet.exposedSlopedCeilingVolumes || []),

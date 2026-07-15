@@ -1,0 +1,57 @@
+{
+  "artifactType": "halofire.protected-pitched-attic-holdout-source.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "projectName": "New Hope Crisis Center - Brigham City UT",
+  "boundedScope": "North-east 4:12 gable core over occupied family-unit wing",
+  "protectedSources": {
+    "architecturalPdf": { "path": "1-Bid Documents/GC - Bid Plans/Building/New Hope Crisis Center Bid Set Drawings.pdf", "bytes": 66511145, "sha256": "9f9f8b97cfb35931474566156f35d97520ae993052dac046efacb408f32ea0a7", "pageCount": 53, "allowedSheets": ["A101", "A102", "A103", "A201", "A301"] },
+    "dwgs": {
+      "floor": { "path": "2-Internal Ops/01-Design/05-CAD Files/CM-177 New Hope Floor Plan.dwg", "bytes": 2542915, "sha256": "79d985df4f51567b8f881d0253700d832c6b5522990923ee5358bd3d2269e898", "reader": "@mlightcad/libredwg-web 0.7.7", "unknownEntityCount": 0 },
+      "rcp": { "path": "2-Internal Ops/01-Design/05-CAD Files/CM-177 New Hope RCP.dwg", "bytes": 719994, "sha256": "4bfeab0b1679fb042274881a7111e3f81a192ff1cf5b3695c2ca3680c3f83eb1", "reader": "@mlightcad/libredwg-web 0.7.7", "unknownEntityCount": 0 },
+      "roof": { "path": "2-Internal Ops/01-Design/05-CAD Files/CM-177 New Hope Roof Plan.dwg", "bytes": 128516, "sha256": "b57e51aeaaeb622ba4ea86337ff1910c8c7d5c3f34ae5c266ec89b7f4d8d61f3", "reader": "@mlightcad/libredwg-web 0.7.7", "unknownEntityCount": 0 },
+      "section3": { "path": "2-Internal Ops/01-Design/05-CAD Files/BS03 BUILDING SECTION.dwg", "bytes": 519787, "sha256": "470252c77ade5743d8f0d7953904bb7d36e16da4abb4fb6f81c85b7874425f56", "reader": "@mlightcad/libredwg-web 0.7.7", "unknownEntityCount": 0 },
+      "section4": { "path": "2-Internal Ops/01-Design/05-CAD Files/BS04 BUILDING SECTION.dwg", "bytes": 639863, "sha256": "d872b0e6101d2033a7eead83e12e30ce43fd28e1068c14be322da5076d5a6156", "reader": "@mlightcad/libredwg-web 0.7.7", "unknownEntityCount": 0 },
+      "section5": { "path": "2-Internal Ops/01-Design/05-CAD Files/BS05 BUILDING SECTION.dwg", "bytes": 488148, "sha256": "e21a6bb8a46d841c1dad8be5558cc9a144fa04ff9c706fc3042931e1db75419a", "reader": "@mlightcad/libredwg-web 0.7.7", "unknownEntityCount": 0 }
+    }
+  },
+  "answerKeyDenylist": [
+    { "role": "approved-plans", "path": "2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Crisis Center - Approved/Approved Plans.PDF", "sha256": null, "openedBeforeCandidateCommit": false },
+    { "role": "as-built", "path": "2-Internal Ops/04-Close-Out Docs/New Hope BGC - Brigham City UT_as builts.pdf", "sha256": null, "openedBeforeCandidateCommit": false },
+    { "role": "field-set", "path": "2-Internal Ops/01-Design/10-Field Set/24-052_NHCC_INSTALL PLAN.pdf", "sha256": null, "openedBeforeCandidateCommit": false }
+  ],
+  "selection": { "repoReferenceHitsBeforeSelection": 0, "answerArtifactRead": false, "answerArtifactHashed": false, "completedLayoutRead": false, "candidateMustBeCommittedBeforeAnswerOpen": true, "rejectedBeforeAnswerOpen": [{ "project": "Chick-Fil-A Providence", "reason": "actual A201/A221/A230/A401 sources show low-slope membrane roof and flat ceiling grids" }] },
+  "placementPolicy": { "maxAreaSqFt": 130, "maxSpacingFt": 15, "minSpacingFt": 6, "status": "frozen transfer policy only; not a code determination" },
+  "sourceOccupiedOrProtectedFloorFootprints": [{
+    "id": "north-east-occupied-family-unit-wing",
+    "verticesFt": [{ "x": 0, "y": 0 }, { "x": 43, "y": 0 }, { "x": 43, "y": 60.75 }, { "x": 0, "y": 60.75 }],
+    "sourcePage": "A101",
+    "sourceDeclaration": "Occupied FAMILY UNIT A, FAMILY UNIT A - BR 1, FAMILY UNIT A - BR 2, and NORTH WING CORRIDOR labels inside the bounded gable core",
+    "sourceDwgLabelEvidenceInches": [{ "name": "FAMILY UNIT A - BR 2", "x": 4280.675669, "y": 23073.906972 }, { "name": "FAMILY UNIT A - BR 1", "x": 4427.45746, "y": 23071.603222 }, { "name": "FAMILY UNIT A", "x": 4618.913959, "y": 22976.139509 }, { "name": "NORTH WING CORRIDOR", "x": 4323.83053, "y": 22804.304893 }]
+  }],
+  "pitchedConcealedVolume": {
+    "id": "north-east-occupied-wing-gable-core",
+    "verticesFt": [{ "x": 0, "y": 0 }, { "x": 43, "y": 0 }, { "x": 43, "y": 60.75 }, { "x": 0, "y": 60.75 }],
+    "widthFt": 43,
+    "depthFt": 60.75,
+    "sourcePages": ["A101", "A102", "A103", "A301"],
+    "ridgeAxis": "x",
+    "ridgeCoordinateFt": 30.375,
+    "slopeRise": 4,
+    "slopeRun": 12,
+    "eaveDatumZFt": 11.083333,
+    "ridgeDatumZFt": 21.208333,
+    "targetKind": "upright",
+    "protectionPlaneOffsetStatus": "unresolved-truss-obstructions-deflector-offset",
+    "protectionEligibility": { "status": "source-declared-protected", "sourceFootprintIds": ["north-east-occupied-family-unit-wing"], "sourcePages": ["A101"] },
+    "sourceRegistration": {
+      "featureId": "north-east-occupied-wing-gable-core",
+      "floor": { "page": "A101", "pdfPageNumber": 22, "sourceFeatureId": "north-east-occupied-wing-gable-core", "dwgBoundsInches": { "xMin": 4192.650371, "xMax": 4708.651349, "yMin": 22435.895444, "yMax": 23164.892045 }, "occupiedLabelCount": 4 },
+      "roof": { "page": "A103", "pdfPageNumber": 24, "sourceFeatureId": "north-east-occupied-wing-gable-core", "dwgRoofBlocks": ["Roof_6", "Roof_7-clipped-east-core"], "ridgeLineYInches": 22800.391643, "ridgeDatumZFt": 21.208333 },
+      "rcp": { "page": "A102", "pdfPageNumber": 23, "sourceFeatureId": "north-east-occupied-wing-gable-core", "ceilingRegime": "flat suspended ceilings below concealed truss volume" },
+      "section": { "page": "A301", "pdfPageNumber": 26, "sourceFeatureId": "north-east-occupied-wing-gable-core", "views": ["Building Section 1", "Building Section 2"], "slopeRise": 4, "slopeRun": 12, "trussBearingDatumZFt": 10.96875 },
+      "structure": { "page": "A301", "pdfPageNumber": 26, "sourceFeatureId": "north-east-occupied-wing-gable-core", "system": "pre-manufactured roof trusses per structural", "obstructionGeometryStatus": "unresolved" }
+    }
+  },
+  "claims": { "sourceXyCandidateReady": false, "freshProjectPlacementVerified": false, "exactHeadElevationReady": false, "obstructionClearanceReady": false, "hydraulicCalculationReady": false, "complianceReady": false, "fabricationReady": false, "fieldReleaseReady": false },
+  "sourceReceiptSha256": "4315d611055eeb50907ddc241421f67dcf04fbe2ebbe0a8d1265f9da33d44e45"
+}

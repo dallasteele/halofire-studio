@@ -129,7 +129,7 @@ describe('transferable source-topology placement policy v2', () => {
       candidateIdPrefix: 'ELIGIBLE',
       placementPolicy: { maxAreaSqFt: 130, maxSpacingFt: 15, minSpacingFt: 6 },
       protectionEligibilityPolicy: { enforceSourceDeclaredFootprintIntersection: true },
-      sourceProtectedFloorFootprints: [rectangle('occupied-level-2', 0, 0, 25, 25, { sourcePage: 'A1.1', sourceDeclaration: 'occupied floor area' })],
+      sourceOccupiedOrProtectedFloorFootprints: [rectangle('occupied-level-2', 0, 0, 25, 25, { sourcePage: 'A1.1', sourceDeclaration: 'occupied floor area' })],
       finishedCeilingRooms: [], pitchedConcealedVolumes: [], exposedSlopedCeilingVolumes: [volume],
     };
     expect(auditSourceProtectionEligibility(packet)).toEqual({ status: 'passed', issues: [], eligibleVolumeIds: ['eligible-slope'], matchedFootprintIds: ['occupied-level-2'] });
@@ -144,7 +144,7 @@ describe('transferable source-topology placement policy v2', () => {
     await expect(buildSourceTopologyPlacementCandidate(missingDeclaration)).rejects.toThrow('SOURCE_PROTECTION_ELIGIBILITY_BLOCKED');
 
     const nonIntersecting = structuredClone(packet);
-    nonIntersecting.sourceProtectedFloorFootprints[0].verticesFt = rectangle('far', 100, 100, 110, 110).verticesFt;
+    nonIntersecting.sourceOccupiedOrProtectedFloorFootprints[0].verticesFt = rectangle('far', 100, 100, 110, 110).verticesFt;
     expect(auditSourceProtectionEligibility(nonIntersecting)).toMatchObject({ status: 'blocked', issues: [{ code: 'SOURCE_PROTECTION_FOOTPRINT_INTERSECTION_MISSING', sourceVolumeId: 'eligible-slope' }] });
     await expect(buildSourceTopologyPlacementCandidate(nonIntersecting)).rejects.toThrow('SOURCE_PROTECTION_ELIGIBILITY_BLOCKED');
   });

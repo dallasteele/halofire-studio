@@ -1,0 +1,762 @@
+{
+  "artifactType": "halofire.fresh-pitched-attic-source-only-candidate.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "boundedScope": "North-east 4:12 gable core over occupied family-unit wing",
+  "sourceReceiptSha256": "4315d611055eeb50907ddc241421f67dcf04fbe2ebbe0a8d1265f9da33d44e45",
+  "sequence": {
+    "answerArtifactRead": false,
+    "answerArtifactHashed": false,
+    "completedLayoutRead": false,
+    "candidateCommittedBeforeAnswerOpen": false
+  },
+  "registration": {
+    "featureId": "north-east-occupied-wing-gable-core",
+    "floor": {
+      "page": "A101",
+      "pdfPageNumber": 22,
+      "sourceFeatureId": "north-east-occupied-wing-gable-core",
+      "dwgBoundsInches": {
+        "xMin": 4192.650371,
+        "xMax": 4708.651349,
+        "yMin": 22435.895444,
+        "yMax": 23164.892045
+      },
+      "occupiedLabelCount": 4
+    },
+    "roof": {
+      "page": "A103",
+      "pdfPageNumber": 24,
+      "sourceFeatureId": "north-east-occupied-wing-gable-core",
+      "dwgRoofBlocks": [
+        "Roof_6",
+        "Roof_7-clipped-east-core"
+      ],
+      "ridgeLineYInches": 22800.391643,
+      "ridgeDatumZFt": 21.208333
+    },
+    "rcp": {
+      "page": "A102",
+      "pdfPageNumber": 23,
+      "sourceFeatureId": "north-east-occupied-wing-gable-core",
+      "ceilingRegime": "flat suspended ceilings below concealed truss volume"
+    },
+    "section": {
+      "page": "A301",
+      "pdfPageNumber": 26,
+      "sourceFeatureId": "north-east-occupied-wing-gable-core",
+      "views": [
+        "Building Section 1",
+        "Building Section 2"
+      ],
+      "slopeRise": 4,
+      "slopeRun": 12,
+      "trussBearingDatumZFt": 10.96875
+    },
+    "structure": {
+      "page": "A301",
+      "pdfPageNumber": 26,
+      "sourceFeatureId": "north-east-occupied-wing-gable-core",
+      "system": "pre-manufactured roof trusses per structural",
+      "obstructionGeometryStatus": "unresolved"
+    }
+  },
+  "geometry": {
+    "widthFt": 43,
+    "depthFt": 60.75,
+    "ridgeAxis": "x",
+    "ridgeCoordinateFt": 30.375,
+    "slopeRise": 4,
+    "slopeRun": 12,
+    "eaveDatumZFt": 11.083333,
+    "ridgeDatumZFt": 21.208333,
+    "trussBearingDatumZFt": 10.96875
+  },
+  "protectionEligibilityAudit": {
+    "status": "passed",
+    "issues": [],
+    "eligibleVolumeIds": [
+      "north-east-occupied-wing-gable-core"
+    ],
+    "matchedFootprintIds": [
+      "north-east-occupied-family-unit-wing"
+    ]
+  },
+  "gridAudit": {
+    "sourceVolumeId": "north-east-occupied-wing-gable-core",
+    "sourcePages": [
+      "A101",
+      "A102",
+      "A103",
+      "A301"
+    ],
+    "boundsFt": {
+      "minX": 0,
+      "minY": 0,
+      "maxX": 43,
+      "maxY": 60.75,
+      "width": 43,
+      "height": 60.75
+    },
+    "widthFt": 43,
+    "heightFt": 60.75,
+    "columns": 4,
+    "rows": 6,
+    "candidateIds": [
+      "NH-U-001",
+      "NH-U-002",
+      "NH-U-003",
+      "NH-U-004",
+      "NH-U-005",
+      "NH-U-006",
+      "NH-U-007",
+      "NH-U-008",
+      "NH-U-009",
+      "NH-U-010",
+      "NH-U-011",
+      "NH-U-012",
+      "NH-U-013",
+      "NH-U-014",
+      "NH-U-015",
+      "NH-U-016",
+      "NH-U-017",
+      "NH-U-018",
+      "NH-U-019",
+      "NH-U-020",
+      "NH-U-021",
+      "NH-U-022",
+      "NH-U-023",
+      "NH-U-024"
+    ]
+  },
+  "heads": [
+    {
+      "id": "NH-U-001",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.375,
+        "y": 5.0625
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 12.770833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-002",
+      "kind": "upright",
+      "localFt": {
+        "x": 16.125,
+        "y": 5.0625
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 0,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 12.770833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-003",
+      "kind": "upright",
+      "localFt": {
+        "x": 26.875,
+        "y": 5.0625
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 0,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 12.770833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-004",
+      "kind": "upright",
+      "localFt": {
+        "x": 37.625,
+        "y": 5.0625
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 0,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 12.770833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-005",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.375,
+        "y": 15.1875
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 1,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 16.145833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-006",
+      "kind": "upright",
+      "localFt": {
+        "x": 16.125,
+        "y": 15.1875
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 1,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 16.145833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-007",
+      "kind": "upright",
+      "localFt": {
+        "x": 26.875,
+        "y": 15.1875
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 1,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 16.145833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-008",
+      "kind": "upright",
+      "localFt": {
+        "x": 37.625,
+        "y": 15.1875
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 1,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 16.145833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-009",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.375,
+        "y": 25.3125
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 2,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 19.520833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-010",
+      "kind": "upright",
+      "localFt": {
+        "x": 16.125,
+        "y": 25.3125
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 2,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 19.520833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-011",
+      "kind": "upright",
+      "localFt": {
+        "x": 26.875,
+        "y": 25.3125
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 2,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 19.520833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-012",
+      "kind": "upright",
+      "localFt": {
+        "x": 37.625,
+        "y": 25.3125
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 2,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 19.520833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-013",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.375,
+        "y": 35.4375
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 3,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 19.520833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-014",
+      "kind": "upright",
+      "localFt": {
+        "x": 16.125,
+        "y": 35.4375
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 3,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 19.520833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-015",
+      "kind": "upright",
+      "localFt": {
+        "x": 26.875,
+        "y": 35.4375
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 3,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 19.520833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-016",
+      "kind": "upright",
+      "localFt": {
+        "x": 37.625,
+        "y": 35.4375
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 3,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 19.520833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-017",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.375,
+        "y": 45.5625
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 4,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 16.145833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-018",
+      "kind": "upright",
+      "localFt": {
+        "x": 16.125,
+        "y": 45.5625
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 4,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 16.145833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-019",
+      "kind": "upright",
+      "localFt": {
+        "x": 26.875,
+        "y": 45.5625
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 4,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 16.145833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-020",
+      "kind": "upright",
+      "localFt": {
+        "x": 37.625,
+        "y": 45.5625
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 4,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 16.145833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-021",
+      "kind": "upright",
+      "localFt": {
+        "x": 5.375,
+        "y": 55.6875
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 5,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 12.770833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-022",
+      "kind": "upright",
+      "localFt": {
+        "x": 16.125,
+        "y": 55.6875
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 5,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 12.770833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-023",
+      "kind": "upright",
+      "localFt": {
+        "x": 26.875,
+        "y": 55.6875
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 5,
+        "column": 2
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 12.770833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    },
+    {
+      "id": "NH-U-024",
+      "kind": "upright",
+      "localFt": {
+        "x": 37.625,
+        "y": 55.6875
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-east-occupied-wing-gable-core",
+      "sourceProtectionPlaneZFt": null,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-east-occupied-wing-gable-core",
+        "ridgeAxis": "x",
+        "slope": "4:12",
+        "row": 5,
+        "column": 3
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false,
+      "sourceRoofSurfaceZFt": 12.770833,
+      "sourceVerticalDatumStatus": "unresolved-truss-obstructions-deflector-offset"
+    }
+  ],
+  "counts": {
+    "total": 24,
+    "upright": 24
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic source-only 4:12 gable policy replay"
+    },
+    "crossSource": {
+      "status": "passed",
+      "method": "A101/A102/A103/A301 plus floor/RCP/roof/section DWGs bind one occupied gable core"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "source, answer-isolation, eligibility, geometry, XY, roof-Z, and false-promotion mutations rejected"
+    }
+  },
+  "sourceXyCandidateReady": true,
+  "pitchedEnvelopeReady": true,
+  "freshProjectPlacementVerified": false,
+  "exactHeadElevationReady": false,
+  "obstructionClearanceReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "fresh-source-only-pitched-attic-candidate-sealed-before-answer-not-scored-or-engineering-ready",
+  "receiptSha256": "24830919a5bb579fb102eb542f0e3f4e1c767b1e5aa452839e6031f8eb7f440d"
+}
