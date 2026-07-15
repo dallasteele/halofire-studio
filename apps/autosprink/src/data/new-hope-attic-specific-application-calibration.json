@@ -1,0 +1,230 @@
+{
+  "artifactType": "halofire.answer-exposed-attic-specific-application-calibration.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "sourceReceiptSha256": "34d2b9d9b457198b16b0a5dd2b4f2d21f8936a14f180dae8acc83ee8ce3d0725",
+  "modelSelection": {
+    "manufacturer": "Tyco",
+    "sin": "TY4180",
+    "model": "BB1",
+    "kFactor": 8,
+    "pitchRange": {
+      "minRise": 4,
+      "maxRiseExclusive": 7,
+      "run": 12
+    },
+    "allowableRoofSpanFt": 60,
+    "minimumFlowGpm": 38,
+    "minimumPressurePsi": 22.6,
+    "ridgeSpacingFt": {
+      "min": 4,
+      "max": 6
+    },
+    "ridgeCenterlineOffsetInMax": 6,
+    "deflectorBelowPeakIn": {
+      "min": 16,
+      "max": 22
+    },
+    "trussFaceClearanceInMin": 6,
+    "drySystemDemandHeadCount": 7
+  },
+  "structure": {
+    "sourceSheets": [
+      "S102",
+      "S301"
+    ],
+    "trussSpacingIn": 24,
+    "trussDirection": "perpendicular-to-outside-wall",
+    "exactTrussFacePolygonsReady": false
+  },
+  "branchline": {
+    "ridgeAxis": "x",
+    "ridgeCoordinateFt": 30.375,
+    "ridgeLengthFt": 43,
+    "startOffsetFt": 4,
+    "spacingFt": 6,
+    "endOffsetFt": 3,
+    "targetCount": 7,
+    "source": "approved-field-as-built-consensus"
+  },
+  "heads": [
+    {
+      "id": "NH-BB1-001",
+      "kind": "specific-application-attic-upright",
+      "manufacturer": "Tyco",
+      "sin": "TY4180",
+      "model": "BB1",
+      "kFactor": 8,
+      "localFt": {
+        "x": 4,
+        "y": 30.375
+      },
+      "sourceRoofSurfaceZFt": 21.208333,
+      "permittedDeflectorZRangeFt": {
+        "min": 19.375,
+        "max": 19.875
+      },
+      "headInstallationZFt": null,
+      "trussFaceClearanceVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "NH-BB1-002",
+      "kind": "specific-application-attic-upright",
+      "manufacturer": "Tyco",
+      "sin": "TY4180",
+      "model": "BB1",
+      "kFactor": 8,
+      "localFt": {
+        "x": 10,
+        "y": 30.375
+      },
+      "sourceRoofSurfaceZFt": 21.208333,
+      "permittedDeflectorZRangeFt": {
+        "min": 19.375,
+        "max": 19.875
+      },
+      "headInstallationZFt": null,
+      "trussFaceClearanceVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "NH-BB1-003",
+      "kind": "specific-application-attic-upright",
+      "manufacturer": "Tyco",
+      "sin": "TY4180",
+      "model": "BB1",
+      "kFactor": 8,
+      "localFt": {
+        "x": 16,
+        "y": 30.375
+      },
+      "sourceRoofSurfaceZFt": 21.208333,
+      "permittedDeflectorZRangeFt": {
+        "min": 19.375,
+        "max": 19.875
+      },
+      "headInstallationZFt": null,
+      "trussFaceClearanceVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "NH-BB1-004",
+      "kind": "specific-application-attic-upright",
+      "manufacturer": "Tyco",
+      "sin": "TY4180",
+      "model": "BB1",
+      "kFactor": 8,
+      "localFt": {
+        "x": 22,
+        "y": 30.375
+      },
+      "sourceRoofSurfaceZFt": 21.208333,
+      "permittedDeflectorZRangeFt": {
+        "min": 19.375,
+        "max": 19.875
+      },
+      "headInstallationZFt": null,
+      "trussFaceClearanceVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "NH-BB1-005",
+      "kind": "specific-application-attic-upright",
+      "manufacturer": "Tyco",
+      "sin": "TY4180",
+      "model": "BB1",
+      "kFactor": 8,
+      "localFt": {
+        "x": 28,
+        "y": 30.375
+      },
+      "sourceRoofSurfaceZFt": 21.208333,
+      "permittedDeflectorZRangeFt": {
+        "min": 19.375,
+        "max": 19.875
+      },
+      "headInstallationZFt": null,
+      "trussFaceClearanceVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "NH-BB1-006",
+      "kind": "specific-application-attic-upright",
+      "manufacturer": "Tyco",
+      "sin": "TY4180",
+      "model": "BB1",
+      "kFactor": 8,
+      "localFt": {
+        "x": 34,
+        "y": 30.375
+      },
+      "sourceRoofSurfaceZFt": 21.208333,
+      "permittedDeflectorZRangeFt": {
+        "min": 19.375,
+        "max": 19.875
+      },
+      "headInstallationZFt": null,
+      "trussFaceClearanceVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "NH-BB1-007",
+      "kind": "specific-application-attic-upright",
+      "manufacturer": "Tyco",
+      "sin": "TY4180",
+      "model": "BB1",
+      "kFactor": 8,
+      "localFt": {
+        "x": 40,
+        "y": 30.375
+      },
+      "sourceRoofSurfaceZFt": 21.208333,
+      "permittedDeflectorZRangeFt": {
+        "min": 19.375,
+        "max": 19.875
+      },
+      "headInstallationZFt": null,
+      "trussFaceClearanceVerified": false,
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    }
+  ],
+  "hydraulics": {
+    "systemType": "dry-steel",
+    "manufacturerDemandHeadCount": 7,
+    "minimumPerHeadFlowGpm": 38,
+    "minimumPerHeadPressurePsi": 22.6,
+    "minimumRemoteSprinklerFlowGpm": 266,
+    "actualNetworkCalculationReady": false
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic manufacturer-bound seven-head ridge replay"
+    },
+    "crossSource": {
+      "status": "passed",
+      "method": "S102/S301 structure plus TFP610 plus approved/field/as-built FP2.0 consensus"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "source, model, pitch, span, spacing, structure, hydraulic, and false-promotion mutations rejected"
+    }
+  },
+  "calibrationReady": true,
+  "freshProjectPlacementVerified": false,
+  "exactHeadElevationReady": false,
+  "obstructionClearanceReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "answer-exposed-structural-and-manufacturer-calibration-only-requires-fresh-transfer-and-exact-obstruction-hydraulic-proof",
+  "receiptSha256": "3c5714fe3f5cb8e6d55ccd6fc242f6e46de278b5cf6855dc8cff921ebefb9fcb"
+}

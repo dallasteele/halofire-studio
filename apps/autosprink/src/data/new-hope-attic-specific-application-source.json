@@ -1,0 +1,14 @@
+{
+  "artifactType": "halofire.answer-exposed-attic-specific-application-source.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "calibrationStatus": "answer-exposed-not-fresh",
+  "sources": {
+    "s102": { "sheet": "S102", "sha256": "2f695364975d6ddccd13e41b14db96f4d927e60ba23accda57bead7d3b9e4f5a", "bytes": 717235, "finding": "pre-manufactured trusses perpendicular to outside walls" },
+    "s301": { "sheet": "S301", "sha256": "9745634c34c037963dbdbd2cc0fa30e00e47c3a2509c711578849aabebe2044a", "bytes": 632463, "finding": "heavy timber truss elevation and connection details" },
+    "tfp610": { "document": "TFP610", "revision": "December 2024", "sha256": "ef738cdc5271e38bd978b8f5932514bcbf1d84e83e778ca9fe5a32dbed1978ca", "bytes": 10207045, "embeddedPdfPages": [116, 143] }
+  },
+  "manufacturerCriteria": { "document": "TFP610", "revision": "December 2024", "sin": "TY4180", "sourcePages": { "designCriteria": 121, "designGuidelines": 123, "obstructions": 129, "hydraulics": 133 } },
+  "feature": { "id": "north-east-occupied-wing-gable-core", "ridgeLengthFt": 43, "horizontalRoofSpanFt": 60, "ridgeCoordinateFt": 30.375, "ridgeDatumZFt": 21.208333, "roofPitch": { "rise": 4, "run": 12 }, "trussSpacingIn": 24, "trussDirection": "perpendicular-to-outside-wall", "systemType": "dry-steel", "branchline": { "startOffsetFt": 4, "spacingFt": 6, "endOffsetFt": 3, "source": "approved-field-as-built-consensus" } },
+  "claims": { "freshProjectPlacementVerified": false, "exactHeadElevationReady": false, "obstructionClearanceReady": false, "hydraulicCalculationReady": false, "complianceReady": false, "fabricationReady": false, "fieldReleaseReady": false },
+  "sourceReceiptSha256": "34d2b9d9b457198b16b0a5dd2b4f2d21f8936a14f180dae8acc83ee8ce3d0725"
+}
