@@ -1,0 +1,426 @@
+{
+  "artifactType": "halofire.fresh-pitched-source-candidate.v1",
+  "projectId": "ironwood-seminary-annex",
+  "projectName": "Ironwood Seminary Annex",
+  "generationVersion": "frozen-building-j-topology-policy-transfer-v1",
+  "generationMode": "sealed-protected-source-room-and-pitched-volume-deterministic-placement",
+  "sourceReceiptSha256": "7eb960a4799c0e342d3b73a5f5866cfd2397ddc237296cff5833a1cebe949ece",
+  "sequence": {
+    "sourceCandidateSealedBeforeAnswerOpen": true,
+    "answerArtifactRead": false,
+    "completedLayoutRead": false,
+    "freshProjectHoldout": true
+  },
+  "policy": {
+    "hazardAssumption": "ordinary",
+    "hazardAssumptionStatus": "frozen Building J internal-alpha default; not source-classified and not code compliance",
+    "maxAreaSqFt": 130,
+    "maxSpacingFt": 15,
+    "minSpacingFt": 6,
+    "source": "frozen Building J topology-v2 deterministic placement policy"
+  },
+  "roomAudit": [
+    {
+      "sourceRoomId": "support-201",
+      "sourcePage": 12,
+      "boundsFt": {
+        "minX": 0,
+        "minY": 0,
+        "maxX": 9.53125,
+        "maxY": 12.46875,
+        "width": 9.53125,
+        "height": 12.46875
+      },
+      "widthFt": 9.53125,
+      "heightFt": 12.46875,
+      "columns": 1,
+      "rows": 1,
+      "candidateIds": [
+        "IRONWOOD-P-001"
+      ]
+    },
+    {
+      "sourceRoomId": "office-202",
+      "sourcePage": 12,
+      "boundsFt": {
+        "minX": 9.53125,
+        "minY": 0,
+        "maxX": 19.197917,
+        "maxY": 12.46875,
+        "width": 9.666667,
+        "height": 12.46875
+      },
+      "widthFt": 9.666667,
+      "heightFt": 12.46875,
+      "columns": 1,
+      "rows": 1,
+      "candidateIds": [
+        "IRONWOOD-P-002"
+      ]
+    },
+    {
+      "sourceRoomId": "entry-121",
+      "sourcePage": 12,
+      "boundsFt": {
+        "minX": 0,
+        "minY": 19.197917,
+        "maxX": 19.197917,
+        "maxY": 23.697917,
+        "width": 19.197917,
+        "height": 4.5
+      },
+      "widthFt": 19.197917,
+      "heightFt": 4.5,
+      "columns": 2,
+      "rows": 1,
+      "candidateIds": [
+        "IRONWOOD-P-003",
+        "IRONWOOD-P-004"
+      ]
+    },
+    {
+      "sourceRoomId": "office-203",
+      "sourcePage": 12,
+      "boundsFt": {
+        "minX": 0,
+        "minY": 30.427084,
+        "maxX": 9.53125,
+        "maxY": 42.895834,
+        "width": 9.53125,
+        "height": 12.46875
+      },
+      "widthFt": 9.53125,
+      "heightFt": 12.46875,
+      "columns": 1,
+      "rows": 1,
+      "candidateIds": [
+        "IRONWOOD-P-005"
+      ]
+    },
+    {
+      "sourceRoomId": "office-204",
+      "sourcePage": 12,
+      "boundsFt": {
+        "minX": 9.53125,
+        "minY": 30.427084,
+        "maxX": 19.197917,
+        "maxY": 42.895834,
+        "width": 9.666667,
+        "height": 12.46875
+      },
+      "widthFt": 9.666667,
+      "heightFt": 12.46875,
+      "columns": 1,
+      "rows": 1,
+      "candidateIds": [
+        "IRONWOOD-P-006"
+      ]
+    }
+  ],
+  "roofAudit": [
+    {
+      "sourceVolumeId": "north-gable-concealed-volume",
+      "sourcePages": [
+        13,
+        14,
+        24,
+        28
+      ],
+      "boundsFt": {
+        "minX": 0,
+        "minY": 0,
+        "maxX": 19.197917,
+        "maxY": 12.46875,
+        "width": 19.197917,
+        "height": 12.46875
+      },
+      "widthFt": 19.197917,
+      "heightFt": 12.46875,
+      "columns": 2,
+      "rows": 1,
+      "candidateIds": [
+        "IRONWOOD-U-001",
+        "IRONWOOD-U-002"
+      ]
+    },
+    {
+      "sourceVolumeId": "south-gable-concealed-volume",
+      "sourcePages": [
+        13,
+        14,
+        24,
+        28
+      ],
+      "boundsFt": {
+        "minX": 0,
+        "minY": 30.427084,
+        "maxX": 19.197917,
+        "maxY": 42.895834,
+        "width": 19.197917,
+        "height": 12.46875
+      },
+      "widthFt": 19.197917,
+      "heightFt": 12.46875,
+      "columns": 2,
+      "rows": 1,
+      "candidateIds": [
+        "IRONWOOD-U-003",
+        "IRONWOOD-U-004"
+      ]
+    }
+  ],
+  "heads": [
+    {
+      "id": "IRONWOOD-P-001",
+      "kind": "pendent",
+      "localFt": {
+        "x": 4.765625,
+        "y": 6.234375
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "new-finished-ceiling-108",
+      "sourceProtectionPlaneZFt": 108,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-room-polygon-centered-policy-grid",
+        "sourceRoomId": "support-201",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "IRONWOOD-P-002",
+      "kind": "pendent",
+      "localFt": {
+        "x": 14.364584,
+        "y": 6.234375
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "new-finished-ceiling-108",
+      "sourceProtectionPlaneZFt": 108,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-room-polygon-centered-policy-grid",
+        "sourceRoomId": "office-202",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "IRONWOOD-P-003",
+      "kind": "pendent",
+      "localFt": {
+        "x": 4.799479,
+        "y": 21.447917
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "new-finished-ceiling-108",
+      "sourceProtectionPlaneZFt": 108,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-room-polygon-centered-policy-grid",
+        "sourceRoomId": "entry-121",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "IRONWOOD-P-004",
+      "kind": "pendent",
+      "localFt": {
+        "x": 14.398438,
+        "y": 21.447917
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "new-finished-ceiling-108",
+      "sourceProtectionPlaneZFt": 108,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-room-polygon-centered-policy-grid",
+        "sourceRoomId": "entry-121",
+        "row": 0,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "IRONWOOD-P-005",
+      "kind": "pendent",
+      "localFt": {
+        "x": 4.765625,
+        "y": 36.661459
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "new-finished-ceiling-108",
+      "sourceProtectionPlaneZFt": 108,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-room-polygon-centered-policy-grid",
+        "sourceRoomId": "office-203",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "IRONWOOD-P-006",
+      "kind": "pendent",
+      "localFt": {
+        "x": 14.364584,
+        "y": 36.661459
+      },
+      "sourceProtectionRegime": "finished-ceiling-pendent-source-plane",
+      "sourceProtectionPlaneId": "new-finished-ceiling-108",
+      "sourceProtectionPlaneZFt": 108,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-room-polygon-centered-policy-grid",
+        "sourceRoomId": "office-204",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "IRONWOOD-U-001",
+      "kind": "upright",
+      "localFt": {
+        "x": 4.799479,
+        "y": 6.234375
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-gable-concealed-volume",
+      "sourceProtectionPlaneZFt": 110.597656,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-gable-concealed-volume",
+        "ridgeAxis": "x",
+        "slope": "5:12",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "IRONWOOD-U-002",
+      "kind": "upright",
+      "localFt": {
+        "x": 14.398438,
+        "y": 6.234375
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "north-gable-concealed-volume",
+      "sourceProtectionPlaneZFt": 110.597656,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "north-gable-concealed-volume",
+        "ridgeAxis": "x",
+        "slope": "5:12",
+        "row": 0,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "IRONWOOD-U-003",
+      "kind": "upright",
+      "localFt": {
+        "x": 4.799479,
+        "y": 36.661459
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "south-gable-concealed-volume",
+      "sourceProtectionPlaneZFt": 110.597656,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "south-gable-concealed-volume",
+        "ridgeAxis": "x",
+        "slope": "5:12",
+        "row": 0,
+        "column": 0
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    },
+    {
+      "id": "IRONWOOD-U-004",
+      "kind": "upright",
+      "localFt": {
+        "x": 14.398438,
+        "y": 36.661459
+      },
+      "sourceProtectionRegime": "pitched-concealed-volume-source-protection-target",
+      "sourceProtectionPlaneId": "south-gable-concealed-volume",
+      "sourceProtectionPlaneZFt": 110.597656,
+      "headInstallationZFt": null,
+      "sprinklerModel": null,
+      "sourceDerivation": {
+        "method": "source-pitched-volume-centered-policy-grid",
+        "sourceVolumeId": "south-gable-concealed-volume",
+        "ridgeAxis": "x",
+        "slope": "5:12",
+        "row": 0,
+        "column": 1
+      },
+      "obstructionClearanceVerified": false,
+      "hydraulicNodeAssigned": false
+    }
+  ],
+  "counts": {
+    "total": 10,
+    "pendent": 6,
+    "upright": 4
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "deterministic protected-source room and pitched-volume replay"
+    },
+    "independent": {
+      "status": "passed",
+      "method": "source receipt, polygon containment, spacing, area, count, and roof-slope arithmetic checks"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "receipt, source boundary, geometry, answer leakage, and false-promotion attacks rejected"
+    }
+  },
+  "sourceGeneratedCandidateReady": true,
+  "answerScoreReady": false,
+  "freshProjectPlacementVerified": false,
+  "concealedSpaceProtectionRequirementVerified": false,
+  "sprinklerModelSelectionReady": false,
+  "exactMechanicalObstructionFootprintsReady": false,
+  "exactStructuralMemberDepthsReady": false,
+  "obstructionClearancesVerified": false,
+  "branchPipeTopologyReady": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "claimStatus": "fresh-source-sealed-candidate-awaiting-answer-only-score-not-code-compliance-hydraulics-fabrication-or-release",
+  "receiptSha256": "fb6f897b20f58fead2ea34235f398c7d08d111fd229d1cd54d4018407ff741c4"
+}

@@ -1,0 +1,294 @@
+{
+  "artifactType": "halofire.protected-source-topology.v1",
+  "projectId": "ironwood-seminary-annex",
+  "projectName": "Ironwood Seminary Annex",
+  "candidateIdPrefix": "IRONWOOD",
+  "protectedSource": {
+    "egnyteRelativePath": "03-Closed/Porter Brother/Ironwood LDS Seminary Annex-Queen Creek AZ/COM_Ironstone rittenhouse addition_Drawings.pdf",
+    "sha256": "b80b399aa219dd91344d68ad8637e22e165a87d7726427764348ead7ef21cba6",
+    "pageCount": 38,
+    "allowedPages": [
+      12,
+      13,
+      14,
+      24,
+      28
+    ],
+    "excludedPages": [
+      26
+    ],
+    "excludedPageReason": "The construction set contains a fire-sprinkler sheet. It is answer-shaped and is forbidden to source generation or tuning."
+  },
+  "sourceSequence": {
+    "repoReferenceSearchPassed": true,
+    "sourceInspectedBeforeAnswer": true,
+    "answerArtifactRead": false,
+    "completedLayoutRead": false,
+    "answerArtifactHashed": false,
+    "candidateMustBeCommittedBeforeAnswerOpen": true
+  },
+  "sourceExtraction": {
+    "method": "protected PDF vector geometry plus printed architectural dimensions",
+    "textLayerAvailable": false,
+    "vectorDrawingsAvailable": true,
+    "floorPlanScale": "1/8 inch = 1 foot",
+    "pdfPointsPerFoot": 9,
+    "sourceGeometryVisuallyVerified": true,
+    "sprinklerSymbolsConsumed": false
+  },
+  "placementPolicy": {
+    "hazardAssumption": "ordinary",
+    "hazardAssumptionStatus": "frozen Building J internal-alpha default; not source-classified and not code compliance",
+    "maxAreaSqFt": 130,
+    "maxSpacingFt": 15,
+    "minSpacingFt": 6,
+    "source": "frozen Building J topology-v2 deterministic placement policy"
+  },
+  "datums": {
+    "finishedFloorZFt": 100,
+    "wallPlateZFt": 108,
+    "roofSlopeRise": 5,
+    "roofSlopeRun": 12
+  },
+  "finishedCeilingRooms": [
+    {
+      "id": "support-201",
+      "sourcePage": 12,
+      "ceilingPlaneId": "new-finished-ceiling-108",
+      "ceilingDatumZFt": 108,
+      "verticesFt": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 9.53125,
+          "y": 0
+        },
+        {
+          "x": 9.53125,
+          "y": 12.46875
+        },
+        {
+          "x": 0,
+          "y": 12.46875
+        }
+      ]
+    },
+    {
+      "id": "office-202",
+      "sourcePage": 12,
+      "ceilingPlaneId": "new-finished-ceiling-108",
+      "ceilingDatumZFt": 108,
+      "verticesFt": [
+        {
+          "x": 9.53125,
+          "y": 0
+        },
+        {
+          "x": 19.197917,
+          "y": 0
+        },
+        {
+          "x": 19.197917,
+          "y": 12.46875
+        },
+        {
+          "x": 9.53125,
+          "y": 12.46875
+        }
+      ]
+    },
+    {
+      "id": "entry-121",
+      "sourcePage": 12,
+      "ceilingPlaneId": "new-finished-ceiling-108",
+      "ceilingDatumZFt": 108,
+      "verticesFt": [
+        {
+          "x": 0,
+          "y": 19.197917
+        },
+        {
+          "x": 19.197917,
+          "y": 19.197917
+        },
+        {
+          "x": 19.197917,
+          "y": 23.697917
+        },
+        {
+          "x": 0,
+          "y": 23.697917
+        }
+      ]
+    },
+    {
+      "id": "office-203",
+      "sourcePage": 12,
+      "ceilingPlaneId": "new-finished-ceiling-108",
+      "ceilingDatumZFt": 108,
+      "verticesFt": [
+        {
+          "x": 0,
+          "y": 30.427084
+        },
+        {
+          "x": 9.53125,
+          "y": 30.427084
+        },
+        {
+          "x": 9.53125,
+          "y": 42.895834
+        },
+        {
+          "x": 0,
+          "y": 42.895834
+        }
+      ]
+    },
+    {
+      "id": "office-204",
+      "sourcePage": 12,
+      "ceilingPlaneId": "new-finished-ceiling-108",
+      "ceilingDatumZFt": 108,
+      "verticesFt": [
+        {
+          "x": 9.53125,
+          "y": 30.427084
+        },
+        {
+          "x": 19.197917,
+          "y": 30.427084
+        },
+        {
+          "x": 19.197917,
+          "y": 42.895834
+        },
+        {
+          "x": 9.53125,
+          "y": 42.895834
+        }
+      ]
+    }
+  ],
+  "pitchedConcealedVolumes": [
+    {
+      "id": "north-gable-concealed-volume",
+      "sourcePages": [
+        13,
+        14,
+        24,
+        28
+      ],
+      "ridgeAxis": "x",
+      "ridgeCoordinateFt": 6.234375,
+      "slopeRise": 5,
+      "slopeRun": 12,
+      "eaveDatumZFt": 108,
+      "verticesFt": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 19.197917,
+          "y": 0
+        },
+        {
+          "x": 19.197917,
+          "y": 12.46875
+        },
+        {
+          "x": 0,
+          "y": 12.46875
+        }
+      ]
+    },
+    {
+      "id": "south-gable-concealed-volume",
+      "sourcePages": [
+        13,
+        14,
+        24,
+        28
+      ],
+      "ridgeAxis": "x",
+      "ridgeCoordinateFt": 36.661459,
+      "slopeRise": 5,
+      "slopeRun": 12,
+      "eaveDatumZFt": 108,
+      "verticesFt": [
+        {
+          "x": 0,
+          "y": 30.427084
+        },
+        {
+          "x": 19.197917,
+          "y": 30.427084
+        },
+        {
+          "x": 19.197917,
+          "y": 42.895834
+        },
+        {
+          "x": 0,
+          "y": 42.895834
+        }
+      ]
+    }
+  ],
+  "visualUnderlays": {
+    "floorPlan": {
+      "page": 12,
+      "sheet": "A101",
+      "cropPdfPt": {
+        "x": 1600,
+        "y": 125,
+        "width": 650,
+        "height": 1075
+      }
+    },
+    "roofAndRcp": {
+      "page": 13,
+      "sheet": "A102",
+      "cropPdfPt": {
+        "x": 1650,
+        "y": 175,
+        "width": 575,
+        "height": 950
+      }
+    },
+    "elevationsAndSections": {
+      "page": 14,
+      "sheet": "A201",
+      "cropPdfPt": {
+        "x": 75,
+        "y": 25,
+        "width": 2325,
+        "height": 1550
+      }
+    },
+    "roofFraming": {
+      "page": 24,
+      "sheet": "S300",
+      "cropPdfPt": {
+        "x": 500,
+        "y": 25,
+        "width": 1450,
+        "height": 1500
+      }
+    },
+    "mechanical": {
+      "page": 28,
+      "sheet": "M101",
+      "cropPdfPt": {
+        "x": 100,
+        "y": 25,
+        "width": 2300,
+        "height": 1550
+      }
+    }
+  },
+  "sourceReceiptSha256": "7eb960a4799c0e342d3b73a5f5866cfd2397ddc237296cff5833a1cebe949ece"
+}
