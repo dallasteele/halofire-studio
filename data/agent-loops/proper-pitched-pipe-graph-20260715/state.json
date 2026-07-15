@@ -1,8 +1,8 @@
 {
   "loop": "proper-pitched-pipe-graph-20260715",
   "stage": "ITERATE",
-  "status": "verified-bounded-ridge-branch-path-grade-direction-catchment-and-deflector-envelope-exact-z-and-whole-fp20-still-fail-closed",
-  "iteration": 10,
+  "status": "verified-two-complete-long-branch-drainage-trees-and-relative-profiles-exact-z-and-whole-fp20-still-fail-closed",
+  "iteration": 11,
   "brainPreflight": {
     "status": "passed",
     "topEpisodes": [148441, 124864, 148034]
@@ -19,6 +19,7 @@
     "hydraulicRouteBindingEngine": "apps/autosprink/src/engine/approved-fp20-hydraulic-route-binding.js",
     "architecturalVerticalControlEngine": "apps/autosprink/src/engine/approved-fp20-architectural-vertical-controls.js",
     "boundedRidgeBranchGradeEngine": "apps/autosprink/src/engine/new-hope-ridge-branch-grade-envelope.js",
+    "completeLongBranchDrainageEngine": "apps/autosprink/src/engine/new-hope-long-branch-drainage.js",
     "hydraulicRouteEvidence": [
       "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-1.json",
       "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-2.json",
@@ -97,8 +98,46 @@
     "exactDrainRouteReady": false,
     "wholeFp20GradeDirectionReady": false
   },
+  "completeLongBranchDrainage": {
+    "status": "passed",
+    "systemCount": 2,
+    "canonicalEdgeCount": 44,
+    "directedEdgeCount": 43,
+    "lowPointZoneEdgeCount": 1,
+    "sprinklerCount": 28,
+    "systems": [
+      {
+        "id": "lower-long-branch-system",
+        "lowPoints": ["low-point-01"],
+        "rootCanonicalNodes": ["canonical-node-054", "canonical-node-059"],
+        "terminalCanonicalNodes": ["canonical-node-079", "canonical-node-107"],
+        "relativeTerminalProfiles": [
+          {"terminal": "canonical-node-079", "planRunFt": 16.219753, "requiredRiseIn": 0.810988},
+          {"terminal": "canonical-node-107", "planRunFt": 65.320793, "requiredRiseIn": 3.26604}
+        ]
+      },
+      {
+        "id": "upper-long-branch-system",
+        "lowPoints": ["low-point-04"],
+        "rootCanonicalNodes": ["canonical-node-056"],
+        "terminalCanonicalNodes": ["canonical-node-083", "canonical-node-112"],
+        "relativeTerminalProfiles": [
+          {"terminal": "canonical-node-083", "planRunFt": 16.698203, "requiredRiseIn": 0.83491},
+          {"terminal": "canonical-node-112", "planRunFt": 65.808466, "requiredRiseIn": 3.290423}
+        ]
+      }
+    ],
+    "longBranchSourceTopologyReady": true,
+    "longBranchLowPointBindingReady": true,
+    "longBranchGradeDirectionReady": true,
+    "longBranchRelativeGradeProfilesReady": true,
+    "exactPipeCenterlineZReady": false,
+    "wholeFp20GradeDirectionReady": false,
+    "properPipeLayoutReady": false
+  },
   "remainingLayoutBlockers": [
-    "FP20_NON_CALCULATED_EDGES_AWAIT_DIRECTION_BINDING",
+    "FP20_REMAINING_BRANCH_COMPONENTS_AWAIT_DIRECTION_BINDING",
+    "FP20_CROSS_MAINS_AWAIT_DIRECTION_AND_CATCHMENT_BINDING",
     "FP20_WHOLE_SYSTEM_DRAINAGE_GRADE_REQUIRES_ELEVATION_BINDING",
     "FP20_WHOLE_SYSTEM_GRADE_DIRECTION_UNRESOLVED",
     "FP20_ENDPOINT_ELEVATION_UNRESOLVED",
@@ -106,13 +145,15 @@
     "FP20_FITTING_IDENTITY_UNRESOLVED"
   ],
   "verification": {
-    "focusedTests": "36 passed across bounded ridge-branch grade, all three hydraulic route bindings, architectural vertical controls, governed/canonical topology, actual-PDF proof, and adversarial mutations",
+    "focusedTests": "39 passed across complete long-branch drainage, bounded ridge-branch grade, all three hydraulic route bindings, architectural vertical controls, governed/canonical topology, actual-PDF proof, and adversarial mutations",
     "productionBuild": "passed Vite build",
     "formalProof": {
       "status": "verified",
       "prover": "Lean 4.13.0 on GX10",
       "elapsedMs": 133,
-      "receipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-proof.json"
+      "receipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-proof.json",
+      "longBranchReceipt": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-long-branch-proof.json",
+      "longBranchElapsedMs": 71
     },
     "browser": {
       "url": "http://127.0.0.1:3312/src/data/proofs/new-hope-truss-clearance/index.html",
@@ -127,6 +168,13 @@
       "boundedGradeVectorCount": 6,
       "boundedGradeHeadCount": 7,
       "boundedGradeProfileRangeCount": 7,
+      "longBranchSourceTopologyReady": true,
+      "longBranchLowPointBindingReady": true,
+      "longBranchGradeDirectionReady": true,
+      "longBranchRelativeGradeProfilesReady": true,
+      "longBranchGradeVectorCount": 43,
+      "longBranchRelativeProfileCount": 4,
+      "longBranchAuditRowCount": 4,
       "exactDeflectorElevationsReady": false,
       "exactPipeCenterlineZReady": false,
       "route21FlowOverlayVectorCount": 36,
@@ -134,19 +182,20 @@
       "route23FlowOverlayVectorCount": 31,
       "properPipeLayoutReady": false,
       "consoleErrorsOrWarnings": 0,
-      "visualInspection": "passed actual A102 RCP, A103 roof, A201 elevations, A301 sections, S102 framing, approved FP2.0 overlay, orange east-high-to-west-low plan vectors, and side/elevation grade envelope"
+      "visualInspection": "passed actual A102 RCP, A103 roof, A201 elevations, A301 sections, S102 framing, approved FP2.0 PDF underlay, 43 lime high-to-low long-branch plan vectors, orange bounded ridge vectors, four separated relative elevation profiles, and the bounded deflector grade envelope"
     },
     "agenticRules": "passed"
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 148662,
-    "title": "New Hope bounded ridge branch grade and direction verified"
+    "episodeId": 148709,
+    "title": "New Hope complete long branch drainage trees verified"
   },
   "claims": {
     "properPipeLayoutReady": false,
     "wholeFp20HydraulicFlowReady": false,
     "boundedRidgeBranchGradeDirectionReady": true,
+    "completeLongBranchGradeDirectionReady": true,
     "wholeFp20GradeDirectionReady": false,
     "endpointElevationsReady": false,
     "pipeCenterlineOffsetReady": false,
@@ -154,5 +203,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "nextAction": "Extend the same explicit plan-path, high/low endpoint, drainage-catchment, and manufacturer-envelope proof to each remaining simple branch and cross-main segment. Keep exact pipe centerline Z and FIELD ROUTE drains blocked until fitting geometry and field-resolved endpoints are source-bound."
+  "nextAction": "Classify and bind the remaining branch components and cross-main segments by source topology, explicit drain catchment, and high/low endpoint evidence. Keep exact pipe centerline Z and FIELD ROUTE drains blocked until fitting geometry and field-resolved endpoints are source-bound."
 }

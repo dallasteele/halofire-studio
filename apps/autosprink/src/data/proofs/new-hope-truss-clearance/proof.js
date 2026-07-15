@@ -9,6 +9,7 @@ import { canonicalizeApprovedFp20Topology } from '../../../engine/approved-fp20-
 import { bindApprovedFp20HydraulicRouteSet } from '../../../engine/approved-fp20-hydraulic-route-binding.js';
 import { evaluateApprovedFp20ArchitecturalVerticalControls } from '../../../engine/approved-fp20-architectural-vertical-controls.js';
 import { evaluateNewHopeRidgeBranchGradeEnvelope } from '../../../engine/new-hope-ridge-branch-grade-envelope.js';
+import { evaluateNewHopeLongBranchDrainage } from '../../../engine/new-hope-long-branch-drainage.js';
 
 const calibrationUrl = '../../new-hope-truss-clearance-calibration.json';
 const sourceUrl = '../../new-hope-truss-clearance-source.json';
@@ -25,6 +26,7 @@ const answerEvidenceUrl = '../../new-hope-pitched-holdout-answer-evidence.json';
 const svg = document.querySelector('#structural-overlay');
 const pipeSvg = document.querySelector('#fp20-pipe-overlay');
 const gradeProfileSvg = document.querySelector('#bounded-grade-profile');
+const longBranchProfileSvg = document.querySelector('#long-branch-relative-profile');
 const rows = document.querySelector('#clearance-rows');
 const status = document.querySelector('#load-status');
 const NS = 'http://www.w3.org/2000/svg';
@@ -89,6 +91,8 @@ try {
   const pipeCenterlineOffsetReady = architecturalValidation.pipeCenterlineOffsetReady;
   const ridgeGrade = evaluateNewHopeRidgeBranchGradeEnvelope({ pipeVectors, canonicalTopology, operationalAnnotations, atticSource, atticCalibration, answerEvidence });
   if (!ridgeGrade.boundedDeflectorGradeEnvelopeReady) throw new Error(`bounded ridge grade envelope: ${ridgeGrade.blockerCodes.join(', ')}`);
+  const longBranchDrainage = evaluateNewHopeLongBranchDrainage({ pipeVectors, canonicalTopology, governedSkeleton, operationalAnnotations });
+  if (!longBranchDrainage.longBranchGradeDirectionReady) throw new Error(`complete long-branch drainage: ${longBranchDrainage.blockerCodes.join(', ')}`);
   const [hydraulicRoute21, hydraulicRoute22, hydraulicRoute23] = hydraulicRouteSet.remoteAreas;
   const remainingLayoutBlockers = [
     ...hydraulicRouteSet.remainingBlockers,
@@ -167,6 +171,9 @@ try {
     arrow.append(element('path', { d: 'M 0 0 L 10 5 L 0 10 z', class: `hydraulic-flow-arrowhead area-${remoteAreaId}` }));
     defs.append(arrow);
   }
+  const longBranchArrow = element('marker', { id: 'long-branch-grade-arrow', viewBox: '0 0 10 10', refX: 8.5, refY: 5, markerUnits: 'userSpaceOnUse', markerWidth: 11, markerHeight: 11, orient: 'auto' });
+  longBranchArrow.append(element('path', { d: 'M 0 0 L 10 5 L 0 10 z', class: 'long-branch-grade-arrowhead' }));
+  defs.append(longBranchArrow);
   const gradeArrow = element('marker', { id: 'bounded-grade-arrow', viewBox: '0 0 10 10', refX: 8.5, refY: 5, markerUnits: 'userSpaceOnUse', markerWidth: 13, markerHeight: 13, orient: 'auto' });
   gradeArrow.append(element('path', { d: 'M 0 0 L 10 5 L 0 10 z', class: 'bounded-grade-arrowhead' }));
   defs.append(gradeArrow);
@@ -200,6 +207,15 @@ try {
       const label = element('text', { class: `hydraulic-node-label area-${areaResult.remoteAreaId}`, x: binding.leaderTargetPdfPt.x + 5, y: binding.leaderTargetPdfPt.y + labelOffsetY });
       label.textContent = binding.calculationNodeId;
       pipeSvg.append(label);
+    }
+  }
+  for (const branchSystem of longBranchDrainage.branchSystems) {
+    for (const edge of branchSystem.directedEdges) {
+      const line = element('line', { class: 'long-branch-grade-vector', x1: edge.highPdfPt.x, y1: edge.highPdfPt.y, x2: edge.lowPdfPt.x, y2: edge.lowPdfPt.y, 'marker-end': 'url(#long-branch-grade-arrow)' });
+      const title = element('title');
+      title.textContent = `${branchSystem.id}: ${edge.edgeId} drops ${edge.requiredDropIn.toFixed(3)} in toward ${branchSystem.lowPointId}`;
+      line.append(title);
+      pipeSvg.append(line);
     }
   }
   for (let index = ridgeGrade.headElevationEnvelopes.length - 1; index > 0; index -= 1) {
@@ -246,12 +262,46 @@ try {
     row.innerHTML = `<td>${head.headId}</td><td>${head.stationFtFromWestLowEnd.toFixed(0)}</td><td>${head.minimumDeflectorZFt.toFixed(3)}</td><td>${head.maximumDeflectorZFt.toFixed(3)}</td><td>${drainage.nearestLowPointId}</td><td>${drainage.alternateLowPointMarginFt.toFixed(3)} ft</td>`;
     ridgeGradeRows.append(row);
   }
+
+  const relativeChart = { left: 290, right: 50, top: 36, bottom: 52, width: 900, height: 520, maxRunFt: 70, riseScalePxPerIn: 17 };
+  const relativeX = (runFt) => relativeChart.left + runFt / relativeChart.maxRunFt * (relativeChart.width - relativeChart.left - relativeChart.right);
+  const laneBaselines = [112, 220, 328, 436];
+  longBranchProfileSvg.append(element('line', { class: 'relative-profile-axis', x1: relativeChart.left, y1: relativeChart.height - relativeChart.bottom, x2: relativeChart.width - relativeChart.right, y2: relativeChart.height - relativeChart.bottom }));
+  for (let runFt = 0; runFt <= 70; runFt += 10) {
+    const label = element('text', { class: 'profile-axis-label', x: relativeX(runFt), y: 498, 'text-anchor': 'middle' });
+    label.textContent = `${runFt}'`;
+    longBranchProfileSvg.append(label);
+  }
+  const longBranchRows = document.querySelector('#long-branch-grade-rows');
+  let profileIndex = 0;
+  for (const branchSystem of longBranchDrainage.branchSystems) {
+    const profileClass = branchSystem.id.startsWith('upper') ? 'upper' : 'lower';
+    for (const profile of branchSystem.terminalProfiles) {
+      const baselineY = laneBaselines[profileIndex];
+      const terminalY = baselineY - profile.requiredRiseFromLowPointIn * relativeChart.riseScalePxPerIn;
+      longBranchProfileSvg.append(element('line', { class: 'relative-profile-guide', x1: relativeChart.left, y1: baselineY, x2: relativeChart.width - relativeChart.right, y2: baselineY }));
+      longBranchProfileSvg.append(element('line', { class: `relative-profile-line ${profileClass}`, x1: relativeX(0), y1: baselineY, x2: relativeX(profile.planRunLengthFt), y2: terminalY }));
+      longBranchProfileSvg.append(element('circle', { class: `relative-profile-dot ${profileClass}`, cx: relativeX(0), cy: baselineY, r: 5 }));
+      longBranchProfileSvg.append(element('circle', { class: `relative-profile-dot ${profileClass}`, cx: relativeX(profile.planRunLengthFt), cy: terminalY, r: 6 }));
+      const label = element('text', { class: `relative-profile-label ${profileClass}`, x: 24, y: baselineY - 16 });
+      label.textContent = `${branchSystem.id.replace('-long-branch-system', '').toUpperCase()}  |  ${profile.lowPointId}`;
+      longBranchProfileSvg.append(label);
+      const meta = element('text', { class: `relative-profile-meta ${profileClass}`, x: 24, y: baselineY + 10 });
+      meta.textContent = `HIGH ${profile.terminalNodeId}  |  ${profile.planRunLengthFt.toFixed(3)} ft  |  +${profile.requiredRiseFromLowPointIn.toFixed(3)} in`;
+      longBranchProfileSvg.append(meta);
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${branchSystem.id}</td><td>${profile.lowPointId}</td><td>${profile.terminalNodeId}</td><td>${profile.planRunLengthFt.toFixed(3)}</td><td>${profile.requiredRiseFromLowPointIn.toFixed(3)}</td><td>UNSET / FAIL-CLOSED</td>`;
+      longBranchRows.append(row);
+      profileIndex += 1;
+    }
+  }
   document.querySelector('#vector-proof-status').textContent = `PASS: ${vectorAcceptance.metrics.connectedPipeVectorCount}/${vectorAcceptance.metrics.pipeVectorCount} connected primary vectors, ${vectorAcceptance.metrics.sprinklerCount} heads`;
   document.querySelector('#plan-graph-status').textContent = `PASS: ${planGraph.metrics.nodeCount} nodes / ${planGraph.metrics.edgeCount} split edges / ${planGraph.metrics.connectedComponentCount} component`;
   document.querySelector('#size-proof-status').textContent = `PASS: ${governedSkeleton.metrics.assignedPrimarySegmentCount}/67 primary size + role assignments`;
   document.querySelector('#operations-proof-status').textContent = `PASS: ${governedSkeleton.metrics.operationalReferenceVectorCount} drain/test vectors + ${governedSkeleton.metrics.lowPointAnchorCount} low points`;
   document.querySelector('#hydraulic-route-proof-status').textContent = `PASS: RA2-1/2/3 ${hydraulicRouteSet.metrics.planBoundCalculationNodeCount} plan nodes / ${hydraulicRouteSet.metrics.pipeTableLegCount} calc legs / ${hydraulicRouteSet.metrics.mappedCalculatedCanonicalEdgeCount} calculated edges`;
   document.querySelector('#architectural-source-status').textContent = `PASS: A102 RCP + A103 roof + A201 elevations + A301 sections; 4:12 roof, ${architecturalSource.pitchedConcealedVolume.eaveDatumZFt.toFixed(3)}-${architecturalSource.pitchedConcealedVolume.ridgeDatumZFt.toFixed(3)} ft roof envelope`;
+  document.querySelector('#long-branch-grade-proof-status').textContent = `PASS: 2 complete 14-head systems / 44 edges / 43 directed toward low-point-01 and low-point-04`;
   document.querySelector('#ridge-grade-proof-status').textContent = `PASS: bounded seven-head ridge branch drains east-high to west-low toward low-point-04; ${ridgeGrade.totalHeadRowRiseIn.toFixed(1)} in across 36 ft`;
   const candidate = buildNewHopeProperPipeGraphCandidate(calibration, source);
   const acceptance = evaluateProperPitchedPipeGraph(candidate);
@@ -265,11 +315,15 @@ try {
     row.innerHTML = `<td style="color:#fda4af">${blocker.code}</td><td>${blocker.message}</td>`;
     blockerRows.append(row);
   }
-  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | architecturalSourceRegistrationReady=${architecturalValidation.sourceRegistrationReady} | architecturalVerticalControlReady=${architecturalVerticalControlReady} | boundedRidgeBranchPlanPathReady=${ridgeGrade.boundedBranchPlanPathReady} | boundedRidgeBranchGradeMagnitudeReady=${ridgeGrade.boundedBranchGradeMagnitudeReady} | boundedRidgeBranchGradeDirectionReady=${ridgeGrade.boundedBranchGradeDirectionReady} | boundedRidgeBranchDrainCatchmentReady=${ridgeGrade.boundedBranchDrainCatchmentReady} | boundedDeflectorGradeEnvelopeReady=${ridgeGrade.boundedDeflectorGradeEnvelopeReady} | exactDeflectorElevationsReady=${ridgeGrade.exactDeflectorElevationsReady} | exactPipeCenterlineZReady=${ridgeGrade.exactPipeCenterlineZReady} | exactDrainRouteReady=${ridgeGrade.exactDrainRouteReady} | pipeCenterlineOffsetReady=${pipeCenterlineOffsetReady} | primaryPipeVectorExtractionReady=${governedSkeleton.primaryPipeVectorExtractionReady} | wholeSystemVectorExtractionReady=${governedSkeleton.wholeSystemVectorExtractionReady} | sourceTopologyConnected=${vectorAcceptance.sourceTopologyConnected} | sourcePlanGraphReady=${planGraph.sourcePlanGraphReady} | canonicalTopologyReady=${canonicalTopology.canonicalTopologyReady} | canonicalNodes=${canonicalTopology.metrics.canonicalNodeCount} | canonicalEdges=${canonicalTopology.metrics.canonicalEdgeCount} | connectorOnlyCyclesRemoved=${canonicalTopology.metrics.artificialConnectorCycleCount} | sourceLoopsBoundByApprovedCalculations=${canonicalTopology.metrics.canonicalCycleRank} | sourceLoopsAwaitingCalcBinding=0 | primaryPipeSizeAssignmentReady=${governedSkeleton.primaryPipeSizeAssignmentReady} | primaryPipeRoleAssignmentReady=${governedSkeleton.primaryPipeRoleAssignmentReady} | operationalReferenceExtractionReady=${governedSkeleton.operationalReferenceExtractionReady} | supplySourceAnchorReady=${governedSkeleton.supplySourceAnchorReady} | lowPointIntentReady=${governedSkeleton.lowPointIntentReady} | drainIntentReady=${governedSkeleton.drainIntentReady} | gradeMagnitudeReady=${governedSkeleton.gradeMagnitudeReady} | hydraulicCalculationCorpusReady=${governedSkeleton.hydraulicCalculationCorpusReady} | approvedRemoteAreaSetReady=${hydraulicRouteSet.approvedRemoteAreaSetReady} | approvedRemoteAreaHydraulicFlowReady=${hydraulicRouteSet.approvedRemoteAreaHydraulicFlowReady} | calculationEndpointElevationEvidenceReady=${hydraulicRouteSet.calculationEndpointElevationEvidenceReady} | route21ExplicitPlanPathReady=${hydraulicRoute21.explicitPlanPathReady} | route22ExplicitPlanPathReady=${hydraulicRoute22.explicitPlanPathReady} | route23ExplicitPlanPathReady=${hydraulicRoute23.explicitPlanPathReady} | wholeFp20HydraulicNodeBindingReady=${hydraulicRouteSet.wholeFp20HydraulicNodeBindingReady} | wholeFp20HydraulicFlowReady=${hydraulicRouteSet.wholeFp20HydraulicFlowReady} | fieldDrainRouteResolved=${governedSkeleton.fieldDrainRouteResolved} | properPipeLayoutReady=${governedSkeleton.properPipeLayoutReady} | wholeFp20GradeDirectionReady=${ridgeGrade.wholeFp20GradeDirectionReady} | endpointElevationsReady=${governedSkeleton.endpointElevationsReady} | complianceReady=false | fabricationReady=${governedSkeleton.fabricationReady} | fieldReleaseReady=${governedSkeleton.fieldReleaseReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent = `actualPdfUnderlays=true | architecturalSourceRegistrationReady=${architecturalValidation.sourceRegistrationReady} | architecturalVerticalControlReady=${architecturalVerticalControlReady} | longBranchSourceTopologyReady=${longBranchDrainage.longBranchSourceTopologyReady} | longBranchLowPointBindingReady=${longBranchDrainage.longBranchLowPointBindingReady} | longBranchGradeDirectionReady=${longBranchDrainage.longBranchGradeDirectionReady} | longBranchRelativeGradeProfilesReady=${longBranchDrainage.longBranchRelativeGradeProfilesReady} | boundedRidgeBranchPlanPathReady=${ridgeGrade.boundedBranchPlanPathReady} | boundedRidgeBranchGradeMagnitudeReady=${ridgeGrade.boundedBranchGradeMagnitudeReady} | boundedRidgeBranchGradeDirectionReady=${ridgeGrade.boundedBranchGradeDirectionReady} | boundedRidgeBranchDrainCatchmentReady=${ridgeGrade.boundedBranchDrainCatchmentReady} | boundedDeflectorGradeEnvelopeReady=${ridgeGrade.boundedDeflectorGradeEnvelopeReady} | exactDeflectorElevationsReady=${ridgeGrade.exactDeflectorElevationsReady} | exactPipeCenterlineZReady=${ridgeGrade.exactPipeCenterlineZReady} | exactDrainRouteReady=${ridgeGrade.exactDrainRouteReady} | pipeCenterlineOffsetReady=${pipeCenterlineOffsetReady} | primaryPipeVectorExtractionReady=${governedSkeleton.primaryPipeVectorExtractionReady} | wholeSystemVectorExtractionReady=${governedSkeleton.wholeSystemVectorExtractionReady} | sourceTopologyConnected=${vectorAcceptance.sourceTopologyConnected} | sourcePlanGraphReady=${planGraph.sourcePlanGraphReady} | canonicalTopologyReady=${canonicalTopology.canonicalTopologyReady} | canonicalNodes=${canonicalTopology.metrics.canonicalNodeCount} | canonicalEdges=${canonicalTopology.metrics.canonicalEdgeCount} | connectorOnlyCyclesRemoved=${canonicalTopology.metrics.artificialConnectorCycleCount} | sourceLoopsBoundByApprovedCalculations=${canonicalTopology.metrics.canonicalCycleRank} | sourceLoopsAwaitingCalcBinding=0 | primaryPipeSizeAssignmentReady=${governedSkeleton.primaryPipeSizeAssignmentReady} | primaryPipeRoleAssignmentReady=${governedSkeleton.primaryPipeRoleAssignmentReady} | operationalReferenceExtractionReady=${governedSkeleton.operationalReferenceExtractionReady} | supplySourceAnchorReady=${governedSkeleton.supplySourceAnchorReady} | lowPointIntentReady=${governedSkeleton.lowPointIntentReady} | drainIntentReady=${governedSkeleton.drainIntentReady} | gradeMagnitudeReady=${governedSkeleton.gradeMagnitudeReady} | hydraulicCalculationCorpusReady=${governedSkeleton.hydraulicCalculationCorpusReady} | approvedRemoteAreaSetReady=${hydraulicRouteSet.approvedRemoteAreaSetReady} | approvedRemoteAreaHydraulicFlowReady=${hydraulicRouteSet.approvedRemoteAreaHydraulicFlowReady} | calculationEndpointElevationEvidenceReady=${hydraulicRouteSet.calculationEndpointElevationEvidenceReady} | route21ExplicitPlanPathReady=${hydraulicRoute21.explicitPlanPathReady} | route22ExplicitPlanPathReady=${hydraulicRoute22.explicitPlanPathReady} | route23ExplicitPlanPathReady=${hydraulicRoute23.explicitPlanPathReady} | wholeFp20HydraulicNodeBindingReady=${hydraulicRouteSet.wholeFp20HydraulicNodeBindingReady} | wholeFp20HydraulicFlowReady=${hydraulicRouteSet.wholeFp20HydraulicFlowReady} | fieldDrainRouteResolved=${governedSkeleton.fieldDrainRouteResolved} | properPipeLayoutReady=${governedSkeleton.properPipeLayoutReady} | wholeFp20GradeDirectionReady=${longBranchDrainage.wholeFp20GradeDirectionReady} | endpointElevationsReady=${governedSkeleton.endpointElevationsReady} | complianceReady=false | fabricationReady=${governedSkeleton.fabricationReady} | fieldReleaseReady=${governedSkeleton.fieldReleaseReady}`;
   document.documentElement.dataset.proofReady = 'true';
   document.documentElement.dataset.architecturalSourceRegistrationReady = String(architecturalValidation.sourceRegistrationReady);
   document.documentElement.dataset.architecturalVerticalControlReady = String(architecturalVerticalControlReady);
   document.documentElement.dataset.pipeCenterlineOffsetReady = String(pipeCenterlineOffsetReady);
+  document.documentElement.dataset.longBranchSourceTopologyReady = String(longBranchDrainage.longBranchSourceTopologyReady);
+  document.documentElement.dataset.longBranchLowPointBindingReady = String(longBranchDrainage.longBranchLowPointBindingReady);
+  document.documentElement.dataset.longBranchGradeDirectionReady = String(longBranchDrainage.longBranchGradeDirectionReady);
+  document.documentElement.dataset.longBranchRelativeGradeProfilesReady = String(longBranchDrainage.longBranchRelativeGradeProfilesReady);
   document.documentElement.dataset.boundedRidgeBranchGradeDirectionReady = String(ridgeGrade.boundedBranchGradeDirectionReady);
   document.documentElement.dataset.boundedRidgeBranchDrainCatchmentReady = String(ridgeGrade.boundedBranchDrainCatchmentReady);
   document.documentElement.dataset.boundedDeflectorGradeEnvelopeReady = String(ridgeGrade.boundedDeflectorGradeEnvelopeReady);

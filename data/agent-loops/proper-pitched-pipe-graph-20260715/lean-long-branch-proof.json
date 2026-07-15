@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/proper-pitched-pipe-graph-20260715/lean-long-branch-request.json",
+  "theoremNames": [
+    "completeLongBranchInventory",
+    "completeLongBranchRelativeRiseArithmetic",
+    "completeLongBranchesDoNotPromoteWholeLayout"
+  ],
+  "claim": "Two complete 14-head branch systems contain 28 sprinklers and 44 canonical edges. Forty-three edges have source-bound direction and one edge is the low-point zone. The rounded relative-rise profiles satisfy the 0.5-inch-per-10-foot rule. This bounded readiness does not promote exact pipe centerline Z, whole-FP2.0 grade direction, proper layout, or fabrication readiness.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 71,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}
