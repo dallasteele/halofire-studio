@@ -1,0 +1,94 @@
+{
+  "loop": "bgc-source-plan-section-3d-registration-20260716",
+  "stage": "VERIFY",
+  "status": "source-registered-plan-section-and-blender-3d-proved-release-gates-remain-closed",
+  "iteration": 2,
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "browser", "formal", "build"]
+  },
+  "sourceExtraction": {
+    "project": "Boys & Girls Club Community Center - Brigham City UT",
+    "asBuiltSheet": "FP 1.0 physical page 3",
+    "asBuiltGuardedUprights": 64,
+    "approvedGuardedUprights": 64,
+    "sourceProvenBranchHalfEdges": 48,
+    "canonicalGraphSha256": "495c5c66bb224213889c1862db926de02a26d6e7778a24cfe9dd31bf937bff88",
+    "artifactReceiptSha256": "c2e98e95833122cd55cc1f4022e68556a4686815d2902e0ff543d5099948abd0",
+    "pdfPointsPerFt": 9,
+    "grid2To6SpanFt": 104,
+    "gymWidthFt": 89.5,
+    "roofPitchRiseInPer12": 2,
+    "eaveElevationFt": 25,
+    "ridgeElevationFt": 32.458333,
+    "branchHalfMeanOffsetPt": 4.162476
+  },
+  "visualEvidence": {
+    "actualPdfTopPlan": {
+      "path": "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-plan-overlay.png",
+      "bytes": 564542,
+      "sha256": "184d20cf037ad1871310300c124c274e890f7eb1b84dd891eaa02fa0d6385fc6"
+    },
+    "actualA301Section": {
+      "path": "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-section-overlay.png",
+      "bytes": 224298,
+      "sha256": "62a5c4be93d4a6d76fe5c1ada334114e22bd50cfb0b9d9262544fccc1e225622"
+    },
+    "blender3d": {
+      "pngPath": "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.png",
+      "pngBytes": 1970550,
+      "pngSha256": "7c1ab90ef09d7cb9ccb8176c48ce7d1074bb7cfcbd98dcd4e1aafbf57d67deb0",
+      "blendSha256": "60f9b590178c42919656c4312c7f257f72dc7aa55cd6a4d2f4761492e53c7fe3",
+      "glbSha256": "694e4c8b8593968d83ab0a177c6e5e71f269ff319788ef002512dc325bfba4f2",
+      "blenderVersion": "5.0.1",
+      "actualPlanRasterVisibleBeneath": true,
+      "targetMarkersArePartGeometry": false
+    },
+    "browser": {
+      "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/index.html",
+      "viewportWidthPx": 1265,
+      "horizontalOverflow": false,
+      "allThreeImagesLoaded": true,
+      "planNaturalSizePx": [2080, 1880],
+      "sectionNaturalSizePx": [1080, 600],
+      "modelNaturalSizePx": [1800, 1200]
+    }
+  },
+  "verification": {
+    "focusedTests": "4 files / 15 tests passed",
+    "fullAutoSprinkSuite": "314 files / 2403 tests passed",
+    "autosprinkProductionBuild": "passed",
+    "biomeFocusedLint": "passed",
+    "pythonSyntax": "passed",
+    "gitDiffCheck": "passed",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "formalProof": {
+      "status": "verified",
+      "prover": "Lean 4.13.0",
+      "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+      "elapsedMs": 298,
+      "theoremCount": 3
+    },
+    "brainPreflight": { "status": "used" },
+    "brainPostflight": { "status": "recorded", "episodeId": 153971 }
+  },
+  "claims": {
+    "syntheticBGCProofRetired": true,
+    "sourcePlanCoordinatesVerified": true,
+    "sourceBranchHalfAdjacencyVerified": true,
+    "roofSurfaceTargetProjectionVerified": true,
+    "sharedPlanElevation3dGraphVerified": true,
+    "exactInstalledSprinklerElevationVerified": false,
+    "exactInstalledPipeElevationVerified": false,
+    "crossMainFittingTopologyVerified": false,
+    "pipeDirectionVerified": false,
+    "pipeGradeVerified": false,
+    "hydraulicCalculationReady": false,
+    "complianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsDeploymentReady": false
+  },
+  "nextAction": "Extract the BGC cross-main fittings, sizes, flow/drain direction marks, and dimensioned vertical offsets from the native FP1.0 and fabrication sources; close exact installed pipe Z against sections before any grade, hydraulic, fabrication, field, or VPS promotion."
+}

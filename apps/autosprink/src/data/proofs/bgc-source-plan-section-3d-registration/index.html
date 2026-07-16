@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BGC source-bound pitched-roof registration</title><style>
+:root{--bg:#030712;--card:#0b1425;--line:#253650;--text:#f8fafc;--muted:#a9bdd4;--blue:#42aeff;--orange:#ff9d2e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0,#10294a 0,#030712 42%);color:var(--text);font:16px/1.45 Inter,Segoe UI,sans-serif}
+main{max-width:1500px;margin:auto;padding:42px 26px 70px}h1{font-size:clamp(30px,5vw,56px);line-height:1.04;margin:0 0 14px}.lede{max-width:980px;color:var(--muted);font-size:20px}
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 32px}.badge{border:1px solid var(--line);border-radius:999px;padding:8px 13px;background:#091426}.pass{color:#8be8bd}.hold{color:#ffd18c}
+.grid{display:grid;grid-template-columns:1fr;gap:24px}article{background:linear-gradient(145deg,rgba(16,34,59,.96),rgba(5,13,25,.96));border:1px solid var(--line);border-radius:24px;padding:18px;box-shadow:0 20px 70px #0008}h2{margin:4px 4px 14px;font-size:25px}img{display:block;width:100%;height:auto;border-radius:15px;background:white}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:26px 0}.fact{padding:16px;border-radius:16px;background:#091426;border:1px solid var(--line)}.fact b{display:block;font-size:25px;color:var(--blue)}code{font-size:12px;word-break:break-all;color:#b8d9f4}
+</style></head><body><main><h1>Real plan. Real section. One geometry graph.</h1>
+<p class="lede">Boys &amp; Girls Club Community Center, Brigham City. This replaces the old synthetic 8 × 8 dot diagram. Every visible proof below is bound to an actual project PDF; the overlay comes from native PDF vectors, not image-generation.</p>
+<div class="badges"><span class="badge pass">64 / 64 native symbols</span><span class="badge pass">9 pt/ft grid closure</span><span class="badge pass">2:12 native roof vectors</span><span class="badge pass">same graph: plan / elevation / 3D</span><span class="badge hold">exact installed Z + grade held closed</span></div>
+<div class="facts"><div class="fact"><b>64</b>as-built guarded uprights</div><div class="fact"><b>48</b>source-covered branch-half edges</div><div class="fact"><b>4.1625 pt</b>preserved ridge half-offset</div><div class="fact"><b>104 × 89.5 ft</b>registered gym envelope</div></div>
+<div class="grid"><article><h2>Top plan — actual as-built FP 1.0 underlay</h2><img src="bgc-plan-overlay.png" alt="Actual as-built sprinkler plan under native-vector overlay"></article>
+<article><h2>Elevation — actual A301 transverse roof section</h2><img src="bgc-section-overlay.png" alt="Actual A301 transverse section under registered roof graph"></article>
+<article><h2>3D — Blender model with the actual plan raster beneath</h2><img src="bgc-source-registered-3d.png" alt="Blender source-registered pitched roof model over actual plan raster"></article></div>
+<p><strong>Receipt</strong><br><code>c2e98e95833122cd55cc1f4022e68556a4686815d2902e0ff543d5099948abd0</code></p><p class="lede">Truth boundary: this proves source registration, head coordinates, branch-half adjacency, building envelope, and roof-surface target projection. It does not yet prove exact installed sprinkler/pipe Z, cross-main fitting topology, pipe direction/grade, hydraulic compliance, fabrication, field release, or VPS release.</p>
+</main></body></html>

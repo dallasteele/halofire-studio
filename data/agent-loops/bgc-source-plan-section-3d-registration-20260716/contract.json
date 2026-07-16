@@ -1,0 +1,55 @@
+{
+  "name": "bgc-source-plan-section-3d-registration-20260716",
+  "owner": "codex",
+  "goal": "Replace the Boys and Girls Club synthetic topology-only diagram with a source-bound actual-PDF plan, roof-section elevation, and 3D registration generated from one canonical geometry graph while preserving the failed blind-v4 history and every unresolved release gate.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "apps/autosprink/src/data/boys-girls-club-unseen-pitched-holdout.json",
+    "apps/autosprink/src/data/boys-girls-club-pitched-heldout-comparison.json",
+    "apps/autosprink/src/engine/boys-girls-club-pitched-heldout-comparison.js",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/1-Bid Documents/GC - Bid Plans/Building/Boys and Girls Club Community Center Permit Set.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/Brigham City/BGC CC - Brigham City UT_app plans.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/11-As-Built Set/BGC_INSTALL PLAN.pdf"
+  ],
+  "exit_criteria": [
+    "the as-built FP 1.0 raster remains visibly legible beneath the top-plan overlay and its immutable source hash and physical page are recorded",
+    "the actual architectural or sprinkler transverse roof section remains visibly legible beneath the elevation overlay",
+    "the 3D proof visibly carries the actual roof-plan raster and is generated from the same canonical nodes and edges as the top and elevation views",
+    "a deterministic native-vector signature extracts exactly 64 guarded TY3131 uprights from the as-built FP 1.0 and independent approved-to-as-built parity closes",
+    "plan registration proves 9 PDF points per foot from grids 2 through 6 and closes the 104-foot by 89.5-foot gym envelope against the 2-in-12 A301 roof with 25-foot eaves and 32.458333-foot ridge",
+    "the source-observed 4.1625-point branch-half offset is retained rather than normalized into a synthetic eight-by-eight grid",
+    "only source-proven branch-half adjacency and coordinates are promoted; exact installed sprinkler Z, pipe Z, pipe grade, hydraulic compliance, fabrication, field release, and VPS release remain false",
+    "wrong source hash, page, native-vector signature, symbol count, scale, grid registration, roof pitch, graph identity, and false-readiness mutations all fail closed",
+    "focused regression, deterministic replay, primary, cross-source, adversarial, production build, browser visual inspection, formal invariant, rules verification, loop guard, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source hash and physical-page replay",
+    "native PDF vector extraction unit tests",
+    "approved-to-as-built independent symbol-count parity",
+    "canonical plan, elevation, and 3D graph identity check",
+    "adversarial source, signature, count, scale, offset, pitch, graph, Z, grade, and false-promotion mutations",
+    "actual-PDF plan, section, and 3D browser screenshot inspection",
+    "focused AutoSprink tests and production build",
+    "GX10 Lean 4 invariant proof",
+    "authoritative agentic-rule check",
+    "brain close writeback with confirmed episode or exact failure"
+  ],
+  "state_path": "data/agent-loops/bgc-source-plan-section-3d-registration-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/bgc-source-plan-section-3d-registration.json",
+    "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/index.html",
+    "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-plan-overlay.png",
+    "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-section-overlay.png",
+    "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.png",
+    "data/agent-loops/bgc-source-plan-section-3d-registration-20260716/state.json",
+    "data/agent-loops/bgc-source-plan-section-3d-registration-20260716/lean-proof.json"
+  ],
+  "max_iterations": 12,
+  "max_tokens": 500000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

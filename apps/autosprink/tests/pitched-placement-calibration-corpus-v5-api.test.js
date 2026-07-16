@@ -43,8 +43,9 @@ describe('authenticated BGC failure and pitched calibration revision five', () =
     expect(serverStderr).not.toContain('ERR_ERL_UNEXPECTED_X_FORWARDED_FOR');
   });
 
-  it('rejects anonymous access to both answer-exposed routes', async () => {
+  it('rejects anonymous access to every answer-exposed BGC route', async () => {
     expect((await fetch(`${BASE}/api/evidence/boys-girls-club-pitched-heldout-comparison`)).status).toBe(401);
+    expect((await fetch(`${BASE}/api/evidence/bgc-source-plan-section-3d-registration`)).status).toBe(401);
     expect((await fetch(`${BASE}/api/evidence/pitched-placement-calibration-corpus-v5`)).status).toBe(401);
   });
 
@@ -54,8 +55,35 @@ describe('authenticated BGC failure and pitched calibration revision five', () =
     expect(response.headers.get('cache-control')).toBe('private, no-store');
     const body = await response.json();
     expect(body).toMatchObject({ status: 'passed', artifactType: 'halofire.boys-girls-club-pitched-heldout-comparison.v1', receiptSha256: '37fee9c38560e2a98507844e390658c865f4cc9c24d277c7859d5c9f544b6b57', blindPrediction: { headCount: 12 }, approved: { headCount: 64 }, asBuilt: { headCount: 64 }, result: { status: 'failed', headCountDelta: -52, topologyMatched: false, v4OutOfEnvelopePromotionGuardWorked: true }, candidatePlacementVerified: false, complianceReady: false, fabricationReady: false, fieldReleaseReady: false });
-    expect(body.comparisonSvg).toContain('orange as-built 8 x 8 (64), cyan blind v4 3 x 4 (12)');
+    expect(body.comparisonSvg).toContain('HISTORICAL FAILED BLIND V4 — NOT A SPRINKLER LAYOUT');
+    expect(body.comparisonSvg).toContain('synthetic 8 × 8 dot graphic has been retired');
+    expect(body.comparisonSvg).not.toContain('<circle');
     expect(body.adversarialLoop).toMatchObject({ status: 'passed', attemptedCases: 12 });
+  });
+
+  it('returns the source-bound actual-PDF plan, section, and 3D graph', async () => {
+    const response = await fetch(`${BASE}/api/evidence/bgc-source-plan-section-3d-registration`, { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    const body = await response.json();
+    expect(body).toMatchObject({
+      status: 'passed',
+      artifactType: 'halofire.bgc-source-plan-section-3d-registration.v1',
+      receiptSha256: 'c2e98e95833122cd55cc1f4022e68556a4686815d2902e0ff543d5099948abd0',
+      detectors: { asBuilt: { guardedUprightCount: 64 }, ahjApproved: { guardedUprightCount: 64 } },
+      geometryGraph: { nodeCount: 64, edgeCount: 48 },
+      sourcePlanCoordinatesVerified: true,
+      sourceBranchHalfAdjacencyVerified: true,
+      roofSurfaceTargetProjectionVerified: true,
+      exactInstalledPipeElevationVerified: false,
+      pipeGradeVerified: false,
+      complianceReady: false,
+      fabricationReady: false,
+      fieldReleaseReady: false,
+      vpsReleaseReady: false,
+      adversarialLoop: { status: 'passed', attemptedCases: 16 },
+    });
+    expect(new Set(Object.values(body.viewBindings).map((view) => view.geometryGraphSha256)).size).toBe(1);
   });
 
   it('returns v5 with the calibrated-domain hard gate and preserved failure', async () => {

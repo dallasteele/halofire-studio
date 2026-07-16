@@ -13,11 +13,14 @@ describe('Boys and Girls Club pitched heldout comparison', () => {
     expect(packet.result).toMatchObject({ status: 'failed', headCountDelta: -52, predictedToAsBuiltRatio: 0.1875, topologyMatched: false, countMatched: false, v4TopologyGeneralizationVerified: false });
   });
 
-  it('renders an explicit topology-failure proof without field-coordinate claims', () => {
+  it('retires the synthetic dot graphic and routes to actual-PDF source proof', () => {
     const view = renderBoysGirlsClubHeldoutComparison(packet);
     expect(view.status).toBe('passed');
-    expect(view.svg).toContain('orange as-built 8 x 8 (64), cyan blind v4 3 x 4 (12)');
-    expect(view.svg).toContain('Topology diagram only - no exact field-coordinate claim');
+    expect(view.svg).toContain('HISTORICAL FAILED BLIND V4 — NOT A SPRINKLER LAYOUT');
+    expect(view.svg).toContain('synthetic 8 × 8 dot graphic has been retired');
+    expect(view.svg).toContain('bgc-source-plan-section-3d-registration/index.html');
+    expect(view.svg).not.toContain('<circle');
+    expect(view.syntheticTopologyGraphicRetired).toBe(true);
     expect(view.topologyMatched).toBe(false);
     expect(view.complianceReady).toBe(false);
   });

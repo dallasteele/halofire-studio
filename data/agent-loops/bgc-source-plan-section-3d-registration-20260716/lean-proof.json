@@ -1,0 +1,23 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/bgc-source-plan-section-3d-registration-20260716/lean-request.json",
+  "theoremNames": [
+    "bgcSourceGraphCardinalityCloses",
+    "sharedSourceGraphDoesNotPromoteInstalledGeometry",
+    "unresolvedPipeFactsBlockVpsRelease"
+  ],
+  "claim": "The BGC source graph closes as 64 head nodes and 48 source-proven branch-half edges; plan, elevation, and 3D may share that source registration without promoting installed Z or grade; unresolved pipe facts keep VPS release false.",
+  "firstAttempt": {
+    "status": "failed",
+    "elapsedMs": 94,
+    "reason": "Boolean conjunction precedence made the installed-geometry proposition assert true instead of explicit false equalities; the request was corrected before acceptance."
+  },
+  "result": {
+    "status": "verified",
+    "elapsedMs": 298,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

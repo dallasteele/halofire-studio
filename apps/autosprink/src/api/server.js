@@ -84,6 +84,7 @@ import { validatePitchedPlacementCalibrationCorpusV3, verifyPitchedPlacementCali
 import { validatePitchedPlacementCalibrationCorpusV4, verifyPitchedPlacementCalibrationV4AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v4.js';
 import { buildBoysGirlsClubSourceOnlyCandidate } from '../engine/boys-girls-club-unseen-pitched-holdout.js';
 import { renderBoysGirlsClubHeldoutComparison, validateBoysGirlsClubHeldoutComparison, verifyBoysGirlsClubComparisonAdversarialLoop } from '../engine/boys-girls-club-pitched-heldout-comparison.js';
+import { validateBgcSourcePlanSection3dRegistration, verifyBgcSourcePlanSection3dAdversarialLoop } from '../engine/bgc-source-plan-section-3d-registration.js';
 import { validatePitchedPlacementCalibrationCorpusV5, verifyPitchedPlacementCalibrationV5AdversarialLoop } from '../engine/pitched-placement-calibration-corpus-v5.js';
 import { renderPolarisHeldoutComparisonViews, validatePolarisAnswerEvidence, validatePolarisHeldoutComparison, verifyPolarisHeldoutComparisonAdversarialLoop } from '../engine/polaris-academy-pitched-attic-heldout-comparison.js';
 import { buildCadModel } from '../engine/cad-model.js';
@@ -192,6 +193,7 @@ const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V3_PATH = path.resolve(__dirname, '..
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V4_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v4.json');
 const BOYS_GIRLS_CLUB_SOURCE_SEAL_PATH = path.resolve(__dirname, '../data/boys-girls-club-unseen-pitched-holdout.json');
 const BOYS_GIRLS_CLUB_HELDOUT_COMPARISON_PATH = path.resolve(__dirname, '../data/boys-girls-club-pitched-heldout-comparison.json');
+const BGC_SOURCE_PLAN_SECTION_3D_REGISTRATION_PATH = path.resolve(__dirname, '../data/bgc-source-plan-section-3d-registration.json');
 const PITCHED_PLACEMENT_CALIBRATION_CORPUS_V5_PATH = path.resolve(__dirname, '../data/pitched-placement-calibration-corpus-v5.json');
 const POLARIS_SOURCE_SEAL_PATH = path.resolve(__dirname, '../data/polaris-academy-unseen-pitched-attic-holdout.json');
 const POLARIS_SOURCE_CANDIDATE_PATH = path.resolve(__dirname, '../data/polaris-academy-source-only-pitched-attic-candidate.json');
@@ -2673,6 +2675,28 @@ app.get('/api/evidence/boys-girls-club-pitched-heldout-comparison', authMiddlewa
   } catch (error) {
     log.error('Failed to load Boys and Girls Club heldout comparison', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'boys_girls_club_heldout_load_failed', candidatePlacementVerified: false, complianceReady: false });
+  }
+});
+
+app.get('/api/evidence/bgc-source-plan-section-3d-registration', authMiddleware, async (req, res) => {
+  try {
+    const packet = JSON.parse(fs.readFileSync(BGC_SOURCE_PLAN_SECTION_3D_REGISTRATION_PATH, 'utf8'));
+    const [validation, adversarialLoop] = await Promise.all([validateBgcSourcePlanSection3dRegistration(packet), verifyBgcSourcePlanSection3dAdversarialLoop(packet)]);
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') return res.status(422).json({ status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop, exactInstalledPipeElevationVerified: false, pipeGradeVerified: false, complianceReady: false, vpsReleaseReady: false });
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.json({
+      status: 'passed', artifactType: packet.artifactType, receiptSha256: packet.receiptSha256,
+      sourceBindings: packet.sourceBindings, detectors: packet.detectors, registration: packet.registration,
+      geometryGraph: packet.geometryGraph, viewBindings: packet.viewBindings, adversarialLoop,
+      sourcePlanCoordinatesVerified: true, sourceBranchHalfAdjacencyVerified: true, roofSurfaceTargetProjectionVerified: true,
+      exactInstalledSprinklerElevationVerified: false, exactInstalledPipeElevationVerified: false,
+      pipeDirectionVerified: false, pipeGradeVerified: false, hydraulicCalculationReady: false,
+      complianceReady: false, fabricationReady: false, fieldReleaseReady: false, vpsReleaseReady: false,
+      claimStatus: packet.claimStatus,
+    });
+  } catch (error) {
+    log.error('Failed to load BGC source plan, section, and 3D registration', { error: error.message });
+    return res.status(500).json({ status: 'blocked', error: 'bgc_source_plan_section_3d_registration_load_failed', exactInstalledPipeElevationVerified: false, pipeGradeVerified: false, complianceReady: false, vpsReleaseReady: false });
   }
 });
 

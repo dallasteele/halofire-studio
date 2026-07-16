@@ -1,0 +1,1915 @@
+{
+  "artifactType": "halofire.bgc-source-plan-section-3d-registration.v1",
+  "projectId": "boys-girls-club-community-center-brigham-city-ut",
+  "projectName": "Boys & Girls Club Community Center - Brigham City UT",
+  "sourceBindings": {
+    "architectural": {
+      "fileName": "Boys and Girls Club Community Center Permit Set.pdf",
+      "sha256": "f220c7841dfd1ca7fc0b8eaf8f440d0b63a1541b8228c7c006e4c44a88180b20",
+      "bytes": 18178437,
+      "sheet": "A301",
+      "physicalPage": 15
+    },
+    "ahjApproved": {
+      "fileName": "BGC CC - Brigham City UT_app plans.pdf",
+      "sha256": "799fba69311eb3aa285d6b96cb346aed184b3093d73777737597d23df60a0a18",
+      "bytes": 5313661,
+      "sheet": "FP 1.0",
+      "physicalPage": 3
+    },
+    "asBuilt": {
+      "fileName": "BGC_INSTALL PLAN.pdf",
+      "sha256": "6f20b0ad824aaae6a8a71fac46e5faf89e5904eef0ad762cf98b8d0ed186b252",
+      "bytes": 14918460,
+      "sheet": "FP 1.0",
+      "physicalPage": 3
+    }
+  },
+  "detectors": {
+    "asBuilt": {
+      "pageDrawingCount": 21076,
+      "signature": {
+        "rectWidthPt": 9.0,
+        "rectHeightPt": 8.875,
+        "itemCount": 25,
+        "itemKinds": "lllllllllllllllllllllllll",
+        "strokeWidthPt": 0.4,
+        "color": [
+          0,
+          0,
+          0
+        ]
+      },
+      "guardedUprightCount": 64
+    },
+    "ahjApproved": {
+      "pageDrawingCount": 87907,
+      "signature": {
+        "rectWidthRangePt": [
+          8.7,
+          9.1
+        ],
+        "rectHeightRangePt": [
+          11.1,
+          11.4
+        ],
+        "itemCount": 8,
+        "itemKinds": "llcllcll",
+        "strokeWidthPt": 0.4,
+        "colorMax": 0.02,
+        "regionPdf": [
+          1100,
+          1300,
+          1900,
+          2250
+        ]
+      },
+      "guardedUprightCount": 64
+    },
+    "approvedToAsBuiltParity": {
+      "status": "passed",
+      "headCountMatched": true,
+      "topologyFamilyMatched": true,
+      "coordinateParityClaimed": false
+    }
+  },
+  "registration": {
+    "plan": {
+      "coordinateSpace": "as-built-FP1.0-pdf-points",
+      "gridXPdfPt": {
+        "2": 744.5359497070312,
+        "3": 978.5359497070312,
+        "4": 1212.5359497070312,
+        "5": 1446.5359497070312,
+        "6": 1680.5359497070312
+      },
+      "grid2To6SpanPt": 936.0,
+      "grid2To6SpanFt": 104,
+      "pdfPointsPerFt": 9.0,
+      "ridgeYPdfPt": 1488.861328125,
+      "branchHalfOffset": {
+        "upperHalfXPt": [
+          818.175415,
+          923.694946,
+          1034.954712,
+          1151.954712,
+          1268.954712,
+          1385.954712,
+          1501.454712,
+          1611.292114
+        ],
+        "lowerHalfXPt": [
+          822.337891,
+          927.857422,
+          1039.117188,
+          1156.117188,
+          1273.117188,
+          1390.117188,
+          1505.617188,
+          1615.45459
+        ],
+        "lowerMinusUpperOffsetsPt": [
+          4.162476,
+          4.162476,
+          4.162476,
+          4.162476,
+          4.162476,
+          4.162476,
+          4.162476,
+          4.162476
+        ],
+        "meanOffsetPt": 4.162476,
+        "maxOffsetResidualPt": 0.0
+      }
+    },
+    "envelope": {
+      "lengthFt": 104,
+      "widthFt": 89.5,
+      "floorElevationFt": 100,
+      "eaveElevationFt": 25.0,
+      "ridgeElevationFt": 32.458333,
+      "pitchRiseInPer12": 2.0
+    },
+    "section": {
+      "leftEavePdfPoint": [
+        82.08,
+        332.16
+      ],
+      "ridgePdfPoint": [
+        202.32,
+        312.12
+      ],
+      "rightEavePdfPoint": [
+        322.56,
+        332.16
+      ],
+      "leftSlopeRisePerRun": 0.166667,
+      "rightSlopeRisePerRun": 0.166667,
+      "nativeVectorPitchVerified": true
+    }
+  },
+  "geometryGraph": {
+    "nodeCount": 64,
+    "edgeCount": 48,
+    "nodes": [
+      {
+        "id": "BGC-H-01-01",
+        "branchIndex": 1,
+        "acrossSlopePosition": 1,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 16636,
+        "planPdfPoint": [
+          818.175415,
+          1151.095398
+        ],
+        "planPointFt": [
+          8.182163,
+          -37.529548
+        ],
+        "roofSurfaceTargetElevationFt": 26.203408,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-01-02",
+        "branchIndex": 1,
+        "acrossSlopePosition": 2,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17058,
+        "planPdfPoint": [
+          818.175415,
+          1247.470398
+        ],
+        "planPointFt": [
+          8.182163,
+          -26.821214
+        ],
+        "roofSurfaceTargetElevationFt": 27.988131,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-01-03",
+        "branchIndex": 1,
+        "acrossSlopePosition": 3,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17754,
+        "planPdfPoint": [
+          818.175415,
+          1343.845398
+        ],
+        "planPointFt": [
+          8.182163,
+          -16.112881
+        ],
+        "roofSurfaceTargetElevationFt": 29.772853,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-01-04",
+        "branchIndex": 1,
+        "acrossSlopePosition": 4,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 18760,
+        "planPdfPoint": [
+          818.175415,
+          1440.220398
+        ],
+        "planPointFt": [
+          8.182163,
+          -5.404548
+        ],
+        "roofSurfaceTargetElevationFt": 31.557575,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-01-05",
+        "branchIndex": 1,
+        "acrossSlopePosition": 5,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 18742,
+        "planPdfPoint": [
+          822.337891,
+          1537.501099
+        ],
+        "planPointFt": [
+          8.64466,
+          5.404419
+        ],
+        "roofSurfaceTargetElevationFt": 31.557597,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-01-06",
+        "branchIndex": 1,
+        "acrossSlopePosition": 6,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17738,
+        "planPdfPoint": [
+          822.337891,
+          1633.876343
+        ],
+        "planPointFt": [
+          8.64466,
+          16.112779
+        ],
+        "roofSurfaceTargetElevationFt": 29.77287,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-01-07",
+        "branchIndex": 1,
+        "acrossSlopePosition": 7,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17042,
+        "planPdfPoint": [
+          822.337891,
+          1730.25177
+        ],
+        "planPointFt": [
+          8.64466,
+          26.82116
+        ],
+        "roofSurfaceTargetElevationFt": 27.98814,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-01-08",
+        "branchIndex": 1,
+        "acrossSlopePosition": 8,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 16620,
+        "planPdfPoint": [
+          822.337891,
+          1826.627075
+        ],
+        "planPointFt": [
+          8.64466,
+          37.529527
+        ],
+        "roofSurfaceTargetElevationFt": 26.203412,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-02-01",
+        "branchIndex": 2,
+        "acrossSlopePosition": 1,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 16632,
+        "planPdfPoint": [
+          923.694946,
+          1151.095398
+        ],
+        "planPointFt": [
+          19.906555,
+          -37.529548
+        ],
+        "roofSurfaceTargetElevationFt": 26.203408,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-02-02",
+        "branchIndex": 2,
+        "acrossSlopePosition": 2,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17056,
+        "planPdfPoint": [
+          923.694946,
+          1247.470398
+        ],
+        "planPointFt": [
+          19.906555,
+          -26.821214
+        ],
+        "roofSurfaceTargetElevationFt": 27.988131,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-02-03",
+        "branchIndex": 2,
+        "acrossSlopePosition": 3,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17752,
+        "planPdfPoint": [
+          923.694946,
+          1343.845398
+        ],
+        "planPointFt": [
+          19.906555,
+          -16.112881
+        ],
+        "roofSurfaceTargetElevationFt": 29.772853,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-02-04",
+        "branchIndex": 2,
+        "acrossSlopePosition": 4,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 18758,
+        "planPdfPoint": [
+          923.694946,
+          1440.220398
+        ],
+        "planPointFt": [
+          19.906555,
+          -5.404548
+        ],
+        "roofSurfaceTargetElevationFt": 31.557575,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-02-05",
+        "branchIndex": 2,
+        "acrossSlopePosition": 5,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 18740,
+        "planPdfPoint": [
+          927.857422,
+          1537.501099
+        ],
+        "planPointFt": [
+          20.369052,
+          5.404419
+        ],
+        "roofSurfaceTargetElevationFt": 31.557597,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-02-06",
+        "branchIndex": 2,
+        "acrossSlopePosition": 6,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17736,
+        "planPdfPoint": [
+          927.857422,
+          1633.876343
+        ],
+        "planPointFt": [
+          20.369052,
+          16.112779
+        ],
+        "roofSurfaceTargetElevationFt": 29.77287,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-02-07",
+        "branchIndex": 2,
+        "acrossSlopePosition": 7,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17040,
+        "planPdfPoint": [
+          927.857422,
+          1730.25177
+        ],
+        "planPointFt": [
+          20.369052,
+          26.82116
+        ],
+        "roofSurfaceTargetElevationFt": 27.98814,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-02-08",
+        "branchIndex": 2,
+        "acrossSlopePosition": 8,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 16618,
+        "planPdfPoint": [
+          927.857422,
+          1826.627075
+        ],
+        "planPointFt": [
+          20.369052,
+          37.529527
+        ],
+        "roofSurfaceTargetElevationFt": 26.203412,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-03-01",
+        "branchIndex": 3,
+        "acrossSlopePosition": 1,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 16630,
+        "planPdfPoint": [
+          1034.954712,
+          1151.095398
+        ],
+        "planPointFt": [
+          32.268751,
+          -37.529548
+        ],
+        "roofSurfaceTargetElevationFt": 26.203408,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-03-02",
+        "branchIndex": 3,
+        "acrossSlopePosition": 2,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17054,
+        "planPdfPoint": [
+          1034.954712,
+          1247.470398
+        ],
+        "planPointFt": [
+          32.268751,
+          -26.821214
+        ],
+        "roofSurfaceTargetElevationFt": 27.988131,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-03-03",
+        "branchIndex": 3,
+        "acrossSlopePosition": 3,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17750,
+        "planPdfPoint": [
+          1034.954712,
+          1343.845398
+        ],
+        "planPointFt": [
+          32.268751,
+          -16.112881
+        ],
+        "roofSurfaceTargetElevationFt": 29.772853,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-03-04",
+        "branchIndex": 3,
+        "acrossSlopePosition": 4,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 18756,
+        "planPdfPoint": [
+          1034.954712,
+          1440.220398
+        ],
+        "planPointFt": [
+          32.268751,
+          -5.404548
+        ],
+        "roofSurfaceTargetElevationFt": 31.557575,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-03-05",
+        "branchIndex": 3,
+        "acrossSlopePosition": 5,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 18738,
+        "planPdfPoint": [
+          1039.117188,
+          1537.501099
+        ],
+        "planPointFt": [
+          32.731249,
+          5.404419
+        ],
+        "roofSurfaceTargetElevationFt": 31.557597,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-03-06",
+        "branchIndex": 3,
+        "acrossSlopePosition": 6,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17734,
+        "planPdfPoint": [
+          1039.117188,
+          1633.876343
+        ],
+        "planPointFt": [
+          32.731249,
+          16.112779
+        ],
+        "roofSurfaceTargetElevationFt": 29.77287,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-03-07",
+        "branchIndex": 3,
+        "acrossSlopePosition": 7,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17038,
+        "planPdfPoint": [
+          1039.117188,
+          1730.25177
+        ],
+        "planPointFt": [
+          32.731249,
+          26.82116
+        ],
+        "roofSurfaceTargetElevationFt": 27.98814,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-03-08",
+        "branchIndex": 3,
+        "acrossSlopePosition": 8,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 16616,
+        "planPdfPoint": [
+          1039.117188,
+          1826.627075
+        ],
+        "planPointFt": [
+          32.731249,
+          37.529527
+        ],
+        "roofSurfaceTargetElevationFt": 26.203412,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-04-01",
+        "branchIndex": 4,
+        "acrossSlopePosition": 1,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 16628,
+        "planPdfPoint": [
+          1151.954712,
+          1151.095398
+        ],
+        "planPointFt": [
+          45.268751,
+          -37.529548
+        ],
+        "roofSurfaceTargetElevationFt": 26.203408,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-04-02",
+        "branchIndex": 4,
+        "acrossSlopePosition": 2,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17052,
+        "planPdfPoint": [
+          1151.954712,
+          1247.470398
+        ],
+        "planPointFt": [
+          45.268751,
+          -26.821214
+        ],
+        "roofSurfaceTargetElevationFt": 27.988131,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-04-03",
+        "branchIndex": 4,
+        "acrossSlopePosition": 3,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17748,
+        "planPdfPoint": [
+          1151.954712,
+          1343.845398
+        ],
+        "planPointFt": [
+          45.268751,
+          -16.112881
+        ],
+        "roofSurfaceTargetElevationFt": 29.772853,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-04-04",
+        "branchIndex": 4,
+        "acrossSlopePosition": 4,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 18754,
+        "planPdfPoint": [
+          1151.954712,
+          1440.220398
+        ],
+        "planPointFt": [
+          45.268751,
+          -5.404548
+        ],
+        "roofSurfaceTargetElevationFt": 31.557575,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-04-05",
+        "branchIndex": 4,
+        "acrossSlopePosition": 5,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 18736,
+        "planPdfPoint": [
+          1156.117188,
+          1537.501099
+        ],
+        "planPointFt": [
+          45.731249,
+          5.404419
+        ],
+        "roofSurfaceTargetElevationFt": 31.557597,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-04-06",
+        "branchIndex": 4,
+        "acrossSlopePosition": 6,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17732,
+        "planPdfPoint": [
+          1156.117188,
+          1633.876343
+        ],
+        "planPointFt": [
+          45.731249,
+          16.112779
+        ],
+        "roofSurfaceTargetElevationFt": 29.77287,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-04-07",
+        "branchIndex": 4,
+        "acrossSlopePosition": 7,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17036,
+        "planPdfPoint": [
+          1156.117188,
+          1730.25177
+        ],
+        "planPointFt": [
+          45.731249,
+          26.82116
+        ],
+        "roofSurfaceTargetElevationFt": 27.98814,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-04-08",
+        "branchIndex": 4,
+        "acrossSlopePosition": 8,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 16614,
+        "planPdfPoint": [
+          1156.117188,
+          1826.627075
+        ],
+        "planPointFt": [
+          45.731249,
+          37.529527
+        ],
+        "roofSurfaceTargetElevationFt": 26.203412,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-05-01",
+        "branchIndex": 5,
+        "acrossSlopePosition": 1,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 16626,
+        "planPdfPoint": [
+          1268.954712,
+          1151.095398
+        ],
+        "planPointFt": [
+          58.268751,
+          -37.529548
+        ],
+        "roofSurfaceTargetElevationFt": 26.203408,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-05-02",
+        "branchIndex": 5,
+        "acrossSlopePosition": 2,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17050,
+        "planPdfPoint": [
+          1268.954712,
+          1247.470398
+        ],
+        "planPointFt": [
+          58.268751,
+          -26.821214
+        ],
+        "roofSurfaceTargetElevationFt": 27.988131,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-05-03",
+        "branchIndex": 5,
+        "acrossSlopePosition": 3,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17746,
+        "planPdfPoint": [
+          1268.954712,
+          1343.845398
+        ],
+        "planPointFt": [
+          58.268751,
+          -16.112881
+        ],
+        "roofSurfaceTargetElevationFt": 29.772853,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-05-04",
+        "branchIndex": 5,
+        "acrossSlopePosition": 4,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 18752,
+        "planPdfPoint": [
+          1268.954712,
+          1440.220398
+        ],
+        "planPointFt": [
+          58.268751,
+          -5.404548
+        ],
+        "roofSurfaceTargetElevationFt": 31.557575,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-05-05",
+        "branchIndex": 5,
+        "acrossSlopePosition": 5,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 18734,
+        "planPdfPoint": [
+          1273.117188,
+          1537.501099
+        ],
+        "planPointFt": [
+          58.731249,
+          5.404419
+        ],
+        "roofSurfaceTargetElevationFt": 31.557597,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-05-06",
+        "branchIndex": 5,
+        "acrossSlopePosition": 6,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17730,
+        "planPdfPoint": [
+          1273.117188,
+          1633.876343
+        ],
+        "planPointFt": [
+          58.731249,
+          16.112779
+        ],
+        "roofSurfaceTargetElevationFt": 29.77287,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-05-07",
+        "branchIndex": 5,
+        "acrossSlopePosition": 7,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17034,
+        "planPdfPoint": [
+          1273.117188,
+          1730.25177
+        ],
+        "planPointFt": [
+          58.731249,
+          26.82116
+        ],
+        "roofSurfaceTargetElevationFt": 27.98814,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-05-08",
+        "branchIndex": 5,
+        "acrossSlopePosition": 8,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 16612,
+        "planPdfPoint": [
+          1273.117188,
+          1826.627075
+        ],
+        "planPointFt": [
+          58.731249,
+          37.529527
+        ],
+        "roofSurfaceTargetElevationFt": 26.203412,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-06-01",
+        "branchIndex": 6,
+        "acrossSlopePosition": 1,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 16624,
+        "planPdfPoint": [
+          1385.954712,
+          1151.095398
+        ],
+        "planPointFt": [
+          71.268751,
+          -37.529548
+        ],
+        "roofSurfaceTargetElevationFt": 26.203408,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-06-02",
+        "branchIndex": 6,
+        "acrossSlopePosition": 2,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17048,
+        "planPdfPoint": [
+          1385.954712,
+          1247.470398
+        ],
+        "planPointFt": [
+          71.268751,
+          -26.821214
+        ],
+        "roofSurfaceTargetElevationFt": 27.988131,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-06-03",
+        "branchIndex": 6,
+        "acrossSlopePosition": 3,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17744,
+        "planPdfPoint": [
+          1385.954712,
+          1343.845398
+        ],
+        "planPointFt": [
+          71.268751,
+          -16.112881
+        ],
+        "roofSurfaceTargetElevationFt": 29.772853,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-06-04",
+        "branchIndex": 6,
+        "acrossSlopePosition": 4,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 18750,
+        "planPdfPoint": [
+          1385.954712,
+          1440.220398
+        ],
+        "planPointFt": [
+          71.268751,
+          -5.404548
+        ],
+        "roofSurfaceTargetElevationFt": 31.557575,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-06-05",
+        "branchIndex": 6,
+        "acrossSlopePosition": 5,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 18732,
+        "planPdfPoint": [
+          1390.117188,
+          1537.501099
+        ],
+        "planPointFt": [
+          71.731249,
+          5.404419
+        ],
+        "roofSurfaceTargetElevationFt": 31.557597,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-06-06",
+        "branchIndex": 6,
+        "acrossSlopePosition": 6,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17728,
+        "planPdfPoint": [
+          1390.117188,
+          1633.876343
+        ],
+        "planPointFt": [
+          71.731249,
+          16.112779
+        ],
+        "roofSurfaceTargetElevationFt": 29.77287,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-06-07",
+        "branchIndex": 6,
+        "acrossSlopePosition": 7,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17032,
+        "planPdfPoint": [
+          1390.117188,
+          1730.25177
+        ],
+        "planPointFt": [
+          71.731249,
+          26.82116
+        ],
+        "roofSurfaceTargetElevationFt": 27.98814,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-06-08",
+        "branchIndex": 6,
+        "acrossSlopePosition": 8,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 16610,
+        "planPdfPoint": [
+          1390.117188,
+          1826.627075
+        ],
+        "planPointFt": [
+          71.731249,
+          37.529527
+        ],
+        "roofSurfaceTargetElevationFt": 26.203412,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-07-01",
+        "branchIndex": 7,
+        "acrossSlopePosition": 1,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 16622,
+        "planPdfPoint": [
+          1501.454712,
+          1151.095398
+        ],
+        "planPointFt": [
+          84.102085,
+          -37.529548
+        ],
+        "roofSurfaceTargetElevationFt": 26.203408,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-07-02",
+        "branchIndex": 7,
+        "acrossSlopePosition": 2,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17046,
+        "planPdfPoint": [
+          1501.454712,
+          1247.470398
+        ],
+        "planPointFt": [
+          84.102085,
+          -26.821214
+        ],
+        "roofSurfaceTargetElevationFt": 27.988131,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-07-03",
+        "branchIndex": 7,
+        "acrossSlopePosition": 3,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17742,
+        "planPdfPoint": [
+          1501.454712,
+          1343.845398
+        ],
+        "planPointFt": [
+          84.102085,
+          -16.112881
+        ],
+        "roofSurfaceTargetElevationFt": 29.772853,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-07-04",
+        "branchIndex": 7,
+        "acrossSlopePosition": 4,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 18748,
+        "planPdfPoint": [
+          1501.454712,
+          1440.220398
+        ],
+        "planPointFt": [
+          84.102085,
+          -5.404548
+        ],
+        "roofSurfaceTargetElevationFt": 31.557575,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-07-05",
+        "branchIndex": 7,
+        "acrossSlopePosition": 5,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 18730,
+        "planPdfPoint": [
+          1505.617188,
+          1537.501099
+        ],
+        "planPointFt": [
+          84.564582,
+          5.404419
+        ],
+        "roofSurfaceTargetElevationFt": 31.557597,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-07-06",
+        "branchIndex": 7,
+        "acrossSlopePosition": 6,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17726,
+        "planPdfPoint": [
+          1505.617188,
+          1633.876343
+        ],
+        "planPointFt": [
+          84.564582,
+          16.112779
+        ],
+        "roofSurfaceTargetElevationFt": 29.77287,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-07-07",
+        "branchIndex": 7,
+        "acrossSlopePosition": 7,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17030,
+        "planPdfPoint": [
+          1505.617188,
+          1730.25177
+        ],
+        "planPointFt": [
+          84.564582,
+          26.82116
+        ],
+        "roofSurfaceTargetElevationFt": 27.98814,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-07-08",
+        "branchIndex": 7,
+        "acrossSlopePosition": 8,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 16608,
+        "planPdfPoint": [
+          1505.617188,
+          1826.627075
+        ],
+        "planPointFt": [
+          84.564582,
+          37.529527
+        ],
+        "roofSurfaceTargetElevationFt": 26.203412,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-08-01",
+        "branchIndex": 8,
+        "acrossSlopePosition": 1,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 16634,
+        "planPdfPoint": [
+          1611.292114,
+          1151.095398
+        ],
+        "planPointFt": [
+          96.30624,
+          -37.529548
+        ],
+        "roofSurfaceTargetElevationFt": 26.203408,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-08-02",
+        "branchIndex": 8,
+        "acrossSlopePosition": 2,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17044,
+        "planPdfPoint": [
+          1611.292114,
+          1247.470398
+        ],
+        "planPointFt": [
+          96.30624,
+          -26.821214
+        ],
+        "roofSurfaceTargetElevationFt": 27.988131,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-08-03",
+        "branchIndex": 8,
+        "acrossSlopePosition": 3,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 17740,
+        "planPdfPoint": [
+          1611.292114,
+          1343.845398
+        ],
+        "planPointFt": [
+          96.30624,
+          -16.112881
+        ],
+        "roofSurfaceTargetElevationFt": 29.772853,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-08-04",
+        "branchIndex": 8,
+        "acrossSlopePosition": 4,
+        "roofPlane": "north",
+        "sourceDrawingIndex": 18746,
+        "planPdfPoint": [
+          1611.292114,
+          1440.220398
+        ],
+        "planPointFt": [
+          96.30624,
+          -5.404548
+        ],
+        "roofSurfaceTargetElevationFt": 31.557575,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-08-05",
+        "branchIndex": 8,
+        "acrossSlopePosition": 5,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 18728,
+        "planPdfPoint": [
+          1615.45459,
+          1537.501099
+        ],
+        "planPointFt": [
+          96.768738,
+          5.404419
+        ],
+        "roofSurfaceTargetElevationFt": 31.557597,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-08-06",
+        "branchIndex": 8,
+        "acrossSlopePosition": 6,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17724,
+        "planPdfPoint": [
+          1615.45459,
+          1633.876343
+        ],
+        "planPointFt": [
+          96.768738,
+          16.112779
+        ],
+        "roofSurfaceTargetElevationFt": 29.77287,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-08-07",
+        "branchIndex": 8,
+        "acrossSlopePosition": 7,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 17028,
+        "planPdfPoint": [
+          1615.45459,
+          1730.25177
+        ],
+        "planPointFt": [
+          96.768738,
+          26.82116
+        ],
+        "roofSurfaceTargetElevationFt": 27.98814,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-H-08-08",
+        "branchIndex": 8,
+        "acrossSlopePosition": 8,
+        "roofPlane": "south",
+        "sourceDrawingIndex": 16606,
+        "planPdfPoint": [
+          1615.45459,
+          1826.627075
+        ],
+        "planPointFt": [
+          96.768738,
+          37.529527
+        ],
+        "roofSurfaceTargetElevationFt": 26.203412,
+        "headType": "Tyco TY3131 TY-FRB 5.6 upright quick response natural brass 200F with head guard",
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false
+      }
+    ],
+    "edges": [
+      {
+        "id": "BGC-E-001",
+        "from": "BGC-H-01-01",
+        "to": "BGC-H-01-02",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-002",
+        "from": "BGC-H-01-02",
+        "to": "BGC-H-01-03",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-003",
+        "from": "BGC-H-01-03",
+        "to": "BGC-H-01-04",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-004",
+        "from": "BGC-H-01-05",
+        "to": "BGC-H-01-06",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-005",
+        "from": "BGC-H-01-06",
+        "to": "BGC-H-01-07",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-006",
+        "from": "BGC-H-01-07",
+        "to": "BGC-H-01-08",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-007",
+        "from": "BGC-H-02-01",
+        "to": "BGC-H-02-02",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-008",
+        "from": "BGC-H-02-02",
+        "to": "BGC-H-02-03",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-009",
+        "from": "BGC-H-02-03",
+        "to": "BGC-H-02-04",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-010",
+        "from": "BGC-H-02-05",
+        "to": "BGC-H-02-06",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-011",
+        "from": "BGC-H-02-06",
+        "to": "BGC-H-02-07",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-012",
+        "from": "BGC-H-02-07",
+        "to": "BGC-H-02-08",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-013",
+        "from": "BGC-H-03-01",
+        "to": "BGC-H-03-02",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-014",
+        "from": "BGC-H-03-02",
+        "to": "BGC-H-03-03",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-015",
+        "from": "BGC-H-03-03",
+        "to": "BGC-H-03-04",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-016",
+        "from": "BGC-H-03-05",
+        "to": "BGC-H-03-06",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-017",
+        "from": "BGC-H-03-06",
+        "to": "BGC-H-03-07",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-018",
+        "from": "BGC-H-03-07",
+        "to": "BGC-H-03-08",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-019",
+        "from": "BGC-H-04-01",
+        "to": "BGC-H-04-02",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-020",
+        "from": "BGC-H-04-02",
+        "to": "BGC-H-04-03",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-021",
+        "from": "BGC-H-04-03",
+        "to": "BGC-H-04-04",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-022",
+        "from": "BGC-H-04-05",
+        "to": "BGC-H-04-06",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-023",
+        "from": "BGC-H-04-06",
+        "to": "BGC-H-04-07",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-024",
+        "from": "BGC-H-04-07",
+        "to": "BGC-H-04-08",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-025",
+        "from": "BGC-H-05-01",
+        "to": "BGC-H-05-02",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-026",
+        "from": "BGC-H-05-02",
+        "to": "BGC-H-05-03",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-027",
+        "from": "BGC-H-05-03",
+        "to": "BGC-H-05-04",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-028",
+        "from": "BGC-H-05-05",
+        "to": "BGC-H-05-06",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-029",
+        "from": "BGC-H-05-06",
+        "to": "BGC-H-05-07",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-030",
+        "from": "BGC-H-05-07",
+        "to": "BGC-H-05-08",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-031",
+        "from": "BGC-H-06-01",
+        "to": "BGC-H-06-02",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-032",
+        "from": "BGC-H-06-02",
+        "to": "BGC-H-06-03",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-033",
+        "from": "BGC-H-06-03",
+        "to": "BGC-H-06-04",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-034",
+        "from": "BGC-H-06-05",
+        "to": "BGC-H-06-06",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-035",
+        "from": "BGC-H-06-06",
+        "to": "BGC-H-06-07",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-036",
+        "from": "BGC-H-06-07",
+        "to": "BGC-H-06-08",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-037",
+        "from": "BGC-H-07-01",
+        "to": "BGC-H-07-02",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-038",
+        "from": "BGC-H-07-02",
+        "to": "BGC-H-07-03",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-039",
+        "from": "BGC-H-07-03",
+        "to": "BGC-H-07-04",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-040",
+        "from": "BGC-H-07-05",
+        "to": "BGC-H-07-06",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-041",
+        "from": "BGC-H-07-06",
+        "to": "BGC-H-07-07",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-042",
+        "from": "BGC-H-07-07",
+        "to": "BGC-H-07-08",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-043",
+        "from": "BGC-H-08-01",
+        "to": "BGC-H-08-02",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-044",
+        "from": "BGC-H-08-02",
+        "to": "BGC-H-08-03",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-045",
+        "from": "BGC-H-08-03",
+        "to": "BGC-H-08-04",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-046",
+        "from": "BGC-H-08-05",
+        "to": "BGC-H-08-06",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-047",
+        "from": "BGC-H-08-06",
+        "to": "BGC-H-08-07",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-048",
+        "from": "BGC-H-08-07",
+        "to": "BGC-H-08-08",
+        "kind": "source-proven-branch-half",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": false,
+        "pipeGradeVerified": false,
+        "exactInstalledElevationVerified": false
+      }
+    ],
+    "digestSha256": "495c5c66bb224213889c1862db926de02a26d6e7778a24cfe9dd31bf937bff88"
+  },
+  "viewBindings": {
+    "topPlan": {
+      "source": "asBuilt",
+      "clipPdf": [
+        700.0,
+        1040.0,
+        1740.0,
+        1980.0
+      ],
+      "image": "proofs/bgc-source-plan-section-3d-registration/bgc-plan-overlay.png",
+      "geometryGraphSha256": "495c5c66bb224213889c1862db926de02a26d6e7778a24cfe9dd31bf937bff88"
+    },
+    "elevation": {
+      "source": "architectural",
+      "clipPdf": [
+        30.0,
+        270.0,
+        390.0,
+        470.0
+      ],
+      "image": "proofs/bgc-source-plan-section-3d-registration/bgc-section-overlay.png",
+      "geometryGraphSha256": "495c5c66bb224213889c1862db926de02a26d6e7778a24cfe9dd31bf937bff88"
+    },
+    "model3d": {
+      "sourceTexture": "proofs/bgc-source-plan-section-3d-registration/bgc-plan-source.png",
+      "image": "proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.png",
+      "blend": "proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.blend",
+      "glb": "proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.glb",
+      "geometryGraphSha256": "495c5c66bb224213889c1862db926de02a26d6e7778a24cfe9dd31bf937bff88"
+    }
+  },
+  "internalVerification": {
+    "primary": {
+      "status": "passed",
+      "method": "as-built-native-vector-signature-plus-source-covered-branch-halves"
+    },
+    "crossSource": {
+      "status": "passed",
+      "method": "approved-64-to-as-built-64-topology-parity-plus-A301-native-roof-vectors"
+    },
+    "adversarial": {
+      "status": "passed",
+      "method": "runtime-validator-mutation-suite"
+    }
+  },
+  "sourcePlanCoordinatesVerified": true,
+  "sourceBranchHalfAdjacencyVerified": true,
+  "roofSurfaceTargetProjectionVerified": true,
+  "exactInstalledSprinklerElevationVerified": false,
+  "exactInstalledPipeElevationVerified": false,
+  "pipeDirectionVerified": false,
+  "pipeGradeVerified": false,
+  "hydraulicCalculationReady": false,
+  "complianceReady": false,
+  "fabricationReady": false,
+  "fieldReleaseReady": false,
+  "vpsReleaseReady": false,
+  "claimStatus": "source-registered-plan-section-and-3d-target-proof-not-installed-z-grade-hydraulic-compliance-fabrication-or-release",
+  "receiptSha256": "c2e98e95833122cd55cc1f4022e68556a4686815d2902e0ff543d5099948abd0"
+}
