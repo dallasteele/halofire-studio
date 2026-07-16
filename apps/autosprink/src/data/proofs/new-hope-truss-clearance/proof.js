@@ -27,6 +27,7 @@ import { evaluateNewHopeCmi06VerticalOutlet } from '../../../engine/new-hope-cmi
 import { evaluateNewHopeCmiRidgeChainFabrication } from '../../../engine/new-hope-cmi-ridge-chain-fabrication.js';
 import { evaluateNewHopeRemainingCmiFabrication } from '../../../engine/new-hope-remaining-cmi-fabrication.js';
 import { evaluateNewHopeCmlCmiWeldedConnectionGraph } from '../../../engine/new-hope-cml-cmi-welded-connection-graph.js';
+import { evaluateNewHopeThreadedTerminalGeometry } from '../../../engine/new-hope-threaded-terminal-geometry.js';
 
 const calibrationUrl = '../../new-hope-truss-clearance-calibration.json';
 const sourceUrl = '../../new-hope-truss-clearance-source.json';
@@ -235,6 +236,17 @@ try {
     centralBranchDrainage,
   });
   if (!armOverDrainage.allTwelveArmOverDrainageReady) throw new Error(`all twelve arm-over drainage bindings: ${armOverDrainage.blockerCodes.join(', ')}`);
+  const threadedTerminalGeometry = evaluateNewHopeThreadedTerminalGeometry({
+    canonicalTopology,
+    operationalAnnotations,
+    fabricationSchedule: fabricationEndScheduleSource,
+    nativeFabGraph: nativeFabAttachmentGraphSource,
+    armOverDrainage,
+    cmi05Cmi08Fabrication,
+    cmi06VerticalOutlet,
+    remainingCmiFabrication,
+  });
+  if (!threadedTerminalGeometry.threadedTerminalAmbiguityQuantified) throw new Error(`CMI.23-CMI.42 threaded terminal geometry: ${threadedTerminalGeometry.blockerCodes.join(', ')}`);
   const properPipeLayout = evaluateNewHopeProperPipeLayout({
     pipeVectors,
     canonicalTopology,
@@ -261,6 +273,7 @@ try {
     crossMainDrainage,
     centralBranchDrainage,
     armOverDrainage,
+    threadedTerminalGeometry,
   });
   if (properPipeLayout.status !== 'passed') throw new Error(`proper pipe-layout evidence assembly: ${properPipeLayout.blockerCodes.join(', ')}`);
   const [hydraulicRoute21, hydraulicRoute22, hydraulicRoute23] = hydraulicRouteSet.remoteAreas;
@@ -643,7 +656,7 @@ try {
   document.querySelector('#cross-main-grade-proof-status').textContent = `PASS: 35-node / 34-edge cross-main tree, including fabricated CMK.01-.03, directed from three high points toward low-point-01, low-point-04, and the riser return`;
   document.querySelector('#central-branch-grade-proof-status').textContent = `PASS: BL48/BL49 23-node / 23-edge branch component; eight-edge BL49 loop graded on both arms toward CMK; false BL48/CMI crossing kept separated; 4 attached arm-overs source-bound`;
   document.querySelector('#arm-over-grade-proof-status').textContent = `PASS: all 12 threaded terminal arm-overs bound to exact source edges, sprinklers, carrier roles, cut-length groups, and explicit drainage catchments`;
-  document.querySelector('#proper-pipe-layout-proof-status').textContent = `AUDITED: ${properPipeLayout.metrics.directedEdgeCount}/${properPipeLayout.metrics.canonicalEdgeCount} edges direction-bound; ${properPipeLayout.metrics.exactElevationPortCount} exact Z ports on ${properPipeLayout.metrics.exactElevationCanonicalNodeCount}/${properPipeLayout.metrics.canonicalNodeCount} nodes; ${properPipeLayout.metrics.sameProjectCmlCmiWeldedPieceCount} CML/CMI welded pieces / ${properPipeLayout.metrics.sameProjectCmlCmiInterPieceAdjacencyCount} same-project junctions / ${properPipeLayout.metrics.sameProjectCmlCmiNativeOutletAttachmentCount} native outlets; whole-project layout remains blocked`;
+  document.querySelector('#proper-pipe-layout-proof-status').textContent = `AUDITED: ${properPipeLayout.metrics.directedEdgeCount}/${properPipeLayout.metrics.canonicalEdgeCount} edges direction-bound; ${properPipeLayout.metrics.exactElevationPortCount} exact Z ports on ${properPipeLayout.metrics.exactElevationCanonicalNodeCount}/${properPipeLayout.metrics.canonicalNodeCount} nodes; ${properPipeLayout.metrics.sameProjectCmlCmiWeldedPieceCount} welded pieces / ${properPipeLayout.metrics.sameProjectCmlCmiInterPieceAdjacencyCount} junctions / ${properPipeLayout.metrics.sameProjectCmlCmiNativeOutletAttachmentCount} outlets; ${properPipeLayout.metrics.threadedTerminalPieceCount} threaded pieces / ${properPipeLayout.metrics.threadedTerminalApprovedHorizontalRouteCount} horizontal routes / ${properPipeLayout.metrics.threadedTerminalDirectCarrierHeadEndpointCount} direct endpoints; exact identity assignment remains blocked`;
   document.querySelector('#source-feed-fabrication-status').textContent = `PASS: CML.01 4-inch x 2'-11½\" plan piece + 4 x 3 upward outlet + node 118 at 11.5 ft; endpoint Z, installed grade, and concealed riser continuation remain blocked`;
   document.querySelector('#low-point-fabrication-status').textContent = `PASS: CMI.09 field/listing piece starts at low-point-01; source-edge-054 is node 059 high to node 054 low with ${lowPointFabrication.directedEdge.requiredDropIn.toFixed(6)} in minimum fall; equal 18.375-ft calc labels do not claim exact differential Z`;
   document.querySelector('#source-feed-fabrication-status').textContent = `PASS: CML.01 + node 118 at 11.5 ft, BOR node 414 at 5.458 ft, and DPV/BV/BFP chain; concealed XY, fabrication-to-calculation decomposition, and installed grade remain blocked`;
@@ -680,6 +693,7 @@ try {
   document.querySelector('#machine-acceptance-boundary').textContent += ` | cmiRidgeEightPieceFabricationReady=${properPipeLayout.cmiRidgeEightPieceFabricationReady} | cmiRidgeTwentyOneOutletScheduleReady=${properPipeLayout.cmiRidgeTwentyOneOutletScheduleReady} | cmiRidgeTwentySprinklerOutletIdentityReady=${properPipeLayout.cmiRidgeTwentySprinklerOutletIdentityReady} | cmi13RemoteInspectorTestOutletReady=${properPipeLayout.cmi13RemoteInspectorTestOutletReady} | cmi13Cmi22AsymmetryReady=${properPipeLayout.cmi13Cmi22AsymmetryReady} | cmiRidgeChainJunctionsReady=${properPipeLayout.cmiRidgeChainJunctionsReady} | cmiRidgeBoundedFittingScheduleReady=${properPipeLayout.cmiRidgeBoundedFittingScheduleReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | remainingCmiNinePieceFabricationReady=${properPipeLayout.remainingCmiNinePieceFabricationReady} | remainingCmiElevenOutletScheduleReady=${properPipeLayout.remainingCmiElevenOutletScheduleReady} | remainingCmiSixDirectSprinklerOutletIdentityReady=${properPipeLayout.remainingCmiSixDirectSprinklerOutletIdentityReady} | remainingCmiFiveBranchOrArmOverOutletScheduleReady=${properPipeLayout.remainingCmiFiveBranchOrArmOverOutletScheduleReady} | remainingCmiFourNoOutletPieceScheduleReady=${properPipeLayout.remainingCmiFourNoOutletPieceScheduleReady} | cmi01SourceOutletZReady=${properPipeLayout.cmi01SourceOutletZReady} | remainingCmiBoundedFittingScheduleReady=${properPipeLayout.remainingCmiBoundedFittingScheduleReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | sameProjectCmlCmiWeldedIdentityReady=${properPipeLayout.sameProjectCmlCmiWeldedIdentityReady} | sameProjectCmlCmiWeldedInterPieceAdjacencyReady=${properPipeLayout.sameProjectCmlCmiWeldedInterPieceAdjacencyReady} | sameProjectCmlCmiNativeOutletAttachmentReady=${properPipeLayout.sameProjectCmlCmiNativeOutletAttachmentReady} | sameProjectCmlCmiExactConnectionTakeoutReady=${properPipeLayout.sameProjectCmlCmiExactConnectionTakeoutReady} | sameProjectCmlCmiThreadedTerminalPieceAdjacencyReady=${properPipeLayout.sameProjectCmlCmiThreadedTerminalPieceAdjacencyReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent += ` | threadedTerminalInventoryReady=${properPipeLayout.threadedTerminalInventoryReady} | threadedTerminalHorizontalRouteClassesReady=${properPipeLayout.threadedTerminalHorizontalRouteClassesReady} | threadedTerminalFollowerClassesReady=${properPipeLayout.threadedTerminalFollowerClassesReady} | threadedTerminalDirectEndpointSetReady=${properPipeLayout.threadedTerminalDirectEndpointSetReady} | threadedTerminalAmbiguityQuantified=${properPipeLayout.threadedTerminalAmbiguityQuantified} | exactThreadedTerminalPieceAdjacencyReady=${properPipeLayout.exactThreadedTerminalPieceAdjacencyReady} | exactThreadedTerminalTakeoutReady=${properPipeLayout.exactThreadedTerminalTakeoutReady}`;
   document.querySelector('#cmi-ridge-machine-boundary').textContent = `cmiRidgeEightPieceFabricationReady=${properPipeLayout.cmiRidgeEightPieceFabricationReady} | cmiRidgeTwentyOneOutletScheduleReady=${properPipeLayout.cmiRidgeTwentyOneOutletScheduleReady} | cmiRidgeTwentySprinklerOutletIdentityReady=${properPipeLayout.cmiRidgeTwentySprinklerOutletIdentityReady} | cmi13RemoteInspectorTestOutletReady=${properPipeLayout.cmi13RemoteInspectorTestOutletReady} | cmi13Cmi22AsymmetryReady=${properPipeLayout.cmi13Cmi22AsymmetryReady} | cmiRidgeChainJunctionsReady=${properPipeLayout.cmiRidgeChainJunctionsReady} | cmiRidgeBoundedFittingScheduleReady=${properPipeLayout.cmiRidgeBoundedFittingScheduleReady}`;
   document.querySelector('#remaining-cmi-machine-boundary').textContent = `remainingCmiNinePieceFabricationReady=${properPipeLayout.remainingCmiNinePieceFabricationReady} | remainingCmiElevenOutletScheduleReady=${properPipeLayout.remainingCmiElevenOutletScheduleReady} | remainingCmiSixDirectSprinklerOutletIdentityReady=${properPipeLayout.remainingCmiSixDirectSprinklerOutletIdentityReady} | remainingCmiFiveBranchOrArmOverOutletScheduleReady=${properPipeLayout.remainingCmiFiveBranchOrArmOverOutletScheduleReady} | remainingCmiFourNoOutletPieceScheduleReady=${properPipeLayout.remainingCmiFourNoOutletPieceScheduleReady} | cmi01SourceOutletZReady=${properPipeLayout.cmi01SourceOutletZReady} | remainingCmiBoundedFittingScheduleReady=${properPipeLayout.remainingCmiBoundedFittingScheduleReady}`;
   document.documentElement.dataset.proofReady = 'true';
@@ -803,6 +817,13 @@ try {
   document.documentElement.dataset.sameProjectCmlCmiNativeOutletAttachmentReady = String(properPipeLayout.sameProjectCmlCmiNativeOutletAttachmentReady);
   document.documentElement.dataset.sameProjectCmlCmiExactConnectionTakeoutReady = String(properPipeLayout.sameProjectCmlCmiExactConnectionTakeoutReady);
   document.documentElement.dataset.sameProjectCmlCmiThreadedTerminalPieceAdjacencyReady = String(properPipeLayout.sameProjectCmlCmiThreadedTerminalPieceAdjacencyReady);
+  document.documentElement.dataset.threadedTerminalInventoryReady = String(properPipeLayout.threadedTerminalInventoryReady);
+  document.documentElement.dataset.threadedTerminalHorizontalRouteClassesReady = String(properPipeLayout.threadedTerminalHorizontalRouteClassesReady);
+  document.documentElement.dataset.threadedTerminalFollowerClassesReady = String(properPipeLayout.threadedTerminalFollowerClassesReady);
+  document.documentElement.dataset.threadedTerminalDirectEndpointSetReady = String(properPipeLayout.threadedTerminalDirectEndpointSetReady);
+  document.documentElement.dataset.threadedTerminalAmbiguityQuantified = String(properPipeLayout.threadedTerminalAmbiguityQuantified);
+  document.documentElement.dataset.exactThreadedTerminalPieceAdjacencyReady = String(properPipeLayout.exactThreadedTerminalPieceAdjacencyReady);
+  document.documentElement.dataset.exactThreadedTerminalTakeoutReady = String(properPipeLayout.exactThreadedTerminalTakeoutReady);
   document.documentElement.dataset.fittingScheduleReady = String(properPipeLayout.fittingScheduleReady);
   document.documentElement.dataset.fittingAdjacencyMethodCalibrationReady = String(properPipeLayout.fittingAdjacencyMethodCalibrationReady);
   document.documentElement.dataset.completedProjectGeometryTransferred = String(properPipeLayout.completedProjectGeometryTransferred);

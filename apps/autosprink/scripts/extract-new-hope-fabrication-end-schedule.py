@@ -72,6 +72,16 @@ def exact_fitting_ports(text: str, family: str) -> tuple[str | None, list[float]
     return size_text, sizes
 
 
+def listed_cut_length_in(body_before_end_prep: str) -> float:
+    match = re.search(r"(\d+)'\s*-\s*(\d+)?([Â¼Â½Â¾]?)\s*$", body_before_end_prep)
+    if not match:
+        raise ValueError(f"threaded row lacks exact cut length: {body_before_end_prep}")
+    feet = int(match.group(1))
+    whole_inches = int(match.group(2) or 0)
+    fraction_inches = FRACTION_VALUES.get(match.group(3), 0)
+    return feet * 12 + whole_inches + fraction_inches
+
+
 def parse(source: Path) -> dict:
     source_bytes = source.read_bytes()
     source_sha256 = hashlib.sha256(source_bytes).hexdigest().upper()
@@ -145,12 +155,14 @@ def parse(source: Path) -> dict:
                 raise ValueError(f"unclassified threaded fitting: {body}")
             fitting_text = body[end_prep.end() :]
             fitting_size_text, nominal_port_sizes_in = exact_fitting_ports(fitting_text, family)
+            cut_length_in = listed_cut_length_in(body[: end_prep.start()])
             threaded_pieces.append(
                 {
                     "pieceId": f"{current_line}.{int(row.group(1)):02d}",
                     "lineName": current_line,
                     "quantity": current_quantity,
                     "physicalPage": page_number,
+                    "cutLengthIn": cut_length_in,
                     "endPreparation": [end_prep.group(1), end_prep.group(2)],
                     "endFittingFamily": family,
                     "endFittingText": fitting_text,

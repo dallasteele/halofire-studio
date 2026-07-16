@@ -22,6 +22,7 @@ import { evaluateNewHopeSideBranchDrainage } from '../src/engine/new-hope-side-b
 import { evaluateNewHopeSourceFeedCalculationChain } from '../src/engine/new-hope-source-feed-calculation-chain.js'
 import { evaluateNewHopeSourceFeedAsbuiltRiser } from '../src/engine/new-hope-source-feed-asbuilt-riser.js'
 import { evaluateNewHopeSourceFeedFabrication } from '../src/engine/new-hope-source-feed-fabrication.js'
+import { evaluateNewHopeThreadedTerminalGeometry } from '../src/engine/new-hope-threaded-terminal-geometry.js'
 
 const read = (name) =>
   JSON.parse(fs.readFileSync(new URL(`../src/data/${name}`, import.meta.url), 'utf8'))
@@ -155,6 +156,16 @@ const armOverDrainage = evaluateNewHopeArmOverDrainage({
   crossMainDrainage,
   centralBranchDrainage,
 })
+const threadedTerminalGeometry = evaluateNewHopeThreadedTerminalGeometry({
+  canonicalTopology,
+  operationalAnnotations,
+  fabricationSchedule: fabricationEndScheduleSource,
+  nativeFabGraph: nativeFabAttachmentGraphSource,
+  armOverDrainage,
+  cmi05Cmi08Fabrication,
+  cmi06VerticalOutlet,
+  remainingCmiFabrication,
+})
 const inputs = {
   pipeVectors,
   canonicalTopology,
@@ -181,6 +192,7 @@ const inputs = {
   crossMainDrainage,
   centralBranchDrainage,
   armOverDrainage,
+  threadedTerminalGeometry,
 }
 
 describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
@@ -216,6 +228,10 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       sameProjectCmlCmiWeldedPieceCount: 23,
       sameProjectCmlCmiInterPieceAdjacencyCount: 22,
       sameProjectCmlCmiNativeOutletAttachmentCount: 45,
+      threadedTerminalPieceCount: 20,
+      threadedTerminalApprovedHorizontalRouteCount: 4,
+      threadedTerminalDirectCarrierHeadEndpointCount: 12,
+      threadedTerminalExactAssignmentCandidateCount: 7664025600,
       fieldDrainIntentCount: 2,
     })
     expect(result.undirectedEdges).toEqual([])
@@ -311,6 +327,13 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.sameProjectCmlCmiNativeOutletAttachmentReady).toBe(true)
     expect(result.sameProjectCmlCmiExactConnectionTakeoutReady).toBe(false)
     expect(result.sameProjectCmlCmiThreadedTerminalPieceAdjacencyReady).toBe(false)
+    expect(result.threadedTerminalInventoryReady).toBe(true)
+    expect(result.threadedTerminalHorizontalRouteClassesReady).toBe(true)
+    expect(result.threadedTerminalFollowerClassesReady).toBe(true)
+    expect(result.threadedTerminalDirectEndpointSetReady).toBe(true)
+    expect(result.threadedTerminalAmbiguityQuantified).toBe(true)
+    expect(result.exactThreadedTerminalPieceAdjacencyReady).toBe(false)
+    expect(result.exactThreadedTerminalTakeoutReady).toBe(false)
     expect(result.cmlCmiWeldedConnectionGraph.metrics).toMatchObject({
       weldedPieceCount: 23,
       interPieceAdjacencyCount: 22,
@@ -467,6 +490,16 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       'NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED',
     )
     expect(absentCmlCmiGraph.sameProjectCmlCmiWeldedInterPieceAdjacencyReady).toBe(false)
+
+    const absentThreadedTerminal = evaluateNewHopeProperPipeLayout({
+      ...inputs,
+      threadedTerminalGeometry: null,
+    })
+    expect(absentThreadedTerminal.status).toBe('blocked')
+    expect(absentThreadedTerminal.blockerCodes).toContain(
+      'NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED',
+    )
+    expect(absentThreadedTerminal.threadedTerminalInventoryReady).toBe(false)
 
     const absentLowPoint = evaluateNewHopeProperPipeLayout({ ...inputs, lowPointFabrication: null })
     expect(absentLowPoint.status).toBe('blocked')

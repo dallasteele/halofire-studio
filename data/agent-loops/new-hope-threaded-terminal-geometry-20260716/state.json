@@ -1,0 +1,131 @@
+{
+  "loop": "new-hope-threaded-terminal-geometry-20260716",
+  "stage": "VERIFY",
+  "status": "bounded-terminal-geometry-verified",
+  "iteration": 3,
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "browser", "computerUse", "blenderMcp", "formal"]
+  },
+  "sourceEvidence": {
+    "approvedPdf": {
+      "sha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5"
+    },
+    "fieldPdf": {
+      "sha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5"
+    },
+    "listingPdf": {
+      "sha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734",
+      "physicalPage": 42
+    },
+    "threadedTerminal": {
+      "pieceCount": 20,
+      "approvedHorizontalRouteCount": 4,
+      "followerPieceCount": 4,
+      "directCarrierHeadEndpointCount": 12,
+      "directLengthClasses": {
+        "10in": 5,
+        "9.5in": 4,
+        "9in": 3
+      },
+      "exactAssignmentCandidateCount": 7664025600
+    }
+  },
+  "artifacts": {
+    "actualPdfTopElevationProof": {
+      "pdf": {
+        "path": "output/pdf/new-hope-threaded-terminal-top-elevation-proof.pdf",
+        "bytes": 8699628,
+        "sha256": "8313009A31F959CDBF3244B7FB52A7854B782D00E3C05C4F6F4026A0DD276B8D"
+      },
+      "png": {
+        "path": "output/pdf/new-hope-threaded-terminal-top-elevation-proof.png",
+        "bytes": 1051794,
+        "sha256": "8158DB327016371D48434310C25A19A4882245B590B2EF14CD1299565DE99F3D"
+      },
+      "pageCount": 2,
+      "deterministicReplay": true,
+      "visualInspection": "passed: actual approved FP2.0 remains visible under the four route classes and twelve endpoint markers; actual field section and listing page 42 remain visible on the elevation boundary page"
+    },
+    "blenderMcpPipeBodies": {
+      "configuration": "E:/ClaudeBot/.mcp.json",
+      "mcpExecutable": "C:/Python312/Scripts/blender-mcp.exe",
+      "blenderExecutable": "C:/Program Files/Blender Foundation/Blender 5.0/blender.exe",
+      "addon": "C:/Users/dalla/AppData/Roaming/Blender Foundation/Blender/5.0/scripts/addons/BlenderMCP_addon.py",
+      "port": 9876,
+      "pipeObjectCount": 20,
+      "nominalOdMm": 33.4,
+      "exactCutLengthsReady": true,
+      "threadedEndsReady": true,
+      "blend": {
+        "path": "output/3d/new-hope-threaded-terminal-parts.blend",
+        "bytes": 118767,
+        "sha256": "4DB9EAF75C8A11D34DBC53793B9F2D78B998C7C1E70A2A25E56E0A276EB29134"
+      },
+      "glb": {
+        "path": "output/3d/new-hope-threaded-terminal-parts.glb",
+        "bytes": 264196,
+        "sha256": "976EBA709F5799B421D96FEAEB11308B1970DB5F143F5EA510E30A0E94D32E6D"
+      },
+      "png": {
+        "path": "output/3d/new-hope-threaded-terminal-parts.png",
+        "bytes": 1132528,
+        "sha256": "FE5A390C1261DD91991BE13FA33FFDAA77282D148C9AFB3DE0E3FD7840CEFF28"
+      },
+      "deterministicGlbReplay": true,
+      "deterministicPngReplay": true,
+      "computerUseVisualInspection": "passed after rejecting and correcting the first clipped camera render",
+      "sourceValidityBoundary": "the existing wheatland_sch40_black_1in_21ft catalog SCAD says Sch40 in its name/category but sets schedule=sch10 and grooved ports; it was not used to promote New Hope fitting or layout geometry"
+    }
+  },
+  "verification": {
+    "focusedAndNewHopeTests": "26 files / 177 tests passed",
+    "editorProductionBuild": "8 tasks successful / 8 total",
+    "biome": "passed",
+    "pythonCompile": "passed for extractor, actual-PDF renderer, and Blender MCP renderer",
+    "gitDiffCheck": "passed",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "browser": {
+      "url": "http://127.0.0.1:3313/apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html?terminal-proof=20260716",
+      "title": "New Hope PDF-bound truss and pipe proof",
+      "proofReady": true,
+      "boundedTerminalFlagsReady": true,
+      "exactThreadedTerminalPieceAdjacencyReady": false,
+      "exactThreadedTerminalTakeoutReady": false,
+      "properPipeLayoutReady": false,
+      "brokenImages": 0,
+      "warningsOrErrors": 0
+    },
+    "formalProof": {
+      "status": "verified",
+      "prover": "Lean 4.13.0 on GX10",
+      "elapsedMs": 376,
+      "receipt": "data/agent-loops/new-hope-threaded-terminal-geometry-20260716/lean-proof.json"
+    },
+    "brainPreflight": {
+      "status": "used",
+      "episodeId": 151269
+    },
+    "brainPostflight": {
+      "status": "recorded",
+      "episodeId": 151395
+    }
+  },
+  "claims": {
+    "threadedTerminalInventoryReady": true,
+    "threadedTerminalHorizontalRouteClassesReady": true,
+    "threadedTerminalFollowerClassesReady": true,
+    "threadedTerminalDirectEndpointSetReady": true,
+    "threadedTerminalAmbiguityQuantified": true,
+    "blenderExactCutLengthPipeBodiesReady": true,
+    "exactThreadedTerminalPieceAdjacencyReady": false,
+    "exactThreadedTerminalTakeoutReady": false,
+    "exactWholeSystemZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsDeploymentReady": false
+  },
+  "nextAction": "Decode or locate source-native CMI.23-CMI.42 per-piece connection and placement records, then obtain a source-valid 1-inch threaded 90 elbow and 1x3/4 threaded reducer takeout model. Bind those components to exact side-view/native-CAD grade and pipe-centerline Z before assembling the verified Blender pipe bodies into the pitched-roof building model."
+}

@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-threaded-terminal-geometry-20260716/lean-request.json",
+  "theoremNames": [
+    "threadedTerminalInventoryPartition",
+    "threadedTerminalAssignmentAmbiguity",
+    "boundedTerminalAndBlenderEvidenceDoesNotPromoteRelease"
+  ],
+  "claim": "The protected threaded-terminal inventory partitions into four horizontal, four follower, and twelve direct pieces; the unresolved exact assignment count is 7,664,025,600; exact project cut-length Blender meshes do not promote exact adjacency, fitting takeout, whole-system Z, proper layout, fabrication, or field release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 376,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}
