@@ -1,0 +1,101 @@
+{
+  "artifactType": "halofire.opencascade-unified-thread-specimen-receipt.v1",
+  "scope": "standards-specimen-only",
+  "source": {
+    "pdfSha256": "116D4FBD0C009B3B18C20487B3FAC87B69E17BEA808C7AC9CD140C8C4450720D",
+    "physicalPdfPage": 61,
+    "printedPage": "2.27",
+    "table": "2.21"
+  },
+  "kernel": {
+    "name": "OpenCascade via FreeCAD",
+    "freecadVersion": [
+      "1",
+      "1",
+      "1",
+      "20260414 (Git shallow)",
+      "Unknown",
+      "2026/04/14 22:09:59",
+      "(HEAD detached at 0108fd4b4)",
+      "0108fd4b4850cc46e625b60e53cea7a7bbe69f8d"
+    ],
+    "modelUnits": "millimeter",
+    "inputUnits": "inch"
+  },
+  "thread": {
+    "designation": ".375-16 UNC 2A/2B",
+    "tpi": 16,
+    "pitchIn": 0.0625,
+    "leadIn": 0.0625,
+    "hand": "right",
+    "limits": {
+      "external2A": {
+        "majorDiameterMaxIn": 0.3737,
+        "pitchDiameterMaxIn": 0.3331,
+        "minorDiameterIn": 0.297
+      },
+      "internal2B": {
+        "minorDiameterMinIn": 0.307,
+        "pitchDiameterMinIn": 0.3344,
+        "majorDiameterMinIn": 0.375
+      }
+    },
+    "minimumPitchDiameterClearanceIn": 0.0012999999999999678,
+    "minimumPitchRadiusClearanceIn": 0.0006499999999999839,
+    "modeledHelicalSolid": true
+  },
+  "topology": {
+    "maleSolidCount": 1,
+    "femaleSolidCount": 1,
+    "maleShellCount": 1,
+    "femaleShellCount": 1,
+    "maleVolumeMm3": 977.8923209784834,
+    "femaleVolumeMm3": 1907.2343849774995,
+    "assembledCommonVolumeMm3": 0,
+    "assembledInterferenceToleranceMm3": 0.00001,
+    "assembledInterferenceFree": true
+  },
+  "placement": {
+    "femaleOffsetIn": 0.125,
+    "femaleOffsetPitchCount": 2,
+    "helicalPhasePreserved": true
+  },
+  "outputs": [
+    {
+      "file": "unified-thread-375-16-unc-specimen.FCStd",
+      "byteLength": 98816,
+      "sha256": "44B8259424841F423870ACA67973E3A83F347B7068665F63BB2862EBEA553AA1"
+    },
+    {
+      "file": "unified-thread-375-16-unc-2a-male.step",
+      "byteLength": 268467,
+      "sha256": "774BB6431117FD6EEBC6B3ECBC81825B177C073E943F9A0A4ADD2D6DF2D01CC1"
+    },
+    {
+      "file": "unified-thread-375-16-unc-2b-female.step",
+      "byteLength": 6285,
+      "sha256": "F4220B5EA3ACED4ADE523648A84F716688CD6C168EAED5A25320ED7F78472B90"
+    },
+    {
+      "file": "unified-thread-375-16-unc-fit-assembly.step",
+      "byteLength": 273564,
+      "sha256": "C70FE3CC9A8DF223BEF11D49663157AF3439A39F07144558DA8BC9336C4E2B9B"
+    },
+    {
+      "file": "unified-thread-375-16-unc-2a-male.stl",
+      "byteLength": 5932178,
+      "sha256": "3ADB9B641B8EFAE35459D90DDC95FCCE08E8572E7E954DEA4B62E926464CF746"
+    },
+    {
+      "file": "unified-thread-375-16-unc-2b-female.stl",
+      "byteLength": 476858,
+      "sha256": "B652BC4CDE789EC7755CA0B36C953C1B195B73D95B3B42F8A2505176487BA614"
+    }
+  ],
+  "releasePolicy": {
+    "manufacturerPartEligible": false,
+    "projectAssemblyEligible": false,
+    "newHopePartEligible": false,
+    "reason": "A standards fit specimen is not manufacturer part geometry or a listed support assembly."
+  }
+}

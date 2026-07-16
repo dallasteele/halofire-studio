@@ -1,0 +1,55 @@
+{
+  "artifactType": "halofire.unified-thread-limit-packet.v1",
+  "scope": "standards-specimen-only",
+  "source": {
+    "publisher": "United States Department of Commerce, National Bureau of Standards",
+    "title": "Handbook H28 (1969), Part I, Screw-Thread Standards for Federal Services",
+    "edition": "1969",
+    "officialUrl": "https://nvlpubs.nist.gov/nistpubs/Legacy/hb/nbshandbook28-1969p1.pdf",
+    "pdfSha256": "116D4FBD0C009B3B18C20487B3FAC87B69E17BEA808C7AC9CD140C8C4450720D",
+    "physicalPdfPage": 61,
+    "printedPage": "2.27",
+    "table": "2.21",
+    "tableTitle": "Standard series limits of size - Unified screw threads"
+  },
+  "thread": {
+    "nominalDesignation": ".375-16 UNC",
+    "nominalMajorDiameterIn": 0.375,
+    "tpi": 16,
+    "pitchIn": 0.0625,
+    "profileAngleDeg": 60,
+    "hand": "right",
+    "external2A": {
+      "allowanceIn": 0.0013,
+      "majorDiameterMaxIn": 0.3737,
+      "majorDiameterMinIn": 0.3643,
+      "majorDiameterMinRootReliefIn": 0.3595,
+      "pitchDiameterMaxIn": 0.3331,
+      "pitchDiameterMinIn": 0.3287,
+      "pitchDiameterToleranceIn": 0.0044,
+      "minorDiameterIn": 0.297
+    },
+    "internal2B": {
+      "minorDiameterMinIn": 0.307,
+      "minorDiameterMaxIn": 0.321,
+      "pitchDiameterMinIn": 0.3344,
+      "pitchDiameterMaxIn": 0.3401,
+      "pitchDiameterToleranceIn": 0.0057,
+      "majorDiameterMinIn": 0.375
+    }
+  },
+  "derived": {
+    "leadIn": 0.0625,
+    "minimumPitchDiameterClearanceIn": 0.0013,
+    "minimumPitchRadiusClearanceIn": 0.00065,
+    "maximumMaterialExternalMajorDiameterIn": 0.3737,
+    "maximumMaterialInternalMinorDiameterIn": 0.307
+  },
+  "releasePolicy": {
+    "manufacturerPartNumber": null,
+    "manufacturerPartEligible": false,
+    "projectAssemblyEligible": false,
+    "newHopePartEligible": false,
+    "reason": "This packet proves a reusable .375-16 UNC 2A/2B standards specimen only. It does not identify the manufacturer, material, coating, length, load rating, installation torque, or listing of the New Hope all-thread rod or any mating bracket."
+  }
+}

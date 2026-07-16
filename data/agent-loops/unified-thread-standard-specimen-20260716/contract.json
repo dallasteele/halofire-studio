@@ -1,0 +1,23 @@
+{
+  "name": "unified-thread-standard-specimen-20260716",
+  "objective": "Close the reusable source-bound .375-16 UNC 2A/2B thread-limit and helical-fit machinery without promoting a standards coupon into a manufacturer or project part.",
+  "sources": [
+    "apps/autosprink/src/data/unified-thread-375-16-unc.json",
+    "https://nvlpubs.nist.gov/nistpubs/Legacy/hb/nbshandbook28-1969p1.pdf",
+    "NIST H28 1969 Part I SHA256 116D4FBD0C009B3B18C20487B3FAC87B69E17BEA808C7AC9CD140C8C4450720D, physical PDF page 61, printed page 2.27, Table 2.21"
+  ],
+  "acceptance": [
+    "the immutable source hash, page, table, designation, TPI, pitch, 2A limits, 2B limits, and derived pitch-diameter allowance pass primary and adversarial verification",
+    "FreeCAD/OpenCascade emits one closed helical BREP solid per mating side and STEP/STL/FCStd outputs",
+    "the independently computed installed common volume is at or below 0.00001 mm3 at a phase-preserving two-pitch placement",
+    "Blender MCP imports the kernel meshes, saves the scene, renders the assembled and cutaway proof, and the render is visually inspected",
+    "manufacturerPartEligible, projectAssemblyEligible, and newHopePartEligible remain false",
+    "focused exact-assembly and unified-thread tests pass"
+  ],
+  "state_path": "data/agent-loops/unified-thread-standard-specimen-20260716/state.json",
+  "evidence_paths": [
+    "data/agent-loops/unified-thread-standard-specimen-20260716/kernel-receipt.json",
+    "output/3d/unified-thread-375-16-unc/unified-thread-375-16-unc-blender-proof-v2.png",
+    "output/3d/unified-thread-375-16-unc/unified-thread-375-16-unc-blender-proof.blend"
+  ]
+}

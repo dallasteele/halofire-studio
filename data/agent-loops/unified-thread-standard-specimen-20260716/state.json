@@ -1,0 +1,43 @@
+{
+  "loop": "unified-thread-standard-specimen-20260716",
+  "status": "verified-reusable-standard-specimen-only",
+  "sourceReady": true,
+  "threadLimitTableReady": true,
+  "helicalBrepReady": true,
+  "kernelFitReady": true,
+  "blenderMcpProofReady": true,
+  "manufacturerPartEligible": false,
+  "projectAssemblyEligible": false,
+  "newHopePartEligible": false,
+  "brainPostflightEpisodeId": 155183,
+  "metrics": {
+    "tpi": 16,
+    "pitchIn": 0.0625,
+    "minimumPitchDiameterClearanceIn": 0.0013,
+    "minimumPitchRadiusClearanceIn": 0.00065,
+    "maleSolidCount": 1,
+    "femaleSolidCount": 1,
+    "assembledCommonVolumeMm3": 0,
+    "focusedTestCount": 28,
+    "focusedTestFailures": 0,
+    "fullSuiteTestCount": 2436,
+    "fullSuitePassCount": 2435,
+    "fullSuiteFailureCount": 1,
+    "fullSuiteFailureCause": "Y drive offline: Cooperative 1881 source PDF unavailable to autobid-spatial-review-browser-smoke.test.js"
+  },
+  "evidence": {
+    "sourcePacket": "apps/autosprink/src/data/unified-thread-375-16-unc.json",
+    "kernelReceipt": "data/agent-loops/unified-thread-standard-specimen-20260716/kernel-receipt.json",
+    "freeCadModel": "output/3d/unified-thread-375-16-unc/unified-thread-375-16-unc-specimen.FCStd",
+    "stepAssembly": "output/3d/unified-thread-375-16-unc/unified-thread-375-16-unc-fit-assembly.step",
+    "blenderScene": "output/3d/unified-thread-375-16-unc/unified-thread-375-16-unc-blender-proof.blend",
+    "visualProof": "output/3d/unified-thread-375-16-unc/unified-thread-375-16-unc-blender-proof-v2.png"
+  },
+  "remainingAcceptanceBlockers": [
+    "the New Hope quote identifies 3/8-inch all-thread but does not identify the rod manufacturer and exact catalog part number",
+    "material grade, coating, product length, thread manufacturing class, installation torque, load/listing data, and exact mating bracket thread are not source-closed",
+    "no manufacturer-part-specific unmodified solid is available for the quoted rod or mating bracket",
+    "Egnyte Y drive is offline, so cross-project source acquisition cannot continue from the mounted corpus in this slice"
+  ],
+  "nextAction": "Reconnect the Egnyte Y drive, search completed bid and submittal corpora across projects for the exact all-thread rod and mating bracket manufacturer/product numbers and source CAD, then run each acquired solid through the existing exact-part dimension, thread, installed-fit, collision, and structure-attachment gates."
+}
