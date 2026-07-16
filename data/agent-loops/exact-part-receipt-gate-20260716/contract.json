@@ -1,0 +1,43 @@
+{
+  "name": "exact-part-receipt-gate-20260716",
+  "owner": "codex",
+  "goal": "Prevent catalog metadata, links, uploads, or manifest flags from self-promoting a sprinkler part to manufacturer-exact without byte-verified source, geometry, dimension, thread, kernel, collision, connection-fit, and render evidence.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "apps/autosprink/src/api/server.js",
+    "apps/autosprink/src/data/trusted-exact-part-receipts.json",
+    "apps/autosprink/tests/part-override-api.test.js",
+    "data/agent-loops/new-hope-purchased-support-components-20260716/state.json"
+  ],
+  "exit_criteria": [
+    "typed manufacturer and license metadata cannot set manufacturerExact true",
+    "remote mesh links remain catalog evidence with unverified remote bytes",
+    "a manifest file cannot self-assert manufacturer exactness",
+    "client-supplied hashes cannot promote exactness without an operator-controlled matching receipt",
+    "the server hashes every required local source and audit artifact itself",
+    "threaded parts require both a thread-standard source and modeled-thread geometry receipt",
+    "the server hashes the safe local render mesh itself and detects later tampering",
+    "unsafe upload paths are rejected",
+    "a catalog item counts as dimensioned only after its source and dimension audit verify",
+    "the whole-system parity gate remains blocked independently of individual exact-part status"
+  ],
+  "verification_gates": [
+    "npx vitest run tests/part-override-api.test.js tests/parts-api.test.js tests/part-mesh.test.js in apps/autosprink",
+    "npm run build in apps/autosprink",
+    "full AutoSPRINK test suite",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "canonical hal-brain remember postflight"
+  ],
+  "state_path": "data/agent-loops/exact-part-receipt-gate-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/api/server.js",
+    "apps/autosprink/src/data/trusted-exact-part-receipts.json",
+    "apps/autosprink/tests/part-override-api.test.js",
+    "data/agent-loops/exact-part-receipt-gate-20260716/state.json"
+  ],
+  "max_iterations": 4,
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

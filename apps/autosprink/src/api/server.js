@@ -425,6 +425,7 @@ function initDatabase() {
       manufacturer TEXT,
       license TEXT,
       notes TEXT,
+      exact_evidence_json TEXT,
       evidence_id INTEGER REFERENCES project_evidence(id),
       created_by TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -593,6 +594,7 @@ function initDatabase() {
   ensureColumn('part_overrides', 'manufacturer', 'TEXT');
   ensureColumn('part_overrides', 'license', 'TEXT');
   ensureColumn('part_overrides', 'notes', 'TEXT');
+  ensureColumn('part_overrides', 'exact_evidence_json', 'TEXT');
   ensureColumn('part_overrides', 'evidence_id', 'INTEGER');
   ensureColumn('part_overrides', 'created_by', 'TEXT');
 
@@ -23165,11 +23167,18 @@ app.post('/api/parts/generate', authMiddleware, (req, res) => {
 // route is needed.
 // HONESTY/fail-closed: generated meshes are best-effort, NOT manufacturer-exact.
 // manufacturerExactCount is 0 for generated/missing parts; it only rises when a
-// user attaches a real catalog model (manufacturer+license) via the R4 override
-// route. EITHER WAY the AUTOSPRINK_PARITY gate stays hardcoded 'blocked' (parity
-// needs manufacturer-exact models for EVERY required part + PE/AHJ review). No STL
-// is ever fabricated for a part without a real mesh.
+// local mesh and every required source/audit artifact match the operator-owned
+// receipt registry. The AUTOSPRINK_PARITY gate remains hardcoded 'blocked'.
 const PARTS_MANIFEST_PATH = path.resolve(__dirname, '../../parts/parts-manifest.json');
+const TRUSTED_PART_RECEIPTS_PATH = path.resolve(
+  process.env.HALOFIRE_TRUSTED_PART_RECEIPTS_PATH || path.resolve(__dirname, '../data/trusted-exact-part-receipts.json'),
+);
+const EXACT_PART_MESH_ROOT = path.resolve(
+  process.env.HALOFIRE_EXACT_PART_MESH_ROOT || path.resolve(__dirname, '../../parts'),
+);
+const EXACT_PART_EVIDENCE_ROOT = path.resolve(
+  process.env.HALOFIRE_EXACT_PART_EVIDENCE_ROOT || path.resolve(__dirname, '../data/exact-part-evidence'),
+);
 // S5: the autonomous part-sourcing run (scripts/auto-source-run.mjs) writes its
 // observable status here, relative to the repo root (same place the script writes).
 const AUTO_SOURCE_STATUS_PATH = path.resolve(__dirname, '../../out/auto-source-status.json');
@@ -23178,30 +23187,207 @@ const PARTS_DISCLAIMER =
   'manufacturer-exact and conferring NO AutoSprink/AutoCAD/AHJ/PE approval. ' +
   'The AUTOSPRINK_PARITY gate stays BLOCKED.';
 
-// A part is manufacturer-exact ONLY if it comes from a real licensed
-// catalog/manufacturer source. Generated/missing parts (and any tampered
-// on-disk manifest entry) are coerced to manufacturerExact:false here so the
-// served manifest can never leak a false manufacturer-exact claim.
+// A manifest file may never self-assert exactness. trustedExact is supplied only
+// after the server verifies registry metadata and hashes the local evidence.
 const REAL_PART_SOURCES = new Set(['catalog', 'manufacturer']);
-function sanitizePartEntry(entry) {
+function sanitizePartEntry(entry, { trustedExact = false } = {}) {
   const e = entry && typeof entry === 'object' ? entry : {};
   const source = typeof e.source === 'string' ? e.source : 'missing';
-  return { ...e, source, manufacturerExact: REAL_PART_SOURCES.has(source) && e.manufacturerExact === true };
+  return {
+    ...e,
+    source,
+    manufacturerExact:
+      trustedExact === true && REAL_PART_SOURCES.has(source) && e.manufacturerExact === true,
+  };
 }
 
 // Only these formats are web-renderable 3D meshes. A non-mesh upload (STEP/DWG)
 // is recorded as catalog evidence but carries NO renderable file (file stays
 // null, present stays false) — we never fabricate a mesh from CAD source.
 const WEB_MESH_FORMATS = new Set(['stl', 'glb', 'gltf', 'obj']);
-const PART_OVERRIDE_FIELDS = new Set(['mode', 'url', 'filename', 'format', 'manufacturer', 'license', 'notes']);
+const PART_OVERRIDE_FIELDS = new Set([
+  'mode', 'url', 'filename', 'format', 'manufacturer', 'license', 'notes', 'exactEvidence',
+]);
+const SHA256_RE = /^[a-f0-9]{64}$/i;
+const EXACT_EVIDENCE_FIELDS = new Set([
+  'manufacturerPartNumber',
+  'sourceFileSha256',
+  'geometrySha256',
+  'dimensionAuditReceiptSha256',
+  'threadStandardSourceSha256',
+  'threadGeometrySha256',
+  'solidKernelReceiptSha256',
+  'sceneCollisionReceiptSha256',
+  'connectionFitReceiptSha256',
+  'renderMeshSha256',
+]);
+const REQUIRED_EXACT_HASH_FIELDS = [
+  'sourceFileSha256',
+  'geometrySha256',
+  'dimensionAuditReceiptSha256',
+  'solidKernelReceiptSha256',
+  'sceneCollisionReceiptSha256',
+  'connectionFitReceiptSha256',
+  'renderMeshSha256',
+];
 
-// Merge user-attached catalog part overrides over a base manifest's components.
-// For an overridden key: source -> 'catalog'; manufacturerExact -> true ONLY when
-// BOTH a manufacturer AND a license were attested; file/present -> set ONLY for a
-// web-renderable mesh format. Every merged entry is re-run through
-// sanitizePartEntry (defense in depth: it re-affirms the source-set guard so a
-// tampered row can never leak a false manufacturer-exact claim). Overrides NEVER
-// touch parityGateStatus — that gate stays hardcoded 'blocked' at the call site.
+function normalizeExactEvidence(value, { rejectMalformed = false } = {}) {
+  if (value === null || value === undefined || value === '') return null;
+  let parsed = value;
+  if (typeof value === 'string') {
+    try { parsed = JSON.parse(value); } catch {
+      if (rejectMalformed) throw new Error('exactEvidence must be valid JSON');
+      return null;
+    }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    if (rejectMalformed) throw new Error('exactEvidence must be an object');
+    return null;
+  }
+  const rejected = Object.keys(parsed).filter((key) => !EXACT_EVIDENCE_FIELDS.has(key));
+  if (rejected.length) {
+    if (rejectMalformed) throw new Error(`Unsupported exactEvidence fields: ${rejected.join(', ')}`);
+    return null;
+  }
+  const manufacturerPartNumber = String(parsed.manufacturerPartNumber || '').trim();
+  if (!manufacturerPartNumber) {
+    if (rejectMalformed) throw new Error('exactEvidence.manufacturerPartNumber is required');
+    return null;
+  }
+  for (const field of REQUIRED_EXACT_HASH_FIELDS) {
+    if (!SHA256_RE.test(String(parsed[field] || ''))) {
+      if (rejectMalformed) throw new Error(`exactEvidence.${field} must be a SHA-256 hex digest`);
+      return null;
+    }
+  }
+  for (const field of ['threadStandardSourceSha256', 'threadGeometrySha256']) {
+    if (parsed[field] !== null && parsed[field] !== undefined && !SHA256_RE.test(String(parsed[field]))) {
+      if (rejectMalformed) throw new Error(`exactEvidence.${field} must be null or a SHA-256 hex digest`);
+      return null;
+    }
+  }
+  return Object.fromEntries(
+    [...EXACT_EVIDENCE_FIELDS].map((field) => [
+      field,
+      field === 'manufacturerPartNumber'
+        ? manufacturerPartNumber
+        : (parsed[field] ? String(parsed[field]).toLowerCase() : null),
+    ]),
+  );
+}
+
+function readTrustedPartReceipts() {
+  try {
+    const raw = JSON.parse(fs.readFileSync(TRUSTED_PART_RECEIPTS_PATH, 'utf8'));
+    return Array.isArray(raw.receipts) ? raw.receipts : [];
+  } catch (err) {
+    log.warn(`trusted exact-part registry read failed: ${err.message}`);
+    return [];
+  }
+}
+
+function safeLocalMeshPath(ref) {
+  const name = String(ref || '');
+  if (!name || name !== path.basename(name) || name.includes('/') || name.includes('\\')) return null;
+  const resolved = path.resolve(EXACT_PART_MESH_ROOT, name);
+  return path.dirname(resolved) === EXACT_PART_MESH_ROOT ? resolved : null;
+}
+
+function safeEvidenceArtifactPath(ref) {
+  const relativeRef = String(ref || '');
+  if (!relativeRef || path.isAbsolute(relativeRef)) return null;
+  const resolved = path.resolve(EXACT_PART_EVIDENCE_ROOT, relativeRef);
+  const relative = path.relative(EXACT_PART_EVIDENCE_ROOT, resolved);
+  return relative && !relative.startsWith('..') && !path.isAbsolute(relative) ? resolved : null;
+}
+
+function verifyTrustedReceiptArtifacts(receipt, evidence) {
+  const blockerCodes = [];
+  const artifactFields = [
+    ...REQUIRED_EXACT_HASH_FIELDS.filter((field) => field !== 'renderMeshSha256'),
+    ...(receipt.threadRequired === true ? ['threadStandardSourceSha256', 'threadGeometrySha256'] : []),
+  ];
+  for (const field of artifactFields) {
+    const artifactPath = safeEvidenceArtifactPath(receipt.artifactFiles?.[field]);
+    if (!artifactPath || !fs.existsSync(artifactPath) || !fs.statSync(artifactPath).isFile()) {
+      blockerCodes.push('PART_EXACT_AUDIT_ARTIFACT_MISSING');
+      continue;
+    }
+    const actualSha256 = createHash('sha256').update(fs.readFileSync(artifactPath)).digest('hex');
+    if (actualSha256 !== evidence[field]) blockerCodes.push('PART_EXACT_AUDIT_ARTIFACT_HASH_MISMATCH');
+  }
+  return { ready: blockerCodes.length === 0, blockerCodes: [...new Set(blockerCodes)] };
+}
+
+function exactReceiptMatches(receipt, row, evidence, { allowMissingThreadEvidence = false } = {}) {
+  if (!receipt || receipt.status !== 'verified' || !evidence) return false;
+  const metadataMatches =
+    receipt.key === row.key &&
+    String(receipt.manufacturer || '').trim() === String(row.manufacturer || '').trim() &&
+    String(receipt.license || '').trim() === String(row.license || '').trim() &&
+    String(receipt.manufacturerPartNumber || '').trim() === evidence.manufacturerPartNumber &&
+    String(receipt.format || '').toLowerCase() === String(row.format || '').toLowerCase();
+  if (!metadataMatches) return false;
+  return [...EXACT_EVIDENCE_FIELDS]
+    .filter((field) => field !== 'manufacturerPartNumber')
+    .every((field) => {
+      if (
+        allowMissingThreadEvidence &&
+        (field === 'threadStandardSourceSha256' || field === 'threadGeometrySha256') &&
+        evidence[field] === null
+      ) return true;
+      const expected = receipt[field] ? String(receipt[field]).toLowerCase() : null;
+      return expected === evidence[field];
+    });
+}
+
+function evaluateExactPartOverride(row) {
+  const blockerCodes = [];
+  const evidence = normalizeExactEvidence(row.exact_evidence_json ?? row.exactEvidence);
+  if (!evidence) blockerCodes.push('PART_EXACT_EVIDENCE_MISSING');
+
+  const trustedReceipt = evidence
+    ? readTrustedPartReceipts().find((receipt) =>
+      exactReceiptMatches(receipt, row, evidence, { allowMissingThreadEvidence: true }))
+    : null;
+  if (evidence && !trustedReceipt) blockerCodes.push('PART_EXACT_RECEIPT_UNTRUSTED');
+  if (trustedReceipt?.threadRequired === true && (!evidence.threadStandardSourceSha256 || !evidence.threadGeometrySha256)) {
+    blockerCodes.push('PART_EXACT_THREAD_EVIDENCE_MISSING');
+  }
+  const artifactVerification = trustedReceipt && !blockerCodes.includes('PART_EXACT_THREAD_EVIDENCE_MISSING')
+    ? verifyTrustedReceiptArtifacts(trustedReceipt, evidence)
+    : { ready: false, blockerCodes: [] };
+  blockerCodes.push(...artifactVerification.blockerCodes);
+  const exactSourceReady = Boolean(trustedReceipt) && artifactVerification.ready;
+
+  let renderMeshReady = false;
+  if (row.mode === 'link') {
+    blockerCodes.push('PART_EXACT_REMOTE_BYTES_UNVERIFIED');
+  } else if (!WEB_MESH_FORMATS.has(String(row.format || '').toLowerCase())) {
+    blockerCodes.push('PART_EXACT_RENDER_MESH_MISSING');
+  } else {
+    const meshPath = safeLocalMeshPath(row.ref);
+    if (!meshPath || !fs.existsSync(meshPath) || !fs.statSync(meshPath).isFile()) {
+      blockerCodes.push('PART_EXACT_RENDER_MESH_MISSING');
+    } else if (evidence) {
+      const actualSha256 = createHash('sha256').update(fs.readFileSync(meshPath)).digest('hex');
+      if (actualSha256 !== evidence.renderMeshSha256) blockerCodes.push('PART_EXACT_RENDER_MESH_HASH_MISMATCH');
+      else renderMeshReady = true;
+    }
+  }
+
+  const verified = exactSourceReady && renderMeshReady && blockerCodes.length === 0;
+  return {
+    status: verified ? 'verified' : 'pending',
+    exactSourceReady,
+    renderMeshReady,
+    blockerCodes: [...new Set(blockerCodes)],
+  };
+}
+
+// Merge user-attached catalog overrides over the base manifest. Manufacturer and
+// license text alone are metadata, never exactness. Exactness requires a trusted
+// receipt tuple, local audit artifacts, and a byte-matched local render mesh.
 function mergePartOverrides(components) {
   let rows;
   try {
@@ -23218,9 +23404,13 @@ function mergePartOverrides(components) {
     if (!o) return c;
     const fmt = o.format ? String(o.format).toLowerCase() : null;
     const isWebMesh = Boolean(fmt && WEB_MESH_FORMATS.has(fmt));
-    const manufacturerExact = Boolean(
-      o.manufacturer && String(o.manufacturer).trim() && o.license && String(o.license).trim(),
+    const localMeshPath = o.mode === 'upload' && isWebMesh ? safeLocalMeshPath(o.ref) : null;
+    const renderRefPresent = isWebMesh && (
+      (o.mode === 'link' && Boolean(o.ref)) ||
+      (Boolean(localMeshPath) && fs.existsSync(localMeshPath) && fs.statSync(localMeshPath).isFile())
     );
+    const exactVerification = evaluateExactPartOverride(o);
+    const manufacturerExact = exactVerification.status === 'verified';
     return sanitizePartEntry({
       ...c,
       source: 'catalog',
@@ -23228,10 +23418,12 @@ function mergePartOverrides(components) {
       license: o.license || null,
       provenance: o.mode === 'link' ? 'catalog_link' : 'catalog_upload',
       format: isWebMesh ? fmt : null,
-      file: isWebMesh ? (o.ref || null) : null, // web mesh only; non-mesh => null
-      present: isWebMesh ? Boolean(o.ref) : false,
-      manufacturerExact, // sanitizePartEntry re-affirms source ∈ {catalog,manufacturer}
-    });
+      file: renderRefPresent ? (o.ref || null) : null,
+      present: renderRefPresent,
+      manufacturerPartNumber: normalizeExactEvidence(o.exact_evidence_json)?.manufacturerPartNumber || null,
+      exactVerification,
+      manufacturerExact,
+    }, { trustedExact: manufacturerExact });
   });
 }
 
@@ -23246,13 +23438,11 @@ function recountParts(components) {
 }
 
 // W3 parts-pipeline ledger: dimensioned (real spec-accurate true-scale mesh) vs
-// flagged (needs-verification / no dimensioned mesh). A user-attached catalog
-// part counts as dimensioned (it carries a real mesh). manufacturer-EXACT is
-// reported separately and stays whatever the (sanitized) entries attest — the
-// generated pipeline contributes 0. Surfaced in Settings via /api/parts.
+// flagged (needs-verification / no dimensioned mesh). A catalog link or upload
+// does not count as dimensioned until its source and audit artifacts verify.
 function dimensionLedgerFor(components) {
   const isDimensioned = (c) =>
-    c.dimensioned === true || (c.present === true && c.source === 'catalog');
+    c.dimensioned === true || c.exactVerification?.exactSourceReady === true;
   const dimensioned = components.filter(isDimensioned).length;
   return {
     total: components.length,
@@ -23262,12 +23452,12 @@ function dimensionLedgerFor(components) {
     provenance: {
       'spec-nominal': components.filter((c) => c.dimProvenance === 'spec-nominal').length,
       cutsheet: components.filter((c) => c.dimProvenance === 'cutsheet').length,
-      catalog: components.filter((c) => c.present === true && c.source === 'catalog').length,
+      catalog: components.filter((c) => c.exactVerification?.exactSourceReady === true).length,
     },
     note:
       'Dimensioned = spec-accurate true-scale mesh. Flagged = needs-verification ' +
-      '(no dimensioned mesh / awaiting manufacturer CAD). Manufacturer-EXACT stays ' +
-      'flagged needs-verification; the generated pipeline claims none.',
+      '(no trusted dimension audit / awaiting verified manufacturer CAD). ' +
+      'Catalog metadata and unverified meshes do not count as dimensioned.',
   };
 }
 
@@ -23303,10 +23493,9 @@ app.get('/api/parts', authMiddleware, async (req, res) => {
 });
 
 // ── Per-component catalog part override (R4) ──
-// A user attaches a real catalog/manufacturer part for one component via Settings
-// to override its generated/missing mesh. This is the ONLY path to source
-// 'catalog' + manufacturerExact:true (the build pipeline only produces
-// generated/missing and is hardcoded manufacturerExact:false).
+// Settings records catalog evidence for one component. manufacturerExact:true is
+// returned only after trusted-registry, local artifact, thread (when required),
+// kernel, collision, mating-fit, and render-mesh verification all pass.
 // HONESTY/fail-closed: attaching a part is recorded as PRESENT catalog evidence,
 // but it NEVER clears AUTOSPRINK_PARITY — that gate requires manufacturer-exact
 // models for EVERY required component PLUS licensed PE/AHJ review, none of which
@@ -23320,7 +23509,10 @@ app.post('/api/parts/:key/override', authMiddleware, requireRole('admin'), (req,
   const key = req.params.key;
   if (!getComponent(key)) return res.status(404).json({ error: 'Unknown component key' });
 
-  const { mode, url = null, filename = null, format = null, manufacturer = null, license = null, notes = null } = req.body;
+  const {
+    mode, url = null, filename = null, format = null, manufacturer = null,
+    license = null, notes = null, exactEvidence = null,
+  } = req.body;
   if (mode !== 'link' && mode !== 'upload') {
     return res.status(400).json({ error: "mode must be 'link' or 'upload'" });
   }
@@ -23328,13 +23520,23 @@ app.post('/api/parts/:key/override', authMiddleware, requireRole('admin'), (req,
   if (!ref || !String(ref).trim()) {
     return res.status(400).json({ error: mode === 'link' ? 'url is required for mode=link' : 'filename is required for mode=upload' });
   }
+  if (mode === 'upload' && !safeLocalMeshPath(ref)) {
+    return res.status(400).json({ error: 'filename must be a safe basename inside the exact-part mesh root' });
+  }
 
   const fmt = format ? String(format).toLowerCase() : null;
   const isWebMesh = Boolean(fmt && WEB_MESH_FORMATS.has(fmt));
-  // manufacturerExact requires BOTH a manufacturer AND a license attestation.
-  const manufacturerExact = Boolean(
-    manufacturer && String(manufacturer).trim() && license && String(license).trim(),
-  );
+  let normalizedExactEvidence = null;
+  try {
+    normalizedExactEvidence = normalizeExactEvidence(exactEvidence, { rejectMalformed: true });
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+  const verification = evaluateExactPartOverride({
+    key, mode, ref: String(ref), format: fmt, manufacturer, license,
+    exactEvidence: normalizedExactEvidence,
+  });
+  const manufacturerExact = verification.status === 'verified';
 
   const evidenceNotes =
     `Catalog part override (${mode}) for ${key}` +
@@ -23349,9 +23551,14 @@ app.post('/api/parts/:key/override', authMiddleware, requireRole('admin'), (req,
                 VALUES (?, ?, ?, ?, ?, ?)`)
       .run('HaloFire Library', 'catalog_part', mode === 'upload' ? String(ref) : null, String(ref), 'present', evidenceNotes);
     const ov = db
-      .prepare(`INSERT INTO part_overrides (key, mode, ref, format, manufacturer, license, notes, evidence_id, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(key, mode, String(ref), fmt, manufacturer, license, notes, evidence.lastInsertRowid, req.user.username);
+      .prepare(`INSERT INTO part_overrides
+                (key, mode, ref, format, manufacturer, license, notes, exact_evidence_json, evidence_id, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(
+        key, mode, String(ref), fmt, manufacturer, license, notes,
+        normalizedExactEvidence ? JSON.stringify(normalizedExactEvidence) : null,
+        evidence.lastInsertRowid, req.user.username,
+      );
     return { id: ov.lastInsertRowid, evidence_id: evidence.lastInsertRowid };
   });
   const result = tx();
@@ -23360,6 +23567,8 @@ app.post('/api/parts/:key/override', authMiddleware, requireRole('admin'), (req,
     key,
     source: 'catalog',
     manufacturerExact,
+    manufacturerPartNumber: normalizedExactEvidence?.manufacturerPartNumber || null,
+    exactVerification: verification,
     message: 'Part override recorded',
   });
 });

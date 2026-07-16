@@ -1,0 +1,60 @@
+{
+  "loop": "exact-part-receipt-gate-20260716",
+  "stage": "VERIFY",
+  "status": "false-promotion-path-closed-real-parts-still-pending",
+  "iteration": 2,
+  "evidence": {
+    "registryArtifactType": "halofire.trusted-exact-part-receipt-registry.v1",
+    "productionTrustedReceiptCount": 0,
+    "newHopeRequiredPartDefinitionCount": 16,
+    "newHopeExactPartDefinitionCount": 0,
+    "requiredExactHashes": [
+      "sourceFileSha256",
+      "geometrySha256",
+      "dimensionAuditReceiptSha256",
+      "solidKernelReceiptSha256",
+      "sceneCollisionReceiptSha256",
+      "connectionFitReceiptSha256",
+      "renderMeshSha256"
+    ],
+    "threadHashesRequiredWhenApplicable": [
+      "threadStandardSourceSha256",
+      "threadGeometrySha256"
+    ],
+    "serverHashedArtifactClasses": [
+      "manufacturer-source-cad",
+      "geometry",
+      "dimension-audit",
+      "thread-standard-source",
+      "thread-geometry-audit",
+      "solid-kernel-audit",
+      "scene-collision-audit",
+      "connection-fit-audit",
+      "render-mesh"
+    ],
+    "adversarialCases": [
+      "manufacturer-and-license-metadata-only",
+      "remote-render-mesh-link",
+      "non-renderable-step-metadata",
+      "client-valid-hashes-without-trusted-receipt",
+      "trusted-threaded-part-with-thread-evidence-omitted",
+      "render-mesh-byte-tampering-after-verification",
+      "connection-fit-receipt-byte-tampering-after-verification",
+      "upload-path-traversal"
+    ]
+  },
+  "verification": {
+    "focusedTests": "3 files / 26 tests passed, including 17 exact-part override API cases",
+    "build": "passed",
+    "fullSuite": "316 files / 2440 tests passed; one pre-existing browser smoke failed because the required Cooperative 1881 Y: PDF is offline",
+    "agenticRules": "passed",
+    "brainPostflight": "episode 155300"
+  },
+  "remainingBlockers": [
+    "No New Hope purchased part has a complete trusted exact-part receipt package yet",
+    "The SWDR purchased manufacturer part number and installed substrate remain unresolved",
+    "Manufacturer-authored part-specific solids and complete dimensional/thread audits remain absent for the purchased support roster"
+  ],
+  "releaseReady": false,
+  "vpsDeployAllowed": false
+}
