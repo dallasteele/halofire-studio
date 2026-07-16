@@ -1,0 +1,55 @@
+{
+  "name": "new-hope-remaining-cmi-fabrication-20260715",
+  "owner": "codex",
+  "goal": "Bind New Hope CMI.01-CMI.04 and CMI.14-CMI.18 to the actual field-plan topology and AutoSPRINK fabrication listing, including ordered piece direction, sizes, fittings, outlet stations/orientations, transitions, and only source-proved vertical offsets without conflating fabrication order, hydraulic flow, drainage grade, roof elevation, or pipe-centerline Z.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/10-Field Set/24-052_NHCC_INSTALL PLAN.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/NEW HOPE CRISIS CENTER_NHCC List.FAB",
+    "apps/autosprink/src/data/new-hope-approved-fp20-pipe-vectors.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js"
+  ],
+  "exit_criteria": [
+    "all nine remaining CMI pieces bind to exact source segments, ordered canonical edges, diameters, listing pages, and cut lengths",
+    "every listed threaded/grooved outlet binds its station and orientation without inventing an outlet at a plan crossing",
+    "piece junctions and diameter transitions agree with canonical topology",
+    "only source-proved vertical offsets are accepted; roof pitch and below-deck tags do not fabricate pipe Z",
+    "actual field and listing PDF panels are rendered and visually inspected",
+    "adversarial tests reject identity, edge order, station, fitting, direction, transition, and false-readiness drift",
+    "full New Hope tests, production build, formal proof, loop guards, browser proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "protected source hash and project identity",
+    "nine exact piece paths and junctions",
+    "exact listing outlet count and orientation",
+    "diameter and fitting transition closure",
+    "source-only vertical offset semantics",
+    "adversarial mutation suite",
+    "actual-PDF browser proof",
+    "Lean invariant receipt",
+    "agentic rules and brain postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-remaining-cmi-fabrication-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/engine/new-hope-remaining-cmi-fabrication.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js",
+    "apps/autosprink/tests/new-hope-remaining-cmi-fabrication.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/new-hope-remaining-cmi-fabrication-20260715/lean-proof.json",
+    "data/agent-loops/new-hope-remaining-cmi-fabrication-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 180000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

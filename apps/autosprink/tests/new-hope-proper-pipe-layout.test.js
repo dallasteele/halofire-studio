@@ -14,6 +14,7 @@ import { evaluateNewHopeElevationDatum } from '../src/engine/new-hope-elevation-
 import { evaluateNewHopeLongBranchDrainage } from '../src/engine/new-hope-long-branch-drainage.js'
 import { evaluateNewHopeLowPointFabrication } from '../src/engine/new-hope-low-point-fabrication.js'
 import { evaluateNewHopeProperPipeLayout } from '../src/engine/new-hope-proper-pipe-layout.js'
+import { evaluateNewHopeRemainingCmiFabrication } from '../src/engine/new-hope-remaining-cmi-fabrication.js'
 import { evaluateNewHopeSideBranchDrainage } from '../src/engine/new-hope-side-branch-drainage.js'
 import { evaluateNewHopeSourceFeedFabrication } from '../src/engine/new-hope-source-feed-fabrication.js'
 
@@ -68,6 +69,13 @@ const cmiRidgeChainFabrication = evaluateNewHopeCmiRidgeChainFabrication({
   governedSkeleton,
   operationalAnnotations,
 })
+const remainingCmiFabrication = evaluateNewHopeRemainingCmiFabrication({
+  pipeVectors,
+  canonicalTopology,
+  governedSkeleton,
+  operationalAnnotations,
+  sourceFeedFabrication,
+})
 const longBranchDrainage = evaluateNewHopeLongBranchDrainage({
   pipeVectors,
   canonicalTopology,
@@ -117,6 +125,7 @@ const inputs = {
   cmi05Cmi08Fabrication,
   cmi06VerticalOutlet,
   cmiRidgeChainFabrication,
+  remainingCmiFabrication,
   operationalAnnotations,
   longBranchDrainage,
   sideBranchDrainage,
@@ -147,7 +156,7 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       exactElevationCanonicalNodeCount: 31,
       exactElevationNodeCoverageRatio: 0.21831,
       sameXyVerticalLegCount: 1,
-      sourceBoundFabricationOutletCount: 34,
+      sourceBoundFabricationOutletCount: 45,
       exactVerticalLegCount: 1,
       fieldDrainIntentCount: 2,
     })
@@ -192,6 +201,22 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.cmi13Cmi22AsymmetryReady).toBe(true)
     expect(result.cmiRidgeChainJunctionsReady).toBe(true)
     expect(result.cmiRidgeBoundedFittingScheduleReady).toBe(true)
+    expect(result.remainingCmiNinePieceFabricationReady).toBe(true)
+    expect(result.remainingCmiElevenOutletScheduleReady).toBe(true)
+    expect(result.remainingCmiSixDirectSprinklerOutletIdentityReady).toBe(true)
+    expect(result.remainingCmiFiveBranchOrArmOverOutletScheduleReady).toBe(true)
+    expect(result.remainingCmiFourNoOutletPieceScheduleReady).toBe(true)
+    expect(result.cmi01SourceOutletZReady).toBe(true)
+    expect(result.remainingCmiBoundedFittingScheduleReady).toBe(true)
+    expect(result.remainingCmiFabrication.sourceOutletRegistration).toMatchObject({
+      upstreamPieceId: 'CML.01',
+      downstreamPieceId: 'CMI.01',
+      canonicalNodeId: 'canonical-node-002',
+      calculationNodeId: '118',
+      localElevationFt: 11.5,
+      farEndZReady: false,
+      installedGradeReady: false,
+    })
     expect(result.cmiRidgeChainFabrication.remoteInspectorTestOutlet).toMatchObject({
       pieceId: 'CMI.13',
       listedStationIn: 238,
@@ -300,6 +325,16 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       'NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED',
     )
     expect(absentRidgeChain.cmiRidgeBoundedFittingScheduleReady).toBe(false)
+
+    const absentRemainingCmi = evaluateNewHopeProperPipeLayout({
+      ...inputs,
+      remainingCmiFabrication: null,
+    })
+    expect(absentRemainingCmi.status).toBe('blocked')
+    expect(absentRemainingCmi.blockerCodes).toContain(
+      'NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED',
+    )
+    expect(absentRemainingCmi.remainingCmiBoundedFittingScheduleReady).toBe(false)
 
     const absentLowPoint = evaluateNewHopeProperPipeLayout({ ...inputs, lowPointFabrication: null })
     expect(absentLowPoint.status).toBe('blocked')

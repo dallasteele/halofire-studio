@@ -1,0 +1,65 @@
+{
+  "loop": "new-hope-remaining-cmi-fabrication-20260715",
+  "stage": "VERIFY",
+  "status": "nine-piece-source-binding-and-adversarial-verification-passed",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [150337, 150262, 149894, 149978]
+  },
+  "sourceMapping": {
+    "lowerWestChain": {
+      "pieceIds": ["CMI.01", "CMI.02", "CMI.03", "CMI.04"],
+      "sourceSegmentIds": ["pipe-002", "pipe-003", "pipe-058", "pipe-061"]
+    },
+    "upperWestChain": {
+      "pieceIds": ["CMI.14", "CMI.15", "CMI.16", "CMI.17", "CMI.18"],
+      "sourceSegmentIds": ["pipe-059", "pipe-060", "pipe-064", "pipe-031", "pipe-033"]
+    }
+  },
+  "claims": {
+    "ninePieceFabricationReady": true,
+    "elevenOutletScheduleReady": true,
+    "sixDirectSprinklerOutletIdentityReady": true,
+    "fiveBranchOrArmOverOutletScheduleReady": true,
+    "fourNoOutletPieceScheduleReady": true,
+    "transitionScheduleReady": true,
+    "cmi01SourceOutletZReady": true,
+    "completeFittingScheduleReady": false,
+    "exactPipeCenterlineZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "pieceCount": 9,
+    "canonicalEdgeCount": 19,
+    "outletCount": 11,
+    "directSprinklerOutletCount": 6,
+    "branchOrArmOverOutletCount": 5,
+    "noOutletPieceCount": 4,
+    "sourceBoundFabricationOutletCountWholeLayout": 45,
+    "actualPdfPanelCount": 5,
+    "leanStatus": "verified",
+    "leanElapsedMs": 87,
+    "adversarialTestCount": 10,
+    "newHopeTestCount": 120,
+    "productionBuild": "passed",
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "broadAutosprinkSweep": "not-counted-repeated-fixed-port-harness-skips",
+    "browser": {
+      "proofReady": true,
+      "actualPdfImagesLoaded": 5,
+      "remainingCmiNinePieceFabricationReady": true,
+      "remainingCmiElevenOutletScheduleReady": true,
+      "cmi01SourceOutletZReady": true,
+      "wholeGradeReady": true,
+      "properPipeLayoutReady": false,
+      "exactPipeCenterlineZReady": false,
+      "fittingScheduleReady": false,
+      "consoleWarningsOrErrors": 0
+    }
+  },
+  "nextAction": "Commit and push this bounded slice, complete brain postflight, then continue resolving the source-feed 3D path and exact piece-end/inter-piece fitting and vertical-offset topology without promoting the unresolved source-feed grade, field drains, exact whole-system Z, or whole-layout release gates."
+}

@@ -1,0 +1,9 @@
+{
+  "status": "verified",
+  "output": "",
+  "elapsed_ms": 87,
+  "prover": "lean4",
+  "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+  "returncode": 0,
+  "claim": "Nine directed pieces contain 19 canonical edges and 11 outlets with four no-outlet pieces; all declared piece/outlet residual bounds hold; the CMI.15 2-1/2-inch branch remains distinct from the continuing 3-inch CMI.16; and bounded remaining-CMI evidence cannot promote far-end Z, source-feed grade, complete fitting, exact whole-system Z, field-drain, or proper-layout readiness."
+}

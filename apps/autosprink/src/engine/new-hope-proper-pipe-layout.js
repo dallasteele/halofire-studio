@@ -167,6 +167,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.cmi05Cmi08Fabrication - Evaluated CMI.05, CMI.07, and CMI.08 fitting schedule.
  * @param {object} inputs.cmi06VerticalOutlet - Evaluated CMI.06 outlet and head-057 vertical leg.
  * @param {object} inputs.cmiRidgeChainFabrication - Evaluated CMI.10-CMI.13 and CMI.19-CMI.22 ridge chains.
+ * @param {object} inputs.remainingCmiFabrication - Evaluated CMI.01-CMI.04 and CMI.14-CMI.18 schedule.
  * @param {object} inputs.operationalAnnotations - Source notes, grades, drains, and details.
  * @param {object} inputs.longBranchDrainage - Long-branch drainage schedule.
  * @param {object} inputs.sideBranchDrainage - Side-branch drainage schedule.
@@ -190,6 +191,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
     cmiRidgeChainFabrication,
+    remainingCmiFabrication,
     operationalAnnotations,
     longBranchDrainage,
     sideBranchDrainage,
@@ -210,6 +212,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
     cmiRidgeChainFabrication,
+    remainingCmiFabrication,
     operationalAnnotations,
   ].map((entry) => entry?.projectId)
   if (projectIds.some((projectId) => projectId !== EXPECTED_PROJECT_ID)) {
@@ -242,6 +245,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['cmi05-cmi08-fabrication', cmi05Cmi08Fabrication?.status],
     ['cmi06-vertical-outlet', cmi06VerticalOutlet?.status],
     ['cmi-ridge-chain-fabrication', cmiRidgeChainFabrication?.status],
+    ['remaining-cmi-fabrication', remainingCmiFabrication?.status],
     ['long-branch-drainage', longBranchDrainage?.status],
     ['side-branch-drainage', sideBranchDrainage?.status],
     ['cross-main-drainage', crossMainDrainage?.status],
@@ -388,7 +392,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',
-      'CMI.05 through CMI.13 and CMI.19 through CMI.22 now have source-bound piece and outlet identities, and head-057 has an exact vertical leg; CMI.01-CMI.04, CMI.14-CMI.18, and the complete vertical-offset schedule are still not assembled for every canonical edge.',
+      'CMI.01 through CMI.22 now have source-bound piece and outlet identities, and head-057 has an exact vertical leg; exact piece-end/inter-piece fittings and the complete vertical-offset schedule are still not assembled for every canonical edge.',
     ),
   ]
   const ready = issues.length === 0
@@ -465,7 +469,8 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         (cmi06VerticalOutlet?.branchOutlet ? 1 : 0) +
         (lowPointFabrication?.piece ? 2 : 0) +
         (sourceFeedFabrication?.outlet ? 1 : 0) +
-        (cmiRidgeChainFabrication?.metrics?.boundedOutletCount || 0),
+        (cmiRidgeChainFabrication?.metrics?.boundedOutletCount || 0) +
+        (remainingCmiFabrication?.metrics?.boundedOutletCount || 0),
       exactVerticalLegCount: cmi06VerticalOutlet?.head057VerticalLegReady ? 1 : 0,
       fieldDrainIntentCount: fieldRouteDrainIntents.length,
     },
@@ -564,6 +569,28 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ready && cmiRidgeChainFabrication?.ridgeChainJunctionsReady === true,
     cmiRidgeBoundedFittingScheduleReady:
       ready && cmiRidgeChainFabrication?.boundedRidgeChainFittingScheduleReady === true,
+    remainingCmiFabrication: remainingCmiFabrication
+      ? {
+          pieces: remainingCmiFabrication.pieces,
+          outletRegistrations: remainingCmiFabrication.outletRegistrations,
+          sourceOutletRegistration: remainingCmiFabrication.sourceOutletRegistration,
+          metrics: remainingCmiFabrication.metrics,
+        }
+      : null,
+    remainingCmiNinePieceFabricationReady:
+      ready && remainingCmiFabrication?.ninePieceFabricationReady === true,
+    remainingCmiElevenOutletScheduleReady:
+      ready && remainingCmiFabrication?.elevenOutletScheduleReady === true,
+    remainingCmiSixDirectSprinklerOutletIdentityReady:
+      ready && remainingCmiFabrication?.sixDirectSprinklerOutletIdentityReady === true,
+    remainingCmiFiveBranchOrArmOverOutletScheduleReady:
+      ready && remainingCmiFabrication?.fiveBranchOrArmOverOutletScheduleReady === true,
+    remainingCmiFourNoOutletPieceScheduleReady:
+      ready && remainingCmiFabrication?.fourNoOutletPieceScheduleReady === true,
+    cmi01SourceOutletZReady:
+      ready && remainingCmiFabrication?.cmi01SourceOutletZReady === true,
+    remainingCmiBoundedFittingScheduleReady:
+      ready && remainingCmiFabrication?.boundedRemainingCmiFittingScheduleReady === true,
     sourceFeedPlanFabricationReady:
       ready && sourceFeedFabrication?.sourceFeedPlanFabricationReady === true,
     sourceFeedOutletTransitionReady:
