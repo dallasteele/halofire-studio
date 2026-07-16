@@ -65,6 +65,24 @@
     "unresolvedParentFittingCount": 0,
     "purpose": "Positive control proving the same parser recovers native pipe-to-fitting joins when the FAB source contains them."
   },
+  "crossProjectListingControl": {
+    "projectId": "goodyear-storage-riser-closed-project",
+    "sourcePath": "02-Active jobs/03-Closed/Goodyear Storage - Goodyear AZ/Engineering/Fabrication Listings/Riser.PDF",
+    "listingPdfSha256": "417E8E7916EC822531529E76A5D4C22269868459546BE14B0EA459C61FF16300",
+    "pageCount": 4,
+    "software": "AutoSPRINK 2020 v16.3.9.0",
+    "listingDate": "2023-01-23",
+    "fittingIdentities": [
+      { "pieceId": "DNA.B", "nativeFittingUniqueId": 16, "itemCode": 1099, "listedText": "2 Threaded Straight Tee, DI" },
+      { "pieceId": "DNA.C", "nativeFittingUniqueId": 14, "itemCode": 668, "listedText": "2 Threaded, 90° Elbow, CI" },
+      { "pieceId": "DNA.D", "nativeFittingUniqueId": 12, "itemCode": 2943, "listedText": "2 Threaded, 45° Elbow, CI, Galv" },
+      { "pieceId": "DNA.E", "nativeFittingUniqueId": 18, "itemCode": 668, "listedText": "2 Threaded, 90° Elbow, CI" },
+      { "pieceId": "I..1", "nativeFittingUniqueId": 28, "itemCode": 1252, "listedText": "4 x 11 SOW Slip Redu Flange" }
+    ],
+    "matchedNativeFittingCount": 5,
+    "exactTakeoutPublished": false,
+    "purpose": "Visually verified pairing of native FAB item codes to the printed fitting identities on pages 3 and 4. The listing publishes already-cut pipe lengths, not raw fitting takeout."
+  },
   "claims": {
     "nativeSourceFeedTopologyReady": true,
     "nativeSourceFeedTransitionFittingReady": false,

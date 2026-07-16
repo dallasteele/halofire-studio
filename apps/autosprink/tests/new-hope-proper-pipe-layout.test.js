@@ -12,6 +12,7 @@ import { evaluateNewHopeCmiRidgeChainFabrication } from '../src/engine/new-hope-
 import { evaluateNewHopeCrossMainDrainage } from '../src/engine/new-hope-cross-main-drainage.js'
 import { evaluateNewHopeElevationDatum } from '../src/engine/new-hope-elevation-datum.js'
 import { evaluateNewHopeFabricationEndSchedule } from '../src/engine/new-hope-fabrication-end-schedule.js'
+import { evaluateNativeFabAttachmentGraph } from '../src/engine/native-fab-attachment-graph.js'
 import { evaluateNewHopeLongBranchDrainage } from '../src/engine/new-hope-long-branch-drainage.js'
 import { evaluateNewHopeLowPointFabrication } from '../src/engine/new-hope-low-point-fabrication.js'
 import { evaluateNewHopeProperPipeLayout } from '../src/engine/new-hope-proper-pipe-layout.js'
@@ -29,6 +30,7 @@ const operationalAnnotations = read('new-hope-approved-fp20-operational-annotati
 const sourceFeedAsbuiltRiserRegistration = read('new-hope-asbuilt-source-feed-riser-registration.json')
 const fabricationEndScheduleSource = read('new-hope-fabrication-end-schedule.json')
 const nativeFabTopology = read('new-hope-native-fab-topology.json')
+const nativeFabAttachmentGraphSource = read('new-hope-native-fab-attachment-graph.json')
 const hydraulicRoutes = ['2-1', '2-2', '2-3'].map((id) =>
   read(`new-hope-approved-fp20-hydraulic-route-${id}.json`),
 )
@@ -64,6 +66,11 @@ const sourceFeedAsbuiltRiser = evaluateNewHopeSourceFeedAsbuiltRiser({
   sourceFeedCalculationChain,
 })
 const fabricationEndSchedule = evaluateNewHopeFabricationEndSchedule(fabricationEndScheduleSource)
+const nativeFabAttachmentGraph = evaluateNativeFabAttachmentGraph({
+  graph: nativeFabAttachmentGraphSource,
+  fabricationSchedule: fabricationEndScheduleSource,
+  parserControl: nativeFabTopology,
+})
 const lowPointFabrication = evaluateNewHopeLowPointFabrication({
   canonicalTopology,
   governedSkeleton,
@@ -146,6 +153,7 @@ const inputs = {
   sourceFeedCalculationChain,
   sourceFeedAsbuiltRiser,
   fabricationEndSchedule,
+  nativeFabAttachmentGraph,
   lowPointFabrication,
   cmi05Cmi08Fabrication,
   cmi06VerticalOutlet,
@@ -212,7 +220,11 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.allListedPieceEndPreparationsReady).toBe(true)
     expect(result.allListedEndFittingFamiliesReady).toBe(true)
     expect(result.exactThreadedFittingSizesReady).toBe(true)
+    expect(result.nativeFabAttachmentGraphReady).toBe(true)
+    expect(result.nativeFabListedFittingIdentityCoverageReady).toBe(true)
+    expect(result.nativeFabFittingAttachmentCount).toBe(97)
     expect(result.interPieceFittingTopologyReady).toBe(false)
+    expect(result.exactFittingTakeoutReady).toBe(false)
     expect(result.completeVerticalOffsetScheduleReady).toBe(false)
     expect(result.sourceFeedEndpointElevationsReady).toBe(true)
     expect(result.sourceFeedDesignedGradeDirectionReady).toBe(true)

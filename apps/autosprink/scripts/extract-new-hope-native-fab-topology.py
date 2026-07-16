@@ -259,6 +259,90 @@ def label_row(row: dict[str, object], names: dict[int, str]) -> dict[str, object
     }
 
 
+def build_attachment_graph(
+    lines: list[dict[str, object]],
+    pipes: list[dict[str, object]],
+    outlets: list[dict[str, object]],
+    fittings: list[dict[str, object]],
+) -> dict[str, object]:
+    """Build only the parent relationships explicitly stored by Project.seidb.
+
+    A fitting's pipe parent proves an attachment, not which adjacent pipe shares
+    the fitting.  The graph therefore exposes line-to-pipe, pipe-to-outlet, and
+    pipe-to-fitting edges while keeping inter-piece adjacency fail-closed.
+    """
+    line_records = [label_row(row, LINE_FIELD_NAMES) for row in lines]
+    pipe_records = [label_row(row, PIPE_FIELD_NAMES) for row in pipes]
+    outlet_records = [label_row(row, OUTLET_FIELD_NAMES) for row in outlets]
+    fitting_records = [label_row(row, FITTING_FIELD_NAMES) for row in fittings]
+    line_ids = {int(row["uniqueId"]) for row in line_records}
+    pipe_ids = {int(row["uniqueId"]) for row in pipe_records}
+    outlet_ids = {int(row["uniqueId"]) for row in outlet_records}
+    fitting_ids = {int(row["uniqueId"]) for row in fitting_records}
+    table_ids = line_ids | pipe_ids | outlet_ids | fitting_ids
+    total_record_count = sum(
+        len(records)
+        for records in (line_records, pipe_records, outlet_records, fitting_records)
+    )
+    if len(table_ids) != total_record_count:
+        raise ValueError("Project.seidb unique IDs overlap across topology tables")
+
+    line_pipe_edges = [
+        {"fromLineUniqueId": row["parentId"], "toPipeUniqueId": row["uniqueId"]}
+        for row in pipe_records
+    ]
+    pipe_outlet_edges = [
+        {"fromPipeUniqueId": row["parentId"], "toOutletUniqueId": row["uniqueId"]}
+        for row in outlet_records
+    ]
+    pipe_fitting_edges = [
+        {"fromPipeUniqueId": row["parentId"], "toFittingUniqueId": row["uniqueId"]}
+        for row in fitting_records
+    ]
+    unresolved_line_pipe = [
+        edge for edge in line_pipe_edges if int(edge["fromLineUniqueId"]) not in line_ids
+    ]
+    unresolved_pipe_outlet = [
+        edge for edge in pipe_outlet_edges if int(edge["fromPipeUniqueId"]) not in pipe_ids
+    ]
+    unresolved_pipe_fitting = [
+        edge for edge in pipe_fitting_edges if int(edge["fromPipeUniqueId"]) not in pipe_ids
+    ]
+    return {
+        "identityNamespace": "Project.seidb.uniqueId",
+        "records": {
+            "lines": line_records,
+            "pipes": pipe_records,
+            "outlets": outlet_records,
+            "fittings": fitting_records,
+        },
+        "edges": {
+            "lineToPipe": line_pipe_edges,
+            "pipeToOutlet": pipe_outlet_edges,
+            "pipeToFitting": pipe_fitting_edges,
+        },
+        "metrics": {
+            "lineNodeCount": len(line_records),
+            "pipeNodeCount": len(pipe_records),
+            "outletNodeCount": len(outlet_records),
+            "fittingNodeCount": len(fitting_records),
+            "lineToPipeEdgeCount": len(line_pipe_edges),
+            "pipeToOutletEdgeCount": len(pipe_outlet_edges),
+            "pipeToFittingEdgeCount": len(pipe_fitting_edges),
+            "unresolvedLineToPipeEdgeCount": len(unresolved_line_pipe),
+            "unresolvedPipeToOutletEdgeCount": len(unresolved_pipe_outlet),
+            "unresolvedPipeToFittingEdgeCount": len(unresolved_pipe_fitting),
+        },
+        "claims": {
+            "nativeAttachmentGraphReady": not (
+                unresolved_line_pipe or unresolved_pipe_outlet or unresolved_pipe_fitting
+            ),
+            "interPieceAdjacencyReady": False,
+            "exactFittingTakeoutReady": False,
+        },
+    }
+
+
 def extract(archive: Path, include_records: bool = False) -> dict[str, object]:
     archive_bytes = archive.read_bytes()
     with zipfile.ZipFile(archive) as container:
@@ -285,6 +369,7 @@ def extract(archive: Path, include_records: bool = False) -> dict[str, object]:
     fittings = parse_table(
         data, fitting_schema, len(data), FITTING_FIELD_TYPES, FITTING_FIELD_ORDER
     )
+    attachment_graph = build_attachment_graph(lines, pipes, outlets, fittings)
 
     cml_lines = [row for row in lines if row["fields"]["9"] == "CML"]
     cml01_candidates = [
@@ -343,7 +428,9 @@ def extract(archive: Path, include_records: bool = False) -> dict[str, object]:
             "unresolvedParentFittingCount": sum(
                 row["parentKind"] == "unresolved" for row in fitting_parent_joins
             ),
+            **attachment_graph["metrics"],
         },
+        "attachmentGraph": attachment_graph,
         "cmlLines": [label_row(row, LINE_FIELD_NAMES) for row in cml_lines],
         "cml01Candidates": [
             label_row(row, PIPE_FIELD_NAMES) for row in cml01_candidates
@@ -367,14 +454,24 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("archive", type=Path)
     parser.add_argument("--all-records", action="store_true")
+    parser.add_argument("--graph-only", action="store_true")
+    parser.add_argument("--display-path")
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args()
-    print(
-        json.dumps(
-            extract(args.archive, include_records=args.all_records),
-            indent=2,
-            sort_keys=True,
-        )
-    )
+    result = extract(args.archive, include_records=args.all_records)
+    if args.graph_only:
+        result = {
+            "artifactType": "halofire.autosprink-native-fab-attachment-graph.v1",
+            "source": result["source"],
+            **result["attachmentGraph"],
+        }
+    if args.display_path:
+        result["source"]["archive"] = args.display_path
+    rendered = json.dumps(result, indent=2, sort_keys=True)
+    if args.output:
+        args.output.write_bytes(f"{rendered}\n".encode("utf-8"))
+    else:
+        print(rendered)
 
 
 if __name__ == "__main__":

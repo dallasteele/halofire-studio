@@ -31,6 +31,10 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('listing-cmi14-page16.png');
     expect(html).toContain('listing-cmi15-cmi18-page17.png');
     expect(html).toContain('approved-calcs-source-feed-page15.png');
+    expect(html).toContain('control-goodyear-riser-listing-page3.png');
+    expect(html).toContain('control-goodyear-riser-listing-page4.png');
+    expect(fs.statSync(new URL('control-goodyear-riser-listing-page3.png', proof)).size).toBeGreaterThan(60_000);
+    expect(fs.statSync(new URL('control-goodyear-riser-listing-page4.png', proof)).size).toBeGreaterThan(60_000);
     expect(fs.statSync(new URL('approved-calcs-source-feed-page15.png', proof)).size).toBeGreaterThan(30_000);
     expect(html).toContain('asbuilt-fp10-riser-plan.png');
     expect(html).toContain('asbuilt-fp10-riser-section.png');
@@ -195,6 +199,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('evaluateNewHopeSourceFeedFabrication');
     expect(script).toContain('evaluateNewHopeSourceFeedCalculationChain');
     expect(script).toContain('evaluateNewHopeSourceFeedAsbuiltRiser');
+    expect(script).toContain('evaluateNativeFabAttachmentGraph');
     expect(script).toContain('evaluateNewHopeLowPointFabrication');
     expect(script).toContain('evaluateNewHopeCmi05Cmi08Fabrication');
     expect(script).toContain('evaluateNewHopeCmi06VerticalOutlet');
@@ -248,6 +253,10 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.sourceFeedFabricationPieceToCalculationLegDecompositionReady = String(properPipeLayout.sourceFeedFabricationPieceToCalculationLegDecompositionReady)');
     expect(script).toContain('dataset.sourceFeedNativeFabricationTopologyReady = String(properPipeLayout.sourceFeedNativeFabricationTopologyReady)');
     expect(script).toContain('dataset.sourceFeedNativeTransitionFittingTakeoutReady = String(properPipeLayout.sourceFeedNativeTransitionFittingTakeoutReady)');
+    expect(script).toContain('dataset.nativeFabAttachmentGraphReady = String(properPipeLayout.nativeFabAttachmentGraphReady)');
+    expect(script).toContain('dataset.nativeFabListedFittingIdentityCoverageReady = String(properPipeLayout.nativeFabListedFittingIdentityCoverageReady)');
+    expect(script).toContain('dataset.nativeFabFittingAttachmentCount = String(properPipeLayout.nativeFabFittingAttachmentCount)');
+    expect(script).toContain('dataset.exactFittingTakeoutReady = String(properPipeLayout.exactFittingTakeoutReady)');
     expect(script).toContain('dataset.sourceFeedAsBuiltRiserIdentityReady = String(properPipeLayout.sourceFeedAsBuiltRiserIdentityReady)');
     expect(script).toContain('dataset.sourceFeedSharedTransferAxisReady = String(properPipeLayout.sourceFeedSharedTransferAxisReady)');
     expect(script).toContain('dataset.sourceFeedOrthogonalCalculationDecompositionReady = String(properPipeLayout.sourceFeedOrthogonalCalculationDecompositionReady)');

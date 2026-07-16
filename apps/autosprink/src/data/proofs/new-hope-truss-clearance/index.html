@@ -87,7 +87,7 @@
         <div class="status"><b>CMI.06 exact vertical outlet</b>The actual field set and listing bind four 3 x 1 upward threaded outlets plus the 3 x 2-1/2 grooved branch outlet on the 3-inch, 21-foot piece. RA2-2 independently proves head-057 as a one-foot vertical leg from carrier Z 20.5 feet to sprinkler Z 21.5 feet.</div>
         <div class="status"><b>CMI ridge-chain fabrication</b>The actual field set and listing bind CMI.10-CMI.13 and CMI.19-CMI.22 as two directed chains: eight pieces, 28 canonical edges, 20 sprinkler outlets, one CMI.13 inspector-test outlet, and two no-outlet transitions. Piece direction is not drainage grade.</div>
         <div class="status"><b>Remaining CMI fabrication</b>The actual field set and listing bind CMI.01-CMI.04 and CMI.14-CMI.18 as nine directed pieces across 19 canonical edges with 11 exact outlets and four no-outlet pieces. CMI.15 keeps its 2-1/2-inch branch distinct from the continuing 3-inch CMI.16.</div>
-        <div class="status"><b>Native CML.01 parent chain</b>The protected FAB archive binds line CML (158) to pipe CML.01 (159) to its welded outlet (160), with both pipe end codes and the exact 29.5-inch outlet station preserved. The same parser recovers five pipe-to-fitting joins from a separate completed riser project. New Hope contains no attached CML.01 transition-fitting record, so concealed takeout remains blocked instead of being drawn from a guess.</div>
+        <div class="status"><b>Native attachment graph</b>The protected FAB archive now replays all 272 line-to-pipe, 293 pipe-to-outlet, and 97 pipe-to-fitting parent edges. Every native fitting attachment resolves to the exact pipe-piece identity and fitting family printed in the approved 42-page listing. A visually inspected completed-project riser pairs five native item codes to its printed tee, 90°, 45°, and flange identities. Neither source publishes the other-piece adjacency or raw takeout, so those remain blocked instead of being guessed.</div>
         <div class="status"><b>Mirrored side-branch drainage</b>Two acyclic seven-head components bind 28 branch-line edges to low-point-02 and low-point-03. Their four terminal arm-overs are source-bound to those same catchments.</div>
         <div class="status"><b>Complete cross-main drainage</b>The corrected 35-node, 34-edge source tree includes fabricated CMK.01-.03 and is directed from three high points toward low-point-01, low-point-04, and the dry-valve/base-of-riser return at 0.25 inch per 10 feet.</div>
         <div class="status"><b>Central BL48/BL49 drainage</b>The exact 23-node, 23-edge component retains one eight-edge BL49 loop. A generated relative schedule grades both loop arms and both BL48 terminals toward the sole CMK.03 feed while preserving the non-connecting BL48.02/CMI crossing.</div>
@@ -101,7 +101,7 @@
         <div class="status"><b>Finished-floor datum registered</b>FP0.1 defines pipe elevation above finished floor, A102 fixes finished floor at project elevation 100'-0", and all 32 approved calculation ports now carry both local and project elevation. FP2.0 retains six distinct ridge elevations; no global roof plane is permitted.</div>
         <div class="status closed"><b>Field drain routes blocked</b>Two one-inch drum-drip runs explicitly say FIELD ROUTE / LOCATE; exact fabrication geometry cannot be invented.</div>
         <div class="status"><b>Complete listed pipe ends</b>All 257 pipe-piece definitions and 264 fabricated units are source-bound across listing pages 7-42: 158 welded definitions retain G-G / No Fitting ends and 99 threaded definitions retain T-T/T-G preparation plus fitting family.</div>
-        <div class="status closed"><b>Proper layout blocked</b>Listed end preparation and exact threaded fitting sizes are now complete, but installed inter-piece topology, per-edge absolute Z, the complete vertical-offset schedule, obstruction/compliance checks, and field-resolved drains are not closed.</div>
+        <div class="status closed"><b>Proper layout blocked</b>Listed end preparation, exact threaded fitting sizes, native parent attachments, and all 97 fitting identities are complete. Other-piece adjacency, exact takeout, per-edge absolute Z, the complete vertical-offset schedule, obstruction/compliance checks, and field-resolved drains are not closed.</div>
       </div>
     </section>
 
@@ -128,6 +128,17 @@
       <figure>
         <div class="visual"><img src="listing-complete-threaded-page42.png" alt="Actual AutoSPRINK threaded pipeline report page 42 showing T-T and T-G end preparations and fitting families"></div>
         <figcaption><b>Actual approved threaded pipeline listing.</b> Page 42 visibly preserves T-T/T-G preparation, quantities, fitting families, and fraction-bearing sizes for CMB through CMJ. The embedded font ToUnicode map preserves U+00BD and U+00BE losslessly; the evaluator binds all 99 threaded definitions across pages 40-42 to exact numeric fitting ports.</figcaption>
+      </figure>
+    </section>
+
+    <section class="evidence-grid" id="native-fab-cross-project-control" style="margin-top:22px">
+      <figure>
+        <div class="visual"><img src="control-goodyear-riser-listing-page3.png" alt="Completed-project AutoSPRINK welded riser fabrication report used as a native FAB identity control"></div>
+        <figcaption><b>Completed-project welded-listing control.</b> The native FAB item on piece I..1 resolves to the printed 4 x 11 slip reducing flange while the other welded pieces explicitly say No Fitting. This verifies the parser can distinguish a real attached fitting from an absent one.</figcaption>
+      </figure>
+      <figure>
+        <div class="visual"><img src="control-goodyear-riser-listing-page4.png" alt="Completed-project AutoSPRINK threaded riser listing showing tee 90 degree and 45 degree fitting identities"></div>
+        <figcaption><b>Completed-project threaded-listing control.</b> Native fitting item codes on DNA.B-E resolve piece-for-piece to the printed straight tee, two 90° elbows, and galvanized 45° elbow. The page publishes already-cut pipe lengths, not raw fitting takeout; the gate keeps exact takeout false.</figcaption>
       </figure>
     </section>
 

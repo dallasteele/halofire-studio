@@ -20,6 +20,7 @@ import { evaluateNewHopeSourceFeedFabrication } from '../../../engine/new-hope-s
 import { evaluateNewHopeSourceFeedCalculationChain } from '../../../engine/new-hope-source-feed-calculation-chain.js';
 import { evaluateNewHopeSourceFeedAsbuiltRiser } from '../../../engine/new-hope-source-feed-asbuilt-riser.js';
 import { evaluateNewHopeFabricationEndSchedule } from '../../../engine/new-hope-fabrication-end-schedule.js';
+import { evaluateNativeFabAttachmentGraph } from '../../../engine/native-fab-attachment-graph.js';
 import { evaluateNewHopeLowPointFabrication } from '../../../engine/new-hope-low-point-fabrication.js';
 import { evaluateNewHopeCmi05Cmi08Fabrication } from '../../../engine/new-hope-cmi05-cmi08-fabrication.js';
 import { evaluateNewHopeCmi06VerticalOutlet } from '../../../engine/new-hope-cmi06-vertical-outlet.js';
@@ -42,6 +43,7 @@ const answerEvidenceUrl = '../../new-hope-pitched-holdout-answer-evidence.json';
 const sourceFeedAsbuiltRiserUrl = '../../new-hope-asbuilt-source-feed-riser-registration.json';
 const fabricationEndScheduleUrl = '../../new-hope-fabrication-end-schedule.json';
 const nativeFabTopologyUrl = '../../new-hope-native-fab-topology.json';
+const nativeFabAttachmentGraphUrl = '../../new-hope-native-fab-attachment-graph.json';
 const svg = document.querySelector('#structural-overlay');
 const pipeSvg = document.querySelector('#fp20-pipe-overlay');
 const gradeProfileSvg = document.querySelector('#bounded-grade-profile');
@@ -61,7 +63,7 @@ function element(name, attributes = {}) {
 }
 
 try {
-  const [response, sourceResponse, pipeVectorResponse, planGraphResponse, operationalResponse, hydraulicRoute21Response, hydraulicRoute22Response, hydraulicRoute23Response, architecturalSourceResponse, elevationDatumResponse, atticSourceResponse, atticCalibrationResponse, answerEvidenceResponse, sourceFeedAsbuiltRiserResponse, fabricationEndScheduleResponse, nativeFabTopologyResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl), fetch(operationalAnnotationsUrl), fetch(hydraulicRoute21Url), fetch(hydraulicRoute22Url), fetch(hydraulicRoute23Url), fetch(architecturalSourceUrl), fetch(elevationDatumUrl), fetch(atticSourceUrl), fetch(atticCalibrationUrl), fetch(answerEvidenceUrl), fetch(sourceFeedAsbuiltRiserUrl), fetch(fabricationEndScheduleUrl), fetch(nativeFabTopologyUrl)]);
+  const [response, sourceResponse, pipeVectorResponse, planGraphResponse, operationalResponse, hydraulicRoute21Response, hydraulicRoute22Response, hydraulicRoute23Response, architecturalSourceResponse, elevationDatumResponse, atticSourceResponse, atticCalibrationResponse, answerEvidenceResponse, sourceFeedAsbuiltRiserResponse, fabricationEndScheduleResponse, nativeFabTopologyResponse, nativeFabAttachmentGraphResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl), fetch(operationalAnnotationsUrl), fetch(hydraulicRoute21Url), fetch(hydraulicRoute22Url), fetch(hydraulicRoute23Url), fetch(architecturalSourceUrl), fetch(elevationDatumUrl), fetch(atticSourceUrl), fetch(atticCalibrationUrl), fetch(answerEvidenceUrl), fetch(sourceFeedAsbuiltRiserUrl), fetch(fabricationEndScheduleUrl), fetch(nativeFabTopologyUrl), fetch(nativeFabAttachmentGraphUrl)]);
   if (!response.ok) throw new Error(`calibration fetch ${response.status}`);
   if (!sourceResponse.ok) throw new Error(`source fetch ${sourceResponse.status}`);
   if (!pipeVectorResponse.ok) throw new Error(`pipe vector fetch ${pipeVectorResponse.status}`);
@@ -78,7 +80,8 @@ try {
   if (!sourceFeedAsbuiltRiserResponse.ok) throw new Error(`source-feed as-built riser fetch ${sourceFeedAsbuiltRiserResponse.status}`);
   if (!fabricationEndScheduleResponse.ok) throw new Error(`fabrication end schedule fetch ${fabricationEndScheduleResponse.status}`);
   if (!nativeFabTopologyResponse.ok) throw new Error(`native FAB topology fetch ${nativeFabTopologyResponse.status}`);
-  const [calibration, source, pipeVectors, planGraph, operationalAnnotations, hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence, architecturalSource, elevationDatumSource, atticSource, atticCalibration, answerEvidence, sourceFeedAsbuiltRiserRegistration, fabricationEndScheduleSource, nativeFabTopology] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json(), operationalResponse.json(), hydraulicRoute21Response.json(), hydraulicRoute22Response.json(), hydraulicRoute23Response.json(), architecturalSourceResponse.json(), elevationDatumResponse.json(), atticSourceResponse.json(), atticCalibrationResponse.json(), answerEvidenceResponse.json(), sourceFeedAsbuiltRiserResponse.json(), fabricationEndScheduleResponse.json(), nativeFabTopologyResponse.json()]);
+  if (!nativeFabAttachmentGraphResponse.ok) throw new Error(`native FAB attachment graph fetch ${nativeFabAttachmentGraphResponse.status}`);
+  const [calibration, source, pipeVectors, planGraph, operationalAnnotations, hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence, architecturalSource, elevationDatumSource, atticSource, atticCalibration, answerEvidence, sourceFeedAsbuiltRiserRegistration, fabricationEndScheduleSource, nativeFabTopology, nativeFabAttachmentGraphSource] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json(), operationalResponse.json(), hydraulicRoute21Response.json(), hydraulicRoute22Response.json(), hydraulicRoute23Response.json(), architecturalSourceResponse.json(), elevationDatumResponse.json(), atticSourceResponse.json(), atticCalibrationResponse.json(), answerEvidenceResponse.json(), sourceFeedAsbuiltRiserResponse.json(), fabricationEndScheduleResponse.json(), nativeFabTopologyResponse.json(), nativeFabAttachmentGraphResponse.json()]);
   const scale = 1.5;
   const branchY = 430;
 
@@ -142,6 +145,8 @@ try {
   if (!sourceFeedAsbuiltRiser.orthogonalCalculationDecompositionReady) throw new Error(`source-feed as-built riser: ${sourceFeedAsbuiltRiser.blockerCodes.join(', ')}`);
   const fabricationEndSchedule = evaluateNewHopeFabricationEndSchedule(fabricationEndScheduleSource);
   if (!fabricationEndSchedule.allListedPieceEndPreparationsReady) throw new Error(`complete listed pipe-end schedule: ${fabricationEndSchedule.blockerCodes.join(', ')}`);
+  const nativeFabAttachmentGraph = evaluateNativeFabAttachmentGraph({ graph: nativeFabAttachmentGraphSource, fabricationSchedule: fabricationEndScheduleSource, parserControl: nativeFabTopology });
+  if (!nativeFabAttachmentGraph.listedFittingIdentityCoverageReady) throw new Error(`native FAB attachment graph: ${nativeFabAttachmentGraph.blockerCodes.join(', ')}`);
   const lowPointFabrication = evaluateNewHopeLowPointFabrication({
     canonicalTopology,
     governedSkeleton,
@@ -226,6 +231,7 @@ try {
     sourceFeedCalculationChain,
     sourceFeedAsbuiltRiser,
     fabricationEndSchedule,
+    nativeFabAttachmentGraph,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -728,7 +734,11 @@ try {
   document.documentElement.dataset.allListedPieceEndPreparationsReady = String(properPipeLayout.allListedPieceEndPreparationsReady);
   document.documentElement.dataset.allListedEndFittingFamiliesReady = String(properPipeLayout.allListedEndFittingFamiliesReady);
   document.documentElement.dataset.exactThreadedFittingSizesReady = String(properPipeLayout.exactThreadedFittingSizesReady);
+  document.documentElement.dataset.nativeFabAttachmentGraphReady = String(properPipeLayout.nativeFabAttachmentGraphReady);
+  document.documentElement.dataset.nativeFabListedFittingIdentityCoverageReady = String(properPipeLayout.nativeFabListedFittingIdentityCoverageReady);
+  document.documentElement.dataset.nativeFabFittingAttachmentCount = String(properPipeLayout.nativeFabFittingAttachmentCount);
   document.documentElement.dataset.interPieceFittingTopologyReady = String(properPipeLayout.interPieceFittingTopologyReady);
+  document.documentElement.dataset.exactFittingTakeoutReady = String(properPipeLayout.exactFittingTakeoutReady);
   document.documentElement.dataset.completeVerticalOffsetScheduleReady = String(properPipeLayout.completeVerticalOffsetScheduleReady);
   document.documentElement.dataset.sourceFeedInstalledGradeReady = String(properPipeLayout.sourceFeedInstalledGradeReady);
   document.documentElement.dataset.sourceFeedConcealedRiserContinuationReady = String(properPipeLayout.sourceFeedConcealedRiserContinuationReady);

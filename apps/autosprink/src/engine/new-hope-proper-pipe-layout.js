@@ -165,6 +165,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.sourceFeedCalculationChain - Evaluated node-118/BOR/valve calculation chain.
  * @param {object} inputs.sourceFeedAsbuiltRiser - Evaluated FP1.0 riser and calculation decomposition.
  * @param {object} inputs.fabricationEndSchedule - Evaluated complete listed pipe-end schedule.
+ * @param {object} inputs.nativeFabAttachmentGraph - Evaluated native parent graph and listing identity crosswalk.
  * @param {object} inputs.lowPointFabrication - Evaluated CMI.09 low-point/listing/grade registration.
  * @param {object} inputs.cmi05Cmi08Fabrication - Evaluated CMI.05, CMI.07, and CMI.08 fitting schedule.
  * @param {object} inputs.cmi06VerticalOutlet - Evaluated CMI.06 outlet and head-057 vertical leg.
@@ -192,6 +193,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     sourceFeedCalculationChain,
     sourceFeedAsbuiltRiser,
     fabricationEndSchedule,
+    nativeFabAttachmentGraph,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -216,6 +218,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     sourceFeedCalculationChain,
     sourceFeedAsbuiltRiser,
     fabricationEndSchedule,
+    nativeFabAttachmentGraph,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -252,6 +255,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['source-feed-calculation-chain', sourceFeedCalculationChain?.status],
     ['source-feed-asbuilt-riser', sourceFeedAsbuiltRiser?.status],
     ['fabrication-end-schedule', fabricationEndSchedule?.status],
+    ['native-fab-attachment-graph', nativeFabAttachmentGraph?.status],
     ['low-point-fabrication', lowPointFabrication?.status],
     ['cmi05-cmi08-fabrication', cmi05Cmi08Fabrication?.status],
     ['cmi06-vertical-outlet', cmi06VerticalOutlet?.status],
@@ -403,7 +407,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',
-      'The approved listing now closes all 257 pipe-piece identities and end preparations across 264 fabricated units, including exact threaded fitting sizes (61 one-inch, 16 one-by-half, 20 one-by-three-quarter, and 2 No Fitting records). Inter-piece topology and the complete vertical-offset schedule remain unresolved.',
+      'The approved listing closes all 257 pipe-piece identities and end preparations across 264 fabricated units. Native Project.seidb parent IDs now attach all 97 fitting records to their exact listed pipe-piece identity and fitting family. The source does not publish the other-piece adjacency or raw fitting takeout, so inter-piece topology and the complete vertical-offset schedule remain unresolved.',
     ),
   ]
   const ready = issues.length === 0
@@ -664,7 +668,14 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       fabricationEndSchedule?.allThreadedEndFittingFamiliesReady === true,
     exactThreadedFittingSizesReady:
       ready && fabricationEndSchedule?.exactThreadedFittingSizesReady === true,
+    nativeFabAttachmentGraphReady:
+      ready && nativeFabAttachmentGraph?.nativeAttachmentGraphReady === true,
+    nativeFabListedFittingIdentityCoverageReady:
+      ready && nativeFabAttachmentGraph?.listedFittingIdentityCoverageReady === true,
+    nativeFabFittingAttachmentCount:
+      ready ? nativeFabAttachmentGraph?.metrics?.listedFittingIdentityCount ?? null : null,
     interPieceFittingTopologyReady: false,
+    exactFittingTakeoutReady: false,
     completeVerticalOffsetScheduleReady: false,
     sourceFeedEndpointElevationsReady:
       ready && sourceFeedFabrication?.designedEndpointElevationsReady === true,
