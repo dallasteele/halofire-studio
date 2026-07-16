@@ -52,7 +52,7 @@
     "armOverCrossProjectMethodCalibrationReady": true,
     "wholeFp20GradeDirectionReady": true,
     "properPipeEvidenceAssemblyReady": true,
-    "directedCanonicalEdgeCount": 140,
+    "directedCanonicalEdgeCount": 141,
     "canonicalEdgeCount": 143,
     "exactElevationPortCount": 32,
     "exactElevationCanonicalNodeCount": 31,
@@ -61,8 +61,18 @@
     "finishedFloorDatumReady": true,
     "multiRoofRegionControlReady": true,
     "sourceFeed3dPathReady": false,
-    "lowPointZoneGradeReady": false,
+    "lowPointZoneGradeReady": true,
     "fieldDrainRoutesReady": false,
+    "cmi05PieceFabricationReady": true,
+    "cmi05OutletScheduleReady": true,
+    "cmi05SeparatedCrossingReady": true,
+    "cmi07PieceFabricationReady": true,
+    "cmi07OutletScheduleReady": true,
+    "cmi07ArmOverTerminalBindingReady": true,
+    "cmi08PieceFabricationReady": true,
+    "cmi08NoOutletScheduleReady": true,
+    "cmi07Cmi08JunctionReady": true,
+    "cmi05Cmi08BoundedFittingScheduleReady": true,
     "fittingScheduleReady": false,
     "exactPipeCenterlineZReady": false,
     "properPipeLayoutReady": false,
@@ -130,13 +140,14 @@
   "properPipeLayoutEvidence": {
     "canonicalNodes": 142,
     "canonicalEdges": 143,
-    "directedEdges": 140,
+    "directedEdges": 141,
     "undirectedSourceFeedEdges": 2,
-    "undirectedLowPointZoneEdges": 1,
+    "undirectedLowPointZoneEdges": 0,
     "directionConflicts": 0,
     "exactElevationPorts": 32,
     "exactElevationCanonicalNodes": 31,
     "sameXyVerticalLegCount": 1,
+    "sourceBoundFabricationOutletCount": 13,
     "calculationAnchorRangeFt": [11.5, 21.5],
     "architecturalProjectAnchorRangeFt": [111.5, 121.5],
     "finishedFloorArchitecturalProjectElevationFt": 100,
@@ -150,7 +161,7 @@
       "NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE"
     ],
     "browser": {
-      "actualPdfUnderlays": 8,
+      "actualPdfUnderlays": 10,
       "properLayoutAuditVisible": true,
       "machineGateValuesVerified": true,
       "consoleWarningsOrErrors": 0
@@ -163,5 +174,5 @@
     "status": "passed",
     "episodeId": 149978
   },
-  "nextAction": "Use the registered finished-floor datum plus FP2.0 below-deck tags and six separate roof regions to assign only source-bound pipe-centerline Z paths; keep the two supply transitions, low-point tie-in, field drains, and fittings fail-closed until their exact evidence resolves."
+  "nextAction": "Continue source-binding the remaining CMI fitting and vertical-offset pieces, then use the registered finished-floor datum plus FP2.0 below-deck tags and six separate roof regions to assign only source-bound pipe-centerline Z paths; keep the two supply transitions, field drains, and whole fitting schedule fail-closed until their exact evidence resolves."
 }

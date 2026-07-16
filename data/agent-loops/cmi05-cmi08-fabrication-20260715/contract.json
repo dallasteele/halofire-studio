@@ -1,0 +1,54 @@
+{
+  "name": "cmi05-cmi08-fabrication-20260715",
+  "owner": "codex",
+  "goal": "Bind New Hope CMI.05, CMI.07, and CMI.08 to the exact field-plan topology and AutoSPRINK fabrication lengths, outlet stations, outlet directions, connected arm-overs, and CMI.07-to-CMI.08 junction while preserving whole-layout fail-closed gates.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/10-Field Set/24-052_NHCC_INSTALL PLAN.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/NEW HOPE CRISIS CENTER_NHCC List.FAB",
+    "apps/autosprink/src/data/new-hope-approved-fp20-pipe-vectors.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json"
+  ],
+  "exit_criteria": [
+    "CMI.05 is the 3-inch 21-foot pipe-062 piece with three 3 x 1 threaded outlets Up:0 at listed stations 4 feet 3 inches, 10 feet 3 inches, and 16 feet 3 inches",
+    "the BL48 plan crossing within CMI.05 remains a separated no-fitting crossing",
+    "CMI.07 is the 3-inch 10-foot 0.5-inch pipe-063 piece with two 3 x 1 threaded outlets Toward:90 feeding the exact one-inch arm-overs",
+    "CMI.08 is the 3-inch 8-foot 1.5-inch pipe-030 piece with no outlets and an exact CMI.07 junction",
+    "piece and outlet station residuals stay within explicit PDF-to-listing tolerances",
+    "adversarial source, identity, topology, diameter, orientation, station, and false-promotion mutations are rejected",
+    "actual field and listing PDF proof is rendered and inspected",
+    "focused tests, production build, formal proof, rules verification, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source hash and project identity",
+    "exact CMI.05, CMI.07, and CMI.08 source topology",
+    "fabrication length and outlet station residuals",
+    "outlet direction and connected arm-over identity",
+    "separated-crossing preservation",
+    "adversarial mutation suite",
+    "actual-PDF browser proof",
+    "Lean invariant receipt",
+    "agentic rules and brain postflight"
+  ],
+  "state_path": "data/agent-loops/cmi05-cmi08-fabrication-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/new-hope-cmi05-cmi08-fabrication.js",
+    "apps/autosprink/tests/new-hope-cmi05-cmi08-fabrication.test.js",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/cmi05-cmi08-fabrication-20260715/lean-proof.json",
+    "data/agent-loops/cmi05-cmi08-fabrication-20260715/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 120000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

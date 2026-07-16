@@ -1,0 +1,9 @@
+{
+  "status": "verified",
+  "output": "",
+  "elapsed_ms": 68,
+  "prover": "lean4",
+  "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+  "returncode": 0,
+  "claim": "Nine canonical edges form three bounded fabrication pieces with five source-listed outlets; all measured listing-to-plan residuals remain inside their declared tolerances, and bounded fabrication readiness cannot promote complete fitting, exact-Z, field-drain, or proper-layout readiness."
+}

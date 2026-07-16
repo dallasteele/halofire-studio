@@ -1,0 +1,57 @@
+{
+  "loop": "cmi05-cmi08-fabrication-20260715",
+  "stage": "VERIFY",
+  "status": "bounded-cmi05-cmi08-fabrication-verified-whole-layout-open",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [149978, 149894]
+  },
+  "sourceMapping": {
+    "cmi05": {
+      "sourceSegmentId": "pipe-062",
+      "sourceEdgeIds": ["source-edge-122", "source-edge-123", "source-edge-124", "source-edge-125", "source-edge-126"]
+    },
+    "cmi07": {
+      "sourceSegmentId": "pipe-063",
+      "sourceEdgeIds": ["source-edge-127", "source-edge-128", "source-edge-129"]
+    },
+    "cmi08": {
+      "sourceSegmentId": "pipe-030",
+      "sourceEdgeIds": ["source-edge-050"]
+    }
+  },
+  "claims": {
+    "cmi05FabricationReady": true,
+    "cmi07FabricationReady": true,
+    "cmi08FabricationReady": true,
+    "cmi05Cmi08BoundedFittingScheduleReady": true,
+    "completeFittingScheduleReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "sourceBoundPieceCount": 3,
+    "sourceBoundOutletCount": 5,
+    "sourceBoundCanonicalEdgeCount": 9,
+    "separatedCrossingCount": 1,
+    "exactArmOverTerminalCount": 2,
+    "focusedTests": "149 passed in 24 files",
+    "productionBuild": "passed",
+    "browser": {
+      "actualPdfPanels": 2,
+      "fieldImageNaturalSize": "1900x1250",
+      "listingImageNaturalSize": "1275x1650",
+      "consoleWarningsOrErrors": 0
+    },
+    "formalProof": "Lean 4.13 verified in 68 ms"
+  },
+  "remainingAcceptanceBlockers": [
+    "NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED",
+    "NH_PROPER_PIPE_EXACT_Z_INCOMPLETE",
+    "NH_PROPER_PIPE_FIELD_DRAIN_ROUTES_UNRESOLVED",
+    "NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE"
+  ],
+  "nextAction": "Continue source-binding the remaining CMI fitting and vertical-offset pieces; do not promote whole layout, fabrication, or field release until the supply 3D path, exact centerline Z, field drains, and complete fitting schedule close."
+}

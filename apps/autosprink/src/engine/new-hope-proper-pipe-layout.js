@@ -164,6 +164,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.elevationDatum - Evaluated FP0.1/A102/calculation datum registration.
  * @param {object} inputs.sourceFeedFabrication - Evaluated CML.01 plan/listing/outlet registration.
  * @param {object} inputs.lowPointFabrication - Evaluated CMI.09 low-point/listing/grade registration.
+ * @param {object} inputs.cmi05Cmi08Fabrication - Evaluated CMI.05, CMI.07, and CMI.08 fitting schedule.
  * @param {object} inputs.cmi06VerticalOutlet - Evaluated CMI.06 outlet and head-057 vertical leg.
  * @param {object} inputs.operationalAnnotations - Source notes, grades, drains, and details.
  * @param {object} inputs.longBranchDrainage - Long-branch drainage schedule.
@@ -185,6 +186,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     elevationDatum,
     sourceFeedFabrication,
     lowPointFabrication,
+    cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
     operationalAnnotations,
     longBranchDrainage,
@@ -203,6 +205,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     elevationDatum,
     sourceFeedFabrication,
     lowPointFabrication,
+    cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
     operationalAnnotations,
   ].map((entry) => entry?.projectId)
@@ -233,6 +236,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['calculation-elevation-datum', elevationDatum?.status],
     ['source-feed-fabrication', sourceFeedFabrication?.status],
     ['low-point-fabrication', lowPointFabrication?.status],
+    ['cmi05-cmi08-fabrication', cmi05Cmi08Fabrication?.status],
     ['cmi06-vertical-outlet', cmi06VerticalOutlet?.status],
     ['long-branch-drainage', longBranchDrainage?.status],
     ['side-branch-drainage', sideBranchDrainage?.status],
@@ -380,7 +384,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',
-      'CMI.06 and CMI.09 now have source-bound outlet identities, and head-057 has an exact vertical leg; a complete fitting and vertical-offset schedule is still not assembled for every canonical edge.',
+      'CMI.05 through CMI.09 now have source-bound piece and outlet identities, and head-057 has an exact vertical leg; the remaining CMI pieces and complete vertical-offset schedule are still not assembled for every canonical edge.',
     ),
   ]
   const ready = issues.length === 0
@@ -452,6 +456,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         : 0,
       sameXyVerticalLegCount: multiElevationNodes.length,
       sourceBoundFabricationOutletCount:
+        (cmi05Cmi08Fabrication?.metrics?.boundedOutletCount || 0) +
         (cmi06VerticalOutlet?.outlets?.length || 0) +
         (cmi06VerticalOutlet?.branchOutlet ? 1 : 0) +
         (lowPointFabrication?.piece ? 2 : 0) +
@@ -482,6 +487,32 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     lowPointZoneGradeReady:
       ready && lowPointFabrication?.lowPointRelativeGradeDirectionReady === true,
     lowPointExactDifferentialZReady: false,
+    cmi05Cmi08Fabrication: cmi05Cmi08Fabrication
+      ? {
+          pieces: cmi05Cmi08Fabrication.pieces,
+          metrics: cmi05Cmi08Fabrication.metrics,
+        }
+      : null,
+    cmi05PieceFabricationReady:
+      ready && cmi05Cmi08Fabrication?.cmi05PieceFabricationReady === true,
+    cmi05OutletScheduleReady:
+      ready && cmi05Cmi08Fabrication?.cmi05OutletScheduleReady === true,
+    cmi05SeparatedCrossingReady:
+      ready && cmi05Cmi08Fabrication?.cmi05SeparatedCrossingReady === true,
+    cmi07PieceFabricationReady:
+      ready && cmi05Cmi08Fabrication?.cmi07PieceFabricationReady === true,
+    cmi07OutletScheduleReady:
+      ready && cmi05Cmi08Fabrication?.cmi07OutletScheduleReady === true,
+    cmi07ArmOverTerminalBindingReady:
+      ready && cmi05Cmi08Fabrication?.cmi07ArmOverTerminalBindingReady === true,
+    cmi08PieceFabricationReady:
+      ready && cmi05Cmi08Fabrication?.cmi08PieceFabricationReady === true,
+    cmi08NoOutletScheduleReady:
+      ready && cmi05Cmi08Fabrication?.cmi08NoOutletScheduleReady === true,
+    cmi07Cmi08JunctionReady:
+      ready && cmi05Cmi08Fabrication?.cmi07Cmi08JunctionReady === true,
+    cmi05Cmi08BoundedFittingScheduleReady:
+      ready && cmi05Cmi08Fabrication?.cmi05Cmi08BoundedFittingScheduleReady === true,
     cmi06VerticalOutlet: cmi06VerticalOutlet
       ? {
           piece: cmi06VerticalOutlet.piece,

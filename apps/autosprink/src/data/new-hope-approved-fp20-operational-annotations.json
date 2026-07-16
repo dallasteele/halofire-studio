@@ -120,6 +120,114 @@
         "sourceEvidence": "Field-set FP2.0 labels CMI.09 as 2-1/2 inch by 5 feet 4-1/2 inches from the LOW POINT TIE IN DRAIN, with a 2-1/2 x 2 grooved outlet at 0 feet 7 inches and a 2-1/2 x 3/4 threaded outlet at cumulative 2 feet 10 inches; listing page 15 identifies their orientations as Toward:87 and Up:0."
       }
     ],
+    "crossMainPieceBindings": [
+      {
+        "id": "cmi05-three-upward-outlets",
+        "lineName": "CMI",
+        "pieceId": "CMI.05",
+        "systemRole": "cross-main",
+        "nominalDiameterIn": 3,
+        "cutLengthIn": 252,
+        "fabricationListingPage": 15,
+        "sourceSegmentId": "pipe-062",
+        "sourceEdgeIds": [
+          "source-edge-122",
+          "source-edge-123",
+          "source-edge-124",
+          "source-edge-125",
+          "source-edge-126"
+        ],
+        "pieceStartCanonicalNodeId": "canonical-node-133",
+        "pieceFarEndCanonicalNodeId": "canonical-node-137",
+        "outlets": [
+          {
+            "canonicalNodeId": "canonical-node-134",
+            "sprinklerId": "head-059",
+            "fromPieceStartIn": 51,
+            "fitting": "3 x 1 threaded outlet",
+            "orientation": "up-0-degrees"
+          },
+          {
+            "canonicalNodeId": "canonical-node-135",
+            "sprinklerId": "head-066",
+            "fromPieceStartIn": 123,
+            "fitting": "3 x 1 threaded outlet",
+            "orientation": "up-0-degrees"
+          },
+          {
+            "canonicalNodeId": "canonical-node-136",
+            "sprinklerId": "head-065",
+            "fromPieceStartIn": 195,
+            "fitting": "3 x 1 threaded outlet",
+            "orientation": "up-0-degrees"
+          }
+        ],
+        "separatedCrossingCanonicalNodeId": "canonical-node-022",
+        "separatedCrossingSourceSegmentId": "pipe-013",
+        "maximumPlanResidualIn": 2,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-062 as CMI.05, 3 inch by 21 feet. Listing page 15 places three 3 x 1 threaded outlets Up:0 at cumulative stations 4 feet 3 inches, 10 feet 3 inches, and 16 feet 3 inches. BL48.02 crosses the piece at canonical node 022 without a fitting or outlet."
+      },
+      {
+        "id": "cmi07-two-toward-armovers",
+        "lineName": "CMI",
+        "pieceId": "CMI.07",
+        "systemRole": "cross-main",
+        "nominalDiameterIn": 3,
+        "cutLengthIn": 120.5,
+        "fabricationListingPage": 15,
+        "sourceSegmentId": "pipe-063",
+        "sourceEdgeIds": [
+          "source-edge-127",
+          "source-edge-128",
+          "source-edge-129"
+        ],
+        "pieceStartCanonicalNodeId": "canonical-node-138",
+        "pieceFarEndCanonicalNodeId": "canonical-node-053",
+        "outlets": [
+          {
+            "canonicalNodeId": "canonical-node-117",
+            "fromPieceStartIn": 31,
+            "fitting": "3 x 1 threaded outlet",
+            "orientation": "toward-90-degrees",
+            "downstreamSourceSegmentId": "pipe-054",
+            "downstreamSourceEdgeId": "source-edge-108",
+            "sprinklerId": "head-053"
+          },
+          {
+            "canonicalNodeId": "canonical-node-089",
+            "fromPieceStartIn": 92.5,
+            "fitting": "3 x 1 threaded outlet",
+            "orientation": "toward-90-degrees",
+            "downstreamSourceSegmentId": "pipe-044",
+            "downstreamSourceEdgeId": "source-edge-084",
+            "sprinklerId": "head-035"
+          }
+        ],
+        "maximumOutletStationResidualIn": 3,
+        "maximumPieceLengthResidualIn": 4.2,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-063 as CMI.07, 3 inch by 10 feet 0-1/2 inch. Listing page 15 places two 3 x 1 threaded outlets Toward:90 at cumulative stations 2 feet 7 inches and 7 feet 8-1/2 inches; the plan graph proves those outlets feed the exact one-inch arm-overs to heads 053 and 035."
+      },
+      {
+        "id": "cmi08-no-outlet-turn",
+        "lineName": "CMI",
+        "pieceId": "CMI.08",
+        "systemRole": "cross-main",
+        "nominalDiameterIn": 3,
+        "cutLengthIn": 97.5,
+        "fabricationListingPage": 15,
+        "sourceSegmentId": "pipe-030",
+        "sourceEdgeIds": [
+          "source-edge-050"
+        ],
+        "pieceStartCanonicalNodeId": "canonical-node-053",
+        "pieceFarEndCanonicalNodeId": "canonical-node-054",
+        "connectedUpstreamPieceId": "CMI.07",
+        "connectedDownstreamPieceId": "CMI.09",
+        "outlets": [],
+        "maximumPlanResidualIn": 2,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-030 as CMI.08, 3 inch by 8 feet 1-1/2 inches between the CMI.07 turn and the CMI.09 low-point tie-in. Listing page 15 proves the piece has no outlets."
+      }
+    ],
     "verticalOutletBindings": [
       {
         "id": "cmi06-head057-vertical",
