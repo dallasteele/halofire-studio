@@ -28,6 +28,7 @@ const planGraph = read('new-hope-approved-fp20-plan-graph.json')
 const operationalAnnotations = read('new-hope-approved-fp20-operational-annotations.json')
 const sourceFeedAsbuiltRiserRegistration = read('new-hope-asbuilt-source-feed-riser-registration.json')
 const fabricationEndScheduleSource = read('new-hope-fabrication-end-schedule.json')
+const nativeFabTopology = read('new-hope-native-fab-topology.json')
 const hydraulicRoutes = ['2-1', '2-2', '2-3'].map((id) =>
   read(`new-hope-approved-fp20-hydraulic-route-${id}.json`),
 )
@@ -48,6 +49,7 @@ const sourceFeedFabrication = evaluateNewHopeSourceFeedFabrication({
   governedSkeleton,
   operationalAnnotations,
   hydraulicRoutes,
+  nativeFabTopology,
 })
 const sourceFeedCalculationChain = evaluateNewHopeSourceFeedCalculationChain({
   hydraulicRoutes,
@@ -216,6 +218,11 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.sourceFeedDesignedGradeDirectionReady).toBe(true)
     expect(result.sourceFeedDesignedGradeMagnitudeReady).toBe(true)
     expect(result.sourceFeedCml01Plan3dPathReady).toBe(true)
+    expect(result.sourceFeedNativeFabricationTopologyReady).toBe(true)
+    expect(result.sourceFeedNativeLineToPipeParentJoinReady).toBe(true)
+    expect(result.sourceFeedNativePipeToOutletParentJoinReady).toBe(true)
+    expect(result.sourceFeedNativeAttachedFittingCount).toBe(0)
+    expect(result.sourceFeedNativeTransitionFittingTakeoutReady).toBe(false)
     expect(result.sourceFeedConcealedPlanXyReady).toBe(true)
     expect(result.sourceFeedFabricationPieceToCalculationLegDecompositionReady).toBe(true)
     expect(result.sourceFeedInstalledGradeReady).toBe(false)

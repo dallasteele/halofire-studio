@@ -9,10 +9,11 @@ const read = (name) => JSON.parse(fs.readFileSync(new URL(`../src/data/${name}`,
 const pipeVectors = read('new-hope-approved-fp20-pipe-vectors.json')
 const planGraph = read('new-hope-approved-fp20-plan-graph.json')
 const operationalAnnotations = read('new-hope-approved-fp20-operational-annotations.json')
+const nativeFabTopology = read('new-hope-native-fab-topology.json')
 const hydraulicRoutes = ['2-1', '2-2', '2-3'].map((id) => read(`new-hope-approved-fp20-hydraulic-route-${id}.json`))
 const canonicalTopology = canonicalizeApprovedFp20Topology(planGraph)
 const governedSkeleton = evaluateApprovedFp20GovernedSkeleton(pipeVectors, planGraph, operationalAnnotations)
-const sourceFeedFabrication = evaluateNewHopeSourceFeedFabrication({ canonicalTopology, governedSkeleton, operationalAnnotations, hydraulicRoutes })
+const sourceFeedFabrication = evaluateNewHopeSourceFeedFabrication({ canonicalTopology, governedSkeleton, operationalAnnotations, hydraulicRoutes, nativeFabTopology })
 const inputs = { hydraulicRoutes, sourceFeedFabrication }
 
 describe('New Hope source-feed approved calculation/device chain', () => {

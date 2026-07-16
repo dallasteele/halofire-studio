@@ -390,7 +390,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
   const acceptanceBlockers = [
     issue(
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
-      'CML.01 now has a complete as-designed plan axis, high-to-low direction, grade magnitude, endpoint Z schedule, exact cross-sheet riser station, and a bounded CML.01-to-118/414 component mapping. Exact transition takeout and field-measured installed grade remain unresolved, so the source-feed route is not yet fabrication-ready 3D.',
+      'CML.01 now has a complete as-designed plan axis, high-to-low direction, grade magnitude, endpoint Z schedule, exact cross-sheet riser station, a bounded CML.01-to-118/414 component mapping, and a native CML-to-pipe-to-welded-outlet parent chain. Project.seidb contains no transition-fitting record on CML.01; exact concealed-transition takeout and field-measured installed grade remain unresolved, so the source-feed route is not yet fabrication-ready 3D.',
       'source-edge-001,source-edge-002',
     ),
     issue(
@@ -674,6 +674,15 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ready && sourceFeedFabrication?.designedGradeMagnitudeReady === true,
     sourceFeedCml01Plan3dPathReady:
       ready && sourceFeedFabrication?.cml01Plan3dPathReady === true,
+    sourceFeedNativeFabricationTopologyReady:
+      ready && sourceFeedFabrication?.nativeFabricationTopologyReady === true,
+    sourceFeedNativeLineToPipeParentJoinReady:
+      ready && sourceFeedFabrication?.nativeLineToPipeParentJoinReady === true,
+    sourceFeedNativePipeToOutletParentJoinReady:
+      ready && sourceFeedFabrication?.nativePipeToOutletParentJoinReady === true,
+    sourceFeedNativeAttachedFittingCount:
+      ready ? sourceFeedFabrication?.nativeAttachedFittingCount ?? null : null,
+    sourceFeedNativeTransitionFittingTakeoutReady: false,
     sourceFeedConcealedPlanXyReady:
       ready && sourceFeedAsbuiltRiser?.exactInstalledRiserPlanStationReady === true,
     sourceFeedFabricationPieceToCalculationLegDecompositionReady:

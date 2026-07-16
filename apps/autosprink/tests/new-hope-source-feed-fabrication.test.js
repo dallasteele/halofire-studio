@@ -9,6 +9,7 @@ const read = (name) =>
 const pipeVectors = read('new-hope-approved-fp20-pipe-vectors.json')
 const planGraph = read('new-hope-approved-fp20-plan-graph.json')
 const operationalAnnotations = read('new-hope-approved-fp20-operational-annotations.json')
+const nativeFabTopology = read('new-hope-native-fab-topology.json')
 const hydraulicRoutes = ['2-1', '2-2', '2-3'].map((id) =>
   read(`new-hope-approved-fp20-hydraulic-route-${id}.json`),
 )
@@ -23,6 +24,7 @@ const inputs = {
   governedSkeleton,
   operationalAnnotations,
   hydraulicRoutes,
+  nativeFabTopology,
 }
 
 describe('New Hope CML.01 source-feed fabrication registration', () => {
@@ -72,6 +74,11 @@ describe('New Hope CML.01 source-feed fabrication registration', () => {
     expect(result.designedGradeDirectionReady).toBe(true)
     expect(result.designedGradeMagnitudeReady).toBe(true)
     expect(result.cml01Plan3dPathReady).toBe(true)
+    expect(result.nativeFabricationTopologyReady).toBe(true)
+    expect(result.nativeLineToPipeParentJoinReady).toBe(true)
+    expect(result.nativePipeToOutletParentJoinReady).toBe(true)
+    expect(result.nativeAttachedFittingCount).toBe(0)
+    expect(result.nativeTransitionFittingTakeoutReady).toBe(false)
     expect(result.installedGradeReady).toBe(false)
     expect(result.concealedRiserContinuationReady).toBe(false)
     expect(result.sourceFeed3dPathReady).toBe(false)
@@ -88,6 +95,9 @@ describe('New Hope CML.01 source-feed fabrication registration', () => {
     ['grade magnitude', (copy) => { copy.operationalAnnotations.gradeRequirements.find((entry) => entry.id === 'grade-cross-mains').riseInPer10Ft = 0.5 }, 'NH_SOURCE_FEED_DESIGN_GRADE_SOURCE_INVALID'],
     ['riser low end', (copy) => { copy.operationalAnnotations.supplyAnchor.boundPrimaryNodeId = 'pipe-001-node-02' }, 'NH_SOURCE_FEED_DESIGN_GRADE_SOURCE_INVALID'],
     ['false installed grade', (copy) => { copy.operationalAnnotations.fabricationLineEvidence.primaryLineBindings.find((entry) => entry.lineName === 'CML').installedGradeStatus = 'resolved' }, 'NH_SOURCE_FEED_GOVERNED_BINDING_BLOCKED'],
+    ['native pipe parent', (copy) => { copy.nativeFabTopology.sourceFeed.pipe.parentId = 999 }, 'NH_SOURCE_FEED_NATIVE_FAB_TOPOLOGY_INVALID'],
+    ['fabricated transition', (copy) => { copy.nativeFabTopology.sourceFeed.attachedFittings.push({ uniqueId: 999 }) }, 'NH_SOURCE_FEED_NATIVE_FAB_FALSE_TRANSITION_PROMOTION'],
+    ['cross-project parser control', (copy) => { copy.nativeFabTopology.crossProjectParserControl.pipeParentFittingCount = 0 }, 'NH_SOURCE_FEED_NATIVE_FAB_PARSER_CONTROL_INVALID'],
   ])('fails closed on %s drift', (_name, mutate, expectedCode) => {
     const copy = structuredClone(inputs)
     mutate(copy)

@@ -1,0 +1,77 @@
+{
+  "artifactType": "halofire.new-hope-native-fab-topology-evidence.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "source": {
+    "path": "02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/NEW HOPE CRISIS CENTER_NHCC List.FAB",
+    "archiveSha256": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9",
+    "member": "Project.seidb",
+    "memberBytes": 102757,
+    "memberSha256": "0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135"
+  },
+  "tableCounts": {
+    "lines": 66,
+    "pipes": 272,
+    "outlets": 293,
+    "fittings": 97
+  },
+  "sourceFeed": {
+    "line": {
+      "lineName": "CML",
+      "uniqueId": 158
+    },
+    "pipe": {
+      "pieceName": ".01",
+      "uniqueId": 159,
+      "parentId": 158,
+      "itemCode": 137,
+      "sizeCode": 28,
+      "quantity": 1,
+      "lengthFt": 2.958333333333333,
+      "endCode1": 3,
+      "endCode2": 3
+    },
+    "outlet": {
+      "uniqueId": 160,
+      "parentId": 159,
+      "itemCode": 41,
+      "sizeCode": 470,
+      "quantity": 1,
+      "angleDeg": 0,
+      "distanceFt": 2.458333333333333
+    },
+    "attachedFittings": [],
+    "nativeLineToPipeParentJoinReady": true,
+    "nativePipeToOutletParentJoinReady": true,
+    "nativeAttachedFittingCount": 0,
+    "nativeTransitionFittingTakeoutReady": false
+  },
+  "wholeFileTopology": {
+    "pipeParentFittingCount": 97,
+    "outletParentFittingCount": 0,
+    "unresolvedParentFittingCount": 0
+  },
+  "crossProjectParserControl": {
+    "projectId": "goodyear-storage-riser-closed-project",
+    "sourcePath": "02-Active jobs/03-Closed/Goodyear Storage - Goodyear AZ/Engineering/Fabrication Listings/Riser.fab",
+    "archiveSha256": "E42E13068F5B737E4C9C0D7B2FDA79DC0C49694A7354046526358A9CD15F7B1A",
+    "memberSha256": "3E37C15AE6B5A26F6B0AD8B89A1E491F65731C8D1BB3FCD5DC76875378CB728A",
+    "tableCounts": {
+      "lines": 7,
+      "pipes": 12,
+      "outlets": 5,
+      "fittings": 5
+    },
+    "pipeParentFittingCount": 5,
+    "unresolvedParentFittingCount": 0,
+    "purpose": "Positive control proving the same parser recovers native pipe-to-fitting joins when the FAB source contains them."
+  },
+  "claims": {
+    "nativeSourceFeedTopologyReady": true,
+    "nativeSourceFeedTransitionFittingReady": false,
+    "exactTransitionTakeoutReady": false,
+    "installedGradeReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

@@ -14,6 +14,9 @@ const EXPECTED_EDGE_IDS = Object.freeze(['source-edge-001', 'source-edge-002'])
 const EXPECTED_GRADE_IN_PER_10_FT = 0.25
 const OUTLET_FROM_START_IN = 29.5
 const OUTLET_TO_FAR_END_IN = 6
+const EXPECTED_NATIVE_FAB_SHA = 'A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9'
+const EXPECTED_NATIVE_MEMBER_SHA = '0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135'
+const EXPECTED_CONTROL_FAB_SHA = 'E42E13068F5B737E4C9C0D7B2FDA79DC0C49694A7354046526358A9CD15F7B1A'
 
 const issue = (code, message, entityId = null) => ({
   severity: 'blocking',
@@ -46,12 +49,18 @@ function findCalculation118Port(routes) {
  * @param {object} inputs.governedSkeleton - Evaluated source/fabrication roles.
  * @param {object} inputs.operationalAnnotations - Field/listing annotations.
  * @param {object[]} inputs.hydraulicRoutes - Approved RA2-1/2/3 route packets.
+ * @param {object} inputs.nativeFabTopology - Read-only Project.seidb topology extraction.
  * @returns {object} Bounded source-feed fabrication validation result.
  */
 export function evaluateNewHopeSourceFeedFabrication(inputs = {}) {
   const issues = []
-  const { canonicalTopology, governedSkeleton, operationalAnnotations, hydraulicRoutes = [] } =
-    inputs
+  const {
+    canonicalTopology,
+    governedSkeleton,
+    operationalAnnotations,
+    hydraulicRoutes = [],
+    nativeFabTopology,
+  } = inputs
   const binding = operationalAnnotations?.fabricationLineEvidence?.primaryLineBindings?.find(
     (entry) => entry.lineName === 'CML',
   )
@@ -129,6 +138,57 @@ export function evaluateNewHopeSourceFeedFabrication(inputs = {}) {
   ) {
     issues.push(issue('NH_SOURCE_FEED_FALSE_3D_PROMOTION', 'CML.01 endpoints and installed grade cannot be promoted from plan/listing evidence.'))
   }
+  const nativeLine = nativeFabTopology?.sourceFeed?.line
+  const nativePipe = nativeFabTopology?.sourceFeed?.pipe
+  const nativeOutlet = nativeFabTopology?.sourceFeed?.outlet
+  if (
+    nativeFabTopology?.artifactType !== 'halofire.new-hope-native-fab-topology-evidence.v1' ||
+    nativeFabTopology?.projectId !== EXPECTED_PROJECT_ID ||
+    nativeFabTopology?.source?.archiveSha256 !== EXPECTED_NATIVE_FAB_SHA ||
+    nativeFabTopology?.source?.memberSha256 !== EXPECTED_NATIVE_MEMBER_SHA ||
+    nativeFabTopology?.source?.memberBytes !== 102757 ||
+    nativeFabTopology?.tableCounts?.pipes !== 272 ||
+    nativeFabTopology?.tableCounts?.outlets !== 293 ||
+    nativeFabTopology?.tableCounts?.fittings !== 97
+  ) {
+    issues.push(issue('NH_SOURCE_FEED_NATIVE_FAB_SOURCE_INVALID', 'The native FAB archive, Project.seidb member, and table counts must retain their protected identities.'))
+  }
+  if (
+    nativeLine?.lineName !== 'CML' ||
+    nativeLine?.uniqueId !== 158 ||
+    nativePipe?.pieceName !== '.01' ||
+    nativePipe?.uniqueId !== 159 ||
+    nativePipe?.parentId !== 158 ||
+    Math.abs((nativePipe?.lengthFt ?? 0) - 35.5 / 12) > 1e-12 ||
+    nativePipe?.endCode1 !== 3 ||
+    nativePipe?.endCode2 !== 3 ||
+    nativeOutlet?.uniqueId !== 160 ||
+    nativeOutlet?.parentId !== 159 ||
+    nativeOutlet?.angleDeg !== 0 ||
+    Math.abs((nativeOutlet?.distanceFt ?? 0) - 29.5 / 12) > 1e-12 ||
+    nativeFabTopology?.sourceFeed?.nativeLineToPipeParentJoinReady !== true ||
+    nativeFabTopology?.sourceFeed?.nativePipeToOutletParentJoinReady !== true
+  ) {
+    issues.push(issue('NH_SOURCE_FEED_NATIVE_FAB_TOPOLOGY_INVALID', 'Project.seidb must retain the CML to CML.01 to 4 x 3 outlet parent chain, exact end codes, and exact outlet station.'))
+  }
+  if (
+    nativeFabTopology?.sourceFeed?.attachedFittings?.length !== 0 ||
+    nativeFabTopology?.sourceFeed?.nativeAttachedFittingCount !== 0 ||
+    nativeFabTopology?.sourceFeed?.nativeTransitionFittingTakeoutReady !== false ||
+    nativeFabTopology?.claims?.nativeSourceFeedTransitionFittingReady !== false ||
+    nativeFabTopology?.claims?.exactTransitionTakeoutReady !== false
+  ) {
+    issues.push(issue('NH_SOURCE_FEED_NATIVE_FAB_FALSE_TRANSITION_PROMOTION', 'The native CML.01 record contains the welded outlet but no attached transition-fitting or takeout record.'))
+  }
+  if (
+    nativeFabTopology?.wholeFileTopology?.pipeParentFittingCount !== 97 ||
+    nativeFabTopology?.wholeFileTopology?.unresolvedParentFittingCount !== 0 ||
+    nativeFabTopology?.crossProjectParserControl?.archiveSha256 !== EXPECTED_CONTROL_FAB_SHA ||
+    nativeFabTopology?.crossProjectParserControl?.pipeParentFittingCount !== 5 ||
+    nativeFabTopology?.crossProjectParserControl?.unresolvedParentFittingCount !== 0
+  ) {
+    issues.push(issue('NH_SOURCE_FEED_NATIVE_FAB_PARSER_CONTROL_INVALID', 'The extractor must retain New Hope whole-file fitting joins and the independent closed-project positive control.'))
+  }
 
   const ready = issues.length === 0
   const outletElevationFt = ready ? ports[0].elevationFt : null
@@ -193,6 +253,11 @@ export function evaluateNewHopeSourceFeedFabrication(inputs = {}) {
     designedGradeDirectionReady: ready,
     designedGradeMagnitudeReady: ready,
     cml01Plan3dPathReady: ready,
+    nativeFabricationTopologyReady: ready,
+    nativeLineToPipeParentJoinReady: ready,
+    nativePipeToOutletParentJoinReady: ready,
+    nativeAttachedFittingCount: ready ? 0 : null,
+    nativeTransitionFittingTakeoutReady: false,
     installedGradeReady: false,
     concealedRiserContinuationReady: false,
     sourceFeed3dPathReady: false,
