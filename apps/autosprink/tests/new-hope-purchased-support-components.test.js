@@ -19,6 +19,8 @@ describe('New Hope purchased support components', () => {
       purchasedSupportUnitCount: 977,
     })
     expect(result.purchaseIdentityReady).toBe(true)
+    expect(result.manufacturerAuthoredAb2SourceAcquired).toBe(true)
+    expect(result.manufacturerCadCoverageComplete).toBe(false)
     expect(result.exactManufacturerGeometryReady).toBe(false)
     expect(result.exactThreadSolidsReady).toBe(false)
     expect(result.verifiedMatingAssembliesReady).toBe(false)
@@ -50,5 +52,23 @@ describe('New Hope purchased support components', () => {
     const result = evaluateNewHopePurchasedSupportComponents(falseGreen)
     expect(result.blockerCodes).toContain('NH_SUPPORT_MODELING_BOUNDARY_INVALID')
     expect(result.supportModelReleaseReady).toBe(false)
+
+    const badArchive = structuredClone(source)
+    badArchive.manufacturerCadAcquisition.sourceArchive.sha256 = 'BAD'
+    expect(evaluateNewHopePurchasedSupportComponents(badArchive).blockerCodes).toContain(
+      'NH_SUPPORT_AB2_CAD_SOURCE_INVALID',
+    )
+
+    const badRfa = structuredClone(source)
+    badRfa.manufacturerCadAcquisition.sourceFiles[0].sha256 = 'BAD'
+    expect(evaluateNewHopePurchasedSupportComponents(badRfa).blockerCodes).toContain(
+      'NH_SUPPORT_AB2_CAD_SOURCE_INVALID',
+    )
+
+    const unverifiedPromotion = structuredClone(source)
+    unverifiedPromotion.manufacturerCadAcquisition.geometryExtractionVerified = true
+    expect(
+      evaluateNewHopePurchasedSupportComponents(unverifiedPromotion).blockerCodes,
+    ).toContain('NH_SUPPORT_AB2_CAD_VERIFICATION_BOUNDARY_INVALID')
   })
 })

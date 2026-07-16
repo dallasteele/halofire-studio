@@ -2,7 +2,7 @@
   "loop": "new-hope-purchased-support-components-20260716",
   "stage": "VERIFY",
   "status": "purchase-identities-bound-installed-geometry-rejected",
-  "iteration": 1,
+  "iteration": 2,
   "evidence": {
     "looseMaterialQuote": {
       "quoteNumber": "0133821",
@@ -16,11 +16,20 @@
       "shownSupport": "AFCON 300 ring hanger",
       "purchasedSupport": "Anvil Fig. 69 adjustable swivel ring",
       "geometryInterchangeable": false
+    },
+    "manufacturerCadAcquisition": {
+      "officialVictaulicRevitArchiveSha256": "B467AFEF240738F478E5C55F48639064B66AD9036D103FE7F7D2FC7034A20495",
+      "quoteBoundProductNumber": "A240AB200N",
+      "verifiedSourceFileCount": 2,
+      "manufacturerAuthoredAb2SourceAcquired": true,
+      "geometryExtractionVerified": false,
+      "dimensionAuditVerified": false
     }
   },
   "verification": {
-    "focusedTests": "2 files / 4 tests passed",
-    "adversarialCases": 4,
+    "focusedTests": "27 files / 174 tests passed",
+    "adversarialCases": 7,
+    "autosprinkBuild": "passed",
     "browser": {
       "proofReady": true,
       "purchaseIdentityReady": true,
@@ -35,5 +44,5 @@
       "episodeId": 151561
     }
   },
-  "nextAction": "Acquire exact manufacturer CAD or complete manufacturing dimensions for each quote-bound product number, then use Blender MCP to generate thread-bearing solids and run automated mating, envelope, and connector checks before any support is placed in the pitched-roof model."
+  "nextAction": "Verify and extract the official Victaulic AB2 RFA geometry, audit its dimensions, acquire exact manufacturer CAD or complete manufacturing dimensions for every remaining quote-bound support, then use Blender MCP to assemble thread-bearing solids and run mating, envelope, connector, and collision checks before pitched-roof placement."
 }

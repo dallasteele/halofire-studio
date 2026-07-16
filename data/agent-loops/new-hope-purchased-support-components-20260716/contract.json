@@ -6,17 +6,22 @@
   "sourceGates": [
     "Loose-material quote 0133821 SHA-256 and all 16 support product lines match",
     "Approved AFCON 300 submittal imagery is explicitly non-interchangeable with purchased Anvil Fig. 69 geometry",
+    "Official Victaulic AB2 Revit archive and family file hashes match before source acquisition is credited",
     "Exact manufacturer CAD or complete manufacturing drawings are required per product number",
     "Thread solids and mating assemblies must be geometrically verified before Blender model promotion"
   ],
   "adversarialMutations": [
     "remove a purchased support line",
     "change a purchased quantity",
+    "change the official Victaulic archive or either AB2 RFA hash",
+    "promote acquired AB2 source to extracted geometry without a dimension audit",
     "allow generic AFCON 300 substitution",
     "promote exact thread geometry without evidence"
   ],
   "releaseGate": {
     "purchaseIdentityReady": true,
+    "manufacturerAuthoredAb2SourceAcquired": true,
+    "manufacturerCadCoverageComplete": false,
     "exactManufacturerGeometryReady": false,
     "exactThreadSolidsReady": false,
     "verifiedMatingAssembliesReady": false,

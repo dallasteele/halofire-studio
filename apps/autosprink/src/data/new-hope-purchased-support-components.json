@@ -17,6 +17,35 @@
     "purchaseEquivalent": "Anvil Fig. 69 adjustable swivel ring",
     "geometryInterchangeableWithoutProductSpecificEvidence": false
   },
+  "manufacturerCadAcquisition": {
+    "officialLibraryUrl": "https://assets.victaulic.com/assets/uploads/software-content/Autodesk_Revit_MEP.html",
+    "sourceArchive": {
+      "fileName": "Adsk_Revit_FP_Sprinklers.zip",
+      "sha256": "B467AFEF240738F478E5C55F48639064B66AD9036D103FE7F7D2FC7034A20495"
+    },
+    "quoteBoundProductNumber": "A240AB200N",
+    "manufacturer": "Victaulic",
+    "model": "VicFlex AB2 24-inch",
+    "sourceFiles": [
+      {
+        "fileName": "Sprinkler-Victaulic-Conc_Pendent_VicFlex-AB2.rfa",
+        "byteLength": 1970176,
+        "sha256": "1B9A437132D846ADE3ED67B5BBEA2D43D1F01D4D9BCD693A64967F0F5E91178C"
+      },
+      {
+        "fileName": "Sprinkler-Victaulic-Recessed_Pendent_VicFlex-AB2.rfa",
+        "byteLength": 3104768,
+        "sha256": "75F0AAC075483B6EF43F032F59E3A949B109A1759ED7B53CF0B6241D6C0AD27C"
+      }
+    ],
+    "manufacturerAuthoredSourceAcquired": true,
+    "sourceFormat": "Autodesk Revit family",
+    "geometryExtractionVerified": false,
+    "publishedDimensionAuditVerified": false,
+    "threadSolidVerified": false,
+    "matingAssemblyVerified": false,
+    "installedPlacementVerified": false
+  },
   "components": [
     { "family": "flexible-drop-bracket", "manufacturer": "Victaulic", "model": "VicFlex AB2 24-inch", "productNumber": "A240AB200N", "quantity": 152, "purchasedDescription": "AB2 Hard-Lid Ceiling; 24-inch Adjustable Bracket" },
     { "family": "threaded-rod", "manufacturer": null, "model": "3/8-inch x 10-foot plated all-thread rod", "productNumber": "3/8X10P", "quantity": 230, "purchasedDescription": "3/8 X 10 FT PLTD ATR" },
@@ -39,10 +68,12 @@
     "purchaseIdentityReady": true,
     "genericSupportSubstitutionAllowed": false,
     "manufacturerExactCadAcquired": false,
+    "manufacturerAuthoredAb2SourceAcquired": true,
+    "manufacturerCadCoverageComplete": false,
     "fullyDimensionedManufacturingDrawingsAcquired": false,
     "exactThreadSolidsReady": false,
     "verifiedMatingAssembliesReady": false,
     "blenderInstalledSupportGeometryReady": false,
-    "reason": "The quote fixes the actual purchased identities and quantities. The approved AFCON 300 page, generic hanger profiles, and primary dimensions do not prove the complete Anvil Fig. 69, VicFlex AB2, anchor, clamp, brace fitting, adapter, or swivel manufacturing solids."
+    "reason": "The quote fixes the actual purchased identities and quantities, and the official Victaulic archive supplies manufacturer-authored AB2 Revit families. Geometry extraction and dimension audit are not yet verified, and the remaining Anvil Fig. 69, rod, anchor, clamp, brace fitting, adapter, and swivel manufacturing solids are not acquired."
   }
 }
