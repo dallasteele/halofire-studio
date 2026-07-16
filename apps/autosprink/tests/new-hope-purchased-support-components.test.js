@@ -26,6 +26,9 @@ describe('New Hope purchased support components', () => {
       ascSeismicOfficialSourceCount: 4,
       ascSeismicQuoteBoundProductCount: 8,
       ascSeismicDimensionedFamilyCount: 3,
+      exactAssemblyRequiredPartDefinitionCount: 16,
+      exactAssemblyRequiredInstalledUnitCount: 977,
+      exactAssemblyInstalledInstanceCount: 0,
     })
     expect(result.purchaseIdentityReady).toBe(true)
     expect(result.manufacturerAuthoredAb2SourceAcquired).toBe(true)
@@ -49,6 +52,21 @@ describe('New Hope purchased support components', () => {
     expect(result.ascSeismicStructureAttachmentVerified).toBe(false)
     expect(result.ascSeismicCollisionAnalysisVerified).toBe(false)
     expect(result.ascSeismicListedAssemblyFitVerified).toBe(false)
+    expect(result.exactAssemblyBlockerCodes).toEqual([
+      'EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED',
+      'EXACT_ASSEMBLY_INSTANCE_COVERAGE_INCOMPLETE',
+      'EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED',
+      'EXACT_ASSEMBLY_STRUCTURE_ATTACHMENT_UNVERIFIED',
+      'EXACT_ASSEMBLY_SOLID_KERNEL_RECEIPT_MISSING',
+      'EXACT_ASSEMBLY_SCENE_COLLISION_RECEIPT_MISSING',
+    ])
+    expect(result.exactAssemblyPartDefinitionsReady).toBe(false)
+    expect(result.exactAssemblyInstalledInstanceCoverageReady).toBe(false)
+    expect(result.exactAssemblyConnectionFitReady).toBe(false)
+    expect(result.exactAssemblyStructureAttachmentReady).toBe(false)
+    expect(result.exactAssemblySolidKernelReceiptReady).toBe(false)
+    expect(result.exactAssemblySceneCollisionReceiptReady).toBe(false)
+    expect(result.exactAssemblyReleaseReady).toBe(false)
     expect(result.manufacturerCadCoverageComplete).toBe(false)
     expect(result.exactManufacturerGeometryReady).toBe(false)
     expect(result.exactThreadSolidsReady).toBe(false)
@@ -187,6 +205,30 @@ describe('New Hope purchased support components', () => {
     falseAscFit.manufacturerCadAcquisition.ascSeismicBracing.listedAssemblyFitVerified = true
     expect(evaluateNewHopePurchasedSupportComponents(falseAscFit).blockerCodes).toContain(
       'NH_SUPPORT_ASC_SEISMIC_VERIFICATION_BOUNDARY_INVALID',
+    )
+
+    const badAssemblyDigest = structuredClone(source)
+    badAssemblyDigest.exactAssemblyVerification.requirementsDigestSha256 = 'BAD'
+    expect(evaluateNewHopePurchasedSupportComponents(badAssemblyDigest).blockerCodes).toContain(
+      'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
+    )
+
+    const fakeTrustedReceipt = structuredClone(source)
+    fakeTrustedReceipt.exactAssemblyVerification.trustedReceiptDigests.push('A'.repeat(64))
+    expect(evaluateNewHopePurchasedSupportComponents(fakeTrustedReceipt).blockerCodes).toContain(
+      'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
+    )
+
+    const catalogProxyPromotion = structuredClone(source)
+    catalogProxyPromotion.exactAssemblyVerification.releaseOnCatalogImagesOrGeneratedProxies = true
+    expect(evaluateNewHopePurchasedSupportComponents(catalogProxyPromotion).blockerCodes).toContain(
+      'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
+    )
+
+    const falseAssemblyRelease = structuredClone(source)
+    falseAssemblyRelease.modelingBoundary.exactAssemblyReleaseReady = true
+    expect(evaluateNewHopePurchasedSupportComponents(falseAssemblyRelease).blockerCodes).toContain(
+      'NH_SUPPORT_MODELING_BOUNDARY_INVALID',
     )
   })
 })

@@ -1,7 +1,7 @@
 {
   "name": "new-hope-purchased-support-components-20260716",
   "owner": "codex",
-  "goal": "Bind the acquired New Hope support-component evidence to exact source hashes and reject any promotion of ambiguous identities, mismatched substrates, family line art, or incomplete dimensions as installed thread-bearing geometry.",
+  "goal": "Bind the acquired New Hope support-component evidence to exact source hashes and enforce a reusable exact-part assembly gate for dimensions, helical threads, installed placement, mating fit, structure attachment, solid-kernel interference, and scene collision.",
   "loop_type": "closed",
   "sources_of_truth": [
     "E:/ClaudeBot/AGENTIC_RULES.md",
@@ -20,7 +20,8 @@
     "https://www.asc-es.com/products/af779-multi-connector-adapter",
     "https://s3.us-east-2.amazonaws.com/asc-es.com/price-sheets/pdf/PH-7.21-pdf.pdf",
     "apps/autosprink/src/data/new-hope-purchased-support-components.json",
-    "apps/autosprink/src/engine/new-hope-purchased-support-components.js"
+    "apps/autosprink/src/engine/new-hope-purchased-support-components.js",
+    "apps/autosprink/src/components/exact-assembly-fit.js"
   ],
   "exit_criteria": [
     "all sixteen quote lines and quantities remain exact, including 212 Fig. 69 hangers and 212 Sammy anchors",
@@ -31,10 +32,16 @@
     "official ASC AF730, AF035, AF076, and AF779 submittal hashes, quote variants, and published mating rules remain exact",
     "ASC price-sheet page 108 maps purchased product 0500604541 to AF779 catalog size 2 rather than a fabricated size 2-1/2 identity",
     "published ASC dimensions and installation rules cannot clear part-solid, fastener-thread, brace-insertion, structure-attachment, collision, or listed-assembly-fit gates",
+    "all 16 source-bound part definitions and all 977 installed units are required before release",
+    "installed instance coverage must match each product's required quantity, exact geometry digest, and a rigid right-handed 3D placement transform",
+    "threaded connections require modeled helical solids with compatible standard, nominal size, TPI, gender, hand, taper, diameter stack, and bounded engagement",
+    "brace insertion, clamp diameter, bolt-hole clearance, substrate, load capacity, brace angle, and installed coordinates must pass dimensional checks",
+    "only trusted exact-BREP and installed-scene receipts with zero unresolved interference or collision can clear the assembly gate",
+    "catalog images, generated proxies, smooth thread cylinders, caller flags, and untrusted receipts cannot clear any exact assembly gate",
     "focused and New Hope regression tests pass, the AutoSPRINK build passes, the proof surface reports the same fail-closed truth, and the brain postflight records the evidence"
   ],
   "verification_gates": [
-    "npx vitest run apps/autosprink/tests/new-hope-purchased-support-components.test.js",
+    "npx vitest run apps/autosprink/tests/exact-assembly-fit.test.js apps/autosprink/tests/new-hope-purchased-support-components.test.js",
     "npx vitest run new-hope",
     "npm run build in apps/autosprink",
     "browser proof at apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
@@ -44,6 +51,8 @@
   "state_path": "data/agent-loops/new-hope-purchased-support-components-20260716/state.json",
   "evidence_paths": [
     "apps/autosprink/src/data/new-hope-purchased-support-components.json",
+    "apps/autosprink/src/components/exact-assembly-fit.js",
+    "apps/autosprink/tests/exact-assembly-fit.test.js",
     "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
     "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
     "data/agent-loops/new-hope-purchased-support-components-20260716/state.json"

@@ -1,3 +1,5 @@
+import { evaluateExactPartAssembly } from '../components/exact-assembly-fit.js'
+
 const EXPECTED_QUOTE_SHA = '844981467740F66D9847B356C2B44BE7CB8D0F77825B453E40C9FACD3B1659DB'
 const EXPECTED_VICTAULIC_ARCHIVE_SHA = 'B467AFEF240738F478E5C55F48639064B66AD9036D103FE7F7D2FC7034A20495'
 const EXPECTED_FIG69_RFA_SHA = 'B079BA1D50E1F96279E96561208AAA25918472793F4029B261448A2B0D557F17'
@@ -189,12 +191,63 @@ const EXPECTED_ASC_MATING_REQUIREMENTS = Object.freeze({
   },
 })
 
+const EXPECTED_EXACT_ASSEMBLY_REQUIREMENTS_DIGEST =
+  'E919A915F430D90B8A2C20922399F080B853C65D94936BD22810D7B8000A3D23'
+const EXPECTED_EXACT_ASSEMBLY_BLOCKERS = Object.freeze([
+  'EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED',
+  'EXACT_ASSEMBLY_INSTANCE_COVERAGE_INCOMPLETE',
+  'EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED',
+  'EXACT_ASSEMBLY_STRUCTURE_ATTACHMENT_UNVERIFIED',
+  'EXACT_ASSEMBLY_SOLID_KERNEL_RECEIPT_MISSING',
+  'EXACT_ASSEMBLY_SCENE_COLLISION_RECEIPT_MISSING',
+])
+
 const issue = (code, message, entityId = null) => ({
   severity: 'blocking',
   code,
   message,
   entityId,
 })
+
+export function buildNewHopeExactSupportAssemblyCandidate(source = {}) {
+  const verification = source.exactAssemblyVerification || {}
+  const partDefinitions = (Array.isArray(source.components) ? source.components : []).map(
+    (component) => ({
+      productNumber: component.productNumber,
+      manufacturer: component.manufacturer,
+      model: component.model,
+      requiredQuantity: component.quantity,
+      source: {
+        classification: 'unverified-project-source',
+        manufacturerPartNumber: null,
+        fileSha256: null,
+        geometrySha256: null,
+        format: null,
+        units: verification.coordinateUnits,
+        unitScaleVerified: false,
+        watertightSolidVerified: false,
+        partNumberBound: false,
+      },
+      ports: [],
+    }),
+  )
+  return {
+    artifactType: 'halofire.exact-part-assembly.v1',
+    assemblyId: verification.assemblyId,
+    coordinateUnits: verification.coordinateUnits,
+    sourceDigestSha256: verification.requirementsDigestSha256,
+    requirements: {
+      productNumbers: partDefinitions.map((part) => part.productNumber),
+      requiredInstalledUnitCount: verification.requiredInstalledUnitCount,
+      connectionKinds: verification.requiredConnectionKinds,
+    },
+    partDefinitions,
+    instances: verification.installedInstances || [],
+    connections: verification.connections || [],
+    supports: verification.structureAttachments || [],
+    receipts: verification.kernelReceipts || [],
+  }
+}
 
 export function evaluateNewHopePurchasedSupportComponents(source = {}) {
   const issues = []
@@ -619,6 +672,72 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     )
   }
 
+  const exactAssemblyVerification = source.exactAssemblyVerification
+  const exactAssemblyRequirementsReady = (
+    exactAssemblyVerification?.artifactType ===
+      'halofire.new-hope-exact-support-assembly-requirements.v1' &&
+    exactAssemblyVerification?.assemblyId === 'new-hope-support-and-seismic-assembly' &&
+    exactAssemblyVerification?.coordinateUnits === 'inch' &&
+    exactAssemblyVerification?.requirementsDigestSha256 ===
+      EXPECTED_EXACT_ASSEMBLY_REQUIREMENTS_DIGEST &&
+    exactAssemblyVerification?.requiredPartDefinitionCount === 16 &&
+    exactAssemblyVerification?.requiredInstalledUnitCount === 977 &&
+    JSON.stringify(exactAssemblyVerification?.requiredConnectionKinds) ===
+      JSON.stringify(['threaded', 'brace-insertion', 'clamp', 'bolted']) &&
+    JSON.stringify(exactAssemblyVerification?.requiredReceiptKinds) ===
+      JSON.stringify(['solid-kernel-fit', 'scene-placement-collision']) &&
+    Array.isArray(exactAssemblyVerification?.trustedReceiptDigests) &&
+    exactAssemblyVerification.trustedReceiptDigests.length === 0 &&
+    Array.isArray(exactAssemblyVerification?.installedInstances) &&
+    exactAssemblyVerification.installedInstances.length === 0 &&
+    Array.isArray(exactAssemblyVerification?.connections) &&
+    exactAssemblyVerification.connections.length === 0 &&
+    Array.isArray(exactAssemblyVerification?.structureAttachments) &&
+    exactAssemblyVerification.structureAttachments.length === 0 &&
+    Array.isArray(exactAssemblyVerification?.kernelReceipts) &&
+    exactAssemblyVerification.kernelReceipts.length === 0 &&
+    exactAssemblyVerification?.releaseOnCatalogImagesOrGeneratedProxies === false &&
+    exactAssemblyVerification?.releaseOnUntrustedCallerFlags === false
+  )
+  if (!exactAssemblyRequirementsReady) {
+    issues.push(issue(
+      'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
+      'The New Hope assembly gate must retain all 16 part definitions, 977 installed units, four connection kinds, and trusted solid/scene receipt requirements.',
+    ))
+  }
+
+  const exactAssemblyFit = evaluateExactPartAssembly(
+    buildNewHopeExactSupportAssemblyCandidate(source),
+    { trustedReceiptDigests: exactAssemblyVerification?.trustedReceiptDigests },
+  )
+  const exactAssemblyGateReady = (
+    exactAssemblyFit.status === 'blocked' &&
+    JSON.stringify(exactAssemblyFit.blockerCodes) ===
+      JSON.stringify(EXPECTED_EXACT_ASSEMBLY_BLOCKERS) &&
+    exactAssemblyFit.metrics.requiredPartDefinitionCount === 16 &&
+    exactAssemblyFit.metrics.partDefinitionCount === 16 &&
+    exactAssemblyFit.metrics.exactPartDefinitionCount === 0 &&
+    exactAssemblyFit.metrics.requiredInstalledUnitCount === 977 &&
+    exactAssemblyFit.metrics.installedInstanceCount === 0 &&
+    exactAssemblyFit.metrics.connectionCount === 0 &&
+    exactAssemblyFit.metrics.supportAttachmentCount === 0 &&
+    exactAssemblyFit.metrics.trustedReceiptCount === 0 &&
+    exactAssemblyFit.exactSourceGeometryReady === false &&
+    exactAssemblyFit.threadSolidsReady === false &&
+    exactAssemblyFit.installedInstanceCoverageReady === false &&
+    exactAssemblyFit.connectionFitReady === false &&
+    exactAssemblyFit.structureAttachmentReady === false &&
+    exactAssemblyFit.solidKernelReceiptReady === false &&
+    exactAssemblyFit.sceneCollisionReceiptReady === false &&
+    exactAssemblyFit.assemblyReleaseReady === false
+  )
+  if (!exactAssemblyGateReady) {
+    issues.push(issue(
+      'NH_SUPPORT_EXACT_ASSEMBLY_GATE_INVALID',
+      'The reusable exact-part verifier must reject missing exact solids, threads, installed instances, connection fits, structure attachments, and trusted kernel receipts.',
+    ))
+  }
+
   const boundary = source.modelingBoundary
   if (
     boundary?.purchaseIdentityReady !== true ||
@@ -644,6 +763,13 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     boundary?.ascSeismicStructureAttachmentVerified !== false ||
     boundary?.ascSeismicCollisionAnalysisVerified !== false ||
     boundary?.ascSeismicListedAssemblyFitVerified !== false ||
+    boundary?.exactAssemblyPartDefinitionsReady !== false ||
+    boundary?.exactAssemblyInstalledInstanceCoverageReady !== false ||
+    boundary?.exactAssemblyConnectionFitReady !== false ||
+    boundary?.exactAssemblyStructureAttachmentReady !== false ||
+    boundary?.exactAssemblySolidKernelReceiptReady !== false ||
+    boundary?.exactAssemblySceneCollisionReceiptReady !== false ||
+    boundary?.exactAssemblyReleaseReady !== false ||
     boundary?.manufacturerCadCoverageComplete !== false ||
     boundary?.fullyDimensionedManufacturingDrawingsAcquired !== false ||
     boundary?.exactThreadSolidsReady !== false ||
@@ -691,6 +817,15 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
         )
         : 0,
       ascSeismicDimensionedFamilyCount: purchaseReady ? 3 : 0,
+      exactAssemblyRequiredPartDefinitionCount: purchaseReady
+        ? exactAssemblyFit.metrics.requiredPartDefinitionCount
+        : 0,
+      exactAssemblyRequiredInstalledUnitCount: purchaseReady
+        ? exactAssemblyFit.metrics.requiredInstalledUnitCount
+        : 0,
+      exactAssemblyInstalledInstanceCount: purchaseReady
+        ? exactAssemblyFit.metrics.installedInstanceCount
+        : 0,
     },
     purchaseIdentityReady: purchaseReady,
     manufacturerAuthoredAb2SourceAcquired: purchaseReady,
@@ -714,6 +849,14 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     ascSeismicStructureAttachmentVerified: false,
     ascSeismicCollisionAnalysisVerified: false,
     ascSeismicListedAssemblyFitVerified: false,
+    exactAssemblyBlockerCodes: exactAssemblyFit.blockerCodes,
+    exactAssemblyPartDefinitionsReady: false,
+    exactAssemblyInstalledInstanceCoverageReady: false,
+    exactAssemblyConnectionFitReady: false,
+    exactAssemblyStructureAttachmentReady: false,
+    exactAssemblySolidKernelReceiptReady: false,
+    exactAssemblySceneCollisionReceiptReady: false,
+    exactAssemblyReleaseReady: false,
     manufacturerCadCoverageComplete: false,
     exactManufacturerGeometryReady: false,
     exactThreadSolidsReady: false,
