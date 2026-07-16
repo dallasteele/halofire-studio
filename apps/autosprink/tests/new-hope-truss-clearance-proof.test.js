@@ -21,7 +21,11 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('listing-cmi06-vertical-outlet.png');
     expect(html).toContain('field-cmi05-cmi08-layout.png');
     expect(html).toContain('listing-cmi05-cmi08-page15.png');
-    for (const image of ['s102-roof-framing-underlay.png', 'approved-ridge-branch-underlay.png', 'approved-dry-pipe-note.png', 'approved-fp20-full-underlay.png', 'approved-fp20-pipe-size-overlay.png', 'architectural-a102-rcp.png', 'architectural-a103-roof-plan.png', 'architectural-a201-elevations.png', 'architectural-a301-sections.png', 'field-cmi09-low-point.png', 'listing-cmi09-page15.png', 'field-cmi06-vertical-outlet.png', 'listing-cmi06-vertical-outlet.png', 'field-cmi05-cmi08-layout.png', 'listing-cmi05-cmi08-page15.png']) expect(fs.statSync(new URL(image, proof)).size).toBeGreaterThan(30_000);
+    expect(html).toContain('field-cmi-ridge-chains.png');
+    expect(html).toContain('listing-cmi10-cmi13-page16.png');
+    expect(html).toContain('listing-cmi19-page17.png');
+    expect(html).toContain('listing-cmi20-cmi22-page18.png');
+    for (const image of ['s102-roof-framing-underlay.png', 'approved-ridge-branch-underlay.png', 'approved-dry-pipe-note.png', 'approved-fp20-full-underlay.png', 'approved-fp20-pipe-size-overlay.png', 'architectural-a102-rcp.png', 'architectural-a103-roof-plan.png', 'architectural-a201-elevations.png', 'architectural-a301-sections.png', 'field-cmi09-low-point.png', 'listing-cmi09-page15.png', 'field-cmi06-vertical-outlet.png', 'listing-cmi06-vertical-outlet.png', 'field-cmi05-cmi08-layout.png', 'listing-cmi05-cmi08-page15.png', 'field-cmi-ridge-chains.png', 'listing-cmi10-cmi13-page16.png', 'listing-cmi19-page17.png', 'listing-cmi20-cmi22-page18.png']) expect(fs.statSync(new URL(image, proof)).size).toBeGreaterThan(30_000);
   });
 
   it('states the missing pipe-layout facts instead of presenting a connector as a design', () => {
@@ -51,6 +55,13 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('head057ExactCarrierZReady=false');
     expect(html).toContain('head057ExactSprinklerZReady=false');
     expect(html).toContain('boundedVerticalOffsetScheduleReady=false');
+    expect(html).toContain('cmiRidgeEightPieceFabricationReady=false');
+    expect(html).toContain('cmiRidgeTwentyOneOutletScheduleReady=false');
+    expect(html).toContain('cmiRidgeTwentySprinklerOutletIdentityReady=false');
+    expect(html).toContain('cmi13RemoteInspectorTestOutletReady=false');
+    expect(html).toContain('cmi13Cmi22AsymmetryReady=false');
+    expect(html).toContain('cmiRidgeChainJunctionsReady=false');
+    expect(html).toContain('cmiRidgeBoundedFittingScheduleReady=false');
     expect(html).toContain('architecturalSourceRegistrationReady=false');
     expect(html).toContain('architecturalVerticalControlReady=false');
     expect(html).toContain('pipeCenterlineOffsetReady=false');
@@ -166,6 +177,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('evaluateNewHopeLowPointFabrication');
     expect(script).toContain('evaluateNewHopeCmi05Cmi08Fabrication');
     expect(script).toContain('evaluateNewHopeCmi06VerticalOutlet');
+    expect(script).toContain('evaluateNewHopeCmiRidgeChainFabrication');
     expect(script).toContain('dataset.lowPointPieceFabricationReady = String(lowPointFabrication.lowPointPieceFabricationReady)');
     expect(script).toContain('dataset.lowPointPlanStationRegistrationReady = String(lowPointFabrication.lowPointPlanStationRegistrationReady)');
     expect(script).toContain('dataset.lowPointRelativeGradeDirectionReady = String(lowPointFabrication.lowPointRelativeGradeDirectionReady)');
@@ -188,6 +200,11 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.head057ExactCarrierZReady = String(properPipeLayout.head057ExactCarrierZReady)');
     expect(script).toContain('dataset.head057ExactSprinklerZReady = String(properPipeLayout.head057ExactSprinklerZReady)');
     expect(script).toContain('dataset.boundedVerticalOffsetScheduleReady = String(properPipeLayout.boundedVerticalOffsetScheduleReady)');
+    expect(script).toContain('dataset.cmiRidgeEightPieceFabricationReady = String(properPipeLayout.cmiRidgeEightPieceFabricationReady)');
+    expect(script).toContain('dataset.cmiRidgeTwentyOneOutletScheduleReady = String(properPipeLayout.cmiRidgeTwentyOneOutletScheduleReady)');
+    expect(script).toContain('dataset.cmi13RemoteInspectorTestOutletReady = String(properPipeLayout.cmi13RemoteInspectorTestOutletReady)');
+    expect(script).toContain('dataset.cmi13Cmi22AsymmetryReady = String(properPipeLayout.cmi13Cmi22AsymmetryReady)');
+    expect(script).toContain('dataset.cmiRidgeBoundedFittingScheduleReady = String(properPipeLayout.cmiRidgeBoundedFittingScheduleReady)');
     expect(script).toContain('dataset.sourceFeedPlanFabricationReady = String(properPipeLayout.sourceFeedPlanFabricationReady)');
     expect(script).toContain('dataset.sourceFeedOutletTransitionReady = String(properPipeLayout.sourceFeedOutletTransitionReady)');
     expect(script).toContain('dataset.sourceFeedOutletElevationReady = String(properPipeLayout.sourceFeedOutletElevationReady)');

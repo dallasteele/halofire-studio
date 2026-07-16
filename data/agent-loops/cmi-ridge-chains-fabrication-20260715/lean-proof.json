@@ -1,0 +1,9 @@
+{
+  "status": "verified",
+  "output": "",
+  "elapsed_ms": 143,
+  "prover": "lean4",
+  "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+  "returncode": 0,
+  "claim": "Eight directed pieces contain 28 canonical edges and 21 outlets; CMI.13 alone carries the inspector-test outlet, all declared residual bounds hold, and bounded ridge fabrication cannot promote complete fitting, exact-Z, drain-route, source-feed-3D, or proper-layout readiness."
+}

@@ -20,7 +20,7 @@
     <div class="eyebrow">Actual A102/A103/A201/A301 + S102 + approved FP2.0</div>
     <span class="badge">WHOLE-SHEET PIPE DIRECTION + ALL 12 ARM-OVERS BOUND / EXACT PIPE Z, FITTINGS, AND FIELD DRAINS STILL BLOCKED</span>
     <h1>All approved remote-area calculation routes are visible - not yet a proper installable layout.</h1>
-    <p class="lede">The actual architectural RCP, roof plan, exterior elevations, building sections, S102 framing, approved FP2.0 plan, field set, fabrication listing, FAB archive, and hydraulic calculations stay independently bound. Four outer branch systems, the central BL48/BL49 component, the corrected 35-node cross-main, and all 12 one-inch threaded terminal arm-overs now have explicit high-to-low direction and drainage catchments. CMI.06 now binds four listed upward outlets, and head-057 has an exact one-foot same-XY vertical leg. BL48.02 crossing CMI stays separate because the listing proves no outlet or fitting there. Hydraulic flow, drainage direction, roof elevation, and pipe-centerline Z remain distinct. Exact whole-system pipe Z, complete fitting topology, obstruction/compliance closure, and field-routed drains remain closed.</p>
+    <p class="lede">The actual architectural RCP, roof plan, exterior elevations, building sections, S102 framing, approved FP2.0 plan, field set, fabrication listing, FAB archive, and hydraulic calculations stay independently bound. Four outer branch systems, the central BL48/BL49 component, the corrected 35-node cross-main, and all 12 one-inch threaded terminal arm-overs now have explicit high-to-low direction and drainage catchments. CMI.10-CMI.13 and CMI.19-CMI.22 now bind eight start-to-far-end pieces and 21 exact outlets; the CMI.13-only inspector-test outlet is deliberately not mirrored onto CMI.22. Hydraulic flow, fabrication direction, drainage grade, roof elevation, and pipe-centerline Z remain distinct. Exact whole-system pipe Z, complete fitting topology, obstruction/compliance closure, and field-routed drains remain closed.</p>
   </header>
   <main>
     <section class="metrics">
@@ -84,6 +84,7 @@
         <div class="status"><b>CMI.09 low-point connector</b>The actual field set, fabrication listing, plan topology, and RA2-2 jointly resolve source-edge-054 from node 059 high to low-point node 054 at 0.5 in / 10 ft. Equal rounded calculation labels remain separate from exact endpoint Z.</div>
         <div class="status"><b>CMI.05-CMI.08 fabrication chain</b>The actual field set and AutoSPRINK listing bind CMI.05, CMI.07, and CMI.08 to 3-inch source pieces, five exact outlet stations and directions, two exact arm-over terminals, the separated BL48 crossing, and the no-outlet CMI.08 turn.</div>
         <div class="status"><b>CMI.06 exact vertical outlet</b>The actual field set and listing bind four 3 x 1 upward threaded outlets plus the 3 x 2-1/2 grooved branch outlet on the 3-inch, 21-foot piece. RA2-2 independently proves head-057 as a one-foot vertical leg from carrier Z 20.5 feet to sprinkler Z 21.5 feet.</div>
+        <div class="status"><b>CMI ridge-chain fabrication</b>The actual field set and listing bind CMI.10-CMI.13 and CMI.19-CMI.22 as two directed chains: eight pieces, 28 canonical edges, 20 sprinkler outlets, one CMI.13 inspector-test outlet, and two no-outlet transitions. Piece direction is not drainage grade.</div>
         <div class="status"><b>Mirrored side-branch drainage</b>Two acyclic seven-head components bind 28 branch-line edges to low-point-02 and low-point-03. Their four terminal arm-overs are source-bound to those same catchments.</div>
         <div class="status"><b>Complete cross-main drainage</b>The corrected 35-node, 34-edge source tree includes fabricated CMK.01-.03 and is directed from three high points toward low-point-01, low-point-04, and the dry-valve/base-of-riser return at 0.25 inch per 10 feet.</div>
         <div class="status"><b>Central BL48/BL49 drainage</b>The exact 23-node, 23-edge component retains one eight-edge BL49 loop. A generated relative schedule grades both loop arms and both BL48 terminals toward the sole CMK.03 feed while preserving the non-connecting BL48.02/CMI crossing.</div>
@@ -98,6 +99,25 @@
         <div class="status closed"><b>Field drain routes blocked</b>Two one-inch drum-drip runs explicitly say FIELD ROUTE / LOCATE; exact fabrication geometry cannot be invented.</div>
         <div class="status closed"><b>Proper layout blocked</b>Complete per-edge absolute Z, complete fitting/vertical-offset topology, obstruction/compliance checks, and field-resolved drains are not closed. Grade direction, the CMI.09 connector, and the central loop are no longer blockers.</div>
       </div>
+    </section>
+
+    <section class="evidence-grid" id="cmi-ridge-chain-fabrication-evidence" style="margin-top:22px">
+      <figure>
+        <div class="visual"><img src="field-cmi-ridge-chains.png" alt="Actual New Hope field install plan crop showing both pitched-roof CMI ridge chains over the building plan"></div>
+        <figcaption><b>Actual field FP2.0 plan beneath the evidence, not a generated pipe image.</b> Both pitched-roof ridge runs, CMI.10-CMI.13 and CMI.19-CMI.22, remain over the real architectural plan. Their turns, piece labels, pipe sizes, ridge elevations, flow arrows, and the lower-chain remote inspector-test callout remain visible.</figcaption>
+      </figure>
+      <figure>
+        <div class="visual"><img src="listing-cmi10-cmi13-page16.png" alt="Actual AutoSPRINK fabrication listing page 16 showing CMI.10 through CMI.13"></div>
+        <figcaption><b>Actual AutoSPRINK listing page 16.</b> CMI.10 and CMI.12 each have three Up:0 sprinkler outlets; CMI.11 has none; CMI.13 has four sprinkler outlets plus the separate 2-1/2 x 1 Up:0 inspector-test outlet at 19'-10. The gate reconciles listing order to plan direction.</figcaption>
+      </figure>
+      <figure>
+        <div class="visual"><img src="listing-cmi19-page17.png" alt="Actual AutoSPRINK fabrication listing page 17 showing CMI.19"></div>
+        <figcaption><b>Actual AutoSPRINK listing page 17.</b> CMI.19 starts the upper chain with three Up:0 outlets at 3'-6, 9'-6, and 15'-6. This independently proves the upper chain's piece direction and first three outlet stations.</figcaption>
+      </figure>
+      <figure>
+        <div class="visual"><img src="listing-cmi20-cmi22-page18.png" alt="Actual AutoSPRINK fabrication listing page 18 showing CMI.20 through CMI.22"></div>
+        <figcaption><b>Actual AutoSPRINK listing page 18.</b> CMI.20 has no outlets, CMI.21 has three Up:0 outlets, and CMI.22 has four sprinkler outlets with no inspector-test outlet. The adversarial gate rejects the tempting but incorrect mirrored-outlet layout.</figcaption>
+      </figure>
     </section>
 
     <section class="evidence-grid" id="cmi05-cmi08-fabrication-evidence" style="margin-top:22px">
@@ -210,7 +230,7 @@
       <h2>Seven head-to-truss conditional envelopes</h2>
       <p class="loading" id="load-status">Loading sealed calibration...</p>
       <div class="table-wrap"><table><thead><tr><th>Head</th><th>Local X ft</th><th>S102 X pt</th><th>Nearest truss</th><th>Centerline distance in</th><th>Maximum truss face width preserving 6 in</th></tr></thead><tbody id="clearance-rows"></tbody></table></div>
-      <div class="legend"><span id="low-point-fabrication-status">loading CMI.09 low-point fabrication...</span><span id="cmi05-cmi08-fabrication-status">loading CMI.05-CMI.08 fabrication...</span><span id="cmi06-vertical-status">loading CMI.06 exact vertical outlet...</span></div>
+      <div class="legend"><span id="low-point-fabrication-status">loading CMI.09 low-point fabrication...</span><span id="cmi05-cmi08-fabrication-status">loading CMI.05-CMI.08 fabrication...</span><span id="cmi06-vertical-status">loading CMI.06 exact vertical outlet...</span><span id="cmi-ridge-chain-fabrication-status">loading CMI ridge-chain fabrication...</span></div>
     </section>
 
     <figure class="wide" style="margin-top:22px">
@@ -222,6 +242,7 @@
 
     <section class="card" style="border-color:#fb7185;background:#4c1d2455">
       <h2>Acceptance boundary</h2>
+      <p class="gate" id="cmi-ridge-machine-boundary">cmiRidgeEightPieceFabricationReady=false | cmiRidgeTwentyOneOutletScheduleReady=false | cmiRidgeTwentySprinklerOutletIdentityReady=false | cmi13RemoteInspectorTestOutletReady=false | cmi13Cmi22AsymmetryReady=false | cmiRidgeChainJunctionsReady=false | cmiRidgeBoundedFittingScheduleReady=false</p>
       <p class="gate" id="machine-acceptance-boundary">actualPdfUnderlays=true | architecturalSourceRegistrationReady=false | architecturalVerticalControlReady=false | longBranchSourceTopologyReady=false | longBranchLowPointBindingReady=false | longBranchGradeDirectionReady=false | longBranchRelativeGradeProfilesReady=false | sideBranchSourceTopologyReady=false | sideBranchLowPointBindingReady=false | sideBranchLineGradeDirectionReady=false | sideBranchRelativeGradeProfilesReady=false | sideBranchArmOverDrainageReady=false | crossMainSourceTopologyReady=false | crossMainHighPointBindingReady=false | crossMainLowPointBindingReady=false | crossMainRiserReturnReady=false | crossMainGradeDirectionReady=false | crossMainRelativeGradeProfilesReady=false | cmkLineBindingReady=false | cmkHighPointBindingReady=false | cmkHighPointAbsoluteZReady=false | upperHighPointAbsoluteZReady=false | centralBranchSourceTopologyReady=false | centralBranchFabricationLineBindingReady=false | centralBranchSeparatedCrossingReady=false | centralBranchGeneratedGradeDirectionReady=false | centralBranchRelativeGradeProfilesReady=false | centralLoopDirectionReady=false | selectedLoopHighPointAbsoluteZReady=false | centralBranchArmOverDrainageReady=false | boundedRidgeBranchPlanPathReady=false | boundedRidgeBranchGradeMagnitudeReady=false | boundedRidgeBranchGradeDirectionReady=false | boundedRidgeBranchDrainCatchmentReady=false | boundedDeflectorGradeEnvelopeReady=false | exactDeflectorElevationsReady=false | exactPipeCenterlineZReady=false | exactDrainRouteReady=false | pipeCenterlineOffsetReady=false | primaryPipeVectorExtractionReady=false | wholeSystemVectorExtractionReady=false | primaryPipeSizeAssignmentReady=false | primaryPipeRoleAssignmentReady=false | operationalReferenceExtractionReady=false | supplySourceAnchorReady=false | lowPointIntentReady=false | drainIntentReady=false | gradeMagnitudeReady=false | approvedRemoteAreaSetReady=false | approvedRemoteAreaHydraulicFlowReady=false | calculationEndpointElevationEvidenceReady=false | route21ExplicitPlanPathReady=false | route22ExplicitPlanPathReady=false | route23ExplicitPlanPathReady=false | wholeFp20HydraulicNodeBindingReady=false | wholeFp20HydraulicFlowReady=false | cmi05PieceFabricationReady=false | cmi05OutletScheduleReady=false | cmi05SeparatedCrossingReady=false | cmi07PieceFabricationReady=false | cmi07OutletScheduleReady=false | cmi07ArmOverTerminalBindingReady=false | cmi08PieceFabricationReady=false | cmi08NoOutletScheduleReady=false | cmi07Cmi08JunctionReady=false | cmi05Cmi08BoundedFittingScheduleReady=false | cmi06PieceFabricationReady=false | cmi06OutletScheduleReady=false | cmi06BranchOutletReady=false | head057OutletFittingReady=false | head057VerticalLegReady=false | head057ExactCarrierZReady=false | head057ExactSprinklerZReady=false | boundedVerticalOffsetScheduleReady=false | fieldDrainRouteResolved=false | properPipeLayoutReady=false | wholeFp20GradeDirectionReady=false | endpointElevationsReady=false | complianceReady=false | fabricationReady=false | fieldReleaseReady=false</p>
     </section>
   </main>

@@ -1,0 +1,52 @@
+{
+  "loop": "cmi-ridge-chains-fabrication-20260715",
+  "stage": "VERIFY",
+  "status": "eight-piece-source-binding-and-adversarial-verification-passed",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [150262, 149894, 149978]
+  },
+  "sourceMapping": {
+    "lowerChain": {
+      "pieceIds": ["CMI.10", "CMI.11", "CMI.12", "CMI.13"],
+      "sourceSegmentIds": ["pipe-038", "pipe-048", "pipe-050", "pipe-052"]
+    },
+    "upperChain": {
+      "pieceIds": ["CMI.19", "CMI.20", "CMI.21", "CMI.22"],
+      "sourceSegmentIds": ["pipe-039", "pipe-049", "pipe-051", "pipe-053"]
+    }
+  },
+  "claims": {
+    "eightPieceFabricationReady": true,
+    "twentyOneOutletScheduleReady": true,
+    "remoteInspectorTestOutletReady": true,
+    "ridgeChainAsymmetryReady": true,
+    "completeFittingScheduleReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "pieceCount": 8,
+    "canonicalEdgeCount": 28,
+    "outletCount": 21,
+    "sprinklerOutletCount": 20,
+    "operationalOutletCount": 1,
+    "noOutletPieceCount": 2,
+    "actualPdfPanelCount": 4,
+    "leanStatus": "verified",
+    "adversarialTestCount": 13,
+    "newHopeTestCount": 159,
+    "productionBuild": "passed",
+    "browser": {
+      "proofReady": true,
+      "actualPdfImagesLoaded": 4,
+      "wholeGradeReady": true,
+      "properPipeLayoutReady": false,
+      "exactPipeCenterlineZReady": false,
+      "consoleWarningsOrErrors": 0
+    }
+  },
+  "nextAction": "Commit and push this bounded slice, complete brain postflight, then continue source-binding CMI.01-CMI.04 and CMI.14-CMI.18 without promoting unresolved Z, supply-path, field-drain, or whole-fitting gates."
+}

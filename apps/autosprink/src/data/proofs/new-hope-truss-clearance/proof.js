@@ -20,6 +20,7 @@ import { evaluateNewHopeSourceFeedFabrication } from '../../../engine/new-hope-s
 import { evaluateNewHopeLowPointFabrication } from '../../../engine/new-hope-low-point-fabrication.js';
 import { evaluateNewHopeCmi05Cmi08Fabrication } from '../../../engine/new-hope-cmi05-cmi08-fabrication.js';
 import { evaluateNewHopeCmi06VerticalOutlet } from '../../../engine/new-hope-cmi06-vertical-outlet.js';
+import { evaluateNewHopeCmiRidgeChainFabrication } from '../../../engine/new-hope-cmi-ridge-chain-fabrication.js';
 
 const calibrationUrl = '../../new-hope-truss-clearance-calibration.json';
 const sourceUrl = '../../new-hope-truss-clearance-source.json';
@@ -136,6 +137,13 @@ try {
     hydraulicRoutes: [hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence],
   });
   if (!cmi06VerticalOutlet.head057VerticalLegReady) throw new Error(`CMI.06 head-057 vertical outlet: ${cmi06VerticalOutlet.blockerCodes.join(', ')}`);
+  const cmiRidgeChainFabrication = evaluateNewHopeCmiRidgeChainFabrication({
+    pipeVectors,
+    canonicalTopology,
+    governedSkeleton,
+    operationalAnnotations,
+  });
+  if (!cmiRidgeChainFabrication.boundedRidgeChainFittingScheduleReady) throw new Error(`CMI.10-CMI.13 / CMI.19-CMI.22 ridge-chain fabrication: ${cmiRidgeChainFabrication.blockerCodes.join(', ')}`);
   const ridgeGrade = evaluateNewHopeRidgeBranchGradeEnvelope({ pipeVectors, canonicalTopology, operationalAnnotations, atticSource, atticCalibration, answerEvidence });
   if (!ridgeGrade.boundedDeflectorGradeEnvelopeReady) throw new Error(`bounded ridge grade envelope: ${ridgeGrade.blockerCodes.join(', ')}`);
   const longBranchDrainage = evaluateNewHopeLongBranchDrainage({ pipeVectors, canonicalTopology, governedSkeleton, operationalAnnotations });
@@ -181,6 +189,7 @@ try {
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
+    cmiRidgeChainFabrication,
     operationalAnnotations,
     longBranchDrainage,
     sideBranchDrainage,
@@ -565,6 +574,7 @@ try {
   document.querySelector('#low-point-fabrication-status').textContent = `PASS: CMI.09 field/listing piece starts at low-point-01; source-edge-054 is node 059 high to node 054 low with ${lowPointFabrication.directedEdge.requiredDropIn.toFixed(6)} in minimum fall; equal 18.375-ft calc labels do not claim exact differential Z`;
   document.querySelector('#cmi05-cmi08-fabrication-status').textContent = `PASS: CMI.05, CMI.07, and CMI.08 bind 3 exact field/listing pieces, 5 listed outlets, 2 exact one-inch arm-over terminals, and the no-outlet CMI.08 turn; fabrication piece direction remains separate from drainage direction`;
   document.querySelector('#cmi06-vertical-status').textContent = `PASS: CMI.06 is the 3-inch x 21-foot pipe-067 piece with four upward 3 x 1 threaded outlets plus the 3 x 2-1/2 grooved branch outlet; head-057 is an exact 1-foot same-XY vertical leg from carrier Z 20.5 ft to sprinkler Z 21.5 ft`;
+  document.querySelector('#cmi-ridge-chain-fabrication-status').textContent = `PASS: CMI.10-CMI.13 and CMI.19-CMI.22 bind 8 start-to-far-end pieces, 28 canonical edges, 20 sprinkler outlets, 1 CMI.13 inspector-test outlet, and 2 no-outlet transitions; mirrored plan geometry does not mirror the CMI.13-only outlet`;
   document.querySelector('#ridge-grade-proof-status').textContent = `PASS: bounded seven-head ridge branch drains east-high to west-low toward low-point-04; ${ridgeGrade.totalHeadRowRiseIn.toFixed(1)} in across 36 ft`;
   const candidate = buildNewHopeProperPipeGraphCandidate(calibration, source);
   const acceptance = evaluateProperPitchedPipeGraph(candidate);
@@ -586,6 +596,8 @@ try {
   document.querySelector('#machine-acceptance-boundary').textContent += ` | lowPointPieceFabricationReady=${lowPointFabrication.lowPointPieceFabricationReady} | lowPointPlanStationRegistrationReady=${lowPointFabrication.lowPointPlanStationRegistrationReady} | lowPointRelativeGradeDirectionReady=${lowPointFabrication.lowPointRelativeGradeDirectionReady} | lowPointExactDifferentialZReady=${lowPointFabrication.exactDifferentialZReady} | properPipeEvidenceAssemblyStatus=${properPipeLayout.status} | directedCanonicalEdges=${properPipeLayout.metrics.directedEdgeCount}/${properPipeLayout.metrics.canonicalEdgeCount} | exactElevationPorts=${properPipeLayout.metrics.exactElevationPortCount} | exactElevationCanonicalNodes=${properPipeLayout.metrics.exactElevationCanonicalNodeCount}/${properPipeLayout.metrics.canonicalNodeCount} | sameXyVerticalLegReady=${properPipeLayout.sameXyVerticalLegReady} | calculationToArchitecturalDatumRegistrationReady=${properPipeLayout.calculationToArchitecturalDatumRegistrationReady} | lowPointZoneGradeReady=${properPipeLayout.lowPointZoneGradeReady} | sourceFeedPlanFabricationReady=${properPipeLayout.sourceFeedPlanFabricationReady} | sourceFeedOutletTransitionReady=${properPipeLayout.sourceFeedOutletTransitionReady} | sourceFeedOutletElevationReady=${properPipeLayout.sourceFeedOutletElevationReady} | sourceFeedEndpointElevationsReady=${properPipeLayout.sourceFeedEndpointElevationsReady} | sourceFeedInstalledGradeReady=${properPipeLayout.sourceFeedInstalledGradeReady} | sourceFeedConcealedRiserContinuationReady=${properPipeLayout.sourceFeedConcealedRiserContinuationReady} | sourceFeed3dPathReady=${properPipeLayout.sourceFeed3dPathReady} | fittingScheduleReady=${properPipeLayout.fittingScheduleReady} | properPipeLayoutReady=${properPipeLayout.properPipeLayoutReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | cmi05PieceFabricationReady=${properPipeLayout.cmi05PieceFabricationReady} | cmi05OutletScheduleReady=${properPipeLayout.cmi05OutletScheduleReady} | cmi05SeparatedCrossingReady=${properPipeLayout.cmi05SeparatedCrossingReady} | cmi07PieceFabricationReady=${properPipeLayout.cmi07PieceFabricationReady} | cmi07OutletScheduleReady=${properPipeLayout.cmi07OutletScheduleReady} | cmi07ArmOverTerminalBindingReady=${properPipeLayout.cmi07ArmOverTerminalBindingReady} | cmi08PieceFabricationReady=${properPipeLayout.cmi08PieceFabricationReady} | cmi08NoOutletScheduleReady=${properPipeLayout.cmi08NoOutletScheduleReady} | cmi07Cmi08JunctionReady=${properPipeLayout.cmi07Cmi08JunctionReady} | cmi05Cmi08BoundedFittingScheduleReady=${properPipeLayout.cmi05Cmi08BoundedFittingScheduleReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | cmi06PieceFabricationReady=${properPipeLayout.cmi06PieceFabricationReady} | cmi06OutletScheduleReady=${properPipeLayout.cmi06OutletScheduleReady} | cmi06BranchOutletReady=${properPipeLayout.cmi06BranchOutletReady} | head057OutletFittingReady=${properPipeLayout.head057OutletFittingReady} | head057VerticalLegReady=${properPipeLayout.head057VerticalLegReady} | head057ExactCarrierZReady=${properPipeLayout.head057ExactCarrierZReady} | head057ExactSprinklerZReady=${properPipeLayout.head057ExactSprinklerZReady} | boundedVerticalOffsetScheduleReady=${properPipeLayout.boundedVerticalOffsetScheduleReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent += ` | cmiRidgeEightPieceFabricationReady=${properPipeLayout.cmiRidgeEightPieceFabricationReady} | cmiRidgeTwentyOneOutletScheduleReady=${properPipeLayout.cmiRidgeTwentyOneOutletScheduleReady} | cmiRidgeTwentySprinklerOutletIdentityReady=${properPipeLayout.cmiRidgeTwentySprinklerOutletIdentityReady} | cmi13RemoteInspectorTestOutletReady=${properPipeLayout.cmi13RemoteInspectorTestOutletReady} | cmi13Cmi22AsymmetryReady=${properPipeLayout.cmi13Cmi22AsymmetryReady} | cmiRidgeChainJunctionsReady=${properPipeLayout.cmiRidgeChainJunctionsReady} | cmiRidgeBoundedFittingScheduleReady=${properPipeLayout.cmiRidgeBoundedFittingScheduleReady}`;
+  document.querySelector('#cmi-ridge-machine-boundary').textContent = `cmiRidgeEightPieceFabricationReady=${properPipeLayout.cmiRidgeEightPieceFabricationReady} | cmiRidgeTwentyOneOutletScheduleReady=${properPipeLayout.cmiRidgeTwentyOneOutletScheduleReady} | cmiRidgeTwentySprinklerOutletIdentityReady=${properPipeLayout.cmiRidgeTwentySprinklerOutletIdentityReady} | cmi13RemoteInspectorTestOutletReady=${properPipeLayout.cmi13RemoteInspectorTestOutletReady} | cmi13Cmi22AsymmetryReady=${properPipeLayout.cmi13Cmi22AsymmetryReady} | cmiRidgeChainJunctionsReady=${properPipeLayout.cmiRidgeChainJunctionsReady} | cmiRidgeBoundedFittingScheduleReady=${properPipeLayout.cmiRidgeBoundedFittingScheduleReady}`;
   document.documentElement.dataset.proofReady = 'true';
   document.documentElement.dataset.architecturalSourceRegistrationReady = String(architecturalValidation.sourceRegistrationReady);
   document.documentElement.dataset.architecturalVerticalControlReady = String(architecturalVerticalControlReady);
@@ -664,6 +676,13 @@ try {
   document.documentElement.dataset.head057ExactCarrierZReady = String(properPipeLayout.head057ExactCarrierZReady);
   document.documentElement.dataset.head057ExactSprinklerZReady = String(properPipeLayout.head057ExactSprinklerZReady);
   document.documentElement.dataset.boundedVerticalOffsetScheduleReady = String(properPipeLayout.boundedVerticalOffsetScheduleReady);
+  document.documentElement.dataset.cmiRidgeEightPieceFabricationReady = String(properPipeLayout.cmiRidgeEightPieceFabricationReady);
+  document.documentElement.dataset.cmiRidgeTwentyOneOutletScheduleReady = String(properPipeLayout.cmiRidgeTwentyOneOutletScheduleReady);
+  document.documentElement.dataset.cmiRidgeTwentySprinklerOutletIdentityReady = String(properPipeLayout.cmiRidgeTwentySprinklerOutletIdentityReady);
+  document.documentElement.dataset.cmi13RemoteInspectorTestOutletReady = String(properPipeLayout.cmi13RemoteInspectorTestOutletReady);
+  document.documentElement.dataset.cmi13Cmi22AsymmetryReady = String(properPipeLayout.cmi13Cmi22AsymmetryReady);
+  document.documentElement.dataset.cmiRidgeChainJunctionsReady = String(properPipeLayout.cmiRidgeChainJunctionsReady);
+  document.documentElement.dataset.cmiRidgeBoundedFittingScheduleReady = String(properPipeLayout.cmiRidgeBoundedFittingScheduleReady);
   document.documentElement.dataset.fittingScheduleReady = String(properPipeLayout.fittingScheduleReady);
   document.documentElement.dataset.pipeVectorStatus = vectorAcceptance.status;
   document.documentElement.dataset.sourcePlanGraphStatus = planGraph.sourcePlanGraphReady ? 'passed' : 'blocked';

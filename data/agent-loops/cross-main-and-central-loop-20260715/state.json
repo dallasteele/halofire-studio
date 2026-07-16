@@ -2,7 +2,7 @@
   "loop": "cross-main-and-central-loop-20260715",
   "stage": "VERIFY",
   "status": "calculation-datum-registered-exact-z-fittings-field-drains-open",
-  "iteration": 5,
+  "iteration": 6,
   "brainPreflight": {
     "status": "passed",
     "topEpisodes": [149894, 148709, 148734, 148662, 148601]
@@ -73,6 +73,13 @@
     "cmi08NoOutletScheduleReady": true,
     "cmi07Cmi08JunctionReady": true,
     "cmi05Cmi08BoundedFittingScheduleReady": true,
+    "cmiRidgeEightPieceFabricationReady": true,
+    "cmiRidgeTwentyOneOutletScheduleReady": true,
+    "cmiRidgeTwentySprinklerOutletIdentityReady": true,
+    "cmi13RemoteInspectorTestOutletReady": true,
+    "cmi13Cmi22AsymmetryReady": true,
+    "cmiRidgeChainJunctionsReady": true,
+    "cmiRidgeBoundedFittingScheduleReady": true,
     "fittingScheduleReady": false,
     "exactPipeCenterlineZReady": false,
     "properPipeLayoutReady": false,
@@ -147,26 +154,25 @@
     "exactElevationPorts": 32,
     "exactElevationCanonicalNodes": 31,
     "sameXyVerticalLegCount": 1,
-    "sourceBoundFabricationOutletCount": 13,
+    "sourceBoundFabricationOutletCount": 34,
     "calculationAnchorRangeFt": [11.5, 21.5],
     "architecturalProjectAnchorRangeFt": [111.5, 121.5],
     "finishedFloorArchitecturalProjectElevationFt": 100,
     "distinctRoofRidgeElevationCount": 6,
     "globalRoofPlaneAllowed": false,
     "remainingAcceptanceBlockers": [
-      "NH_PROPER_PIPE_LOW_POINT_ZONE_GRADE_UNRESOLVED",
       "NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED",
       "NH_PROPER_PIPE_EXACT_Z_INCOMPLETE",
       "NH_PROPER_PIPE_FIELD_DRAIN_ROUTES_UNRESOLVED",
       "NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE"
     ],
     "browser": {
-      "actualPdfUnderlays": 10,
+      "actualPdfUnderlays": 14,
       "properLayoutAuditVisible": true,
       "machineGateValuesVerified": true,
       "consoleWarningsOrErrors": 0
     },
-    "focusedTests": "51 passed",
+    "focusedTests": "159 passed",
     "productionBuild": "passed",
     "formalProof": "verified"
   },

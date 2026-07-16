@@ -1,0 +1,54 @@
+{
+  "name": "cmi-ridge-chains-fabrication-20260715",
+  "owner": "codex",
+  "goal": "Bind New Hope CMI.10-CMI.13 and CMI.19-CMI.22 to exact field-plan topology and AutoSPRINK fabrication lengths, ordered piece direction, 21 listed threaded outlets, sprinkler identities, and the CMI.13 remote inspector-test outlet without treating the two ridge chains as falsely identical.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/10-Field Set/24-052_NHCC_INSTALL PLAN.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/NEW HOPE CRISIS CENTER_NHCC List.FAB",
+    "apps/autosprink/src/data/new-hope-approved-fp20-pipe-vectors.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json"
+  ],
+  "exit_criteria": [
+    "all eight pieces bind to exact source segments, ordered canonical edges, diameters, and listed cut lengths",
+    "CMI.10 and CMI.19 each bind three 2-1/2 x 3/4 Up:0 outlets",
+    "CMI.11 and CMI.20 remain no-outlet transition pieces",
+    "CMI.12 and CMI.21 each bind three 2-1/2 x 3/4 Up:0 outlets",
+    "CMI.13 binds four sprinkler outlets plus its distinct 2-1/2 x 1 remote inspector-test outlet",
+    "CMI.22 binds four sprinkler outlets and does not inherit the CMI.13 inspector-test outlet",
+    "piece and outlet residuals remain within explicit PDF-to-listing tolerances",
+    "actual field and listing PDF proof is rendered and inspected",
+    "adversarial tests, build, formal proof, rules verification, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source hash and project identity",
+    "eight exact piece paths and chain junctions",
+    "21 exact outlet schedules",
+    "CMI.13 versus CMI.22 asymmetry",
+    "remote inspector-test source-vector registration",
+    "adversarial identity, order, station, diameter, and false-promotion mutations",
+    "actual-PDF browser proof",
+    "Lean invariant receipt",
+    "agentic rules and brain postflight"
+  ],
+  "state_path": "data/agent-loops/cmi-ridge-chains-fabrication-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/new-hope-cmi-ridge-chain-fabrication.js",
+    "apps/autosprink/tests/new-hope-cmi-ridge-chain-fabrication.test.js",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/cmi-ridge-chains-fabrication-20260715/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 140000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

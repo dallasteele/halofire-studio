@@ -228,6 +228,155 @@
         "sourceEvidence": "Field-set FP2.0 labels pipe-030 as CMI.08, 3 inch by 8 feet 1-1/2 inches between the CMI.07 turn and the CMI.09 low-point tie-in. Listing page 15 proves the piece has no outlets."
       }
     ],
+    "ridgeChainPieceBindings": [
+      {
+        "chainId": "lower-east-ridge-chain",
+        "pieceId": "CMI.10",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2.5,
+        "cutLengthIn": 252,
+        "fabricationListingPage": 16,
+        "sourceSegmentId": "pipe-038",
+        "sourceEdgeIds": ["source-edge-069", "source-edge-068", "source-edge-067", "source-edge-066"],
+        "pieceStartCanonicalNodeId": "canonical-node-057",
+        "pieceFarEndCanonicalNodeId": "canonical-node-071",
+        "outlets": [
+          { "canonicalNodeId": "canonical-node-074", "sprinklerId": "head-025", "fromPieceStartIn": 42, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-073", "sprinklerId": "head-029", "fromPieceStartIn": 114, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-072", "sprinklerId": "head-031", "fromPieceStartIn": 186, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" }
+        ],
+        "maximumPlanResidualIn": 2,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-038 as CMI.10. Listing page 16 proves a 2-1/2-inch by 21-foot piece with three 2-1/2 x 3/4 threaded outlets Up:0 at cumulative stations 3 feet 6 inches, 9 feet 6 inches, and 15 feet 6 inches."
+      },
+      {
+        "chainId": "lower-east-ridge-chain",
+        "pieceId": "CMI.11",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2.5,
+        "cutLengthIn": 34.5,
+        "fabricationListingPage": 16,
+        "sourceSegmentId": "pipe-048",
+        "sourceEdgeIds": ["source-edge-088"],
+        "pieceStartCanonicalNodeId": "canonical-node-071",
+        "pieceFarEndCanonicalNodeId": "canonical-node-097",
+        "outlets": [],
+        "maximumPlanResidualIn": 3.3,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-048 as CMI.11. Listing page 16 proves a 2-1/2-inch by 2-foot 10-1/2-inch transition piece with no outlets."
+      },
+      {
+        "chainId": "lower-east-ridge-chain",
+        "pieceId": "CMI.12",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2.5,
+        "cutLengthIn": 197.5,
+        "fabricationListingPage": 16,
+        "sourceSegmentId": "pipe-050",
+        "sourceEdgeIds": ["source-edge-093", "source-edge-092", "source-edge-091", "source-edge-090"],
+        "pieceStartCanonicalNodeId": "canonical-node-097",
+        "pieceFarEndCanonicalNodeId": "canonical-node-099",
+        "outlets": [
+          { "canonicalNodeId": "canonical-node-102", "sprinklerId": "head-039", "fromPieceStartIn": 11.5, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-101", "sprinklerId": "head-041", "fromPieceStartIn": 83.5, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-100", "sprinklerId": "head-043", "fromPieceStartIn": 155.5, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" }
+        ],
+        "maximumPlanResidualIn": 2,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-050 as CMI.12. Listing page 16 proves a 2-1/2-inch by 16-foot 5-1/2-inch piece with three 2-1/2 x 3/4 threaded outlets Up:0 at cumulative stations 11-1/2 inches, 6 feet 11-1/2 inches, and 12 feet 11-1/2 inches."
+      },
+      {
+        "chainId": "lower-east-ridge-chain",
+        "pieceId": "CMI.13",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2.5,
+        "cutLengthIn": 252,
+        "fabricationListingPage": 16,
+        "sourceSegmentId": "pipe-052",
+        "sourceEdgeIds": ["source-edge-102", "source-edge-101", "source-edge-100", "source-edge-099", "source-edge-098"],
+        "pieceStartCanonicalNodeId": "canonical-node-099",
+        "pieceFarEndCanonicalNodeId": "canonical-node-107",
+        "outlets": [
+          { "canonicalNodeId": "canonical-node-111", "sprinklerId": "head-045", "fromPieceStartIn": 30, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-110", "sprinklerId": "head-047", "fromPieceStartIn": 102, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-109", "sprinklerId": "head-049", "fromPieceStartIn": 174, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "operationalReferenceId": "remote-inspectors-test", "fromPieceStartIn": 238, "fitting": "2-1/2 x 1 threaded outlet", "orientation": "up-0-degrees", "referenceVectorDrawingIndex": 6610 },
+          { "canonicalNodeId": "canonical-node-108", "sprinklerId": "head-051", "fromPieceStartIn": 246, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" }
+        ],
+        "maximumPlanResidualIn": 2,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-052 as CMI.13 and calls out the remote inspector test at its far end. Listing page 16 proves four 2-1/2 x 3/4 sprinkler outlets Up:0 at cumulative stations 2 feet 6 inches, 8 feet 6 inches, 14 feet 6 inches, and 20 feet 6 inches plus a distinct 2-1/2 x 1 threaded outlet Up:0 at 19 feet 10 inches for the remote inspector test."
+      },
+      {
+        "chainId": "upper-east-ridge-chain",
+        "pieceId": "CMI.19",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2.5,
+        "cutLengthIn": 252,
+        "fabricationListingPage": 17,
+        "sourceSegmentId": "pipe-039",
+        "sourceEdgeIds": ["source-edge-073", "source-edge-072", "source-edge-071", "source-edge-070"],
+        "pieceStartCanonicalNodeId": "canonical-node-060",
+        "pieceFarEndCanonicalNodeId": "canonical-node-075",
+        "outlets": [
+          { "canonicalNodeId": "canonical-node-078", "sprinklerId": "head-026", "fromPieceStartIn": 42, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-077", "sprinklerId": "head-030", "fromPieceStartIn": 114, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-076", "sprinklerId": "head-032", "fromPieceStartIn": 186, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" }
+        ],
+        "maximumPlanResidualIn": 2,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-039 as CMI.19. Listing page 17 proves a 2-1/2-inch by 21-foot piece with three 2-1/2 x 3/4 threaded outlets Up:0 at cumulative stations 3 feet 6 inches, 9 feet 6 inches, and 15 feet 6 inches."
+      },
+      {
+        "chainId": "upper-east-ridge-chain",
+        "pieceId": "CMI.20",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2.5,
+        "cutLengthIn": 34.5,
+        "fabricationListingPage": 18,
+        "sourceSegmentId": "pipe-049",
+        "sourceEdgeIds": ["source-edge-089"],
+        "pieceStartCanonicalNodeId": "canonical-node-075",
+        "pieceFarEndCanonicalNodeId": "canonical-node-098",
+        "outlets": [],
+        "maximumPlanResidualIn": 3.3,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-049 as CMI.20. Listing page 18 proves a 2-1/2-inch by 2-foot 10-1/2-inch transition piece with no outlets."
+      },
+      {
+        "chainId": "upper-east-ridge-chain",
+        "pieceId": "CMI.21",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2.5,
+        "cutLengthIn": 197.5,
+        "fabricationListingPage": 18,
+        "sourceSegmentId": "pipe-051",
+        "sourceEdgeIds": ["source-edge-097", "source-edge-096", "source-edge-095", "source-edge-094"],
+        "pieceStartCanonicalNodeId": "canonical-node-098",
+        "pieceFarEndCanonicalNodeId": "canonical-node-103",
+        "outlets": [
+          { "canonicalNodeId": "canonical-node-106", "sprinklerId": "head-040", "fromPieceStartIn": 11.5, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-105", "sprinklerId": "head-042", "fromPieceStartIn": 83.5, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-104", "sprinklerId": "head-044", "fromPieceStartIn": 155.5, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" }
+        ],
+        "maximumPlanResidualIn": 2,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-051 as CMI.21. Listing page 18 proves a 2-1/2-inch by 16-foot 5-1/2-inch piece with three 2-1/2 x 3/4 threaded outlets Up:0 at cumulative stations 11-1/2 inches, 6 feet 11-1/2 inches, and 12 feet 11-1/2 inches."
+      },
+      {
+        "chainId": "upper-east-ridge-chain",
+        "pieceId": "CMI.22",
+        "systemRole": "branch-line",
+        "nominalDiameterIn": 2.5,
+        "cutLengthIn": 252,
+        "fabricationListingPage": 18,
+        "sourceSegmentId": "pipe-053",
+        "sourceEdgeIds": ["source-edge-107", "source-edge-106", "source-edge-105", "source-edge-104", "source-edge-103"],
+        "pieceStartCanonicalNodeId": "canonical-node-103",
+        "pieceFarEndCanonicalNodeId": "canonical-node-112",
+        "outlets": [
+          { "canonicalNodeId": "canonical-node-116", "sprinklerId": "head-046", "fromPieceStartIn": 30, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-115", "sprinklerId": "head-048", "fromPieceStartIn": 102, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-114", "sprinklerId": "head-050", "fromPieceStartIn": 174, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" },
+          { "canonicalNodeId": "canonical-node-113", "sprinklerId": "head-052", "fromPieceStartIn": 246, "fitting": "2-1/2 x 3/4 threaded outlet", "orientation": "up-0-degrees" }
+        ],
+        "maximumPlanResidualIn": 2,
+        "sourceEvidence": "Field-set FP2.0 labels pipe-053 as CMI.22. Listing page 18 proves a 2-1/2-inch by 21-foot piece with four 2-1/2 x 3/4 threaded outlets Up:0 at cumulative stations 2 feet 6 inches, 8 feet 6 inches, 14 feet 6 inches, and 20 feet 6 inches. No remote inspector-test outlet is listed on CMI.22."
+      }
+    ],
     "verticalOutletBindings": [
       {
         "id": "cmi06-head057-vertical",
