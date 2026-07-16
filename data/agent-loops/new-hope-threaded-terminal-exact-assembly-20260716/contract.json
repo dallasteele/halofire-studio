@@ -1,0 +1,47 @@
+{
+  "name": "new-hope-threaded-terminal-exact-assembly-20260716",
+  "owner": "codex",
+  "goal": "Route New Hope's quote-bound ASC/SCI threaded terminal fittings through the reusable exact-part assembly verifier so no smooth proxy, nominal envelope, catalog image, or self-asserted thread can release as installed geometry.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/03-Fabrication Quotes/Response/New Hope Crisis Center Fab Quote.pdf",
+    "apps/autosprink/src/data/new-hope-threaded-terminal-catalog-parts.json",
+    "apps/autosprink/src/components/exact-assembly-fit.js"
+  ],
+  "exit_criteria": [
+    "the four Fig. 3201 elbows and sixteen Fig. 3221R reducers remain bound to the protected listing, FAB, and purchase identities",
+    "ASME B16.3 and B16.14 body-dimension standards and ASME B1.20.1 NPT are source-bound without claiming a complete manufacturing solid",
+    "all twenty installed fitting instances require part-number-specific watertight solids and full critical-dimension audits",
+    "every threaded port requires modeled helical profile, lead, crest, root, major, pitch, and minor diameters",
+    "every fitting-to-pipe or fitting-to-sprinkler connection requires verified engaged turns, radial clearance, and alignment",
+    "exact-BREP fit and installed-scene collision receipts must be independently trusted",
+    "non-structural fitting assemblies can use the verifier without weakening the default structural-support gate",
+    "primary, cross-source, adversarial, build, rulebook, loop-guard, and browser checks pass while exact assembly release remains false"
+  ],
+  "verification_gates": [
+    "focused exact-assembly, threaded-terminal catalog, and proof tests",
+    "all New Hope tests",
+    "AutoSPRINK production build",
+    "browser proof at apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate contract"
+  ],
+  "state_path": "data/agent-loops/new-hope-threaded-terminal-exact-assembly-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/components/exact-assembly-fit.js",
+    "apps/autosprink/src/data/new-hope-threaded-terminal-catalog-parts.json",
+    "apps/autosprink/src/engine/new-hope-threaded-terminal-catalog-parts.js",
+    "apps/autosprink/tests/exact-assembly-fit.test.js",
+    "apps/autosprink/tests/new-hope-threaded-terminal-catalog-parts.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/new-hope-threaded-terminal-exact-assembly-20260716/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 120000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

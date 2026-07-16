@@ -1,0 +1,90 @@
+{
+  "loop": "new-hope-threaded-terminal-exact-assembly-20260716",
+  "stage": "VERIFY",
+  "status": "catalog-and-standard-identity-passed-exact-assembly-blocked",
+  "iteration": 2,
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "build", "browser"]
+  },
+  "sourceEvidence": {
+    "terminalFittingProducts": [
+      {
+        "figure": "3201",
+        "productNumber": "0840000004",
+        "installedTerminalQuantity": 4,
+        "bodyDimensionStandard": "ASME B16.3",
+        "threadStandard": "ASME B1.20.1",
+        "officialSubmittalSha256": "3BDBAAAFC629808803024E051D4A41D7822E3AF4A98F1286F567C10F795837BD",
+        "officialSubmittalRevision": "PS-SUB-3201-v01 20220118"
+      },
+      {
+        "figure": "3221R",
+        "productNumber": "0840010763",
+        "installedTerminalQuantity": 16,
+        "bodyDimensionStandardFromSubmittal": "ASME B16.3",
+        "bodyDimensionStandardFromProductPage": "ASME B16.14",
+        "bodyDimensionStandardConflictResolved": false,
+        "threadStandard": "ASME B1.20.1",
+        "officialSubmittalSha256": "EC2712780DDE3598100DC83E054269A602249C7B788892FFFA3775D980EAD247",
+        "officialSubmittalRevision": "PS-SUB-3221R-v01 20220118"
+      }
+    ],
+    "haloOpsCadFilenameSearch": {
+      "scope": "Y:/Shared/HaloOps",
+      "exactTargetMatchCount": 0,
+      "extensions": ["rfa", "rvt", "dwg", "dxf", "step", "stp", "iges", "igs", "sat", "ifc", "fcstd", "blend", "zip"]
+    }
+  },
+  "verification": {
+    "focusedTests": "3 files / 10 tests passed plus exact-assembly regression 1 file / 5 tests passed",
+    "allNewHopeTests": "28 files / 180 tests passed",
+    "autosprinkProductionBuild": "passed",
+    "browser": {
+      "url": "http://127.0.0.1:3314/apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html?exact-terminal=20260716b",
+      "proofReady": true,
+      "catalogPartIdentityReady": true,
+      "bodyDimensionStandardsIdentified": true,
+      "bodyDimensionStandardConflictResolved": false,
+      "threadStandardIdentified": true,
+      "exactPartDefinitionsReady": false,
+      "exactInstalledInstanceCoverageReady": false,
+      "exactConnectionFitReady": false,
+      "exactSolidKernelReceiptReady": false,
+      "exactSceneCollisionReceiptReady": false,
+      "exactAssemblyReleaseReady": false,
+      "properPipeLayoutReady": false,
+      "brokenImages": 0,
+      "warningsOrErrors": 0,
+      "screenshot": "output/playwright/new-hope-threaded-terminal-exact-assembly-gate.png"
+    },
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "brainPreflight": {
+      "status": "used"
+    },
+    "brainPostflight": {
+      "status": "recorded",
+      "episodeId": 153747
+    }
+  },
+  "claims": {
+    "catalogPartIdentityReady": true,
+    "bodyDimensionStandardsIdentified": true,
+    "bodyDimensionStandardConflictResolved": false,
+    "threadStandardIdentified": true,
+    "completeManufacturingDimensionsAcquired": false,
+    "completeStandardThreadTableAcquired": false,
+    "exactAssemblyPartDefinitionsReady": false,
+    "exactAssemblyInstalledInstanceCoverageReady": false,
+    "exactAssemblyConnectionFitReady": false,
+    "exactAssemblySolidKernelReceiptReady": false,
+    "exactAssemblySceneCollisionReceiptReady": false,
+    "exactAssemblyReleaseReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsDeploymentReady": false
+  },
+  "nextAction": "Acquire or locate independently trusted manufacturer solids or fully dimensioned manufacturing drawings for the exact ASC/SCI products, then populate all twenty source-bound installed instances and verify helical NPT engagement, clearances, exact-BREP fit, and whole-scene collision before release."
+}

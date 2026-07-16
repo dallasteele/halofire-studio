@@ -268,10 +268,30 @@ describe('exact part assembly fit verifier', () => {
     expect(result.threadSolidsReady).toBe(true)
     expect(result.installedInstanceCoverageReady).toBe(true)
     expect(result.connectionFitReady).toBe(true)
+    expect(result.structureAttachmentsRequired).toBe(true)
     expect(result.structureAttachmentReady).toBe(true)
     expect(result.solidKernelReceiptReady).toBe(true)
     expect(result.sceneCollisionReceiptReady).toBe(true)
     expect(result.assemblyReleaseReady).toBe(true)
+  })
+
+  it('allows an explicitly non-structural fitting assembly without weakening support assemblies', () => {
+    const fittingAssembly = validFixture()
+    fittingAssembly.requirements.structureAttachmentsRequired = false
+    fittingAssembly.instances[3].supportRole = 'none'
+    fittingAssembly.supports = []
+
+    const result = evaluateExactPartAssembly(fittingAssembly, trustedEvidence)
+    expect(result.status).toBe('verified')
+    expect(result.structureAttachmentsRequired).toBe(false)
+    expect(result.structureAttachmentReady).toBe(true)
+    expect(result.assemblyReleaseReady).toBe(true)
+
+    fittingAssembly.instances[3].supportRole = 'seismic-structure-attachment'
+    const falseBoundary = evaluateExactPartAssembly(fittingAssembly, trustedEvidence)
+    expect(falseBoundary.blockerCodes).toContain(
+      'EXACT_ASSEMBLY_STRUCTURE_ATTACHMENT_UNVERIFIED',
+    )
   })
 
   it('rejects generated geometry, false threads, bad engagement, bad insertion, bad clamp fit, and bad bolts', () => {

@@ -6,8 +6,10 @@
  * parts fit. It consumes evidence produced by solid-CAD and installed-scene
  * kernels and checks the boundary conditions needed before an assembly can be
  * released: part-number-specific solids, units, port geometry, real thread
- * form, compatible interfaces, engagement, support-to-structure attachment,
- * and collision receipts.
+ * form, compatible interfaces, engagement, required support-to-structure
+ * attachment, and collision receipts. Non-structural fitting assemblies must
+ * explicitly set `requirements.structureAttachmentsRequired` to false; support
+ * assemblies remain fail-closed by default.
  *
  * Receipt trust is injected by the caller. A syntactically valid receipt is
  * non-gating unless its digest is present in `trustedReceiptDigests`.
@@ -437,6 +439,7 @@ export function evaluateExactPartAssembly(source = {}, options = {}) {
     issues.push(issue('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED', 'Every required threaded, insertion, clamp, and bolted connection must pass dimensional fit checks.'))
   }
 
+  const structureAttachmentsRequired = requirements.structureAttachmentsRequired !== false
   const supportRoles = new Set(
     instances
       .filter((entry) => entry?.supportRole && entry.supportRole !== 'none')
@@ -444,13 +447,20 @@ export function evaluateExactPartAssembly(source = {}, options = {}) {
   )
   const supportedInstances = new Set(supports.map((entry) => entry?.supportInstanceId))
   const connectionIdSet = new Set(connectionIds)
-  const supportSetReady = (
-    supportRoles.size > 0 &&
-    [...supportRoles].every((instanceId) => supportedInstances.has(instanceId)) &&
-    supports.every((entry) => validateSupport(entry, instancesById, connectionIdSet))
-  )
+  const supportSetReady = structureAttachmentsRequired
+    ? (
+        supportRoles.size > 0 &&
+        [...supportRoles].every((instanceId) => supportedInstances.has(instanceId)) &&
+        supports.every((entry) => validateSupport(entry, instancesById, connectionIdSet))
+      )
+    : supportRoles.size === 0 && supports.length === 0
   if (!supportSetReady) {
-    issues.push(issue('EXACT_ASSEMBLY_STRUCTURE_ATTACHMENT_UNVERIFIED', 'Every hanger or brace must be bound to source structure, compatible substrate, listed capacity, and verified connections.'))
+    issues.push(issue(
+      'EXACT_ASSEMBLY_STRUCTURE_ATTACHMENT_UNVERIFIED',
+      structureAttachmentsRequired
+        ? 'Every hanger or brace must be bound to source structure, compatible substrate, listed capacity, and verified connections.'
+        : 'A non-structural assembly cannot contain support roles or structure attachments.',
+    ))
   }
 
   const trustedReceipts = receipts.filter((receipt) => receiptTrusted(receipt, trustedReceiptDigests))
@@ -511,6 +521,7 @@ export function evaluateExactPartAssembly(source = {}, options = {}) {
     threadSolidsReady,
     installedInstanceCoverageReady: instanceSetReady,
     connectionFitReady: connectionSetReady,
+    structureAttachmentsRequired,
     structureAttachmentReady: supportSetReady,
     solidKernelReceiptReady: solidReceiptReady,
     sceneCollisionReceiptReady: sceneReceiptReady,

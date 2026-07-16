@@ -296,6 +296,12 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('properPipeLayout.acceptanceBlockers');
     expect(script).toContain('dataset.exactAssemblySourceTrustReady = String(purchasedSupportComponents.exactAssemblySourceTrustReady)');
     expect(script).toContain('dataset.nativeHangerScheduleReady = String(nativeHangerSchedule.nativeHangerScheduleReady)');
+    expect(script).toContain('dataset.threadedTerminalBodyDimensionStandardsIdentified = String(threadedTerminalCatalogParts.bodyDimensionStandardsIdentified)');
+    expect(script).toContain('dataset.threadedTerminalBodyDimensionStandardConflictResolved = String(threadedTerminalCatalogParts.bodyDimensionStandardConflictResolved)');
+    expect(script).toContain('dataset.threadedTerminalThreadStandardIdentified = String(threadedTerminalCatalogParts.threadStandardIdentified)');
+    expect(script).toContain('dataset.threadedTerminalExactAssemblyPartDefinitionsReady = String(threadedTerminalCatalogParts.exactAssemblyPartDefinitionsReady)');
+    expect(script).toContain('dataset.threadedTerminalExactAssemblyConnectionFitReady = String(threadedTerminalCatalogParts.exactAssemblyConnectionFitReady)');
+    expect(script).toContain('dataset.threadedTerminalExactAssemblyReleaseReady = String(threadedTerminalCatalogParts.exactAssemblyReleaseReady)');
     expect(script).toContain('dataset.projectPipeSizeAssignmentForFig69Ready = String(nativeHangerSchedule.perLineNominalPipeSizeAssignmentReady)');
     expect(script).toContain('independently trusted geometry hashes and critical-dimension audit hashes');
     expect(script).toContain('modeled thread profile/lead/crest/root solids');
