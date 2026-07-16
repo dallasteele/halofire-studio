@@ -2,7 +2,7 @@
   "loop": "new-hope-purchased-support-components-20260716",
   "stage": "VERIFY",
   "status": "reusable-exact-assembly-verifier-bound-release-rejected",
-  "iteration": 6,
+  "iteration": 7,
   "evidence": {
     "looseMaterialQuote": {
       "quoteNumber": "0133821",
@@ -103,6 +103,7 @@
       "artifactType": "halofire.exact-part-assembly.v1",
       "requiredPartDefinitionCount": 16,
       "exactPartDefinitionCount": 0,
+      "sourceTrustedPartDefinitionCount": 0,
       "requiredInstalledUnitCount": 977,
       "installedInstanceCount": 0,
       "requiredConnectionKinds": ["threaded", "brace-insertion", "clamp", "bolted"],
@@ -111,6 +112,9 @@
       "requiredReceiptKinds": ["solid-kernel-fit", "scene-placement-collision"],
       "trustedReceiptCount": 0,
       "modeledHelicalThreadsRequired": true,
+      "independentlyTrustedGeometryHashesRequired": true,
+      "independentlyTrustedCriticalDimensionAuditsRequired": true,
+      "threadProfileLeadCrestRootAndEngagedTurnsRequired": true,
       "exactBrepFitRequired": true,
       "installedSceneCollisionReceiptRequired": true,
       "assemblyReleaseReady": false
@@ -118,8 +122,9 @@
   },
   "verification": {
     "focusedTests": "27 files / 174 tests passed",
-    "exactAssemblyFocusedTests": "2 files / 5 tests passed",
-    "adversarialCases": 36,
+    "exactAssemblyFocusedTests": "2 files / 6 tests passed",
+    "exactAssemblyAndProofTests": "4 files / 16 tests passed",
+    "adversarialCases": 41,
     "autosprinkBuild": "passed",
     "browser": {
       "proofReady": true,
@@ -143,6 +148,7 @@
       "ascSeismicCollisionAnalysisVerified": false,
       "ascSeismicListedAssemblyFitVerified": false,
       "exactAssemblyPartDefinitionsReady": false,
+      "exactAssemblySourceTrustReady": false,
       "exactAssemblyInstalledInstanceCoverageReady": false,
       "exactAssemblyConnectionFitReady": false,
       "exactAssemblyStructureAttachmentReady": false,
@@ -157,8 +163,8 @@
     },
     "brainPostflight": {
       "endpoint": "canonical hal-brain /remember",
-        "episodeId": 151852
+      "episodeId": 153562
     }
   },
-  "nextAction": "After explicit first-launch confirmation, inspect the official SWDR DWG, Victaulic AB2 RFA, and ASC Fig. 69 RFA with ODA; continue acquiring part-number-specific AF730, AF035, AF076, and AF779 solids or complete manufacturing geometry; resolve the Sammy part and substrate conflict; then use Blender/OpenGeometry to create true thread solids and verify brace insertion, rod engagement, fastener fit, H1/H2 structure attachment, installed placement, and collision-free listed assemblies before model release."
+  "nextAction": "After explicit first-launch confirmation, inspect the official SWDR DWG, Victaulic AB2 RFA, and ASC Fig. 69 RFA with ODA; continue acquiring part-number-specific AF730, AF035, AF076, and AF779 solids or complete manufacturing geometry; resolve the Sammy part and substrate conflict; then use Blender/OpenGeometry to create true thread solids and produce independently trusted geometry hashes, critical-dimension audits, thread-profile/lead/crest/root and engaged-turn receipts, brace insertion, rod engagement, fastener fit, H1/H2 structure attachment, installed placement, and collision-free listed assemblies before model release."
 }

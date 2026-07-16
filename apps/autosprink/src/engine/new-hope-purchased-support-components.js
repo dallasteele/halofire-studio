@@ -249,6 +249,12 @@ export function buildNewHopeExactSupportAssemblyCandidate(source = {}) {
         unitScaleVerified: false,
         watertightSolidVerified: false,
         partNumberBound: false,
+        publishedDimensionSourceSha256: null,
+        dimensionAuditReceiptSha256: null,
+        criticalDimensionCount: 0,
+        verifiedCriticalDimensionCount: 0,
+        maxDimensionResidualIn: null,
+        dimensionToleranceIn: null,
       },
       ports: [],
     }),
@@ -710,6 +716,10 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
       JSON.stringify(['solid-kernel-fit', 'scene-placement-collision']) &&
     Array.isArray(exactAssemblyVerification?.trustedReceiptDigests) &&
     exactAssemblyVerification.trustedReceiptDigests.length === 0 &&
+    Array.isArray(exactAssemblyVerification?.trustedGeometryDigests) &&
+    exactAssemblyVerification.trustedGeometryDigests.length === 0 &&
+    Array.isArray(exactAssemblyVerification?.trustedDimensionAuditDigests) &&
+    exactAssemblyVerification.trustedDimensionAuditDigests.length === 0 &&
     Array.isArray(exactAssemblyVerification?.installedInstances) &&
     exactAssemblyVerification.installedInstances.length === 0 &&
     Array.isArray(exactAssemblyVerification?.connections) &&
@@ -730,7 +740,11 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
 
   const exactAssemblyFit = evaluateExactPartAssembly(
     buildNewHopeExactSupportAssemblyCandidate(source),
-    { trustedReceiptDigests: exactAssemblyVerification?.trustedReceiptDigests },
+    {
+      trustedReceiptDigests: exactAssemblyVerification?.trustedReceiptDigests,
+      trustedGeometryDigests: exactAssemblyVerification?.trustedGeometryDigests,
+      trustedDimensionAuditDigests: exactAssemblyVerification?.trustedDimensionAuditDigests,
+    },
   )
   const exactAssemblyGateReady = (
     exactAssemblyFit.status === 'blocked' &&
@@ -739,12 +753,14 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     exactAssemblyFit.metrics.requiredPartDefinitionCount === 16 &&
     exactAssemblyFit.metrics.partDefinitionCount === 16 &&
     exactAssemblyFit.metrics.exactPartDefinitionCount === 0 &&
+    exactAssemblyFit.metrics.sourceTrustedPartDefinitionCount === 0 &&
     exactAssemblyFit.metrics.requiredInstalledUnitCount === 977 &&
     exactAssemblyFit.metrics.installedInstanceCount === 0 &&
     exactAssemblyFit.metrics.connectionCount === 0 &&
     exactAssemblyFit.metrics.supportAttachmentCount === 0 &&
     exactAssemblyFit.metrics.trustedReceiptCount === 0 &&
     exactAssemblyFit.exactSourceGeometryReady === false &&
+    exactAssemblyFit.sourceTrustReady === false &&
     exactAssemblyFit.threadSolidsReady === false &&
     exactAssemblyFit.installedInstanceCoverageReady === false &&
     exactAssemblyFit.connectionFitReady === false &&
@@ -822,6 +838,7 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     boundary?.ascSeismicCollisionAnalysisVerified !== false ||
     boundary?.ascSeismicListedAssemblyFitVerified !== false ||
     boundary?.exactAssemblyPartDefinitionsReady !== false ||
+    boundary?.exactAssemblySourceTrustReady !== false ||
     boundary?.exactAssemblyInstalledInstanceCoverageReady !== false ||
     boundary?.exactAssemblyConnectionFitReady !== false ||
     boundary?.exactAssemblyStructureAttachmentReady !== false ||
@@ -886,6 +903,9 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
       exactAssemblyInstalledInstanceCount: purchaseReady
         ? exactAssemblyFit.metrics.installedInstanceCount
         : 0,
+      exactAssemblySourceTrustedPartDefinitionCount: purchaseReady
+        ? exactAssemblyFit.metrics.sourceTrustedPartDefinitionCount
+        : 0,
       indexedCadCorpusFileCount: purchaseReady ? cadAudit.indexedFileCount : 0,
       indexedCadCorpusCadFileCount: purchaseReady
         ? Object.values(cadAudit.cadFileCounts).reduce((sum, count) => sum + count, 0)
@@ -918,6 +938,7 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     ascSeismicListedAssemblyFitVerified: false,
     exactAssemblyBlockerCodes: exactAssemblyFit.blockerCodes,
     exactAssemblyPartDefinitionsReady: false,
+    exactAssemblySourceTrustReady: false,
     exactAssemblyInstalledInstanceCoverageReady: false,
     exactAssemblyConnectionFitReady: false,
     exactAssemblyStructureAttachmentReady: false,

@@ -14,6 +14,12 @@ function source(productNumber, char) {
     unitScaleVerified: true,
     watertightSolidVerified: true,
     partNumberBound: true,
+    publishedDimensionSourceSha256: sha('9'),
+    dimensionAuditReceiptSha256: sha(char),
+    criticalDimensionCount: 8,
+    verifiedCriticalDimensionCount: 8,
+    maxDimensionResidualIn: 0.0004,
+    dimensionToleranceIn: 0.001,
   }
 }
 
@@ -29,6 +35,11 @@ function thread(gender) {
     pitchDiameterIn: 0.3344,
     minorDiameterIn: 0.297,
     threadedLengthIn: 0.75,
+    profileAngleDeg: 60,
+    leadIn: 1 / 16,
+    fitDesignation: gender === 'male' ? '2A' : '2B',
+    geometrySha256: sha(gender === 'male' ? '3' : '4'),
+    crestRootGeometryVerified: true,
     modeledHelicalSolid: true,
   }
 }
@@ -120,6 +131,8 @@ function validFixture() {
           minimumEngagementIn: 0.3,
           maximumEngagementIn: 0.6,
           actualEngagementIn: 0.45,
+          minimumTurnsEngaged: 5,
+          actualTurnsEngaged: 7.2,
           radialClearanceIn: 0.001,
           maximumRadialClearanceIn: 0.005,
           axialAlignmentErrorIn: 0.0002,
@@ -224,11 +237,18 @@ function validFixture() {
 }
 
 const trustedReceipts = [sha('1'), sha('2')]
+const trustedGeometryDigests = ['A', 'B', 'C', 'D', 'E', '6', '7', '8'].map(sha)
+const trustedDimensionAuditDigests = ['a', 'b', 'c', 'd', 'e', '6', '7', '8'].map(sha)
+const trustedEvidence = {
+  trustedReceiptDigests: trustedReceipts,
+  trustedGeometryDigests,
+  trustedDimensionAuditDigests,
+}
 
 describe('exact part assembly fit verifier', () => {
   it('accepts only a fully source-bound, fit-checked, collision-checked assembly', () => {
     const result = evaluateExactPartAssembly(validFixture(), {
-      trustedReceiptDigests: trustedReceipts,
+      ...trustedEvidence,
     })
     expect(result.status).toBe('verified')
     expect(result.issues).toEqual([])
@@ -236,6 +256,7 @@ describe('exact part assembly fit verifier', () => {
       requiredPartDefinitionCount: 8,
       partDefinitionCount: 8,
       exactPartDefinitionCount: 8,
+      sourceTrustedPartDefinitionCount: 8,
       requiredInstalledUnitCount: 8,
       installedInstanceCount: 8,
       connectionCount: 4,
@@ -243,6 +264,7 @@ describe('exact part assembly fit verifier', () => {
       trustedReceiptCount: 2,
     })
     expect(result.exactSourceGeometryReady).toBe(true)
+    expect(result.sourceTrustReady).toBe(true)
     expect(result.threadSolidsReady).toBe(true)
     expect(result.installedInstanceCoverageReady).toBe(true)
     expect(result.connectionFitReady).toBe(true)
@@ -255,84 +277,117 @@ describe('exact part assembly fit verifier', () => {
   it('rejects generated geometry, false threads, bad engagement, bad insertion, bad clamp fit, and bad bolts', () => {
     const generated = validFixture()
     generated.partDefinitions[0].source.classification = 'generated-openscad'
-    expect(evaluateExactPartAssembly(generated, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(generated, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED')
 
     const smoothThread = validFixture()
     smoothThread.partDefinitions[0].ports[0].thread.modeledHelicalSolid = false
-    expect(evaluateExactPartAssembly(smoothThread, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(smoothThread, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
 
     const sameGender = validFixture()
     sameGender.partDefinitions[1].ports[0].thread.gender = 'male'
-    expect(evaluateExactPartAssembly(sameGender, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(sameGender, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
 
     const badEngagement = validFixture()
     badEngagement.connections[0].fit.actualEngagementIn = 0.1
-    expect(evaluateExactPartAssembly(badEngagement, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(badEngagement, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
 
     const notBottomed = validFixture()
     notBottomed.connections[1].fit.bottomedOut = false
-    expect(evaluateExactPartAssembly(notBottomed, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(notBottomed, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
 
     const oversizedClamp = validFixture()
     oversizedClamp.connections[2].fit.clampInsideDiameterIn = 3.7
-    expect(evaluateExactPartAssembly(oversizedClamp, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(oversizedClamp, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
 
     const oversizedBolt = validFixture()
     oversizedBolt.connections[3].fit.boltDiameterIn = 0.625
-    expect(evaluateExactPartAssembly(oversizedBolt, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(oversizedBolt, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
   })
 
   it('rejects untrusted receipts, source drift, missing placements, structure failures, and collisions', () => {
-    const untrusted = evaluateExactPartAssembly(validFixture())
+    const untrusted = evaluateExactPartAssembly(validFixture(), {
+      trustedGeometryDigests,
+      trustedDimensionAuditDigests,
+    })
     expect(untrusted.blockerCodes).toContain('EXACT_ASSEMBLY_SOLID_KERNEL_RECEIPT_MISSING')
     expect(untrusted.blockerCodes).toContain('EXACT_ASSEMBLY_SCENE_COLLISION_RECEIPT_MISSING')
 
     const wrongDigest = validFixture()
     wrongDigest.receipts[0].inputAssemblyDigestSha256 = sha('e')
-    expect(evaluateExactPartAssembly(wrongDigest, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(wrongDigest, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_SOLID_KERNEL_RECEIPT_MISSING')
 
     const missingPlacement = validFixture()
     missingPlacement.instances.pop()
-    expect(evaluateExactPartAssembly(missingPlacement, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(missingPlacement, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_INSTANCE_COVERAGE_INCOMPLETE')
 
     const wrongProductMix = validFixture()
     wrongProductMix.instances[7].productNumber = 'TEST-BOLT'
     wrongProductMix.instances[7].geometrySha256 = sha('7')
-    expect(evaluateExactPartAssembly(wrongProductMix, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(wrongProductMix, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_INSTANCE_COVERAGE_INCOMPLETE')
 
     const wrongGeometry = validFixture()
     wrongGeometry.instances[0].geometrySha256 = sha('9')
-    expect(evaluateExactPartAssembly(wrongGeometry, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(wrongGeometry, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_INSTANCE_COVERAGE_INCOMPLETE')
 
     const skewedPlacement = validFixture()
     skewedPlacement.instances[0].rotationMatrix = [1, 0.1, 0, 0, 1, 0, 0, 0, 1]
-    expect(evaluateExactPartAssembly(skewedPlacement, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(skewedPlacement, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_INSTANCE_COVERAGE_INCOMPLETE')
 
     const detached = validFixture()
     detached.supports[0].structureAttachmentVerified = false
-    expect(evaluateExactPartAssembly(detached, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(detached, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_STRUCTURE_ATTACHMENT_UNVERIFIED')
 
     const overloaded = validFixture()
     overloaded.supports[0].appliedLoadLb = 301
-    expect(evaluateExactPartAssembly(overloaded, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(overloaded, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_STRUCTURE_ATTACHMENT_UNVERIFIED')
 
     const collision = validFixture()
     collision.receipts[1].unresolvedCollisionCount = 1
-    expect(evaluateExactPartAssembly(collision, { trustedReceiptDigests: trustedReceipts }).blockerCodes)
+    expect(evaluateExactPartAssembly(collision, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_SCENE_COLLISION_RECEIPT_MISSING')
+  })
+
+  it('rejects self-asserted manufacturer geometry, dimension audits, and thread-turn claims', () => {
+    const untrustedGeometry = evaluateExactPartAssembly(validFixture(), {
+      trustedReceiptDigests: trustedReceipts,
+      trustedDimensionAuditDigests,
+    })
+    expect(untrustedGeometry.blockerCodes).toContain('EXACT_ASSEMBLY_PART_SOURCE_UNTRUSTED')
+    expect(untrustedGeometry.metrics.sourceTrustedPartDefinitionCount).toBe(0)
+
+    const untrustedDimensions = evaluateExactPartAssembly(validFixture(), {
+      trustedReceiptDigests: trustedReceipts,
+      trustedGeometryDigests,
+    })
+    expect(untrustedDimensions.blockerCodes).toContain('EXACT_ASSEMBLY_PART_SOURCE_UNTRUSTED')
+
+    const badDimensionResidual = validFixture()
+    badDimensionResidual.partDefinitions[0].source.maxDimensionResidualIn = 0.002
+    expect(evaluateExactPartAssembly(badDimensionResidual, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED')
+
+    const fakeLead = validFixture()
+    fakeLead.partDefinitions[0].ports[0].thread.leadIn = 0.07
+    expect(evaluateExactPartAssembly(fakeLead, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED')
+
+    const fakeTurns = validFixture()
+    fakeTurns.connections[0].fit.actualTurnsEngaged = 9
+    expect(evaluateExactPartAssembly(fakeTurns, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
   })
 })

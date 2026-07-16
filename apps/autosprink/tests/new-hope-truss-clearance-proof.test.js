@@ -292,5 +292,9 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('evaluateProperPitchedPipeGraph');
     expect(script).toContain("dataset.pipeGraphStatus = properPipeLayout.properPipeLayoutReady ? 'passed' : 'blocked'");
     expect(script).toContain('properPipeLayout.acceptanceBlockers');
+    expect(script).toContain('dataset.exactAssemblySourceTrustReady = String(purchasedSupportComponents.exactAssemblySourceTrustReady)');
+    expect(script).toContain('independently trusted geometry hashes and critical-dimension audit hashes');
+    expect(script).toContain('modeled thread profile/lead/crest/root solids');
+    expect(script).toContain('verified engaged turns');
   });
 });

@@ -29,6 +29,7 @@ describe('New Hope purchased support components', () => {
       exactAssemblyRequiredPartDefinitionCount: 16,
       exactAssemblyRequiredInstalledUnitCount: 977,
       exactAssemblyInstalledInstanceCount: 0,
+      exactAssemblySourceTrustedPartDefinitionCount: 0,
       indexedCadCorpusFileCount: 455150,
       indexedCadCorpusCadFileCount: 1631,
       indexedCadCorpusExactTargetMatchCount: 0,
@@ -64,6 +65,7 @@ describe('New Hope purchased support components', () => {
       'EXACT_ASSEMBLY_SCENE_COLLISION_RECEIPT_MISSING',
     ])
     expect(result.exactAssemblyPartDefinitionsReady).toBe(false)
+    expect(result.exactAssemblySourceTrustReady).toBe(false)
     expect(result.exactAssemblyInstalledInstanceCoverageReady).toBe(false)
     expect(result.exactAssemblyConnectionFitReady).toBe(false)
     expect(result.exactAssemblyStructureAttachmentReady).toBe(false)
@@ -221,6 +223,18 @@ describe('New Hope purchased support components', () => {
     const fakeTrustedReceipt = structuredClone(source)
     fakeTrustedReceipt.exactAssemblyVerification.trustedReceiptDigests.push('A'.repeat(64))
     expect(evaluateNewHopePurchasedSupportComponents(fakeTrustedReceipt).blockerCodes).toContain(
+      'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
+    )
+
+    const fakeTrustedGeometry = structuredClone(source)
+    fakeTrustedGeometry.exactAssemblyVerification.trustedGeometryDigests.push('A'.repeat(64))
+    expect(evaluateNewHopePurchasedSupportComponents(fakeTrustedGeometry).blockerCodes).toContain(
+      'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
+    )
+
+    const fakeTrustedDimensionAudit = structuredClone(source)
+    fakeTrustedDimensionAudit.exactAssemblyVerification.trustedDimensionAuditDigests.push('B'.repeat(64))
+    expect(evaluateNewHopePurchasedSupportComponents(fakeTrustedDimensionAudit).blockerCodes).toContain(
       'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
     )
 

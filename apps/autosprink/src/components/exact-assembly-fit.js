@@ -78,6 +78,13 @@ function validateThread(thread = {}) {
     thread.majorDiameterIn > thread.pitchDiameterIn &&
     thread.pitchDiameterIn > thread.minorDiameterIn &&
     positive(thread.threadedLengthIn) &&
+    positive(thread.profileAngleDeg) &&
+    positive(thread.leadIn) &&
+    Math.abs(thread.leadIn - (1 / thread.tpi)) <= 1e-8 &&
+    typeof thread.fitDesignation === 'string' &&
+    thread.fitDesignation.length > 0 &&
+    sha256(thread.geometrySha256) &&
+    thread.crestRootGeometryVerified === true &&
     thread.modeledHelicalSolid === true
   )
 }
@@ -93,7 +100,16 @@ function validateSource(source = {}, productNumber) {
     ALLOWED_UNITS.has(source.units) &&
     source.unitScaleVerified === true &&
     source.watertightSolidVerified === true &&
-    source.partNumberBound === true
+    source.partNumberBound === true &&
+    sha256(source.publishedDimensionSourceSha256) &&
+    sha256(source.dimensionAuditReceiptSha256) &&
+    Number.isInteger(source.criticalDimensionCount) &&
+    source.criticalDimensionCount > 0 &&
+    source.verifiedCriticalDimensionCount === source.criticalDimensionCount &&
+    nonNegative(source.maxDimensionResidualIn) &&
+    positive(source.dimensionToleranceIn) &&
+    source.dimensionToleranceIn <= 0.005 &&
+    source.maxDimensionResidualIn <= source.dimensionToleranceIn
   )
 }
 
@@ -189,6 +205,10 @@ function validateThreadedConnection(connection, fromPort, toPort) {
     finite(fit.actualEngagementIn) &&
     fit.actualEngagementIn >= fit.minimumEngagementIn &&
     fit.actualEngagementIn <= fit.maximumEngagementIn &&
+    positive(fit.minimumTurnsEngaged) &&
+    positive(fit.actualTurnsEngaged) &&
+    fit.actualTurnsEngaged >= fit.minimumTurnsEngaged &&
+    Math.abs(fit.actualTurnsEngaged - (fit.actualEngagementIn * a.tpi)) <= 0.05 &&
     nonNegative(fit.radialClearanceIn) &&
     nonNegative(fit.maximumRadialClearanceIn) &&
     fit.radialClearanceIn <= fit.maximumRadialClearanceIn &&
@@ -301,11 +321,13 @@ function validateSupport(support, instancesById, connectionIds) {
 
 /**
  * @param {object} source
- * @param {{trustedReceiptDigests?:Iterable<string>}} [options]
+ * @param {{trustedReceiptDigests?:Iterable<string>,trustedGeometryDigests?:Iterable<string>,trustedDimensionAuditDigests?:Iterable<string>}} [options]
  */
 export function evaluateExactPartAssembly(source = {}, options = {}) {
   const issues = []
   const trustedReceiptDigests = new Set(options.trustedReceiptDigests || [])
+  const trustedGeometryDigests = new Set(options.trustedGeometryDigests || [])
+  const trustedDimensionAuditDigests = new Set(options.trustedDimensionAuditDigests || [])
   const requirements = source.requirements || {}
   const partDefinitions = Array.isArray(source.partDefinitions) ? source.partDefinitions : []
   const instances = Array.isArray(source.instances) ? source.instances : []
@@ -337,10 +359,24 @@ export function evaluateExactPartAssembly(source = {}, options = {}) {
   }
 
   const exactParts = new Set()
+  const sourceTrustedParts = new Set()
   const portByProduct = new Map()
   for (const part of partDefinitions) {
-    if (validatePartDefinition(part)) exactParts.add(part.productNumber)
-    else issues.push(issue('EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED', 'Part-number-specific watertight solid, units, and verified ports are required.', part?.productNumber || null))
+    const definitionReady = validatePartDefinition(part)
+    if (definitionReady) {
+      const sourceTrusted = (
+        trustedGeometryDigests.has(part.source.geometrySha256) &&
+        trustedDimensionAuditDigests.has(part.source.dimensionAuditReceiptSha256)
+      )
+      if (sourceTrusted) {
+        exactParts.add(part.productNumber)
+        sourceTrustedParts.add(part.productNumber)
+      } else {
+        issues.push(issue('EXACT_ASSEMBLY_PART_SOURCE_UNTRUSTED', 'Manufacturer geometry and critical-dimension audit digests must be independently trusted before exact promotion.', part?.productNumber || null))
+      }
+    } else {
+      issues.push(issue('EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED', 'Part-number-specific watertight solid, complete critical-dimension audit, units, verified ports, and modeled thread profiles are required.', part?.productNumber || null))
+    }
     const ports = new Map()
     for (const port of part?.ports || []) ports.set(port.id, port)
     portByProduct.set(part?.productNumber, ports)
@@ -463,6 +499,7 @@ export function evaluateExactPartAssembly(source = {}, options = {}) {
       requiredPartDefinitionCount: requiredProducts.length,
       partDefinitionCount: partDefinitions.length,
       exactPartDefinitionCount: exactParts.size,
+      sourceTrustedPartDefinitionCount: sourceTrustedParts.size,
       requiredInstalledUnitCount: Number.isInteger(requiredUnitCount) ? requiredUnitCount : 0,
       installedInstanceCount: instances.length,
       connectionCount: connections.length,
@@ -470,6 +507,7 @@ export function evaluateExactPartAssembly(source = {}, options = {}) {
       trustedReceiptCount: trustedReceipts.length,
     },
     exactSourceGeometryReady,
+    sourceTrustReady: partDefinitions.length > 0 && sourceTrustedParts.size === partDefinitions.length,
     threadSolidsReady,
     installedInstanceCoverageReady: instanceSetReady,
     connectionFitReady: connectionSetReady,
