@@ -164,10 +164,11 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.metrics).toEqual({
       canonicalNodeCount: 142,
       canonicalEdgeCount: 143,
-      directedEdgeCount: 141,
-      undirectedEdgeCount: 2,
-      directionCoverageRatio: 0.986014,
+      directedEdgeCount: 143,
+      undirectedEdgeCount: 0,
+      directionCoverageRatio: 1,
       scheduleCounts: {
+        'source-feed': 2,
         'long-branch': 43,
         'side-branch': 28,
         'cross-main': 34,
@@ -188,10 +189,7 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       listedFabricatedPipeUnitCount: 264,
       fieldDrainIntentCount: 2,
     })
-    expect(result.undirectedEdges.map((edge) => [edge.edgeId, edge.classification])).toEqual([
-      ['source-edge-001', 'source-feed-fabricated-plan-edge-with-bor-calculation-z-but-concealed-xy-and-installed-geometry-unresolved'],
-      ['source-edge-002', 'source-feed-fabricated-plan-edge-with-bor-calculation-z-but-concealed-xy-and-installed-geometry-unresolved'],
-    ])
+    expect(result.undirectedEdges).toEqual([])
     expect(result.wholeFp20RelativeGradeDirectionReady).toBe(true)
     expect(result.partialExactPipeElevationAnchorReady).toBe(true)
     expect(result.exactPipeCenterlineZReady).toBe(false)
@@ -214,7 +212,10 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.exactThreadedFittingSizesReady).toBe(false)
     expect(result.interPieceFittingTopologyReady).toBe(false)
     expect(result.completeVerticalOffsetScheduleReady).toBe(false)
-    expect(result.sourceFeedEndpointElevationsReady).toBe(false)
+    expect(result.sourceFeedEndpointElevationsReady).toBe(true)
+    expect(result.sourceFeedDesignedGradeDirectionReady).toBe(true)
+    expect(result.sourceFeedDesignedGradeMagnitudeReady).toBe(true)
+    expect(result.sourceFeedCml01Plan3dPathReady).toBe(true)
     expect(result.sourceFeedConcealedPlanXyReady).toBe(false)
     expect(result.sourceFeedFabricationPieceToCalculationLegDecompositionReady).toBe(false)
     expect(result.sourceFeedInstalledGradeReady).toBe(false)

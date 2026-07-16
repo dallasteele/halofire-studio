@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-source-feed-designed-grade-20260715/lean-request.json",
+  "theoremNames": [
+    "cml01GradeDropSchedule",
+    "completeCanonicalDirectionCoverage",
+    "designedGradeDoesNotPromoteInstalledAssembly"
+  ],
+  "claim": "The two exact CML.01 grade drops compose to the full-piece drop, adding the two source-feed directions closes all 143 canonical edges, and designed direction, magnitude, and endpoint Z cannot promote the unresolved installed riser assembly or whole-layout release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 448,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

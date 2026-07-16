@@ -1,0 +1,51 @@
+{
+  "name": "new-hope-source-feed-designed-grade-20260715",
+  "owner": "codex",
+  "goal": "Bind both CML.01 source-feed edges to the approved as-built plan axis, the printed dry cross-main grade, the riser-room low-end destination, and node 118 elevation without claiming a field-measured installed riser assembly.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/04-Close-Out Docs/New Hope BGC - Brigham City UT_as builts.pdf",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
+    "apps/autosprink/src/data/new-hope-asbuilt-source-feed-riser-registration.json",
+    "apps/autosprink/src/engine/new-hope-source-feed-fabrication.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js"
+  ],
+  "exit_criteria": [
+    "CML.01 retains its exact 29.5-inch outlet station and 6-inch far-end remainder",
+    "both source-feed edges drain high-to-low toward the approved riser-room anchor",
+    "the printed 0.25 inch per 10 foot cross-main grade determines both design drops",
+    "node 118 at 11.5 feet anchors all three CML.01 design endpoint elevations",
+    "whole-plan direction coverage becomes 143 of 143 canonical edges",
+    "field-measured installed grade, exact below-attic riser station, complete 3D, fabrication, and field release remain false",
+    "adversarial tests, New Hope suite, syntax checks, browser proof, formal proof, rules, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected as-built and approved-plan identity",
+    "fabrication cut and outlet station",
+    "grade magnitude and drainage destination",
+    "node 118 exact elevation",
+    "adversarial source mutations",
+    "actual-PDF browser proof",
+    "Lean invariant receipt",
+    "agent loop guard and agentic rules",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-source-feed-designed-grade-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/new-hope-source-feed-fabrication.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js",
+    "apps/autosprink/tests/new-hope-source-feed-fabrication.test.js",
+    "apps/autosprink/tests/new-hope-proper-pipe-layout.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/new-hope-source-feed-designed-grade-20260715/lean-proof.json",
+    "data/agent-loops/new-hope-source-feed-designed-grade-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 120000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

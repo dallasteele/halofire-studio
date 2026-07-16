@@ -3,12 +3,17 @@
  *
  * The field set and AutoSPRINK listing prove one 4-inch fabricated piece and
  * its 4 x 3 upward outlet. Approved hydraulic routes independently register
- * calculation node 118 at that outlet. They do not prove the installed slope,
- * both endpoint elevations, or the concealed continuation to the riser room.
+ * calculation node 118 at that outlet. The source-bound dry cross-main grade
+ * rule and the riser-room drain destination are sufficient to produce the
+ * as-designed high-to-low direction and endpoint Z values for CML.01. They do
+ * not prove a field-measured installed slope or the concealed riser assembly.
  */
 
 const EXPECTED_PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut'
 const EXPECTED_EDGE_IDS = Object.freeze(['source-edge-001', 'source-edge-002'])
+const EXPECTED_GRADE_IN_PER_10_FT = 0.25
+const OUTLET_FROM_START_IN = 29.5
+const OUTLET_TO_FAR_END_IN = 6
 
 const issue = (code, message, entityId = null) => ({
   severity: 'blocking',
@@ -16,6 +21,7 @@ const issue = (code, message, entityId = null) => ({
   message,
   entityId,
 })
+const round = (value, digits = 6) => Number(value.toFixed(digits))
 
 function findCalculation118Port(routes) {
   const ports = []
@@ -62,6 +68,17 @@ export function evaluateNewHopeSourceFeedFabrication(inputs = {}) {
     canonicalTopology?.projectId !== EXPECTED_PROJECT_ID
   ) {
     issues.push(issue('NH_SOURCE_FEED_PROJECT_IDENTITY_INVALID', 'Every input must identify New Hope.'))
+  }
+  const crossMainGrade = operationalAnnotations?.gradeRequirements?.find(
+    (entry) => entry.id === 'grade-cross-mains',
+  )
+  if (
+    crossMainGrade?.pipeRole !== 'cross-main' ||
+    crossMainGrade?.rawText !== 'SLOPE CROSS MAINS 1/4" EVERY 10\'-0"' ||
+    crossMainGrade?.riseInPer10Ft !== EXPECTED_GRADE_IN_PER_10_FT ||
+    operationalAnnotations?.supplyAnchor?.boundPrimaryNodeId !== 'pipe-001-node-01'
+  ) {
+    issues.push(issue('NH_SOURCE_FEED_DESIGN_GRADE_SOURCE_INVALID', 'CML.01 must retain the approved dry cross-main grade rule and the riser-room low-end anchor.'))
   }
   if (governedSkeleton?.status !== 'passed' || !governedSkeleton?.sourceFeedFabricationBindingReady) {
     issues.push(issue('NH_SOURCE_FEED_GOVERNED_BINDING_BLOCKED', 'The governed CML source binding must pass first.'))
@@ -114,6 +131,34 @@ export function evaluateNewHopeSourceFeedFabrication(inputs = {}) {
   }
 
   const ready = issues.length === 0
+  const outletElevationFt = ready ? ports[0].elevationFt : null
+  const dropStartToOutletIn = (OUTLET_FROM_START_IN / 12) * (EXPECTED_GRADE_IN_PER_10_FT / 10)
+  const dropOutletToFarEndIn = (OUTLET_TO_FAR_END_IN / 12) * (EXPECTED_GRADE_IN_PER_10_FT / 10)
+  const designedNodeElevations = ready
+    ? [
+        { canonicalNodeId: 'canonical-node-001', role: 'riser-room-low-end', localElevationFt: round(outletElevationFt - dropStartToOutletIn / 12) },
+        { canonicalNodeId: 'canonical-node-002', role: 'node-118-outlet', localElevationFt: outletElevationFt },
+        { canonicalNodeId: 'canonical-node-003', role: 'cml01-far-high-end', localElevationFt: round(outletElevationFt + dropOutletToFarEndIn / 12) },
+      ]
+    : []
+  const directedEdges = ready
+    ? [
+        {
+          edgeId: 'source-edge-001',
+          highNodeId: 'canonical-node-002',
+          lowNodeId: 'canonical-node-001',
+          requiredDropIn: round(dropStartToOutletIn),
+          basis: 'approved-cross-main-grade-to-riser-room-low-end',
+        },
+        {
+          edgeId: 'source-edge-002',
+          highNodeId: 'canonical-node-003',
+          lowNodeId: 'canonical-node-002',
+          requiredDropIn: round(dropOutletToFarEndIn),
+          basis: 'approved-cross-main-grade-to-riser-room-low-end',
+        },
+      ]
+    : []
   return {
     artifactType: 'halofire.new-hope-source-feed-fabrication-result.v1',
     projectId: operationalAnnotations?.projectId,
@@ -142,7 +187,12 @@ export function evaluateNewHopeSourceFeedFabrication(inputs = {}) {
     sourceFeedPlanFabricationReady: ready,
     sourceFeedOutletTransitionReady: ready,
     sourceFeedOutletElevationReady: ready,
-    endpointElevationsReady: false,
+    directedEdges,
+    designedNodeElevations,
+    designedEndpointElevationsReady: ready,
+    designedGradeDirectionReady: ready,
+    designedGradeMagnitudeReady: ready,
+    cml01Plan3dPathReady: ready,
     installedGradeReady: false,
     concealedRiserContinuationReady: false,
     sourceFeed3dPathReady: false,

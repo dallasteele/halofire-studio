@@ -18,10 +18,7 @@
 
 const EXPECTED_PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut'
 const EXPECTED_PLAN_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5'
-const EXPECTED_UNDIRECTED_EDGE_IDS = Object.freeze([
-  'source-edge-001',
-  'source-edge-002',
-])
+const EXPECTED_UNDIRECTED_EDGE_IDS = Object.freeze([])
 const EXPECTED_SUPPLY_EDGE_IDS = Object.freeze(['source-edge-001', 'source-edge-002'])
 const EXPECTED_LOW_POINT_ZONE_EDGE_IDS = Object.freeze(['source-edge-054'])
 
@@ -36,6 +33,7 @@ const sorted = (values) => [...values].sort()
 
 function directionalGroups(inputs) {
   return [
+    ['source-feed', inputs.sourceFeedFabrication?.directedEdges || []],
     [
       'long-branch',
       inputs.longBranchDrainage?.branchSystems?.flatMap((system) => system.directedEdges) || [],
@@ -285,7 +283,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     issues.push(
       issue(
         'NH_PROPER_PIPE_DIRECTION_COVERAGE_DRIFT',
-        'The assembled layout must retain exactly the two unresolved source-feed edges.',
+        'Every canonical pipe edge must retain one source-bound drainage direction.',
       ),
     )
   }
@@ -322,7 +320,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     issues.push(
       issue(
         'NH_PROPER_PIPE_SUPPLY_IDENTITY_INVALID',
-        'The two unresolved source-feed edges must remain attached to the approved SUPPLY FROM RISER ROOM anchor.',
+        'The two CML.01 source-feed edges must remain attached to the approved SUPPLY FROM RISER ROOM low-end anchor.',
       ),
     )
   }
@@ -392,7 +390,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
   const acceptanceBlockers = [
     issue(
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
-      'CML.01, node 118, the base-of-riser endpoint Z, the device chain, the as-built riser identity, and the orthogonal plan-plus-Z calculation decomposition are source-bound; the exact installed riser station, fabrication-piece-to-calculation mapping, and installed grade remain unresolved.',
+      'CML.01 now has a complete as-designed plan axis, high-to-low direction, grade magnitude, and endpoint Z schedule tied to node 118. The below-attic riser assembly still lacks an exact installed station and fabrication-piece-to-calculation mapping, and field-measured grade remains unresolved.',
       'source-edge-001,source-edge-002',
     ),
     issue(
@@ -498,7 +496,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       fieldDrainIntentCount: fieldRouteDrainIntents.length,
     },
     planTopologyReady: ready && canonicalEdges.length === 143,
-    wholeFp20RelativeGradeDirectionReady: ready && directionByEdgeId.size === 141,
+    wholeFp20RelativeGradeDirectionReady: ready && directionByEdgeId.size === canonicalEdges.length,
     partialExactPipeElevationAnchorReady: ready && ports.length === 32,
     sameXyVerticalLegReady: ready && multiElevationNodes.length === 1,
     architecturalVerticalControlReady:
@@ -667,7 +665,14 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     exactThreadedFittingSizesReady: false,
     interPieceFittingTopologyReady: false,
     completeVerticalOffsetScheduleReady: false,
-    sourceFeedEndpointElevationsReady: false,
+    sourceFeedEndpointElevationsReady:
+      ready && sourceFeedFabrication?.designedEndpointElevationsReady === true,
+    sourceFeedDesignedGradeDirectionReady:
+      ready && sourceFeedFabrication?.designedGradeDirectionReady === true,
+    sourceFeedDesignedGradeMagnitudeReady:
+      ready && sourceFeedFabrication?.designedGradeMagnitudeReady === true,
+    sourceFeedCml01Plan3dPathReady:
+      ready && sourceFeedFabrication?.cml01Plan3dPathReady === true,
     sourceFeedConcealedPlanXyReady: false,
     sourceFeedFabricationPieceToCalculationLegDecompositionReady: false,
     sourceFeedInstalledGradeReady: false,

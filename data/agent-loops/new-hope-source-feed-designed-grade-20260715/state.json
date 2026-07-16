@@ -1,0 +1,56 @@
+{
+  "loop": "new-hope-source-feed-designed-grade-20260715",
+  "stage": "VERIFY",
+  "status": "source-feed-designed-grade-and-direction-verification-passed",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed-via-remote-hal-api",
+    "gateway": "http://192.168.1.76:9000"
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "path": "decisions/new-hope-cml-01-designed-grade-closes-canonical-direction-coverage.md"
+  },
+  "claims": {
+    "sourceFeedDesignedGradeDirectionReady": true,
+    "sourceFeedDesignedGradeMagnitudeReady": true,
+    "sourceFeedEndpointElevationsReady": true,
+    "sourceFeedCml01Plan3dPathReady": true,
+    "sourceFeedInstalledGradeReady": false,
+    "sourceFeedConcealedRiserContinuationReady": false,
+    "sourceFeed3dPathReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "asBuiltSha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B",
+    "approvedPlanSha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+    "sourceFeedDirectedEdgeCount": 2,
+    "wholePlanDirectedEdgeCount": 143,
+    "wholePlanCanonicalEdgeCount": 143,
+    "node118LocalElevationFt": 11.5,
+    "startLocalElevationFt": 11.494878,
+    "farEndLocalElevationFt": 11.501042,
+    "startToOutletDropIn": 0.061458,
+    "outletToFarEndDropIn": 0.0125,
+    "newHopeTestCount": 151,
+    "javascriptSyntaxChecks": "passed",
+    "productionBuild": "passed-after-tauri-workspace-order-fix",
+    "leanStatus": "verified",
+    "leanElapsedMs": 448,
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "browser": {
+      "proofReady": true,
+      "directedCanonicalEdges": "143/143",
+      "sourceFeedDesignedGradeDirectionReady": true,
+      "sourceFeedDesignedGradeMagnitudeReady": true,
+      "sourceFeedEndpointElevationsReady": true,
+      "sourceFeedCml01Plan3dPathReady": true,
+      "sourceFeedInstalledGradeReady": false,
+      "properPipeLayoutReady": false
+    }
+  },
+  "nextAction": "Resolve the exact below-attic riser station and fabrication-piece-to-calculation mapping, then propagate exact design Z through the remaining connected graph without promoting field-routed drains or field-measured installation claims."
+}
