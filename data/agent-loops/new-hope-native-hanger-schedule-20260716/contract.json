@@ -1,0 +1,47 @@
+{
+  "name": "new-hope-native-hanger-schedule-20260716",
+  "owner": "codex",
+  "goal": "Decode New Hope's native AutoSPRINK hanger schedule and crosswalk every line/pipe-size row to the exact purchase-bound ASC Fig. 69 variant without promoting unproven placement, solids, threads, or mating fit.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/NEW HOPE CRISIS CENTER_NHCC List.FAB",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/03-Fabrication Quotes/Response/New Hope Crisis Center Loose Quote.pdf",
+    "apps/autosprink/scripts/extract-new-hope-native-fab-topology.py",
+    "apps/autosprink/src/data/new-hope-native-fab-hanger-schedule.json",
+    "apps/autosprink/src/data/new-hope-purchased-support-components.json"
+  ],
+  "exit_criteria": [
+    "the protected FAB and Project.seidb hashes remain exact",
+    "all 76 native hanger schedule rows decode with unique identities and exact native fields",
+    "native hanger quantities total 212 across 57 fabrication lines",
+    "native size-code quantities reproduce 25, 97, 14, 48, and 28 for 1, 1-1/2, 2, 2-1/2, and 3 inch pipe",
+    "each native size code maps one-to-one to the quote-bound ASC Fig. 69 product number and published dimension variant",
+    "CMI retains four schedule rows totaling 28 hangers rather than a fabricated per-piece placement",
+    "installed XYZ, manufacturer part solids, helical thread geometry, rod engagement, structure attachment, mating fit, and support model release remain false",
+    "deterministic replay, primary tests, adversarial mutations, production build, browser proof, rulebook verification, loop guard, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "deterministic byte-identical native hanger extraction",
+    "28 New Hope test files and focused native FAB tests",
+    "AutoSPRINK production build",
+    "browser proof at apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate contract"
+  ],
+  "state_path": "data/agent-loops/new-hope-native-hanger-schedule-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-native-fab-hanger-schedule.json",
+    "apps/autosprink/src/engine/new-hope-native-hanger-schedule.js",
+    "apps/autosprink/tests/new-hope-native-hanger-schedule.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/new-hope-native-hanger-schedule-20260716/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 120000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

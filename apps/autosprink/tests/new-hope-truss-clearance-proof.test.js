@@ -201,6 +201,8 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('evaluateNewHopeSourceFeedCalculationChain');
     expect(script).toContain('evaluateNewHopeSourceFeedAsbuiltRiser');
     expect(script).toContain('evaluateNativeFabAttachmentGraph');
+    expect(script).toContain('evaluateNewHopeNativeHangerSchedule');
+    expect(script).toContain('../../new-hope-native-fab-hanger-schedule.json');
     expect(script).toContain('evaluateNewHopeLowPointFabrication');
     expect(script).toContain('evaluateNewHopeCmi05Cmi08Fabrication');
     expect(script).toContain('evaluateNewHopeCmi06VerticalOutlet');
@@ -293,6 +295,8 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain("dataset.pipeGraphStatus = properPipeLayout.properPipeLayoutReady ? 'passed' : 'blocked'");
     expect(script).toContain('properPipeLayout.acceptanceBlockers');
     expect(script).toContain('dataset.exactAssemblySourceTrustReady = String(purchasedSupportComponents.exactAssemblySourceTrustReady)');
+    expect(script).toContain('dataset.nativeHangerScheduleReady = String(nativeHangerSchedule.nativeHangerScheduleReady)');
+    expect(script).toContain('dataset.projectPipeSizeAssignmentForFig69Ready = String(nativeHangerSchedule.perLineNominalPipeSizeAssignmentReady)');
     expect(script).toContain('independently trusted geometry hashes and critical-dimension audit hashes');
     expect(script).toContain('modeled thread profile/lead/crest/root solids');
     expect(script).toContain('verified engaged turns');

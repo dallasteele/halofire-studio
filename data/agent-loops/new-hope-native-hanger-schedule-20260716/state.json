@@ -1,0 +1,90 @@
+{
+  "loop": "new-hope-native-hanger-schedule-20260716",
+  "stage": "VERIFY",
+  "status": "native-schedule-crosswalk-passed-installed-geometry-blocked",
+  "iteration": 3,
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "deterministicReplay", "browser"]
+  },
+  "sourceEvidence": {
+    "fabricationArchive": {
+      "sha256": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9"
+    },
+    "projectSeidb": {
+      "memberBytes": 102757,
+      "sha256": "0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135"
+    },
+    "nativeHangerSchedule": {
+      "rowCount": 76,
+      "hangerCount": 212,
+      "fabricationLineCount": 57,
+      "sizeCodeQuantity": {
+        "13": 25,
+        "17": 97,
+        "21": 14,
+        "23": 48,
+        "25": 28
+      },
+      "cmiScheduleRowCount": 4,
+      "cmiHangerCount": 28
+    },
+    "purchaseCrosswalk": {
+      "nominalPipeSizesIn": [1, 1.5, 2, 2.5, 3],
+      "productNumbers": ["0500301692", "0500301742", "0500301759", "0500301767", "0500301775"],
+      "publishedDimensionVariantCount": 5
+    }
+  },
+  "verification": {
+    "deterministicReplay": {
+      "byteIdentical": true,
+      "sha256": "F687DCABECC2AD33C8D445C8958A701415F5F8802539A7B5B1D1B7CD513FE23D"
+    },
+    "focusedAndNewHopeTests": "28 files / 180 tests passed",
+    "adversarialNativeHangerCases": 5,
+    "autosprinkProductionBuild": "passed",
+    "monorepoBuild": "11 of 12 tasks passed; pre-existing desktop packaging gate still lacks bin/halofire-pipeline-x86_64-pc-windows-msvc.exe",
+    "biomeFocusedNewFiles": "passed",
+    "pythonCompile": "passed",
+    "gitDiffCheck": "passed",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "browser": {
+      "url": "http://127.0.0.1:3314/apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html?native-hangers=20260716",
+      "proofReady": true,
+      "nativeHangerScheduleReady": true,
+      "projectPipeSizeAssignmentForFig69Ready": true,
+      "nativeHangerCatalogDimensionAssignmentReady": true,
+      "nativeHangerExactInstalledPlacementReady": false,
+      "exactSupportManufacturerGeometryReady": false,
+      "exactSupportThreadSolidsReady": false,
+      "verifiedSupportMatingAssembliesReady": false,
+      "supportModelReleaseReady": false,
+      "properPipeLayoutReady": false,
+      "brokenImages": 0,
+      "warningsOrErrors": 0
+    },
+    "brainPreflight": {
+      "status": "used"
+    },
+    "brainPostflight": {
+      "status": "recorded",
+      "episodeId": 153683
+    }
+  },
+  "claims": {
+    "nativeHangerScheduleReady": true,
+    "perLineNominalPipeSizeAssignmentReady": true,
+    "purchaseBoundCatalogDimensionAssignmentReady": true,
+    "exactInstalledPlacementReady": false,
+    "manufacturerPartSolidReady": false,
+    "exactThreadGeometryReady": false,
+    "matingAssemblyReady": false,
+    "supportModelReleaseReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsDeploymentReady": false
+  },
+  "nextAction": "Decode or locate source-native CMI.23-CMI.42 adjacency and placement, acquire independently trusted manufacturer solids for the Fig. 69/Sammy/AB2 assemblies and threaded terminal fittings, then verify helical thread standards and engaged turns, dimensional mating clearance, structure attachment, installed XYZ, exact-BREP interference, and scene collision before any support or whole-layout release."
+}

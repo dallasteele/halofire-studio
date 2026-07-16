@@ -63,6 +63,24 @@ FITTING_FIELD_TYPES = {
 }
 FITTING_FIELD_ORDER = tuple(range(1, 13))
 
+HANGER_FIELD_TYPES = {
+    1: "int",
+    2: "int",
+    3: "int",
+    4: "int",
+    5: "int",
+    6: "int",
+    7: "byte",
+    8: "double",
+    9: "string",
+    10: "int",
+    11: "int",
+    12: "string",
+    13: "double",
+    14: "double",
+}
+HANGER_FIELD_ORDER = tuple(range(1, 15))
+
 OUTLET_FIELD_TYPES = {
     1: "int",
     2: "int",
@@ -129,6 +147,22 @@ FITTING_FIELD_NAMES = {
     10: "isBullhead",
     11: "fittingConnectionId",
     12: "isOnFitting",
+}
+HANGER_FIELD_NAMES = {
+    1: "itemCode",
+    2: "sizeCode",
+    3: "originCode",
+    4: "uniqueId",
+    5: "parentId",
+    6: "quantity",
+    7: "descriptionCode",
+    8: "lengthFt",
+    9: "lineName",
+    10: "constructionId",
+    11: "hangerTypeId",
+    12: "hangerCode",
+    13: "extraRodLengthFt",
+    14: "spanFt",
 }
 
 
@@ -343,6 +377,46 @@ def build_attachment_graph(
     }
 
 
+def build_hanger_schedule(hangers: list[dict[str, object]]) -> dict[str, object]:
+    """Expose the exact native hanger rows without inventing placement geometry.
+
+    Project.seidb stores one schedule row per line/pipe-size grouping.  These
+    rows prove quantities and native fabrication attributes, but they do not
+    contain plan XYZ, a manufacturer solid, substrate identity, or thread
+    engagement.  Those boundaries remain explicit in the emitted claims.
+    """
+    records = [label_row(row, HANGER_FIELD_NAMES) for row in hangers]
+    size_code_quantities: dict[str, int] = {}
+    line_quantities: dict[str, int] = {}
+    for record in records:
+        size_code = str(record["sizeCode"])
+        line_name = str(record["lineName"])
+        size_code_quantities[size_code] = (
+            size_code_quantities.get(size_code, 0) + int(record["quantity"])
+        )
+        line_quantities[line_name] = (
+            line_quantities.get(line_name, 0) + int(record["quantity"])
+        )
+    return {
+        "records": records,
+        "metrics": {
+            "scheduleRowCount": len(records),
+            "hangerQuantity": sum(int(record["quantity"]) for record in records),
+            "lineCount": len(line_quantities),
+            "sizeCodeQuantities": dict(sorted(size_code_quantities.items())),
+            "lineQuantities": dict(sorted(line_quantities.items())),
+        },
+        "claims": {
+            "nativeHangerScheduleReady": True,
+            "nominalPipeSizeCrosswalkReady": False,
+            "exactInstalledPlacementReady": False,
+            "manufacturerPartSolidReady": False,
+            "exactThreadGeometryReady": False,
+            "matingAssemblyReady": False,
+        },
+    }
+
+
 def extract(archive: Path, include_records: bool = False) -> dict[str, object]:
     archive_bytes = archive.read_bytes()
     with zipfile.ZipFile(archive) as container:
@@ -354,7 +428,20 @@ def extract(archive: Path, include_records: bool = False) -> dict[str, object]:
     fitting_schema = data.find(
         "FITTING CONNECTION ID".encode("utf-16le"), outlet_schema + 1
     )
-    if min(pipe_schema, line_schema, outlet_schema, fitting_schema) < 0:
+    hanger_schema = data.find(
+        "HANGER TYPE".encode("utf-16le"), fitting_schema + 1
+    )
+    sprinkler_schema = data.find(
+        "IS GALVANIZED".encode("utf-16le"), hanger_schema + 1
+    )
+    if min(
+        pipe_schema,
+        line_schema,
+        outlet_schema,
+        fitting_schema,
+        hanger_schema,
+        sprinkler_schema,
+    ) < 0:
         raise ValueError("required SEiDataBook table schema was not found")
 
     pipes = parse_table(
@@ -367,9 +454,13 @@ def extract(archive: Path, include_records: bool = False) -> dict[str, object]:
         data, outlet_schema, fitting_schema, OUTLET_FIELD_TYPES, OUTLET_FIELD_ORDER
     )
     fittings = parse_table(
-        data, fitting_schema, len(data), FITTING_FIELD_TYPES, FITTING_FIELD_ORDER
+        data, fitting_schema, hanger_schema, FITTING_FIELD_TYPES, FITTING_FIELD_ORDER
+    )
+    hangers = parse_table(
+        data, hanger_schema, sprinkler_schema, HANGER_FIELD_TYPES, HANGER_FIELD_ORDER
     )
     attachment_graph = build_attachment_graph(lines, pipes, outlets, fittings)
+    hanger_schedule = build_hanger_schedule(hangers)
 
     cml_lines = [row for row in lines if row["fields"]["9"] == "CML"]
     cml01_candidates = [
@@ -417,6 +508,7 @@ def extract(archive: Path, include_records: bool = False) -> dict[str, object]:
             "lines": len(lines),
             "outlets": len(outlets),
             "fittings": len(fittings),
+            "hangers": len(hangers),
         },
         "topologyMetrics": {
             "pipeParentFittingCount": sum(
@@ -431,6 +523,7 @@ def extract(archive: Path, include_records: bool = False) -> dict[str, object]:
             **attachment_graph["metrics"],
         },
         "attachmentGraph": attachment_graph,
+        "hangerSchedule": hanger_schedule,
         "cmlLines": [label_row(row, LINE_FIELD_NAMES) for row in cml_lines],
         "cml01Candidates": [
             label_row(row, PIPE_FIELD_NAMES) for row in cml01_candidates
@@ -455,6 +548,7 @@ def main() -> None:
     parser.add_argument("archive", type=Path)
     parser.add_argument("--all-records", action="store_true")
     parser.add_argument("--graph-only", action="store_true")
+    parser.add_argument("--hanger-schedule-only", action="store_true")
     parser.add_argument("--display-path")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
@@ -464,6 +558,12 @@ def main() -> None:
             "artifactType": "halofire.autosprink-native-fab-attachment-graph.v1",
             "source": result["source"],
             **result["attachmentGraph"],
+        }
+    if args.hanger_schedule_only:
+        result = {
+            "artifactType": "halofire.autosprink-native-fab-hanger-schedule.v1",
+            "source": result["source"],
+            **result["hangerSchedule"],
         }
     if args.display_path:
         result["source"]["archive"] = args.display_path
