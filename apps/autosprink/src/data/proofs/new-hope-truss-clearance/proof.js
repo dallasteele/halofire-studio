@@ -17,6 +17,7 @@ import { evaluateNewHopeArmOverDrainage } from '../../../engine/new-hope-arm-ove
 import { evaluateNewHopeElevationDatum } from '../../../engine/new-hope-elevation-datum.js';
 import { evaluateNewHopeProperPipeLayout } from '../../../engine/new-hope-proper-pipe-layout.js';
 import { evaluateNewHopeSourceFeedFabrication } from '../../../engine/new-hope-source-feed-fabrication.js';
+import { evaluateNewHopeSourceFeedCalculationChain } from '../../../engine/new-hope-source-feed-calculation-chain.js';
 import { evaluateNewHopeLowPointFabrication } from '../../../engine/new-hope-low-point-fabrication.js';
 import { evaluateNewHopeCmi05Cmi08Fabrication } from '../../../engine/new-hope-cmi05-cmi08-fabrication.js';
 import { evaluateNewHopeCmi06VerticalOutlet } from '../../../engine/new-hope-cmi06-vertical-outlet.js';
@@ -116,6 +117,11 @@ try {
     hydraulicRoutes: [hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence],
   });
   if (!sourceFeedFabrication.sourceFeedOutletElevationReady) throw new Error(`CML.01 source-feed fabrication: ${sourceFeedFabrication.blockerCodes.join(', ')}`);
+  const sourceFeedCalculationChain = evaluateNewHopeSourceFeedCalculationChain({
+    hydraulicRoutes: [hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence],
+    sourceFeedFabrication,
+  });
+  if (!sourceFeedCalculationChain.calculationChainReady) throw new Error(`source-feed calculation chain: ${sourceFeedCalculationChain.blockerCodes.join(', ')}`);
   const lowPointFabrication = evaluateNewHopeLowPointFabrication({
     canonicalTopology,
     governedSkeleton,
@@ -151,6 +157,7 @@ try {
     governedSkeleton,
     operationalAnnotations,
     sourceFeedFabrication,
+    sourceFeedCalculationChain,
   });
   if (!remainingCmiFabrication.boundedRemainingCmiFittingScheduleReady) throw new Error(`CMI.01-CMI.04 / CMI.14-CMI.18 fabrication: ${remainingCmiFabrication.blockerCodes.join(', ')}`);
   const ridgeGrade = evaluateNewHopeRidgeBranchGradeEnvelope({ pipeVectors, canonicalTopology, operationalAnnotations, atticSource, atticCalibration, answerEvidence });
@@ -195,6 +202,7 @@ try {
     architecturalVerticalControls: architecturalValidation,
     elevationDatum,
     sourceFeedFabrication,
+    sourceFeedCalculationChain,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -582,6 +590,7 @@ try {
   document.querySelector('#proper-pipe-layout-proof-status').textContent = `AUDITED: ${properPipeLayout.metrics.directedEdgeCount}/${properPipeLayout.metrics.canonicalEdgeCount} edges direction-bound; ${properPipeLayout.metrics.exactElevationPortCount} exact Z ports on ${properPipeLayout.metrics.exactElevationCanonicalNodeCount}/${properPipeLayout.metrics.canonicalNodeCount} nodes; datum 100'-0\" registered across ${elevationDatum.metrics.distinctRoofRidgeElevationCount} roof regions; proper layout remains blocked`;
   document.querySelector('#source-feed-fabrication-status').textContent = `PASS: CML.01 4-inch x 2'-11½\" plan piece + 4 x 3 upward outlet + node 118 at 11.5 ft; endpoint Z, installed grade, and concealed riser continuation remain blocked`;
   document.querySelector('#low-point-fabrication-status').textContent = `PASS: CMI.09 field/listing piece starts at low-point-01; source-edge-054 is node 059 high to node 054 low with ${lowPointFabrication.directedEdge.requiredDropIn.toFixed(6)} in minimum fall; equal 18.375-ft calc labels do not claim exact differential Z`;
+  document.querySelector('#source-feed-fabrication-status').textContent = `PASS: CML.01 + node 118 at 11.5 ft, BOR node 414 at 5.458 ft, and DPV/BV/BFP chain; concealed XY, fabrication-to-calculation decomposition, and installed grade remain blocked`;
   document.querySelector('#cmi05-cmi08-fabrication-status').textContent = `PASS: CMI.05, CMI.07, and CMI.08 bind 3 exact field/listing pieces, 5 listed outlets, 2 exact one-inch arm-over terminals, and the no-outlet CMI.08 turn; fabrication piece direction remains separate from drainage direction`;
   document.querySelector('#cmi06-vertical-status').textContent = `PASS: CMI.06 is the 3-inch x 21-foot pipe-067 piece with four upward 3 x 1 threaded outlets plus the 3 x 2-1/2 grooved branch outlet; head-057 is an exact 1-foot same-XY vertical leg from carrier Z 20.5 ft to sprinkler Z 21.5 ft`;
   document.querySelector('#cmi-ridge-chain-fabrication-status').textContent = `PASS: CMI.10-CMI.13 and CMI.19-CMI.22 bind 8 start-to-far-end pieces, 28 canonical edges, 20 sprinkler outlets, 1 CMI.13 inspector-test outlet, and 2 no-outlet transitions; mirrored plan geometry does not mirror the CMI.13-only outlet`;
@@ -606,6 +615,7 @@ try {
   document.querySelector('#machine-acceptance-boundary').textContent += ` | armOverSourceTopologyReady=${armOverDrainage.armOverSourceTopologyReady} | armOverTerminalSprinklerBindingReady=${armOverDrainage.armOverTerminalSprinklerBindingReady} | armOverFabricationBindingReady=${armOverDrainage.armOverFabricationBindingReady} | armOverCrossProjectMethodCalibrationReady=${armOverDrainage.armOverCrossProjectMethodCalibrationReady} | armOverGeneratedGradeDirectionReady=${armOverDrainage.armOverGeneratedGradeDirectionReady} | armOverRelativeGradeProfilesReady=${armOverDrainage.armOverRelativeGradeProfilesReady} | allTwelveArmOverDrainageReady=${armOverDrainage.allTwelveArmOverDrainageReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | lowPointPieceFabricationReady=${lowPointFabrication.lowPointPieceFabricationReady} | lowPointPlanStationRegistrationReady=${lowPointFabrication.lowPointPlanStationRegistrationReady} | lowPointRelativeGradeDirectionReady=${lowPointFabrication.lowPointRelativeGradeDirectionReady} | lowPointExactDifferentialZReady=${lowPointFabrication.exactDifferentialZReady} | properPipeEvidenceAssemblyStatus=${properPipeLayout.status} | directedCanonicalEdges=${properPipeLayout.metrics.directedEdgeCount}/${properPipeLayout.metrics.canonicalEdgeCount} | exactElevationPorts=${properPipeLayout.metrics.exactElevationPortCount} | exactElevationCanonicalNodes=${properPipeLayout.metrics.exactElevationCanonicalNodeCount}/${properPipeLayout.metrics.canonicalNodeCount} | sameXyVerticalLegReady=${properPipeLayout.sameXyVerticalLegReady} | calculationToArchitecturalDatumRegistrationReady=${properPipeLayout.calculationToArchitecturalDatumRegistrationReady} | lowPointZoneGradeReady=${properPipeLayout.lowPointZoneGradeReady} | sourceFeedPlanFabricationReady=${properPipeLayout.sourceFeedPlanFabricationReady} | sourceFeedOutletTransitionReady=${properPipeLayout.sourceFeedOutletTransitionReady} | sourceFeedOutletElevationReady=${properPipeLayout.sourceFeedOutletElevationReady} | sourceFeedEndpointElevationsReady=${properPipeLayout.sourceFeedEndpointElevationsReady} | sourceFeedInstalledGradeReady=${properPipeLayout.sourceFeedInstalledGradeReady} | sourceFeedConcealedRiserContinuationReady=${properPipeLayout.sourceFeedConcealedRiserContinuationReady} | sourceFeed3dPathReady=${properPipeLayout.sourceFeed3dPathReady} | fittingScheduleReady=${properPipeLayout.fittingScheduleReady} | properPipeLayoutReady=${properPipeLayout.properPipeLayoutReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | cmi05PieceFabricationReady=${properPipeLayout.cmi05PieceFabricationReady} | cmi05OutletScheduleReady=${properPipeLayout.cmi05OutletScheduleReady} | cmi05SeparatedCrossingReady=${properPipeLayout.cmi05SeparatedCrossingReady} | cmi07PieceFabricationReady=${properPipeLayout.cmi07PieceFabricationReady} | cmi07OutletScheduleReady=${properPipeLayout.cmi07OutletScheduleReady} | cmi07ArmOverTerminalBindingReady=${properPipeLayout.cmi07ArmOverTerminalBindingReady} | cmi08PieceFabricationReady=${properPipeLayout.cmi08PieceFabricationReady} | cmi08NoOutletScheduleReady=${properPipeLayout.cmi08NoOutletScheduleReady} | cmi07Cmi08JunctionReady=${properPipeLayout.cmi07Cmi08JunctionReady} | cmi05Cmi08BoundedFittingScheduleReady=${properPipeLayout.cmi05Cmi08BoundedFittingScheduleReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent += ` | sourceFeedCalculationChainReady=${properPipeLayout.sourceFeedCalculationChainReady} | sourceFeedBaseOfRiserEndpointZReady=${properPipeLayout.sourceFeedBaseOfRiserEndpointZReady} | sourceFeedDryPipeValveIdentityReady=${properPipeLayout.sourceFeedDryPipeValveIdentityReady} | sourceFeedDownstreamValveBackflowElevationChainReady=${properPipeLayout.sourceFeedDownstreamValveBackflowElevationChainReady} | sourceFeedConcealedPlanXyReady=${properPipeLayout.sourceFeedConcealedPlanXyReady} | sourceFeedFabricationPieceToCalculationLegDecompositionReady=${properPipeLayout.sourceFeedFabricationPieceToCalculationLegDecompositionReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | cmi06PieceFabricationReady=${properPipeLayout.cmi06PieceFabricationReady} | cmi06OutletScheduleReady=${properPipeLayout.cmi06OutletScheduleReady} | cmi06BranchOutletReady=${properPipeLayout.cmi06BranchOutletReady} | head057OutletFittingReady=${properPipeLayout.head057OutletFittingReady} | head057VerticalLegReady=${properPipeLayout.head057VerticalLegReady} | head057ExactCarrierZReady=${properPipeLayout.head057ExactCarrierZReady} | head057ExactSprinklerZReady=${properPipeLayout.head057ExactSprinklerZReady} | boundedVerticalOffsetScheduleReady=${properPipeLayout.boundedVerticalOffsetScheduleReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | cmiRidgeEightPieceFabricationReady=${properPipeLayout.cmiRidgeEightPieceFabricationReady} | cmiRidgeTwentyOneOutletScheduleReady=${properPipeLayout.cmiRidgeTwentyOneOutletScheduleReady} | cmiRidgeTwentySprinklerOutletIdentityReady=${properPipeLayout.cmiRidgeTwentySprinklerOutletIdentityReady} | cmi13RemoteInspectorTestOutletReady=${properPipeLayout.cmi13RemoteInspectorTestOutletReady} | cmi13Cmi22AsymmetryReady=${properPipeLayout.cmi13Cmi22AsymmetryReady} | cmiRidgeChainJunctionsReady=${properPipeLayout.cmiRidgeChainJunctionsReady} | cmiRidgeBoundedFittingScheduleReady=${properPipeLayout.cmiRidgeBoundedFittingScheduleReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | remainingCmiNinePieceFabricationReady=${properPipeLayout.remainingCmiNinePieceFabricationReady} | remainingCmiElevenOutletScheduleReady=${properPipeLayout.remainingCmiElevenOutletScheduleReady} | remainingCmiSixDirectSprinklerOutletIdentityReady=${properPipeLayout.remainingCmiSixDirectSprinklerOutletIdentityReady} | remainingCmiFiveBranchOrArmOverOutletScheduleReady=${properPipeLayout.remainingCmiFiveBranchOrArmOverOutletScheduleReady} | remainingCmiFourNoOutletPieceScheduleReady=${properPipeLayout.remainingCmiFourNoOutletPieceScheduleReady} | cmi01SourceOutletZReady=${properPipeLayout.cmi01SourceOutletZReady} | remainingCmiBoundedFittingScheduleReady=${properPipeLayout.remainingCmiBoundedFittingScheduleReady}`;
@@ -664,6 +674,10 @@ try {
   document.documentElement.dataset.sourceFeedOutletTransitionReady = String(properPipeLayout.sourceFeedOutletTransitionReady);
   document.documentElement.dataset.sourceFeedOutletElevationReady = String(properPipeLayout.sourceFeedOutletElevationReady);
   document.documentElement.dataset.sourceFeedEndpointElevationsReady = String(properPipeLayout.sourceFeedEndpointElevationsReady);
+  document.documentElement.dataset.sourceFeedCalculationChainReady = String(properPipeLayout.sourceFeedCalculationChainReady);
+  document.documentElement.dataset.sourceFeedBaseOfRiserEndpointZReady = String(properPipeLayout.sourceFeedBaseOfRiserEndpointZReady);
+  document.documentElement.dataset.sourceFeedCalculationLegEndpointElevationsReady = String(properPipeLayout.sourceFeedCalculationLegEndpointElevationsReady);
+  document.documentElement.dataset.sourceFeedConcealedPlanXyReady = String(properPipeLayout.sourceFeedConcealedPlanXyReady);
   document.documentElement.dataset.sourceFeedInstalledGradeReady = String(properPipeLayout.sourceFeedInstalledGradeReady);
   document.documentElement.dataset.sourceFeedConcealedRiserContinuationReady = String(properPipeLayout.sourceFeedConcealedRiserContinuationReady);
   document.documentElement.dataset.lowPointZoneGradeReady = String(properPipeLayout.lowPointZoneGradeReady);

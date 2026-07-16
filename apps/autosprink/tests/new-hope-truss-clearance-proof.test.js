@@ -30,6 +30,8 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(html).toContain('listing-cmi01-cmi04-page14.png');
     expect(html).toContain('listing-cmi14-page16.png');
     expect(html).toContain('listing-cmi15-cmi18-page17.png');
+    expect(html).toContain('approved-calcs-source-feed-page15.png');
+    expect(fs.statSync(new URL('approved-calcs-source-feed-page15.png', proof)).size).toBeGreaterThan(30_000);
     for (const image of ['s102-roof-framing-underlay.png', 'approved-ridge-branch-underlay.png', 'approved-dry-pipe-note.png', 'approved-fp20-full-underlay.png', 'approved-fp20-pipe-size-overlay.png', 'architectural-a102-rcp.png', 'architectural-a103-roof-plan.png', 'architectural-a201-elevations.png', 'architectural-a301-sections.png', 'field-cmi09-low-point.png', 'listing-cmi09-page15.png', 'field-cmi06-vertical-outlet.png', 'listing-cmi06-vertical-outlet.png', 'field-cmi05-cmi08-layout.png', 'listing-cmi05-cmi08-page15.png', 'field-cmi-ridge-chains.png', 'listing-cmi10-cmi13-page16.png', 'listing-cmi19-page17.png', 'listing-cmi20-cmi22-page18.png', 'field-cmi01-cmi04.png', 'field-cmi14-cmi18.png', 'listing-cmi01-cmi04-page14.png', 'listing-cmi14-page16.png', 'listing-cmi15-cmi18-page17.png']) expect(fs.statSync(new URL(image, proof)).size).toBeGreaterThan(30_000);
   });
 
@@ -186,6 +188,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.exactDeflectorElevationsReady = String(ridgeGrade.exactDeflectorElevationsReady)');
     expect(script).toContain('dataset.exactPipeCenterlineZReady = String(properPipeLayout.exactPipeCenterlineZReady)');
     expect(script).toContain('evaluateNewHopeSourceFeedFabrication');
+    expect(script).toContain('evaluateNewHopeSourceFeedCalculationChain');
     expect(script).toContain('evaluateNewHopeLowPointFabrication');
     expect(script).toContain('evaluateNewHopeCmi05Cmi08Fabrication');
     expect(script).toContain('evaluateNewHopeCmi06VerticalOutlet');
@@ -228,6 +231,10 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.sourceFeedPlanFabricationReady = String(properPipeLayout.sourceFeedPlanFabricationReady)');
     expect(script).toContain('dataset.sourceFeedOutletTransitionReady = String(properPipeLayout.sourceFeedOutletTransitionReady)');
     expect(script).toContain('dataset.sourceFeedOutletElevationReady = String(properPipeLayout.sourceFeedOutletElevationReady)');
+    expect(script).toContain('dataset.sourceFeedCalculationChainReady = String(properPipeLayout.sourceFeedCalculationChainReady)');
+    expect(script).toContain('dataset.sourceFeedBaseOfRiserEndpointZReady = String(properPipeLayout.sourceFeedBaseOfRiserEndpointZReady)');
+    expect(script).toContain('dataset.sourceFeedCalculationLegEndpointElevationsReady = String(properPipeLayout.sourceFeedCalculationLegEndpointElevationsReady)');
+    expect(script).toContain('dataset.sourceFeedConcealedPlanXyReady = String(properPipeLayout.sourceFeedConcealedPlanXyReady)');
     expect(script).toContain('dataset.sourceFeedInstalledGradeReady = String(properPipeLayout.sourceFeedInstalledGradeReady)');
     expect(script).toContain('bounded-grade-vector');
     expect(script).toContain('bounded-grade-profile');

@@ -10,9 +10,10 @@
  *
  * Known limitations: approved calculations anchor only a subset of the plan
  * graph; the registered calculation datum still does not establish Z for the
- * remaining plan nodes, the source-feed transition, the field-routed drum-drip
- * drains, or a complete fitting schedule. This module therefore never invents
- * pipe Z from roof Z and never treats hydraulic flow as drainage grade.
+ * remaining plan nodes, the concealed source-feed XY/decomposition, the
+ * field-routed drum-drip drains, or a complete fitting schedule. This module
+ * therefore never invents pipe Z from roof Z and never treats hydraulic flow
+ * as drainage grade.
  */
 
 const EXPECTED_PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut'
@@ -163,6 +164,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.architecturalVerticalControls - Evaluated A201/A301 controls.
  * @param {object} inputs.elevationDatum - Evaluated FP0.1/A102/calculation datum registration.
  * @param {object} inputs.sourceFeedFabrication - Evaluated CML.01 plan/listing/outlet registration.
+ * @param {object} inputs.sourceFeedCalculationChain - Evaluated node-118/BOR/valve calculation chain.
  * @param {object} inputs.lowPointFabrication - Evaluated CMI.09 low-point/listing/grade registration.
  * @param {object} inputs.cmi05Cmi08Fabrication - Evaluated CMI.05, CMI.07, and CMI.08 fitting schedule.
  * @param {object} inputs.cmi06VerticalOutlet - Evaluated CMI.06 outlet and head-057 vertical leg.
@@ -187,6 +189,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     architecturalVerticalControls,
     elevationDatum,
     sourceFeedFabrication,
+    sourceFeedCalculationChain,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -208,6 +211,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     architecturalVerticalControls,
     elevationDatum,
     sourceFeedFabrication,
+    sourceFeedCalculationChain,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -241,6 +245,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['architectural-vertical-controls', architecturalVerticalControls?.status],
     ['calculation-elevation-datum', elevationDatum?.status],
     ['source-feed-fabrication', sourceFeedFabrication?.status],
+    ['source-feed-calculation-chain', sourceFeedCalculationChain?.status],
     ['low-point-fabrication', lowPointFabrication?.status],
     ['cmi05-cmi08-fabrication', cmi05Cmi08Fabrication?.status],
     ['cmi06-vertical-outlet', cmi06VerticalOutlet?.status],
@@ -379,7 +384,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
   const acceptanceBlockers = [
     issue(
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
-      'CML.01, its 4 x 3 upward outlet, and node-118 elevation are source-bound; endpoint Z, installed grade, and the concealed riser-room continuation remain unresolved.',
+      'CML.01, node 118, the base-of-riser endpoint Z, and the downstream valve/backflow calculation chain are source-bound; the concealed XY route, fabrication-piece-to-calculation-leg decomposition, and installed geometry remain unresolved.',
       'source-edge-001,source-edge-002',
     ),
     issue(
@@ -414,7 +419,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         fromNodeId: edge.fromNodeId,
         toNodeId: edge.toNodeId,
         classification: EXPECTED_SUPPLY_EDGE_IDS.includes(edge.id)
-          ? 'source-feed-fabricated-plan-edge-endpoint-z-and-grade-unresolved'
+          ? 'source-feed-fabricated-plan-edge-with-bor-calculation-z-but-concealed-xy-and-installed-geometry-unresolved'
           : 'unclassified-undirected-edge',
       })),
     exactElevationPorts: ports,
@@ -472,6 +477,10 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         (cmiRidgeChainFabrication?.metrics?.boundedOutletCount || 0) +
         (remainingCmiFabrication?.metrics?.boundedOutletCount || 0),
       exactVerticalLegCount: cmi06VerticalOutlet?.head057VerticalLegReady ? 1 : 0,
+      sourceFeedCalculationPortCount:
+        sourceFeedCalculationChain?.exactCalculationElevationPortCount || 0,
+      sourceFeedExternalCalculationPortCount:
+        sourceFeedCalculationChain?.exactExternalCalculationPortCount || 0,
       fieldDrainIntentCount: fieldRouteDrainIntents.length,
     },
     planTopologyReady: ready && canonicalEdges.length === 143,
@@ -485,6 +494,17 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ? {
           piece: sourceFeedFabrication.piece,
           outlet: sourceFeedFabrication.outlet,
+        }
+      : null,
+    sourceFeedCalculationChain: sourceFeedCalculationChain
+      ? {
+          source: sourceFeedCalculationChain.source,
+          calculationPorts: sourceFeedCalculationChain.calculationPorts,
+          calculationLegs: sourceFeedCalculationChain.calculationLegs,
+          sourceOutletToBaseOfRiserDeltaZFt:
+            sourceFeedCalculationChain.sourceOutletToBaseOfRiserDeltaZFt,
+          sourceOutletToBaseOfRiserPhysicalLengthFt:
+            sourceFeedCalculationChain.sourceOutletToBaseOfRiserPhysicalLengthFt,
         }
       : null,
     lowPointFabrication: lowPointFabrication
@@ -597,7 +617,19 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ready && sourceFeedFabrication?.sourceFeedOutletTransitionReady === true,
     sourceFeedOutletElevationReady:
       ready && sourceFeedFabrication?.sourceFeedOutletElevationReady === true,
+    sourceFeedCalculationChainReady:
+      ready && sourceFeedCalculationChain?.calculationChainReady === true,
+    sourceFeedBaseOfRiserEndpointZReady:
+      ready && sourceFeedCalculationChain?.baseOfRiserEndpointZReady === true,
+    sourceFeedDryPipeValveIdentityReady:
+      ready && sourceFeedCalculationChain?.dryPipeValveIdentityReady === true,
+    sourceFeedDownstreamValveBackflowElevationChainReady:
+      ready && sourceFeedCalculationChain?.downstreamValveBackflowElevationChainReady === true,
+    sourceFeedCalculationLegEndpointElevationsReady:
+      ready && sourceFeedCalculationChain?.baseOfRiserEndpointZReady === true,
     sourceFeedEndpointElevationsReady: false,
+    sourceFeedConcealedPlanXyReady: false,
+    sourceFeedFabricationPieceToCalculationLegDecompositionReady: false,
     sourceFeedInstalledGradeReady: false,
     sourceFeedConcealedRiserContinuationReady: false,
     sourceFeed3dPathReady: false,

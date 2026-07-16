@@ -16,6 +16,7 @@ import { evaluateNewHopeLowPointFabrication } from '../src/engine/new-hope-low-p
 import { evaluateNewHopeProperPipeLayout } from '../src/engine/new-hope-proper-pipe-layout.js'
 import { evaluateNewHopeRemainingCmiFabrication } from '../src/engine/new-hope-remaining-cmi-fabrication.js'
 import { evaluateNewHopeSideBranchDrainage } from '../src/engine/new-hope-side-branch-drainage.js'
+import { evaluateNewHopeSourceFeedCalculationChain } from '../src/engine/new-hope-source-feed-calculation-chain.js'
 import { evaluateNewHopeSourceFeedFabrication } from '../src/engine/new-hope-source-feed-fabrication.js'
 
 const read = (name) =>
@@ -43,6 +44,10 @@ const sourceFeedFabrication = evaluateNewHopeSourceFeedFabrication({
   governedSkeleton,
   operationalAnnotations,
   hydraulicRoutes,
+})
+const sourceFeedCalculationChain = evaluateNewHopeSourceFeedCalculationChain({
+  hydraulicRoutes,
+  sourceFeedFabrication,
 })
 const lowPointFabrication = evaluateNewHopeLowPointFabrication({
   canonicalTopology,
@@ -75,6 +80,7 @@ const remainingCmiFabrication = evaluateNewHopeRemainingCmiFabrication({
   governedSkeleton,
   operationalAnnotations,
   sourceFeedFabrication,
+  sourceFeedCalculationChain,
 })
 const longBranchDrainage = evaluateNewHopeLongBranchDrainage({
   pipeVectors,
@@ -121,6 +127,7 @@ const inputs = {
   architecturalVerticalControls,
   elevationDatum,
   sourceFeedFabrication,
+  sourceFeedCalculationChain,
   lowPointFabrication,
   cmi05Cmi08Fabrication,
   cmi06VerticalOutlet,
@@ -158,11 +165,13 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       sameXyVerticalLegCount: 1,
       sourceBoundFabricationOutletCount: 45,
       exactVerticalLegCount: 1,
+      sourceFeedCalculationPortCount: 4,
+      sourceFeedExternalCalculationPortCount: 3,
       fieldDrainIntentCount: 2,
     })
     expect(result.undirectedEdges.map((edge) => [edge.edgeId, edge.classification])).toEqual([
-      ['source-edge-001', 'source-feed-fabricated-plan-edge-endpoint-z-and-grade-unresolved'],
-      ['source-edge-002', 'source-feed-fabricated-plan-edge-endpoint-z-and-grade-unresolved'],
+      ['source-edge-001', 'source-feed-fabricated-plan-edge-with-bor-calculation-z-but-concealed-xy-and-installed-geometry-unresolved'],
+      ['source-edge-002', 'source-feed-fabricated-plan-edge-with-bor-calculation-z-but-concealed-xy-and-installed-geometry-unresolved'],
     ])
     expect(result.wholeFp20RelativeGradeDirectionReady).toBe(true)
     expect(result.partialExactPipeElevationAnchorReady).toBe(true)
@@ -171,7 +180,14 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.sourceFeedPlanFabricationReady).toBe(true)
     expect(result.sourceFeedOutletTransitionReady).toBe(true)
     expect(result.sourceFeedOutletElevationReady).toBe(true)
+    expect(result.sourceFeedCalculationChainReady).toBe(true)
+    expect(result.sourceFeedBaseOfRiserEndpointZReady).toBe(true)
+    expect(result.sourceFeedDryPipeValveIdentityReady).toBe(true)
+    expect(result.sourceFeedDownstreamValveBackflowElevationChainReady).toBe(true)
+    expect(result.sourceFeedCalculationLegEndpointElevationsReady).toBe(true)
     expect(result.sourceFeedEndpointElevationsReady).toBe(false)
+    expect(result.sourceFeedConcealedPlanXyReady).toBe(false)
+    expect(result.sourceFeedFabricationPieceToCalculationLegDecompositionReady).toBe(false)
     expect(result.sourceFeedInstalledGradeReady).toBe(false)
     expect(result.sourceFeedConcealedRiserContinuationReady).toBe(false)
     expect(result.lowPointZoneGradeReady).toBe(true)
@@ -238,6 +254,7 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     })
     expect(result.properPipeLayoutReady).toBe(false)
     expect(result.fabricationReady).toBe(false)
+    expect(result.sourceFeedCalculationChain.sourceOutletToBaseOfRiserDeltaZFt).toBe(6.041667)
   })
 
   it('preserves the source-proved one-foot same-XY vertical leg as two Z ports', () => {
@@ -340,6 +357,14 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(absentLowPoint.status).toBe('blocked')
     expect(absentLowPoint.blockerCodes).toContain('NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED')
     expect(absentLowPoint.blockerCodes).toContain('NH_PROPER_PIPE_DIRECTION_COVERAGE_DRIFT')
+
+    const absentSourceChain = evaluateNewHopeProperPipeLayout({
+      ...inputs,
+      sourceFeedCalculationChain: null,
+    })
+    expect(absentSourceChain.status).toBe('blocked')
+    expect(absentSourceChain.blockerCodes).toContain('NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED')
+    expect(absentSourceChain.sourceFeedBaseOfRiserEndpointZReady).toBe(false)
 
     const absent = evaluateNewHopeProperPipeLayout({ ...inputs, armOverDrainage: null })
     expect(absent.status).toBe('blocked')

@@ -1,0 +1,49 @@
+{
+  "name": "new-hope-source-feed-calculation-chain-20260715",
+  "owner": "codex",
+  "goal": "Bind the approved New Hope node-118-to-base-of-riser and downstream valve/backflow calculation chain while refusing to promote concealed XY, fabrication-piece decomposition, installed grade, or a field-releasable 3D source-feed route.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/02-Submittals/New Hope Calcs.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/04-Close-Out Docs/New Hope BGC - Brigham City UT_as builts.pdf",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-1.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-2.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-3.json"
+  ],
+  "exit_criteria": [
+    "all three approved remote-area routes repeat the same source-feed calculation elevations, sizes, physical length, fitting-equivalent lengths, and device semantics",
+    "node 118 remains plan-bound while nodes 414, 560, and 554 remain external calculation/device nodes",
+    "the actual approved calculation page is rendered and visually inspected",
+    "concealed plan XY, fabrication decomposition, installed grade, source-feed 3D path, fabrication, and field release remain fail-closed",
+    "adversarial tests, full New Hope tests, production build, formal proof, loop guard, browser proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected hydraulic-report hash and page identities",
+    "three-route repetition",
+    "node and device identity",
+    "elevation, diameter, length, fitting, and C-factor drift rejection",
+    "no false continuous-grade or concealed-XY promotion",
+    "actual-PDF visual proof",
+    "Lean invariant receipt",
+    "agentic rules and brain postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-source-feed-calculation-chain-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/new-hope-source-feed-calculation-chain.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js",
+    "apps/autosprink/tests/new-hope-source-feed-calculation-chain.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/approved-calcs-source-feed-page15.png",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/new-hope-source-feed-calculation-chain-20260715/lean-proof.json",
+    "data/agent-loops/new-hope-source-feed-calculation-chain-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 160000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

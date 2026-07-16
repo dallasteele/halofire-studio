@@ -1,0 +1,57 @@
+{
+  "loop": "new-hope-source-feed-calculation-chain-20260715",
+  "stage": "VERIFY",
+  "status": "source-calculation-chain-and-fail-closed-boundary-verified",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [150048, 149978, 149894, 150121, 148601]
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 150493
+  },
+  "claims": {
+    "calculationChainReady": true,
+    "baseOfRiserEndpointZReady": true,
+    "downstreamValveBackflowElevationChainReady": true,
+    "concealedPlanXyReady": false,
+    "fabricationPieceToCalculationLegDecompositionReady": false,
+    "installedGradeReady": false,
+    "sourceFeed3dPathReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "approvedCalculationSha256": "D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719",
+    "repeatedRemoteAreaCount": 3,
+    "calculationPortCount": 4,
+    "planBoundCalculationPortCount": 1,
+    "externalCalculationPortCount": 3,
+    "calculationLegCount": 3,
+    "sourceOutletToBaseOfRiserDeltaZFt": 6.041667,
+    "sourceOutletToBaseOfRiserPhysicalLengthFt": 8.416667,
+    "adversarialTestCount": 8,
+    "newHopeTestFiles": 20,
+    "newHopeTestCount": 129,
+    "productionBuild": "passed",
+    "leanStatus": "verified",
+    "leanElapsedMs": 379,
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "browser": {
+      "proofReady": true,
+      "actualCalculationImageLoaded": true,
+      "actualCalculationImageNaturalSize": "1275x1650",
+      "sourceFeedCalculationChainReady": true,
+      "sourceFeedBaseOfRiserEndpointZReady": true,
+      "sourceFeedConcealedPlanXyReady": false,
+      "sourceFeedInstalledGradeReady": false,
+      "sourceFeed3dPathReady": false,
+      "properPipeLayoutReady": false,
+      "newConsoleErrorsAfterRepair": 0
+    }
+  },
+  "nextAction": "Commit and push this bounded slice, then resolve the concealed source-feed XY/fabrication decomposition only from coordinated evidence; continue with field drains and complete piece-end/inter-piece fitting and vertical-offset topology without promoting unproven installed geometry."
+}
