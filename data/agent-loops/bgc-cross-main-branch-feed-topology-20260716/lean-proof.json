@@ -4,14 +4,14 @@
   "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
   "requestPath": "data/agent-loops/bgc-cross-main-branch-feed-topology-20260716/lean-request.json",
   "theoremNames": [
-    "bgcExtendedSourceGraphCardinalityCloses",
-    "bgcNativeFabricationCountsClose",
-    "sourceTopologyAndSizeDoNotPromoteExactPartsOrRelease"
+    "bgcRegisteredGymGraphCardinalityCloses",
+    "bgcRegisteredGymOutletExclusionIsUniqueAtGate",
+    "scopedGymPieceTruthDoesNotPromoteExactPartsOrRelease"
   ],
-  "claim": "The BGC source graph closes at 90 nodes and 89 edges; the native FAB closes at 121 pipe, 20 line, 87 outlet, 50 fitting, and 22 hanger rows; source topology and nominal size cannot promote unresolved part solids, bracket geometry, thread geometry, engagement or tolerances, mating fit, direction, grade, installed Z, or VPS release.",
+  "claim": "The registered BGC gym graph closes at 94 nodes and 93 edges; exactly eight of nine monotonic FAB outlet candidates close within the quarter-inch gate while the runner-up misses by more than 66 inches; scoped gym piece truth cannot promote unresolved manufacturer parts, brackets, threads, mating fit, direction, grade, installed Z, or VPS release.",
   "result": {
     "status": "verified",
-    "elapsedMs": 193,
+    "elapsedMs": 406,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

@@ -69,13 +69,16 @@ describe('authenticated BGC failure and pitched calibration revision five', () =
     expect(body).toMatchObject({
       status: 'passed',
       artifactType: 'halofire.bgc-source-plan-section-3d-registration.v1',
-      receiptSha256: '1d1f1ecb1e0fb17a8f81c5ff048f146647a0a3db191008dafdab08668f5a355d',
+      receiptSha256: '429b2a8d459c0421045debb2a7c21d53749924d97a96d967a9a4d591156b6c0c',
       detectors: { asBuilt: { guardedUprightCount: 64 }, ahjApproved: { guardedUprightCount: 64 }, branchFeedAxis: { segmentCount: 16, branchFeedCount: 8 } },
-      geometryGraph: { nodeCount: 90, edgeCount: 89 },
+      geometryGraph: { nodeCount: 94, edgeCount: 93 },
       sourcePlanCoordinatesVerified: true,
       sourceBranchHalfAdjacencyVerified: true,
       sourceBranchFeedTopologyVerified: true,
       sourceCrossMainPlanAxisVerified: true,
+      registeredGymCrossMainPieceOrderVerified: true,
+      registeredGymCrossMainPieceBoundariesVerified: true,
+      planToFabGymOutletMappingVerified: true,
       pipeSizeVerified: true,
       roofSurfaceTargetProjectionVerified: true,
       exactInstalledPipeElevationVerified: false,
@@ -92,7 +95,7 @@ describe('authenticated BGC failure and pitched calibration revision five', () =
       fabricationReady: false,
       fieldReleaseReady: false,
       vpsReleaseReady: false,
-      adversarialLoop: { status: 'passed', attemptedCases: 27 },
+      adversarialLoop: { status: 'passed', attemptedCases: 33 },
     });
     expect(new Set(Object.values(body.viewBindings).map((view) => view.geometryGraphSha256)).size).toBe(1);
   });

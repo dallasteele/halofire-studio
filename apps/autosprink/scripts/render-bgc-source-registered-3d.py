@@ -98,7 +98,13 @@ def main():
 
     blue = material("Source-covered branch halves", (0.01, 0.28, 1.0), metallic=0.25, roughness=0.25, emission=(0.01, 0.15, 1.0))
     green = material("Source-covered branch feeds", (0.01, 0.72, 0.48), metallic=0.25, roughness=0.25, emission=(0.0, 0.45, 0.24))
-    magenta = material("Source-registered cross-main axis", (0.95, 0.02, 0.55), metallic=0.28, roughness=0.24, emission=(0.72, 0.0, 0.32))
+    cross_main_materials = {
+        ".09": material("FAB #E.09 target centerline", (0.95, 0.02, 0.55), metallic=0.28, roughness=0.24, emission=(0.72, 0.0, 0.32)),
+        ".10": material("FAB #E.10 target centerline", (0.78, 0.02, 0.92), metallic=0.28, roughness=0.24, emission=(0.52, 0.0, 0.72)),
+        ".11": material("FAB #E.11 target centerline", (0.98, 0.12, 0.32), metallic=0.28, roughness=0.24, emission=(0.75, 0.01, 0.12)),
+        ".12": material("FAB #E.12 target centerline", (1.0, 0.35, 0.08), metallic=0.28, roughness=0.24, emission=(0.8, 0.12, 0.0)),
+        ".13": material("FAB #E.13 target centerline", (0.9, 0.05, 0.68), metallic=0.28, roughness=0.24, emission=(0.65, 0.0, 0.42)),
+    }
     orange = material("Source guarded head centers", (1.0, 0.22, 0.015), metallic=0.2, roughness=0.3, emission=(1.0, 0.08, 0.0))
     gold = material("Ridge", (1.0, 0.55, 0.02), metallic=0.5, roughness=0.28, emission=(1.0, 0.22, 0.0))
 
@@ -107,7 +113,7 @@ def main():
         start = (*a["planPointFt"], a["roofSurfaceTargetElevationFt"] + 0.35)
         end = (*b["planPointFt"], b["roofSurfaceTargetElevationFt"] + 0.35)
         if edge["kind"] == "source-registered-gym-cross-main-axis":
-            edge_material, radius = magenta, 0.22
+            edge_material, radius = cross_main_materials[edge["fabricationPieceName"]], 0.22
         elif "branch-feed" in edge["kind"]:
             edge_material, radius = green, 0.16
         else:
@@ -120,6 +126,14 @@ def main():
         head = bpy.context.object
         head.name = node["id"] + "_TARGET_MARKER_NOT_PART_GEOMETRY"
         head.data.materials.append(orange)
+    for node in nodes:
+        if node.get("role") != "registered-gym-cross-main-piece-boundary":
+            continue
+        location = (*node["planPointFt"], node["roofSurfaceTargetElevationFt"] + 0.7)
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.55, location=location)
+        marker = bpy.context.object
+        marker.name = node["id"] + "_REGISTERED_BOUNDARY_MARKER_NOT_FITTING"
+        marker.data.materials.append(gold)
     cylinder_between("A301_RIDGE_132_5_1_2", (0, 0, 32.7), (104, 0, 32.7), 0.16, gold)
 
     camera_data = bpy.data.cameras.new("Proof camera")
@@ -138,18 +152,6 @@ def main():
     bpy.ops.object.light_add(type="AREA", location=(105, 70, 75))
     bpy.context.object.data.energy = 1500
     bpy.context.object.data.size = 70
-
-    for text_value, location, size in (
-        ("ACTUAL AS-BUILT FP1.0 RASTER", (-5, -57, 0.5), 3.2),
-        ("A301 2:12 SOURCE ROOF", (24, 4, 36), 3.0),
-        ("TARGET SURFACE PROJECTION — NOT INSTALLED Z", (7, 52, 1), 2.5),
-    ):
-        bpy.ops.object.text_add(location=location, rotation=(0, 0, 0))
-        label = bpy.context.object
-        label.data.body = text_value
-        label.data.size = size
-        label.data.extrude = 0.04
-        label.data.materials.append(gold)
 
     scene.render.filepath = str(PROOF / "bgc-source-registered-3d.png")
     bpy.ops.wm.save_as_mainfile(filepath=str(PROOF / "bgc-source-registered-3d.blend"))

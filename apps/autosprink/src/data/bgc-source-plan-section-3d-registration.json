@@ -197,6 +197,39 @@
           "#E.13",
           "#E.14"
         ],
+        "pieceLabelPositionsPdfPt": {
+          "#E.09": [
+            795.750122,
+            1519.144958
+          ],
+          "#E.10": [
+            1010.73999,
+            1536.925354
+          ],
+          "#E.11": [
+            1126.840942,
+            1519.144958
+          ],
+          "#E.12": [
+            1356.776306,
+            1519.144958
+          ],
+          "#E.13": [
+            1541.997253,
+            1519.144958
+          ],
+          "#E.14": [
+            721.162231,
+            1545.818909
+          ]
+        },
+        "registeredGymPieceLabelsWestToEast": [
+          "#E.09",
+          "#E.10",
+          "#E.11",
+          "#E.12",
+          "#E.13"
+        ],
         "nativeBoundarySignature": [
           {
             "sourceDrawingIndex": 1004,
@@ -244,7 +277,9 @@
           }
         ],
         "fullLinePieceOrderVerified": false,
-        "pieceBoundaryCoordinatesVerified": false
+        "registeredGymPieceOrderVerified": true,
+        "registeredGymPieceBoundaryCoordinatesVerified": true,
+        "registrationToleranceIn": 0.25
       }
     },
     "envelope": {
@@ -1038,7 +1073,220 @@
     "exactBracketGeometryVerified": false,
     "exactThreadGeometryVerified": false,
     "threadEngagementAndToleranceVerified": false,
-    "matingFitVerified": false
+    "matingFitVerified": false,
+    "registeredGym": {
+      "fabricationLineName": "#E",
+      "pieceNamesWestToEast": [
+        ".09",
+        ".10",
+        ".11",
+        ".12",
+        ".13"
+      ],
+      "pieceCount": 5,
+      "candidateOutletCount": 9,
+      "mappedGymOutletCount": 8,
+      "translationOnlyOriginPdfXPt": 734.87595,
+      "registrationGateIn": 0.25,
+      "maxAbsResidualIn": 0.241366,
+      "runnerUpMaxAbsResidualIn": 66.491366,
+      "outletMap": [
+        {
+          "branchIndex": 1,
+          "junctionNodeId": "BGC-CM-J01",
+          "fabricationOutletUniqueId": 29,
+          "fabricationPieceUniqueId": 28,
+          "fabricationPieceName": ".09",
+          "pieceStationFt": 9.506858586,
+          "chainStationFt": 9.506858586,
+          "outletSizeCode": 405,
+          "outletAngleDeg": 0,
+          "registeredPlanPdfXPt": 820.437677,
+          "observedPlanPdfXPt": 820.256653,
+          "residualIn": -0.241366,
+          "planToFabOutletMappingVerified": true,
+          "exactManufacturerFittingIdentityVerified": false
+        },
+        {
+          "branchIndex": 2,
+          "junctionNodeId": "BGC-CM-J02",
+          "fabricationOutletUniqueId": 33,
+          "fabricationPieceUniqueId": 31,
+          "fabricationPieceName": ".10",
+          "pieceStationFt": 1.656666667,
+          "chainStationFt": 21.198333333,
+          "outletSizeCode": 405,
+          "outletAngleDeg": 0,
+          "registeredPlanPdfXPt": 925.66095,
+          "observedPlanPdfXPt": 925.776184,
+          "residualIn": 0.153645,
+          "planToFabOutletMappingVerified": true,
+          "exactManufacturerFittingIdentityVerified": false
+        },
+        {
+          "branchIndex": 3,
+          "junctionNodeId": "BGC-CM-J03",
+          "fabricationOutletUniqueId": 32,
+          "fabricationPieceUniqueId": 31,
+          "fabricationPieceName": ".10",
+          "pieceStationFt": 14.031666667,
+          "chainStationFt": 33.573333333,
+          "outletSizeCode": 405,
+          "outletAngleDeg": 0,
+          "registeredPlanPdfXPt": 1037.03595,
+          "observedPlanPdfXPt": 1037.03595,
+          "residualIn": 0.0,
+          "planToFabOutletMappingVerified": true,
+          "exactManufacturerFittingIdentityVerified": false
+        },
+        {
+          "branchIndex": 4,
+          "junctionNodeId": "BGC-CM-J04",
+          "fabricationOutletUniqueId": 36,
+          "fabricationPieceUniqueId": 34,
+          "fabricationPieceName": ".11",
+          "pieceStationFt": 6.031666667,
+          "chainStationFt": 46.573333333,
+          "outletSizeCode": 405,
+          "outletAngleDeg": 0,
+          "registeredPlanPdfXPt": 1154.03595,
+          "observedPlanPdfXPt": 1154.03595,
+          "residualIn": 0.0,
+          "planToFabOutletMappingVerified": true,
+          "exactManufacturerFittingIdentityVerified": false
+        },
+        {
+          "branchIndex": 5,
+          "junctionNodeId": "BGC-CM-J05",
+          "fabricationOutletUniqueId": 35,
+          "fabricationPieceUniqueId": 34,
+          "fabricationPieceName": ".11",
+          "pieceStationFt": 19.031666667,
+          "chainStationFt": 59.573333333,
+          "outletSizeCode": 405,
+          "outletAngleDeg": 0,
+          "registeredPlanPdfXPt": 1271.03595,
+          "observedPlanPdfXPt": 1271.03595,
+          "residualIn": 0.0,
+          "planToFabOutletMappingVerified": true,
+          "exactManufacturerFittingIdentityVerified": false
+        },
+        {
+          "branchIndex": 6,
+          "junctionNodeId": "BGC-CM-J06",
+          "fabricationOutletUniqueId": 38,
+          "fabricationPieceUniqueId": 37,
+          "fabricationPieceName": ".12",
+          "pieceStationFt": 11.031666667,
+          "chainStationFt": 72.573333333,
+          "outletSizeCode": 405,
+          "outletAngleDeg": 0,
+          "registeredPlanPdfXPt": 1388.03595,
+          "observedPlanPdfXPt": 1388.03595,
+          "residualIn": 0.0,
+          "planToFabOutletMappingVerified": true,
+          "exactManufacturerFittingIdentityVerified": false
+        },
+        {
+          "branchIndex": 7,
+          "junctionNodeId": "BGC-CM-J07",
+          "fabricationOutletUniqueId": 44,
+          "fabricationPieceUniqueId": 42,
+          "fabricationPieceName": ".13",
+          "pieceStationFt": 2.856025872,
+          "chainStationFt": 85.397692539,
+          "outletSizeCode": 405,
+          "outletAngleDeg": 0,
+          "registeredPlanPdfXPt": 1503.455183,
+          "observedPlanPdfXPt": 1503.53595,
+          "residualIn": 0.10769,
+          "planToFabOutletMappingVerified": true,
+          "exactManufacturerFittingIdentityVerified": false
+        },
+        {
+          "branchIndex": 8,
+          "junctionNodeId": "BGC-CM-J08",
+          "fabricationOutletUniqueId": 43,
+          "fabricationPieceUniqueId": 42,
+          "fabricationPieceName": ".13",
+          "pieceStationFt": 15.060190121,
+          "chainStationFt": 97.601856788,
+          "outletSizeCode": 405,
+          "outletAngleDeg": 0,
+          "registeredPlanPdfXPt": 1613.292661,
+          "observedPlanPdfXPt": 1613.373352,
+          "residualIn": 0.107588,
+          "planToFabOutletMappingVerified": true,
+          "exactManufacturerFittingIdentityVerified": false
+        }
+      ],
+      "excludedWestOfGymOutlet": {
+        "fabricationOutletUniqueId": 30,
+        "fabricationPieceUniqueId": 28,
+        "fabricationPieceName": ".09",
+        "pieceStationFt": 2.423525253,
+        "chainStationFt": 2.423525253,
+        "outletSizeCode": 405,
+        "outletAngleDeg": 0,
+        "registeredPlanPdfXPt": 756.687677,
+        "reason": "unique translation-only solution places this outlet west of the registered gym span"
+      },
+      "pieceBoundaries": [
+        {
+          "fabricationPieceName": ".09",
+          "fabricationPieceUniqueId": 28,
+          "lengthFt": 19.541666666666664,
+          "startChainStationFt": 0.0,
+          "endChainStationFt": 19.541666667,
+          "startPlanPdfXPt": 734.87595,
+          "endPlanPdfXPt": 910.75095
+        },
+        {
+          "fabricationPieceName": ".10",
+          "fabricationPieceUniqueId": 31,
+          "lengthFt": 21.0,
+          "startChainStationFt": 19.541666667,
+          "endChainStationFt": 40.541666667,
+          "startPlanPdfXPt": 910.75095,
+          "endPlanPdfXPt": 1099.75095
+        },
+        {
+          "fabricationPieceName": ".11",
+          "fabricationPieceUniqueId": 34,
+          "lengthFt": 21.0,
+          "startChainStationFt": 40.541666667,
+          "endChainStationFt": 61.541666667,
+          "startPlanPdfXPt": 1099.75095,
+          "endPlanPdfXPt": 1288.75095
+        },
+        {
+          "fabricationPieceName": ".12",
+          "fabricationPieceUniqueId": 37,
+          "lengthFt": 21.0,
+          "startChainStationFt": 61.541666667,
+          "endChainStationFt": 82.541666667,
+          "startPlanPdfXPt": 1288.75095,
+          "endPlanPdfXPt": 1477.75095
+        },
+        {
+          "fabricationPieceName": ".13",
+          "fabricationPieceUniqueId": 42,
+          "lengthFt": 21.0,
+          "startChainStationFt": 82.541666667,
+          "endChainStationFt": 103.541666667,
+          "startPlanPdfXPt": 1477.75095,
+          "endPlanPdfXPt": 1666.75095
+        }
+      ],
+      "registeredGymPieceOrderVerified": true,
+      "registeredGymInterPieceAdjacencyVerified": true,
+      "registeredGymPieceBoundaryCoordinatesVerified": true,
+      "planToFabGymOutletMappingVerified": true,
+      "outletSizeAndAngleVerified": true,
+      "exactManufacturerFittingIdentityVerified": false,
+      "fullLinePieceOrderVerified": false
+    },
+    "registeredGymInterPieceAdjacencyVerified": true
   },
   "networkRegistration": {
     "branchFeedCount": 8,
@@ -1293,8 +1541,14 @@
       }
     ],
     "crossMainJunctionCount": 8,
-    "crossMainGraphEdgeCount": 9,
+    "crossMainPieceBoundaryNodeCount": 4,
+    "crossMainGraphEdgeCount": 13,
     "planTopologyVerified": true,
+    "registeredGymPieceOrderVerified": true,
+    "registeredGymInterPieceFabricationAdjacencyVerified": true,
+    "registeredGymPieceBoundaryCoordinatesVerified": true,
+    "planToFabGymOutletMappingVerified": true,
+    "planToFabGymOutletMaxResidualIn": 0.241366,
     "exactInterPieceFabricationAdjacencyVerified": false,
     "exactFittingIdentityVerified": false,
     "pipeDirectionVerified": false,
@@ -1302,8 +1556,8 @@
     "exactInstalledElevationVerified": false
   },
   "geometryGraph": {
-    "nodeCount": 90,
-    "edgeCount": 89,
+    "nodeCount": 94,
+    "edgeCount": 93,
     "nodes": [
       {
         "id": "BGC-H-01-01",
@@ -2554,7 +2808,14 @@
         "exactInstalledElevationVerified": false,
         "branchIndex": 1,
         "exactFittingIdentityVerified": false,
-        "exactFittingTakeoutVerified": false
+        "exactFittingTakeoutVerified": false,
+        "fabricationLineName": "#E",
+        "fabricationPieceName": ".09",
+        "fabricationPieceUniqueId": 28,
+        "fabricationOutletUniqueId": 29,
+        "fabricationOutletStationFt": 9.506858586,
+        "planToFabOutletResidualIn": -0.241366,
+        "planToFabOutletMappingVerified": true
       },
       {
         "id": "BGC-BF-01-S",
@@ -2606,7 +2867,14 @@
         "exactInstalledElevationVerified": false,
         "branchIndex": 2,
         "exactFittingIdentityVerified": false,
-        "exactFittingTakeoutVerified": false
+        "exactFittingTakeoutVerified": false,
+        "fabricationLineName": "#E",
+        "fabricationPieceName": ".10",
+        "fabricationPieceUniqueId": 31,
+        "fabricationOutletUniqueId": 33,
+        "fabricationOutletStationFt": 1.656666667,
+        "planToFabOutletResidualIn": 0.153645,
+        "planToFabOutletMappingVerified": true
       },
       {
         "id": "BGC-BF-02-S",
@@ -2658,7 +2926,14 @@
         "exactInstalledElevationVerified": false,
         "branchIndex": 3,
         "exactFittingIdentityVerified": false,
-        "exactFittingTakeoutVerified": false
+        "exactFittingTakeoutVerified": false,
+        "fabricationLineName": "#E",
+        "fabricationPieceName": ".10",
+        "fabricationPieceUniqueId": 31,
+        "fabricationOutletUniqueId": 32,
+        "fabricationOutletStationFt": 14.031666667,
+        "planToFabOutletResidualIn": 0.0,
+        "planToFabOutletMappingVerified": true
       },
       {
         "id": "BGC-BF-03-S",
@@ -2710,7 +2985,14 @@
         "exactInstalledElevationVerified": false,
         "branchIndex": 4,
         "exactFittingIdentityVerified": false,
-        "exactFittingTakeoutVerified": false
+        "exactFittingTakeoutVerified": false,
+        "fabricationLineName": "#E",
+        "fabricationPieceName": ".11",
+        "fabricationPieceUniqueId": 34,
+        "fabricationOutletUniqueId": 36,
+        "fabricationOutletStationFt": 6.031666667,
+        "planToFabOutletResidualIn": 0.0,
+        "planToFabOutletMappingVerified": true
       },
       {
         "id": "BGC-BF-04-S",
@@ -2762,7 +3044,14 @@
         "exactInstalledElevationVerified": false,
         "branchIndex": 5,
         "exactFittingIdentityVerified": false,
-        "exactFittingTakeoutVerified": false
+        "exactFittingTakeoutVerified": false,
+        "fabricationLineName": "#E",
+        "fabricationPieceName": ".11",
+        "fabricationPieceUniqueId": 34,
+        "fabricationOutletUniqueId": 35,
+        "fabricationOutletStationFt": 19.031666667,
+        "planToFabOutletResidualIn": 0.0,
+        "planToFabOutletMappingVerified": true
       },
       {
         "id": "BGC-BF-05-S",
@@ -2814,7 +3103,14 @@
         "exactInstalledElevationVerified": false,
         "branchIndex": 6,
         "exactFittingIdentityVerified": false,
-        "exactFittingTakeoutVerified": false
+        "exactFittingTakeoutVerified": false,
+        "fabricationLineName": "#E",
+        "fabricationPieceName": ".12",
+        "fabricationPieceUniqueId": 37,
+        "fabricationOutletUniqueId": 38,
+        "fabricationOutletStationFt": 11.031666667,
+        "planToFabOutletResidualIn": 0.0,
+        "planToFabOutletMappingVerified": true
       },
       {
         "id": "BGC-BF-06-S",
@@ -2866,7 +3162,14 @@
         "exactInstalledElevationVerified": false,
         "branchIndex": 7,
         "exactFittingIdentityVerified": false,
-        "exactFittingTakeoutVerified": false
+        "exactFittingTakeoutVerified": false,
+        "fabricationLineName": "#E",
+        "fabricationPieceName": ".13",
+        "fabricationPieceUniqueId": 42,
+        "fabricationOutletUniqueId": 44,
+        "fabricationOutletStationFt": 2.856025872,
+        "planToFabOutletResidualIn": 0.10769,
+        "planToFabOutletMappingVerified": true
       },
       {
         "id": "BGC-BF-07-S",
@@ -2918,7 +3221,14 @@
         "exactInstalledElevationVerified": false,
         "branchIndex": 8,
         "exactFittingIdentityVerified": false,
-        "exactFittingTakeoutVerified": false
+        "exactFittingTakeoutVerified": false,
+        "fabricationLineName": "#E",
+        "fabricationPieceName": ".13",
+        "fabricationPieceUniqueId": 42,
+        "fabricationOutletUniqueId": 43,
+        "fabricationOutletStationFt": 15.060190121,
+        "planToFabOutletResidualIn": 0.107588,
+        "planToFabOutletMappingVerified": true
       },
       {
         "id": "BGC-BF-08-S",
@@ -2951,7 +3261,83 @@
         "roofSurfaceTargetElevationFt": 32.458333,
         "targetOnly": true,
         "exactInstalledElevationVerified": false,
-        "pieceBoundaryCoordinatesVerified": false
+        "registeredGymLimitOnly": true
+      },
+      {
+        "id": "BGC-CM-PB-09-10",
+        "role": "registered-gym-cross-main-piece-boundary",
+        "planPdfPoint": [
+          910.75095,
+          1488.861328
+        ],
+        "planPointFt": [
+          18.468333,
+          0.0
+        ],
+        "roofSurfaceTargetElevationFt": 32.458333,
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false,
+        "westFabricationPieceName": ".09",
+        "eastFabricationPieceName": ".10",
+        "registeredGymPieceBoundaryCoordinatesVerified": true,
+        "registrationToleranceIn": 0.25
+      },
+      {
+        "id": "BGC-CM-PB-10-11",
+        "role": "registered-gym-cross-main-piece-boundary",
+        "planPdfPoint": [
+          1099.75095,
+          1488.861328
+        ],
+        "planPointFt": [
+          39.468333,
+          0.0
+        ],
+        "roofSurfaceTargetElevationFt": 32.458333,
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false,
+        "westFabricationPieceName": ".10",
+        "eastFabricationPieceName": ".11",
+        "registeredGymPieceBoundaryCoordinatesVerified": true,
+        "registrationToleranceIn": 0.25
+      },
+      {
+        "id": "BGC-CM-PB-11-12",
+        "role": "registered-gym-cross-main-piece-boundary",
+        "planPdfPoint": [
+          1288.75095,
+          1488.861328
+        ],
+        "planPointFt": [
+          60.468333,
+          0.0
+        ],
+        "roofSurfaceTargetElevationFt": 32.458333,
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false,
+        "westFabricationPieceName": ".11",
+        "eastFabricationPieceName": ".12",
+        "registeredGymPieceBoundaryCoordinatesVerified": true,
+        "registrationToleranceIn": 0.25
+      },
+      {
+        "id": "BGC-CM-PB-12-13",
+        "role": "registered-gym-cross-main-piece-boundary",
+        "planPdfPoint": [
+          1477.75095,
+          1488.861328
+        ],
+        "planPointFt": [
+          81.468333,
+          0.0
+        ],
+        "roofSurfaceTargetElevationFt": 32.458333,
+        "targetOnly": true,
+        "exactInstalledElevationVerified": false,
+        "westFabricationPieceName": ".12",
+        "eastFabricationPieceName": ".13",
+        "registeredGymPieceBoundaryCoordinatesVerified": true,
+        "registrationToleranceIn": 0.25
       },
       {
         "id": "BGC-CM-E",
@@ -2967,7 +3353,7 @@
         "roofSurfaceTargetElevationFt": 32.458333,
         "targetOnly": true,
         "exactInstalledElevationVerified": false,
-        "pieceBoundaryCoordinatesVerified": false
+        "registeredGymLimitOnly": true
       }
     ],
     "edges": [
@@ -4214,7 +4600,10 @@
         "endPreparation": "grooved",
         "sourceVectorCoverageVerified": true,
         "pipeSizeVerified": true,
-        "pieceIdentityVerified": false,
+        "fabricationPieceName": ".09",
+        "fabricationPieceUniqueId": 28,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
         "pipeDirectionVerified": false,
         "pipeGradeVerified": false,
         "exactFittingIdentityVerified": false,
@@ -4223,6 +4612,26 @@
       {
         "id": "BGC-E-082",
         "from": "BGC-CM-J01",
+        "to": "BGC-CM-PB-09-10",
+        "kind": "source-registered-gym-cross-main-axis",
+        "fabricationLineName": "#E",
+        "nominalDiameterIn": 3.0,
+        "schedule": 10,
+        "endPreparation": "grooved",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": true,
+        "fabricationPieceName": ".09",
+        "fabricationPieceUniqueId": 28,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
+        "pipeDirectionVerified": false,
+        "pipeGradeVerified": false,
+        "exactFittingIdentityVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-083",
+        "from": "BGC-CM-PB-09-10",
         "to": "BGC-CM-J02",
         "kind": "source-registered-gym-cross-main-axis",
         "fabricationLineName": "#E",
@@ -4231,14 +4640,17 @@
         "endPreparation": "grooved",
         "sourceVectorCoverageVerified": true,
         "pipeSizeVerified": true,
-        "pieceIdentityVerified": false,
+        "fabricationPieceName": ".10",
+        "fabricationPieceUniqueId": 31,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
         "pipeDirectionVerified": false,
         "pipeGradeVerified": false,
         "exactFittingIdentityVerified": false,
         "exactInstalledElevationVerified": false
       },
       {
-        "id": "BGC-E-083",
+        "id": "BGC-E-084",
         "from": "BGC-CM-J02",
         "to": "BGC-CM-J03",
         "kind": "source-registered-gym-cross-main-axis",
@@ -4248,15 +4660,38 @@
         "endPreparation": "grooved",
         "sourceVectorCoverageVerified": true,
         "pipeSizeVerified": true,
-        "pieceIdentityVerified": false,
+        "fabricationPieceName": ".10",
+        "fabricationPieceUniqueId": 31,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
         "pipeDirectionVerified": false,
         "pipeGradeVerified": false,
         "exactFittingIdentityVerified": false,
         "exactInstalledElevationVerified": false
       },
       {
-        "id": "BGC-E-084",
+        "id": "BGC-E-085",
         "from": "BGC-CM-J03",
+        "to": "BGC-CM-PB-10-11",
+        "kind": "source-registered-gym-cross-main-axis",
+        "fabricationLineName": "#E",
+        "nominalDiameterIn": 3.0,
+        "schedule": 10,
+        "endPreparation": "grooved",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": true,
+        "fabricationPieceName": ".10",
+        "fabricationPieceUniqueId": 31,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
+        "pipeDirectionVerified": false,
+        "pipeGradeVerified": false,
+        "exactFittingIdentityVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-086",
+        "from": "BGC-CM-PB-10-11",
         "to": "BGC-CM-J04",
         "kind": "source-registered-gym-cross-main-axis",
         "fabricationLineName": "#E",
@@ -4265,14 +4700,17 @@
         "endPreparation": "grooved",
         "sourceVectorCoverageVerified": true,
         "pipeSizeVerified": true,
-        "pieceIdentityVerified": false,
+        "fabricationPieceName": ".11",
+        "fabricationPieceUniqueId": 34,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
         "pipeDirectionVerified": false,
         "pipeGradeVerified": false,
         "exactFittingIdentityVerified": false,
         "exactInstalledElevationVerified": false
       },
       {
-        "id": "BGC-E-085",
+        "id": "BGC-E-087",
         "from": "BGC-CM-J04",
         "to": "BGC-CM-J05",
         "kind": "source-registered-gym-cross-main-axis",
@@ -4282,15 +4720,38 @@
         "endPreparation": "grooved",
         "sourceVectorCoverageVerified": true,
         "pipeSizeVerified": true,
-        "pieceIdentityVerified": false,
+        "fabricationPieceName": ".11",
+        "fabricationPieceUniqueId": 34,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
         "pipeDirectionVerified": false,
         "pipeGradeVerified": false,
         "exactFittingIdentityVerified": false,
         "exactInstalledElevationVerified": false
       },
       {
-        "id": "BGC-E-086",
+        "id": "BGC-E-088",
         "from": "BGC-CM-J05",
+        "to": "BGC-CM-PB-11-12",
+        "kind": "source-registered-gym-cross-main-axis",
+        "fabricationLineName": "#E",
+        "nominalDiameterIn": 3.0,
+        "schedule": 10,
+        "endPreparation": "grooved",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": true,
+        "fabricationPieceName": ".11",
+        "fabricationPieceUniqueId": 34,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
+        "pipeDirectionVerified": false,
+        "pipeGradeVerified": false,
+        "exactFittingIdentityVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-089",
+        "from": "BGC-CM-PB-11-12",
         "to": "BGC-CM-J06",
         "kind": "source-registered-gym-cross-main-axis",
         "fabricationLineName": "#E",
@@ -4299,15 +4760,38 @@
         "endPreparation": "grooved",
         "sourceVectorCoverageVerified": true,
         "pipeSizeVerified": true,
-        "pieceIdentityVerified": false,
+        "fabricationPieceName": ".12",
+        "fabricationPieceUniqueId": 37,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
         "pipeDirectionVerified": false,
         "pipeGradeVerified": false,
         "exactFittingIdentityVerified": false,
         "exactInstalledElevationVerified": false
       },
       {
-        "id": "BGC-E-087",
+        "id": "BGC-E-090",
         "from": "BGC-CM-J06",
+        "to": "BGC-CM-PB-12-13",
+        "kind": "source-registered-gym-cross-main-axis",
+        "fabricationLineName": "#E",
+        "nominalDiameterIn": 3.0,
+        "schedule": 10,
+        "endPreparation": "grooved",
+        "sourceVectorCoverageVerified": true,
+        "pipeSizeVerified": true,
+        "fabricationPieceName": ".12",
+        "fabricationPieceUniqueId": 37,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
+        "pipeDirectionVerified": false,
+        "pipeGradeVerified": false,
+        "exactFittingIdentityVerified": false,
+        "exactInstalledElevationVerified": false
+      },
+      {
+        "id": "BGC-E-091",
+        "from": "BGC-CM-PB-12-13",
         "to": "BGC-CM-J07",
         "kind": "source-registered-gym-cross-main-axis",
         "fabricationLineName": "#E",
@@ -4316,14 +4800,17 @@
         "endPreparation": "grooved",
         "sourceVectorCoverageVerified": true,
         "pipeSizeVerified": true,
-        "pieceIdentityVerified": false,
+        "fabricationPieceName": ".13",
+        "fabricationPieceUniqueId": 42,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
         "pipeDirectionVerified": false,
         "pipeGradeVerified": false,
         "exactFittingIdentityVerified": false,
         "exactInstalledElevationVerified": false
       },
       {
-        "id": "BGC-E-088",
+        "id": "BGC-E-092",
         "from": "BGC-CM-J07",
         "to": "BGC-CM-J08",
         "kind": "source-registered-gym-cross-main-axis",
@@ -4333,14 +4820,17 @@
         "endPreparation": "grooved",
         "sourceVectorCoverageVerified": true,
         "pipeSizeVerified": true,
-        "pieceIdentityVerified": false,
+        "fabricationPieceName": ".13",
+        "fabricationPieceUniqueId": 42,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
         "pipeDirectionVerified": false,
         "pipeGradeVerified": false,
         "exactFittingIdentityVerified": false,
         "exactInstalledElevationVerified": false
       },
       {
-        "id": "BGC-E-089",
+        "id": "BGC-E-093",
         "from": "BGC-CM-J08",
         "to": "BGC-CM-E",
         "kind": "source-registered-gym-cross-main-axis",
@@ -4350,14 +4840,17 @@
         "endPreparation": "grooved",
         "sourceVectorCoverageVerified": true,
         "pipeSizeVerified": true,
-        "pieceIdentityVerified": false,
+        "fabricationPieceName": ".13",
+        "fabricationPieceUniqueId": 42,
+        "pieceIdentityVerified": true,
+        "registeredGymPieceChainVerified": true,
         "pipeDirectionVerified": false,
         "pipeGradeVerified": false,
         "exactFittingIdentityVerified": false,
         "exactInstalledElevationVerified": false
       }
     ],
-    "digestSha256": "933f26d76ef50327e1be07abab8148a0c00e2f051e9d9bf694f022311b220443"
+    "digestSha256": "0cacdc69107b9bb24da277d0088f336dca00e3248c5ae3cc1aacd3c947f72931"
   },
   "viewBindings": {
     "topPlan": {
@@ -4369,7 +4862,7 @@
         1980.0
       ],
       "image": "proofs/bgc-source-plan-section-3d-registration/bgc-plan-overlay.png",
-      "geometryGraphSha256": "933f26d76ef50327e1be07abab8148a0c00e2f051e9d9bf694f022311b220443"
+      "geometryGraphSha256": "0cacdc69107b9bb24da277d0088f336dca00e3248c5ae3cc1aacd3c947f72931"
     },
     "elevation": {
       "source": "architectural",
@@ -4380,14 +4873,14 @@
         470.0
       ],
       "image": "proofs/bgc-source-plan-section-3d-registration/bgc-section-overlay.png",
-      "geometryGraphSha256": "933f26d76ef50327e1be07abab8148a0c00e2f051e9d9bf694f022311b220443"
+      "geometryGraphSha256": "0cacdc69107b9bb24da277d0088f336dca00e3248c5ae3cc1aacd3c947f72931"
     },
     "model3d": {
       "sourceTexture": "proofs/bgc-source-plan-section-3d-registration/bgc-plan-source.png",
       "image": "proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.png",
       "blend": "proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.blend",
       "glb": "proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.glb",
-      "geometryGraphSha256": "933f26d76ef50327e1be07abab8148a0c00e2f051e9d9bf694f022311b220443"
+      "geometryGraphSha256": "0cacdc69107b9bb24da277d0088f336dca00e3248c5ae3cc1aacd3c947f72931"
     }
   },
   "internalVerification": {
@@ -4408,6 +4901,9 @@
   "sourceBranchHalfAdjacencyVerified": true,
   "sourceBranchFeedTopologyVerified": true,
   "sourceCrossMainPlanAxisVerified": true,
+  "registeredGymCrossMainPieceOrderVerified": true,
+  "registeredGymCrossMainPieceBoundariesVerified": true,
+  "planToFabGymOutletMappingVerified": true,
   "pipeSizeVerified": true,
   "roofSurfaceTargetProjectionVerified": true,
   "exactInstalledSprinklerElevationVerified": false,
@@ -4426,6 +4922,6 @@
   "fabricationReady": false,
   "fieldReleaseReady": false,
   "vpsReleaseReady": false,
-  "claimStatus": "source-registered-head-branch-feed-cross-main-size-and-native-fab-proof-not-piece-order-fitting-takeout-part-solid-thread-fit-direction-grade-installed-z-compliance-or-release",
-  "receiptSha256": "1d1f1ecb1e0fb17a8f81c5ff048f146647a0a3db191008dafdab08668f5a355d"
+  "claimStatus": "source-registered-head-branch-feed-and-scoped-gym-cross-main-piece-outlet-proof-not-full-line-order-fitting-takeout-part-solid-thread-fit-direction-grade-installed-z-compliance-or-release",
+  "receiptSha256": "429b2a8d459c0421045debb2a7c21d53749924d97a96d967a9a4d591156b6c0c"
 }

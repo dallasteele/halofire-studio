@@ -23,6 +23,9 @@ describe('BGC actual-PDF plan, section, native FAB, and 3D registration', () => 
       sourceBranchHalfAdjacencyVerified: true,
       sourceBranchFeedTopologyVerified: true,
       sourceCrossMainPlanAxisVerified: true,
+      registeredGymCrossMainPieceOrderVerified: true,
+      registeredGymCrossMainPieceBoundariesVerified: true,
+      planToFabGymOutletMappingVerified: true,
       pipeSizeVerified: true,
       exactInstalledPipeElevationVerified: false,
       pipeDirectionVerified: false,
@@ -32,7 +35,7 @@ describe('BGC actual-PDF plan, section, native FAB, and 3D registration', () => 
       fieldReleaseReady: false,
       vpsReleaseReady: false,
     })
-    expect(packet.geometryGraph).toMatchObject({ nodeCount: 90, edgeCount: 89 })
+    expect(packet.geometryGraph).toMatchObject({ nodeCount: 94, edgeCount: 93 })
     expect(packet.registration.plan.branchHalfOffset.meanOffsetPt).toBeCloseTo(4.162476, 6)
     expect(packet.detectors).toMatchObject({
       asBuilt: { guardedUprightCount: 64 },
@@ -43,7 +46,11 @@ describe('BGC actual-PDF plan, section, native FAB, and 3D registration', () => 
     expect(packet.networkRegistration).toMatchObject({
       branchFeedCount: 8,
       crossMainJunctionCount: 8,
-      crossMainGraphEdgeCount: 9,
+      crossMainPieceBoundaryNodeCount: 4,
+      crossMainGraphEdgeCount: 13,
+      registeredGymPieceOrderVerified: true,
+      registeredGymPieceBoundaryCoordinatesVerified: true,
+      planToFabGymOutletMappingVerified: true,
       exactFittingIdentityVerified: false,
       pipeDirectionVerified: false,
       pipeGradeVerified: false,
@@ -51,6 +58,7 @@ describe('BGC actual-PDF plan, section, native FAB, and 3D registration', () => 
     expect(packet.fabricationEvidence).toMatchObject({
       recordCounts: { pipes: 121, lines: 20, outlets: 87, fittings: 50, hangers: 22 },
       nativeAttachmentGraphVerified: true,
+      registeredGymInterPieceAdjacencyVerified: true,
       interPieceAdjacencyVerified: false,
       exactFittingTakeoutVerified: false,
       manufacturerPartSolidVerified: false,
@@ -61,6 +69,14 @@ describe('BGC actual-PDF plan, section, native FAB, and 3D registration', () => 
     })
     expect(packet.fabricationEvidence.lineGroups['#10']).toMatchObject({ quantity: 7 })
     expect(packet.fabricationEvidence.lineGroups['#06']).toMatchObject({ quantity: 8 })
+    expect(packet.fabricationEvidence.registeredGym).toMatchObject({
+      pieceNamesWestToEast: ['.09', '.10', '.11', '.12', '.13'],
+      mappedGymOutletCount: 8,
+      maxAbsResidualIn: 0.241366,
+      runnerUpMaxAbsResidualIn: 66.491366,
+      planToFabGymOutletMappingVerified: true,
+      exactManufacturerFittingIdentityVerified: false,
+    })
   })
 
   it('binds all three views to one graph and actual source images', () => {
@@ -82,7 +98,8 @@ describe('BGC actual-PDF plan, section, native FAB, and 3D registration', () => 
     }
     const html = fs.readFileSync(proof('index.html'), 'utf8')
     expect(html).toContain('This replaces the old synthetic 8 &times; 8 dot diagram')
-    expect(html).toContain('direction + grade + installed Z held closed')
+    expect(html).toContain('5 registered FAB pieces')
+    expect(html).toContain('0.241 in')
     expect(html).toContain('manufacturer part or bracket geometry')
     expect(html).toContain('helical threads')
     expect(html).toContain('thread engagement or tolerances')
@@ -93,10 +110,13 @@ describe('BGC actual-PDF plan, section, native FAB, and 3D registration', () => 
     expect(result.status).toBe('passed')
     expect(result.rejectedCases).toHaveLength(result.attemptedCases)
     expect(result).toMatchObject({
-      attemptedCases: 27,
+      attemptedCases: 33,
       sourcePlanCoordinatesVerified: true,
       sourceBranchFeedTopologyVerified: true,
       sourceCrossMainPlanAxisVerified: true,
+      registeredGymCrossMainPieceOrderVerified: true,
+      registeredGymCrossMainPieceBoundariesVerified: true,
+      planToFabGymOutletMappingVerified: true,
       pipeSizeVerified: true,
       exactInstalledPipeElevationVerified: false,
       pipeDirectionVerified: false,

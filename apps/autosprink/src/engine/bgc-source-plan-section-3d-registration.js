@@ -216,12 +216,21 @@ function validateRegistration(packet, issues) {
     !near(main?.planAxisYPdfPt, 1488.861328125) ||
     !near(main?.registeredGymSpanFt, 93.333327) ||
     main?.fullLinePieceOrderVerified !== false ||
-    main?.pieceBoundaryCoordinatesVerified !== false
+    main?.registeredGymPieceOrderVerified !== true ||
+    main?.registeredGymPieceBoundaryCoordinatesVerified !== true ||
+    main?.registrationToleranceIn !== 0.25 ||
+    !same(main?.registeredGymPieceLabelsWestToEast, [
+      '#E.09',
+      '#E.10',
+      '#E.11',
+      '#E.12',
+      '#E.13',
+    ])
   ) {
     issues.push(
       issue(
         'BGC_SOURCE_3D_CROSS_MAIN_REGISTRATION_DRIFT',
-        'Cross-main registered gym axis or its fail-closed piece boundary changed.',
+        'Cross-main registered gym axis, scoped piece order, or boundary registration changed.',
       ),
     )
   }
@@ -315,6 +324,7 @@ function validateFabrication(packet, issues) {
   }
   if (
     fab?.interPieceAdjacencyVerified !== false ||
+    fab?.registeredGymInterPieceAdjacencyVerified !== true ||
     fab?.exactFittingTakeoutVerified !== false ||
     fab?.manufacturerPartSolidVerified !== false ||
     fab?.exactBracketGeometryVerified !== false ||
@@ -329,6 +339,106 @@ function validateFabrication(packet, issues) {
       ),
     )
   }
+  const gym = fab?.registeredGym
+  const expectedOutletMap = [
+    [1, 'BGC-CM-J01', 29, 28, '.09', 9.506858586, -0.241366],
+    [2, 'BGC-CM-J02', 33, 31, '.10', 1.656666667, 0.153645],
+    [3, 'BGC-CM-J03', 32, 31, '.10', 14.031666667, 0],
+    [4, 'BGC-CM-J04', 36, 34, '.11', 6.031666667, 0],
+    [5, 'BGC-CM-J05', 35, 34, '.11', 19.031666667, 0],
+    [6, 'BGC-CM-J06', 38, 37, '.12', 11.031666667, 0],
+    [7, 'BGC-CM-J07', 44, 42, '.13', 2.856025872, 0.10769],
+    [8, 'BGC-CM-J08', 43, 42, '.13', 15.060190121, 0.107588],
+  ]
+  if (
+    gym?.fabricationLineName !== '#E' ||
+    !same(gym?.pieceNamesWestToEast, ['.09', '.10', '.11', '.12', '.13']) ||
+    gym?.pieceCount !== 5 ||
+    gym?.candidateOutletCount !== 9 ||
+    gym?.mappedGymOutletCount !== 8 ||
+    !near(gym?.translationOnlyOriginPdfXPt, 734.87595) ||
+    gym?.registrationGateIn !== 0.25 ||
+    !near(gym?.maxAbsResidualIn, 0.241366) ||
+    !near(gym?.runnerUpMaxAbsResidualIn, 66.491366) ||
+    gym?.registeredGymPieceOrderVerified !== true ||
+    gym?.registeredGymInterPieceAdjacencyVerified !== true ||
+    gym?.registeredGymPieceBoundaryCoordinatesVerified !== true ||
+    gym?.planToFabGymOutletMappingVerified !== true ||
+    gym?.outletSizeAndAngleVerified !== true ||
+    gym?.exactManufacturerFittingIdentityVerified !== false ||
+    gym?.fullLinePieceOrderVerified !== false ||
+    gym?.outletMap?.length !== 8 ||
+    gym?.pieceBoundaries?.length !== 5
+  ) {
+    issues.push(
+      issue(
+        'BGC_SOURCE_3D_GYM_FAB_REGISTRATION_DRIFT',
+        'Scoped gym FAB piece, outlet, uniqueness, or fail-closed registration changed.',
+      ),
+    )
+  }
+  for (const [index, expected] of expectedOutletMap.entries()) {
+    const outlet = gym?.outletMap?.[index]
+    const [branch, nodeId, outletId, pieceId, pieceName, stationFt, residualIn] = expected
+    if (
+      outlet?.branchIndex !== branch ||
+      outlet?.junctionNodeId !== nodeId ||
+      outlet?.fabricationOutletUniqueId !== outletId ||
+      outlet?.fabricationPieceUniqueId !== pieceId ||
+      outlet?.fabricationPieceName !== pieceName ||
+      !near(outlet?.pieceStationFt, stationFt) ||
+      !near(outlet?.residualIn, residualIn) ||
+      outlet?.outletSizeCode !== 405 ||
+      outlet?.outletAngleDeg !== 0 ||
+      outlet?.planToFabOutletMappingVerified !== true ||
+      outlet?.exactManufacturerFittingIdentityVerified !== false
+    ) {
+      issues.push(
+        issue(
+          'BGC_SOURCE_3D_GYM_FAB_OUTLET_MAP_DRIFT',
+          `Gym junction ${index + 1} no longer maps to its unique native FAB outlet.`,
+        ),
+      )
+    }
+  }
+  const expectedBoundaries = [
+    ['.09', 28, 734.87595, 910.75095],
+    ['.10', 31, 910.75095, 1099.75095],
+    ['.11', 34, 1099.75095, 1288.75095],
+    ['.12', 37, 1288.75095, 1477.75095],
+    ['.13', 42, 1477.75095, 1666.75095],
+  ]
+  for (const [index, expected] of expectedBoundaries.entries()) {
+    const boundary = gym?.pieceBoundaries?.[index]
+    const [pieceName, pieceId, startX, endX] = expected
+    if (
+      boundary?.fabricationPieceName !== pieceName ||
+      boundary?.fabricationPieceUniqueId !== pieceId ||
+      !near(boundary?.startPlanPdfXPt, startX) ||
+      !near(boundary?.endPlanPdfXPt, endX)
+    ) {
+      issues.push(
+        issue(
+          'BGC_SOURCE_3D_GYM_FAB_BOUNDARY_DRIFT',
+          `Registered gym piece ${pieceName} boundary changed.`,
+        ),
+      )
+    }
+  }
+  if (
+    gym?.excludedWestOfGymOutlet?.fabricationOutletUniqueId !== 30 ||
+    gym?.excludedWestOfGymOutlet?.fabricationPieceUniqueId !== 28 ||
+    gym?.excludedWestOfGymOutlet?.fabricationPieceName !== '.09' ||
+    !near(gym?.excludedWestOfGymOutlet?.pieceStationFt, 2.423525253) ||
+    !near(gym?.excludedWestOfGymOutlet?.registeredPlanPdfXPt, 756.687677)
+  ) {
+    issues.push(
+      issue(
+        'BGC_SOURCE_3D_GYM_FAB_EXCLUSION_DRIFT',
+        'The uniquely excluded west-of-gym FAB outlet changed.',
+      ),
+    )
+  }
 }
 
 function validateGraph(packet, issues) {
@@ -336,18 +446,18 @@ function validateGraph(packet, issues) {
   const nodes = graph?.nodes || []
   const edges = graph?.edges || []
   if (
-    graph?.nodeCount !== 90 ||
-    nodes.length !== 90 ||
-    graph?.edgeCount !== 89 ||
-    edges.length !== 89 ||
+    graph?.nodeCount !== 94 ||
+    nodes.length !== 94 ||
+    graph?.edgeCount !== 93 ||
+    edges.length !== 93 ||
     !SHA.test(graph?.digestSha256 || '')
   ) {
     issues.push(
-      issue('BGC_SOURCE_3D_GRAPH_SHAPE_DRIFT', 'Canonical 90-node/89-edge source graph changed.'),
+      issue('BGC_SOURCE_3D_GRAPH_SHAPE_DRIFT', 'Canonical 94-node/93-edge source graph changed.'),
     )
   }
   const ids = new Set(nodes.map((node) => node.id))
-  if (ids.size !== 90)
+  if (ids.size !== 94)
     issues.push(
       issue('BGC_SOURCE_3D_NODE_ID_DUPLICATE', 'Canonical graph node identities are not unique.'),
     )
@@ -440,9 +550,22 @@ function validateGraph(packet, issues) {
   }
   const mainChain = [
     'BGC-CM-W',
-    ...Array.from({ length: 8 }, (_, index) => `BGC-CM-J${String(index + 1).padStart(2, '0')}`),
+    'BGC-CM-J01',
+    'BGC-CM-PB-09-10',
+    'BGC-CM-J02',
+    'BGC-CM-J03',
+    'BGC-CM-PB-10-11',
+    'BGC-CM-J04',
+    'BGC-CM-J05',
+    'BGC-CM-PB-11-12',
+    'BGC-CM-J06',
+    'BGC-CM-PB-12-13',
+    'BGC-CM-J07',
+    'BGC-CM-J08',
     'BGC-CM-E',
   ]
+  const expectedPieces = ['.09', '.09', '.10', '.10', '.10', '.11', '.11', '.11', '.12', '.12', '.13', '.13', '.13']
+  const expectedPieceIds = [28, 28, 31, 31, 31, 34, 34, 34, 37, 37, 42, 42, 42]
   for (let index = 0; index < mainChain.length - 1; index += 1) {
     const edge = edges.find(
       (candidate) => candidate.from === mainChain[index] && candidate.to === mainChain[index + 1],
@@ -455,7 +578,10 @@ function validateGraph(packet, issues) {
       edge.schedule !== 10 ||
       edge.endPreparation !== 'grooved' ||
       edge.pipeSizeVerified !== true ||
-      edge.pieceIdentityVerified !== false ||
+      edge.fabricationPieceName !== expectedPieces[index] ||
+      edge.fabricationPieceUniqueId !== expectedPieceIds[index] ||
+      edge.pieceIdentityVerified !== true ||
+      edge.registeredGymPieceChainVerified !== true ||
       edge.pipeDirectionVerified !== false ||
       edge.pipeGradeVerified !== false ||
       edge.exactFittingIdentityVerified !== false ||
@@ -465,6 +591,53 @@ function validateGraph(packet, issues) {
         issue(
           'BGC_SOURCE_3D_CROSS_MAIN_TOPOLOGY_DRIFT',
           `${mainChain[index]} to ${mainChain[index + 1]} cross-main edge changed.`,
+        ),
+      )
+    }
+  }
+  const boundaryNodes = nodes.filter(
+    (node) => node.role === 'registered-gym-cross-main-piece-boundary',
+  )
+  const expectedBoundaryNodes = [
+    ['BGC-CM-PB-09-10', 910.75095, '.09', '.10'],
+    ['BGC-CM-PB-10-11', 1099.75095, '.10', '.11'],
+    ['BGC-CM-PB-11-12', 1288.75095, '.11', '.12'],
+    ['BGC-CM-PB-12-13', 1477.75095, '.12', '.13'],
+  ]
+  for (const [id, x, westPiece, eastPiece] of expectedBoundaryNodes) {
+    const node = boundaryNodes.find((candidate) => candidate.id === id)
+    if (
+      !node ||
+      !near(node.planPdfPoint?.[0], x) ||
+      node.westFabricationPieceName !== westPiece ||
+      node.eastFabricationPieceName !== eastPiece ||
+      node.registeredGymPieceBoundaryCoordinatesVerified !== true ||
+      node.registrationToleranceIn !== 0.25
+    ) {
+      issues.push(
+        issue(
+          'BGC_SOURCE_3D_CROSS_MAIN_BOUNDARY_NODE_DRIFT',
+          `${id} no longer closes the scoped FAB piece boundary.`,
+        ),
+      )
+    }
+  }
+  const gymOutlets = packet.fabricationEvidence?.registeredGym?.outletMap || []
+  for (const mapping of gymOutlets) {
+    const node = nodes.find((candidate) => candidate.id === mapping.junctionNodeId)
+    if (
+      !node ||
+      node.fabricationPieceName !== mapping.fabricationPieceName ||
+      node.fabricationPieceUniqueId !== mapping.fabricationPieceUniqueId ||
+      node.fabricationOutletUniqueId !== mapping.fabricationOutletUniqueId ||
+      !near(node.fabricationOutletStationFt, mapping.pieceStationFt) ||
+      !near(node.planToFabOutletResidualIn, mapping.residualIn) ||
+      node.planToFabOutletMappingVerified !== true
+    ) {
+      issues.push(
+        issue(
+          'BGC_SOURCE_3D_CROSS_MAIN_JUNCTION_FAB_DRIFT',
+          `${mapping.junctionNodeId || 'unknown'} lost its native FAB outlet binding.`,
         ),
       )
     }
@@ -505,8 +678,14 @@ export async function validateBgcSourcePlanSection3dRegistration(packet) {
   if (
     network?.branchFeedCount !== 8 ||
     network?.crossMainJunctionCount !== 8 ||
-    network?.crossMainGraphEdgeCount !== 9 ||
+    network?.crossMainPieceBoundaryNodeCount !== 4 ||
+    network?.crossMainGraphEdgeCount !== 13 ||
     network?.planTopologyVerified !== true ||
+    network?.registeredGymPieceOrderVerified !== true ||
+    network?.registeredGymInterPieceFabricationAdjacencyVerified !== true ||
+    network?.registeredGymPieceBoundaryCoordinatesVerified !== true ||
+    network?.planToFabGymOutletMappingVerified !== true ||
+    !near(network?.planToFabGymOutletMaxResidualIn, 0.241366) ||
     network?.exactInterPieceFabricationAdjacencyVerified !== false ||
     network?.exactFittingIdentityVerified !== false ||
     network?.pipeDirectionVerified !== false ||
@@ -551,6 +730,9 @@ export async function validateBgcSourcePlanSection3dRegistration(packet) {
     packet.sourceBranchHalfAdjacencyVerified !== true ||
     packet.sourceBranchFeedTopologyVerified !== true ||
     packet.sourceCrossMainPlanAxisVerified !== true ||
+    packet.registeredGymCrossMainPieceOrderVerified !== true ||
+    packet.registeredGymCrossMainPieceBoundariesVerified !== true ||
+    packet.planToFabGymOutletMappingVerified !== true ||
     packet.pipeSizeVerified !== true ||
     packet.roofSurfaceTargetProjectionVerified !== true ||
     packet.exactInstalledSprinklerElevationVerified !== false ||
@@ -585,6 +767,9 @@ export async function validateBgcSourcePlanSection3dRegistration(packet) {
     sourceBranchHalfAdjacencyVerified: passed,
     sourceBranchFeedTopologyVerified: passed,
     sourceCrossMainPlanAxisVerified: passed,
+    registeredGymCrossMainPieceOrderVerified: passed,
+    registeredGymCrossMainPieceBoundariesVerified: passed,
+    planToFabGymOutletMappingVerified: passed,
     pipeSizeVerified: passed,
     exactInstalledPipeElevationVerified: false,
     pipeDirectionVerified: false,
@@ -680,6 +865,42 @@ export async function verifyBgcSourcePlanSection3dAdversarialLoop(packet) {
       },
     ],
     [
+      'gym-piece-order',
+      (value) => {
+        value.fabricationEvidence.registeredGym.pieceNamesWestToEast.reverse()
+      },
+    ],
+    [
+      'gym-outlet-identity',
+      (value) => {
+        value.fabricationEvidence.registeredGym.outletMap[0].fabricationOutletUniqueId = 30
+      },
+    ],
+    [
+      'gym-outlet-station',
+      (value) => {
+        value.fabricationEvidence.registeredGym.outletMap[1].pieceStationFt += 1
+      },
+    ],
+    [
+      'gym-excluded-outlet',
+      (value) => {
+        value.fabricationEvidence.registeredGym.excludedWestOfGymOutlet.fabricationOutletUniqueId = 29
+      },
+    ],
+    [
+      'gym-piece-boundary',
+      (value) => {
+        value.geometryGraph.nodes.find((node) => node.id === 'BGC-CM-PB-09-10').planPdfPoint[0] += 1
+      },
+    ],
+    [
+      'gym-edge-piece-identity',
+      (value) => {
+        value.geometryGraph.edges.find((edge) => edge.id === 'BGC-E-083').fabricationPieceName = '.09'
+      },
+    ],
+    [
       'main-piece-promotion',
       (value) => {
         value.exactCrossMainPieceOrderVerified = true
@@ -768,6 +989,10 @@ export async function verifyBgcSourcePlanSection3dAdversarialLoop(packet) {
   for (const [id, mutate] of cases) {
     const value = structuredClone(packet)
     mutate(value)
+    if (id !== 'receipt') {
+      const { receiptSha256: _receiptSha256, ...draft } = value
+      value.receiptSha256 = await sha256Hex(draft)
+    }
     if ((await validateBgcSourcePlanSection3dRegistration(value)).status === 'blocked')
       rejectedCases.push(id)
   }
@@ -778,6 +1003,9 @@ export async function verifyBgcSourcePlanSection3dAdversarialLoop(packet) {
     sourcePlanCoordinatesVerified: rejectedCases.length === cases.length,
     sourceBranchFeedTopologyVerified: rejectedCases.length === cases.length,
     sourceCrossMainPlanAxisVerified: rejectedCases.length === cases.length,
+    registeredGymCrossMainPieceOrderVerified: rejectedCases.length === cases.length,
+    registeredGymCrossMainPieceBoundariesVerified: rejectedCases.length === cases.length,
+    planToFabGymOutletMappingVerified: rejectedCases.length === cases.length,
     pipeSizeVerified: rejectedCases.length === cases.length,
     exactInstalledPipeElevationVerified: false,
     pipeDirectionVerified: false,

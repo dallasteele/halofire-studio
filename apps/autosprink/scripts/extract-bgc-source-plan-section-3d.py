@@ -9,6 +9,7 @@ import io
 import json
 import math
 from pathlib import Path
+from statistics import median
 
 import fitz
 from PIL import Image, ImageDraw, ImageFont
@@ -226,10 +227,22 @@ def extract_cross_main_plan_registration(page: fitz.Page) -> dict[str, object]:
         for word in page.get_text("words")
         if 690 <= word[0] <= 1700 and 1470 <= word[1] <= 1560
     ]
-    labels = sorted({word[4] for word in words if word[4].startswith("#E.")})
+    label_words = [word for word in words if word[4].startswith("#E.")]
+    labels = sorted({word[4] for word in label_words})
     expected_labels = ["#E.09", "#E.10", "#E.11", "#E.12", "#E.13", "#E.14"]
     if labels != expected_labels:
         raise RuntimeError(f"cross-main plan labels changed: {labels}")
+    piece_label_positions = {
+        word[4]: [round((word[0] + word[2]) / 2, 6), round((word[1] + word[3]) / 2, 6)]
+        for word in label_words
+    }
+    registered_chain_labels = [
+        label
+        for label, _point in sorted(piece_label_positions.items(), key=lambda item: item[1][0])
+        if label in {"#E.09", "#E.10", "#E.11", "#E.12", "#E.13"}
+    ]
+    if registered_chain_labels != ["#E.09", "#E.10", "#E.11", "#E.12", "#E.13"]:
+        raise RuntimeError(f"registered gym cross-main label order changed: {registered_chain_labels}")
 
     boundary_segments = []
     for drawing_index, drawing in enumerate(page.get_drawings()):
@@ -265,9 +278,12 @@ def extract_cross_main_plan_registration(page: fitz.Page) -> dict[str, object]:
         "registeredGymSpanPdfPt": [GYM_CROSS_MAIN_SPAN[0], RIDGE_Y, GYM_CROSS_MAIN_SPAN[1], RIDGE_Y],
         "registeredGymSpanFt": round((GYM_CROSS_MAIN_SPAN[1] - GYM_CROSS_MAIN_SPAN[0]) / PDF_POINTS_PER_FOOT, 6),
         "pieceLabelsObserved": labels,
+        "pieceLabelPositionsPdfPt": piece_label_positions,
+        "registeredGymPieceLabelsWestToEast": registered_chain_labels,
         "nativeBoundarySignature": boundary_segments,
         "fullLinePieceOrderVerified": False,
-        "pieceBoundaryCoordinatesVerified": False,
+        "registeredGymPieceOrderVerified": False,
+        "registeredGymPieceBoundaryCoordinatesVerified": False,
     }
 
 
@@ -371,6 +387,157 @@ def load_native_fabrication_evidence() -> dict[str, object]:
     if evidence["archiveSha256"] != EXPECTED[FAB_ARCHIVE][0]:
         raise RuntimeError("FAB archive hash changed during native extraction")
     return evidence
+
+
+def register_gym_fabrication_chain(
+    cross_main: dict[str, object],
+    fabrication_evidence: dict[str, object],
+    junction_nodes: list[dict[str, object]],
+) -> dict[str, object]:
+    """Register the five FAB pieces and eight in-gym outlets without promoting the full #E line."""
+    line = fabrication_evidence["lineGroups"]["#E"]
+    piece_names = [".09", ".10", ".11", ".12", ".13"]
+    pieces_by_name = {piece["pieceName"]: piece for piece in line["pieces"]}
+    pieces = [pieces_by_name[name] for name in piece_names]
+    if cross_main["registeredGymPieceLabelsWestToEast"] != [f"#E{name}" for name in piece_names]:
+        raise RuntimeError("plan-label order no longer matches the registered FAB piece chain")
+
+    piece_starts: dict[str, float] = {}
+    cumulative = 0.0
+    for piece in pieces:
+        piece_starts[piece["pieceName"]] = cumulative
+        cumulative += piece["lengthFt"]
+
+    candidate_outlets = []
+    for outlet in line["outlets"]:
+        piece = next((item for item in pieces if item["uniqueId"] == outlet["parentId"]), None)
+        if piece is None:
+            continue
+        candidate_outlets.append({
+            "fabricationOutletUniqueId": outlet["uniqueId"],
+            "fabricationPieceUniqueId": piece["uniqueId"],
+            "fabricationPieceName": piece["pieceName"],
+            "pieceStationFt": round(outlet["distanceFt"], 9),
+            "chainStationFt": round(piece_starts[piece["pieceName"]] + outlet["distanceFt"], 9),
+            "outletSizeCode": outlet["sizeCode"],
+            "outletAngleDeg": outlet["angleDeg"],
+        })
+    candidate_outlets.sort(key=lambda outlet: outlet["chainStationFt"])
+    if len(candidate_outlets) != 9 or len(junction_nodes) != 8:
+        raise RuntimeError(
+            f"registered FAB outlet cardinality changed: candidates={len(candidate_outlets)} junctions={len(junction_nodes)}"
+        )
+
+    fits = []
+    junction_x = [node["planPdfPoint"][0] for node in junction_nodes]
+    for excluded_index in range(len(candidate_outlets)):
+        selected = [
+            outlet for index, outlet in enumerate(candidate_outlets) if index != excluded_index
+        ]
+        origins = [
+            plan_x - PDF_POINTS_PER_FOOT * outlet["chainStationFt"]
+            for plan_x, outlet in zip(junction_x, selected)
+        ]
+        origin = median(origins)
+        residuals_in = [
+            (plan_x - (origin + PDF_POINTS_PER_FOOT * outlet["chainStationFt"]))
+            / PDF_POINTS_PER_FOOT
+            * 12
+            for plan_x, outlet in zip(junction_x, selected)
+        ]
+        fits.append({
+            "excludedIndex": excluded_index,
+            "selected": selected,
+            "originPdfXPt": origin,
+            "residualsIn": residuals_in,
+            "maxAbsResidualIn": max(abs(value) for value in residuals_in),
+        })
+    fits.sort(key=lambda fit: fit["maxAbsResidualIn"])
+    best, runner_up = fits[:2]
+    if best["maxAbsResidualIn"] > 0.25 or runner_up["maxAbsResidualIn"] < 12:
+        raise RuntimeError(
+            "registered gym FAB outlet map is not uniquely closed within the quarter-inch gate: "
+            f"best={best['maxAbsResidualIn']} runnerUp={runner_up['maxAbsResidualIn']}"
+        )
+
+    origin = best["originPdfXPt"]
+    outlet_map = []
+    for node, outlet, residual in zip(junction_nodes, best["selected"], best["residualsIn"]):
+        registered_x = origin + PDF_POINTS_PER_FOOT * outlet["chainStationFt"]
+        mapping = {
+            "branchIndex": node["branchIndex"],
+            "junctionNodeId": node["id"],
+            **outlet,
+            "registeredPlanPdfXPt": round(registered_x, 6),
+            "observedPlanPdfXPt": node["planPdfPoint"][0],
+            "residualIn": round(residual, 6),
+            "planToFabOutletMappingVerified": True,
+            "exactManufacturerFittingIdentityVerified": False,
+        }
+        node.update({
+            "fabricationLineName": "#E",
+            "fabricationPieceName": outlet["fabricationPieceName"],
+            "fabricationPieceUniqueId": outlet["fabricationPieceUniqueId"],
+            "fabricationOutletUniqueId": outlet["fabricationOutletUniqueId"],
+            "fabricationOutletStationFt": outlet["pieceStationFt"],
+            "planToFabOutletResidualIn": round(residual, 6),
+            "planToFabOutletMappingVerified": True,
+        })
+        outlet_map.append(mapping)
+
+    boundaries = []
+    chain_station = 0.0
+    for piece in pieces:
+        start_x = origin + PDF_POINTS_PER_FOOT * chain_station
+        chain_station += piece["lengthFt"]
+        end_x = origin + PDF_POINTS_PER_FOOT * chain_station
+        boundaries.append({
+            "fabricationPieceName": piece["pieceName"],
+            "fabricationPieceUniqueId": piece["uniqueId"],
+            "lengthFt": piece["lengthFt"],
+            "startChainStationFt": round(chain_station - piece["lengthFt"], 9),
+            "endChainStationFt": round(chain_station, 9),
+            "startPlanPdfXPt": round(start_x, 6),
+            "endPlanPdfXPt": round(end_x, 6),
+        })
+
+    excluded = candidate_outlets[best["excludedIndex"]]
+    excluded_x = origin + PDF_POINTS_PER_FOOT * excluded["chainStationFt"]
+    if excluded_x >= cross_main["registeredGymSpanPdfPt"][0]:
+        raise RuntimeError("the uniquely excluded FAB outlet no longer falls west of the registered gym")
+    registration = {
+        "fabricationLineName": "#E",
+        "pieceNamesWestToEast": piece_names,
+        "pieceCount": len(pieces),
+        "candidateOutletCount": len(candidate_outlets),
+        "mappedGymOutletCount": len(outlet_map),
+        "translationOnlyOriginPdfXPt": round(origin, 6),
+        "registrationGateIn": 0.25,
+        "maxAbsResidualIn": round(best["maxAbsResidualIn"], 6),
+        "runnerUpMaxAbsResidualIn": round(runner_up["maxAbsResidualIn"], 6),
+        "outletMap": outlet_map,
+        "excludedWestOfGymOutlet": {
+            **excluded,
+            "registeredPlanPdfXPt": round(excluded_x, 6),
+            "reason": "unique translation-only solution places this outlet west of the registered gym span",
+        },
+        "pieceBoundaries": boundaries,
+        "registeredGymPieceOrderVerified": True,
+        "registeredGymInterPieceAdjacencyVerified": True,
+        "registeredGymPieceBoundaryCoordinatesVerified": True,
+        "planToFabGymOutletMappingVerified": True,
+        "outletSizeAndAngleVerified": True,
+        "exactManufacturerFittingIdentityVerified": False,
+        "fullLinePieceOrderVerified": False,
+    }
+    cross_main.update({
+        "registeredGymPieceOrderVerified": True,
+        "registeredGymPieceBoundaryCoordinatesVerified": True,
+        "registrationToleranceIn": 0.25,
+    })
+    fabrication_evidence["registeredGym"] = registration
+    fabrication_evidence["registeredGymInterPieceAdjacencyVerified"] = True
+    return registration
 
 
 def vertical_pipe_covers(page: fitz.Page, x: float, y0: float, y1: float) -> bool:
@@ -492,6 +659,7 @@ def extend_graph_with_feed_and_crossmain(
     offset: dict[str, object],
     feed_segments: list[dict[str, object]],
     cross_main: dict[str, object],
+    fabrication_evidence: dict[str, object],
 ) -> dict[str, object]:
     by_id = {node["id"]: node for node in nodes}
     junction_nodes = []
@@ -573,21 +741,49 @@ def extend_graph_with_feed_and_crossmain(
             "branchAxisOffsetPt": round(lower_x - upper_x, 6),
         })
 
+    gym_fabrication = register_gym_fabrication_chain(
+        cross_main, fabrication_evidence, junction_nodes
+    )
+    boundary_nodes = []
+    for west_piece, east_piece in zip(
+        gym_fabrication["pieceBoundaries"], gym_fabrication["pieceBoundaries"][1:]
+    ):
+        boundary_x = west_piece["endPlanPdfXPt"]
+        boundary_node = graph_node(
+            f"BGC-CM-PB-{west_piece['fabricationPieceName'][1:]}-{east_piece['fabricationPieceName'][1:]}",
+            "registered-gym-cross-main-piece-boundary",
+            [boundary_x, RIDGE_Y],
+            westFabricationPieceName=west_piece["fabricationPieceName"],
+            eastFabricationPieceName=east_piece["fabricationPieceName"],
+            registeredGymPieceBoundaryCoordinatesVerified=True,
+            registrationToleranceIn=gym_fabrication["registrationGateIn"],
+        )
+        boundary_nodes.append(boundary_node)
+
     start_node = graph_node(
         "BGC-CM-W",
         "registered-gym-cross-main-west-limit",
         [cross_main["registeredGymSpanPdfPt"][0], RIDGE_Y],
-        pieceBoundaryCoordinatesVerified=False,
+        registeredGymLimitOnly=True,
     )
     end_node = graph_node(
         "BGC-CM-E",
         "registered-gym-cross-main-east-limit",
         [cross_main["registeredGymSpanPdfPt"][2], RIDGE_Y],
-        pieceBoundaryCoordinatesVerified=False,
+        registeredGymLimitOnly=True,
     )
-    nodes.extend((start_node, end_node))
-    main_chain = [start_node, *junction_nodes, end_node]
+    nodes.extend((start_node, *boundary_nodes, end_node))
+    main_chain = sorted(
+        [start_node, *junction_nodes, *boundary_nodes, end_node],
+        key=lambda node: node["planPdfPoint"][0],
+    )
     for start, end in zip(main_chain, main_chain[1:]):
+        midpoint = (start["planPdfPoint"][0] + end["planPdfPoint"][0]) / 2
+        piece = next(
+            piece
+            for piece in gym_fabrication["pieceBoundaries"]
+            if piece["startPlanPdfXPt"] <= midpoint <= piece["endPlanPdfXPt"]
+        )
         edges.append({
             "id": f"BGC-E-{len(edges) + 1:03d}",
             "from": start["id"],
@@ -599,7 +795,10 @@ def extend_graph_with_feed_and_crossmain(
             "endPreparation": "grooved",
             "sourceVectorCoverageVerified": True,
             "pipeSizeVerified": True,
-            "pieceIdentityVerified": False,
+            "fabricationPieceName": piece["fabricationPieceName"],
+            "fabricationPieceUniqueId": piece["fabricationPieceUniqueId"],
+            "pieceIdentityVerified": True,
+            "registeredGymPieceChainVerified": True,
             "pipeDirectionVerified": False,
             "pipeGradeVerified": False,
             "exactFittingIdentityVerified": False,
@@ -609,8 +808,14 @@ def extend_graph_with_feed_and_crossmain(
         "branchFeedCount": len(feed_evidence),
         "branchFeeds": feed_evidence,
         "crossMainJunctionCount": len(junction_nodes),
+        "crossMainPieceBoundaryNodeCount": len(boundary_nodes),
         "crossMainGraphEdgeCount": len(main_chain) - 1,
         "planTopologyVerified": True,
+        "registeredGymPieceOrderVerified": True,
+        "registeredGymInterPieceFabricationAdjacencyVerified": True,
+        "registeredGymPieceBoundaryCoordinatesVerified": True,
+        "planToFabGymOutletMappingVerified": True,
+        "planToFabGymOutletMaxResidualIn": gym_fabrication["maxAbsResidualIn"],
         "exactInterPieceFabricationAdjacencyVerified": False,
         "exactFittingIdentityVerified": False,
         "pipeDirectionVerified": False,
@@ -663,6 +868,10 @@ def draw_plan_proof(source: Image.Image, nodes: list[dict[str, object]], edges: 
             if node.get("role") == "cross-main-branch-plan-junction":
                 x, y = plan_pixel(node["planPdfPoint"])
                 draw.rectangle((x - 6, y - 6, x + 6, y + 6), outline=(255, 255, 255, 250), fill=(255, 40, 194, 220), width=2)
+            elif node.get("role") == "registered-gym-cross-main-piece-boundary":
+                x, y = plan_pixel(node["planPdfPoint"])
+                draw.line((x, y - 24, x, y + 24), fill=(255, 202, 40, 255), width=5)
+                draw.text((x - 30, y - 52), node["eastFabricationPieceName"], font=font(16, True), fill=(255, 236, 145, 255))
             continue
         x, y = plan_pixel(node["planPdfPoint"])
         draw.ellipse((x - 9, y - 9, x + 9, y + 9), outline=(0, 90, 255, 245), width=4)
@@ -670,9 +879,9 @@ def draw_plan_proof(source: Image.Image, nodes: list[dict[str, object]], edges: 
     panel = (18, 18, 830, 210)
     draw.rounded_rectangle(panel, radius=18, fill=(3, 12, 28, 225), outline=(66, 174, 255, 255), width=3)
     draw.text((42, 34), "ACTUAL AS-BUILT FP 1.0 + NATIVE-VECTOR OVERLAY", font=font(24, True), fill="white")
-    draw.text((42, 72), "64 heads | 8 complete branch feeds | 3 in SCH 10 registered gym cross-main", font=font(21), fill=(196, 230, 255))
-    draw.text((42, 106), "Blue = branches  Green = feeds  Magenta = cross-main plan axis", font=font(19), fill=(196, 230, 255))
-    draw.text((42, 138), "FAB: #05 + 7x #10 north / 8x #06 south / #E main", font=font(18), fill=(180, 255, 226))
+    draw.text((42, 72), "64 heads | 8 complete branch feeds | 5-piece / 8-outlet gym cross-main", font=font(21), fill=(196, 230, 255))
+    draw.text((42, 106), "Blue = branches  Green = feeds  Magenta = main  Gold = FAB piece boundaries", font=font(19), fill=(196, 230, 255))
+    draw.text((42, 138), "#E.09 -> .10 -> .11 -> .12 -> .13 | outlet-map max residual 0.241 in", font=font(18), fill=(180, 255, 226))
     draw.text((42, 170), "Direction, grade, installed Z, exact fitting takeout and release remain blocked", font=font(18, True), fill=(255, 204, 128))
     return Image.alpha_composite(image, overlay).convert("RGB")
 
@@ -734,12 +943,12 @@ main{{max-width:1500px;margin:auto;padding:42px 26px 70px}}h1{{font-size:clamp(3
 .facts{{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:26px 0}}.fact{{padding:16px;border-radius:16px;background:#091426;border:1px solid var(--line)}}.fact b{{display:block;font-size:25px;color:var(--blue)}}code{{font-size:12px;word-break:break-all;color:#b8d9f4}}
 </style></head><body><main><h1>Real plan. Real pipe graph. Real fabrication identities.</h1>
 <p class="lede">Boys &amp; Girls Club Community Center, Brigham City. This replaces the old synthetic 8 &times; 8 dot diagram. Every visible proof below is bound to actual project PDFs and the native fabrication package; the overlay comes from deterministic PDF vectors and typed FAB rows, not image generation.</p>
-<div class="badges"><span class="badge pass">64 / 64 native symbols</span><span class="badge pass">8 / 8 branch feeds</span><span class="badge pass">3 in SCH 10 main</span><span class="badge pass">same graph: plan / elevation / 3D</span><span class="badge hold">direction + grade + installed Z held closed</span></div>
-<div class="facts"><div class="fact"><b>64</b>as-built guarded uprights</div><div class="fact"><b>89</b>source-bound graph edges</div><div class="fact"><b>4.1625 pt</b>preserved ridge half-offset</div><div class="fact"><b>121 / 87 / 50</b>native FAB pipes / outlets / fittings</div></div>
+<div class="badges"><span class="badge pass">64 / 64 native symbols</span><span class="badge pass">8 / 8 branch feeds</span><span class="badge pass">5 registered FAB pieces</span><span class="badge pass">8 / 8 gym outlets</span><span class="badge pass">same graph: plan / elevation / 3D</span><span class="badge hold">threads + exact part fit held closed</span></div>
+<div class="facts"><div class="fact"><b>64</b>as-built guarded uprights</div><div class="fact"><b>93</b>source-bound graph edges</div><div class="fact"><b>0.241 in</b>maximum FAB-to-plan outlet residual</div><div class="fact"><b>66.49 in</b>minimum wrong-exclusion residual</div></div>
 <div class="grid"><article><h2>Top plan &mdash; actual as-built FP 1.0 underlay</h2><img src="bgc-plan-overlay.png" alt="Actual as-built sprinkler plan under native-vector pipe overlay"></article>
 <article><h2>Elevation &mdash; actual A301 transverse roof section</h2><img src="bgc-section-overlay.png" alt="Actual A301 transverse section under registered roof graph"></article>
-<article><h2>3D &mdash; Blender model with the actual plan raster beneath</h2><img src="bgc-source-registered-3d.png" alt="Blender source-registered pitched roof model over actual plan raster"></article></div>
-<p><strong>Receipt</strong><br><code>{receipt}</code></p><p class="lede">Truth boundary: this proves the gym plan coordinates, eight branch feeds, the registered cross-main axis, 1&frac14;-inch and 3-inch Schedule 10 size identities, and native FAB parent attachments. It does not invent cross-main piece order, exact fitting takeout, manufacturer part or bracket geometry, helical threads, thread engagement or tolerances, mating fit, direction, grade, installed Z, compliance, field release, or VPS release.</p>
+<article><h2>3D &mdash; Blender model with the actual plan raster beneath</h2><img src="bgc-source-registered-3d.png" alt="Blender source-registered pitched roof model over actual plan raster"><p class="lede">Blue and green are source-registered target centerlines. The five-color ridge chain is #E.09 through #E.13; gold markers are registered piece boundaries. These are deliberately not presented as manufacturer part solids or installed Z.</p></article></div>
+<p><strong>Receipt</strong><br><code>{receipt}</code></p><p class="lede">Truth boundary: this proves the gym plan coordinates, eight branch feeds, the scoped #E.09 through #E.13 piece order and boundaries, eight native FAB outlet identities, and 1&frac14;-inch / 3-inch Schedule 10 size identities. It does not promote the complete #E line, exact fitting takeout, manufacturer part or bracket geometry, helical threads, thread engagement or tolerances, mating fit, direction, grade, installed Z, compliance, field release, or VPS release.</p>
 </main></body></html>"""
 
 
@@ -760,7 +969,7 @@ def main() -> None:
     cross_main = extract_cross_main_plan_registration(as_built_page)
     fabrication_evidence = load_native_fabrication_evidence()
     network_registration = extend_graph_with_feed_and_crossmain(
-        as_built_page, nodes, edges, offset, feed_segments, cross_main
+        as_built_page, nodes, edges, offset, feed_segments, cross_main, fabrication_evidence
     )
 
     left, ridge, right = (SECTION_ROOF[key] for key in ("leftEavePdfPoint", "ridgePdfPoint", "rightEavePdfPoint"))
@@ -828,6 +1037,9 @@ def main() -> None:
         "sourceBranchHalfAdjacencyVerified": True,
         "sourceBranchFeedTopologyVerified": True,
         "sourceCrossMainPlanAxisVerified": True,
+        "registeredGymCrossMainPieceOrderVerified": True,
+        "registeredGymCrossMainPieceBoundariesVerified": True,
+        "planToFabGymOutletMappingVerified": True,
         "pipeSizeVerified": True,
         "roofSurfaceTargetProjectionVerified": True,
         "exactInstalledSprinklerElevationVerified": False,
@@ -846,7 +1058,7 @@ def main() -> None:
         "fabricationReady": False,
         "fieldReleaseReady": False,
         "vpsReleaseReady": False,
-        "claimStatus": "source-registered-head-branch-feed-cross-main-size-and-native-fab-proof-not-piece-order-fitting-takeout-part-solid-thread-fit-direction-grade-installed-z-compliance-or-release",
+        "claimStatus": "source-registered-head-branch-feed-and-scoped-gym-cross-main-piece-outlet-proof-not-full-line-order-fitting-takeout-part-solid-thread-fit-direction-grade-installed-z-compliance-or-release",
     }
     packet = {**draft, "receiptSha256": digest_value(draft)}
     write_text_lf(OUTPUT, json.dumps(packet, indent=2) + "\n")
