@@ -17,9 +17,18 @@ describe('New Hope purchased support components', () => {
     expect(result.metrics).toEqual({
       purchasedSupportLineCount: 16,
       purchasedSupportUnitCount: 977,
+      fig69QuoteProductCount: 5,
+      fig69PublishedVariantCount: 7,
     })
     expect(result.purchaseIdentityReady).toBe(true)
     expect(result.manufacturerAuthoredAb2SourceAcquired).toBe(true)
+    expect(result.manufacturerAuthoredFig69SourceAcquired).toBe(true)
+    expect(result.manufacturerPublishedFig69DimensionsReady).toBe(true)
+    expect(result.projectPipeSizeAssignmentForFig69Ready).toBe(false)
+    expect(result.fig69RfaDimensionAuditReady).toBe(false)
+    expect(result.exactFig69ThreadSolidReady).toBe(false)
+    expect(result.fig69MatingAssemblyReady).toBe(false)
+    expect(result.sammyAnchorManufacturerIdentityReady).toBe(false)
     expect(result.manufacturerCadCoverageComplete).toBe(false)
     expect(result.exactManufacturerGeometryReady).toBe(false)
     expect(result.exactThreadSolidsReady).toBe(false)
@@ -70,5 +79,33 @@ describe('New Hope purchased support components', () => {
     expect(
       evaluateNewHopePurchasedSupportComponents(unverifiedPromotion).blockerCodes,
     ).toContain('NH_SUPPORT_AB2_CAD_VERIFICATION_BOUNDARY_INVALID')
+
+    const badFig69Rfa = structuredClone(source)
+    badFig69Rfa.manufacturerCadAcquisition.fig69.sourceFile.sha256 = 'BAD'
+    expect(evaluateNewHopePurchasedSupportComponents(badFig69Rfa).blockerCodes).toContain(
+      'NH_SUPPORT_FIG69_SOURCE_INVALID',
+    )
+
+    const badFig69Dimension = structuredClone(source)
+    badFig69Dimension.components.find(
+      (component) => component.productNumber === '0500301767',
+    ).publishedVariants[0].bIn = 4.01
+    expect(
+      evaluateNewHopePurchasedSupportComponents(badFig69Dimension).blockerCodes,
+    ).toContain('NH_SUPPORT_FIG69_DIMENSION_INVALID')
+
+    const falseFig69Assignment = structuredClone(source)
+    falseFig69Assignment.manufacturerCadAcquisition.fig69.projectPipeSizeAssignmentVerified = true
+    expect(
+      evaluateNewHopePurchasedSupportComponents(falseFig69Assignment).blockerCodes,
+    ).toContain('NH_SUPPORT_FIG69_VERIFICATION_BOUNDARY_INVALID')
+
+    const falseSammyResolution = structuredClone(source)
+    falseSammyResolution.manufacturerIdentityConflicts[0].status = 'resolved'
+    falseSammyResolution.manufacturerIdentityConflicts[0].selectedManufacturerPartNumber = '8056957'
+    falseSammyResolution.manufacturerIdentityConflicts[0].exactGeometryEligible = true
+    expect(
+      evaluateNewHopePurchasedSupportComponents(falseSammyResolution).blockerCodes,
+    ).toContain('NH_SUPPORT_SAMMY_IDENTITY_CONFLICT_INVALID')
   })
 })

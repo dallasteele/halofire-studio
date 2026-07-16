@@ -2,7 +2,7 @@
   "loop": "new-hope-purchased-support-components-20260716",
   "stage": "VERIFY",
   "status": "purchase-identities-bound-installed-geometry-rejected",
-  "iteration": 2,
+  "iteration": 3,
   "evidence": {
     "looseMaterialQuote": {
       "quoteNumber": "0133821",
@@ -24,15 +24,43 @@
       "manufacturerAuthoredAb2SourceAcquired": true,
       "geometryExtractionVerified": false,
       "dimensionAuditVerified": false
+    },
+    "fig69ManufacturerEvidence": {
+      "officialRfaSha256": "B079BA1D50E1F96279E96561208AAA25918472793F4029B261448A2B0D557F17",
+      "officialCatalogSha256": "69DDBD5E3C87C50142AABBC71A17B4BE089249FE1858202B4C8F5751D4D91061",
+      "catalogPhysicalPage": 45,
+      "catalogRevision": "PH-1.18",
+      "quoteProductCount": 5,
+      "publishedSizeVariantCount": 7,
+      "manufacturerAuthoredSourceAcquired": true,
+      "publishedDimensionTableReady": true,
+      "projectPipeSizeAssignmentVerified": false,
+      "rfaDimensionAuditVerified": false,
+      "threadSolidVerified": false,
+      "matingAssemblyVerified": false
+    },
+    "sammyManufacturerIdentityConflict": {
+      "quoteProductNumber": "SWDR1-1/2",
+      "quoteDescription": "ITW SWDR 516 1-1/2 SIDE STEEL Sammy",
+      "candidateManufacturerPartNumbers": ["8056957", "8054957"],
+      "candidateFastenerThreads": ["5/16-18", "12-24"],
+      "candidateLengthsIn": [1.25, 1.5],
+      "resolved": false,
+      "exactGeometryEligible": false
     }
   },
   "verification": {
     "focusedTests": "27 files / 174 tests passed",
-    "adversarialCases": 7,
+    "adversarialCases": 11,
     "autosprinkBuild": "passed",
     "browser": {
       "proofReady": true,
       "purchaseIdentityReady": true,
+      "manufacturerAuthoredFig69SourceAcquired": true,
+      "manufacturerPublishedFig69DimensionsReady": true,
+      "projectPipeSizeAssignmentForFig69Ready": false,
+      "fig69RfaDimensionAuditReady": false,
+      "sammyAnchorManufacturerIdentityReady": false,
       "exactSupportManufacturerGeometryReady": false,
       "exactSupportThreadSolidsReady": false,
       "verifiedSupportMatingAssembliesReady": false,
@@ -41,8 +69,8 @@
     },
     "brainPostflight": {
       "endpoint": "canonical hal-brain /remember",
-      "episodeId": 151604
+      "episodeId": 151661
     }
   },
-  "nextAction": "Verify and extract the official Victaulic AB2 RFA geometry, audit its dimensions, acquire exact manufacturer CAD or complete manufacturing dimensions for every remaining quote-bound support, then use Blender MCP to assemble thread-bearing solids and run mating, envelope, connector, and collision checks before pitched-roof placement."
+  "nextAction": "Resolve the Sammy SWDR manufacturer identity from project evidence; verify and extract the official Victaulic AB2 and ASC/Anvil Fig. 69 RFA geometry; audit Fig. 69 B/C/F/G dimensions; bind each installed hanger to its actual pipe size; acquire exact manufacturer CAD or complete manufacturing dimensions for every remaining support; then use Blender MCP to assemble thread-bearing solids and run mating, envelope, connector, and collision checks before pitched-roof placement."
 }

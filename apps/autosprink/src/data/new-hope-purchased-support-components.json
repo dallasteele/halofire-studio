@@ -17,6 +17,37 @@
     "purchaseEquivalent": "Anvil Fig. 69 adjustable swivel ring",
     "geometryInterchangeableWithoutProductSpecificEvidence": false
   },
+  "manufacturerIdentityConflicts": [
+    {
+      "quoteProductNumber": "SWDR1-1/2",
+      "quoteDescription": "ITW SWDR 516 1-1/2 SIDE STEEL Sammy",
+      "manufacturer": "ITW Buildex",
+      "status": "unresolved",
+      "reason": "The distributor line combines two different ITW model identities whose screw thread and length are not interchangeable.",
+      "candidates": [
+        {
+          "manufacturerPartNumber": "8056957",
+          "model": "SWDR 516",
+          "rodThread": "3/8-16",
+          "substrateFastenerThread": "5/16-18",
+          "substrateFastenerLengthIn": 1.25,
+          "officialProductUrl": "https://fastening-solutions.itwbuildex.com/item/sammys-threaded-rod-anchors-3-8-/sammys-3-8-horizontal-threaded-rod-anchor/8056957"
+        },
+        {
+          "manufacturerPartNumber": "8054957",
+          "model": "SWDR 1-1/2",
+          "rodThread": "3/8-16",
+          "substrateFastenerThread": "12-24",
+          "substrateFastenerLengthIn": 1.5,
+          "officialProductUrl": "https://fastening-solutions.itwbuildex.com/item/sammys-threaded-rod-anchors-3-8-/sammys-3-8-horizontal-threaded-rod-anchor/8054957"
+        }
+      ],
+      "selectedManufacturerPartNumber": null,
+      "manufacturerCadAvailable": true,
+      "manufacturerCadAcquired": false,
+      "exactGeometryEligible": false
+    }
+  ],
   "manufacturerCadAcquisition": {
     "officialLibraryUrl": "https://assets.victaulic.com/assets/uploads/software-content/Autodesk_Revit_MEP.html",
     "sourceArchive": {
@@ -44,16 +75,52 @@
     "publishedDimensionAuditVerified": false,
     "threadSolidVerified": false,
     "matingAssemblyVerified": false,
-    "installedPlacementVerified": false
+    "installedPlacementVerified": false,
+    "fig69": {
+      "officialBimCatalogUrl": "https://bim-catalog.asc-es.com/viewitems/ring-hangers-1/fig--69---adjustable-swivel-ring",
+      "officialProductUrl": "https://www.asc-es.com/products/69-adjustable-swivel-ring",
+      "sourceFile": {
+        "fileName": "Hanger-Swivel_Ring-Anvil-69_60.rfa",
+        "byteLength": 204352,
+        "sha256": "B079BA1D50E1F96279E96561208AAA25918472793F4029B261448A2B0D557F17"
+      },
+      "dimensionSource": {
+        "fileName": "Anvil-Pipe-Hangers-Supports-Submittal-Catalog.pdf",
+        "byteLength": 31616364,
+        "sha256": "69DDBD5E3C87C50142AABBC71A17B4BE089249FE1858202B4C8F5751D4D91061",
+        "physicalPage": 45,
+        "revision": "PH-1.18"
+      },
+      "quoteBoundProductNumbers": ["0500301692", "0500301742", "0500301759", "0500301767", "0500301775"],
+      "manufacturerAuthoredSourceAcquired": true,
+      "publishedDimensionTableAcquired": true,
+      "projectPipeSizeAssignmentVerified": false,
+      "rfaDimensionAuditVerified": false,
+      "threadSolidVerified": false,
+      "matingAssemblyVerified": false,
+      "installedPlacementVerified": false
+    }
   },
   "components": [
     { "family": "flexible-drop-bracket", "manufacturer": "Victaulic", "model": "VicFlex AB2 24-inch", "productNumber": "A240AB200N", "quantity": 152, "purchasedDescription": "AB2 Hard-Lid Ceiling; 24-inch Adjustable Bracket" },
     { "family": "threaded-rod", "manufacturer": null, "model": "3/8-inch x 10-foot plated all-thread rod", "productNumber": "3/8X10P", "quantity": 230, "purchasedDescription": "3/8 X 10 FT PLTD ATR" },
-    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 1/2-1", "productNumber": "0500301692", "quantity": 25, "purchasedDescription": "69 1/2-1 ZP LT/DTY W/NFPA TAP HGR" },
-    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 1-1/2", "productNumber": "0500301742", "quantity": 97, "purchasedDescription": "69 1-1/2 ZP LT/DTY W/NFPA TAP HGR" },
-    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 2", "productNumber": "0500301759", "quantity": 14, "purchasedDescription": "69 2 ZP LT/DTY W/NFPA TAP HGR" },
-    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 2-1/2", "productNumber": "0500301767", "quantity": 48, "purchasedDescription": "69 2-1/2 ZP LT/DTY W/NFPA TAP HGR" },
-    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 3", "productNumber": "0500301775", "quantity": 28, "purchasedDescription": "69 3 ZP LT/DTY W/NFPA TAP HGR" },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 1/2-1", "productNumber": "0500301692", "quantity": 25, "purchasedDescription": "69 1/2-1 ZP LT/DTY W/NFPA TAP HGR", "publishedVariants": [
+      { "pipeSizeIn": 0.5, "maxLoadLb": 300, "weightLb": 0.1, "rodSizeAIn": 0.375, "bIn": 2.875, "cIn": 2, "fIn": 1.5625, "gWidthIn": 0.625 },
+      { "pipeSizeIn": 0.75, "maxLoadLb": 300, "weightLb": 0.1, "rodSizeAIn": 0.375, "bIn": 2.75, "cIn": 1.875, "fIn": 1.3125, "gWidthIn": 0.625 },
+      { "pipeSizeIn": 1, "maxLoadLb": 300, "weightLb": 0.1, "rodSizeAIn": 0.375, "bIn": 2.5625, "cIn": 1.6875, "fIn": 1, "gWidthIn": 0.625 }
+    ] },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 1-1/2", "productNumber": "0500301742", "quantity": 97, "purchasedDescription": "69 1-1/2 ZP LT/DTY W/NFPA TAP HGR", "publishedVariants": [
+      { "pipeSizeIn": 1.5, "maxLoadLb": 300, "weightLb": 0.1, "rodSizeAIn": 0.375, "bIn": 2.75, "cIn": 1.875, "fIn": 0.875, "gWidthIn": 0.625 }
+    ] },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 2", "productNumber": "0500301759", "quantity": 14, "purchasedDescription": "69 2 ZP LT/DTY W/NFPA TAP HGR", "publishedVariants": [
+      { "pipeSizeIn": 2, "maxLoadLb": 300, "weightLb": 0.11, "rodSizeAIn": 0.375, "bIn": 3.25, "cIn": 2.375, "fIn": 1.125, "gWidthIn": 0.625 }
+    ] },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 2-1/2", "productNumber": "0500301767", "quantity": 48, "purchasedDescription": "69 2-1/2 ZP LT/DTY W/NFPA TAP HGR", "publishedVariants": [
+      { "pipeSizeIn": 2.5, "maxLoadLb": 525, "weightLb": 0.2, "rodSizeAIn": 0.375, "bIn": 4, "cIn": 2.75, "fIn": 1.3125, "gWidthIn": 0.75 }
+    ] },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 3", "productNumber": "0500301775", "quantity": 28, "purchasedDescription": "69 3 ZP LT/DTY W/NFPA TAP HGR", "publishedVariants": [
+      { "pipeSizeIn": 3, "maxLoadLb": 525, "weightLb": 0.2, "rodSizeAIn": 0.375, "bIn": 3.8125, "cIn": 2.9375, "fIn": 1.1875, "gWidthIn": 0.75 }
+    ] },
     { "family": "steel-anchor", "manufacturer": "ITW Buildex", "model": "Sammy Sidewinder 516 1-1/2", "productNumber": "SWDR1-1/2", "quantity": 212, "purchasedDescription": "ITW SWDR 516 1-1/2 SIDE STEEL Sammy" },
     { "family": "brace-clamp", "manufacturer": "ASC Engineered Solutions", "model": "AF730 3", "productNumber": "0502005710", "quantity": 5, "purchasedDescription": "AF730 3 PLAIN LATERAL/LONGITUDINAL CLAMP" },
     { "family": "brace-clamp", "manufacturer": "ASC Engineered Solutions", "model": "AF730 2-1/2", "productNumber": "0502005708", "quantity": 2, "purchasedDescription": "AF730 2-1/2 PLAIN LATERAL/LONGITUDINAL CLAMP" },
@@ -69,11 +136,18 @@
     "genericSupportSubstitutionAllowed": false,
     "manufacturerExactCadAcquired": false,
     "manufacturerAuthoredAb2SourceAcquired": true,
+    "manufacturerAuthoredFig69SourceAcquired": true,
+    "manufacturerPublishedFig69DimensionsReady": true,
+    "projectPipeSizeAssignmentForFig69Ready": false,
+    "fig69RfaDimensionAuditReady": false,
+    "exactFig69ThreadSolidReady": false,
+    "fig69MatingAssemblyReady": false,
+    "sammyAnchorManufacturerIdentityReady": false,
     "manufacturerCadCoverageComplete": false,
     "fullyDimensionedManufacturingDrawingsAcquired": false,
     "exactThreadSolidsReady": false,
     "verifiedMatingAssembliesReady": false,
     "blenderInstalledSupportGeometryReady": false,
-    "reason": "The quote fixes the actual purchased identities and quantities, and the official Victaulic archive supplies manufacturer-authored AB2 Revit families. Geometry extraction and dimension audit are not yet verified, and the remaining Anvil Fig. 69, rod, anchor, clamp, brace fitting, adapter, and swivel manufacturing solids are not acquired."
+    "reason": "The quote fixes the purchased line identities and quantities. Official Victaulic AB2 and ASC/Anvil Fig. 69 Revit sources are acquired, and the Fig. 69 manufacturer dimension table is bound. The Sammy line is manufacturer-ambiguous between SWDR 516 and SWDR 1-1/2, which have different screw threads and lengths. RFA dimensions, project pipe-size assignment, threads, mating, placement, and the remaining rod, clamp, brace fitting, adapter, and swivel solids are not verified."
   }
 }
