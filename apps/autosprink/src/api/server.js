@@ -175,6 +175,7 @@ const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dill
 const DILLON_VERTICAL_REGISTRATION_PATH = path.resolve(__dirname, '../data/dillon-vertical-registration.json');
 const DILLON_RCP_VECTOR_FACE_REGISTRY_PATH = path.resolve(__dirname, '../data/dillon-rcp-vector-face-registry.json');
 const DILLON_STRUCTURAL_ROOF_SOURCE_PATH = path.resolve(__dirname, '../data/dillon-structural-framing-roof-source.json');
+const DILLON_STRUCTURAL_UNDERLAY_MANIFEST_PATH = path.resolve(__dirname, '../../public/plan-underlays/dillon-structural-roof/manifest.json');
 const REGER_FLORES_BOX_BEAM_CALIBRATION_PATH = path.resolve(__dirname, '../data/reger-flores-box-beam-calibration.json');
 const SAGEWOOD_PITCHED_ATTIC_CALIBRATION_PATH = path.resolve(__dirname, '../data/sagewood-pitched-attic-calibration.json');
 const CHOLLA_SOURCE_SEAL_PATH = path.resolve(__dirname, '../data/cholla-main-house-unseen-pitched-holdout.json');
@@ -3110,10 +3111,12 @@ app.get('/api/projects/:name/structural-roof-surfaces', authMiddleware, async (r
     const source = JSON.parse(fs.readFileSync(DILLON_STRUCTURAL_ROOF_SOURCE_PATH, 'utf8'));
     const floorModel = JSON.parse(fs.readFileSync(DILLON_FLOOR_MODEL_PATH, 'utf8'));
     const slopedCalibration = JSON.parse(fs.readFileSync(DILLON_SLOPED_CALIBRATION_PATH, 'utf8'));
+    const underlayManifest = JSON.parse(fs.readFileSync(DILLON_STRUCTURAL_UNDERLAY_MANIFEST_PATH, 'utf8'));
     const packet = await buildDillonStructuralRoofPacket(source, floorModel, slopedCalibration);
     const validation = await validateDillonStructuralRoofPacket(packet, { source, floorModel, slopedCalibration });
     if (validation.status !== 'passed') return res.status(422).json(validation);
-    const model = buildDillonStructuralRoofModel(validation); const topView = renderDillonStructuralRoofTopView(model);
+    const model = buildDillonStructuralRoofModel(validation); const topView = renderDillonStructuralRoofTopView(model, source, underlayManifest);
+    if (topView.status !== 'passed') return res.status(422).json(topView);
     return res.json({ status: 'passed', artifactType: 'halofire.autobid-structural-roof-surfaces.v2', projectName: req.params.name, receiptSha256: packet.receiptSha256, counts: validation.counts, sheets: packet.sheets, sourceControls: source.sheets.map((sheet) => ({ sheetId: sheet.sheetId, rejectedHatchLegendText: sheet.hatchLegendText, rejectedHatchClassification: sheet.hatchClassification, slopeRoofLegendText: sheet.slopeRoofLegendText, speckledRoofExtraction: { method: sheet.speckledRoofExtraction.method, sourceLayer: sheet.speckledRoofExtraction.sourceLayer, sourceSpeckleStrokeCount: sheet.speckledRoofExtraction.sourceSpeckleStrokeCount, reconstructionTolerancePt: sheet.speckledRoofExtraction.reconstructionTolerancePt, contourCount: sheet.speckledRoofExtraction.contours.length }, pitchControls: sheet.pitchControls, topPlateControls: sheet.topPlateControls })), model, topView, completeRoofPlanes: false, geometryGrounded: true, complianceReady: false, approvalReady: false, limitations: packet.limitations, claimStatus: packet.claimStatus });
   } catch (error) {
     log.error('Failed to build Dillon structural roof surfaces', { error: error.message });

@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import fs from 'node:fs';
+import { createHash } from 'node:crypto';
 import { buildDillonStructuralRoofModel, buildDillonStructuralRoofPacket, renderDillonStructuralRoofTopView, validateDillonStructuralRoofPacket } from '../src/engine/dillon-structural-roof-surfaces.js';
 import { sha256Hex } from '../src/engine/elevation-datums.js';
 
@@ -7,6 +8,7 @@ const read = (name) => JSON.parse(fs.readFileSync(new URL(`../src/data/${name}`,
 const source = read('dillon-structural-framing-roof-source.json');
 const floorModel = read('dillon-floor-by-floor-model.json');
 const slopedCalibration = read('submitted-sloped-ceiling-calibration.dillon.json');
+const underlayManifest = JSON.parse(fs.readFileSync(new URL('../public/plan-underlays/dillon-structural-roof/manifest.json', import.meta.url), 'utf8'));
 let packet; let validation;
 
 async function reseal(value) {
@@ -42,10 +44,30 @@ describe('Dillon structural slope-roof footprints', () => {
     expect(model.footprints.every((footprint) => footprint.render3d === false && footprint.datumAssociationStatus === 'unlinked')).toBe(true);
     expect(model.surfaces3d).toEqual([]);
     expect(model.rejectedCandidates).toBe(48);
-    const view = renderDillonStructuralRoofTopView(model);
-    expect(view.svg).toContain('11 registered speckled slope-roof contours');
+    const view = renderDillonStructuralRoofTopView(model, source, underlayManifest);
+    expect(view.status).toBe('passed');
+    expect(view.sourceCoordinateOverlay).toBe(true);
+    expect(view.svg).toContain('Actual structural sheets');
+    expect(view.svg).toContain('/public/plan-underlays/dillon-structural-roof/S-020-main-level-framing.png');
+    expect(view.svg).toContain('/public/plan-underlays/dillon-structural-roof/S-021-upper-level-framing.png');
     expect(view.svg).toContain('0 structural 3D planes');
     expect(view.svg).toContain('48 gray recess-floor triangles rejected');
+    expect(view.svg).toContain('orange = Roof-Hatch contour');
+    for (const sheet of underlayManifest.sheets) {
+      const png = fs.readFileSync(new URL(`../public/plan-underlays/dillon-structural-roof/${sheet.file}`, import.meta.url));
+      expect(createHash('sha256').update(png).digest('hex')).toBe(sheet.pngSha256);
+      expect(sheet.sourcePdfSha256).toBe(source.sheets.find((entry) => entry.sheetId === sheet.sheetId).sourceSha256);
+    }
+  });
+
+  it('blocks blank, substituted, or unbound structural underlays', () => {
+    const model = buildDillonStructuralRoofModel(validation);
+    expect(renderDillonStructuralRoofTopView(model, source, null).status).toBe('blocked');
+    const changed = structuredClone(underlayManifest);
+    changed.sheets[0].sourcePdfSha256 = '0'.repeat(64);
+    const result = renderDillonStructuralRoofTopView(model, source, changed);
+    expect(result.status).toBe('blocked');
+    expect(result.issues.map((entry) => entry.code)).toContain('DILLON_STRUCTURAL_ROOF_UNDERLAY_BINDING_INVALID');
   });
 
   it.each([

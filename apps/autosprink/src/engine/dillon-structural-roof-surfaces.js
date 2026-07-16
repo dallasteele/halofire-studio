@@ -155,17 +155,39 @@ export async function validateDillonStructuralRoofPacket(input, { source, floorM
 
 export function buildDillonStructuralRoofModel(validation) {
   if (validation?.status !== 'passed' || !validation.packet) return { status: 'blocked', issues: [issue('DILLON_STRUCTURAL_ROOF_NOT_VALIDATED', 'Passed structural roof validation is required.')] };
-  const footprints = validation.packet.sheets.flatMap((sheet) => sheet.roofContours.filter((contour) => contour.registrationStatus === 'registered').map((contour) => ({ id: contour.id, sheetId: sheet.sheetId, levelId: sheet.levelId, polygonDwgFt: contour.polygonDwgFt, holesDwgFt: contour.holesDwgFt, reconstructionToleranceFt: round(contour.reconstructionTolerancePt / 13.5), pitchAssociationStatus: contour.pitchAssociationStatus, datumAssociationStatus: contour.datumAssociationStatus, render3d: false })));
+  const footprints = validation.packet.sheets.flatMap((sheet) => sheet.roofContours.filter((contour) => contour.registrationStatus === 'registered').map((contour) => ({ id: contour.id, sheetId: sheet.sheetId, levelId: sheet.levelId, sourcePolygonTopLeftPt: contour.sourcePolygonTopLeftPt, sourceHolesTopLeftPt: contour.sourceHolesTopLeftPt, polygonDwgFt: contour.polygonDwgFt, holesDwgFt: contour.holesDwgFt, reconstructionToleranceFt: round(contour.reconstructionTolerancePt / 13.5), pitchAssociationStatus: contour.pitchAssociationStatus, datumAssociationStatus: contour.datumAssociationStatus, render3d: false })));
   return { status: 'passed', artifactType: 'halofire.dillon-structural-roof-footprint-model.v2', footprints, surfaces3d: [], rejectedCandidates: validation.packet.counts.rejectedRecessFloorTriangles, counts: validation.counts, completeRoofPlanes: false, geometryGrounded: true, complianceReady: false, claimStatus: validation.packet.claimStatus };
 }
 
-export function renderDillonStructuralRoofTopView(model) {
+function pathForSourcePolygon(polygon) {
+  return polygon.map((point, index) => `${index ? 'L' : 'M'}${round(point[0])},${round(point[1])}`).join(' ') + ' Z';
+}
+
+function manifestSheetFor(sheetId, sourceSheet, underlayManifest) {
+  const underlay = underlayManifest?.sheets?.find((entry) => entry.sheetId === sheetId);
+  if (!underlay || underlay.sourceId !== sourceSheet?.sourceId || underlay.sourcePdfSha256 !== sourceSheet?.sourceSha256 || underlay.widthPt !== sourceSheet?.pageTopLeftPt?.width || underlay.heightPt !== sourceSheet?.pageTopLeftPt?.height || !/^\/public\/plan-underlays\/dillon-structural-roof\/[A-Za-z0-9._-]+\.png$/.test(underlay.url || '') || !/^[0-9a-f]{64}$/.test(underlay.pngSha256 || '')) return null;
+  return underlay;
+}
+
+export function renderDillonStructuralRoofTopView(model, source, underlayManifest) {
   if (model?.status !== 'passed') return { status: 'blocked' };
-  const width = 920; const height = 310; const points = model.footprints.flatMap((footprint) => footprint.polygonDwgFt);
-  const minX = Math.min(...points.map((point) => point[0])); const maxX = Math.max(...points.map((point) => point[0]));
-  const minY = Math.min(...points.map((point) => point[1])); const maxY = Math.max(...points.map((point) => point[1]));
-  const scale = Math.min(820 / Math.max(1, maxX - minX), 190 / Math.max(1, maxY - minY));
-  const pathFor = (polygon) => polygon.map((point, index) => `${index ? 'L' : 'M'}${round(50 + (point[0] - minX) * scale)},${round(220 - (point[1] - minY) * scale)}`).join(' ') + ' Z';
-  const paths = model.footprints.map((footprint) => `<path d="${pathFor(footprint.polygonDwgFt)}" fill="rgba(56,189,248,.22)" stroke="#38bdf8" stroke-width="2"/><title>${footprint.id} · ${footprint.levelId} · tolerance ${footprint.reconstructionToleranceFt} ft</title>`).join('');
-  return { status: 'passed', svg: `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Dillon registered structural slope-roof contours" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#07111f"/>${paths}<text x="24" y="256" fill="#bae6fd" font-family="monospace" font-size="15">11 registered speckled slope-roof contours · 0 structural 3D planes</text><text x="24" y="280" fill="#fde68a" font-family="monospace" font-size="13">Pitch/datum joins remain blocked; toy mirror unresolved; 48 gray recess-floor triangles rejected.</text><text x="24" y="300" fill="#cbd5e1" font-family="monospace" font-size="12">Vector-speckle boundary tolerance: 4 pt / 0.296 ft. Not compliance or fabrication evidence.</text></svg>` };
+  const sourceSheets = ['S-020', 'S-021'].map((sheetId) => source?.sheets?.find((entry) => entry.sheetId === sheetId));
+  const underlays = sourceSheets.map((sourceSheet) => manifestSheetFor(sourceSheet?.sheetId, sourceSheet, underlayManifest));
+  if (sourceSheets.some((sheet) => !sheet) || underlays.some((entry) => !entry)) return { status: 'blocked', issues: [issue('DILLON_STRUCTURAL_ROOF_UNDERLAY_BINDING_INVALID', 'Exact hash-bound S-020 and S-021 structural PDF underlays are required.')] };
+  const width = 920; const height = 1465; const panelX = 20; const panelWidth = 880; const scale = panelWidth / 3024; const firstY = 100; const secondY = 790;
+  const renderPanel = (sourceSheet, underlay, panelY) => {
+    const footprints = model.footprints.filter((entry) => entry.sheetId === sourceSheet.sheetId);
+    const contours = footprints.map((footprint) => `<path d="${pathForSourcePolygon(footprint.sourcePolygonTopLeftPt)}" fill="#f9731630" stroke="#ea580c" stroke-width="9" vector-effect="non-scaling-stroke"><title>${footprint.id} · exact PDF coordinates · ${footprint.reconstructionToleranceFt} ft reconstruction tolerance · not a 3D plane</title></path>`).join('');
+    const pitchControls = sourceSheet.pitchControls.map((control) => {
+      const [x, y] = control.arrowTipTopLeftPt; const [dx, dy] = control.slopeDirectionTopLeftUnit; const linked = control.associationStatus === 'linked-to-speckled-contour';
+      return `<g><circle cx="${x}" cy="${y}" r="18" fill="${linked ? '#16a34a' : '#2563eb'}" stroke="#fff" stroke-width="6" vector-effect="non-scaling-stroke"/><line x1="${x}" y1="${y}" x2="${round(x + dx * 120)}" y2="${round(y + dy * 120)}" stroke="${linked ? '#16a34a' : '#2563eb'}" stroke-width="9" stroke-dasharray="22 13" vector-effect="non-scaling-stroke"/><title>${control.id} · ${control.sourceText} · ${linked ? 'source linked' : 'unlinked'} · direction ${dx},${dy}</title></g>`;
+    }).join('');
+    const datums = sourceSheet.topPlateControls.map((control) => {
+      const [x0, y0, x1, y1] = control.bboxTopLeftPt;
+      return `<rect x="${x0 - 8}" y="${y0 - 8}" width="${x1 - x0 + 16}" height="${y1 - y0 + 16}" fill="#facc1530" stroke="#ca8a04" stroke-width="7" vector-effect="non-scaling-stroke"><title>${control.sourceText} · extracted top-plate text only · not joined to a roof face</title></rect>`;
+    }).join('');
+    return `<text x="${panelX}" y="${panelY - 16}" fill="#e2e8f0" font-family="system-ui" font-size="17" font-weight="700">${sourceSheet.sheetId} · exact PDF underlay ${sourceSheet.sourceSha256.slice(0, 12)}…</text><g transform="translate(${panelX} ${panelY}) scale(${scale})"><image href="${underlay.url}" x="0" y="0" width="3024" height="2160" preserveAspectRatio="none"/>${contours}${pitchControls}${datums}</g>`;
+  };
+  const svg = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Dillon structural PDF roof evidence overlays" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#07111f"/><text x="20" y="28" fill="#f8fafc" font-family="system-ui" font-size="19" font-weight="700">Actual structural sheets · source-coordinate evidence overlay</text><text x="20" y="50" fill="#94a3b8" font-family="monospace" font-size="12">orange = Roof-Hatch contour · blue = unlinked pitch arrow · yellow = unlinked T.P. text</text>${renderPanel(sourceSheets[0], underlays[0], firstY)}${renderPanel(sourceSheets[1], underlays[1], secondY)}<text x="20" y="1438" fill="#fde68a" font-family="monospace" font-size="13">0 structural 3D planes · pitch/datum joins remain blocked · 48 gray recess-floor triangles rejected</text><text x="20" y="1457" fill="#cbd5e1" font-family="monospace" font-size="12">Exact underlays and overlays are evidence only — not compliance, fabrication, or field release.</text></svg>`;
+  return { status: 'passed', svg, sourceCoordinateOverlay: true, underlays: underlays.map(({ sheetId, sourcePdfSha256, pngSha256, url }) => ({ sheetId, sourcePdfSha256, pngSha256, url })) };
 }

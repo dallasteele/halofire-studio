@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dillon structural PDF roof evidence</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; background:#050b14; color:#e5eefb }
+    body { margin:0; background:radial-gradient(circle at 20% 0,#0c2a3b 0,#07111f 38%,#040914 100%); min-height:100vh }
+    main { width:min(1120px,calc(100% - 32px)); margin:auto; padding:28px 0 56px }
+    h1 { margin:0 0 8px; font-size:clamp(24px,4vw,42px) }
+    p { color:#b8c7da; line-height:1.55 }
+    .gate { border:1px solid #b45309; background:#431407cc; color:#ffedd5; border-radius:14px; padding:14px 16px; margin:18px 0 }
+    .proof { border:1px solid #28445d; background:#07111f; border-radius:18px; overflow:hidden; box-shadow:0 25px 80px #0009 }
+    .proof svg { display:block; width:100%; height:auto }
+    code { color:#7dd3fc }
+    a { color:#67e8f9 }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Actual structural PDF roof evidence</h1>
+    <p>S-020 and S-021 are the exact hash-bound structural sheets. Orange outlines are source <code>Roof-Hatch</code> contours; blue markers are unlinked pitch controls; yellow boxes are unlinked top-plate elevation text.</p>
+    <div class="gate"><b>Fail-closed:</b> this proves where the extracted evidence sits on the drawings. It does not claim complete roof faces, resolved 3D planes, sprinkler compliance, fabrication, or field release.</div>
+    <div id="status">Loading the authenticated evidence packet...</div>
+    <div id="proof" class="proof" hidden></div>
+  </main>
+  <script type="module">
+    const status = document.querySelector('#status');
+    const proof = document.querySelector('#proof');
+    try {
+      const response = await fetch('/api/projects/Dillon%20Residence/structural-roof-surfaces', { credentials: 'same-origin' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const packet = await response.json();
+      if (packet.status !== 'passed' || packet.topView?.status !== 'passed' || packet.topView?.sourceCoordinateOverlay !== true) throw new Error('source-coordinate proof unavailable');
+      proof.innerHTML = packet.topView.svg;
+      proof.hidden = false;
+      status.textContent = `Passed: ${packet.topView.underlays.length} exact underlays; ${packet.counts.registeredRoofFacePatches} registered hatch contours; ${packet.counts.structurallyResolvedPlanes} structural 3D planes.`;
+    } catch (error) {
+      status.innerHTML = `Evidence could not be loaded (${error.message}). <a href="/login.html">Sign in</a> and reopen this page.`;
+    }
+  </script>
+</body>
+</html>

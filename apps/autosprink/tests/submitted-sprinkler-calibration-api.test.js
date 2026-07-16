@@ -239,7 +239,10 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(result.model.footprints).toHaveLength(11);
     expect(result.model.footprints.every((footprint) => footprint.render3d === false && footprint.datumAssociationStatus === 'unlinked')).toBe(true);
     expect(result.model.surfaces3d).toEqual([]);
-    expect(result.topView.svg).toContain('11 registered speckled slope-roof contours');
+    expect(result.topView.status).toBe('passed');
+    expect(result.topView.sourceCoordinateOverlay).toBe(true);
+    expect(result.topView.svg).toContain('Actual structural sheets');
+    expect(result.topView.underlays.map((entry) => entry.sheetId)).toEqual(['S-020', 'S-021']);
     expect(result.sourceControls[0].slopeRoofLegendText).toBe('HATCH AREA INDICATES SLOPE ROOF');
     expect(result.completeRoofPlanes).toBe(false);
     expect(result.complianceReady).toBe(false);

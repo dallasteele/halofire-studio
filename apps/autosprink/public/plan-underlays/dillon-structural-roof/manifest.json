@@ -1,0 +1,37 @@
+{
+  "artifactType": "halofire.dillon-structural-underlay-manifest.v1",
+  "projectName": "Dillon Residence",
+  "coordinateConvention": "PDF top-left points",
+  "targetPx": 2268,
+  "note": "Exact hash-bound structural PDF underlays. Overlays are evidence only; unresolved pitch/datum joins are not 3D, compliance, fabrication, or field-release evidence.",
+  "sheets": [
+    {
+      "sheetId": "S-020",
+      "sourceId": "main-framing-pdf",
+      "page": 1,
+      "file": "S-020-main-level-framing.png",
+      "url": "/public/plan-underlays/dillon-structural-roof/S-020-main-level-framing.png",
+      "widthPt": 3024,
+      "heightPt": 2160,
+      "widthPx": 2268,
+      "heightPx": 1620,
+      "bytes": 1530655,
+      "pngSha256": "e3ead32902201eacd13692d5bee96838c45026123c470ac9362fda5a995a900f",
+      "sourcePdfSha256": "953959b1b429a63c5154eef5662d59124e9561fc97d6514786d21aca7bad4b10"
+    },
+    {
+      "sheetId": "S-021",
+      "sourceId": "upper-framing-pdf",
+      "page": 1,
+      "file": "S-021-upper-level-framing.png",
+      "url": "/public/plan-underlays/dillon-structural-roof/S-021-upper-level-framing.png",
+      "widthPt": 3024,
+      "heightPt": 2160,
+      "widthPx": 2268,
+      "heightPx": 1620,
+      "bytes": 915752,
+      "pngSha256": "2e63f9de6c4c82048998312b0a5fbfaa91b2d733568aff02024d7042f5855baf",
+      "sourcePdfSha256": "7d42aeb0363a38a297bac6bfb18efb23a273db7a2af3f083d85a60826d3eee91"
+    }
+  ]
+}
