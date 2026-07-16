@@ -1,0 +1,59 @@
+{
+  "name": "new-hope-cml-cmi-welded-adjacency-20260715",
+  "owner": "codex",
+  "goal": "Assemble New Hope CML.01 and CMI.01-CMI.22 into one same-project welded connection graph from protected FP2.0 traversals, listing identities, and Project.seidb outlet parents while keeping takeout, threaded terminal geometry, whole-project adjacency, complete Z, fabrication, and release fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Crisis Center - Approved/Approved Plans.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/NEW HOPE CRISIS CENTER_NHCC List.FAB",
+    "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/data/new-hope-native-fab-attachment-graph.json"
+  ],
+  "exit_criteria": [
+    "exactly 23 bounded welded pieces reconcile one-to-one across FP2.0, the listing, and Project.seidb",
+    "exactly 22 same-project inter-piece junctions form one acyclic connected graph",
+    "CMI.03 retains its two-way lower and upper chain bifurcation at canonical node 125",
+    "all 45 native outlets remain parent-attached to the bounded pieces and no native threaded fitting is falsely attached",
+    "endpoint and native-parent adversarial mutations fail closed",
+    "the protected approved FP2.0 PDF is the visible underlay in a deterministic Bluebeam-compatible overlay",
+    "exact connection takeout, CMI.23-CMI.42 terminal adjacency, whole-project adjacency, complete Z, fabrication, and release remain false",
+    "focused tests, New Hope regression, production build, formal proof, loop guard, agentic rules, browser proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected source hashes and project identity",
+    "piece endpoint and source-segment crosswalk",
+    "listing to native piece reconciliation",
+    "same-project canonical junction incidence",
+    "native outlet and fitting parent inventory",
+    "adversarial endpoint, outlet-parent, and upstream false-green tests",
+    "byte-identical PDF and PNG replay",
+    "actual-PDF browser rendering",
+    "Lean invariant receipt",
+    "agent loop guard and agentic rules",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-cml-cmi-welded-adjacency-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/new-hope-cml-cmi-welded-connection-graph.js",
+    "apps/autosprink/tests/new-hope-cml-cmi-welded-connection-graph.test.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "apps/autosprink/scripts/render-new-hope-cml-cmi-welded-proof.py",
+    "output/pdf/new-hope-cml-cmi-welded-adjacency-overlay.pdf",
+    "output/pdf/new-hope-cml-cmi-welded-adjacency-overlay.png",
+    "data/agent-loops/new-hope-cml-cmi-welded-adjacency-20260715/lean-proof.json",
+    "data/agent-loops/new-hope-cml-cmi-welded-adjacency-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 180000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

@@ -172,6 +172,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.cmi06VerticalOutlet - Evaluated CMI.06 outlet and head-057 vertical leg.
  * @param {object} inputs.cmiRidgeChainFabrication - Evaluated CMI.10-CMI.13 and CMI.19-CMI.22 ridge chains.
  * @param {object} inputs.remainingCmiFabrication - Evaluated CMI.01-CMI.04 and CMI.14-CMI.18 schedule.
+ * @param {object} inputs.cmlCmiWeldedConnectionGraph - Evaluated same-project CML.01/CMI.01-CMI.22 welded adjacency graph.
  * @param {object} inputs.operationalAnnotations - Source notes, grades, drains, and details.
  * @param {object} inputs.longBranchDrainage - Long-branch drainage schedule.
  * @param {object} inputs.sideBranchDrainage - Side-branch drainage schedule.
@@ -201,6 +202,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     cmi06VerticalOutlet,
     cmiRidgeChainFabrication,
     remainingCmiFabrication,
+    cmlCmiWeldedConnectionGraph,
     operationalAnnotations,
     longBranchDrainage,
     sideBranchDrainage,
@@ -226,6 +228,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     cmi06VerticalOutlet,
     cmiRidgeChainFabrication,
     remainingCmiFabrication,
+    cmlCmiWeldedConnectionGraph,
     operationalAnnotations,
   ].map((entry) => entry?.projectId)
   if (projectIds.some((projectId) => projectId !== EXPECTED_PROJECT_ID)) {
@@ -263,6 +266,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['cmi06-vertical-outlet', cmi06VerticalOutlet?.status],
     ['cmi-ridge-chain-fabrication', cmiRidgeChainFabrication?.status],
     ['remaining-cmi-fabrication', remainingCmiFabrication?.status],
+    ['cml-cmi-welded-connection-graph', cmlCmiWeldedConnectionGraph?.status],
     ['long-branch-drainage', longBranchDrainage?.status],
     ['side-branch-drainage', sideBranchDrainage?.status],
     ['cross-main-drainage', crossMainDrainage?.status],
@@ -436,7 +440,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',
-      'The approved listing closes all 257 pipe-piece identities and end preparations across 264 fabricated units. Native Project.seidb parent IDs now attach all 97 fitting records to their exact listed pipe-piece identity and fitting family. The completed Polaris control now calibrates all 28 rigid source junctions, including one pipe-mounted detector and one source-oriented open test-drain terminal, while manufacturer takeout remains false. New Hope still does not publish its own complete inter-piece adjacency or raw fitting takeout, so same-project topology and the complete vertical-offset schedule remain unresolved.',
+      'The approved listing closes all 257 pipe-piece identities and end preparations across 264 fabricated units. New Hope now closes its own complete CML.01 plus CMI.01-CMI.22 welded subnetwork: 23 protected native pieces, 22 exact FP2.0 inter-piece junctions, and 45 native outlets. Project.seidb also attaches all 97 threaded fitting records to their listed piece identities. Whole-project adjacency, CMI.23-CMI.42 terminal geometry, raw connection takeout, and the complete vertical-offset schedule remain unresolved.',
     ),
   ]
   const ready = issues.length === 0
@@ -544,6 +548,12 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         fabricationEndSchedule?.coverage?.totalListedPipePieceDefinitionCount || 0,
       listedFabricatedPipeUnitCount:
         fabricationEndSchedule?.coverage?.totalFabricatedPipeUnitCount || 0,
+      sameProjectCmlCmiWeldedPieceCount:
+        cmlCmiWeldedConnectionGraph?.metrics?.weldedPieceCount || 0,
+      sameProjectCmlCmiInterPieceAdjacencyCount:
+        cmlCmiWeldedConnectionGraph?.metrics?.interPieceAdjacencyCount || 0,
+      sameProjectCmlCmiNativeOutletAttachmentCount:
+        cmlCmiWeldedConnectionGraph?.metrics?.nativeOutletAttachmentCount || 0,
       fieldDrainIntentCount: fieldRouteDrainIntents.length,
     },
     planTopologyReady: ready && canonicalEdges.length === 143,
@@ -681,6 +691,21 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ready && remainingCmiFabrication?.cmi01SourceOutletZReady === true,
     remainingCmiBoundedFittingScheduleReady:
       ready && remainingCmiFabrication?.boundedRemainingCmiFittingScheduleReady === true,
+    cmlCmiWeldedConnectionGraph: cmlCmiWeldedConnectionGraph
+      ? {
+          pieces: cmlCmiWeldedConnectionGraph.pieces,
+          adjacencies: cmlCmiWeldedConnectionGraph.adjacencies,
+          metrics: cmlCmiWeldedConnectionGraph.metrics,
+        }
+      : null,
+    sameProjectCmlCmiWeldedIdentityReady:
+      ready && cmlCmiWeldedConnectionGraph?.sameProjectCmlCmiWeldedIdentityReady === true,
+    sameProjectCmlCmiWeldedInterPieceAdjacencyReady:
+      ready && cmlCmiWeldedConnectionGraph?.sameProjectCmlCmiWeldedInterPieceAdjacencyReady === true,
+    sameProjectCmlCmiNativeOutletAttachmentReady:
+      ready && cmlCmiWeldedConnectionGraph?.sameProjectCmlCmiNativeOutletAttachmentReady === true,
+    sameProjectCmlCmiExactConnectionTakeoutReady: false,
+    sameProjectCmlCmiThreadedTerminalPieceAdjacencyReady: false,
     sourceFeedPlanFabricationReady:
       ready && sourceFeedFabrication?.sourceFeedPlanFabricationReady === true,
     sourceFeedOutletTransitionReady:

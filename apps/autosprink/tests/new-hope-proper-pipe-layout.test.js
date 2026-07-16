@@ -9,6 +9,7 @@ import { evaluateNewHopeCentralBranchDrainage } from '../src/engine/new-hope-cen
 import { evaluateNewHopeCmi05Cmi08Fabrication } from '../src/engine/new-hope-cmi05-cmi08-fabrication.js'
 import { evaluateNewHopeCmi06VerticalOutlet } from '../src/engine/new-hope-cmi06-vertical-outlet.js'
 import { evaluateNewHopeCmiRidgeChainFabrication } from '../src/engine/new-hope-cmi-ridge-chain-fabrication.js'
+import { evaluateNewHopeCmlCmiWeldedConnectionGraph } from '../src/engine/new-hope-cml-cmi-welded-connection-graph.js'
 import { evaluateNewHopeCrossMainDrainage } from '../src/engine/new-hope-cross-main-drainage.js'
 import { evaluateNewHopeElevationDatum } from '../src/engine/new-hope-elevation-datum.js'
 import { evaluateNewHopeFabricationEndSchedule } from '../src/engine/new-hope-fabrication-end-schedule.js'
@@ -106,6 +107,18 @@ const remainingCmiFabrication = evaluateNewHopeRemainingCmiFabrication({
   sourceFeedCalculationChain,
   sourceFeedAsbuiltRiser,
 })
+const cmlCmiWeldedConnectionGraph = evaluateNewHopeCmlCmiWeldedConnectionGraph({
+  canonicalTopology,
+  operationalAnnotations,
+  fabricationSchedule: fabricationEndScheduleSource,
+  nativeFabGraph: nativeFabAttachmentGraphSource,
+  sourceFeedFabrication,
+  lowPointFabrication,
+  cmi05Cmi08Fabrication,
+  cmi06VerticalOutlet,
+  cmiRidgeChainFabrication,
+  remainingCmiFabrication,
+})
 const longBranchDrainage = evaluateNewHopeLongBranchDrainage({
   pipeVectors,
   canonicalTopology,
@@ -161,6 +174,7 @@ const inputs = {
   cmi06VerticalOutlet,
   cmiRidgeChainFabrication,
   remainingCmiFabrication,
+  cmlCmiWeldedConnectionGraph,
   operationalAnnotations,
   longBranchDrainage,
   sideBranchDrainage,
@@ -199,6 +213,9 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       sourceFeedOrthogonalCalculationResidualIn: 0.086322,
       listedPipePieceDefinitionCount: 257,
       listedFabricatedPipeUnitCount: 264,
+      sameProjectCmlCmiWeldedPieceCount: 23,
+      sameProjectCmlCmiInterPieceAdjacencyCount: 22,
+      sameProjectCmlCmiNativeOutletAttachmentCount: 45,
       fieldDrainIntentCount: 2,
     })
     expect(result.undirectedEdges).toEqual([])
@@ -289,6 +306,16 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.remainingCmiFourNoOutletPieceScheduleReady).toBe(true)
     expect(result.cmi01SourceOutletZReady).toBe(true)
     expect(result.remainingCmiBoundedFittingScheduleReady).toBe(true)
+    expect(result.sameProjectCmlCmiWeldedIdentityReady).toBe(true)
+    expect(result.sameProjectCmlCmiWeldedInterPieceAdjacencyReady).toBe(true)
+    expect(result.sameProjectCmlCmiNativeOutletAttachmentReady).toBe(true)
+    expect(result.sameProjectCmlCmiExactConnectionTakeoutReady).toBe(false)
+    expect(result.sameProjectCmlCmiThreadedTerminalPieceAdjacencyReady).toBe(false)
+    expect(result.cmlCmiWeldedConnectionGraph.metrics).toMatchObject({
+      weldedPieceCount: 23,
+      interPieceAdjacencyCount: 22,
+      nativeOutletAttachmentCount: 45,
+    })
     expect(result.remainingCmiFabrication.sourceOutletRegistration).toMatchObject({
       upstreamPieceId: 'CML.01',
       downstreamPieceId: 'CMI.01',
@@ -430,6 +457,16 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       'NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED',
     )
     expect(absentRemainingCmi.remainingCmiBoundedFittingScheduleReady).toBe(false)
+
+    const absentCmlCmiGraph = evaluateNewHopeProperPipeLayout({
+      ...inputs,
+      cmlCmiWeldedConnectionGraph: null,
+    })
+    expect(absentCmlCmiGraph.status).toBe('blocked')
+    expect(absentCmlCmiGraph.blockerCodes).toContain(
+      'NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED',
+    )
+    expect(absentCmlCmiGraph.sameProjectCmlCmiWeldedInterPieceAdjacencyReady).toBe(false)
 
     const absentLowPoint = evaluateNewHopeProperPipeLayout({ ...inputs, lowPointFabrication: null })
     expect(absentLowPoint.status).toBe('blocked')

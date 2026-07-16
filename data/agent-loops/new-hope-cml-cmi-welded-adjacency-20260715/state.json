@@ -1,0 +1,69 @@
+{
+  "loop": "new-hope-cml-cmi-welded-adjacency-20260715",
+  "stage": "VERIFY",
+  "status": "bounded-same-project-welded-adjacency-passed-whole-layout-remains-blocked",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [148076, 151026]
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 151269
+  },
+  "claims": {
+    "sameProjectCmlCmiWeldedIdentityReady": true,
+    "sameProjectCmlCmiWeldedAdjacencyReady": true,
+    "sameProjectCmlCmiNativeOutletAttachmentReady": true,
+    "exactConnectionTakeoutReady": false,
+    "threadedTerminalPieceAdjacencyReady": false,
+    "wholeProjectInterPieceAdjacencyReady": false,
+    "completeVerticalOffsetScheduleReady": false,
+    "exactWholeSystemZReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "sourceSha256": {
+      "approvedFp20": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+      "listing": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734",
+      "fabArchive": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9",
+      "projectSeidb": "0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135"
+    },
+    "boundedPieceCount": 23,
+    "interPieceAdjacencyCount": 22,
+    "nativeOutletCount": 45,
+    "nativeFittingAttachmentCount": 0,
+    "cmi03BifurcationCount": 1,
+    "renderedSourceEdgeCount": 66,
+    "adversarialTestCount": 3,
+    "newHopeTestCount": 175,
+    "webProductionBuild": "passed",
+    "fullMonorepoBuild": "blocked-by-pre-existing-missing-tauri-sidecar-halofire-pipeline-x86_64-pc-windows-msvc.exe",
+    "leanStatus": "verified",
+    "leanElapsedMs": 399,
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "deterministicReplay": {
+      "byteIdentical": true,
+      "pdfSha256": "318EB8A005CDA558D00D9A3A937F5636A0D8FBAD06F49324BC0C9B5369F9BDFB",
+      "pngSha256": "EB9C7707D80D55D128BF6B183DD1781F760D335FD97CFED21055E38ECFA80E89"
+    },
+    "browser": {
+      "proofReady": true,
+      "actualPdfImagesLoaded": 2,
+      "boundedPieceCount": 23,
+      "interPieceAdjacencyCount": 22,
+      "nativeOutletCount": 45,
+      "sameProjectCmlCmiWeldedIdentityReady": true,
+      "sameProjectCmlCmiWeldedAdjacencyReady": true,
+      "sameProjectCmlCmiNativeOutletAttachmentReady": true,
+      "exactConnectionTakeoutReady": false,
+      "threadedTerminalPieceAdjacencyReady": false,
+      "properPipeLayoutReady": false,
+      "acceptanceBlockerCount": 4
+    }
+  },
+  "nextAction": "Map CMI.23-CMI.42 and all remaining pipe families into the same-project graph, then resolve exact takeout, threaded terminal adjacency, complete vertical offsets, field drains, and whole-system Z before fabrication or VPS release."
+}

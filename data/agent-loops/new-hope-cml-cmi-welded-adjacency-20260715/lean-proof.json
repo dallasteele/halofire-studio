@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-cml-cmi-welded-adjacency-20260715/lean-request.json",
+  "theoremNames": [
+    "newHopeCmlCmiWeldedTreeInventory",
+    "cmi03BifurcationInventory",
+    "boundedWeldedAdjacencyDoesNotPromoteWholeLayout"
+  ],
+  "claim": "The bounded same-project graph contains 23 pieces, 22 welded junctions, and 45 native outlets; CMI.03 retains two outgoing paths. This bounded closure cannot promote takeout, threaded terminal adjacency, whole-project adjacency, complete vertical offsets, exact whole-system Z, proper layout, fabrication, or release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 399,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}
