@@ -3,25 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>BGC manufacturer and fabricated-part evidence</title>
+  <title>BGC exact-part evidence</title>
   <link rel="icon" href="data:,">
   <style>
-    :root { color-scheme: dark; --bg:#071014; --panel:#101d22; --line:#29434d; --ink:#eef7f8; --muted:#a9bdc2; --good:#52df9a; --warn:#ffcc66; --bad:#ff6f72; }
+    :root { color-scheme:dark; --bg:#071014; --panel:#101d22; --line:#29434d; --ink:#eef7f8; --muted:#a9bdc2; --good:#52df9a; --warn:#ffcc66; --bad:#ff6f72; }
     * { box-sizing:border-box; }
     body { margin:0; background:radial-gradient(circle at 15% 0,#17313a 0,transparent 34%),var(--bg); color:var(--ink); font:16px/1.5 Inter,ui-sans-serif,system-ui,sans-serif; }
     main { width:min(1480px,94vw); margin:0 auto; padding:42px 0 70px; }
-    h1 { max-width:1000px; margin:0 0 10px; font-size:clamp(2rem,5vw,4.8rem); line-height:.96; letter-spacing:-.045em; }
+    h1 { max-width:1100px; margin:0 0 10px; font-size:clamp(2rem,5vw,4.8rem); line-height:.96; letter-spacing:-.045em; }
     h2 { margin:0 0 12px; font-size:1.35rem; }
     p { margin:.4rem 0 1rem; }
-    .lede { max-width:1000px; color:var(--muted); font-size:1.08rem; }
-    .status { display:inline-flex; gap:8px; align-items:center; margin:16px 0 28px; padding:8px 12px; border:1px solid var(--good); border-radius:999px; color:var(--good); font-weight:800; letter-spacing:.04em; }
+    .lede { max-width:1100px; color:var(--muted); font-size:1.08rem; }
+    .status { display:inline-flex; margin:16px 0 28px; padding:8px 12px; border:1px solid var(--good); border-radius:999px; color:var(--good); font-weight:800; letter-spacing:.04em; }
     .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin:18px 0 34px; }
     .card { overflow:hidden; border:1px solid var(--line); border-radius:18px; background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.015)); box-shadow:0 18px 60px rgba(0,0,0,.28); }
     .card.wide { grid-column:1/-1; }
     .copy { padding:20px 22px; }
     img { display:block; width:100%; height:auto; background:#fff; }
     code { color:#bfe9ff; }
-    .good { color:var(--good); } .warn { color:var(--warn); } .bad { color:var(--bad); }
+    .warn { color:var(--warn); } .bad { color:var(--bad); }
     table { width:100%; border-collapse:collapse; margin-top:12px; }
     th,td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
     th { color:var(--muted); font-size:.82rem; text-transform:uppercase; letter-spacing:.06em; }
@@ -31,38 +31,40 @@
 </head>
 <body>
 <main>
-  <h1>BGC part identity proof, with wrong-part rejection</h1>
-  <p class="lede">These are direct renders of the project fabrication and submittal sources. They are not generated CAD. The machine gate proves what can be selected and, just as importantly, prevents a catalog-looking substitute from becoming an installed part.</p>
-  <div class="status">20 / 20 adversarial mutations rejected</div>
+  <h1>BGC exact catalog identities, without fake solids</h1>
+  <p class="lede">These are direct renders of the BGC listing and manufacturer catalogs. The gate accepts only identities and project inventory selections the sources close, while rejecting unsupported installed-position, body-solid, thread, tolerance, and mating-fit claims.</p>
+  <div class="status">32 / 32 adversarial mutations rejected</div>
 
   <section class="grid">
+    <article class="card wide">
+      <div class="copy"><h2>Actual BGC material summary — page 3</h2><p>This project source selects 27 three-inch Victaulic Style 009N couplings (<code>L03009NPE0</code>), five three-inch Style 75 couplings (<code>L030075PE0</code>), and eleven <code>3 × 1¼ Groove-O-Let</code> outlets. It does not identify which coupling style is installed at each gym piece boundary, nor an outlet manufacturer.</p></div>
+      <img src="bgc-list-material-summary-p3.png" alt="BGC material summary page 3 showing selected coupling and outlet inventory">
+    </article>
     <article class="card">
-      <div class="copy"><h2>Actual BGC welded-main listing — page 9</h2><p>Piece <code>#E.09</code> is 3-inch Schedule 10 with two <code>3 × 1¼ GOL (Up:0)</code> outlets. This is the actual source behind the registered gym junctions.</p></div>
+      <div class="copy"><h2>Actual welded-main listing — page 9</h2><p>Piece <code>#E.09</code> is 3-inch Schedule 10 with two <code>3 × 1¼ GOL (Up:0)</code> outlets. This is the actual source behind the registered gym junctions.</p></div>
       <img src="bgc-listing-page-9.png" alt="Actual BGC welded mains fabrication report page 9">
     </article>
     <article class="card">
-      <div class="copy"><h2>Actual BGC welded-main listing — page 10</h2><p>Pieces <code>#E.10–#E.13</code> retain the same 3 × 1¼ grooved-outlet identity and exact shop stations.</p></div>
+      <div class="copy"><h2>Actual welded-main listing — page 10</h2><p>Pieces <code>#E.10–#E.13</code> retain the same 3 × 1¼ grooved-outlet identity and exact shop stations.</p></div>
       <img src="bgc-listing-page-10.png" alt="Actual BGC welded mains fabrication report page 10">
     </article>
     <article class="card wide">
-      <div class="copy">
-        <h2 class="bad">Auto-reject: Victaulic No. 142 is the wrong size</h2>
-        <p>The official No. 142 table is for a <strong>1-inch nominal branch</strong> (1.315-inch actual OD). BGC requires a <strong>1¼-inch nominal branch</strong> (1.660-inch actual OD). The downloaded manufacturer DWG is hash-sealed as a negative control, not used as geometry.</p>
-        <table><thead><tr><th>Candidate</th><th>Branch nominal</th><th>Actual OD</th><th>Decision</th></tr></thead><tbody><tr><td>Victaulic No. 142</td><td>1 in</td><td>1.315 in</td><td class="bad">Rejected</td></tr><tr><td>BGC #E gym outlet</td><td>1¼ in</td><td>1.660 in</td><td class="warn">Exact body source still required</td></tr></tbody></table>
-      </div>
-      <img src="victaulic-no142-dimensions.png" alt="Official Victaulic publication 10.54 No. 142 dimension table">
+      <div class="copy"><h2 class="bad">Auto-reject: Victaulic No. 142 is the wrong size</h2><p>The official No. 142 table is for a 1-inch nominal branch (1.315-inch actual OD). BGC requires 1¼-inch nominal (1.660-inch actual OD). Its downloaded DWG remains a hash-sealed negative control, never installed geometry.</p><table><thead><tr><th>Candidate</th><th>Branch nominal</th><th>Actual OD</th><th>Decision</th></tr></thead><tbody><tr><td>Victaulic No. 142</td><td>1 in</td><td>1.315 in</td><td class="bad">Rejected</td></tr><tr><td>BGC #E gym outlet</td><td>1¼ in</td><td>1.660 in</td><td class="warn">Manufacturer selection still required</td></tr></tbody></table></div>
+      <img src="victaulic-no142-dimensions.png" alt="Official Victaulic publication No. 142 dimension table">
     </article>
   </section>
 
   <section class="grid">
-    <article class="card"><div class="copy"><h2>TOLCO Fig. 980 family evidence</h2><p>The released BOM names material code <code>13520712</code>, quantity 18. R2 supplies common A/B dimensions, but the BOM wording does not close the exact rod/hole variant or complete body solid.</p></div><img src="bgc-r2-fig-980.png" alt="BGC R2 submitted TOLCO Fig. 980 page"></article>
-    <article class="card"><div class="copy"><h2>TOLCO Fig. 1001 family evidence</h2><p>The released BOM names <code>Y379010020</code>, quantity 3, for a 2-inch Fig. 1001. The cutsheet gives size/load choices, but the brace-pipe variant and full manufacturing envelope remain unresolved.</p></div><img src="bgc-r2-fig-1001.png" alt="BGC R2 submitted TOLCO Fig. 1001 page"></article>
-    <article class="card"><div class="copy"><h2>Fig. 4L is only an equivalent family</h2><p>The BOM rows say <code>Non-TOLCO Part</code> for the installed equivalents. TOLCO geometry is therefore not promoted as the actual bracket.</p></div><img src="bgc-r2-fig-4l.png" alt="BGC R2 submitted TOLCO Fig. 4L page"></article>
-    <article class="card"><div class="copy"><h2>Approved coupling candidates are not a selection</h2><p>The approved packet includes Victaulic Styles 009N and 109. Until purchasing or installed evidence chooses one, neither may appear as the exact BGC coupling.</p></div><img src="bgc-approved-victaulic-009n.png" alt="BGC approved Victaulic coupling dimensions page"></article>
-    <article class="card wide"><div class="copy"><h2>Approved AFCON hanger family is not an installed mapping</h2><p>The approved packet publishes the 3-inch Fig. 300 A/B dimensions. The native project hanger records do not identify AFCON, so this remains candidate-family evidence only.</p></div><img src="bgc-approved-afcon-300.png" alt="BGC approved AFCON Fig. 300 ring hanger page"></article>
+    <article class="card"><div class="copy"><h2>TOLCO 980-3/8 identity is closed</h2><p>The BGC BOM names code <code>13520712</code> and the 3/8-inch Fig. 980 variant. Eaton maps it to <code>980-3/8</code>: A = 4 9/16 inches, B = 2 1/16 inches, mounting hole D = 7/16 inch. The catalog lacks enough manufacturing dimensions for an exact body solid.</p></div><img src="eaton-fig980-p62.png" alt="Official Eaton TOLCO Fig. 980 catalog dimension page"></article>
+    <article class="card"><div class="copy"><h2>TOLCO 1001-2 × 1 identity is closed</h2><p>The BGC design row binds a 2-inch braced pipe to 1-inch Schedule 40 brace pipe and released code <code>Y379010020</code>. Eaton maps that pair to <code>1001-2 X 1</code>, approximate weight 112.6 lb/100. Complete strap, saddle, fastener, and tolerance geometry is not published.</p></div><img src="eaton-fig1001-p68.png" alt="Official Eaton TOLCO Fig. 1001 ordering table"></article>
+    <article class="card wide"><div class="copy"><h2>Dimensioned 3 × 1¼ outlet candidates are explicit</h2><p>The Halo standard Merit Type C cutsheet gives a 3-inch outlet length, 1.368-inch ID, 1.660-inch OD, 0.140-inch wall, and a contour made to fit the first-listed 3-inch header. The official SCI catalog separately identifies <a href="https://www.asc-es.com/resources-and-downloads/sci-cooplet-weld-outlets-adapter-nipples-item-numbers">61CG1012030 / product 4360000040</a>. Neither proves what BGC purchased, and neither supplies a complete cut-groove manufacturing profile here, so neither becomes installed BGC geometry.</p></div><img src="merit-type-c-p4.png" alt="Merit Weld-Miser Type C dimension table for 1-1/4 inch grooved outlet"></article>
+    <article class="card"><div class="copy"><h2>Fig. 4L remains an equivalent family</h2><p>The released rows say <code>Non-TOLCO Part</code> for these installed equivalents. TOLCO geometry is therefore not promoted as the actual bracket.</p></div><img src="bgc-r2-fig-4l.png" alt="BGC submitted TOLCO Fig. 4L page"></article>
+    <article class="card"><div class="copy"><h2>Coupling inventory is selected; positions are not</h2><p>The material summary selects 009N and Style 75 quantities and part numbers. The gym piece boundaries show only grooved ends, so the gate rejects assigning either style to a specific joint until native fabrication or installed-position evidence closes it.</p></div><img src="bgc-approved-victaulic-009n.png" alt="BGC approved Victaulic coupling dimensions page"></article>
+    <article class="card"><div class="copy"><h2 class="bad">Official 3D coupling CAD fails the production-solid gate</h2><p>The exact three-inch blocks were resolved from Victaulic’s <a href="https://assets.victaulic.com/assets/uploads/software-content/Autodesk_AutoCAD_3D_Blocks.html">official AutoCAD library</a>, hash-sealed, cross-converted to R2010, and topology-audited in FreeCAD. Identity recovery succeeded; production geometry did not.</p><table><thead><tr><th>Exact block</th><th>Shells</th><th>Closed</th><th>Solids</th><th>Decision</th></tr></thead><tbody><tr><td><code>Coupling_3 (80)_009-N</code></td><td>10</td><td>0</td><td>0</td><td class="bad">Rejected</td></tr><tr><td><code>Coupling-Flex_3 (80)_75</code></td><td>8</td><td>2</td><td>0</td><td class="bad">Rejected</td></tr></tbody></table><p>Open housing shells and detached face failures cannot be exported as exact STEP/FreeCAD parts. Thread standard, thread engagement, groove seat, interference, clearance, and watertight mating remain false.</p></div></article>
+    <article class="card wide"><div class="copy"><h2>Approved AFCON hanger family is not an installed mapping</h2><p>The approved packet publishes the 3-inch Fig. 300 A/B dimensions. Native project hanger records do not identify AFCON, so this remains candidate-family evidence only.</p></div><img src="bgc-approved-afcon-300.png" alt="BGC approved AFCON Fig. 300 ring hanger page"></article>
   </section>
 
-  <p class="lede"><strong>Current boundary:</strong> source identity and wrong-part rejection are green. Exact outlet body/weld profile/takeout, exact coupling selection, bracket solids, bolt and pipe threads, engagement/tolerance, mating fit, installed placement, fabrication release, field release, and VPS release remain fail-closed.</p>
+  <p class="lede"><strong>Current boundary:</strong> BGC catalog variants, project-wide coupling inventory, exact-dimension outlet candidates, and wrong-part rejection are green. Outlet manufacturer, joint-by-joint coupling mapping, complete solids, groove/thread profiles, fasteners, tolerances, engagement, mating fit, installed placement, fabrication release, field release, and VPS release remain fail-closed.</p>
   <p><a href="../bgc-source-plan-section-3d-registration/index.html">Open the BGC plan + section + PDF-underlaid 3D registration proof</a></p>
 </main>
 </body>

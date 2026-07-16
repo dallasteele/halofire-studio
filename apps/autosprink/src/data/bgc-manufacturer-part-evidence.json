@@ -1,12 +1,12 @@
 {
-  "artifactType": "halofire.bgc-manufacturer-part-evidence.v1",
+  "artifactType": "halofire.bgc-manufacturer-part-evidence.v3",
   "projectId": "boys-girls-club-community-center-brigham-city-ut",
   "sources": {
     "fabricationList": {
       "path": "02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/BGC_LIST.PDF",
       "sha256": "7fe066904709725abd407c786b28b87e2b34dbc3071dcf6462b66d11f7e7d141",
       "bytes": 862711,
-      "physicalPages": [9, 10]
+      "physicalPages": [3, 9, 10]
     },
     "nativeFab": {
       "path": "02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/BGC_LIST.FAB",
@@ -32,6 +32,23 @@
       "bytes": 9897793,
       "physicalPages": [24, 71, 73, 74, 108]
     },
+    "eatonTolcoCatalog": {
+      "path": "Z - General Documents & Forms/01-Project Manager Tools/Cut Sheets/Eaton Catalog - Sway Bracing/tolco-fire-protection-solutions-catalog-ca312001en.pdf",
+      "sha256": "b7f8955fca3bc840b07507d1ee305a37b193d77b0f3cfee7de056e4864d75a13",
+      "bytes": 12714158,
+      "physicalPages": [62, 68]
+    },
+    "haloStandardMeritTeeLet": {
+      "path": "Z - General Documents & Forms/01-Project Manager Tools/Cut Sheets/Standard CS Weld-o-let cut sheet.pdf",
+      "sha256": "492e5e085182d440c9d882cbd2deec64869af84a27b36307c78731838116080d",
+      "bytes": 194990,
+      "physicalPage": 4
+    },
+    "officialSci61cg1": {
+      "url": "https://www.asc-es.com/resources-and-downloads/sci-cooplet-weld-outlets-adapter-nipples-item-numbers",
+      "catalogPartNumber": "61CG1012030",
+      "productNumber": "4360000040"
+    },
     "victaulic1054": {
       "url": "https://assets.victaulic.com/assets/uploads/literature/10.54.pdf",
       "revision": "10161 Rev Q Updated 07/2022",
@@ -54,6 +71,37 @@
       "fileName": "Victaulic_FP-IGS_Outlet Welded_No 142 (IGS)_[3D].dwg",
       "sha256": "7cf2771c58f1f69b58d04ad9a5391a960847c92fcd8e53d4af1afdf49c59c1dd",
       "bytes": 129453
+    },
+    "victaulicOfficialCad": {
+      "listingUrl": "https://assets.victaulic.com/assets/uploads/software-content/Autodesk_AutoCAD_3D_Blocks.html",
+      "fireProtectionPackage": {
+        "group": "Adsk_ACAD_FP_3D",
+        "zipSha256": "dbec3388c3d99c246f3b50d497065cdadf60a92163ccc33c61a7a602e5e25b72",
+        "zipBytes": 315440470,
+        "sourceFile": "Victaulic_FP-FireLock_Coupling Rigid_IR_Style 009N (OGS)_[3D].dwg",
+        "sourceFileSha256": "568dd0dbb5b89fc4b5cd3dfa18413c2f278372853f3dc3a0074f6bacb8230138",
+        "sourceFileBytes": 1155487,
+        "exactThreeInchBlock": "Coupling_3 (80)_009-N",
+        "sourceEntityOwnerHandle": 294,
+        "sourceEntityHandle": 325
+      },
+      "ipsPackage": {
+        "group": "Adsk_ACAD_IPS_3D",
+        "zipSha256": "b165b72d6f2e1bb1a79e7311f583b1e925fa53d547aacb7cc189a0f122f11e42",
+        "zipBytes": 218606231,
+        "sourceFile": "Victaulic_IPS_Coupling Flexible_Style 75 (OGS)_[3D].dwg",
+        "sourceFileSha256": "c6447684cfd900b1719cc9a6c39ad166d71f8260078ead295022d0f6267df9cf",
+        "sourceFileBytes": 446173,
+        "exactThreeInchBlock": "Coupling-Flex_3 (80)_75",
+        "sourceEntityOwnerHandle": 346,
+        "sourceEntityHandle": 377
+      }
+    },
+    "odaFileConverter": {
+      "url": "https://www.opendesign.com/guestfiles/ODA_FILE_CONVERTER",
+      "version": "27.1",
+      "installerSha256": "3d5961f510cf95f398b8e2920899dc8e8c51adecda5b20a40b3d1a29269de81",
+      "installerBytes": 28812288
     }
   },
   "gymGroovedOutlet": {
@@ -61,6 +109,7 @@
     "pieceIds": ["#E.09", "#E.10", "#E.11", "#E.12", "#E.13"],
     "nativeOutletUniqueIds": [29, 33, 32, 36, 35, 38, 44, 43],
     "installedQuantity": 8,
+    "projectMaterialSummaryQuantity": 11,
     "runNominalDiameterIn": 3,
     "branchNominalDiameterIn": 1.25,
     "listingToken": "3 x 1 1/4 GOL (Up:0)",
@@ -69,6 +118,34 @@
     "catalogPartNumber": null,
     "manufacturer": null,
     "identityClassification": "native-fabricated-grooved-outlet-identity-only"
+  },
+  "gymGroovedOutletCandidates": {
+    "meritTypeC": {
+      "manufacturer": "Merit / ASC Engineered Solutions",
+      "family": "Weld-Miser Tee-Let Type C",
+      "nominalOutletIn": 1.25,
+      "nominalHeaderRangeIn": [3, 4],
+      "perfectFitHeaderIn": 3,
+      "outletLengthIn": 3,
+      "insideDiameterIn": 1.368,
+      "outsideDiameterIn": 1.66,
+      "wallThicknessIn": 0.14,
+      "projectSelectionVerified": false,
+      "grooveManufacturingProfileReady": false,
+      "exactBodySolidReady": false
+    },
+    "sci61cg1": {
+      "manufacturer": "SCI / ASC Engineered Solutions",
+      "family": "61CG1 Grooved Weld Outlet",
+      "catalogPartNumber": "61CG1012030",
+      "productNumber": "4360000040",
+      "nominalOutletIn": 1.25,
+      "nominalHeaderIn": 3,
+      "publishedDimensionsIn": { "A": 3, "B": 1.38 },
+      "projectSelectionVerified": false,
+      "grooveManufacturingProfileReady": false,
+      "exactBodySolidReady": false
+    }
   },
   "wrongPartControls": {
     "victaulicNo142": {
@@ -102,24 +179,35 @@
       "2 in Fig. 4L Clamp",
       "Fig.825 Across Beam",
       "2 in Fig. 1001 Clamp"
-    ]
+    ],
+    "designBindings": {
+      "fig980": { "releasedPartNumber": "13520712", "catalogVariant": "980-3/8", "bracePipeNominalDiameterIn": 1, "bracePipeSchedule": 40 },
+      "fig1001": { "releasedPartNumber": "Y379010020", "catalogVariant": "1001-2 X 1", "bracedPipeNominalDiameterIn": 2, "bracePipeNominalDiameterIn": 1, "bracePipeSchedule": 40 }
+    }
   },
   "seismicBraceFamilies": {
     "fig980": {
       "manufacturer": "Eaton B-Line series TOLCO",
       "figure": "980",
       "r2PhysicalPage": 154,
+      "catalogVariant": "980-3/8",
       "publishedCommonEnvelopeIn": { "A": 4.5625, "B": 2.0625 },
-      "exactRodVariantResolved": false,
-      "exactMountingHoleDResolved": false,
+      "publishedMountingHoleDIn": 0.4375,
+      "exactRodVariantResolved": true,
+      "exactMountingHoleDResolved": true,
+      "exactCatalogVariantIdentityReady": true,
       "exactBodySolidReady": false
     },
     "fig1001": {
       "manufacturer": "Eaton B-Line series TOLCO",
       "figure": "1001",
       "r2PhysicalPage": 155,
+      "catalogVariant": "1001-2 X 1",
       "bracedPipeNominalDiameterIn": 2,
-      "bracePipeNominalDiameterIn": null,
+      "bracePipeNominalDiameterIn": 1,
+      "bracePipeSchedule": 40,
+      "publishedApproxWeightPer100Lb": 112.6,
+      "exactCatalogVariantIdentityReady": true,
       "exactBodySolidReady": false
     },
     "fig4L": {
@@ -137,8 +225,13 @@
       "nominalDiameterIn": 3,
       "published009NDimensionsIn": { "actualOd": 3.5, "allowableSeparation": 0.12, "preassembledX": 5.13, "preassembledY": 6.75, "assembledX": 4.63, "assembledY": 6.75, "Z": 2 },
       "published109DimensionsIn": { "actualOd": 3.5, "allowableSeparation": 0.12, "preassembledX": 5.13, "preassembledYL": 2.93, "preassembledYB": 3.53, "assembledX": 4.67, "assembledYL": 2.89, "assembledYB": 3.78, "Z": 2.07 },
-      "selectedStyle": null,
-      "projectStyleSelectionReady": false,
+      "projectSelectedInventory": [
+        { "style": "009N", "nominalDiameterIn": 3, "quantity": 27, "partNumber": "L03009NPE0" },
+        { "style": "75", "nominalDiameterIn": 3, "quantity": 5, "partNumber": "L030075PE0" }
+      ],
+      "installedGymBoundaryStyle": null,
+      "projectInventorySelectionReady": true,
+      "installedPositionSelectionReady": false,
       "exactInstalledCouplingSolidReady": false
     },
     "ringHanger": {
@@ -151,15 +244,65 @@
       "exactInstalledHangerSolidReady": false
     }
   },
+  "cadRecoveryAudit": {
+    "sourceFilesRemainUnmodified": true,
+    "autodeskTrueView2027": {
+      "coreEngineOpenedBothSourceFiles": true,
+      "consoleSaveAsAvailable": false,
+      "consoleNetloadAvailable": false,
+      "productionSolidPromoted": false
+    },
+    "style009NThreeInch": {
+      "sourceIdentityResolved": true,
+      "exactBlockResolved": true,
+      "odaR2010RoundTripCompleted": true,
+      "freecadImportValidCompound": true,
+      "shellCount": 10,
+      "closedShellCount": 0,
+      "solidCount": 0,
+      "detachedFaceFailuresPresent": true,
+      "exactSolidVerified": false,
+      "rejectionCode": "OPEN_SHELLS_AND_DETACHED_FACE_FAILURES"
+    },
+    "style75ThreeInch": {
+      "sourceIdentityResolved": true,
+      "exactBlockResolved": true,
+      "recoveredAcisBytes": 68325,
+      "odaR2010RoundTripCompleted": true,
+      "freecadImportValidCompound": true,
+      "shellCount": 8,
+      "closedShellCount": 2,
+      "solidCount": 0,
+      "detachedFaceFailuresPresent": true,
+      "exactSolidVerified": false,
+      "rejectionCode": "OPEN_HOUSING_SHELLS_AND_DETACHED_FACE_FAILURES"
+    },
+    "productionCadExportAllowed": false
+  },
+  "connectionGeometryGates": {
+    "groovedPipeEndProfileVerified": false,
+    "couplingHousingGrooveSeatVerified": false,
+    "couplingBoltThreadStandardVerified": false,
+    "couplingBoltThreadEngagementVerified": false,
+    "outletBranchGrooveProfileVerified": false,
+    "outletHeaderSaddleCurvatureVerified": false,
+    "bracketFastenerThreadStandardVerified": false,
+    "bracketMountingHoleFitVerified": false,
+    "assemblyInterferenceAndClearanceVerified": false,
+    "watertightMatingAssemblyVerified": false
+  },
   "modelingBoundary": {
     "sourceEvidenceReady": true,
     "wrongPartRejectionReady": true,
     "catalogMaterialCodeEvidenceReady": true,
+    "seismicCatalogVariantIdentityReady": true,
+    "gymOutletCandidateDimensionEvidenceReady": true,
     "gymOutletCatalogIdentityReady": false,
     "gymOutletExactBodyGeometryReady": false,
     "gymOutletWeldProfileReady": false,
     "gymOutletBranchTakeoutReady": false,
-    "couplingStyleSelectionReady": false,
+    "couplingProjectInventorySelectionReady": true,
+    "couplingInstalledPositionSelectionReady": false,
     "manufacturerPartSolidVerified": false,
     "exactBracketGeometryVerified": false,
     "exactThreadGeometryVerified": false,
@@ -169,6 +312,6 @@
     "fieldReleaseReady": false,
     "vpsReleaseReady": false
   },
-  "claimStatus": "source-sealed-bgc-part-selection-and-wrong-part-rejection-not-exact-solids-threads-fit-fabrication-or-release",
-  "receiptSha256": "d9a909ab769e1798cafcd21a00652f9470e0498c15d7feaad8adcaf310447e79"
+  "claimStatus": "source-sealed-bgc-catalog-variant-project-inventory-and-official-cad-identity-with-open-shell-rejection-not-installed-position-exact-solids-threads-fit-fabrication-or-release",
+  "receiptSha256": "0e378bf12da2901e039e2ab947d6c58a310fe8b8a8499eb52b9081cf9a027fae"
 }

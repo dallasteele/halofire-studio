@@ -1,0 +1,75 @@
+{
+  "loop": "bgc-exact-installed-part-acquisition-20260716",
+  "stage": "VERIFY",
+  "status": "official-cad-identity-resolved-production-solids-rejected-loop-continues",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "recalledEpisodes": [154470, 154150, 154100, 153562],
+    "appliedBoundary": "Do not turn alternate-project product evidence into BGC selection evidence; exact geometry, variant, threads, engagement, tolerance, mating, and installed placement each require their own source chain."
+  },
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "formal", "browser", "brain"]
+  },
+  "claims": {
+    "bgcOutletManufacturerSelectionReady": false,
+    "bgcOutletCatalogIdentityReady": false,
+    "bgcCouplingProjectInventoryReady": true,
+    "bgcCouplingStyleSelectionReady": false,
+    "bgcSeismicVariantSelectionReady": true,
+    "manufacturerExactCadIdentityReady": true,
+    "manufacturerExactCadCoverageReady": false,
+    "completeCriticalDimensionCoverageReady": false,
+    "exactThreadGeometryReady": false,
+    "threadEngagementToleranceReady": false,
+    "matingAssemblyReady": false,
+    "installedAssemblyReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsReleaseReady": false
+  },
+  "verification": {
+    "searchInventory": {
+      "status": "passed-for-current-slice",
+      "evidence": "search-inventory.json",
+      "currentMountNote": "The source inventory and hashes were captured while Egnyte Y: was available. After Codex restart, Y: is not mounted; no source-integrity gate was weakened."
+    },
+    "crossSource": {
+      "status": "passed-with-boundary",
+      "result": "Official manufacturer and Halo standard sources establish candidate dimensions and identities, but do not establish the BGC outlet manufacturer or joint-by-joint coupling position."
+    },
+    "formalProof": {
+      "status": "passed-fail-closed",
+      "result": "Exact 3-inch Victaulic 009N and Style 75 blocks were hash-bound and topology-audited. Both contain zero valid solids and are rejected from production export."
+    },
+    "adversarial": {
+      "status": "passed",
+      "mutationsRejected": 32,
+      "mutationCount": 32
+    },
+    "browserAndBlender": {
+      "status": "browser-passed-blender-production-assembly-not-authorized",
+      "browserProof": "apps/autosprink/src/data/proofs/bgc-manufacturer-part-evidence/browser-proof-full.png",
+      "browserConsoleErrors": 0,
+      "blenderBoundary": "No exact Blender mating assembly was generated because no source-verified watertight coupling solid, groove seat, bolt thread, or engagement geometry exists."
+    },
+    "testsAndBuild": {
+      "focusedVitest": "12 passed",
+      "nodeTests": "20 passed",
+      "productionBuild": "passed",
+      "fullVitest": "2409 passed, 1 failed across 315 files",
+      "fullVitestBlocker": "autobid-spatial-review-browser-smoke correctly received 404 because the restarted session has no Y: mount and therefore cannot reopen the hash-bound Cooperative source PDF"
+    },
+    "brainPostflight": {
+      "status": "passed",
+      "episodeId": 154845
+    }
+  },
+  "rejections": {
+    "victaulic009NProductionSolid": "OPEN_SHELLS_AND_DETACHED_FACE_FAILURES",
+    "victaulicStyle75ProductionSolid": "OPEN_HOUSING_SHELLS_AND_DETACHED_FACE_FAILURES",
+    "victaulicNo142ForBgcOutlet": "BRANCH_NOMINAL_SIZE_MISMATCH_1_VS_1_25"
+  },
+  "nextAction": "Acquire the exact BGC outlet purchase/release identity and complete manufacturer geometry schedules for every promoted coupling, outlet, bracket, groove, bolt, rod, and threaded interface. Restore the authenticated Egnyte Y: mount before rerunning the one source-bound browser smoke. Generate Blender/FreeCAD mating assemblies only after watertight solids and all connection geometry gates are source-verified."
+}

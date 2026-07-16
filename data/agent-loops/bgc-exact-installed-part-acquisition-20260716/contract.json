@@ -1,0 +1,57 @@
+{
+  "name": "bgc-exact-installed-part-acquisition-20260716",
+  "owner": "codex",
+  "goal": "Resolve the exact installed manufacturer, catalog identity, variant, dimensions, geometry source, threads, engagement, tolerances, and mating interfaces for the BGC gym 3 x 1-1/4 welded grooved outlets, adjoining couplings, and seismic brace components using BGC procurement evidence first and alternate completed Egnyte projects only as independently corroborated product evidence.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "apps/autosprink/src/data/bgc-manufacturer-part-evidence.json",
+    "apps/autosprink/src/components/exact-assembly-fit.js",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT",
+    "Y:/Shared/HaloOps/01-Bids",
+    "Y:/Shared/HaloOps/02-Active jobs",
+    "Y:/Shared/HaloOps/Z - General Documents & Forms",
+    "official manufacturer submittals and CAD linked from source-identified products"
+  ],
+  "exit_criteria": [
+    "every promoted BGC installed part is tied to a BGC purchase, release, fabrication, invoice, as-built, or explicit project-selection record",
+    "alternate-project evidence may establish reusable manufacturer geometry and interface dimensions but cannot establish BGC selection by itself",
+    "manufacturer CAD or a complete dimension schedule is hash-bound and matches the exact catalog identity and variant",
+    "groove, weld, clamp, bolt, rod, and threaded interfaces carry source-edition geometry, engagement, tolerance, and mating requirements where applicable",
+    "generated BREP and Blender geometry preserve exact dimensions, port datums, threads, and installed mating transforms without proxy scaling",
+    "wrong-size, wrong-style, wrong-variant, partial-dimension, alternate-project-only selection, and false-release mutations fail closed",
+    "primary, cross-source, adversarial, formal, browser/Blender, build, regression, rules, loop-guard, and brain postflight checks pass"
+  ],
+  "verification_gates": [
+    "BGC procurement and release record reconciliation",
+    "alternate completed-project cross-source search",
+    "official manufacturer identity and revision check",
+    "immutable source and geometry hashes",
+    "complete critical-dimension audit",
+    "thread, engagement, tolerance, and mating-port audit",
+    "OpenCascade BREP parse and dimensional checks",
+    "Blender exact-assembly visual and collision inspection",
+    "adversarial false-selection and wrong-geometry mutations",
+    "GX10 Lean invariants",
+    "focused and full regression tests plus production build",
+    "agent-loop guard, authoritative rules, and brain postflight"
+  ],
+  "state_path": "data/agent-loops/bgc-exact-installed-part-acquisition-20260716/state.json",
+  "evidence_paths": [
+    "data/agent-loops/bgc-exact-installed-part-acquisition-20260716/search-inventory.json",
+    "data/agent-loops/bgc-exact-installed-part-acquisition-20260716/state.json",
+    "data/agent-loops/bgc-exact-installed-part-acquisition-20260716/lean-request.json",
+    "data/agent-loops/bgc-exact-installed-part-acquisition-20260716/lean-proof.json",
+    "apps/autosprink/src/data/bgc-manufacturer-part-evidence.json",
+    "apps/autosprink/src/data/proofs/bgc-manufacturer-part-evidence/index.html",
+    "apps/autosprink/src/data/proofs/bgc-manufacturer-part-evidence/browser-proof-full.png",
+    "apps/autosprink/src/data/bgc-exact-installed-part-assembly.json",
+    "apps/autosprink/src/data/proofs/bgc-exact-installed-part-assembly/index.html"
+  ],
+  "max_iterations": 12,
+  "max_tokens": 400000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

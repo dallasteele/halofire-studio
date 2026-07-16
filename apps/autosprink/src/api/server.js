@@ -2722,6 +2722,9 @@ app.get('/api/evidence/bgc-manufacturer-part-evidence', authMiddleware, async (r
       return res.status(422).json({
         status: 'blocked', artifactType: packet.artifactType, issues: validation.issues,
         adversarialLoop, sourceEvidenceReady: false, wrongPartRejectionReady: false,
+        seismicCatalogVariantIdentityReady: false, gymOutletCandidateDimensionEvidenceReady: false,
+        couplingProjectInventorySelectionReady: false, couplingInstalledPositionSelectionReady: false,
+        manufacturerCadIdentityResolved: false, productionCadExportAllowed: false,
         manufacturerPartSolidVerified: false, exactBracketGeometryVerified: false,
         exactThreadGeometryVerified: false, matingFitVerified: false, vpsReleaseReady: false,
       });
@@ -2730,9 +2733,17 @@ app.get('/api/evidence/bgc-manufacturer-part-evidence', authMiddleware, async (r
     return res.json({
       status: 'passed', artifactType: packet.artifactType, receiptSha256: packet.receiptSha256,
       gymGroovedOutlet: packet.gymGroovedOutlet, wrongPartControls: packet.wrongPartControls,
+      gymGroovedOutletCandidates: packet.gymGroovedOutletCandidates,
       seismicBraceBom: packet.seismicBraceBom, seismicBraceFamilies: packet.seismicBraceFamilies,
-      approvedCandidateFamilies: packet.approvedCandidateFamilies, modelingBoundary: packet.modelingBoundary,
+      approvedCandidateFamilies: packet.approvedCandidateFamilies, cadRecoveryAudit: packet.cadRecoveryAudit,
+      connectionGeometryGates: packet.connectionGeometryGates, modelingBoundary: packet.modelingBoundary,
       adversarialLoop, sourceEvidenceReady: true, wrongPartRejectionReady: true,
+      seismicCatalogVariantIdentityReady: validation.seismicCatalogVariantIdentityReady,
+      gymOutletCandidateDimensionEvidenceReady: validation.gymOutletCandidateDimensionEvidenceReady,
+      couplingProjectInventorySelectionReady: validation.couplingProjectInventorySelectionReady,
+      couplingInstalledPositionSelectionReady: validation.couplingInstalledPositionSelectionReady,
+      manufacturerCadIdentityResolved: validation.manufacturerCadIdentityResolved,
+      productionCadExportAllowed: false,
       manufacturerPartSolidVerified: false, exactBracketGeometryVerified: false,
       exactThreadGeometryVerified: false, threadEngagementAndToleranceVerified: false,
       matingFitVerified: false, fabricationReady: false, fieldReleaseReady: false, vpsReleaseReady: false,

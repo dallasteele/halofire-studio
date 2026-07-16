@@ -1,0 +1,59 @@
+{
+  "artifactType": "halofire.bgc-exact-part-search-inventory.v1",
+  "project": "Boys & Girls Club Community Center - Brigham City UT",
+  "scope": "BGC gym 3 x 1-1/4 grooved welded outlets, adjoining 3-inch couplings, and seismic brace components",
+  "primaryProjectFindings": {
+    "fabricationListing": {
+      "sha256": "7fe066904709725abd407c786b28b87e2b34dbc3071dcf6462b66d11f7e7d141",
+      "result": "Eight gym outlets and eleven project material-summary outlets are identified as 3 x 1-1/4 GOL; no manufacturer or outlet catalog number is stated."
+    },
+    "nativeFab": {
+      "sha256": "8968b6865194af5c5b64fed81c221958c9fa1c9974754c3e08dd91f0dfc22a52",
+      "result": "Preserves outlet identities and stations but supplies no manufacturer body solid or groove manufacturing profile."
+    },
+    "couplingInventory": {
+      "result": "Project inventory selects 27 Victaulic 3-inch 009N couplings L03009NPE0 and 5 Victaulic 3-inch Style 75 couplings L030075PE0; gym joint-by-joint style mapping remains absent."
+    },
+    "seismicBom": {
+      "sha256": "0e7b416df69e961474d8641401fcb7548c66a4eb891af8bd8e22390b54caf6f6",
+      "result": "Binds 13520712 to TOLCO 980-3/8 and Y379010020 to TOLCO 1001-2 X 1; nine equivalent-description rows remain unresolved."
+    }
+  },
+  "crossSourceFindings": {
+    "meritTypeC": "The Halo standard sheet gives a 3-inch outlet length, 1.368-inch ID, 1.660-inch OD, and 0.140-inch wall for the 1-1/4 x 3-4 candidate; it does not prove BGC selection or a complete groove profile.",
+    "sci61cg1": "Official SCI identity 61CG1012030 / product 4360000040 gives 1-1/4 x 3 with A=3 and B=1.38; it does not prove BGC selection or an exact solid.",
+    "eatonTolco": "Official catalog dimensions close the 980-3/8 envelope and mounting-hole diameter and the 1001-2 X 1 variant identity; neither source closes exact body solids, fastener thread fit, or installed mating transforms.",
+    "victaulicNo142": "Official geometry is for a 1-inch branch and is rejected for the required 1-1/4-inch BGC outlet."
+  },
+  "officialCadRecovery": {
+    "victaulic009N": {
+      "sourceDwgSha256": "568dd0dbb5b89fc4b5cd3dfa18413c2f278372853f3dc3a0074f6bacb8230138",
+      "exactBlock": "Coupling_3 (80)_009-N",
+      "shellCount": 10,
+      "closedShellCount": 0,
+      "solidCount": 0,
+      "decision": "rejected"
+    },
+    "victaulicStyle75": {
+      "sourceDwgSha256": "c6447684cfd900b1719cc9a6c39ad166d71f8260078ead295022d0f6267df9cf",
+      "exactBlock": "Coupling-Flex_3 (80)_75",
+      "shellCount": 8,
+      "closedShellCount": 2,
+      "solidCount": 0,
+      "decision": "rejected"
+    }
+  },
+  "unresolvedProductionInterfaces": [
+    "grooved pipe-end profile",
+    "coupling housing groove seat",
+    "coupling bolt thread standard and engagement",
+    "outlet branch groove profile",
+    "outlet header saddle curvature and weld profile",
+    "bracket fastener thread standard",
+    "bracket mounting-hole fit",
+    "assembly interference and clearance",
+    "watertight mating assembly",
+    "installed transforms and joint-by-joint catalog mapping"
+  ],
+  "productionCadExportAllowed": false
+}
