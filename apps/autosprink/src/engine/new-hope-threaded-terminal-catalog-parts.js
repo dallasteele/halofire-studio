@@ -232,7 +232,8 @@ export function evaluateNewHopeThreadedTerminalCatalogParts(source = {}) {
     JSON.stringify(verification?.requiredReceiptKinds) ===
       JSON.stringify(['solid-kernel-fit', 'scene-placement-collision']) &&
     ['trustedReceiptDigests', 'trustedGeometryDigests', 'trustedDimensionAuditDigests',
-      'installedInstances', 'connections', 'structureAttachments', 'kernelReceipts']
+      'trustedThreadStandardSourceDigests', 'trustedThreadGeometryDigests', 'installedInstances',
+      'connections', 'structureAttachments', 'kernelReceipts']
       .every((key) => Array.isArray(verification?.[key]) && verification[key].length === 0) &&
     verification?.releaseOnCatalogImagesOrGeneratedProxies === false &&
     verification?.releaseOnUntrustedCallerFlags === false
@@ -251,6 +252,8 @@ export function evaluateNewHopeThreadedTerminalCatalogParts(source = {}) {
       trustedReceiptDigests: verification?.trustedReceiptDigests,
       trustedGeometryDigests: verification?.trustedGeometryDigests,
       trustedDimensionAuditDigests: verification?.trustedDimensionAuditDigests,
+      trustedThreadStandardSourceDigests: verification?.trustedThreadStandardSourceDigests,
+      trustedThreadGeometryDigests: verification?.trustedThreadGeometryDigests,
     },
   )
   const exactAssemblyGateReady =

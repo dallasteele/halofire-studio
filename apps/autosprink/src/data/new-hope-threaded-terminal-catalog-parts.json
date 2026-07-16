@@ -94,6 +94,8 @@
     "trustedReceiptDigests": [],
     "trustedGeometryDigests": [],
     "trustedDimensionAuditDigests": [],
+    "trustedThreadStandardSourceDigests": [],
+    "trustedThreadGeometryDigests": [],
     "installedInstances": [],
     "connections": [],
     "structureAttachments": [],

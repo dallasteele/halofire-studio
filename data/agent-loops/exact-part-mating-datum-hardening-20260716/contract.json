@@ -1,0 +1,44 @@
+{
+  "name": "exact-part-mating-datum-hardening-20260716",
+  "owner": "codex",
+  "goal": "Harden the reusable exact-part assembly verifier so every released part, bracket, fastener, and threaded connection is bound to unmodified manufacturer geometry, complete published and interface-critical dimensions, source-edition thread data, and independently computed installed mating-datum alignment.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "apps/autosprink/src/components/exact-assembly-fit.js",
+    "apps/autosprink/tests/exact-assembly-fit.test.js",
+    "apps/autosprink/src/data/new-hope-purchased-support-components.json",
+    "apps/autosprink/src/data/new-hope-threaded-terminal-catalog-parts.json"
+  ],
+  "exit_criteria": [
+    "generated proxies, nominal envelopes, modified manufacturer solids, incomplete secondary envelopes, and partial dimension audits cannot release",
+    "every helical thread is bound to a named standard edition, hash-bound standard source, trusted thread-table audit, and the parent part BREP",
+    "the verifier transforms each mating port through the installed rigid transform and independently recomputes datum separation and opposed-axis error",
+    "declared fit measurements cannot pass when the actual transformed ports are displaced, skewed, mirrored, or carry untrusted thread evidence",
+    "thread engagement, insertion, clamp, bolt, structure attachment, exact-BREP interference, and installed-scene collision gates remain mandatory",
+    "New Hope terminal and support assemblies remain fail-closed until exact manufacturer solids and real installed receipts exist",
+    "primary, adversarial, focused regression, build, rulebook, loop-guard, and formal invariant checks pass"
+  ],
+  "verification_gates": [
+    "exact-assembly focused tests including displaced, skewed, mirrored, partial-dimension, and untrusted-thread mutations",
+    "New Hope threaded-terminal and purchased-support regression tests",
+    "AutoSPRINK production build",
+    "GX10 formal invariant proof or exact GX10_PROVER_UNAVAILABLE evidence",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate contract"
+  ],
+  "state_path": "data/agent-loops/exact-part-mating-datum-hardening-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/components/exact-assembly-fit.js",
+    "apps/autosprink/tests/exact-assembly-fit.test.js",
+    "data/agent-loops/exact-part-mating-datum-hardening-20260716/lean-request.json",
+    "data/agent-loops/exact-part-mating-datum-hardening-20260716/lean-proof.json",
+    "data/agent-loops/exact-part-mating-datum-hardening-20260716/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 120000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

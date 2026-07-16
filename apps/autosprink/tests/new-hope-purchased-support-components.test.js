@@ -264,6 +264,22 @@ describe('New Hope purchased support components', () => {
       'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
     )
 
+    const fakeTrustedThreadStandard = structuredClone(source)
+    fakeTrustedThreadStandard.exactAssemblyVerification.trustedThreadStandardSourceDigests.push(
+      'C'.repeat(64),
+    )
+    expect(evaluateNewHopePurchasedSupportComponents(fakeTrustedThreadStandard).blockerCodes).toContain(
+      'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
+    )
+
+    const fakeTrustedThreadGeometry = structuredClone(source)
+    fakeTrustedThreadGeometry.exactAssemblyVerification.trustedThreadGeometryDigests.push(
+      'D'.repeat(64),
+    )
+    expect(evaluateNewHopePurchasedSupportComponents(fakeTrustedThreadGeometry).blockerCodes).toContain(
+      'NH_SUPPORT_EXACT_ASSEMBLY_REQUIREMENTS_INVALID',
+    )
+
     const catalogProxyPromotion = structuredClone(source)
     catalogProxyPromotion.exactAssemblyVerification.releaseOnCatalogImagesOrGeneratedProxies = true
     expect(evaluateNewHopePurchasedSupportComponents(catalogProxyPromotion).blockerCodes).toContain(

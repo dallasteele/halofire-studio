@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/exact-part-mating-datum-hardening-20260716/lean-request.json",
+  "theoremNames": [
+    "exactAssemblyReleaseRequiresEveryGate",
+    "missingAnyExactGeometryGateBlocksRelease",
+    "currentNewHopePartsRemainBlocked"
+  ],
+  "claim": "Exact assembly release is the conjunction of part-number-specific solids, complete dimension coverage, source-bound thread BREP, installed mating datums, connection fit, structure attachment, exact-BREP receipts, and scene collision receipts; one false gate blocks release, and current New Hope parts remain blocked despite purchase identity being known.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 435,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

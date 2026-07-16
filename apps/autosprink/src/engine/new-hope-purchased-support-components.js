@@ -776,6 +776,10 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     exactAssemblyVerification.trustedGeometryDigests.length === 0 &&
     Array.isArray(exactAssemblyVerification?.trustedDimensionAuditDigests) &&
     exactAssemblyVerification.trustedDimensionAuditDigests.length === 0 &&
+    Array.isArray(exactAssemblyVerification?.trustedThreadStandardSourceDigests) &&
+    exactAssemblyVerification.trustedThreadStandardSourceDigests.length === 0 &&
+    Array.isArray(exactAssemblyVerification?.trustedThreadGeometryDigests) &&
+    exactAssemblyVerification.trustedThreadGeometryDigests.length === 0 &&
     Array.isArray(exactAssemblyVerification?.installedInstances) &&
     exactAssemblyVerification.installedInstances.length === 0 &&
     Array.isArray(exactAssemblyVerification?.connections) &&
@@ -800,6 +804,9 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
       trustedReceiptDigests: exactAssemblyVerification?.trustedReceiptDigests,
       trustedGeometryDigests: exactAssemblyVerification?.trustedGeometryDigests,
       trustedDimensionAuditDigests: exactAssemblyVerification?.trustedDimensionAuditDigests,
+      trustedThreadStandardSourceDigests:
+        exactAssemblyVerification?.trustedThreadStandardSourceDigests,
+      trustedThreadGeometryDigests: exactAssemblyVerification?.trustedThreadGeometryDigests,
     },
   )
   const exactAssemblyGateReady = (

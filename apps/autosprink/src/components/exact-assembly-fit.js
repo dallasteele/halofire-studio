@@ -5,9 +5,11 @@
  * nominal envelope, generated proxy, or untrusted caller flag as proof that
  * parts fit. It consumes evidence produced by solid-CAD and installed-scene
  * kernels and checks the boundary conditions needed before an assembly can be
- * released: part-number-specific solids, units, port geometry, real thread
- * form, compatible interfaces, engagement, required support-to-structure
- * attachment, and collision receipts. Non-structural fitting assemblies must
+ * released: unmodified part-number-specific solids, units, complete published
+ * and interface-critical dimensions, port geometry, source-edition thread
+ * form, compatible interfaces, engagement, independently recomputed world-space
+ * mating datums, required support-to-structure attachment, and collision
+ * receipts. Non-structural fitting assemblies must
  * explicitly set `requirements.structureAttachmentsRequired` to false; support
  * assemblies remain fail-closed by default.
  *
@@ -41,6 +43,12 @@ function vector3(value, { nonZero = false } = {}) {
   return !nonZero || value.some((entry) => Math.abs(entry) > 1e-12)
 }
 
+function unitVector3(value) {
+  if (!vector3(value, { nonZero: true })) return false
+  const length = Math.hypot(...value)
+  return Math.abs(length - 1) <= 1e-8
+}
+
 function rigidRotationMatrix(value) {
   if (!Array.isArray(value) || value.length !== 9 || !value.every(finite)) return false
   const rows = [value.slice(0, 3), value.slice(3, 6), value.slice(6, 9)]
@@ -64,10 +72,16 @@ function complementaryGender(a, b) {
   return ALLOWED_GENDERS.has(a) && ALLOWED_GENDERS.has(b) && a !== b
 }
 
-function validateThread(thread = {}) {
+function validateThread(thread = {}, parentGeometrySha256 = null) {
   return (
     typeof thread.standard === 'string' &&
     thread.standard.length > 0 &&
+    typeof thread.standardEdition === 'string' &&
+    thread.standardEdition.length > 0 &&
+    sha256(thread.standardSourceSha256) &&
+    sha256(thread.dimensionAuditReceiptSha256) &&
+    sha256(thread.parentGeometrySha256) &&
+    thread.parentGeometrySha256 === parentGeometrySha256 &&
     typeof thread.nominalDesignation === 'string' &&
     thread.nominalDesignation.length > 0 &&
     positive(thread.tpi) &&
@@ -79,6 +93,9 @@ function validateThread(thread = {}) {
     positive(thread.minorDiameterIn) &&
     thread.majorDiameterIn > thread.pitchDiameterIn &&
     thread.pitchDiameterIn > thread.minorDiameterIn &&
+    positive(thread.gaugePlaneDiameterIn) &&
+    nonNegative(thread.crestTruncationIn) &&
+    nonNegative(thread.rootTruncationIn) &&
     positive(thread.threadedLengthIn) &&
     positive(thread.profileAngleDeg) &&
     positive(thread.leadIn) &&
@@ -103,6 +120,11 @@ function validateSource(source = {}, productNumber) {
     source.unitScaleVerified === true &&
     source.watertightSolidVerified === true &&
     source.partNumberBound === true &&
+    source.manufacturerGeometryUnmodified === true &&
+    source.dimensionCoverage === 'all-published-and-interface-critical' &&
+    source.allPublishedDimensionsVerified === true &&
+    source.allInterfaceCriticalDimensionsVerified === true &&
+    source.secondaryEnvelopeVerified === true &&
     sha256(source.publishedDimensionSourceSha256) &&
     sha256(source.dimensionAuditReceiptSha256) &&
     Number.isInteger(source.criticalDimensionCount) &&
@@ -115,18 +137,18 @@ function validateSource(source = {}, productNumber) {
   )
 }
 
-function validatePort(port = {}) {
+function validatePort(port = {}, parentGeometrySha256 = null) {
   if (
     typeof port.id !== 'string' ||
     port.id.length === 0 ||
     typeof port.interfaceKind !== 'string' ||
     port.interfaceKind.length === 0 ||
     !vector3(port.originIn) ||
-    !vector3(port.axis, { nonZero: true }) ||
+    !unitVector3(port.axis) ||
     !positive(port.interfaceDiameterIn) ||
     port.geometryVerified !== true
   ) return false
-  return port.interfaceKind !== 'threaded' || validateThread(port.thread)
+  return port.interfaceKind !== 'threaded' || validateThread(port.thread, parentGeometrySha256)
 }
 
 function validatePartDefinition(part = {}) {
@@ -144,7 +166,25 @@ function validatePartDefinition(part = {}) {
     part.ports.length === 0
   ) return false
   const ids = part.ports.map((port) => port?.id)
-  return new Set(ids).size === ids.length && part.ports.every(validatePort)
+  return (
+    new Set(ids).size === ids.length &&
+    part.ports.every((port) => validatePort(port, part.source.geometrySha256))
+  )
+}
+
+function threadEvidenceTrusted(
+  part,
+  trustedDimensionAuditDigests,
+  trustedThreadStandardSourceDigests,
+  trustedThreadGeometryDigests,
+) {
+  return (part?.ports || [])
+    .filter((port) => port?.interfaceKind === 'threaded')
+    .every((port) => (
+      trustedDimensionAuditDigests.has(port.thread?.dimensionAuditReceiptSha256) &&
+      trustedThreadStandardSourceDigests.has(port.thread?.standardSourceSha256) &&
+      trustedThreadGeometryDigests.has(port.thread?.geometrySha256)
+    ))
 }
 
 function receiptTrusted(receipt, trustedReceiptDigests) {
@@ -193,8 +233,8 @@ function validateThreadedConnection(connection, fromPort, toPort) {
   return (
     fromPort.interfaceKind === 'threaded' &&
     toPort.interfaceKind === 'threaded' &&
-    validateThread(a) &&
-    validateThread(b) &&
+    validateThread(a, a.parentGeometrySha256) &&
+    validateThread(b, b.parentGeometrySha256) &&
     complementaryGender(a.gender, b.gender) &&
     a.standard === b.standard &&
     a.nominalDesignation === b.nominalDesignation &&
@@ -220,6 +260,55 @@ function validateThreadedConnection(connection, fromPort, toPort) {
     nonNegative(fit.angularAlignmentErrorDeg) &&
     nonNegative(fit.maximumAngularAlignmentErrorDeg) &&
     fit.angularAlignmentErrorDeg <= fit.maximumAngularAlignmentErrorDeg
+  )
+}
+
+function transformPoint(instance, point) {
+  const r = instance.rotationMatrix
+  return [
+    instance.originIn[0] + r[0] * point[0] + r[1] * point[1] + r[2] * point[2],
+    instance.originIn[1] + r[3] * point[0] + r[4] * point[1] + r[5] * point[2],
+    instance.originIn[2] + r[6] * point[0] + r[7] * point[1] + r[8] * point[2],
+  ]
+}
+
+function transformDirection(instance, direction) {
+  const r = instance.rotationMatrix
+  return [
+    r[0] * direction[0] + r[1] * direction[1] + r[2] * direction[2],
+    r[3] * direction[0] + r[4] * direction[1] + r[5] * direction[2],
+    r[6] * direction[0] + r[7] * direction[1] + r[8] * direction[2],
+  ]
+}
+
+function validateMatingDatums(connection, fromEndpoint, toEndpoint) {
+  const fit = connection.fit || {}
+  const fromOrigin = transformPoint(fromEndpoint.instance, fromEndpoint.port.originIn)
+  const toOrigin = transformPoint(toEndpoint.instance, toEndpoint.port.originIn)
+  const datumSeparationIn = Math.hypot(
+    fromOrigin[0] - toOrigin[0],
+    fromOrigin[1] - toOrigin[1],
+    fromOrigin[2] - toOrigin[2],
+  )
+  const fromAxis = transformDirection(fromEndpoint.instance, fromEndpoint.port.axis)
+  const toAxis = transformDirection(toEndpoint.instance, toEndpoint.port.axis)
+  const dot = Math.max(-1, Math.min(1, fromAxis.reduce(
+    (sum, entry, index) => sum + entry * toAxis[index],
+    0,
+  )))
+  const axisOppositionErrorDeg = Math.acos(-dot) * (180 / Math.PI)
+  const reportedTolerance = 1e-7
+  return (
+    positive(fit.maximumDatumSeparationIn) &&
+    fit.maximumDatumSeparationIn <= 0.005 &&
+    nonNegative(fit.actualDatumSeparationIn) &&
+    Math.abs(fit.actualDatumSeparationIn - datumSeparationIn) <= reportedTolerance &&
+    datumSeparationIn <= fit.maximumDatumSeparationIn &&
+    positive(fit.maximumAxisOppositionErrorDeg) &&
+    fit.maximumAxisOppositionErrorDeg <= 0.25 &&
+    nonNegative(fit.actualAxisOppositionErrorDeg) &&
+    Math.abs(fit.actualAxisOppositionErrorDeg - axisOppositionErrorDeg) <= reportedTolerance &&
+    axisOppositionErrorDeg <= fit.maximumAxisOppositionErrorDeg
   )
 }
 
@@ -277,15 +366,18 @@ function validateBoltedConnection(connection, fromPort, toPort) {
 }
 
 function validateConnection(connection, portByEndpoint) {
-  const fromPort = portByEndpoint.get(endpointKey(connection?.from))
-  const toPort = portByEndpoint.get(endpointKey(connection?.to))
+  const fromEndpoint = portByEndpoint.get(endpointKey(connection?.from))
+  const toEndpoint = portByEndpoint.get(endpointKey(connection?.to))
+  const fromPort = fromEndpoint?.port
+  const toPort = toEndpoint?.port
   if (
     typeof connection?.id !== 'string' ||
     connection.id.length === 0 ||
     !fromPort ||
     !toPort ||
     endpointKey(connection.from) === endpointKey(connection.to) ||
-    connection.geometryVerified !== true
+    connection.geometryVerified !== true ||
+    !validateMatingDatums(connection, fromEndpoint, toEndpoint)
   ) return false
   if (connection.kind === 'threaded') return validateThreadedConnection(connection, fromPort, toPort)
   if (connection.kind === 'brace-insertion') return validateInsertionConnection(connection, fromPort, toPort)
@@ -323,13 +415,17 @@ function validateSupport(support, instancesById, connectionIds) {
 
 /**
  * @param {object} source
- * @param {{trustedReceiptDigests?:Iterable<string>,trustedGeometryDigests?:Iterable<string>,trustedDimensionAuditDigests?:Iterable<string>}} [options]
+ * @param {{trustedReceiptDigests?:Iterable<string>,trustedGeometryDigests?:Iterable<string>,trustedDimensionAuditDigests?:Iterable<string>,trustedThreadStandardSourceDigests?:Iterable<string>,trustedThreadGeometryDigests?:Iterable<string>}} [options]
  */
 export function evaluateExactPartAssembly(source = {}, options = {}) {
   const issues = []
   const trustedReceiptDigests = new Set(options.trustedReceiptDigests || [])
   const trustedGeometryDigests = new Set(options.trustedGeometryDigests || [])
   const trustedDimensionAuditDigests = new Set(options.trustedDimensionAuditDigests || [])
+  const trustedThreadStandardSourceDigests = new Set(
+    options.trustedThreadStandardSourceDigests || [],
+  )
+  const trustedThreadGeometryDigests = new Set(options.trustedThreadGeometryDigests || [])
   const requirements = source.requirements || {}
   const partDefinitions = Array.isArray(source.partDefinitions) ? source.partDefinitions : []
   const instances = Array.isArray(source.instances) ? source.instances : []
@@ -368,7 +464,13 @@ export function evaluateExactPartAssembly(source = {}, options = {}) {
     if (definitionReady) {
       const sourceTrusted = (
         trustedGeometryDigests.has(part.source.geometrySha256) &&
-        trustedDimensionAuditDigests.has(part.source.dimensionAuditReceiptSha256)
+        trustedDimensionAuditDigests.has(part.source.dimensionAuditReceiptSha256) &&
+        threadEvidenceTrusted(
+          part,
+          trustedDimensionAuditDigests,
+          trustedThreadStandardSourceDigests,
+          trustedThreadGeometryDigests,
+        )
       )
       if (sourceTrusted) {
         exactParts.add(part.productNumber)
@@ -420,7 +522,7 @@ export function evaluateExactPartAssembly(source = {}, options = {}) {
   for (const instance of instances) {
     const ports = portByProduct.get(instance?.productNumber) || new Map()
     for (const [portId, port] of ports) {
-      portByEndpoint.set(`${instance.instanceId}:${portId}`, port)
+      portByEndpoint.set(`${instance.instanceId}:${portId}`, { instance, port })
     }
   }
 
@@ -485,7 +587,10 @@ export function evaluateExactPartAssembly(source = {}, options = {}) {
   const threadSolidsReady = (
     exactSourceGeometryReady &&
     (!requiredConnectionKinds.includes('threaded') || (
-      threadedPorts.length >= 2 && threadedPorts.every((port) => validateThread(port.thread))
+      threadedPorts.length >= 2 && threadedPorts.every((port) => {
+        const owner = partDefinitions.find((part) => part.ports?.includes(port))
+        return validateThread(port.thread, owner?.source?.geometrySha256)
+      })
     ))
   )
   const assemblyReleaseReady = (

@@ -112,6 +112,22 @@ describe('New Hope threaded terminal catalog parts', () => {
       evaluateNewHopeThreadedTerminalCatalogParts(badAssemblyBoundary).blockerCodes,
     ).toContain('NH_TERMINAL_EXACT_ASSEMBLY_REQUIREMENTS_INVALID')
 
+    const fakeTrustedThreadStandard = structuredClone(source)
+    fakeTrustedThreadStandard.exactAssemblyVerification.trustedThreadStandardSourceDigests.push(
+      'A'.repeat(64),
+    )
+    expect(
+      evaluateNewHopeThreadedTerminalCatalogParts(fakeTrustedThreadStandard).blockerCodes,
+    ).toContain('NH_TERMINAL_EXACT_ASSEMBLY_REQUIREMENTS_INVALID')
+
+    const fakeTrustedThreadGeometry = structuredClone(source)
+    fakeTrustedThreadGeometry.exactAssemblyVerification.trustedThreadGeometryDigests.push(
+      'B'.repeat(64),
+    )
+    expect(
+      evaluateNewHopeThreadedTerminalCatalogParts(fakeTrustedThreadGeometry).blockerCodes,
+    ).toContain('NH_TERMINAL_EXACT_ASSEMBLY_REQUIREMENTS_INVALID')
+
     const falseGreen = structuredClone(source)
     falseGreen.modelingBoundary.exactFittingTakeoutReady = true
     const blocked = evaluateNewHopeThreadedTerminalCatalogParts(falseGreen)

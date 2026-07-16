@@ -1,0 +1,76 @@
+{
+  "loop": "exact-part-mating-datum-hardening-20260716",
+  "stage": "VERIFY",
+  "status": "exact-verifier-hardened-real-new-hope-parts-still-source-blocked",
+  "iteration": 2,
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "formal", "build"]
+  },
+  "implementation": {
+    "manufacturerGeometryUnmodifiedRequired": true,
+    "allPublishedDimensionsRequired": true,
+    "allInterfaceCriticalDimensionsRequired": true,
+    "secondaryEnvelopeRequired": true,
+    "threadStandardEditionRequired": true,
+    "threadStandardSourceHashRequired": true,
+    "trustedThreadDimensionAuditRequired": true,
+    "threadBrepParentBindingRequired": true,
+    "worldMatingDatumRecomputedFromInstalledTransforms": true,
+    "maximumDatumSeparationIn": 0.005,
+    "maximumAxisOppositionErrorDeg": 0.25,
+    "properRigidRotationRequired": true
+  },
+  "crossProjectCadSearch": {
+    "databasePath": "E:/ClaudeBot/halofire-autobid/db/halofire_bids.db",
+    "databaseSha256": "5C2AC127B37D570EDF73F097B1C4EEB1DF338D65F4EF3C8F3046B867C2828546",
+    "note": "databaseSha256 is inherited from the current hash-bound corpus audit; the live read-only query did not rehash the 444 MB database in this slice",
+    "solidOrFamilyCadRowsInspected": 12,
+    "ifcCount": 3,
+    "rfaCount": 8,
+    "stepCount": 1,
+    "exactTargetFilenameOrPathMatchCount": 0,
+    "targetTerms": ["AF730", "AF035", "AF076", "AF779", "Fig 69", "Fig69", "Sammy", "SWDR", "3221R", "A240AB200N"],
+    "stepResult": "The sole STEP file is a boiler equipment model, CFH-700-40-150ST.stp, and is ineligible for sprinkler-part geometry. The RFA rows are unrelated HVAC/electrical families. Alternate-project CAD cannot promote any New Hope part in this indexed corpus."
+  },
+  "verification": {
+    "focusedAndNewHopeTests": "29 files / 186 tests passed",
+    "exactAssemblyTestAssertions": 52,
+    "autosprinkProductionBuild": "passed",
+    "biomeFocusedLint": "passed",
+    "gitDiffCheck": "passed",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "formalProof": {
+      "status": "verified",
+      "prover": "Lean 4.13.0",
+      "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+      "elapsedMs": 435,
+      "theoremCount": 3
+    },
+    "brainPreflight": {
+      "status": "used"
+    },
+    "brainPostflight": {
+      "status": "recorded",
+      "episodeId": 153828
+    }
+  },
+  "claims": {
+    "reusableExactPartVerifierReady": true,
+    "completeDimensionGateReady": true,
+    "sourceBoundThreadGateReady": true,
+    "installedMatingDatumGateReady": true,
+    "crossProjectIndexedCadSearchCompleteForExactTargets": true,
+    "manufacturerExactCadCoverageReady": false,
+    "allPartAndBracketGeometryReady": false,
+    "allThreadSolidsReady": false,
+    "allMatingAssembliesReady": false,
+    "allInstalledPlacementsReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsDeploymentReady": false
+  },
+  "nextAction": "Acquire part-number-specific manufacturer STEP/SAT/IGES/Revit solids or fully dimensioned manufacturing drawings for every quote-bound fitting, hanger, fastener, bracket, and seismic component; then convert with OpenCascade, bind all thread-table audits, populate installed transforms from plan/elevation evidence, and run exact-BREP mating and Blender whole-scene collision receipts."
+}

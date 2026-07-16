@@ -14,6 +14,11 @@ function source(productNumber, char) {
     unitScaleVerified: true,
     watertightSolidVerified: true,
     partNumberBound: true,
+    manufacturerGeometryUnmodified: true,
+    dimensionCoverage: 'all-published-and-interface-critical',
+    allPublishedDimensionsVerified: true,
+    allInterfaceCriticalDimensionsVerified: true,
+    secondaryEnvelopeVerified: true,
     publishedDimensionSourceSha256: sha('9'),
     dimensionAuditReceiptSha256: sha(char),
     criticalDimensionCount: 8,
@@ -23,9 +28,13 @@ function source(productNumber, char) {
   }
 }
 
-function thread(gender) {
+function thread(gender, parentChar) {
   return {
     standard: 'UNC',
+    standardEdition: 'ASME B1.1-2019',
+    standardSourceSha256: sha('5'),
+    dimensionAuditReceiptSha256: sha(parentChar),
+    parentGeometrySha256: sha(parentChar.toUpperCase()),
     nominalDesignation: '3/8-16',
     tpi: 16,
     gender,
@@ -34,6 +43,9 @@ function thread(gender) {
     majorDiameterIn: 0.375,
     pitchDiameterIn: 0.3344,
     minorDiameterIn: 0.297,
+    gaugePlaneDiameterIn: 0.3344,
+    crestTruncationIn: 0.004,
+    rootTruncationIn: 0.006,
     threadedLengthIn: 0.75,
     profileAngleDeg: 60,
     leadIn: 1 / 16,
@@ -101,14 +113,14 @@ function validFixture() {
       connectionKinds: ['threaded', 'brace-insertion', 'clamp', 'bolted'],
     },
     partDefinitions: [
-      part('TEST-ROD', 'a', '3/8 rod', port('thread', 'threaded', 0.375, { thread: thread('male') })),
-      part('TEST-ANCHOR', 'b', '3/8 anchor', port('thread', 'threaded', 0.375, { thread: thread('female') })),
+      part('TEST-ROD', 'a', '3/8 rod', port('thread', 'threaded', 0.375, { thread: thread('male', 'a') })),
+      part('TEST-ANCHOR', 'b', '3/8 anchor', port('thread', 'threaded', 0.375, { axis: [0, 0, -1], thread: thread('female', 'b') })),
       part('TEST-BRACE-PIPE', 'c', 'brace pipe', port('end', 'brace-member', 1.315)),
-      part('TEST-BRACE-JAW', 'd', 'brace jaw', port('jaw', 'brace-jaw', 1.335)),
+      part('TEST-BRACE-JAW', 'd', 'brace jaw', port('jaw', 'brace-jaw', 1.335, { axis: [0, 0, -1] })),
       part('TEST-SERVICE-PIPE', 'e', 'service pipe', port('bearing', 'service-pipe-bearing', 3.5)),
-      part('TEST-PIPE-CLAMP', '6', 'pipe clamp', port('clamp', 'pipe-clamp', 3.53)),
+      part('TEST-PIPE-CLAMP', '6', 'pipe clamp', port('clamp', 'pipe-clamp', 3.53, { axis: [0, 0, -1] })),
       part('TEST-BOLT', '7', 'mounting bolt', port('shank', 'bolt-shank', 0.5)),
-      part('TEST-BOLT-HOLE', '8', 'mounting hole', port('hole', 'bolt-hole', 0.56)),
+      part('TEST-BOLT-HOLE', '8', 'mounting hole', port('hole', 'bolt-hole', 0.56, { axis: [0, 0, -1] })),
     ],
     instances: [
       instance('rod-1', 'TEST-ROD', 'a'),
@@ -128,6 +140,10 @@ function validFixture() {
         to: { instanceId: 'anchor-1', portId: 'thread' },
         geometryVerified: true,
         fit: {
+          maximumDatumSeparationIn: 0.001,
+          actualDatumSeparationIn: 0,
+          maximumAxisOppositionErrorDeg: 0.1,
+          actualAxisOppositionErrorDeg: 0,
           minimumEngagementIn: 0.3,
           maximumEngagementIn: 0.6,
           actualEngagementIn: 0.45,
@@ -148,6 +164,10 @@ function validFixture() {
         to: { instanceId: 'brace-jaw-1', portId: 'jaw' },
         geometryVerified: true,
         fit: {
+          maximumDatumSeparationIn: 0.001,
+          actualDatumSeparationIn: 0,
+          maximumAxisOppositionErrorDeg: 0.1,
+          actualAxisOppositionErrorDeg: 0,
           minimumInsertionIn: 1,
           actualInsertionIn: 1.25,
           diametricClearanceIn: 0.02,
@@ -163,6 +183,10 @@ function validFixture() {
         to: { instanceId: 'pipe-clamp-1', portId: 'clamp' },
         geometryVerified: true,
         fit: {
+          maximumDatumSeparationIn: 0.001,
+          actualDatumSeparationIn: 0,
+          maximumAxisOppositionErrorDeg: 0.1,
+          actualAxisOppositionErrorDeg: 0,
           servicePipeOutsideDiameterIn: 3.5,
           clampInsideDiameterIn: 3.53,
           minimumDiametricClearanceIn: 0.01,
@@ -177,6 +201,10 @@ function validFixture() {
         to: { instanceId: 'bolt-hole-1', portId: 'hole' },
         geometryVerified: true,
         fit: {
+          maximumDatumSeparationIn: 0.001,
+          actualDatumSeparationIn: 0,
+          maximumAxisOppositionErrorDeg: 0.1,
+          actualAxisOppositionErrorDeg: 0,
           boltDiameterIn: 0.5,
           holeDiameterIn: 0.56,
           minimumDiametricClearanceIn: 0.01,
@@ -243,6 +271,8 @@ const trustedEvidence = {
   trustedReceiptDigests: trustedReceipts,
   trustedGeometryDigests,
   trustedDimensionAuditDigests,
+  trustedThreadStandardSourceDigests: [sha('5')],
+  trustedThreadGeometryDigests: [sha('3'), sha('4')],
 }
 
 describe('exact part assembly fit verifier', () => {
@@ -329,6 +359,43 @@ describe('exact part assembly fit verifier', () => {
     oversizedBolt.connections[3].fit.boltDiameterIn = 0.625
     expect(evaluateExactPartAssembly(oversizedBolt, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
+
+    const partialDimensionAudit = validFixture()
+    partialDimensionAudit.partDefinitions[0].source.secondaryEnvelopeVerified = false
+    expect(evaluateExactPartAssembly(partialDimensionAudit, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED')
+
+    const modifiedManufacturerGeometry = validFixture()
+    modifiedManufacturerGeometry.partDefinitions[0].source.manufacturerGeometryUnmodified = false
+    expect(evaluateExactPartAssembly(modifiedManufacturerGeometry, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED')
+  })
+
+  it('independently rejects displaced, skewed, mirrored, and falsely reported mating datums', () => {
+    const displaced = validFixture()
+    displaced.instances[1].originIn = [0.01, 0, 0]
+    expect(evaluateExactPartAssembly(displaced, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
+
+    const skewed = validFixture()
+    skewed.instances[1].rotationMatrix = [1, 0, 0, 0, 0, -1, 0, 1, 0]
+    expect(evaluateExactPartAssembly(skewed, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
+
+    const mirrored = validFixture()
+    mirrored.instances[1].rotationMatrix = [-1, 0, 0, 0, 1, 0, 0, 0, 1]
+    expect(evaluateExactPartAssembly(mirrored, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_INSTANCE_COVERAGE_INCOMPLETE')
+
+    const falseReportedSeparation = validFixture()
+    falseReportedSeparation.connections[0].fit.actualDatumSeparationIn = 0.0005
+    expect(evaluateExactPartAssembly(falseReportedSeparation, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
+
+    const looseDatumTolerance = validFixture()
+    looseDatumTolerance.connections[0].fit.maximumDatumSeparationIn = 0.01
+    expect(evaluateExactPartAssembly(looseDatumTolerance, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
   })
 
   it('rejects untrusted receipts, source drift, missing placements, structure failures, and collisions', () => {
@@ -409,5 +476,25 @@ describe('exact part assembly fit verifier', () => {
     fakeTurns.connections[0].fit.actualTurnsEngaged = 9
     expect(evaluateExactPartAssembly(fakeTurns, trustedEvidence).blockerCodes)
       .toContain('EXACT_ASSEMBLY_CONNECTION_FIT_UNVERIFIED')
+
+    const untrustedThreadTable = validFixture()
+    untrustedThreadTable.partDefinitions[0].ports[0].thread.dimensionAuditReceiptSha256 = sha('0')
+    expect(evaluateExactPartAssembly(untrustedThreadTable, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_PART_SOURCE_UNTRUSTED')
+
+    const untrustedThreadStandard = validFixture()
+    untrustedThreadStandard.partDefinitions[0].ports[0].thread.standardSourceSha256 = sha('0')
+    expect(evaluateExactPartAssembly(untrustedThreadStandard, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_PART_SOURCE_UNTRUSTED')
+
+    const untrustedThreadGeometry = validFixture()
+    untrustedThreadGeometry.partDefinitions[0].ports[0].thread.geometrySha256 = sha('0')
+    expect(evaluateExactPartAssembly(untrustedThreadGeometry, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_PART_SOURCE_UNTRUSTED')
+
+    const detachedThreadBrep = validFixture()
+    detachedThreadBrep.partDefinitions[0].ports[0].thread.parentGeometrySha256 = sha('0')
+    expect(evaluateExactPartAssembly(detachedThreadBrep, trustedEvidence).blockerCodes)
+      .toContain('EXACT_ASSEMBLY_PART_GEOMETRY_UNVERIFIED')
   })
 })
