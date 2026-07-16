@@ -1,0 +1,39 @@
+{
+  "loop": "new-hope-purchased-support-components-20260716",
+  "stage": "VERIFY",
+  "status": "purchase-identities-bound-installed-geometry-rejected",
+  "iteration": 1,
+  "evidence": {
+    "looseMaterialQuote": {
+      "quoteNumber": "0133821",
+      "sha256": "844981467740F66D9847B356C2B44BE7CB8D0F77825B453E40C9FACD3B1659DB",
+      "supportProductLineCount": 16,
+      "supportUnitCount": 977
+    },
+    "approvedProductSubmittal": {
+      "sha256": "EF738CDC5271E38BD978B8F5932514BCBF1D84E83E778CA9FE5A32DBED1978CA",
+      "physicalPage": 25,
+      "shownSupport": "AFCON 300 ring hanger",
+      "purchasedSupport": "Anvil Fig. 69 adjustable swivel ring",
+      "geometryInterchangeable": false
+    }
+  },
+  "verification": {
+    "focusedTests": "2 files / 4 tests passed",
+    "adversarialCases": 4,
+    "browser": {
+      "proofReady": true,
+      "purchaseIdentityReady": true,
+      "exactSupportManufacturerGeometryReady": false,
+      "exactSupportThreadSolidsReady": false,
+      "verifiedSupportMatingAssembliesReady": false,
+      "supportModelReleaseReady": false,
+      "brokenImages": 0
+    },
+    "brainPostflight": {
+      "endpoint": "canonical hal-brain /remember",
+      "episodeId": 151561
+    }
+  },
+  "nextAction": "Acquire exact manufacturer CAD or complete manufacturing dimensions for each quote-bound product number, then use Blender MCP to generate thread-bearing solids and run automated mating, envelope, and connector checks before any support is placed in the pitched-roof model."
+}

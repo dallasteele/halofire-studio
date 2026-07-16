@@ -1,0 +1,48 @@
+{
+  "artifactType": "halofire.new-hope-purchased-support-components.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "purchaseEvidence": {
+    "fileName": "New Hope Crisis Center Loose Quote.pdf",
+    "sha256": "844981467740F66D9847B356C2B44BE7CB8D0F77825B453E40C9FACD3B1659DB",
+    "quoteNumber": "0133821",
+    "quoteDate": "2025-02-21",
+    "pageCount": 4
+  },
+  "approvedSubmittalControl": {
+    "fileName": "New Hope Product Submittal.pdf",
+    "sha256": "EF738CDC5271E38BD978B8F5932514BCBF1D84E83E778CA9FE5A32DBED1978CA",
+    "pageCount": 173,
+    "physicalPage": 25,
+    "shownSupport": "AFCON 300 ring hanger",
+    "purchaseEquivalent": "Anvil Fig. 69 adjustable swivel ring",
+    "geometryInterchangeableWithoutProductSpecificEvidence": false
+  },
+  "components": [
+    { "family": "flexible-drop-bracket", "manufacturer": "Victaulic", "model": "VicFlex AB2 24-inch", "productNumber": "A240AB200N", "quantity": 152, "purchasedDescription": "AB2 Hard-Lid Ceiling; 24-inch Adjustable Bracket" },
+    { "family": "threaded-rod", "manufacturer": null, "model": "3/8-inch x 10-foot plated all-thread rod", "productNumber": "3/8X10P", "quantity": 230, "purchasedDescription": "3/8 X 10 FT PLTD ATR" },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 1/2-1", "productNumber": "0500301692", "quantity": 25, "purchasedDescription": "69 1/2-1 ZP LT/DTY W/NFPA TAP HGR" },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 1-1/2", "productNumber": "0500301742", "quantity": 97, "purchasedDescription": "69 1-1/2 ZP LT/DTY W/NFPA TAP HGR" },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 2", "productNumber": "0500301759", "quantity": 14, "purchasedDescription": "69 2 ZP LT/DTY W/NFPA TAP HGR" },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 2-1/2", "productNumber": "0500301767", "quantity": 48, "purchasedDescription": "69 2-1/2 ZP LT/DTY W/NFPA TAP HGR" },
+    { "family": "ring-hanger", "manufacturer": "ASC Engineered Solutions / Anvil", "model": "Fig. 69 3", "productNumber": "0500301775", "quantity": 28, "purchasedDescription": "69 3 ZP LT/DTY W/NFPA TAP HGR" },
+    { "family": "steel-anchor", "manufacturer": "ITW Buildex", "model": "Sammy Sidewinder 516 1-1/2", "productNumber": "SWDR1-1/2", "quantity": 212, "purchasedDescription": "ITW SWDR 516 1-1/2 SIDE STEEL Sammy" },
+    { "family": "brace-clamp", "manufacturer": "ASC Engineered Solutions", "model": "AF730 3", "productNumber": "0502005710", "quantity": 5, "purchasedDescription": "AF730 3 PLAIN LATERAL/LONGITUDINAL CLAMP" },
+    { "family": "brace-clamp", "manufacturer": "ASC Engineered Solutions", "model": "AF730 2-1/2", "productNumber": "0502005708", "quantity": 2, "purchasedDescription": "AF730 2-1/2 PLAIN LATERAL/LONGITUDINAL CLAMP" },
+    { "family": "brace-clamp", "manufacturer": "ASC Engineered Solutions", "model": "AF730 4", "productNumber": "0502005712", "quantity": 1, "purchasedDescription": "AF730 4 PLAIN LATERAL/LONGITUDINAL CLAMP" },
+    { "family": "sway-brace-fitting", "manufacturer": "ASC Engineered Solutions", "model": "AF035 3 x 1", "productNumber": "0502000410", "quantity": 17, "purchasedDescription": "AF035 3X1 SWAY BRACE FTG" },
+    { "family": "sway-brace-fitting", "manufacturer": "ASC Engineered Solutions", "model": "AF035 2-1/2 x 1", "productNumber": "0502000408", "quantity": 31, "purchasedDescription": "AF035 2-1/2X1 SWAY BRACE FTG" },
+    { "family": "sway-brace-fitting", "manufacturer": "ASC Engineered Solutions", "model": "AF035 4 x 1", "productNumber": "0502000414", "quantity": 1, "purchasedDescription": "AF035 4X1 SWAY BRACE FTG" },
+    { "family": "brace-adapter", "manufacturer": "ASC Engineered Solutions", "model": "AF779 size 2-1/2", "productNumber": "0500604541", "quantity": 57, "purchasedDescription": "AF779 SIZE 2-1/2 BOLT, (2) 1/2 PLAIN ADPTR" },
+    { "family": "swivel-attachment", "manufacturer": "ASC Engineered Solutions", "model": "AF076 universal", "productNumber": "0502000830", "quantity": 57, "purchasedDescription": "AF076 UL/FM UNIV SWIVEL ATTACHMENT" }
+  ],
+  "modelingBoundary": {
+    "purchaseIdentityReady": true,
+    "genericSupportSubstitutionAllowed": false,
+    "manufacturerExactCadAcquired": false,
+    "fullyDimensionedManufacturingDrawingsAcquired": false,
+    "exactThreadSolidsReady": false,
+    "verifiedMatingAssembliesReady": false,
+    "blenderInstalledSupportGeometryReady": false,
+    "reason": "The quote fixes the actual purchased identities and quantities. The approved AFCON 300 page, generic hanger profiles, and primary dimensions do not prove the complete Anvil Fig. 69, VicFlex AB2, anchor, clamp, brace fitting, adapter, or swivel manufacturing solids."
+  }
+}

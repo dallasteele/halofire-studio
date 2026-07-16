@@ -1,0 +1,25 @@
+{
+  "loop": "new-hope-purchased-support-components-20260716",
+  "objective": "Bind every purchased New Hope hanger, bracket, anchor, clamp, brace fitting, adapter, and swivel to its exact quote identity and auto-reject generic geometry.",
+  "acceptanceAuthority": "machine-loops",
+  "humanReviewRequired": false,
+  "sourceGates": [
+    "Loose-material quote 0133821 SHA-256 and all 16 support product lines match",
+    "Approved AFCON 300 submittal imagery is explicitly non-interchangeable with purchased Anvil Fig. 69 geometry",
+    "Exact manufacturer CAD or complete manufacturing drawings are required per product number",
+    "Thread solids and mating assemblies must be geometrically verified before Blender model promotion"
+  ],
+  "adversarialMutations": [
+    "remove a purchased support line",
+    "change a purchased quantity",
+    "allow generic AFCON 300 substitution",
+    "promote exact thread geometry without evidence"
+  ],
+  "releaseGate": {
+    "purchaseIdentityReady": true,
+    "exactManufacturerGeometryReady": false,
+    "exactThreadSolidsReady": false,
+    "verifiedMatingAssembliesReady": false,
+    "supportModelReleaseReady": false
+  }
+}
