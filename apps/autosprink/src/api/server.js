@@ -3005,10 +3005,11 @@ app.get('/api/projects/:name/vertical-registration', authMiddleware, async (req,
   if (req.params.name !== 'Dillon Residence') return res.status(404).json({ error: 'vertical_registration_not_found' });
   try {
     const floorModel = JSON.parse(fs.readFileSync(DILLON_FLOOR_MODEL_PATH, 'utf8'));
+    const sourceGeometry = JSON.parse(fs.readFileSync(DILLON_DWG_SOURCE_GEOMETRY_PATH, 'utf8'));
     const bidGeometry = JSON.parse(fs.readFileSync(DILLON_COMPLETED_BID_GEOMETRY_PATH, 'utf8'));
     const slopedCalibration = JSON.parse(fs.readFileSync(DILLON_SLOPED_CALIBRATION_PATH, 'utf8'));
     const packet = JSON.parse(fs.readFileSync(DILLON_VERTICAL_REGISTRATION_PATH, 'utf8'));
-    const validation = await validateDillonVerticalRegistration(packet, { bidGeometry, floorModel, slopedCalibration });
+    const validation = await validateDillonVerticalRegistration(packet, { sourceGeometry, bidGeometry, floorModel, slopedCalibration });
     if (validation.status !== 'passed') return res.status(422).json(validation);
     const model3d = buildDillonVerticalModel(validation); const elevationView = renderDillonVerticalElevationView(model3d);
     return res.json({ status: 'passed', artifactType: 'halofire.autobid-partial-vertical-registration.v1', projectName: req.params.name, receiptSha256: packet.receiptSha256, counts: validation.counts, sheets: packet.sheets, model3d, elevationView, complete: false, geometryGrounded: true, complianceReady: false, approvalReady: false, limitations: packet.limitations, claimStatus: packet.claimStatus });

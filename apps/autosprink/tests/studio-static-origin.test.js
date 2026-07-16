@@ -728,7 +728,7 @@ describe('studio static origin handling', () => {
     expect(html).toContain('no cross-sheet substitution');
     expect(html).toContain('/api/projects/Dillon%20Residence/vertical-registration');
     expect(html).toContain('/api/projects/Dillon%20Residence/structural-roof-surfaces');
-    expect(html).toContain('no default flat-roof height');
+    expect(html).toContain('annotation proximity and default flat-roof heights are rejected');
     expect(html).toContain('verticalGeometry.model3d.heads.forEach');
     expect(html).toContain('verticalGeometry.model3d.pipes.forEach');
     expect(html).toContain('protected-head node identity, compliance, and approval remain fail-closed');

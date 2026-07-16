@@ -1,0 +1,41 @@
+{
+  "name": "dillon-sealed-room-vertical-gate-20260716",
+  "owner": "codex",
+  "loop_type": "closed",
+  "goal": "Reject annotation-proximity-only sprinkler Z, derive reproducible single-surface room cells from the actual Dillon DWG wall hatches and opening linework, and allow 3D elevation only inside a sealed room cell or the registered 3:12 plane.",
+  "sources_of_truth": [
+    "apps/autosprink/src/data/dillon-dwg-source-geometry.json",
+    "apps/autosprink/src/data/dillon-completed-bid-geometry.json",
+    "apps/autosprink/src/data/dillon-floor-by-floor-model.json",
+    "apps/autosprink/src/data/submitted-sloped-ceiling-calibration.dillon.json",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/fp-1-ceiling-analysis.json",
+    "apps/autosprink/tmp/pdfs/dillon-roof-calibration/fp-2-ceiling-analysis.json"
+  ],
+  "exit_criteria": [
+    "Room cells are deterministically reconstructed at quarter-foot resolution from source wall polygons and Door, Window, and Gate opening linework",
+    "A room cell resolves a flat ceiling only when it is source-bounded and all registered annotations inside it agree on kind and height",
+    "Annotation proximity alone cannot assign sprinkler or pipe Z",
+    "The registered 3:12 plane remains independently allowed",
+    "Exterior-connected, mixed-surface, annotation-free, cross-cell, and tampered assignments fail closed",
+    "The full actual 2D completed-bid layout remains available while unresolved Z is omitted from 3D",
+    "Focused tests, Dillon regression tests, production build, loop guard, rules, and browser proof pass"
+  ],
+  "verification_gates": [
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/dillon-sealed-room-vertical-gate-20260716/contract.json",
+    "npx vitest run tests/dillon-vertical-registration.test.js tests/submitted-sprinkler-calibration-api.test.js tests/studio-static-origin.test.js",
+    "npx vitest run dillon",
+    "npm run build",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/dillon-sealed-room-vertical-gate-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/dillon-source-room-registry.js",
+    "apps/autosprink/src/data/dillon-vertical-registration.json",
+    "data/agent-loops/dillon-sealed-room-vertical-gate-20260716/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "brain_writeback_required": true,
+  "human_gate_required": false
+}

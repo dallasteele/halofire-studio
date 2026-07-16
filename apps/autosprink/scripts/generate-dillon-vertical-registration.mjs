@@ -2,11 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sha256Hex } from '../src/engine/elevation-datums.js';
+import { buildDillonSourceRoomRegistry, dillonSourceRoomRegistryPacket } from '../src/engine/dillon-source-room-registry.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 const bid = read(path.join(root, 'src/data/dillon-completed-bid-geometry.json'));
 const floorModel = read(path.join(root, 'src/data/dillon-floor-by-floor-model.json'));
+const sourceGeometry = read(path.join(root, 'src/data/dillon-dwg-source-geometry.json'));
 const slope = read(path.join(root, 'src/data/submitted-sloped-ceiling-calibration.dillon.json'));
 const temp = path.join(root, 'tmp/pdfs/dillon-roof-calibration');
 const analyses = { 'FP-1': read(path.join(temp, 'fp-1-ceiling-analysis.json')), 'FP-2': read(path.join(temp, 'fp-2-ceiling-analysis.json')) };
@@ -22,7 +24,6 @@ for (const [sheetId, analysis] of Object.entries(analyses)) {
   annotationsBySheet[sheetId] = analysis.annotations.map((annotation) => ({ id: annotation.id, kind: annotation.kind, heightAboveFloorFt: round(annotation.height), sourceText: annotation.text, sourceTopLeftPt: annotation.topLeft.map(round), planPointDwgFt: annotation.dwg.map(round), sourceBlockIndex: annotation.block }));
 }
 const annotationMap = new Map(Object.values(annotationsBySheet).flat().map((annotation) => [annotation.id, annotation]));
-const analysisMap = new Map(Object.entries(analyses).flatMap(([sheetId, analysis]) => analysis.assignments.map((assignment) => [`${sheetId}:${assignment.headId}`, assignment])));
 
 const protectedRegion = slope.slopeRegions.find((region) => region.id === 'slope-region-east-covered');
 const submittedToDwg = ([x, y]) => [round(x / 13.5 - 76.70833), round(17.14583 - y / 13.5)];
@@ -31,42 +32,46 @@ function slopeHeightAtDwg([, y]) {
   const submittedY = (17.14583 - y) * 13.5;
   return round(9 - ((submittedY - protectedRegion.elevationDatum.datumPointSubmittedPt[1]) / 13.5) * 3 / 12);
 }
-function trustedFlatAssignment(sheetId, analysisAssignment) {
-  if (!analysisAssignment) return null;
-  const [first, second] = analysisAssignment.nearest; const a = annotationMap.get(first.annotationId); const b = annotationMap.get(second.annotationId);
-  const trusted = first.distanceFt <= 3 || (first.distanceFt <= 6 && a.kind === b.kind && a.heightAboveFloorFt === b.heightAboveFloorFt);
-  return trusted ? { method: first.distanceFt <= 3 ? 'nearest-source-annotation-within-3ft' : 'two-nearest-source-annotations-agree-within-6ft', annotationId: a.id, surfaceKind: a.kind, heightAboveFloorFt: a.heightAboveFloorFt, sourceDistanceFt: round(first.distanceFt) } : null;
+const roomRegistries = new Map();
+for (const sheet of bid.sheets) {
+  const level = sourceGeometry.levels.find((entry) => entry.id === sheet.levelId);
+  roomRegistries.set(sheet.id, await buildDillonSourceRoomRegistry(level, annotationsBySheet[sheet.id]));
 }
-function assignmentForPoint(sheetId, point, analysisAssignment = null) {
+function assignmentForPoint(sheetId, point) {
   if (sheetId === 'FP-1' && inside(point, protectedPolygonDwgFt)) return { method: 'sealed-3:12-source-plane', annotationId: protectedRegion.annotationId, surfaceKind: 'sloped-ceiling', heightAboveFloorFt: slopeHeightAtDwg(point), sourceDistanceFt: 0 };
-  if (analysisAssignment) return trustedFlatAssignment(sheetId, analysisAssignment);
-  const rows = annotationsBySheet[sheetId].map((annotation) => ({ annotation, distanceFt: Math.hypot(point[0] - annotation.planPointDwgFt[0], point[1] - annotation.planPointDwgFt[1]) })).sort((a, b) => a.distanceFt - b.distanceFt);
-  if (rows.length < 2) return null;
-  return trustedFlatAssignment(sheetId, { nearest: rows.slice(0, 2).map((row) => ({ annotationId: row.annotation.id, distanceFt: row.distanceFt })) });
+  const location = roomRegistries.get(sheetId)?.locate(point);
+  if (!location?.room?.surfaceResolved) return null;
+  const annotationId = location.room.annotationIds[0]; const annotation = annotationMap.get(annotationId);
+  if (!annotation) return null;
+  const sourceDistanceFt = Math.min(...location.room.annotationIds.map((id) => {
+    const candidate = annotationMap.get(id);
+    return candidate ? Math.hypot(point[0] - candidate.planPointDwgFt[0], point[1] - candidate.planPointDwgFt[1]) : Number.POSITIVE_INFINITY;
+  }));
+  return { method: 'sealed-source-room-cell', roomCellId: location.room.id, annotationId, surfaceKind: annotation.kind, heightAboveFloorFt: annotation.heightAboveFloorFt, sourceDistanceFt: round(sourceDistanceFt) };
 }
 
 const sheets = bid.sheets.map((sheet) => {
   const level = floorModel.levels.find((entry) => entry.id === sheet.levelId);
   const headAssignments = sheet.heads.map((head) => {
-    const assignment = assignmentForPoint(sheet.id, head.planPointDwgFt, analysisMap.get(`${sheet.id}:${head.id}`));
+    const assignment = assignmentForPoint(sheet.id, head.planPointDwgFt);
     return assignment ? { headId: head.id, planPointDwgFt: head.planPointDwgFt, ...assignment, modelElevationFt: round(level.modelElevationFt + assignment.heightAboveFloorFt), siteProjectElevationFt: round(level.projectFloorElevationFt + assignment.heightAboveFloorFt), status: 'source-assigned' } : { headId: head.id, planPointDwgFt: head.planPointDwgFt, status: 'unresolved' };
   });
   const pipeAssignments = sheet.pipeSegments.map((pipe) => {
     const endpoints = pipe.planDwgFt.map((point) => assignmentForPoint(sheet.id, point));
-    if (endpoints.every(Boolean) && ((endpoints[0].annotationId === endpoints[1].annotationId && endpoints[0].heightAboveFloorFt === endpoints[1].heightAboveFloorFt) || endpoints.every((entry) => entry.method === 'sealed-3:12-source-plane'))) {
-      return { pipeId: pipe.id, planDwgFt: pipe.planDwgFt, endpointMethods: endpoints.map((entry) => entry.method), endpointAnnotationIds: endpoints.map((entry) => entry.annotationId), heightAboveFloorFt: endpoints.map((entry) => entry.heightAboveFloorFt), modelElevationsFt: endpoints.map((entry) => round(level.modelElevationFt + entry.heightAboveFloorFt)), siteProjectElevationsFt: endpoints.map((entry) => round(level.projectFloorElevationFt + entry.heightAboveFloorFt)), status: 'source-assigned' };
+    if (endpoints.every(Boolean) && ((endpoints[0].roomCellId && endpoints[0].roomCellId === endpoints[1].roomCellId && endpoints[0].heightAboveFloorFt === endpoints[1].heightAboveFloorFt) || endpoints.every((entry) => entry.method === 'sealed-3:12-source-plane'))) {
+      return { pipeId: pipe.id, planDwgFt: pipe.planDwgFt, endpointMethods: endpoints.map((entry) => entry.method), endpointAnnotationIds: endpoints.map((entry) => entry.annotationId), ...(endpoints[0].roomCellId ? { endpointRoomCellIds: endpoints.map((entry) => entry.roomCellId) } : {}), heightAboveFloorFt: endpoints.map((entry) => entry.heightAboveFloorFt), modelElevationsFt: endpoints.map((entry) => round(level.modelElevationFt + entry.heightAboveFloorFt)), siteProjectElevationsFt: endpoints.map((entry) => round(level.projectFloorElevationFt + entry.heightAboveFloorFt)), status: 'source-assigned' };
     }
     return { pipeId: pipe.id, planDwgFt: pipe.planDwgFt, status: 'unresolved' };
   });
-  return { sheetId: sheet.id, levelId: sheet.levelId, source: sourceConfigs[sheet.id], annotations: annotationsBySheet[sheet.id], headAssignments, pipeAssignments };
+  return { sheetId: sheet.id, levelId: sheet.levelId, source: sourceConfigs[sheet.id], roomRegistry: dillonSourceRoomRegistryPacket(roomRegistries.get(sheet.id)), annotations: annotationsBySheet[sheet.id], headAssignments, pipeAssignments };
 });
 const assignedHeads = sheets.reduce((n, sheet) => n + sheet.headAssignments.filter((entry) => entry.status === 'source-assigned').length, 0);
 const assignedPipes = sheets.reduce((n, sheet) => n + sheet.pipeAssignments.filter((entry) => entry.status === 'source-assigned').length, 0);
 const draft = {
-  artifactType: 'halofire.dillon-vertical-registration.v1', projectName: 'Dillon Residence', completedBidGeometryReceiptSha256: bid.receiptSha256, floorModelReceiptSha256: floorModel.receiptSha256, slopedCalibrationReceiptSha256: slope.evidenceReceiptSha256,
+  artifactType: 'halofire.dillon-vertical-registration.v2', projectName: 'Dillon Residence', sourceGeometrySha256: await sha256Hex(sourceGeometry), completedBidGeometryReceiptSha256: bid.receiptSha256, floorModelReceiptSha256: floorModel.receiptSha256, slopedCalibrationReceiptSha256: slope.evidenceReceiptSha256,
   sheets, counts: { totalHeads: 76, sourceAssignedHeads: assignedHeads, unresolvedHeads: 76 - assignedHeads, totalPipeSegments: 67, sourceAssignedPipeSegments: assignedPipes, unresolvedPipeSegments: 67 - assignedPipes },
   complete: false, geometryGrounded: true, complianceReady: false, approvalReady: false,
-  limitations: ['Only redundant-nearest-annotation consensus or the sealed 3:12 source plane assigns Z; no default story height is used.', 'Elements crossing ceiling zones or lacking nearby agreeing source annotations remain unresolved.', 'Ceiling-surface elevation is not a manufacturer deflector-offset or fabrication elevation.', 'The missing FP-1 scheduled head remains unresolved.'],
+  limitations: ['Only a sealed source-room cell or the sealed 3:12 source plane assigns Z; annotation proximity alone is rejected.', 'Exterior-connected, mixed-surface, or annotation-free cells and every element outside them remain unresolved.', 'Ceiling-surface elevation is not a manufacturer deflector-offset or fabrication elevation.', 'The missing FP-1 scheduled head remains unresolved.'],
   claimStatus: 'partial-source-bound-vertical-registration-not-code-compliance-or-fabrication',
 };
 const packet = { ...draft, receiptSha256: await sha256Hex(draft) };
