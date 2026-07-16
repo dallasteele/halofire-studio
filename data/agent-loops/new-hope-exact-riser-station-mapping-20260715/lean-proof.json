@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-exact-riser-station-mapping-20260715/lean-request.json",
+  "theoremNames": [
+    "identicalCrossSheetRiserPrimitive",
+    "componentMappingReconcilesHydraulicLength",
+    "exactStationAndMappingDoNotPromoteRelease"
+  ],
+  "claim": "The identical 24-segment FP1.0/FP2.0 primitive has zero cross-sheet coordinate residual, the CML.01 horizontal component plus the vertical component and report-rounding residual equal the approved 118-414 physical length, and exact station/mapping cannot promote unresolved field grade, 3D, proper layout, fabrication, or release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 390,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

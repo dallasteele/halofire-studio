@@ -1,0 +1,71 @@
+{
+  "artifactType": "halofire.new-hope-asbuilt-riser-station-evidence.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "source": {
+    "fileName": "New Hope BGC - Brigham City UT_as builts.pdf",
+    "sha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B",
+    "pageBoxPdfPt": {
+      "width": 3024,
+      "height": 2160
+    }
+  },
+  "primitive": {
+    "extractor": "PyMuPDF Page.get_drawings",
+    "normalizedSha256": "DD2882F7742CFAA5FF5E557C8ACFDED8AD257A7A552743A1FE8B93D1B6D93D7D",
+    "itemCount": 24,
+    "rectPdfPt": [
+      660.474854,
+      1116.084595,
+      660.674561,
+      1120.94043
+    ],
+    "planStationPdfPt": [
+      660.674561,
+      1118.512451
+    ],
+    "crossSheetCoordinateResidualPt": 0.0,
+    "sheets": [
+      {
+        "physicalPage": 3,
+        "sheet": "FP1.0",
+        "drawingIndex": 53184,
+        "normalizedSha256": "DD2882F7742CFAA5FF5E557C8ACFDED8AD257A7A552743A1FE8B93D1B6D93D7D",
+        "itemCount": 24,
+        "rectPdfPt": [
+          660.474854,
+          1116.084595,
+          660.674561,
+          1120.94043
+        ],
+        "planStationPdfPt": [
+          660.674561,
+          1118.512451
+        ]
+      },
+      {
+        "physicalPage": 4,
+        "sheet": "FP2.0",
+        "drawingIndex": 3511,
+        "normalizedSha256": "DD2882F7742CFAA5FF5E557C8ACFDED8AD257A7A552743A1FE8B93D1B6D93D7D",
+        "itemCount": 24,
+        "rectPdfPt": [
+          660.474854,
+          1116.084595,
+          660.674561,
+          1120.94043
+        ],
+        "planStationPdfPt": [
+          660.674561,
+          1118.512451
+        ]
+      }
+    ]
+  },
+  "claims": {
+    "identicalCrossSheetRiserPrimitiveReady": true,
+    "exactRiserPlanStationReady": true,
+    "installedGradeReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "artifactType": "halofire.new-hope-asbuilt-source-feed-riser-registration.v1",
+  "artifactType": "halofire.new-hope-asbuilt-source-feed-riser-registration.v2",
   "projectId": "new-hope-crisis-center-brigham-city-ut",
   "source": {
     "role": "as-built-fire-sprinkler-plan-and-riser-detail",
@@ -33,6 +33,17 @@
       "drawingIndex": 16997,
       "targetPdfPt": { "x": 656.875854, "y": 1118.512451 },
       "calloutPdfPt": { "x": 679.659607, "y": 1132.012451 }
+    },
+    "crossSheetRiserPrimitive": {
+      "extractor": "PyMuPDF Page.get_drawings",
+      "fp10DrawingIndex": 53184,
+      "fp20DrawingIndex": 3511,
+      "normalizedSha256": "DD2882F7742CFAA5FF5E557C8ACFDED8AD257A7A552743A1FE8B93D1B6D93D7D",
+      "itemCount": 24,
+      "rectPdfPt": { "x0": 660.474854, "y0": 1116.084595, "x1": 660.674561, "y1": 1120.94043 },
+      "planStationPdfPt": { "x": 660.674561, "y": 1118.512451 },
+      "crossSheetCoordinateResidualPt": 0,
+      "fp20AnchorRoundingResidualPt": 0.000629
     }
   },
   "fp20TransferEvidence": {
@@ -64,14 +75,27 @@
     "calculationLengthResidualIn": 0.086322,
     "listedOutletFromPieceStartIn": 29.5,
     "planToListingHorizontalResidualIn": 1.086322,
-    "maximumCalculationLengthResidualIn": 0.125
+    "maximumCalculationLengthResidualIn": 0.125,
+    "fabricationPieceToCalculationLegMapping": {
+      "pieceId": "CML.01",
+      "sourceEdgeId": "source-edge-001",
+      "calculationNode1": "118",
+      "calculationNode2": "414",
+      "horizontalPlanCenterlineLengthIn": 28.413678,
+      "listedStartToOutletCutLengthIn": 29.5,
+      "listedCutToPlanCenterlineAdjustmentIn": 1.086322,
+      "verticalCalculationComponentIn": 72.500004,
+      "calculationPhysicalLengthIn": 101.000004,
+      "orthogonalComponentSumIn": 100.913682,
+      "calculationRoundingResidualIn": 0.086322
+    }
   },
   "claims": {
     "asBuiltRiserIdentityReady": true,
     "sharedTransferAxisReady": true,
     "orthogonalCalculationDecompositionReady": true,
-    "exactInstalledRiserPlanStationReady": false,
-    "fabricationPieceToCalculationLegDecompositionReady": false,
+    "exactInstalledRiserPlanStationReady": true,
+    "fabricationPieceToCalculationLegDecompositionReady": true,
     "installedGradeReady": false,
     "sourceFeed3dPathReady": false,
     "fabricationReady": false,

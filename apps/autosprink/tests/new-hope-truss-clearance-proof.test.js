@@ -245,6 +245,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.sourceFeedBaseOfRiserEndpointZReady = String(properPipeLayout.sourceFeedBaseOfRiserEndpointZReady)');
     expect(script).toContain('dataset.sourceFeedCalculationLegEndpointElevationsReady = String(properPipeLayout.sourceFeedCalculationLegEndpointElevationsReady)');
     expect(script).toContain('dataset.sourceFeedConcealedPlanXyReady = String(properPipeLayout.sourceFeedConcealedPlanXyReady)');
+    expect(script).toContain('dataset.sourceFeedFabricationPieceToCalculationLegDecompositionReady = String(properPipeLayout.sourceFeedFabricationPieceToCalculationLegDecompositionReady)');
     expect(script).toContain('dataset.sourceFeedAsBuiltRiserIdentityReady = String(properPipeLayout.sourceFeedAsBuiltRiserIdentityReady)');
     expect(script).toContain('dataset.sourceFeedSharedTransferAxisReady = String(properPipeLayout.sourceFeedSharedTransferAxisReady)');
     expect(script).toContain('dataset.sourceFeedOrthogonalCalculationDecompositionReady = String(properPipeLayout.sourceFeedOrthogonalCalculationDecompositionReady)');

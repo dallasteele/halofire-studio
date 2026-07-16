@@ -390,7 +390,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
   const acceptanceBlockers = [
     issue(
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
-      'CML.01 now has a complete as-designed plan axis, high-to-low direction, grade magnitude, and endpoint Z schedule tied to node 118. The below-attic riser assembly still lacks an exact installed station and fabrication-piece-to-calculation mapping, and field-measured grade remains unresolved.',
+      'CML.01 now has a complete as-designed plan axis, high-to-low direction, grade magnitude, endpoint Z schedule, exact cross-sheet riser station, and a bounded CML.01-to-118/414 component mapping. Exact transition takeout and field-measured installed grade remain unresolved, so the source-feed route is not yet fabrication-ready 3D.',
       'source-edge-001,source-edge-002',
     ),
     issue(
@@ -674,8 +674,10 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ready && sourceFeedFabrication?.designedGradeMagnitudeReady === true,
     sourceFeedCml01Plan3dPathReady:
       ready && sourceFeedFabrication?.cml01Plan3dPathReady === true,
-    sourceFeedConcealedPlanXyReady: false,
-    sourceFeedFabricationPieceToCalculationLegDecompositionReady: false,
+    sourceFeedConcealedPlanXyReady:
+      ready && sourceFeedAsbuiltRiser?.exactInstalledRiserPlanStationReady === true,
+    sourceFeedFabricationPieceToCalculationLegDecompositionReady:
+      ready && sourceFeedAsbuiltRiser?.fabricationPieceToCalculationLegDecompositionReady === true,
     sourceFeedInstalledGradeReady: false,
     sourceFeedConcealedRiserContinuationReady: false,
     sourceFeed3dPathReady: false,

@@ -2,9 +2,9 @@
  * Validates the New Hope as-built FP1.0 riser registration against FP2.0 and
  * the approved hydraulic calculation chain.
  *
- * This closes source identity and an orthogonal calculation decomposition.
- * It deliberately does not promote an exact installed riser station, a
- * fabrication cut-to-calculation decomposition, installed grade, or full 3D.
+ * This closes source identity, the exact cross-sheet riser plan station, and
+ * the CML.01-to-118/414 component mapping. It deliberately does not promote
+ * field-measured grade, exact transition takeout, or the full 3D route.
  */
 
 const EXPECTED_PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut'
@@ -17,6 +17,7 @@ const EXPECTED_DEVICE_TEXTS = Object.freeze([
   '2 INCH DRAIN TO EXTERIOR',
 ])
 const EXPECTED_EXTERNAL_NODES = Object.freeze(['414', '560', '554'])
+const EXPECTED_RISER_PRIMITIVE_SHA = 'DD2882F7742CFAA5FF5E557C8ACFDED8AD257A7A552743A1FE8B93D1B6D93D7D'
 
 const issue = (code, message, entityId = null) => ({ severity: 'blocking', code, message, entityId })
 const round = (value, digits = 6) => Number(value.toFixed(digits))
@@ -44,6 +45,7 @@ export function evaluateNewHopeSourceFeedAsbuiltRiser(inputs = {}) {
     issues.push(issue('NH_ASBUILT_RISER_PROJECT_IDENTITY_INVALID', 'Every source-feed riser input must identify New Hope.'))
   }
   if (
+    registration?.artifactType !== 'halofire.new-hope-asbuilt-source-feed-riser-registration.v2' ||
     registration?.source?.sha256 !== EXPECTED_ASBUILT_SHA ||
     !same(registration?.source?.pageBoxPdfPt, { width: 3024, height: 2160 }) ||
     !same(registration?.source?.sheets, [
@@ -73,6 +75,20 @@ export function evaluateNewHopeSourceFeedAsbuiltRiser(inputs = {}) {
   ) {
     issues.push(issue('NH_ASBUILT_RISER_PLAN_REGISTRATION_INVALID', 'FP1.0 must retain the extracted riser leader and node 414/560/554 callouts.', 'FP1.0:riser'))
   }
+  const riserPrimitive = fp10?.crossSheetRiserPrimitive
+  if (
+    riserPrimitive?.extractor !== 'PyMuPDF Page.get_drawings' ||
+    riserPrimitive?.fp10DrawingIndex !== 53184 ||
+    riserPrimitive?.fp20DrawingIndex !== 3511 ||
+    riserPrimitive?.normalizedSha256 !== EXPECTED_RISER_PRIMITIVE_SHA ||
+    riserPrimitive?.itemCount !== 24 ||
+    !same(riserPrimitive?.rectPdfPt, { x0: 660.474854, y0: 1116.084595, x1: 660.674561, y1: 1120.94043 }) ||
+    !same(riserPrimitive?.planStationPdfPt, { x: 660.674561, y: 1118.512451 }) ||
+    riserPrimitive?.crossSheetCoordinateResidualPt !== 0 ||
+    riserPrimitive?.fp20AnchorRoundingResidualPt !== 0.000629
+  ) {
+    issues.push(issue('NH_ASBUILT_RISER_CROSS_SHEET_PRIMITIVE_INVALID', 'FP1.0 and FP2.0 must retain the identical 24-segment riser primitive and exact shared pipe endpoint.', 'FP1.0:FP2.0:riser'))
+  }
 
   const transfer = registration?.fp20TransferEvidence
   const anchorNode = planGraph?.nodes?.find((node) => node.id === 'pipe-001-node-01')
@@ -101,6 +117,13 @@ export function evaluateNewHopeSourceFeedAsbuiltRiser(inputs = {}) {
   if (!Number.isFinite(transferAxisResidualPt) || transferAxisResidualPt > 0.001) {
     issues.push(issue('NH_ASBUILT_RISER_SHARED_AXIS_INVALID', 'FP1.0 riser evidence and the FP2.0 source anchor must retain one registered transfer axis.'))
   }
+  const stationToAnchorResidualPt = Math.hypot(
+    (riserPrimitive?.planStationPdfPt?.x ?? Number.NaN) - (transfer?.sourceAnchor?.pdfPt?.x ?? Number.NaN),
+    (riserPrimitive?.planStationPdfPt?.y ?? Number.NaN) - (transfer?.sourceAnchor?.pdfPt?.y ?? Number.NaN),
+  )
+  if (!Number.isFinite(stationToAnchorResidualPt) || stationToAnchorResidualPt > 0.001) {
+    issues.push(issue('NH_ASBUILT_RISER_EXACT_STATION_INVALID', 'The identical cross-sheet riser primitive endpoint must match the FP2.0 source anchor within one-thousandth of a PDF point.'))
+  }
 
   const calcLeg = sourceFeedCalculationChain?.calculationLegs?.find(
     (leg) => leg.node1 === '118' && leg.node2 === '414',
@@ -121,6 +144,12 @@ export function evaluateNewHopeSourceFeedAsbuiltRiser(inputs = {}) {
     ? Math.abs(calcLeg.lengthFt - orthogonalSumFt) * 12
     : Number.NaN
   const decomposition = registration?.calculationDecomposition
+  const pieceMapping = decomposition?.fabricationPieceToCalculationLegMapping
+  const planHorizontalLengthIn = planHorizontalLengthFt * 12
+  const verticalCalculationComponentIn = verticalElevationDeltaFt * 12
+  const calculationPhysicalLengthIn = calcLeg ? calcLeg.lengthFt * 12 : Number.NaN
+  const orthogonalComponentSumIn = orthogonalSumFt * 12
+  const listedCutToPlanCenterlineAdjustmentIn = decomposition?.listedOutletFromPieceStartIn - planHorizontalLengthIn
   if (
     sourceFeedCalculationChain?.status !== 'passed' ||
     calcLeg?.nominalDiameterIn !== 4 ||
@@ -137,19 +166,34 @@ export function evaluateNewHopeSourceFeedAsbuiltRiser(inputs = {}) {
     issues.push(issue('NH_ASBUILT_RISER_ORTHOGONAL_DECOMPOSITION_INVALID', 'The source-bound plan run plus vertical Z change must reconcile to the approved 118-to-414 physical length within one-eighth inch.', '118-414'))
   }
   if (
-    registration?.claims?.exactInstalledRiserPlanStationReady !== false ||
-    registration?.claims?.fabricationPieceToCalculationLegDecompositionReady !== false ||
+    pieceMapping?.pieceId !== 'CML.01' ||
+    pieceMapping?.sourceEdgeId !== 'source-edge-001' ||
+    pieceMapping?.calculationNode1 !== '118' ||
+    pieceMapping?.calculationNode2 !== '414' ||
+    pieceMapping?.horizontalPlanCenterlineLengthIn !== round(planHorizontalLengthIn) ||
+    pieceMapping?.listedStartToOutletCutLengthIn !== decomposition?.listedOutletFromPieceStartIn ||
+    pieceMapping?.listedCutToPlanCenterlineAdjustmentIn !== round(listedCutToPlanCenterlineAdjustmentIn) ||
+    pieceMapping?.verticalCalculationComponentIn !== round(verticalCalculationComponentIn) ||
+    pieceMapping?.calculationPhysicalLengthIn !== round(calculationPhysicalLengthIn) ||
+    pieceMapping?.orthogonalComponentSumIn !== round(orthogonalComponentSumIn) ||
+    pieceMapping?.calculationRoundingResidualIn !== round(calculationLengthResidualIn)
+  ) {
+    issues.push(issue('NH_ASBUILT_RISER_FABRICATION_CALC_MAPPING_INVALID', 'CML.01 source-edge-001 and the exact riser Z component must retain their bounded mapping to hydraulic leg 118-414.', 'CML.01:118-414'))
+  }
+  if (
+    registration?.claims?.exactInstalledRiserPlanStationReady !== true ||
+    registration?.claims?.fabricationPieceToCalculationLegDecompositionReady !== true ||
     registration?.claims?.installedGradeReady !== false ||
     registration?.claims?.sourceFeed3dPathReady !== false ||
     registration?.claims?.fabricationReady !== false ||
     registration?.claims?.fieldReleaseReady !== false
   ) {
-    issues.push(issue('NH_ASBUILT_RISER_FALSE_READINESS_PROMOTION', 'As-built riser identity and calculation decomposition cannot promote exact installed XY, fabrication decomposition, grade, 3D, fabrication, or field release.'))
+    issues.push(issue('NH_ASBUILT_RISER_FALSE_READINESS_PROMOTION', 'Exact station and component mapping cannot promote field-measured grade, exact transition takeout, full 3D, fabrication, or field release.'))
   }
 
   const ready = issues.length === 0
   return {
-    artifactType: 'halofire.new-hope-source-feed-asbuilt-riser-result.v1',
+    artifactType: 'halofire.new-hope-source-feed-asbuilt-riser-result.v2',
     projectId: registration?.projectId,
     status: ready ? 'passed' : 'blocked',
     issues,
@@ -168,14 +212,18 @@ export function evaluateNewHopeSourceFeedAsbuiltRiser(inputs = {}) {
           calculationPhysicalLengthFt: calcLeg.lengthFt,
           calculationLengthResidualIn: round(calculationLengthResidualIn),
           transferAxisResidualPt: round(transferAxisResidualPt),
+          exactRiserPlanStationPdfPt: riserPrimitive.planStationPdfPt,
+          exactRiserPlanStationPlanFt: anchorNode.plan,
+          stationToAnchorResidualPt: round(stationToAnchorResidualPt),
+          fabricationPieceToCalculationLegMapping: pieceMapping,
         }
       : null,
     asBuiltRiserIdentityReady: ready,
     sharedTransferAxisReady: ready,
     orthogonalCalculationDecompositionReady: ready,
     concealedRiserContinuationIdentityReady: ready,
-    exactInstalledRiserPlanStationReady: false,
-    fabricationPieceToCalculationLegDecompositionReady: false,
+    exactInstalledRiserPlanStationReady: ready,
+    fabricationPieceToCalculationLegDecompositionReady: ready,
     installedGradeReady: false,
     sourceFeed3dPathReady: false,
     fabricationReady: false,

@@ -1,0 +1,53 @@
+{
+  "name": "new-hope-exact-riser-station-mapping-20260715",
+  "owner": "codex",
+  "goal": "Bind the identical FP1.0/FP2.0 riser primitive to one exact plan station and map CML.01 source-edge-001 plus the vertical riser component to hydraulic leg 118-414 without promoting exact transition takeout, field-measured grade, complete 3D, fabrication, or field release.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/04-Close-Out Docs/New Hope BGC - Brigham City UT_as builts.pdf",
+    "apps/autosprink/scripts/extract-new-hope-asbuilt-riser-station.py",
+    "apps/autosprink/src/data/new-hope-asbuilt-riser-station-evidence.json",
+    "apps/autosprink/src/data/new-hope-asbuilt-source-feed-riser-registration.json",
+    "apps/autosprink/src/engine/new-hope-source-feed-asbuilt-riser.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js"
+  ],
+  "exit_criteria": [
+    "FP1.0 drawing 53184 and FP2.0 drawing 3511 normalize to the same SHA256 fingerprint",
+    "both 24-segment primitives retain plan endpoint 660.674561 / 1118.512451 PDF points with zero cross-sheet residual",
+    "the exact endpoint matches the rounded FP2 source anchor within 0.001 PDF point",
+    "CML.01 source-edge-001 and the exact vertical calculation component remain mapped to hydraulic leg 118-414",
+    "the orthogonal components plus the 0.086322-inch report-rounding residual equal the approved physical length",
+    "field-measured grade, exact transition takeout, complete 3D, proper layout, fabrication, and field release remain false",
+    "adversarial tests, New Hope suite, syntax checks, browser proof, formal proof, rules, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected as-built PDF identity",
+    "deterministic vector extraction",
+    "cross-sheet primitive fingerprint identity",
+    "exact station-to-source-anchor registration",
+    "CML.01-to-118/414 component mapping",
+    "adversarial source mutations",
+    "actual-PDF browser proof",
+    "Lean invariant receipt",
+    "agent loop guard and agentic rules",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-exact-riser-station-mapping-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-asbuilt-riser-station-evidence.json",
+    "apps/autosprink/src/data/new-hope-asbuilt-source-feed-riser-registration.json",
+    "apps/autosprink/src/engine/new-hope-source-feed-asbuilt-riser.js",
+    "apps/autosprink/tests/new-hope-asbuilt-riser-station-evidence.test.js",
+    "apps/autosprink/tests/new-hope-source-feed-asbuilt-riser.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "data/agent-loops/new-hope-exact-riser-station-mapping-20260715/lean-proof.json",
+    "data/agent-loops/new-hope-exact-riser-station-mapping-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 120000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

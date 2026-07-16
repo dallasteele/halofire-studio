@@ -1,0 +1,55 @@
+{
+  "loop": "new-hope-exact-riser-station-mapping-20260715",
+  "stage": "VERIFY",
+  "status": "exact-riser-station-and-calculation-mapping-verified",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed-via-remote-hal-api",
+    "gateway": "http://192.168.1.76:9000",
+    "topEpisodes": [150555, 150514, 149978, 150048, 150493]
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 150839
+  },
+  "claims": {
+    "exactInstalledRiserPlanStationReady": true,
+    "fabricationPieceToCalculationLegDecompositionReady": true,
+    "installedGradeReady": false,
+    "sourceFeed3dPathReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "asBuiltPdfSha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B",
+    "riserPrimitiveSha256": "DD2882F7742CFAA5FF5E557C8ACFDED8AD257A7A552743A1FE8B93D1B6D93D7D",
+    "riserPrimitiveItemCount": 24,
+    "crossSheetCoordinateResidualPt": 0,
+    "stationToAnchorResidualPt": 0.000629,
+    "planStationPdfPt": { "x": 660.674561, "y": 1118.512451 },
+    "mappedPieceId": "CML.01",
+    "mappedSourceEdgeId": "source-edge-001",
+    "mappedCalculationLeg": "118-414",
+    "calculationRoundingResidualIn": 0.086322,
+    "deterministicEvidenceSha256": "C8ED114459E80A4B0F14259D429CFC845010F0935464BA4E9C8AF997130D43B4",
+    "newHopeTestFiles": 23,
+    "newHopeTestCount": 161,
+    "javascriptAndPythonSyntaxChecks": "passed",
+    "autosprinkProductionBuild": "passed",
+    "leanStatus": "verified",
+    "leanElapsedMs": 390,
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "browser": {
+      "proofReady": true,
+      "sourceFeedConcealedPlanXyReady": true,
+      "sourceFeedFabricationPieceToCalculationLegDecompositionReady": true,
+      "sourceFeedInstalledGradeReady": false,
+      "sourceFeed3dPathReady": false,
+      "properPipeLayoutReady": false,
+      "consoleWarningsOrErrors": 0
+    }
+  },
+  "nextAction": "Use the native FAB/listing and the exact cross-sheet station to recover the source-feed transition takeout and vertical fitting topology, then promote only the resulting as-designed 3D path while keeping field measurement and whole-layout release separate."
+}
