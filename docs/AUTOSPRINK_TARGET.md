@@ -49,6 +49,31 @@ Three license tiers, each unlocks more of the ribbon:
 - **Easy Drop** (Pro) — vertical drop placement with takeout deduction
 - **Sway Brace** (Platinum) — auto-attaches structural bracing per NFPA 13 §18
 
+#### Mandatory proper-pipe-layout contract
+
+Head placement is not a pipe layout. A generated pitched-roof, dry-pipe, or
+multi-elevation design cannot be accepted unless every pipe segment carries and
+visibly proves all of the following on the actual registered drawing underlay:
+
+- connected start/end nodes and fitting ports, with branch, cross-main, feed,
+  riser, arm-over, drop, or drain role;
+- pipe size, material, end preparation, and fitting/takeout-adjusted cut geometry;
+- hydraulic upstream/downstream direction, kept distinct from drainage grade;
+- drainage high/low direction, required grade magnitude, and the source note or
+  rule that establishes it;
+- absolute start/end centerline elevations and the resulting installed slope;
+- low-point/drain destination, with loops and field-routed drains explicitly
+  identified rather than guessed;
+- coordinated plan, elevation/section, and 3D views that agree with the same
+  source-bound pipe graph.
+
+`properPipeLayoutReady` must remain false if any required edge is undirected,
+unconnected, missing endpoint Z, missing fitting adjacency/takeout, lacks a
+drainage destination, conflicts with structure/obstructions, or exists only as
+a generated overlay without the actual PDF/DWG source beneath it. A head-only
+placement score, hydraulic solve, fabrication listing, or visually plausible 3D
+render cannot substitute for this contract.
+
 ### Phase 5 — Hydraulic calc
 - `Hydraulics ▸ Auto Peak` — finds the critical remote area on branch lines
 - `Hydraulics ▸ System Optimizer` — iteratively upsize pipes; live pressure / flow / velocity feedback

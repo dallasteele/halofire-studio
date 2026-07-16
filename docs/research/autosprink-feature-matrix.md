@@ -38,7 +38,7 @@ never lose context across sessions.
 | Multi-angle riser-nipple connections | single-riser per system | **GAP** — multi-angle nipple |
 | Apply pipe schedule to whole system at once | — | **GAP** — schedule cascade tool |
 | 3D pipe/fitting/hanger modeling | GLB via SceneBootstrap + Auto-Design | ✅ parity once SCAD render lands |
-| Slope + elevation control | pipes placed at level elevations | ⚠️ no per-segment slope input |
+| Proper pipe layout: topology + flow direction + drainage grade + endpoint Z + low points | partial source-bound evaluators exist; whole-system release remains fail-closed | **P0 GAP** — every segment must bind hydraulic direction separately from high-to-low drainage direction, grade magnitude, exact endpoint elevations, fitting/takeout geometry, and drain destination on coordinated plan/elevation/3D views |
 | Solid modeling + interference check | — | **GAP** — Platinum-tier feature |
 | Auto-arming around obstructions | — | **GAP** — Platinum-tier feature |
 | Control-area definition | — | **GAP** — Platinum-tier feature |

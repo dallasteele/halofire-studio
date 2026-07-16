@@ -89,7 +89,7 @@ Legend: **HAVE** = real + verified · **PART** = exists but incomplete/shallow �
 | Arm-around obstructions (beams/ducts) | MISS | obstacle-aware routing (arm-over is a single straight leg, not obstacle-aware; arm-AROUND still a stub) | XL | P2 |
 | Easy Drop / Sprig (vertical drops) | HAVE | same drop-connect engine (Phase 2, verified): straight drop + sprig nipple synthesis proven via injected in-line/upright heads, idempotent, camera-neutral. Same generator-coverage residual as arm-over | — | — |
 | Sway brace / hanger insertion | MISS | seismic + support pass | L | P2 |
-| Per-segment slope / elevation | PART | slope input, multi-elevation | M | P2 |
+| Proper per-segment pipe layout | PART | **P0 acceptance blocker:** one source-bound graph must prove connectivity/role, hydraulic flow direction, separate high-to-low drainage direction, grade magnitude, exact start/end centerline Z, fitting/takeout-adjusted geometry, low-point/drain destination, and coordinated plan/elevation/3D agreement. No head-only or flat-level route can promote `properPipeLayoutReady`. | XL | P0 |
 | Apply pipe schedule to whole system | HAVE | NFPA-13 pipe-schedule cascade shipped + verified (Phase 2): flatten-all-to-1″-then-apply re-sized 84 pipes into a real pyramid (riser 8″ ≥ cross-main 3″ ≥ branch ≥ drop 1″) via cumulative downstream-head count, idempotent, undoable, BOM reflects new sizes, camera-neutral. Residual: head-count table method (not hydraulic solve, not AHJ/PE); extra-hazard flagged hydraulicRequired | — | — |
 
 ### G. Sprinkler heads & coverage
