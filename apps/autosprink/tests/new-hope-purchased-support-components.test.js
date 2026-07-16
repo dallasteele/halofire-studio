@@ -29,6 +29,9 @@ describe('New Hope purchased support components', () => {
       exactAssemblyRequiredPartDefinitionCount: 16,
       exactAssemblyRequiredInstalledUnitCount: 977,
       exactAssemblyInstalledInstanceCount: 0,
+      indexedCadCorpusFileCount: 455150,
+      indexedCadCorpusCadFileCount: 1631,
+      indexedCadCorpusExactTargetMatchCount: 0,
     })
     expect(result.purchaseIdentityReady).toBe(true)
     expect(result.manufacturerAuthoredAb2SourceAcquired).toBe(true)
@@ -67,6 +70,8 @@ describe('New Hope purchased support components', () => {
     expect(result.exactAssemblySolidKernelReceiptReady).toBe(false)
     expect(result.exactAssemblySceneCollisionReceiptReady).toBe(false)
     expect(result.exactAssemblyReleaseReady).toBe(false)
+    expect(result.indexedCadCorpusAuditReady).toBe(true)
+    expect(result.manufacturerCadExternalRequestReady).toBe(false)
     expect(result.manufacturerCadCoverageComplete).toBe(false)
     expect(result.exactManufacturerGeometryReady).toBe(false)
     expect(result.exactThreadSolidsReady).toBe(false)
@@ -229,6 +234,30 @@ describe('New Hope purchased support components', () => {
     falseAssemblyRelease.modelingBoundary.exactAssemblyReleaseReady = true
     expect(evaluateNewHopePurchasedSupportComponents(falseAssemblyRelease).blockerCodes).toContain(
       'NH_SUPPORT_MODELING_BOUNDARY_INVALID',
+    )
+
+    const badCorpusDigest = structuredClone(source)
+    badCorpusDigest.indexedCadSourceAudit.databaseSha256 = 'BAD'
+    expect(evaluateNewHopePurchasedSupportComponents(badCorpusDigest).blockerCodes).toContain(
+      'NH_SUPPORT_INDEXED_CAD_SOURCE_AUDIT_INVALID',
+    )
+
+    const genericProxyPromotion = structuredClone(source)
+    genericProxyPromotion.indexedCadSourceAudit.genericProxiesEligibleForExactGeometry = true
+    expect(evaluateNewHopePurchasedSupportComponents(genericProxyPromotion).blockerCodes).toContain(
+      'NH_SUPPORT_INDEXED_CAD_SOURCE_AUDIT_INVALID',
+    )
+
+    const fabricatedCadDownload = structuredClone(source)
+    fabricatedCadDownload.indexedCadSourceAudit.ascConnectedContent.exactCadDownloadedCount = 8
+    expect(evaluateNewHopePurchasedSupportComponents(fabricatedCadDownload).blockerCodes).toContain(
+      'NH_SUPPORT_INDEXED_CAD_SOURCE_AUDIT_INVALID',
+    )
+
+    const unauthorizedRequest = structuredClone(source)
+    unauthorizedRequest.indexedCadSourceAudit.ascConnectedContent.requestSubmitted = true
+    expect(evaluateNewHopePurchasedSupportComponents(unauthorizedRequest).blockerCodes).toContain(
+      'NH_SUPPORT_INDEXED_CAD_SOURCE_AUDIT_INVALID',
     )
   })
 })

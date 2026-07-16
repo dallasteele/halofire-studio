@@ -332,6 +332,32 @@
     "releaseOnCatalogImagesOrGeneratedProxies": false,
     "releaseOnUntrustedCallerFlags": false
   },
+  "indexedCadSourceAudit": {
+    "artifactType": "halofire.new-hope-indexed-support-cad-source-audit.v1",
+    "databasePath": "E:/ClaudeBot/halofire-autobid/db/halofire_bids.db",
+    "databaseByteLength": 444063744,
+    "databaseSha256": "5C2AC127B37D570EDF73F097B1C4EEB1DF338D65F4EF3C8F3046B867C2828546",
+    "indexedFileCount": 455150,
+    "cadFileCounts": { ".dwg": 1526, ".dxf": 1, ".ifc": 3, ".rfa": 8, ".rvt": 92, ".stp": 1 },
+    "exactTargetFilenameOrPathMatchCount": 0,
+    "genericProxyCatalogRowCount": 18,
+    "genericProxiesEligibleForExactGeometry": false,
+    "queryReceiptSha256": "90942136B10470713116CFF57CBD6BB491DA2B5064F21F8310A81704037A05ED",
+    "ascConnectedContent": {
+      "officialLibraryUrl": "https://www.asc-es.com/asc-connected-content",
+      "multiCadRequestUrl": "https://bim-catalog.asc-es.com/rfc?name=bim-cad-content-library",
+      "advertisedThreeDimensionalFormats": ["STEP AP214", "STEP AP203", "DXF", "IGES", "SAT 7.0", "SAT 3.0", "VRML", "VDAFS", "Revit Family"],
+      "quoteProductNumbersSearched": ["0502005710", "0502005708", "0502005712", "0502000410", "0502000408", "0502000414", "0500604541", "0502000830"],
+      "liveMultiCadMatchCount": 0,
+      "requestRequiresEmail": true,
+      "externalRequestAuthorized": false,
+      "requestSubmitted": false,
+      "exactCadDownloadedCount": 0
+    },
+    "exactManufacturerCadCoverageReady": false,
+    "odaInspectionReady": false,
+    "solidKernelConversionReady": false
+  },
   "modelingBoundary": {
     "purchaseIdentityReady": true,
     "genericSupportSubstitutionAllowed": false,
@@ -363,6 +389,8 @@
     "exactAssemblySolidKernelReceiptReady": false,
     "exactAssemblySceneCollisionReceiptReady": false,
     "exactAssemblyReleaseReady": false,
+    "indexedCadCorpusAuditReady": true,
+    "manufacturerCadExternalRequestReady": false,
     "manufacturerCadCoverageComplete": false,
     "fullyDimensionedManufacturingDrawingsAcquired": false,
     "exactThreadSolidsReady": false,

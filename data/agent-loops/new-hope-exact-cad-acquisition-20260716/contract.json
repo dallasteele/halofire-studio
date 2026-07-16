@@ -1,0 +1,42 @@
+{
+  "name": "new-hope-exact-cad-acquisition-20260716",
+  "owner": "codex",
+  "goal": "Search the indexed HaloFire corpus and current manufacturer download surfaces for exact New Hope support CAD, reject generic proxies, and produce a reproducible acquisition boundary before solid-kernel inspection.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/halofire-autobid/db/halofire_bids.db",
+    "apps/autosprink/scripts/audit-new-hope-support-cad-corpus.mjs",
+    "apps/autosprink/src/data/new-hope-purchased-support-components.json",
+    "https://www.asc-es.com/asc-connected-content",
+    "https://bim-catalog.asc-es.com/rfc?name=bim-cad-content-library",
+    "https://fastening-solutions.itwbuildex.com/viewitems/sammys-threaded-rod-anchors-3-8-/sammys-3-8-horizontal-threaded-rod-anchor"
+  ],
+  "exit_criteria": [
+    "the authoritative bid database hash, size, indexed-file count, CAD extension counts, and query receipt are reproducible",
+    "all sixteen New Hope support product identities are searched without a full Egnyte filesystem crawl",
+    "generic catalog SCAD rows remain ineligible for exact manufacturer geometry",
+    "current ASC MultiCAD format availability and exact quote-product lookup results are recorded",
+    "no email request, manufacturer download, ODA inspection, or exact-solid claim is fabricated",
+    "focused tests, New Hope regression tests, build, loop guard, and rules verifier pass"
+  ],
+  "verification_gates": [
+    "npm run audit:new-hope-support-cad in apps/autosprink",
+    "npx vitest run apps/autosprink/tests/new-hope-purchased-support-components.test.js",
+    "npx vitest run new-hope",
+    "npm run build in apps/autosprink",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/new-hope-exact-cad-acquisition-20260716/contract.json",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/new-hope-exact-cad-acquisition-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/scripts/audit-new-hope-support-cad-corpus.mjs",
+    "apps/autosprink/src/data/new-hope-purchased-support-components.json",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/new-hope-exact-cad-acquisition-20260716/state.json"
+  ],
+  "max_iterations": 4,
+  "max_tokens": 120000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

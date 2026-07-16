@@ -201,6 +201,28 @@ const EXPECTED_EXACT_ASSEMBLY_BLOCKERS = Object.freeze([
   'EXACT_ASSEMBLY_SOLID_KERNEL_RECEIPT_MISSING',
   'EXACT_ASSEMBLY_SCENE_COLLISION_RECEIPT_MISSING',
 ])
+const EXPECTED_CAD_CORPUS_DATABASE_SHA =
+  '5C2AC127B37D570EDF73F097B1C4EEB1DF338D65F4EF3C8F3046B867C2828546'
+const EXPECTED_CAD_CORPUS_QUERY_RECEIPT_SHA =
+  '90942136B10470713116CFF57CBD6BB491DA2B5064F21F8310A81704037A05ED'
+const EXPECTED_CAD_FILE_COUNTS = Object.freeze({
+  '.dwg': 1526,
+  '.dxf': 1,
+  '.ifc': 3,
+  '.rfa': 8,
+  '.rvt': 92,
+  '.stp': 1,
+})
+const EXPECTED_ASC_CAD_TARGETS = Object.freeze([
+  '0502005710',
+  '0502005708',
+  '0502005712',
+  '0502000410',
+  '0502000408',
+  '0502000414',
+  '0500604541',
+  '0502000830',
+])
 
 const issue = (code, message, entityId = null) => ({
   severity: 'blocking',
@@ -738,6 +760,42 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     ))
   }
 
+  const cadAudit = source.indexedCadSourceAudit
+  const ascCadAudit = cadAudit?.ascConnectedContent
+  const indexedCadCorpusAuditReady = (
+    cadAudit?.artifactType === 'halofire.new-hope-indexed-support-cad-source-audit.v1' &&
+    cadAudit?.databasePath === 'E:/ClaudeBot/halofire-autobid/db/halofire_bids.db' &&
+    cadAudit?.databaseByteLength === 444063744 &&
+    cadAudit?.databaseSha256 === EXPECTED_CAD_CORPUS_DATABASE_SHA &&
+    cadAudit?.indexedFileCount === 455150 &&
+    JSON.stringify(cadAudit?.cadFileCounts) === JSON.stringify(EXPECTED_CAD_FILE_COUNTS) &&
+    cadAudit?.exactTargetFilenameOrPathMatchCount === 0 &&
+    cadAudit?.genericProxyCatalogRowCount === 18 &&
+    cadAudit?.genericProxiesEligibleForExactGeometry === false &&
+    cadAudit?.queryReceiptSha256 === EXPECTED_CAD_CORPUS_QUERY_RECEIPT_SHA &&
+    ascCadAudit?.officialLibraryUrl === 'https://www.asc-es.com/asc-connected-content' &&
+    ascCadAudit?.multiCadRequestUrl ===
+      'https://bim-catalog.asc-es.com/rfc?name=bim-cad-content-library' &&
+    JSON.stringify(ascCadAudit?.advertisedThreeDimensionalFormats) ===
+      JSON.stringify(['STEP AP214', 'STEP AP203', 'DXF', 'IGES', 'SAT 7.0', 'SAT 3.0', 'VRML', 'VDAFS', 'Revit Family']) &&
+    JSON.stringify(ascCadAudit?.quoteProductNumbersSearched) ===
+      JSON.stringify(EXPECTED_ASC_CAD_TARGETS) &&
+    ascCadAudit?.liveMultiCadMatchCount === 0 &&
+    ascCadAudit?.requestRequiresEmail === true &&
+    ascCadAudit?.externalRequestAuthorized === false &&
+    ascCadAudit?.requestSubmitted === false &&
+    ascCadAudit?.exactCadDownloadedCount === 0 &&
+    cadAudit?.exactManufacturerCadCoverageReady === false &&
+    cadAudit?.odaInspectionReady === false &&
+    cadAudit?.solidKernelConversionReady === false
+  )
+  if (!indexedCadCorpusAuditReady) {
+    issues.push(issue(
+      'NH_SUPPORT_INDEXED_CAD_SOURCE_AUDIT_INVALID',
+      'The 455,150-file indexed corpus and current ASC MultiCAD source audit must stay hash-bound and fail closed until exact manufacturer CAD is acquired.',
+    ))
+  }
+
   const boundary = source.modelingBoundary
   if (
     boundary?.purchaseIdentityReady !== true ||
@@ -770,6 +828,8 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     boundary?.exactAssemblySolidKernelReceiptReady !== false ||
     boundary?.exactAssemblySceneCollisionReceiptReady !== false ||
     boundary?.exactAssemblyReleaseReady !== false ||
+    boundary?.indexedCadCorpusAuditReady !== true ||
+    boundary?.manufacturerCadExternalRequestReady !== false ||
     boundary?.manufacturerCadCoverageComplete !== false ||
     boundary?.fullyDimensionedManufacturingDrawingsAcquired !== false ||
     boundary?.exactThreadSolidsReady !== false ||
@@ -826,6 +886,13 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
       exactAssemblyInstalledInstanceCount: purchaseReady
         ? exactAssemblyFit.metrics.installedInstanceCount
         : 0,
+      indexedCadCorpusFileCount: purchaseReady ? cadAudit.indexedFileCount : 0,
+      indexedCadCorpusCadFileCount: purchaseReady
+        ? Object.values(cadAudit.cadFileCounts).reduce((sum, count) => sum + count, 0)
+        : 0,
+      indexedCadCorpusExactTargetMatchCount: purchaseReady
+        ? cadAudit.exactTargetFilenameOrPathMatchCount
+        : 0,
     },
     purchaseIdentityReady: purchaseReady,
     manufacturerAuthoredAb2SourceAcquired: purchaseReady,
@@ -857,6 +924,8 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     exactAssemblySolidKernelReceiptReady: false,
     exactAssemblySceneCollisionReceiptReady: false,
     exactAssemblyReleaseReady: false,
+    indexedCadCorpusAuditReady: purchaseReady && indexedCadCorpusAuditReady,
+    manufacturerCadExternalRequestReady: false,
     manufacturerCadCoverageComplete: false,
     exactManufacturerGeometryReady: false,
     exactThreadSolidsReady: false,

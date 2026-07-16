@@ -1,0 +1,38 @@
+{
+  "loop": "new-hope-exact-cad-acquisition-20260716",
+  "stage": "VERIFY",
+  "status": "indexed-search-complete-manufacturer-request-pending",
+  "iteration": 2,
+  "evidence": {
+    "indexedCorpus": {
+      "databaseSha256": "5C2AC127B37D570EDF73F097B1C4EEB1DF338D65F4EF3C8F3046B867C2828546",
+      "databaseByteLength": 444063744,
+      "indexedFileCount": 455150,
+      "cadFileCount": 1631,
+      "exactTargetFilenameOrPathMatchCount": 0,
+      "genericProxyCatalogRowCount": 18,
+      "queryReceiptSha256": "90942136B10470713116CFF57CBD6BB491DA2B5064F21F8310A81704037A05ED"
+    },
+    "ascConnectedContent": {
+      "advertisedThreeDimensionalFormats": ["STEP AP214", "STEP AP203", "DXF", "IGES", "SAT 7.0", "SAT 3.0", "VRML", "VDAFS", "Revit Family"],
+      "quoteProductNumberSearchCount": 8,
+      "liveMultiCadMatchCount": 0,
+      "requestRequiresEmail": true,
+      "requestSubmitted": false,
+      "exactCadDownloadedCount": 0
+    }
+  },
+  "verification": {
+    "corpusAudit": "passed; database hash and query receipt reproduced",
+    "focusedTests": "1 file / 2 tests passed",
+    "newHopeRegression": "27 files / 174 tests passed",
+    "autosprinkBuild": "passed",
+    "loopGuard": "passed",
+    "rules": "passed",
+    "brainPostflight": {
+      "endpoint": "canonical hal-brain /remember",
+      "episodeId": 151912
+    }
+  },
+  "nextAction": "Obtain explicit authorization and the email address to use for ASC's MultiCAD request, or acquire the exact manufacturer files through another official channel; then hash, inspect, convert, and fit-check the resulting solids."
+}
