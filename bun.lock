@@ -60,6 +60,7 @@
         "@tauri-apps/plugin-dialog": "^2",
         "@tauri-apps/plugin-fs": "^2",
         "@tauri-apps/plugin-shell": "^2",
+        "editor": "workspace:*",
       },
       "devDependencies": {
         "@tauri-apps/cli": "^2",

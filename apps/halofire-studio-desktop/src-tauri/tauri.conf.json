@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "identifier": "com.halofire.studio",
   "build": {
-    "beforeDevCommand": "cd ../../editor && bun run dev",
-    "beforeBuildCommand": "cd ../../editor && bun run build && bun run export",
+    "beforeDevCommand": "cd ../editor && bun run dev",
+    "beforeBuildCommand": "cd ../editor && bun run export",
     "devUrl": "http://localhost:3002",
     "frontendDist": "../../editor/out"
   },
