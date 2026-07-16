@@ -173,6 +173,7 @@ const DILLON_DWG_SOURCE_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-
 const DILLON_FLOOR_MODEL_PATH = path.resolve(__dirname, '../data/dillon-floor-by-floor-model.json');
 const DILLON_COMPLETED_BID_GEOMETRY_PATH = path.resolve(__dirname, '../data/dillon-completed-bid-geometry.json');
 const DILLON_VERTICAL_REGISTRATION_PATH = path.resolve(__dirname, '../data/dillon-vertical-registration.json');
+const DILLON_RCP_VECTOR_FACE_REGISTRY_PATH = path.resolve(__dirname, '../data/dillon-rcp-vector-face-registry.json');
 const DILLON_STRUCTURAL_ROOF_SOURCE_PATH = path.resolve(__dirname, '../data/dillon-structural-framing-roof-source.json');
 const REGER_FLORES_BOX_BEAM_CALIBRATION_PATH = path.resolve(__dirname, '../data/reger-flores-box-beam-calibration.json');
 const SAGEWOOD_PITCHED_ATTIC_CALIBRATION_PATH = path.resolve(__dirname, '../data/sagewood-pitched-attic-calibration.json');
@@ -3091,11 +3092,12 @@ app.get('/api/projects/:name/vertical-registration', authMiddleware, async (req,
     const sourceGeometry = JSON.parse(fs.readFileSync(DILLON_DWG_SOURCE_GEOMETRY_PATH, 'utf8'));
     const bidGeometry = JSON.parse(fs.readFileSync(DILLON_COMPLETED_BID_GEOMETRY_PATH, 'utf8'));
     const slopedCalibration = JSON.parse(fs.readFileSync(DILLON_SLOPED_CALIBRATION_PATH, 'utf8'));
+    const rcpFaceRegistry = JSON.parse(fs.readFileSync(DILLON_RCP_VECTOR_FACE_REGISTRY_PATH, 'utf8'));
     const packet = JSON.parse(fs.readFileSync(DILLON_VERTICAL_REGISTRATION_PATH, 'utf8'));
-    const validation = await validateDillonVerticalRegistration(packet, { sourceGeometry, bidGeometry, floorModel, slopedCalibration });
+    const validation = await validateDillonVerticalRegistration(packet, { sourceGeometry, bidGeometry, floorModel, slopedCalibration, rcpFaceRegistry });
     if (validation.status !== 'passed') return res.status(422).json(validation);
     const model3d = buildDillonVerticalModel(validation); const elevationView = renderDillonVerticalElevationView(model3d);
-    return res.json({ status: 'passed', artifactType: 'halofire.autobid-partial-vertical-registration.v1', projectName: req.params.name, receiptSha256: packet.receiptSha256, counts: validation.counts, sheets: packet.sheets, model3d, elevationView, complete: false, geometryGrounded: true, complianceReady: false, approvalReady: false, limitations: packet.limitations, claimStatus: packet.claimStatus });
+    return res.json({ status: 'passed', artifactType: 'halofire.autobid-partial-vertical-registration.v2', projectName: req.params.name, receiptSha256: packet.receiptSha256, rcpVectorFaceRegistry: { receiptSha256: rcpFaceRegistry.receiptSha256, counts: rcpFaceRegistry.counts, generationPolicy: rcpFaceRegistry.generationPolicy }, counts: validation.counts, sheets: packet.sheets, model3d, elevationView, complete: false, geometryGrounded: true, complianceReady: false, approvalReady: false, limitations: packet.limitations, claimStatus: packet.claimStatus });
   } catch (error) {
     log.error('Failed to load Dillon vertical registration', { error: error.message });
     return res.status(500).json({ status: 'blocked', error: 'vertical_registration_load_failed', complianceReady: false });

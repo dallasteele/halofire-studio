@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sha256Hex } from '../src/engine/elevation-datums.js';
 import { buildDillonSourceRoomRegistry, dillonSourceRoomRegistryPacket } from '../src/engine/dillon-source-room-registry.js';
+import { dillonRcpFaceContainsSegment, locateDillonRcpVectorFace } from '../src/engine/dillon-rcp-vector-face-registry.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -10,6 +11,7 @@ const bid = read(path.join(root, 'src/data/dillon-completed-bid-geometry.json'))
 const floorModel = read(path.join(root, 'src/data/dillon-floor-by-floor-model.json'));
 const sourceGeometry = read(path.join(root, 'src/data/dillon-dwg-source-geometry.json'));
 const slope = read(path.join(root, 'src/data/submitted-sloped-ceiling-calibration.dillon.json'));
+const rcpFaceRegistry = read(path.join(root, 'src/data/dillon-rcp-vector-face-registry.json'));
 const temp = path.join(root, 'tmp/pdfs/dillon-roof-calibration');
 const analyses = { 'FP-1': read(path.join(temp, 'fp-1-ceiling-analysis.json')), 'FP-2': read(path.join(temp, 'fp-2-ceiling-analysis.json')) };
 const round = (value) => Number(value.toFixed(5));
@@ -39,6 +41,8 @@ for (const sheet of bid.sheets) {
 }
 function assignmentForPoint(sheetId, point) {
   if (sheetId === 'FP-1' && inside(point, protectedPolygonDwgFt)) return { method: 'sealed-3:12-source-plane', annotationId: protectedRegion.annotationId, surfaceKind: 'sloped-ceiling', heightAboveFloorFt: slopeHeightAtDwg(point), sourceDistanceFt: 0 };
+  const face = locateDillonRcpVectorFace(rcpFaceRegistry, sheetId, point).face;
+  if (face) return { method: 'sealed-source-rcp-vector-face', sourceFaceId: face.id, annotationId: face.annotationIds[0], surfaceKind: face.surfaceKind, heightAboveFloorFt: face.heightAboveFloorFt };
   const location = roomRegistries.get(sheetId)?.locate(point);
   if (!location?.room?.surfaceResolved) return null;
   const annotationId = location.room.annotationIds[0]; const annotation = annotationMap.get(annotationId);
@@ -58,8 +62,10 @@ const sheets = bid.sheets.map((sheet) => {
   });
   const pipeAssignments = sheet.pipeSegments.map((pipe) => {
     const endpoints = pipe.planDwgFt.map((point) => assignmentForPoint(sheet.id, point));
-    if (endpoints.every(Boolean) && ((endpoints[0].roomCellId && endpoints[0].roomCellId === endpoints[1].roomCellId && endpoints[0].heightAboveFloorFt === endpoints[1].heightAboveFloorFt) || endpoints.every((entry) => entry.method === 'sealed-3:12-source-plane'))) {
-      return { pipeId: pipe.id, planDwgFt: pipe.planDwgFt, endpointMethods: endpoints.map((entry) => entry.method), endpointAnnotationIds: endpoints.map((entry) => entry.annotationId), ...(endpoints[0].roomCellId ? { endpointRoomCellIds: endpoints.map((entry) => entry.roomCellId) } : {}), heightAboveFloorFt: endpoints.map((entry) => entry.heightAboveFloorFt), modelElevationsFt: endpoints.map((entry) => round(level.modelElevationFt + entry.heightAboveFloorFt)), siteProjectElevationsFt: endpoints.map((entry) => round(level.projectFloorElevationFt + entry.heightAboveFloorFt)), status: 'source-assigned' };
+    const face = endpoints[0]?.sourceFaceId ? rcpFaceRegistry.sheets.find((entry) => entry.sheetId === sheet.id)?.faces.find((entry) => entry.id === endpoints[0].sourceFaceId) : null;
+    const sameFace = face && endpoints[0].sourceFaceId === endpoints[1]?.sourceFaceId && dillonRcpFaceContainsSegment(face, pipe.planDwgFt[0], pipe.planDwgFt[1]);
+    if (endpoints.every(Boolean) && ((endpoints[0].roomCellId && endpoints[0].roomCellId === endpoints[1].roomCellId && endpoints[0].heightAboveFloorFt === endpoints[1].heightAboveFloorFt) || sameFace || endpoints.every((entry) => entry.method === 'sealed-3:12-source-plane'))) {
+      return { pipeId: pipe.id, planDwgFt: pipe.planDwgFt, endpointMethods: endpoints.map((entry) => entry.method), endpointAnnotationIds: endpoints.map((entry) => entry.annotationId), ...(endpoints[0].roomCellId ? { endpointRoomCellIds: endpoints.map((entry) => entry.roomCellId) } : {}), ...(endpoints[0].sourceFaceId ? { endpointSourceFaceIds: endpoints.map((entry) => entry.sourceFaceId) } : {}), heightAboveFloorFt: endpoints.map((entry) => entry.heightAboveFloorFt), modelElevationsFt: endpoints.map((entry) => round(level.modelElevationFt + entry.heightAboveFloorFt)), siteProjectElevationsFt: endpoints.map((entry) => round(level.projectFloorElevationFt + entry.heightAboveFloorFt)), status: 'source-assigned' };
     }
     return { pipeId: pipe.id, planDwgFt: pipe.planDwgFt, status: 'unresolved' };
   });
@@ -68,10 +74,10 @@ const sheets = bid.sheets.map((sheet) => {
 const assignedHeads = sheets.reduce((n, sheet) => n + sheet.headAssignments.filter((entry) => entry.status === 'source-assigned').length, 0);
 const assignedPipes = sheets.reduce((n, sheet) => n + sheet.pipeAssignments.filter((entry) => entry.status === 'source-assigned').length, 0);
 const draft = {
-  artifactType: 'halofire.dillon-vertical-registration.v2', projectName: 'Dillon Residence', sourceGeometrySha256: await sha256Hex(sourceGeometry), completedBidGeometryReceiptSha256: bid.receiptSha256, floorModelReceiptSha256: floorModel.receiptSha256, slopedCalibrationReceiptSha256: slope.evidenceReceiptSha256,
+  artifactType: 'halofire.dillon-vertical-registration.v3', projectName: 'Dillon Residence', sourceGeometrySha256: await sha256Hex(sourceGeometry), completedBidGeometryReceiptSha256: bid.receiptSha256, floorModelReceiptSha256: floorModel.receiptSha256, slopedCalibrationReceiptSha256: slope.evidenceReceiptSha256, rcpVectorFaceRegistryReceiptSha256: rcpFaceRegistry.receiptSha256,
   sheets, counts: { totalHeads: 76, sourceAssignedHeads: assignedHeads, unresolvedHeads: 76 - assignedHeads, totalPipeSegments: 67, sourceAssignedPipeSegments: assignedPipes, unresolvedPipeSegments: 67 - assignedPipes },
   complete: false, geometryGrounded: true, complianceReady: false, approvalReady: false,
-  limitations: ['Only a sealed source-room cell or the sealed 3:12 source plane assigns Z; annotation proximity alone is rejected.', 'Exterior-connected, mixed-surface, or annotation-free cells and every element outside them remain unresolved.', 'Ceiling-surface elevation is not a manufacturer deflector-offset or fabrication elevation.', 'The missing FP-1 scheduled head remains unresolved.'],
+  limitations: ['Only a sealed single-surface source-RCP vector face, sealed source-room cell, or the sealed 3:12 source plane assigns Z; annotation proximity alone is rejected.', 'Exterior-connected, mixed-surface, annotation-free, face-crossing, and every element outside the sealed zones remain unresolved.', 'Ceiling-surface elevation is not a manufacturer deflector-offset or fabrication elevation.', 'The missing FP-1 scheduled head remains unresolved.'],
   claimStatus: 'partial-source-bound-vertical-registration-not-code-compliance-or-fabrication',
 };
 const packet = { ...draft, receiptSha256: await sha256Hex(draft) };

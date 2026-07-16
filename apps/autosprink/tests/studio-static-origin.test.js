@@ -728,7 +728,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('no cross-sheet substitution');
     expect(html).toContain('/api/projects/Dillon%20Residence/vertical-registration');
     expect(html).toContain('/api/projects/Dillon%20Residence/structural-roof-surfaces');
-    expect(html).toContain('annotation proximity and default flat-roof heights are rejected');
+    expect(html).toContain('annotation proximity, face-crossing pipe shortcuts, and default flat-roof heights are rejected');
+    expect(html).toContain('architectural RCP vector face');
+    expect(html).toContain('/src/data/proofs/dillon-rcp-vector-faces/index.html');
     expect(html).toContain('verticalGeometry.model3d.heads.forEach');
     expect(html).toContain('verticalGeometry.model3d.pipes.forEach');
     expect(html).toContain('protected-head node identity, compliance, and approval remain fail-closed');

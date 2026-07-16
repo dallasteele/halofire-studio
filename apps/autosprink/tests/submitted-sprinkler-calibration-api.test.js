@@ -251,9 +251,10 @@ describe('AutoBid submitted sprinkler calibration API', () => {
     expect(response.status).toBe(200);
     const result = await response.json();
     expect(result.status).toBe('passed');
-    expect(result.counts).toEqual({ totalHeads: 76, sourceAssignedHeads: 5, unresolvedHeads: 71, totalPipeSegments: 67, sourceAssignedPipeSegments: 3, unresolvedPipeSegments: 64 });
-    expect(result.model3d.heads).toHaveLength(5);
-    expect(result.model3d.pipes).toHaveLength(3);
+    expect(result.counts).toEqual({ totalHeads: 76, sourceAssignedHeads: 34, unresolvedHeads: 42, totalPipeSegments: 67, sourceAssignedPipeSegments: 11, unresolvedPipeSegments: 56 });
+    expect(result.model3d.heads).toHaveLength(34);
+    expect(result.model3d.pipes).toHaveLength(11);
+    expect(result.rcpVectorFaceRegistry.counts).toEqual({ totalVectorFaces: 386, annotatedFaces: 42, singleSurfaceFaces: 37, mixedSurfaceFaces: 5 });
     expect(result.limitations.join(' ')).toContain('annotation proximity alone is rejected');
     expect(result.elevationView.svg).toContain('unresolved elements are omitted');
     expect(result.complete).toBe(false);

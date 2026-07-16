@@ -268,10 +268,12 @@ describe('AutoBid spatial review live browser boundary', () => {
       await page.locator('#spatialRecall0').fill('0.95');
       await page.locator('#spatialPhantoms0').fill('0');
       await page.locator('#spatialNote0').fill('Synthetic copied-DB browser smoke after all eight overlays decoded.');
-      await Promise.all([
-        page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
+      const [reviewResponse] = await Promise.all([
+        page.waitForResponse((response) => response.url().endsWith('/api/autobid/package/9/spatial-review') && response.request().method() === 'POST'),
         accepts.first().click(),
       ]);
+      const reviewResponseText = await reviewResponse.text();
+      expect(reviewResponse.ok(), `${reviewResponse.status()} ${reviewResponseText}`).toBe(true);
 
       const manifest = (await api('/api/autobid/package/9', setup.token)).spatial_verification;
       expect(manifest.plates).toHaveLength(8);
