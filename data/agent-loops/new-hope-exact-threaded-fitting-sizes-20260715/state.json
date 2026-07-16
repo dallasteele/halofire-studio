@@ -1,0 +1,46 @@
+{
+  "loop": "new-hope-exact-threaded-fitting-sizes-20260715",
+  "stage": "VERIFY",
+  "status": "exact-threaded-fitting-size-verification-passed",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed-via-remote-hal-api",
+    "gateway": "http://192.168.1.76:9000"
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 150791
+  },
+  "claims": {
+    "exactThreadedFittingSizesReady": true,
+    "interPieceFittingTopologyReady": false,
+    "completeVerticalOffsetScheduleReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "listingSha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734",
+    "threadedDefinitionCount": 99,
+    "oneInchCount": 61,
+    "oneByHalfCount": 16,
+    "oneByThreeQuarterCount": 20,
+    "noFittingCount": 2,
+    "deterministicArtifactSha256": "6CB517547B0996AE8F7F1F4752909F2E84B56AA5D932D2C796FE4AEF9591F649",
+    "newHopeTestCount": 156,
+    "javascriptSyntaxChecks": "passed",
+    "leanStatus": "verified",
+    "leanElapsedMs": 112,
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "browser": {
+      "proofReady": true,
+      "directedCanonicalEdges": "143/143",
+      "exactThreadedFittingSizesReady": true,
+      "interPieceFittingTopologyReady": false,
+      "completeVerticalOffsetScheduleReady": false,
+      "properPipeLayoutReady": false
+    }
+  },
+  "nextAction": "Resolve the exact below-attic riser station and fabrication-piece-to-calculation mapping, then close inter-piece fitting topology and the complete vertical-offset schedule without promoting field-routed drains."
+}

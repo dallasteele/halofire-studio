@@ -1,9 +1,9 @@
 """Extract the New Hope listed pipe-end schedule from the approved AutoSPRINK PDF.
 
-This intentionally extracts only evidence that the PDF text layer represents
-losslessly: piece identity, page, end preparation, and fitting family. Embedded
-fraction glyphs in the Crystal Reports font are not promoted to exact fitting
-sizes by this script.
+The embedded Arial subset maps fraction bytes to U+00BC/U+00BD/U+00BE in its
+ToUnicode CMap. Some Windows terminals render those code points with a
+replacement-shaped glyph, but the underlying Unicode is exact. This extractor
+therefore parses and validates the exact nominal fitting ports as numbers.
 """
 
 from __future__ import annotations
@@ -20,6 +20,7 @@ from pypdf import PdfReader
 
 PROJECT_ID = "new-hope-crisis-center-brigham-city-ut"
 EXPECTED_SHA256 = "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734"
+FRACTION_VALUES = {"¼": 0.25, "½": 0.5, "¾": 0.75}
 
 
 def fitting_family(text: str) -> str:
@@ -38,6 +39,37 @@ def fitting_family(text: str) -> str:
     if "Reducer" in text:
         return "threaded-reducer"
     return "unclassified"
+
+
+def nominal_size_value(token: str) -> float:
+    token = token.strip()
+    if token in FRACTION_VALUES:
+        return FRACTION_VALUES[token]
+    if token and token[-1] in FRACTION_VALUES:
+        return int(token[:-1]) + FRACTION_VALUES[token[-1]]
+    return float(int(token))
+
+
+def exact_fitting_ports(text: str, family: str) -> tuple[str | None, list[float]]:
+    if family == "no-fitting":
+        if text.strip() != "No Fitting":
+            raise ValueError(f"unexpected no-fitting text: {text}")
+        return None, []
+    size_match = re.match(
+        r"^((?:\d+[¼½¾]?|[¼½¾])(?:\s+x\s+(?:\d+[¼½¾]?|[¼½¾])){0,2})\s+Threaded",
+        text,
+    )
+    if not size_match:
+        raise ValueError(f"threaded fitting lacks exact nominal size: {text}")
+    size_text = size_match.group(1)
+    sizes = [nominal_size_value(token) for token in re.split(r"\s+x\s+", size_text)]
+    if family == "threaded-straight-tee" and len(sizes) == 1:
+        sizes *= 3
+    elif family == "threaded-90-elbow" and len(sizes) == 1:
+        sizes *= 2
+    elif family in {"threaded-reducer", "threaded-90-reducing-elbow"} and len(sizes) != 2:
+        raise ValueError(f"reducing fitting lacks two exact nominal ports: {text}")
+    return size_text, sizes
 
 
 def parse(source: Path) -> dict:
@@ -111,6 +143,8 @@ def parse(source: Path) -> dict:
             family = fitting_family(body[end_prep.end() :])
             if family == "unclassified":
                 raise ValueError(f"unclassified threaded fitting: {body}")
+            fitting_text = body[end_prep.end() :]
+            fitting_size_text, nominal_port_sizes_in = exact_fitting_ports(fitting_text, family)
             threaded_pieces.append(
                 {
                     "pieceId": f"{current_line}.{int(row.group(1)):02d}",
@@ -119,7 +153,10 @@ def parse(source: Path) -> dict:
                     "physicalPage": page_number,
                     "endPreparation": [end_prep.group(1), end_prep.group(2)],
                     "endFittingFamily": family,
-                    "exactFittingSizeReady": False,
+                    "endFittingText": fitting_text,
+                    "fittingSizeText": fitting_size_text,
+                    "nominalPortSizesIn": nominal_port_sizes_in,
+                    "exactFittingSizeReady": True,
                 }
             )
 
@@ -133,7 +170,7 @@ def parse(source: Path) -> dict:
 
     threaded_end_preps = Counter("-".join(piece["endPreparation"]) for piece in threaded_pieces)
     return {
-        "artifactType": "halofire.new-hope-fabrication-end-schedule.v1",
+        "artifactType": "halofire.new-hope-fabrication-end-schedule.v2",
         "projectId": PROJECT_ID,
         "source": {
             "role": "approved-autosprink-fabrication-listing",
@@ -159,6 +196,13 @@ def parse(source: Path) -> dict:
             "threadedPieceCountsByLine": count_by(threaded_pieces, "lineName"),
             "threadedEndPreparationCounts": dict(sorted(threaded_end_preps.items())),
             "threadedFittingFamilyCounts": count_by(threaded_pieces, "endFittingFamily"),
+            "threadedFittingSizeCounts": dict(
+                sorted(
+                    Counter(
+                        piece["fittingSizeText"] or "none" for piece in threaded_pieces
+                    ).items()
+                )
+            ),
         },
         "weldedPieces": welded_pieces,
         "threadedPieces": threaded_pieces,
@@ -167,7 +211,7 @@ def parse(source: Path) -> dict:
             "allListedPieceEndPreparationsReady": True,
             "allWeldedEndFittingFamiliesReady": True,
             "allThreadedEndFittingFamiliesReady": True,
-            "exactThreadedFittingSizesReady": False,
+            "exactThreadedFittingSizesReady": True,
             "interPieceFittingTopologyReady": False,
             "verticalOffsetScheduleReady": False,
             "completeFittingScheduleReady": False,
@@ -175,8 +219,9 @@ def parse(source: Path) -> dict:
             "fieldReleaseReady": False,
         },
         "extractionBoundary": {
-            "embeddedFractionGlyphsLossless": False,
-            "note": "The PDF text layer does not losslessly expose embedded fraction glyphs; exact threaded fitting sizes and installed geometry remain fail-closed.",
+            "embeddedFractionGlyphsLossless": True,
+            "fractionCodePoints": {"¼": "U+00BC", "½": "U+00BD", "¾": "U+00BE"},
+            "note": "The embedded font ToUnicode CMap exposes exact fraction code points. Terminal glyph appearance is not used as evidence; numeric nominal ports are parsed from Unicode values.",
         },
     }
 

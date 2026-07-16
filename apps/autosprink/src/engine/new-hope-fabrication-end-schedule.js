@@ -1,8 +1,8 @@
 /**
  * Validates complete listed pipe-end coverage for the approved New Hope
- * AutoSPRINK fabrication report. Installed inter-piece topology, exact
- * threaded fitting sizes, vertical offsets, and field geometry remain outside
- * this bounded evidence claim.
+ * AutoSPRINK fabrication report. Exact threaded fitting sizes are recovered
+ * from the PDF's lossless Unicode fractions. Installed inter-piece topology,
+ * vertical offsets, and field geometry remain outside this bounded claim.
  */
 
 const EXPECTED_PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut'
@@ -34,6 +34,12 @@ const EXPECTED_FAMILY_COUNTS = Object.freeze({
   'threaded-90-reducing-elbow': 6,
   'threaded-reducer': 30,
   'threaded-straight-tee': 4,
+})
+const EXPECTED_SIZE_COUNTS = Object.freeze({
+  '1': 61,
+  '1 x \u00bd': 16,
+  '1 x \u00be': 20,
+  none: 2,
 })
 
 const issue = (code, message, entityId = null) => ({ severity: 'blocking', code, message, entityId })
@@ -72,6 +78,9 @@ export function evaluateNewHopeFabricationEndSchedule(schedule = {}) {
 
   if (schedule.projectId !== EXPECTED_PROJECT_ID) {
     issues.push(issue('NH_FAB_END_PROJECT_IDENTITY_INVALID', 'The end schedule must identify New Hope.'))
+  }
+  if (schedule.artifactType !== 'halofire.new-hope-fabrication-end-schedule.v2') {
+    issues.push(issue('NH_FAB_END_ARTIFACT_VERSION_INVALID', 'The exact-size schedule must use the v2 evidence contract.'))
   }
   if (
     schedule.source?.sha256 !== EXPECTED_SOURCE_SHA ||
@@ -112,25 +121,50 @@ export function evaluateNewHopeFabricationEndSchedule(schedule = {}) {
   ) {
     issues.push(issue('NH_FAB_END_THREADED_SCHEDULE_INVALID', 'All 99 threaded definitions must retain exact identity, quantity, T-T/T-G preparation, and fitting family.'))
   }
+  const threadedSizesValid =
+    same(schedule.coverage?.threadedFittingSizeCounts, EXPECTED_SIZE_COUNTS) &&
+    threaded.every((piece) => {
+      if (piece.exactFittingSizeReady !== true) return false
+      if (piece.endFittingFamily === 'no-fitting') {
+        return piece.endFittingText === 'No Fitting' && piece.fittingSizeText === null && same(piece.nominalPortSizesIn, [])
+      }
+      if (piece.endFittingFamily === 'threaded-90-elbow') {
+        return piece.fittingSizeText === '1' && same(piece.nominalPortSizesIn, [1, 1])
+      }
+      if (piece.endFittingFamily === 'threaded-straight-tee') {
+        return piece.fittingSizeText === '1' && same(piece.nominalPortSizesIn, [1, 1, 1])
+      }
+      if (piece.endFittingFamily === 'threaded-reducer' || piece.endFittingFamily === 'threaded-90-reducing-elbow') {
+        return (
+          (piece.fittingSizeText === '1 x \u00bd' && same(piece.nominalPortSizesIn, [1, 0.5])) ||
+          (piece.fittingSizeText === '1 x \u00be' && same(piece.nominalPortSizesIn, [1, 0.75]))
+        )
+      }
+      return false
+    }) &&
+    schedule.extractionBoundary?.embeddedFractionGlyphsLossless === true &&
+    same(schedule.extractionBoundary?.fractionCodePoints, { '\u00bc': 'U+00BC', '\u00bd': 'U+00BD', '\u00be': 'U+00BE' })
+  if (!threadedSizesValid) {
+    issues.push(issue('NH_FAB_END_THREADED_SIZES_INVALID', 'All 99 threaded definitions must retain their exact Unicode fraction, size text, and family-specific nominal port cardinality.'))
+  }
   if (
     schedule.claims?.allListedPieceIdentitiesReady !== true ||
     schedule.claims?.allListedPieceEndPreparationsReady !== true ||
     schedule.claims?.allWeldedEndFittingFamiliesReady !== true ||
     schedule.claims?.allThreadedEndFittingFamiliesReady !== true ||
-    schedule.claims?.exactThreadedFittingSizesReady !== false ||
+    schedule.claims?.exactThreadedFittingSizesReady !== true ||
     schedule.claims?.interPieceFittingTopologyReady !== false ||
     schedule.claims?.verticalOffsetScheduleReady !== false ||
     schedule.claims?.completeFittingScheduleReady !== false ||
     schedule.claims?.fabricationReady !== false ||
-    schedule.claims?.fieldReleaseReady !== false ||
-    schedule.extractionBoundary?.embeddedFractionGlyphsLossless !== false
+    schedule.claims?.fieldReleaseReady !== false
   ) {
-    issues.push(issue('NH_FAB_END_FALSE_READINESS_PROMOTION', 'Listed end coverage cannot promote exact fitting sizes, inter-piece topology, vertical offsets, fabrication, or field release.'))
+    issues.push(issue('NH_FAB_END_FALSE_READINESS_PROMOTION', 'Exact listed fitting sizes cannot promote inter-piece topology, vertical offsets, fabrication, or field release.'))
   }
 
   const ready = issues.length === 0
   return {
-    artifactType: 'halofire.new-hope-fabrication-end-schedule-result.v1',
+    artifactType: 'halofire.new-hope-fabrication-end-schedule-result.v2',
     projectId: schedule.projectId,
     status: ready ? 'passed' : 'blocked',
     issues,
@@ -141,7 +175,7 @@ export function evaluateNewHopeFabricationEndSchedule(schedule = {}) {
     allListedPieceEndPreparationsReady: ready,
     allWeldedEndFittingFamiliesReady: ready,
     allThreadedEndFittingFamiliesReady: ready,
-    exactThreadedFittingSizesReady: false,
+    exactThreadedFittingSizesReady: ready && threadedSizesValid,
     interPieceFittingTopologyReady: false,
     verticalOffsetScheduleReady: false,
     completeFittingScheduleReady: false,

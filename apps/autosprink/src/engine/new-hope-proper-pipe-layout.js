@@ -403,7 +403,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',
-      'The approved listing now closes all 257 pipe-piece identities and end preparations across 264 fabricated units (158 welded definitions with G-G / No Fitting ends and 99 threaded definitions with T-T/T-G fitting families). Exact threaded fitting sizes, inter-piece topology, and the complete vertical-offset schedule remain unresolved.',
+      'The approved listing now closes all 257 pipe-piece identities and end preparations across 264 fabricated units, including exact threaded fitting sizes (61 one-inch, 16 one-by-half, 20 one-by-three-quarter, and 2 No Fitting records). Inter-piece topology and the complete vertical-offset schedule remain unresolved.',
     ),
   ]
   const ready = issues.length === 0
@@ -662,7 +662,8 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ready &&
       fabricationEndSchedule?.allWeldedEndFittingFamiliesReady === true &&
       fabricationEndSchedule?.allThreadedEndFittingFamiliesReady === true,
-    exactThreadedFittingSizesReady: false,
+    exactThreadedFittingSizesReady:
+      ready && fabricationEndSchedule?.exactThreadedFittingSizesReady === true,
     interPieceFittingTopologyReady: false,
     completeVerticalOffsetScheduleReady: false,
     sourceFeedEndpointElevationsReady:

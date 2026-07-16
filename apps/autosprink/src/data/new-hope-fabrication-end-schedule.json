@@ -1,5 +1,5 @@
 {
-  "artifactType": "halofire.new-hope-fabrication-end-schedule.v1",
+  "artifactType": "halofire.new-hope-fabrication-end-schedule.v2",
   "projectId": "new-hope-crisis-center-brigham-city-ut",
   "source": {
     "role": "approved-autosprink-fabrication-listing",
@@ -135,6 +135,12 @@
       "threaded-90-reducing-elbow": 6,
       "threaded-reducer": 30,
       "threaded-straight-tee": 4
+    },
+    "threadedFittingSizeCounts": {
+      "1": 61,
+      "1 x \u00bd": 16,
+      "1 x \u00be": 20,
+      "none": 2
     }
   },
   "weldedPieces": [
@@ -2520,7 +2526,14 @@
         "T"
       ],
       "endFittingFamily": "threaded-straight-tee",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded Straight Tee, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL02.04",
@@ -2532,7 +2545,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL03.03",
@@ -2544,7 +2563,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL03.04",
@@ -2556,7 +2581,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL03.05",
@@ -2568,7 +2599,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL03.06",
@@ -2580,7 +2617,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL03.07",
@@ -2592,7 +2635,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL03.08",
@@ -2604,7 +2653,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL04.03",
@@ -2616,7 +2671,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL04.04",
@@ -2628,7 +2689,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL04.05",
@@ -2640,7 +2707,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL04.06",
@@ -2652,7 +2725,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL04.07",
@@ -2664,7 +2743,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL04.08",
@@ -2676,7 +2761,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL04.09",
@@ -2688,7 +2779,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL04.10",
@@ -2700,7 +2797,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL05.03",
@@ -2712,7 +2815,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL05.04",
@@ -2724,7 +2833,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL05.05",
@@ -2736,7 +2851,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL05.06",
@@ -2748,7 +2869,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL06.04",
@@ -2760,7 +2887,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL06.05",
@@ -2772,7 +2905,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL06.06",
@@ -2784,7 +2923,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL07.03",
@@ -2796,7 +2941,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL07.04",
@@ -2808,7 +2959,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL07.05",
@@ -2820,7 +2977,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL07.06",
@@ -2832,7 +2995,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL07.07",
@@ -2844,7 +3013,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL07.08",
@@ -2856,7 +3031,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL08.02",
@@ -2868,7 +3049,14 @@
         "T"
       ],
       "endFittingFamily": "threaded-straight-tee",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded Straight Tee, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL09.03",
@@ -2880,7 +3068,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL09.04",
@@ -2892,7 +3086,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL09.05",
@@ -2904,7 +3104,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL11.03",
@@ -2916,7 +3122,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL12.02",
@@ -2928,7 +3140,14 @@
         "T"
       ],
       "endFittingFamily": "threaded-straight-tee",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded Straight Tee, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL13.03",
@@ -2940,7 +3159,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL13.04",
@@ -2952,7 +3177,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL13.05",
@@ -2964,7 +3195,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL13.06",
@@ -2976,7 +3213,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL13.07",
@@ -2988,7 +3231,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL14.03",
@@ -3000,7 +3249,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL17.03",
@@ -3012,7 +3267,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL18.03",
@@ -3024,7 +3285,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL18.04",
@@ -3036,7 +3303,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL19.03",
@@ -3048,7 +3321,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL22.02",
@@ -3060,7 +3339,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL23.02",
@@ -3072,7 +3357,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL29.03",
@@ -3084,7 +3375,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL31.03",
@@ -3096,7 +3393,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL32.02",
@@ -3108,7 +3411,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL40.02",
@@ -3120,7 +3429,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL41.02",
@@ -3132,7 +3447,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL48.08",
@@ -3144,7 +3465,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-reducing-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded, 90\u00ba Reducing Elbow, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL48.09",
@@ -3156,7 +3483,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-reducing-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded, 90\u00ba Reducing Elbow, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL49.07",
@@ -3168,7 +3501,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-reducing-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded, 90\u00ba Reducing Elbow, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "BL49.08",
@@ -3180,7 +3519,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-reducing-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00bd Threaded, 90\u00ba Reducing Elbow, DI",
+      "fittingSizeText": "1 x \u00bd",
+      "nominalPortSizesIn": [
+        1.0,
+        0.5
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMA.08",
@@ -3192,7 +3537,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMA.09",
@@ -3204,7 +3555,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMA.10",
@@ -3216,7 +3573,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMA.11",
@@ -3228,7 +3591,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMA.12",
@@ -3240,7 +3609,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMA.13",
@@ -3252,7 +3627,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMB.10",
@@ -3264,7 +3645,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMB.11",
@@ -3276,7 +3663,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMB.12",
@@ -3288,7 +3681,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMB.13",
@@ -3300,7 +3699,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMB.14",
@@ -3312,7 +3717,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMC.16",
@@ -3324,7 +3735,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMC.17",
@@ -3336,7 +3753,14 @@
         "T"
       ],
       "endFittingFamily": "threaded-straight-tee",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded Straight Tee, DI(Bull Head)",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMC.18",
@@ -3348,7 +3772,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMC.19",
@@ -3360,7 +3790,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMD.01",
@@ -3372,7 +3808,10 @@
         "T"
       ],
       "endFittingFamily": "no-fitting",
-      "exactFittingSizeReady": false
+      "endFittingText": "No Fitting",
+      "fittingSizeText": null,
+      "nominalPortSizesIn": [],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CME.01",
@@ -3384,7 +3823,10 @@
         "G"
       ],
       "endFittingFamily": "no-fitting",
-      "exactFittingSizeReady": false
+      "endFittingText": "No Fitting",
+      "fittingSizeText": null,
+      "nominalPortSizesIn": [],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMH.08",
@@ -3396,7 +3838,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-reducing-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded, 90\u00ba Reducing Elbow, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMH.09",
@@ -3408,7 +3856,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMH.10",
@@ -3420,7 +3874,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.23",
@@ -3432,7 +3892,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.24",
@@ -3444,7 +3910,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.25",
@@ -3456,7 +3928,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.26",
@@ -3468,7 +3946,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.27",
@@ -3480,7 +3964,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.28",
@@ -3492,7 +3982,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.29",
@@ -3504,7 +4000,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.30",
@@ -3516,7 +4018,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.31",
@@ -3528,7 +4036,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.32",
@@ -3540,7 +4054,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.33",
@@ -3552,7 +4072,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.34",
@@ -3564,7 +4090,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.35",
@@ -3576,7 +4108,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.36",
@@ -3588,7 +4126,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.37",
@@ -3600,7 +4144,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.38",
@@ -3612,7 +4162,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.39",
@@ -3624,7 +4180,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.40",
@@ -3636,7 +4198,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.41",
@@ -3648,7 +4216,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMI.42",
@@ -3660,7 +4234,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMJ.08",
@@ -3672,7 +4252,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-reducing-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded, 90\u00ba Reducing Elbow, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMJ.09",
@@ -3684,7 +4270,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-90-elbow",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 Threaded, 90\u00b0 Elbow, DI",
+      "fittingSizeText": "1",
+      "nominalPortSizesIn": [
+        1.0,
+        1.0
+      ],
+      "exactFittingSizeReady": true
     },
     {
       "pieceId": "CMJ.10",
@@ -3696,7 +4288,13 @@
         "T"
       ],
       "endFittingFamily": "threaded-reducer",
-      "exactFittingSizeReady": false
+      "endFittingText": "1 x \u00be Threaded Reducer, DI",
+      "fittingSizeText": "1 x \u00be",
+      "nominalPortSizesIn": [
+        1.0,
+        0.75
+      ],
+      "exactFittingSizeReady": true
     }
   ],
   "claims": {
@@ -3704,7 +4302,7 @@
     "allListedPieceEndPreparationsReady": true,
     "allWeldedEndFittingFamiliesReady": true,
     "allThreadedEndFittingFamiliesReady": true,
-    "exactThreadedFittingSizesReady": false,
+    "exactThreadedFittingSizesReady": true,
     "interPieceFittingTopologyReady": false,
     "verticalOffsetScheduleReady": false,
     "completeFittingScheduleReady": false,
@@ -3712,7 +4310,12 @@
     "fieldReleaseReady": false
   },
   "extractionBoundary": {
-    "embeddedFractionGlyphsLossless": false,
-    "note": "The PDF text layer does not losslessly expose embedded fraction glyphs; exact threaded fitting sizes and installed geometry remain fail-closed."
+    "embeddedFractionGlyphsLossless": true,
+    "fractionCodePoints": {
+      "\u00bc": "U+00BC",
+      "\u00bd": "U+00BD",
+      "\u00be": "U+00BE"
+    },
+    "note": "The embedded font ToUnicode CMap exposes exact fraction code points. Terminal glyph appearance is not used as evidence; numeric nominal ports are parsed from Unicode values."
   }
 }

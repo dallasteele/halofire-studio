@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-exact-threaded-fitting-sizes-20260715/lean-request.json",
+  "theoremNames": [
+    "exactThreadedDefinitionPartition",
+    "fittingFamilyPartition",
+    "exactSizesDoNotPromoteLayout"
+  ],
+  "claim": "The exact size and fitting-family partitions each cover all 99 threaded definitions, while exact sizes cannot promote unresolved inter-piece topology, vertical offsets, proper layout, fabrication, or field release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 112,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

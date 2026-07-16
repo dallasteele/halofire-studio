@@ -209,7 +209,7 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.allListedPieceIdentitiesReady).toBe(true)
     expect(result.allListedPieceEndPreparationsReady).toBe(true)
     expect(result.allListedEndFittingFamiliesReady).toBe(true)
-    expect(result.exactThreadedFittingSizesReady).toBe(false)
+    expect(result.exactThreadedFittingSizesReady).toBe(true)
     expect(result.interPieceFittingTopologyReady).toBe(false)
     expect(result.completeVerticalOffsetScheduleReady).toBe(false)
     expect(result.sourceFeedEndpointElevationsReady).toBe(true)

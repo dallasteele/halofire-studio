@@ -7,7 +7,7 @@ const schedule = JSON.parse(
 )
 
 describe('New Hope complete listed pipe-end schedule', () => {
-  it('binds every listed pipe definition and unit without promoting installed geometry', () => {
+  it('binds every listed pipe definition, end, and exact threaded size without promoting installed geometry', () => {
     const result = evaluateNewHopeFabricationEndSchedule(schedule)
     expect(result.status).toBe('passed')
     expect(result.coverage).toMatchObject({
@@ -18,11 +18,12 @@ describe('New Hope complete listed pipe-end schedule', () => {
       totalListedPipePieceDefinitionCount: 257,
       totalFabricatedPipeUnitCount: 264,
       threadedEndPreparationCounts: { 'T-G': 1, 'T-T': 98 },
+      threadedFittingSizeCounts: { '1': 61, '1 x \u00bd': 16, '1 x \u00be': 20, none: 2 },
     })
     expect(result.allListedPieceEndPreparationsReady).toBe(true)
     expect(result.allWeldedEndFittingFamiliesReady).toBe(true)
     expect(result.allThreadedEndFittingFamiliesReady).toBe(true)
-    expect(result.exactThreadedFittingSizesReady).toBe(false)
+    expect(result.exactThreadedFittingSizesReady).toBe(true)
     expect(result.interPieceFittingTopologyReady).toBe(false)
     expect(result.verticalOffsetScheduleReady).toBe(false)
     expect(result.completeFittingScheduleReady).toBe(false)
@@ -36,7 +37,12 @@ describe('New Hope complete listed pipe-end schedule', () => {
     ['welded end prep', (copy) => { copy.weldedPieces[0].endPreparation = ['T', 'G'] }, 'NH_FAB_END_WELDED_SCHEDULE_INVALID'],
     ['threaded fitting family', (copy) => { copy.threadedPieces[0].endFittingFamily = 'no-fitting' }, 'NH_FAB_END_THREADED_SCHEDULE_INVALID'],
     ['threaded quantity', (copy) => { copy.threadedPieces[0].quantity = 2 }, 'NH_FAB_END_THREADED_SCHEDULE_INVALID'],
-    ['false fitting size', (copy) => { copy.claims.exactThreadedFittingSizesReady = true }, 'NH_FAB_END_FALSE_READINESS_PROMOTION'],
+    ['half-inch fraction drift', (copy) => { const piece = copy.threadedPieces.find((entry) => entry.fittingSizeText === '1 x \u00bd'); piece.fittingSizeText = '1 x \u00be' }, 'NH_FAB_END_THREADED_SIZES_INVALID'],
+    ['three-quarter port drift', (copy) => { const piece = copy.threadedPieces.find((entry) => entry.fittingSizeText === '1 x \u00be'); piece.nominalPortSizesIn = [1, 0.5] }, 'NH_FAB_END_THREADED_SIZES_INVALID'],
+    ['tee port cardinality', (copy) => { const piece = copy.threadedPieces.find((entry) => entry.endFittingFamily === 'threaded-straight-tee'); piece.nominalPortSizesIn = [1, 1] }, 'NH_FAB_END_THREADED_SIZES_INVALID'],
+    ['size coverage drift', (copy) => { copy.coverage.threadedFittingSizeCounts['1 x \u00bd'] = 15 }, 'NH_FAB_END_THREADED_SIZES_INVALID'],
+    ['fraction boundary', (copy) => { copy.extractionBoundary.embeddedFractionGlyphsLossless = false }, 'NH_FAB_END_THREADED_SIZES_INVALID'],
+    ['false fitting size demotion', (copy) => { copy.claims.exactThreadedFittingSizesReady = false }, 'NH_FAB_END_FALSE_READINESS_PROMOTION'],
     ['false vertical offsets', (copy) => { copy.claims.verticalOffsetScheduleReady = true }, 'NH_FAB_END_FALSE_READINESS_PROMOTION'],
     ['false release', (copy) => { copy.claims.fieldReleaseReady = true }, 'NH_FAB_END_FALSE_READINESS_PROMOTION'],
   ]

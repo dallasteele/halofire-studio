@@ -1,0 +1,49 @@
+{
+  "name": "new-hope-exact-threaded-fitting-sizes-20260715",
+  "owner": "codex",
+  "goal": "Recover and validate every exact threaded fitting size from the approved New Hope AutoSPRINK listing without promoting unresolved installed topology, vertical offsets, fabrication, or field release.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
+    "apps/autosprink/scripts/extract-new-hope-fabrication-end-schedule.py",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/engine/new-hope-fabrication-end-schedule.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js"
+  ],
+  "exit_criteria": [
+    "all 99 threaded definitions retain exact fitting-family and nominal-port cardinality",
+    "size counts remain 61 one-inch, 16 one-by-half, 20 one-by-three-quarter, and 2 No Fitting",
+    "the embedded U+00BC, U+00BD, and U+00BE mapping remains explicit and lossless",
+    "inter-piece topology, complete vertical offsets, proper layout, fabrication, and field release remain false",
+    "adversarial tests, New Hope suite, syntax checks, browser proof, formal proof, rules, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected listing identity",
+    "deterministic extraction",
+    "exact fraction and numeric-port preservation",
+    "family-specific port cardinality",
+    "adversarial source mutations",
+    "actual-PDF browser proof",
+    "Lean invariant receipt",
+    "agent loop guard and agentic rules",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-exact-threaded-fitting-sizes-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/engine/new-hope-fabrication-end-schedule.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js",
+    "apps/autosprink/tests/new-hope-fabrication-end-schedule.test.js",
+    "apps/autosprink/tests/new-hope-proper-pipe-layout.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "data/agent-loops/new-hope-exact-threaded-fitting-sizes-20260715/lean-proof.json",
+    "data/agent-loops/new-hope-exact-threaded-fitting-sizes-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 120000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
