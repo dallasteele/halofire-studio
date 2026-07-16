@@ -19,6 +19,7 @@ import { evaluateNewHopeProperPipeLayout } from '../../../engine/new-hope-proper
 import { evaluateNewHopeSourceFeedFabrication } from '../../../engine/new-hope-source-feed-fabrication.js';
 import { evaluateNewHopeSourceFeedCalculationChain } from '../../../engine/new-hope-source-feed-calculation-chain.js';
 import { evaluateNewHopeSourceFeedAsbuiltRiser } from '../../../engine/new-hope-source-feed-asbuilt-riser.js';
+import { evaluateNewHopeFabricationEndSchedule } from '../../../engine/new-hope-fabrication-end-schedule.js';
 import { evaluateNewHopeLowPointFabrication } from '../../../engine/new-hope-low-point-fabrication.js';
 import { evaluateNewHopeCmi05Cmi08Fabrication } from '../../../engine/new-hope-cmi05-cmi08-fabrication.js';
 import { evaluateNewHopeCmi06VerticalOutlet } from '../../../engine/new-hope-cmi06-vertical-outlet.js';
@@ -39,6 +40,7 @@ const atticSourceUrl = '../../new-hope-attic-specific-application-source.json';
 const atticCalibrationUrl = '../../new-hope-attic-specific-application-calibration.json';
 const answerEvidenceUrl = '../../new-hope-pitched-holdout-answer-evidence.json';
 const sourceFeedAsbuiltRiserUrl = '../../new-hope-asbuilt-source-feed-riser-registration.json';
+const fabricationEndScheduleUrl = '../../new-hope-fabrication-end-schedule.json';
 const svg = document.querySelector('#structural-overlay');
 const pipeSvg = document.querySelector('#fp20-pipe-overlay');
 const gradeProfileSvg = document.querySelector('#bounded-grade-profile');
@@ -58,7 +60,7 @@ function element(name, attributes = {}) {
 }
 
 try {
-  const [response, sourceResponse, pipeVectorResponse, planGraphResponse, operationalResponse, hydraulicRoute21Response, hydraulicRoute22Response, hydraulicRoute23Response, architecturalSourceResponse, elevationDatumResponse, atticSourceResponse, atticCalibrationResponse, answerEvidenceResponse, sourceFeedAsbuiltRiserResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl), fetch(operationalAnnotationsUrl), fetch(hydraulicRoute21Url), fetch(hydraulicRoute22Url), fetch(hydraulicRoute23Url), fetch(architecturalSourceUrl), fetch(elevationDatumUrl), fetch(atticSourceUrl), fetch(atticCalibrationUrl), fetch(answerEvidenceUrl), fetch(sourceFeedAsbuiltRiserUrl)]);
+  const [response, sourceResponse, pipeVectorResponse, planGraphResponse, operationalResponse, hydraulicRoute21Response, hydraulicRoute22Response, hydraulicRoute23Response, architecturalSourceResponse, elevationDatumResponse, atticSourceResponse, atticCalibrationResponse, answerEvidenceResponse, sourceFeedAsbuiltRiserResponse, fabricationEndScheduleResponse] = await Promise.all([fetch(calibrationUrl), fetch(sourceUrl), fetch(pipeVectorUrl), fetch(planGraphUrl), fetch(operationalAnnotationsUrl), fetch(hydraulicRoute21Url), fetch(hydraulicRoute22Url), fetch(hydraulicRoute23Url), fetch(architecturalSourceUrl), fetch(elevationDatumUrl), fetch(atticSourceUrl), fetch(atticCalibrationUrl), fetch(answerEvidenceUrl), fetch(sourceFeedAsbuiltRiserUrl), fetch(fabricationEndScheduleUrl)]);
   if (!response.ok) throw new Error(`calibration fetch ${response.status}`);
   if (!sourceResponse.ok) throw new Error(`source fetch ${sourceResponse.status}`);
   if (!pipeVectorResponse.ok) throw new Error(`pipe vector fetch ${pipeVectorResponse.status}`);
@@ -73,7 +75,8 @@ try {
   if (!atticCalibrationResponse.ok) throw new Error(`attic calibration fetch ${atticCalibrationResponse.status}`);
   if (!answerEvidenceResponse.ok) throw new Error(`answer evidence fetch ${answerEvidenceResponse.status}`);
   if (!sourceFeedAsbuiltRiserResponse.ok) throw new Error(`source-feed as-built riser fetch ${sourceFeedAsbuiltRiserResponse.status}`);
-  const [calibration, source, pipeVectors, planGraph, operationalAnnotations, hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence, architecturalSource, elevationDatumSource, atticSource, atticCalibration, answerEvidence, sourceFeedAsbuiltRiserRegistration] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json(), operationalResponse.json(), hydraulicRoute21Response.json(), hydraulicRoute22Response.json(), hydraulicRoute23Response.json(), architecturalSourceResponse.json(), elevationDatumResponse.json(), atticSourceResponse.json(), atticCalibrationResponse.json(), answerEvidenceResponse.json(), sourceFeedAsbuiltRiserResponse.json()]);
+  if (!fabricationEndScheduleResponse.ok) throw new Error(`fabrication end schedule fetch ${fabricationEndScheduleResponse.status}`);
+  const [calibration, source, pipeVectors, planGraph, operationalAnnotations, hydraulicRoute21Evidence, hydraulicRoute22Evidence, hydraulicRoute23Evidence, architecturalSource, elevationDatumSource, atticSource, atticCalibration, answerEvidence, sourceFeedAsbuiltRiserRegistration, fabricationEndScheduleSource] = await Promise.all([response.json(), sourceResponse.json(), pipeVectorResponse.json(), planGraphResponse.json(), operationalResponse.json(), hydraulicRoute21Response.json(), hydraulicRoute22Response.json(), hydraulicRoute23Response.json(), architecturalSourceResponse.json(), elevationDatumResponse.json(), atticSourceResponse.json(), atticCalibrationResponse.json(), answerEvidenceResponse.json(), sourceFeedAsbuiltRiserResponse.json(), fabricationEndScheduleResponse.json()]);
   const scale = 1.5;
   const branchY = 430;
 
@@ -134,6 +137,8 @@ try {
     sourceFeedCalculationChain,
   });
   if (!sourceFeedAsbuiltRiser.orthogonalCalculationDecompositionReady) throw new Error(`source-feed as-built riser: ${sourceFeedAsbuiltRiser.blockerCodes.join(', ')}`);
+  const fabricationEndSchedule = evaluateNewHopeFabricationEndSchedule(fabricationEndScheduleSource);
+  if (!fabricationEndSchedule.allListedPieceEndPreparationsReady) throw new Error(`complete listed pipe-end schedule: ${fabricationEndSchedule.blockerCodes.join(', ')}`);
   const lowPointFabrication = evaluateNewHopeLowPointFabrication({
     canonicalTopology,
     governedSkeleton,
@@ -217,6 +222,7 @@ try {
     sourceFeedFabrication,
     sourceFeedCalculationChain,
     sourceFeedAsbuiltRiser,
+    fabricationEndSchedule,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -601,7 +607,7 @@ try {
   document.querySelector('#cross-main-grade-proof-status').textContent = `PASS: 35-node / 34-edge cross-main tree, including fabricated CMK.01-.03, directed from three high points toward low-point-01, low-point-04, and the riser return`;
   document.querySelector('#central-branch-grade-proof-status').textContent = `PASS: BL48/BL49 23-node / 23-edge branch component; eight-edge BL49 loop graded on both arms toward CMK; false BL48/CMI crossing kept separated; 4 attached arm-overs source-bound`;
   document.querySelector('#arm-over-grade-proof-status').textContent = `PASS: all 12 threaded terminal arm-overs bound to exact source edges, sprinklers, carrier roles, cut-length groups, and explicit drainage catchments`;
-  document.querySelector('#proper-pipe-layout-proof-status').textContent = `AUDITED: ${properPipeLayout.metrics.directedEdgeCount}/${properPipeLayout.metrics.canonicalEdgeCount} edges direction-bound; ${properPipeLayout.metrics.exactElevationPortCount} exact Z ports on ${properPipeLayout.metrics.exactElevationCanonicalNodeCount}/${properPipeLayout.metrics.canonicalNodeCount} nodes; datum 100'-0\" registered across ${elevationDatum.metrics.distinctRoofRidgeElevationCount} roof regions; proper layout remains blocked`;
+  document.querySelector('#proper-pipe-layout-proof-status').textContent = `AUDITED: ${properPipeLayout.metrics.directedEdgeCount}/${properPipeLayout.metrics.canonicalEdgeCount} edges direction-bound; ${properPipeLayout.metrics.exactElevationPortCount} exact Z ports on ${properPipeLayout.metrics.exactElevationCanonicalNodeCount}/${properPipeLayout.metrics.canonicalNodeCount} nodes; ${properPipeLayout.metrics.listedPipePieceDefinitionCount} listed definitions / ${properPipeLayout.metrics.listedFabricatedPipeUnitCount} units end-prep-bound; proper layout remains blocked`;
   document.querySelector('#source-feed-fabrication-status').textContent = `PASS: CML.01 4-inch x 2'-11½\" plan piece + 4 x 3 upward outlet + node 118 at 11.5 ft; endpoint Z, installed grade, and concealed riser continuation remain blocked`;
   document.querySelector('#low-point-fabrication-status').textContent = `PASS: CMI.09 field/listing piece starts at low-point-01; source-edge-054 is node 059 high to node 054 low with ${lowPointFabrication.directedEdge.requiredDropIn.toFixed(6)} in minimum fall; equal 18.375-ft calc labels do not claim exact differential Z`;
   document.querySelector('#source-feed-fabrication-status').textContent = `PASS: CML.01 + node 118 at 11.5 ft, BOR node 414 at 5.458 ft, and DPV/BV/BFP chain; concealed XY, fabrication-to-calculation decomposition, and installed grade remain blocked`;
@@ -632,6 +638,7 @@ try {
   document.querySelector('#machine-acceptance-boundary').textContent += ` | cmi05PieceFabricationReady=${properPipeLayout.cmi05PieceFabricationReady} | cmi05OutletScheduleReady=${properPipeLayout.cmi05OutletScheduleReady} | cmi05SeparatedCrossingReady=${properPipeLayout.cmi05SeparatedCrossingReady} | cmi07PieceFabricationReady=${properPipeLayout.cmi07PieceFabricationReady} | cmi07OutletScheduleReady=${properPipeLayout.cmi07OutletScheduleReady} | cmi07ArmOverTerminalBindingReady=${properPipeLayout.cmi07ArmOverTerminalBindingReady} | cmi08PieceFabricationReady=${properPipeLayout.cmi08PieceFabricationReady} | cmi08NoOutletScheduleReady=${properPipeLayout.cmi08NoOutletScheduleReady} | cmi07Cmi08JunctionReady=${properPipeLayout.cmi07Cmi08JunctionReady} | cmi05Cmi08BoundedFittingScheduleReady=${properPipeLayout.cmi05Cmi08BoundedFittingScheduleReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | sourceFeedCalculationChainReady=${properPipeLayout.sourceFeedCalculationChainReady} | sourceFeedBaseOfRiserEndpointZReady=${properPipeLayout.sourceFeedBaseOfRiserEndpointZReady} | sourceFeedDryPipeValveIdentityReady=${properPipeLayout.sourceFeedDryPipeValveIdentityReady} | sourceFeedDownstreamValveBackflowElevationChainReady=${properPipeLayout.sourceFeedDownstreamValveBackflowElevationChainReady} | sourceFeedConcealedPlanXyReady=${properPipeLayout.sourceFeedConcealedPlanXyReady} | sourceFeedFabricationPieceToCalculationLegDecompositionReady=${properPipeLayout.sourceFeedFabricationPieceToCalculationLegDecompositionReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | sourceFeedAsBuiltRiserIdentityReady=${properPipeLayout.sourceFeedAsBuiltRiserIdentityReady} | sourceFeedSharedTransferAxisReady=${properPipeLayout.sourceFeedSharedTransferAxisReady} | sourceFeedOrthogonalCalculationDecompositionReady=${properPipeLayout.sourceFeedOrthogonalCalculationDecompositionReady} | sourceFeedConcealedRiserContinuationIdentityReady=${properPipeLayout.sourceFeedConcealedRiserContinuationIdentityReady}`;
+  document.querySelector('#machine-acceptance-boundary').textContent += ` | allListedPieceIdentitiesReady=${properPipeLayout.allListedPieceIdentitiesReady} | allListedPieceEndPreparationsReady=${properPipeLayout.allListedPieceEndPreparationsReady} | allListedEndFittingFamiliesReady=${properPipeLayout.allListedEndFittingFamiliesReady} | exactThreadedFittingSizesReady=${properPipeLayout.exactThreadedFittingSizesReady} | interPieceFittingTopologyReady=${properPipeLayout.interPieceFittingTopologyReady} | completeVerticalOffsetScheduleReady=${properPipeLayout.completeVerticalOffsetScheduleReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | cmi06PieceFabricationReady=${properPipeLayout.cmi06PieceFabricationReady} | cmi06OutletScheduleReady=${properPipeLayout.cmi06OutletScheduleReady} | cmi06BranchOutletReady=${properPipeLayout.cmi06BranchOutletReady} | head057OutletFittingReady=${properPipeLayout.head057OutletFittingReady} | head057VerticalLegReady=${properPipeLayout.head057VerticalLegReady} | head057ExactCarrierZReady=${properPipeLayout.head057ExactCarrierZReady} | head057ExactSprinklerZReady=${properPipeLayout.head057ExactSprinklerZReady} | boundedVerticalOffsetScheduleReady=${properPipeLayout.boundedVerticalOffsetScheduleReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | cmiRidgeEightPieceFabricationReady=${properPipeLayout.cmiRidgeEightPieceFabricationReady} | cmiRidgeTwentyOneOutletScheduleReady=${properPipeLayout.cmiRidgeTwentyOneOutletScheduleReady} | cmiRidgeTwentySprinklerOutletIdentityReady=${properPipeLayout.cmiRidgeTwentySprinklerOutletIdentityReady} | cmi13RemoteInspectorTestOutletReady=${properPipeLayout.cmi13RemoteInspectorTestOutletReady} | cmi13Cmi22AsymmetryReady=${properPipeLayout.cmi13Cmi22AsymmetryReady} | cmiRidgeChainJunctionsReady=${properPipeLayout.cmiRidgeChainJunctionsReady} | cmiRidgeBoundedFittingScheduleReady=${properPipeLayout.cmiRidgeBoundedFittingScheduleReady}`;
   document.querySelector('#machine-acceptance-boundary').textContent += ` | remainingCmiNinePieceFabricationReady=${properPipeLayout.remainingCmiNinePieceFabricationReady} | remainingCmiElevenOutletScheduleReady=${properPipeLayout.remainingCmiElevenOutletScheduleReady} | remainingCmiSixDirectSprinklerOutletIdentityReady=${properPipeLayout.remainingCmiSixDirectSprinklerOutletIdentityReady} | remainingCmiFiveBranchOrArmOverOutletScheduleReady=${properPipeLayout.remainingCmiFiveBranchOrArmOverOutletScheduleReady} | remainingCmiFourNoOutletPieceScheduleReady=${properPipeLayout.remainingCmiFourNoOutletPieceScheduleReady} | cmi01SourceOutletZReady=${properPipeLayout.cmi01SourceOutletZReady} | remainingCmiBoundedFittingScheduleReady=${properPipeLayout.remainingCmiBoundedFittingScheduleReady}`;
@@ -698,6 +705,12 @@ try {
   document.documentElement.dataset.sourceFeedSharedTransferAxisReady = String(properPipeLayout.sourceFeedSharedTransferAxisReady);
   document.documentElement.dataset.sourceFeedOrthogonalCalculationDecompositionReady = String(properPipeLayout.sourceFeedOrthogonalCalculationDecompositionReady);
   document.documentElement.dataset.sourceFeedConcealedRiserContinuationIdentityReady = String(properPipeLayout.sourceFeedConcealedRiserContinuationIdentityReady);
+  document.documentElement.dataset.allListedPieceIdentitiesReady = String(properPipeLayout.allListedPieceIdentitiesReady);
+  document.documentElement.dataset.allListedPieceEndPreparationsReady = String(properPipeLayout.allListedPieceEndPreparationsReady);
+  document.documentElement.dataset.allListedEndFittingFamiliesReady = String(properPipeLayout.allListedEndFittingFamiliesReady);
+  document.documentElement.dataset.exactThreadedFittingSizesReady = String(properPipeLayout.exactThreadedFittingSizesReady);
+  document.documentElement.dataset.interPieceFittingTopologyReady = String(properPipeLayout.interPieceFittingTopologyReady);
+  document.documentElement.dataset.completeVerticalOffsetScheduleReady = String(properPipeLayout.completeVerticalOffsetScheduleReady);
   document.documentElement.dataset.sourceFeedInstalledGradeReady = String(properPipeLayout.sourceFeedInstalledGradeReady);
   document.documentElement.dataset.sourceFeedConcealedRiserContinuationReady = String(properPipeLayout.sourceFeedConcealedRiserContinuationReady);
   document.documentElement.dataset.lowPointZoneGradeReady = String(properPipeLayout.lowPointZoneGradeReady);

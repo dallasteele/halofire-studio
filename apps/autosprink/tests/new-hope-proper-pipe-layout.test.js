@@ -11,6 +11,7 @@ import { evaluateNewHopeCmi06VerticalOutlet } from '../src/engine/new-hope-cmi06
 import { evaluateNewHopeCmiRidgeChainFabrication } from '../src/engine/new-hope-cmi-ridge-chain-fabrication.js'
 import { evaluateNewHopeCrossMainDrainage } from '../src/engine/new-hope-cross-main-drainage.js'
 import { evaluateNewHopeElevationDatum } from '../src/engine/new-hope-elevation-datum.js'
+import { evaluateNewHopeFabricationEndSchedule } from '../src/engine/new-hope-fabrication-end-schedule.js'
 import { evaluateNewHopeLongBranchDrainage } from '../src/engine/new-hope-long-branch-drainage.js'
 import { evaluateNewHopeLowPointFabrication } from '../src/engine/new-hope-low-point-fabrication.js'
 import { evaluateNewHopeProperPipeLayout } from '../src/engine/new-hope-proper-pipe-layout.js'
@@ -26,6 +27,7 @@ const pipeVectors = read('new-hope-approved-fp20-pipe-vectors.json')
 const planGraph = read('new-hope-approved-fp20-plan-graph.json')
 const operationalAnnotations = read('new-hope-approved-fp20-operational-annotations.json')
 const sourceFeedAsbuiltRiserRegistration = read('new-hope-asbuilt-source-feed-riser-registration.json')
+const fabricationEndScheduleSource = read('new-hope-fabrication-end-schedule.json')
 const hydraulicRoutes = ['2-1', '2-2', '2-3'].map((id) =>
   read(`new-hope-approved-fp20-hydraulic-route-${id}.json`),
 )
@@ -59,6 +61,7 @@ const sourceFeedAsbuiltRiser = evaluateNewHopeSourceFeedAsbuiltRiser({
   sourceFeedFabrication,
   sourceFeedCalculationChain,
 })
+const fabricationEndSchedule = evaluateNewHopeFabricationEndSchedule(fabricationEndScheduleSource)
 const lowPointFabrication = evaluateNewHopeLowPointFabrication({
   canonicalTopology,
   governedSkeleton,
@@ -140,6 +143,7 @@ const inputs = {
   sourceFeedFabrication,
   sourceFeedCalculationChain,
   sourceFeedAsbuiltRiser,
+  fabricationEndSchedule,
   lowPointFabrication,
   cmi05Cmi08Fabrication,
   cmi06VerticalOutlet,
@@ -180,6 +184,8 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
       sourceFeedCalculationPortCount: 4,
       sourceFeedExternalCalculationPortCount: 3,
       sourceFeedOrthogonalCalculationResidualIn: 0.086322,
+      listedPipePieceDefinitionCount: 257,
+      listedFabricatedPipeUnitCount: 264,
       fieldDrainIntentCount: 2,
     })
     expect(result.undirectedEdges.map((edge) => [edge.edgeId, edge.classification])).toEqual([
@@ -202,6 +208,12 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.sourceFeedOrthogonalCalculationDecompositionReady).toBe(true)
     expect(result.sourceFeedConcealedRiserContinuationIdentityReady).toBe(true)
     expect(result.sourceFeedCalculationLegEndpointElevationsReady).toBe(true)
+    expect(result.allListedPieceIdentitiesReady).toBe(true)
+    expect(result.allListedPieceEndPreparationsReady).toBe(true)
+    expect(result.allListedEndFittingFamiliesReady).toBe(true)
+    expect(result.exactThreadedFittingSizesReady).toBe(false)
+    expect(result.interPieceFittingTopologyReady).toBe(false)
+    expect(result.completeVerticalOffsetScheduleReady).toBe(false)
     expect(result.sourceFeedEndpointElevationsReady).toBe(false)
     expect(result.sourceFeedConcealedPlanXyReady).toBe(false)
     expect(result.sourceFeedFabricationPieceToCalculationLegDecompositionReady).toBe(false)
@@ -391,6 +403,14 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(absentAsbuiltRiser.status).toBe('blocked')
     expect(absentAsbuiltRiser.blockerCodes).toContain('NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED')
     expect(absentAsbuiltRiser.sourceFeedOrthogonalCalculationDecompositionReady).toBe(false)
+
+    const absentFabricationEndSchedule = evaluateNewHopeProperPipeLayout({
+      ...inputs,
+      fabricationEndSchedule: null,
+    })
+    expect(absentFabricationEndSchedule.status).toBe('blocked')
+    expect(absentFabricationEndSchedule.blockerCodes).toContain('NH_PROPER_PIPE_UPSTREAM_EVIDENCE_BLOCKED')
+    expect(absentFabricationEndSchedule.allListedPieceEndPreparationsReady).toBe(false)
 
     const absent = evaluateNewHopeProperPipeLayout({ ...inputs, armOverDrainage: null })
     expect(absent.status).toBe('blocked')

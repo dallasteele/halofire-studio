@@ -1,0 +1,53 @@
+{
+  "name": "new-hope-complete-fabrication-end-schedule-20260715",
+  "owner": "codex",
+  "goal": "Bind every New Hope pipe definition in the approved AutoSPRINK fabrication listing to exact piece identity, quantity, page, end preparation, and fitting family while keeping exact fraction-bearing threaded fitting sizes, installed inter-piece topology, vertical offsets, fabrication, and field release fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/24-052_NHCC_LIST.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/NEW HOPE CRISIS CENTER_NHCC List.FAB",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/engine/new-hope-fabrication-end-schedule.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js"
+  ],
+  "exit_criteria": [
+    "all welded and threaded listing pages are parsed from the exact protected PDF SHA",
+    "all 257 piece definitions and 264 fabricated units retain exact identities and quantities",
+    "all 158 welded definitions retain G-G and two No Fitting ends",
+    "all 99 threaded definitions retain T-T/T-G preparation and fitting family",
+    "fraction glyph loss cannot promote exact threaded fitting sizes",
+    "inter-piece topology, vertical offsets, fabrication, and field release remain false",
+    "actual listing pages render in the browser and all source images load",
+    "adversarial tests, full New Hope suite, build, formal proof, loop guard, rules, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected source SHA and project identity",
+    "complete piece-definition and fabricated-unit inventory",
+    "welded end-preparation and No Fitting coverage",
+    "threaded end-preparation and fitting-family coverage",
+    "false-readiness adversarial mutations",
+    "actual-PDF browser proof",
+    "Lean invariant receipt",
+    "agent loop guard and agentic rules",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-complete-fabrication-end-schedule-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/scripts/extract-new-hope-fabrication-end-schedule.py",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/engine/new-hope-fabrication-end-schedule.js",
+    "apps/autosprink/tests/new-hope-fabrication-end-schedule.test.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/new-hope-complete-fabrication-end-schedule-20260715/lean-proof.json",
+    "data/agent-loops/new-hope-complete-fabrication-end-schedule-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 180000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

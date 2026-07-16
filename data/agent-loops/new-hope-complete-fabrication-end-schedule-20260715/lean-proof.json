@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-complete-fabrication-end-schedule-20260715/lean-request.json",
+  "theoremNames": [
+    "completeFabricationEndInventory",
+    "completeEndPreparationFamilies",
+    "boundedEndScheduleDoesNotPromoteInstalledGeometry"
+  ],
+  "claim": "The exact listing inventory contains 158 welded plus 99 threaded piece definitions and 164 welded plus 100 threaded fabricated units. Welded No Fitting ends close at two per definition; 98 T-T plus one T-G threaded definitions and all fitting-family counts close at 99. Complete listed end coverage cannot promote exact threaded fitting sizes, installed inter-piece topology, the complete vertical-offset schedule, proper layout, fabrication, or field release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 371,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

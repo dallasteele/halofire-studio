@@ -166,6 +166,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.sourceFeedFabrication - Evaluated CML.01 plan/listing/outlet registration.
  * @param {object} inputs.sourceFeedCalculationChain - Evaluated node-118/BOR/valve calculation chain.
  * @param {object} inputs.sourceFeedAsbuiltRiser - Evaluated FP1.0 riser and calculation decomposition.
+ * @param {object} inputs.fabricationEndSchedule - Evaluated complete listed pipe-end schedule.
  * @param {object} inputs.lowPointFabrication - Evaluated CMI.09 low-point/listing/grade registration.
  * @param {object} inputs.cmi05Cmi08Fabrication - Evaluated CMI.05, CMI.07, and CMI.08 fitting schedule.
  * @param {object} inputs.cmi06VerticalOutlet - Evaluated CMI.06 outlet and head-057 vertical leg.
@@ -192,6 +193,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     sourceFeedFabrication,
     sourceFeedCalculationChain,
     sourceFeedAsbuiltRiser,
+    fabricationEndSchedule,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -215,6 +217,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     sourceFeedFabrication,
     sourceFeedCalculationChain,
     sourceFeedAsbuiltRiser,
+    fabricationEndSchedule,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -250,6 +253,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['source-feed-fabrication', sourceFeedFabrication?.status],
     ['source-feed-calculation-chain', sourceFeedCalculationChain?.status],
     ['source-feed-asbuilt-riser', sourceFeedAsbuiltRiser?.status],
+    ['fabrication-end-schedule', fabricationEndSchedule?.status],
     ['low-point-fabrication', lowPointFabrication?.status],
     ['cmi05-cmi08-fabrication', cmi05Cmi08Fabrication?.status],
     ['cmi06-vertical-outlet', cmi06VerticalOutlet?.status],
@@ -401,7 +405,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',
-      'CMI.01 through CMI.22 now have source-bound piece and outlet identities, and head-057 has an exact vertical leg; exact piece-end/inter-piece fittings and the complete vertical-offset schedule are still not assembled for every canonical edge.',
+      'The approved listing now closes all 257 pipe-piece identities and end preparations across 264 fabricated units (158 welded definitions with G-G / No Fitting ends and 99 threaded definitions with T-T/T-G fitting families). Exact threaded fitting sizes, inter-piece topology, and the complete vertical-offset schedule remain unresolved.',
     ),
   ]
   const ready = issues.length === 0
@@ -487,6 +491,10 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         sourceFeedCalculationChain?.exactExternalCalculationPortCount || 0,
       sourceFeedOrthogonalCalculationResidualIn:
         sourceFeedAsbuiltRiser?.decomposition?.calculationLengthResidualIn ?? null,
+      listedPipePieceDefinitionCount:
+        fabricationEndSchedule?.coverage?.totalListedPipePieceDefinitionCount || 0,
+      listedFabricatedPipeUnitCount:
+        fabricationEndSchedule?.coverage?.totalFabricatedPipeUnitCount || 0,
       fieldDrainIntentCount: fieldRouteDrainIntents.length,
     },
     planTopologyReady: ready && canonicalEdges.length === 143,
@@ -648,6 +656,17 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ready && sourceFeedAsbuiltRiser?.concealedRiserContinuationIdentityReady === true,
     sourceFeedCalculationLegEndpointElevationsReady:
       ready && sourceFeedCalculationChain?.baseOfRiserEndpointZReady === true,
+    allListedPieceIdentitiesReady:
+      ready && fabricationEndSchedule?.allListedPieceIdentitiesReady === true,
+    allListedPieceEndPreparationsReady:
+      ready && fabricationEndSchedule?.allListedPieceEndPreparationsReady === true,
+    allListedEndFittingFamiliesReady:
+      ready &&
+      fabricationEndSchedule?.allWeldedEndFittingFamiliesReady === true &&
+      fabricationEndSchedule?.allThreadedEndFittingFamiliesReady === true,
+    exactThreadedFittingSizesReady: false,
+    interPieceFittingTopologyReady: false,
+    completeVerticalOffsetScheduleReady: false,
     sourceFeedEndpointElevationsReady: false,
     sourceFeedConcealedPlanXyReady: false,
     sourceFeedFabricationPieceToCalculationLegDecompositionReady: false,

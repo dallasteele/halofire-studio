@@ -1,0 +1,3718 @@
+{
+  "artifactType": "halofire.new-hope-fabrication-end-schedule.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "source": {
+    "role": "approved-autosprink-fabrication-listing",
+    "fileName": "24-052_NHCC_LIST.PDF",
+    "sha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734",
+    "pageCount": 42,
+    "software": "AutoSPRINK 2023 v18.1.44.0",
+    "listArea": "NHCC List",
+    "listingDate": "2025-02-20"
+  },
+  "coverage": {
+    "weldedPhysicalPages": [
+      7,
+      39
+    ],
+    "threadedPhysicalPages": [
+      40,
+      42
+    ],
+    "weldedPieceDefinitionCount": 158,
+    "weldedFabricatedUnitCount": 164,
+    "threadedPieceDefinitionCount": 99,
+    "threadedFabricatedUnitCount": 100,
+    "totalListedPipePieceDefinitionCount": 257,
+    "totalFabricatedPipeUnitCount": 264,
+    "weldedPieceCountsByLine": {
+      "BL01": 2,
+      "BL02": 2,
+      "BL03": 2,
+      "BL04": 2,
+      "BL05": 2,
+      "BL06": 3,
+      "BL07": 2,
+      "BL08": 1,
+      "BL09": 2,
+      "BL10": 2,
+      "BL11": 2,
+      "BL12": 1,
+      "BL13": 2,
+      "BL14": 2,
+      "BL15": 2,
+      "BL16": 1,
+      "BL17": 2,
+      "BL18": 2,
+      "BL19": 2,
+      "BL20": 2,
+      "BL21": 1,
+      "BL22": 1,
+      "BL23": 1,
+      "BL24": 1,
+      "BL25": 1,
+      "BL26": 1,
+      "BL27": 1,
+      "BL28": 1,
+      "BL29": 2,
+      "BL30": 1,
+      "BL31": 2,
+      "BL32": 1,
+      "BL33": 1,
+      "BL34": 1,
+      "BL35": 1,
+      "BL36": 1,
+      "BL37": 1,
+      "BL38": 1,
+      "BL39": 1,
+      "BL40": 1,
+      "BL41": 1,
+      "BL42": 1,
+      "BL43": 1,
+      "BL44": 2,
+      "BL45": 2,
+      "BL46": 1,
+      "BL47": 1,
+      "BL48": 7,
+      "BL49": 6,
+      "BL50": 2,
+      "CMA": 7,
+      "CMB": 9,
+      "CMC": 12,
+      "CMF": 1,
+      "CMG": 1,
+      "CMH": 7,
+      "CMI": 22,
+      "CMJ": 7,
+      "CMK": 3,
+      "CML": 1,
+      "FRA": 1,
+      "FRB": 1,
+      "FRC": 1,
+      "TYPICAL": 1
+    },
+    "threadedPieceCountsByLine": {
+      "BL02": 2,
+      "BL03": 6,
+      "BL04": 8,
+      "BL05": 4,
+      "BL06": 3,
+      "BL07": 6,
+      "BL08": 1,
+      "BL09": 3,
+      "BL11": 1,
+      "BL12": 1,
+      "BL13": 5,
+      "BL14": 1,
+      "BL17": 1,
+      "BL18": 2,
+      "BL19": 1,
+      "BL22": 1,
+      "BL23": 1,
+      "BL29": 1,
+      "BL31": 1,
+      "BL32": 1,
+      "BL40": 1,
+      "BL41": 1,
+      "BL48": 2,
+      "BL49": 2,
+      "CMA": 6,
+      "CMB": 5,
+      "CMC": 4,
+      "CMD": 1,
+      "CME": 1,
+      "CMH": 3,
+      "CMI": 20,
+      "CMJ": 3
+    },
+    "threadedEndPreparationCounts": {
+      "T-G": 1,
+      "T-T": 98
+    },
+    "threadedFittingFamilyCounts": {
+      "no-fitting": 2,
+      "threaded-90-elbow": 57,
+      "threaded-90-reducing-elbow": 6,
+      "threaded-reducer": 30,
+      "threaded-straight-tee": 4
+    }
+  },
+  "weldedPieces": [
+    {
+      "pieceId": "CMA.01",
+      "lineName": "CMA",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 7,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMA.02",
+      "lineName": "CMA",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 7,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMA.03",
+      "lineName": "CMA",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 7,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMA.04",
+      "lineName": "CMA",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 7,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMA.05",
+      "lineName": "CMA",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 7,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMA.06",
+      "lineName": "CMA",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 8,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMA.07",
+      "lineName": "CMA",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 8,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMB.01",
+      "lineName": "CMB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 8,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMB.02",
+      "lineName": "CMB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 8,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMB.03",
+      "lineName": "CMB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 8,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMB.04",
+      "lineName": "CMB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 9,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMB.05",
+      "lineName": "CMB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 9,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMB.06",
+      "lineName": "CMB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 9,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMB.07",
+      "lineName": "CMB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 9,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMB.08",
+      "lineName": "CMB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 9,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMB.09",
+      "lineName": "CMB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 10,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.01",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 10,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.02",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 10,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.03",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 10,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.05",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 10,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.06",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 11,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.08",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 11,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.09",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 11,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.11",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 11,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.12",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 11,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.13",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 12,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.14",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 12,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMC.15",
+      "lineName": "CMC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 12,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMF.01",
+      "lineName": "CMF",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 12,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMG.01",
+      "lineName": "CMG",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 12,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMH.01",
+      "lineName": "CMH",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 13,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMH.02",
+      "lineName": "CMH",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 13,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMH.03",
+      "lineName": "CMH",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 13,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMH.04",
+      "lineName": "CMH",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 13,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMH.05",
+      "lineName": "CMH",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 13,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMH.06",
+      "lineName": "CMH",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 13,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMH.07",
+      "lineName": "CMH",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 14,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.01",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 14,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.02",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 14,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.03",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 14,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.04",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 14,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.05",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 15,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.06",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 15,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.07",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 15,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.08",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 15,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.09",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 15,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.10",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 16,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.11",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 16,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.12",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 16,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.13",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 16,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.14",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 16,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.15",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 17,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.16",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 17,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.17",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 17,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.18",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 17,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.19",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 17,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.20",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 18,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.21",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 18,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMI.22",
+      "lineName": "CMI",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 18,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMJ.01",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 18,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMJ.02",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 18,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMJ.03",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 19,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMJ.04",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 19,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMJ.05",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 19,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMJ.06",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 19,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMJ.07",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 19,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMK.01",
+      "lineName": "CMK",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 20,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMK.02",
+      "lineName": "CMK",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 20,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CMK.03",
+      "lineName": "CMK",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 20,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "CML.01",
+      "lineName": "CML",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 20,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "FRA.01",
+      "lineName": "FRA",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 20,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "FRB.01",
+      "lineName": "FRB",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 21,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "FRC.01",
+      "lineName": "FRC",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 21,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "T-1",
+      "lineName": "TYPICAL",
+      "quantity": 3,
+      "typical": true,
+      "physicalPage": 21,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL01.01",
+      "lineName": "BL01",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 22,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL01.02",
+      "lineName": "BL01",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 22,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL02.01",
+      "lineName": "BL02",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 22,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL02.02",
+      "lineName": "BL02",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 22,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL03.01",
+      "lineName": "BL03",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 22,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL03.02",
+      "lineName": "BL03",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 23,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL04.01",
+      "lineName": "BL04",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 23,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL04.02",
+      "lineName": "BL04",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 23,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL05.01",
+      "lineName": "BL05",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 23,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL05.02",
+      "lineName": "BL05",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 23,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL06.01",
+      "lineName": "BL06",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 24,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL06.02",
+      "lineName": "BL06",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 24,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL06.03",
+      "lineName": "BL06",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 24,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL07.01",
+      "lineName": "BL07",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 24,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL07.02",
+      "lineName": "BL07",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 24,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL08.01",
+      "lineName": "BL08",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 25,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL09.01",
+      "lineName": "BL09",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 25,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL09.02",
+      "lineName": "BL09",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 25,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL10.01",
+      "lineName": "BL10",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 25,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL10.02",
+      "lineName": "BL10",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 25,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL11.01",
+      "lineName": "BL11",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 26,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL11.02",
+      "lineName": "BL11",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 26,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL12.01",
+      "lineName": "BL12",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 26,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL13.01",
+      "lineName": "BL13",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 26,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL13.02",
+      "lineName": "BL13",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 26,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL14.01",
+      "lineName": "BL14",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 27,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL14.02",
+      "lineName": "BL14",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 27,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL15.01",
+      "lineName": "BL15",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 27,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL15.02",
+      "lineName": "BL15",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 27,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL16.01",
+      "lineName": "BL16",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 27,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL17.01",
+      "lineName": "BL17",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 28,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL17.02",
+      "lineName": "BL17",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 28,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL18.01",
+      "lineName": "BL18",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 28,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL18.02",
+      "lineName": "BL18",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 28,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL19.01",
+      "lineName": "BL19",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 28,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL19.02",
+      "lineName": "BL19",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 29,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL20.01",
+      "lineName": "BL20",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 29,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL20.02",
+      "lineName": "BL20",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 29,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL21.01",
+      "lineName": "BL21",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 29,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL22.01",
+      "lineName": "BL22",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 29,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL23.01",
+      "lineName": "BL23",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 30,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL24.01",
+      "lineName": "BL24",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 30,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL25.01",
+      "lineName": "BL25",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 30,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL26.01",
+      "lineName": "BL26",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 30,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL27.01",
+      "lineName": "BL27",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 31,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL28.01",
+      "lineName": "BL28",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 31,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL29.01",
+      "lineName": "BL29",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 31,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL29.02",
+      "lineName": "BL29",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 31,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL30.01",
+      "lineName": "BL30",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 31,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL31.01",
+      "lineName": "BL31",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 32,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL31.02",
+      "lineName": "BL31",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 32,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL32.01",
+      "lineName": "BL32",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 32,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL33.01",
+      "lineName": "BL33",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 32,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL34.01",
+      "lineName": "BL34",
+      "quantity": 2,
+      "typical": false,
+      "physicalPage": 32,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL35.01",
+      "lineName": "BL35",
+      "quantity": 2,
+      "typical": false,
+      "physicalPage": 33,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL36.01",
+      "lineName": "BL36",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 33,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL37.01",
+      "lineName": "BL37",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 33,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL38.01",
+      "lineName": "BL38",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 33,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL39.01",
+      "lineName": "BL39",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 34,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL40.01",
+      "lineName": "BL40",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 34,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL41.01",
+      "lineName": "BL41",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 34,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL42.01",
+      "lineName": "BL42",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 34,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL43.01",
+      "lineName": "BL43",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 35,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL44.01",
+      "lineName": "BL44",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 35,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL44.02",
+      "lineName": "BL44",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 35,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL45.01",
+      "lineName": "BL45",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 35,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL45.02",
+      "lineName": "BL45",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 35,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL46.01",
+      "lineName": "BL46",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 36,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL47.01",
+      "lineName": "BL47",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 36,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL48.01",
+      "lineName": "BL48",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 36,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL48.02",
+      "lineName": "BL48",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 36,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL48.03",
+      "lineName": "BL48",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 36,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL48.04",
+      "lineName": "BL48",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 37,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL48.05",
+      "lineName": "BL48",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 37,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL48.06",
+      "lineName": "BL48",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 37,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL48.07",
+      "lineName": "BL48",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 37,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL49.01",
+      "lineName": "BL49",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 37,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL49.02",
+      "lineName": "BL49",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 37,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL49.03",
+      "lineName": "BL49",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 38,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL49.04",
+      "lineName": "BL49",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 38,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL49.05",
+      "lineName": "BL49",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 38,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL49.06",
+      "lineName": "BL49",
+      "quantity": 1,
+      "typical": false,
+      "physicalPage": 38,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL50.01",
+      "lineName": "BL50",
+      "quantity": 2,
+      "typical": false,
+      "physicalPage": 38,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    },
+    {
+      "pieceId": "BL50.02",
+      "lineName": "BL50",
+      "quantity": 2,
+      "typical": false,
+      "physicalPage": 39,
+      "endPreparation": [
+        "G",
+        "G"
+      ],
+      "endFittingFamilies": [
+        "no-fitting",
+        "no-fitting"
+      ]
+    }
+  ],
+  "threadedPieces": [
+    {
+      "pieceId": "BL02.03",
+      "lineName": "BL02",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-straight-tee",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL02.04",
+      "lineName": "BL02",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL03.03",
+      "lineName": "BL03",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL03.04",
+      "lineName": "BL03",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL03.05",
+      "lineName": "BL03",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL03.06",
+      "lineName": "BL03",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL03.07",
+      "lineName": "BL03",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL03.08",
+      "lineName": "BL03",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL04.03",
+      "lineName": "BL04",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL04.04",
+      "lineName": "BL04",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL04.05",
+      "lineName": "BL04",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL04.06",
+      "lineName": "BL04",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL04.07",
+      "lineName": "BL04",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL04.08",
+      "lineName": "BL04",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL04.09",
+      "lineName": "BL04",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL04.10",
+      "lineName": "BL04",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL05.03",
+      "lineName": "BL05",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL05.04",
+      "lineName": "BL05",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL05.05",
+      "lineName": "BL05",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL05.06",
+      "lineName": "BL05",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL06.04",
+      "lineName": "BL06",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL06.05",
+      "lineName": "BL06",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL06.06",
+      "lineName": "BL06",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL07.03",
+      "lineName": "BL07",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL07.04",
+      "lineName": "BL07",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL07.05",
+      "lineName": "BL07",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL07.06",
+      "lineName": "BL07",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL07.07",
+      "lineName": "BL07",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL07.08",
+      "lineName": "BL07",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL08.02",
+      "lineName": "BL08",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-straight-tee",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL09.03",
+      "lineName": "BL09",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL09.04",
+      "lineName": "BL09",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL09.05",
+      "lineName": "BL09",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL11.03",
+      "lineName": "BL11",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL12.02",
+      "lineName": "BL12",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-straight-tee",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL13.03",
+      "lineName": "BL13",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL13.04",
+      "lineName": "BL13",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL13.05",
+      "lineName": "BL13",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL13.06",
+      "lineName": "BL13",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL13.07",
+      "lineName": "BL13",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL14.03",
+      "lineName": "BL14",
+      "quantity": 1,
+      "physicalPage": 40,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL17.03",
+      "lineName": "BL17",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL18.03",
+      "lineName": "BL18",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL18.04",
+      "lineName": "BL18",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL19.03",
+      "lineName": "BL19",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL22.02",
+      "lineName": "BL22",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL23.02",
+      "lineName": "BL23",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL29.03",
+      "lineName": "BL29",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL31.03",
+      "lineName": "BL31",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL32.02",
+      "lineName": "BL32",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL40.02",
+      "lineName": "BL40",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL41.02",
+      "lineName": "BL41",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL48.08",
+      "lineName": "BL48",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-reducing-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL48.09",
+      "lineName": "BL48",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-reducing-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL49.07",
+      "lineName": "BL49",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-reducing-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "BL49.08",
+      "lineName": "BL49",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-reducing-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMA.08",
+      "lineName": "CMA",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMA.09",
+      "lineName": "CMA",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMA.10",
+      "lineName": "CMA",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMA.11",
+      "lineName": "CMA",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMA.12",
+      "lineName": "CMA",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMA.13",
+      "lineName": "CMA",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMB.10",
+      "lineName": "CMB",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMB.11",
+      "lineName": "CMB",
+      "quantity": 1,
+      "physicalPage": 41,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMB.12",
+      "lineName": "CMB",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMB.13",
+      "lineName": "CMB",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMB.14",
+      "lineName": "CMB",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMC.16",
+      "lineName": "CMC",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMC.17",
+      "lineName": "CMC",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-straight-tee",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMC.18",
+      "lineName": "CMC",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMC.19",
+      "lineName": "CMC",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMD.01",
+      "lineName": "CMD",
+      "quantity": 2,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "no-fitting",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CME.01",
+      "lineName": "CME",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "G"
+      ],
+      "endFittingFamily": "no-fitting",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMH.08",
+      "lineName": "CMH",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-reducing-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMH.09",
+      "lineName": "CMH",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMH.10",
+      "lineName": "CMH",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.23",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.24",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.25",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.26",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.27",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.28",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.29",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.30",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.31",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.32",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.33",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.34",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.35",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.36",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.37",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.38",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.39",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.40",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.41",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMI.42",
+      "lineName": "CMI",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMJ.08",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-reducing-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMJ.09",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-90-elbow",
+      "exactFittingSizeReady": false
+    },
+    {
+      "pieceId": "CMJ.10",
+      "lineName": "CMJ",
+      "quantity": 1,
+      "physicalPage": 42,
+      "endPreparation": [
+        "T",
+        "T"
+      ],
+      "endFittingFamily": "threaded-reducer",
+      "exactFittingSizeReady": false
+    }
+  ],
+  "claims": {
+    "allListedPieceIdentitiesReady": true,
+    "allListedPieceEndPreparationsReady": true,
+    "allWeldedEndFittingFamiliesReady": true,
+    "allThreadedEndFittingFamiliesReady": true,
+    "exactThreadedFittingSizesReady": false,
+    "interPieceFittingTopologyReady": false,
+    "verticalOffsetScheduleReady": false,
+    "completeFittingScheduleReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "extractionBoundary": {
+    "embeddedFractionGlyphsLossless": false,
+    "note": "The PDF text layer does not losslessly expose embedded fraction glyphs; exact threaded fitting sizes and installed geometry remain fail-closed."
+  }
+}

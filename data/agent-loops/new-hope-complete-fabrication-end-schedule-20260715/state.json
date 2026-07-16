@@ -1,0 +1,54 @@
+{
+  "loop": "new-hope-complete-fabrication-end-schedule-20260715",
+  "stage": "VERIFY",
+  "status": "complete-listed-piece-end-schedule-and-adversarial-verification-passed",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [148076, 149894, 148147, 149978, 149155]
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 150639
+  },
+  "claims": {
+    "allListedPieceIdentitiesReady": true,
+    "allListedPieceEndPreparationsReady": true,
+    "allListedEndFittingFamiliesReady": true,
+    "exactThreadedFittingSizesReady": false,
+    "interPieceFittingTopologyReady": false,
+    "completeVerticalOffsetScheduleReady": false,
+    "completeFittingScheduleReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "sourceSha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734",
+    "weldedPieceDefinitionCount": 158,
+    "weldedFabricatedUnitCount": 164,
+    "threadedPieceDefinitionCount": 99,
+    "threadedFabricatedUnitCount": 100,
+    "totalListedPipePieceDefinitionCount": 257,
+    "totalFabricatedPipeUnitCount": 264,
+    "adversarialTestCount": 8,
+    "newHopeTestCount": 149,
+    "productionBuild": "passed",
+    "leanStatus": "verified",
+    "leanElapsedMs": 371,
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "browser": {
+      "proofReady": true,
+      "actualPdfImagesLoaded": 2,
+      "allListedPieceIdentitiesReady": true,
+      "allListedPieceEndPreparationsReady": true,
+      "allListedEndFittingFamiliesReady": true,
+      "exactThreadedFittingSizesReady": false,
+      "interPieceFittingTopologyReady": false,
+      "completeVerticalOffsetScheduleReady": false,
+      "properPipeLayoutReady": false
+    }
+  },
+  "nextAction": "Resolve exact fraction-bearing threaded fitting sizes and installed inter-piece topology from lossless FAB/native CAD or drawing evidence, then assemble vertical offsets without promoting unresolved source-feed grade, field drains, exact whole-system Z, or whole-layout release gates."
+}
