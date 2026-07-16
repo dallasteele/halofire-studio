@@ -166,6 +166,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.sourceFeedAsbuiltRiser - Evaluated FP1.0 riser and calculation decomposition.
  * @param {object} inputs.fabricationEndSchedule - Evaluated complete listed pipe-end schedule.
  * @param {object} inputs.nativeFabAttachmentGraph - Evaluated native parent graph and listing identity crosswalk.
+ * @param {object} inputs.completedProjectFittingAdjacencyCalibration - Completed-project source junction calibration; method evidence only, never New Hope geometry.
  * @param {object} inputs.lowPointFabrication - Evaluated CMI.09 low-point/listing/grade registration.
  * @param {object} inputs.cmi05Cmi08Fabrication - Evaluated CMI.05, CMI.07, and CMI.08 fitting schedule.
  * @param {object} inputs.cmi06VerticalOutlet - Evaluated CMI.06 outlet and head-057 vertical leg.
@@ -194,6 +195,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     sourceFeedAsbuiltRiser,
     fabricationEndSchedule,
     nativeFabAttachmentGraph,
+    completedProjectFittingAdjacencyCalibration,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -391,6 +393,29 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
   const exactPipeCenterlineZReady = false
   const fittingScheduleReady = false
   const properPipeLayoutReady = false
+  const fittingAdjacencyMethodCalibrationReady =
+    completedProjectFittingAdjacencyCalibration?.projectId === 'polaris-academy-mesa-az' &&
+    completedProjectFittingAdjacencyCalibration?.claims
+      ?.boundedSupplyTeeInterPieceAdjacencyReady === true &&
+    completedProjectFittingAdjacencyCalibration?.claims
+      ?.boundedInspectorTestDrainInterPieceAdjacencyReady === true &&
+    completedProjectFittingAdjacencyCalibration?.claims
+      ?.sourceFittingCenterlineAdjacencyCompleteReady === false &&
+    completedProjectFittingAdjacencyCalibration?.claims
+      ?.manufacturerExactFittingTakeoutReady === false &&
+    completedProjectFittingAdjacencyCalibration?.claims?.properPipeLayoutReady === false &&
+    completedProjectFittingAdjacencyCalibration?.fittingSemantics?.sourceJunctionGraph?.metrics
+      ?.resolvedRigidFittingCount === 15 &&
+    completedProjectFittingAdjacencyCalibration?.fittingSemantics?.sourceJunctionGraph?.metrics
+      ?.unresolvedRigidFittingCount === 13
+  if (!fittingAdjacencyMethodCalibrationReady) {
+    issues.push(
+      issue(
+        'NH_PROPER_PIPE_FITTING_ADJACENCY_CALIBRATION_INVALID',
+        'The reusable fitting-adjacency method must remain bound to the fail-closed completed Polaris source junction control.',
+      ),
+    )
+  }
   const acceptanceBlockers = [
     issue(
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
@@ -407,7 +432,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',
-      'The approved listing closes all 257 pipe-piece identities and end preparations across 264 fabricated units. Native Project.seidb parent IDs now attach all 97 fitting records to their exact listed pipe-piece identity and fitting family. The source does not publish the other-piece adjacency or raw fitting takeout, so inter-piece topology and the complete vertical-offset schedule remain unresolved.',
+      'The approved listing closes all 257 pipe-piece identities and end preparations across 264 fabricated units. Native Project.seidb parent IDs now attach all 97 fitting records to their exact listed pipe-piece identity and fitting family. A completed Polaris control calibrates source-centerline adjacency on a four-fitting supply tee and a two-port test-and-drain, while retaining 13 unresolved rigid fittings and false manufacturer takeout. New Hope still does not publish its other-piece adjacency or raw fitting takeout, so same-project inter-piece topology and the complete vertical-offset schedule remain unresolved.',
     ),
   ]
   const ready = issues.length === 0
@@ -434,6 +459,21 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       })),
     exactElevationPorts: ports,
     multiElevationNodes,
+    fittingAdjacencyCalibration: fittingAdjacencyMethodCalibrationReady
+      ? {
+          projectId: completedProjectFittingAdjacencyCalibration.projectId,
+          resolvedRigidFittingCount:
+            completedProjectFittingAdjacencyCalibration.fittingSemantics.sourceJunctionGraph.metrics
+              .resolvedRigidFittingCount,
+          unresolvedRigidFittingCount:
+            completedProjectFittingAdjacencyCalibration.fittingSemantics.sourceJunctionGraph.metrics
+              .unresolvedRigidFittingCount,
+          boundedSupplyTeeInterPieceAdjacencyReady: true,
+          boundedInspectorTestDrainInterPieceAdjacencyReady: true,
+          manufacturerExactFittingTakeoutReady: false,
+          projectSpecificGeometryTransferred: false,
+        }
+      : null,
     architecturalRegistration: {
       registeredSheets: architecturalVerticalControls?.registeredSheets || [],
       verticalDatum: elevationDatum?.verticalDatum || null,
@@ -674,6 +714,8 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ready && nativeFabAttachmentGraph?.listedFittingIdentityCoverageReady === true,
     nativeFabFittingAttachmentCount:
       ready ? nativeFabAttachmentGraph?.metrics?.listedFittingIdentityCount ?? null : null,
+    fittingAdjacencyMethodCalibrationReady,
+    completedProjectGeometryTransferred: false,
     interPieceFittingTopologyReady: false,
     exactFittingTakeoutReady: false,
     completeVerticalOffsetScheduleReady: false,

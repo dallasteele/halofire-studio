@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 
 import { evaluatePipeLayoutSourceContinuity } from './pipe-layout-source-continuity.js';
+import {
+  buildSourceFittingJunctionGraph,
+  evaluateBoundedSourceFittingJunction,
+} from './source-fitting-junction-graph.js';
 import { evaluateWetPipeDrainageBasins } from './wet-pipe-drainage-basins.js';
 
 const round = (value, precision = 9) => Number(value.toFixed(precision));
@@ -984,6 +988,29 @@ export function buildPolarisPitchedHydraulicNetwork({
     .filter((fitting) => fitting.connectedPipeEndpoints.length > 0);
   const supplyTeeBridge = fittingBridgeAudit.find((fitting) => fitting.fittingId === supplyTee.id);
   const testDrainBridge = fittingBridgeAudit.find((fitting) => fitting.fittingId === testDrain.id);
+  const sourceFittingJunctionGraph = buildSourceFittingJunctionGraph({
+    pipes: pipeCalibration.pipes,
+    fittings: pipeCalibration.fittings,
+  });
+  const sourceJunctionById = new Map(sourceFittingJunctionGraph.junctions
+    .map((junction) => [junction.fittingId, junction]));
+  const supplyTeeJunction = sourceJunctionById.get(supplyTee.id);
+  const supplyAssemblyFittingIds = [
+    supplyTee.id,
+    ...(supplyTeeJunction?.selectedConnections || [])
+      .filter((connection) => connection.kind === 'fitting-center')
+      .map((connection) => connection.fittingId),
+  ];
+  const supplyAssembly = evaluateBoundedSourceFittingJunction(sourceFittingJunctionGraph, {
+    fittingIds: supplyAssemblyFittingIds,
+    pipeEndpointIds: supplyTeeBridge.connectedPipeEndpoints
+      .map((endpoint) => `${endpoint.pipeId}:${endpoint.endpoint}`),
+  });
+  const inspectorTestDrainAssembly = evaluateBoundedSourceFittingJunction(sourceFittingJunctionGraph, {
+    fittingIds: [testDrain.id],
+    pipeEndpointIds: testDrainBridge.connectedPipeEndpoints
+      .map((endpoint) => `${endpoint.pipeId}:${endpoint.endpoint}`),
+  });
   const physicalNodeById = new Map(graph.nodes.map((node) => [node.id, node]));
   const nearestPhysicalNode = (value) => graph.nodes.reduce((best, node) => {
     const distanceFt = distance(value, node.pointFt);
@@ -1140,6 +1167,9 @@ export function buildPolarisPitchedHydraulicNetwork({
       },
       mainDrainCallout: mainDrainNote,
       sourceEndpointBridgeAudit: fittingBridgeAudit,
+      sourceJunctionGraph: sourceFittingJunctionGraph,
+      boundedSupplyTeeAssembly: supplyAssembly,
+      boundedInspectorTestDrainAssembly: inspectorTestDrainAssembly,
       supplyTeeConnectedPipeIds: [...new Set(supplyTeeBridge.connectedPipeEndpoints.map((endpoint) => endpoint.pipeId))],
       inspectorTestDrainConnectedPipeIds: [...new Set(testDrainBridge.connectedPipeEndpoints.map((endpoint) => endpoint.pipeId))],
     },
@@ -1173,6 +1203,16 @@ export function buildPolarisPitchedHydraulicNetwork({
       inspectorTestDrainDeviceReady: Boolean(testDrain),
       supplyTeePipeBridgeReady: supplyTeeBridge.connectedPipeEndpoints.length === 3,
       inspectorTestDrainPipeBridgeReady: testDrainBridge.connectedPipeEndpoints.length === 2,
+      boundedSupplyTeeInterPieceAdjacencyReady: supplyAssembly.status === 'passed'
+        && supplyAssembly.fittingIds.length === 4
+        && supplyAssembly.fittingLinks.length === 3
+        && supplyAssembly.pipeEndpointLinks.length === 3,
+      boundedInspectorTestDrainInterPieceAdjacencyReady: inspectorTestDrainAssembly.status === 'passed'
+        && inspectorTestDrainAssembly.fittingIds.length === 1
+        && inspectorTestDrainAssembly.pipeEndpointLinks.length === 2,
+      sourceFittingCenterlineAdjacencyCompleteReady:
+        sourceFittingJunctionGraph.claims.sourceCenterlineAdjacencyCompleteReady,
+      manufacturerExactFittingTakeoutReady: false,
       mainDrainCalloutReady: mainDrainNote.leaderSegmentCount === 2,
       roofRelativePipeGradeGeometryReady: geometricGrades.length === 14,
       calculatedSprinklerLeafToDwgPipeBindingReady: calculatedSprinklerLeafBindings

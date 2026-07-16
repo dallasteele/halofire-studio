@@ -10,6 +10,7 @@
   </style>
   <style>
     .source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px}.source-card{border:1px solid #35516e;border-radius:18px;overflow:hidden;background:#fff}.source-card img{display:block;width:100%;height:auto}.source-caption{padding:12px 14px;background:#06101d;color:#bdd2e6}@media(max-width:800px){.source-grid{grid-template-columns:1fr}}
+    .junction-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:18px}.junction-view{margin:0;border:1px solid #35516e;border-radius:18px;overflow:hidden;background:#06101d}.junction-view svg{display:block;width:100%;aspect-ratio:3/2;background:radial-gradient(circle at 50% 40%,#17365a,#050b14 72%)}.junction-view figcaption{padding:11px 14px;color:#bdd2e6}.junction-link{stroke:#7af6d7;stroke-width:5;stroke-linecap:round}.junction-fitting{fill:#ff3b81;stroke:#fff;stroke-width:2}.junction-pipe{fill:#7af6d7;stroke:#052f28;stroke-width:2}.junction-label{font:700 13px ui-monospace,Consolas,monospace;fill:#fff;paint-order:stroke;stroke:#020711;stroke-width:4px;stroke-linejoin:round}@media(max-width:1000px){.junction-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body><main>
@@ -29,6 +30,17 @@
       <div class="source-card"><img src="polaris-final-fl3-source-chain.png" alt="Final FL3 fire-line plan with the new four-inch fire riser connection point"><div class="source-caption">Final FL3: explicit four-inch fire-riser connection point and fire-line utility route.</div></div>
       <div class="source-card"><img src="polaris-asbuilt-fp1-riser-source-chain.png" alt="Completed FP1 fire riser detail from underground fire line to building feed"><div class="source-caption">Completed FP1: underground inlet, flange/coupling, riser devices, main drain, test-and-drain, and building feed.</div></div>
     </div>
+  </section>
+  <section class="glass" id="sourceJunctionProof">
+    <h2>Bounded source fitting adjacency — plan, elevation, and 3D</h2>
+    <p class="lede">The completed source CAD resolves the supply tee as one three-port tee, three adjacent couplings, and three uniquely owned pipe endpoints. The same junction graph resolves the inspector's test-and-drain to two pipe endpoints. These views are three projections of the exact exported XYZ graph used on the approved FP2 underlay below; they are not a decorative fitting sketch.</p>
+    <div class="badges"><span class="badge pass">4 supply fittings resolved</span><span class="badge pass">3 mutual fitting links</span><span class="badge pass">3 uniquely owned supply pipe ends</span><span class="badge pass">2 test-and-drain pipe ends</span><span class="badge hold">13 other rigid fittings unresolved</span><span class="badge hold">manufacturer takeout held</span></div>
+    <div class="junction-grid">
+      <figure class="junction-view"><svg id="supplyJunctionPlan" viewBox="0 0 480 320" aria-label="Top-down plan projection of the exact Polaris supply tee junction"></svg><figcaption>Top-down XY: the side branch is visible; vertical pieces correctly collapse to the same plan station.</figcaption></figure>
+      <figure class="junction-view"><svg id="supplyJunctionElevation" viewBox="0 0 480 320" aria-label="Elevation projection of the exact Polaris supply tee junction"></svg><figcaption>Elevation YZ: tee, three couplings, and vertical/side pipe ends remain distinct.</figcaption></figure>
+      <figure class="junction-view"><svg id="supplyJunction3d" viewBox="0 0 480 320" aria-label="Isometric projection of the exact Polaris supply tee junction"></svg><figcaption>Isometric XYZ: the same source graph, with no invented hose curve or fitting takeout.</figcaption></figure>
+    </div>
+    <p class="boundary">Bounded inter-piece adjacency is proven for these completed-project controls only. The full graph still has 13 unresolved rigid fittings and 70 flex drops without exported hose centerlines. Manufacturer-exact takeout, whole-system fitting adjacency, proper layout, fabrication, and field release remain false.</p>
   </section>
   <section class="glass">
     <h2>Approved FP2 + exact pipe model + governed direction layers</h2>
@@ -64,6 +76,33 @@ const svg = document.querySelector('#overlay');
 const ns = 'http://www.w3.org/2000/svg';
 const projectToPixel = point => ({ x: 521.125 + point.x * 9, y: 1192.25 - point.y * 9 });
 const make = (name, attributes = {}) => { const node = document.createElementNS(ns, name); for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value); return node; };
+const supplyAssembly = network.fittingSemantics.boundedSupplyTeeAssembly;
+document.documentElement.dataset.boundedSupplyTeeInterPieceAdjacencyReady = String(network.claims.boundedSupplyTeeInterPieceAdjacencyReady);
+document.documentElement.dataset.boundedInspectorTestDrainInterPieceAdjacencyReady = String(network.claims.boundedInspectorTestDrainInterPieceAdjacencyReady);
+document.documentElement.dataset.sourceFittingCenterlineAdjacencyCompleteReady = String(network.claims.sourceFittingCenterlineAdjacencyCompleteReady);
+document.documentElement.dataset.manufacturerExactFittingTakeoutReady = String(network.claims.manufacturerExactFittingTakeoutReady);
+function drawSupplyJunctionProjection(svgId, project, {collapseCoincidentLabels=false}={}) {
+  const target = document.querySelector(`#${svgId}`);
+  const fittingPoints = new Map(supplyAssembly.fittingIds.map(id => [id, calibration.fittings.find(fitting => fitting.id === id).pointFt]));
+  const pipePoints = new Map(supplyAssembly.pipeEndpointIds.map(endpointId => {
+    const split = endpointId.lastIndexOf(':'); const pipeId = endpointId.slice(0, split); const endpoint = endpointId.slice(split + 1); const pipe = calibration.pipes.find(candidate => candidate.id === pipeId);
+    return [endpointId, endpoint === 'start' ? pipe.startFt : pipe.endFt];
+  }));
+  const projected = new Map([...fittingPoints, ...pipePoints].map(([id, point]) => [id, project(point)]));
+  const values = [...projected.values()]; const minU = Math.min(...values.map(point => point.u)); const maxU = Math.max(...values.map(point => point.u)); const minV = Math.min(...values.map(point => point.v)); const maxV = Math.max(...values.map(point => point.v)); const spanU = Math.max(maxU - minU, 1); const spanV = Math.max(maxV - minV, 1); const scale = Math.min(360 / spanU, 220 / spanV); const toPixel = point => ({x:240 + (point.u - (minU + maxU) / 2) * scale,y:160 - (point.v - (minV + maxV) / 2) * scale});
+  const links = [
+    ...supplyAssembly.fittingLinks.map(link => [link.fittingIds[0], link.fittingIds[1]]),
+    ...supplyAssembly.pipeEndpointLinks.map(link => [link.fittingId, link.endpointId]),
+  ];
+  for (const [fromId, toId] of links) { const from = toPixel(projected.get(fromId)); const to = toPixel(projected.get(toId)); target.append(make('line',{x1:from.x,y1:from.y,x2:to.x,y2:to.y,class:'junction-link'})); }
+  const teePoint = fittingPoints.get(network.physicalNetwork.rootFittingId); const semanticLabel = (id, sourcePoint) => { if(id===network.physicalNetwork.rootFittingId)return 'TEE'; const prefix=pipePoints.has(id)?'PIPE':'COUPLING'; const deltaY=sourcePoint.y-teePoint.y,deltaZ=sourcePoint.z-teePoint.z; return Math.abs(deltaZ)>Math.abs(deltaY)?`${prefix} ${deltaZ>0?'HIGH':'LOW'}`:`${prefix} SIDE`; };
+  const labelsByPixel = new Map();
+  for (const [id, point] of projected) { const pixel = toPixel(point); const sourcePoint = fittingPoints.get(id) ?? pipePoints.get(id); const isPipe = pipePoints.has(id); target.append(make(isPipe ? 'rect' : 'circle', isPipe ? {x:pixel.x-7,y:pixel.y-7,width:14,height:14,rx:2,class:'junction-pipe'} : {cx:pixel.x,cy:pixel.y,r:9,class:'junction-fitting'})); const key=`${Math.round(pixel.x)}|${Math.round(pixel.y)}`; if(!labelsByPixel.has(key))labelsByPixel.set(key,{pixel,labels:[]}); labelsByPixel.get(key).labels.push(semanticLabel(id,sourcePoint)); }
+  for(const {pixel,labels} of labelsByPixel.values()){const display=collapseCoincidentLabels&&labels.length>1?`VERTICAL STACK ×${labels.length}`:labels.join(' / ');const yOffset=display.startsWith('PIPE ')?21:-12;const label=make('text',{x:pixel.x+12,y:pixel.y+yOffset,class:'junction-label'});label.textContent=display;target.append(label);}
+}
+drawSupplyJunctionProjection('supplyJunctionPlan', point => ({u:point.x,v:point.y}), {collapseCoincidentLabels:true});
+drawSupplyJunctionProjection('supplyJunctionElevation', point => ({u:point.y,v:point.z}));
+drawSupplyJunctionProjection('supplyJunction3d', point => ({u:(point.x-point.y)*0.707107,v:point.z+(point.x+point.y)*0.32}));
 function draw() {
   svg.setAttribute('viewBox', `0 0 ${image.naturalWidth} ${image.naturalHeight}`);
   const defs = make('defs');

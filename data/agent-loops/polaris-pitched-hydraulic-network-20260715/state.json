@@ -30,7 +30,10 @@
     "The nine basins total 37.962174 gallons. Eight upright-ended basins are individually under five gallons; the completed source contains no remote auxiliary-drain fitting at any of them, and upright removal is not substituted for the source rule's single-pendent allowance.",
     "NFPA 13 (2019) section 16.10.5.2.3 is locally primary-source bound for the eight under-five-gallon basins, producing one-half-inch nipple-and-cap-or-plug correction candidates while keeping source disposition false.",
     "The shared 25.035649-gallon basin has exact geometry and volume but remains unsized until the project-edition primary text for that tier is locally bound.",
-    "The approved FP2 proof now overlays all nine exact trapped pipe portions and basin IDs on the real plan and lists exact gallons, coordinates, termination type, and correction status in a browser-verified register."
+    "The approved FP2 proof now overlays all nine exact trapped pipe portions and basin IDs on the real plan and lists exact gallons, coordinates, termination type, and correction status in a browser-verified register.",
+    "A reusable source-fitting junction solver now rejects coincident entities, extra or missing port rays, nonreciprocal fitting links, duplicate pipe-end ownership, over-wide tolerance, and false takeout or proper-layout promotion.",
+    "The completed Polaris supply assembly resolves one three-port tee through three mutual coupling links to three uniquely owned pipe endpoints; the inspector test-and-drain independently resolves two exact pipe endpoints.",
+    "Fifteen of 28 rigid fitting junctions are source-centerline resolved. Thirteen remain ambiguous or incomplete, and all 70 flex drops retain semantic endpoints without an invented hose centerline. Manufacturer-exact takeout remains false."
   ],
   "attempts": [
     "Upgraded the read-only LibreDWG parser to 0.7.7 and extracted pipe, sprinkler, fitting, calculation-label, and source-note attributes with zero unknown entities.",
@@ -68,12 +71,14 @@
     "Implemented a minimax-spill wet-pipe basin solver over the exact physical graph, including linearly clipped pipe portions below spill elevation and hydraulic-report internal-diameter volume arithmetic.",
     "Adversarial tests reject missing or conflicting internal diameters and refuse to credit an upright sprinkler as the single-pendent drain alternative; 30 focused integration tests pass.",
     "Visual inspection caught overlapping gallon labels on the real FP2 overlay; the plan was corrected to compact basin IDs with exact values retained in the register, and the layer was verified off/on with nine register rows.",
-    "Lean 4.13.0 verified the nine-basin partition, 37.962174-gallon arithmetic, and fail-closed correction/drainage/proper-layout boundary in 120 ms; brain postflight persisted the exact basin contract as episode 149846."
+    "Lean 4.13.0 verified the nine-basin partition, 37.962174-gallon arithmetic, and fail-closed correction/drainage/proper-layout boundary in 120 ms; brain postflight persisted the exact basin contract as episode 149846.",
+    "Built and adversarially tested the source-fitting junction graph, promoted only the bounded supply-tee and inspector-test/drain controls, regenerated the network packet byte-identically, and added browser-verified top, elevation, and isometric projections tied to the same exact source XYZ graph."
   ],
   "blockers": [
     "The exact cross-drawing CAD endpoint remains unproven: the nearest extracted fire-line pipe endpoint is 718.821404366 inches from hydraulic node 116. This no longer blocks semantic hydraulic direction, but it must remain labeled as non-exact geometry.",
     "The shared 25.035649-gallon basin cannot receive a promoted drain size until NFPA 13 (2019) 16.10.5.2.2 is locally bound from a primary source.",
-    "All nine trapped basins lack a source-approved drain disposition; eight have code-basis-bound correction candidates, but none are promoted as installed or approved."
+    "All nine trapped basins lack a source-approved drain disposition; eight have code-basis-bound correction candidates, but none are promoted as installed or approved.",
+    "Thirteen rigid fitting junctions still lack an unambiguous complete source-centerline port graph; the 70 flex drops do not export hose centerlines, and no manufacturer-exact fitting takeout has been promoted."
   ],
-  "next_action": "Bind the primary project-edition rule for the 25.035649-gallon basin, then use the nine-basin register as the correction contract for a source-grounded New Hope pitched layout; keep every correction visibly candidate-only until same-project plan disposition exists."
+  "next_action": "Use other completed-project CAD/listing controls and primary manufacturer dimensional data to resolve the remaining rigid fitting families and exact takeout without transferring project geometry; separately bind the primary project-edition rule for the 25.035649-gallon basin. Keep New Hope proper layout and every correction fail-closed until same-project endpoint Z, drains, and field disposition are proven."
 }

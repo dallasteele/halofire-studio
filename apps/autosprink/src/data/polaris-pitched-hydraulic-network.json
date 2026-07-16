@@ -13304,6 +13304,2171 @@
         ]
       }
     ],
+    "sourceJunctionGraph": {
+      "schema": "halofire.source-fitting-junction-graph.v1",
+      "settings": {
+        "maxGapFt": 0.5,
+        "rayAngleDeg": 8
+      },
+      "junctions": [
+        {
+          "fittingId": "fitting-24025",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 141.291666667,
+            "y": 10.159632742,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-24673",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 132.821904788,
+            "y": 43.32863145,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-25321",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 63.416666667,
+            "y": 43.754416701,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-25969",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 20.5,
+            "y": 44.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-26617",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 46.101750049,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-27265",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 31.727008835,
+            "y": 19.854166667,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-27913",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 168.393713811,
+            "y": 9.748616106,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-28561",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 18.893675502,
+            "y": 6.166666667,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-29209",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 16.291666667,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-29857",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 23.705723524,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-30505",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 167.541666667,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-31153",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 6.893675502,
+            "y": 6.166666667,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-31801",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 52.727008835,
+            "y": 13.428051432,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-32449",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 155.208333333,
+            "y": 55.75,
+            "z": 13
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-33097",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 75.1147682,
+            "y": 11.666566762,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-33745",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 59.892251674,
+            "y": 33.600209822,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-34393",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 168.810342169,
+            "y": 0.25,
+            "z": 11.317708333
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-35041",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 99.935525971,
+            "y": 11.484612283,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-35689",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 93.4375,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-36337",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 104.291666667,
+            "y": 44.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-36985",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 140,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-37633",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 134.791666667,
+            "y": 9.326299408,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-38281",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 115.916666667,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-38929",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 48.083333333,
+            "y": 45.583333333,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-39577",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 87.416666667,
+            "y": 34.583333333,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-40225",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 141.291666667,
+            "y": 0.25,
+            "z": 11.317708333
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-40873",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 112.959196671,
+            "y": 43.419989991,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-41521",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 47.583333544,
+            "y": 43.657033318,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-42169",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 6.5,
+            "y": 44.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-42817",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 6.5,
+            "y": 55.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-43465",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 19.958333333,
+            "y": 23.583333333,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-44113",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 152.541666667,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-44761",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 6.708333333,
+            "y": 24.71912526,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-45409",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 46.652287372,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-46057",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 141.875,
+            "y": 44.75,
+            "z": 13
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-46705",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 30.893675502,
+            "y": 7.228431264,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-47353",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 64.246532462,
+            "y": 11.254787348,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-48001",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 155.208333333,
+            "y": 44.75,
+            "z": 13
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-48649",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 82.104166667,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-49297",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 70.520833333,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-49945",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 167.541666667,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-50593",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 116.958333333,
+            "y": 45.583333333,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-51241",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 128.75,
+            "y": 45.583333333,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-51889",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 87.48970444,
+            "y": 11.66659104,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-52537",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 140,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-53185",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 122.852484671,
+            "y": 43.568354667,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-53833",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 101.416666667,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-54481",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 77.416666667,
+            "y": 34.583333333,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-55129",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 34.5,
+            "y": 44.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-55777",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 113.728131066,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-56425",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 34.753363992,
+            "y": 33.114208074,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-57073",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 154.791666667,
+            "y": 10.159632742,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-57721",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 19.727008835,
+            "y": 17.166666667,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-58369",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 18.53087474,
+            "y": 17.958333333,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-59017",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 152.541666667,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-59665",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 6.893675502,
+            "y": 17.125,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-60313",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 141.875,
+            "y": 55.75,
+            "z": 13
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-60961",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 59.905319134,
+            "y": 22.760968737,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-61609",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 168.541666667,
+            "y": 44.75,
+            "z": 13
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-62257",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 122.958333333,
+            "y": 9.326299408,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-62905",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 70.520833333,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-63553",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 168.541666667,
+            "y": 55.75,
+            "z": 13
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-64201",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 104.770833333,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-64849",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 91.625,
+            "y": 44.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-65497",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 134.791666667,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-66145",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 77.791666667,
+            "y": 45.583333333,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-66793",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 129.916666667,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-67441",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 122.958333333,
+            "y": 22.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-68089",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 62.663593365,
+            "y": 45.581542177,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-68737",
+          "subCategory": "Flex Drop",
+          "pointFt": {
+            "x": 50.84301221,
+            "y": 33.75,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "selectedConnections": [],
+          "status": "held-flexible-centerline-not-exported",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-69385",
+          "subCategory": "Flexible Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 1.5
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-78774",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-23024",
+              "endpoint": "end",
+              "residualFt": 0.078333333,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-69616",
+          "subCategory": "Flange",
+          "pointFt": {
+            "x": 177.598713214,
+            "y": 39.666666667,
+            "z": 0.436666667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 4,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.500001,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22250",
+              "endpoint": "start",
+              "residualFt": 0.114583333,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22515",
+              "endpoint": "start",
+              "residualFt": 0.020833334,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-69835",
+          "subCategory": "Flexible Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 10.718333333
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-69852",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22275",
+              "endpoint": "end",
+              "residualFt": 0.078333333,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-69852",
+          "subCategory": "Tee",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 11
+          },
+          "expectedSystemPortCount": 3,
+          "candidateCount": 3,
+          "rawCandidateCount": 6,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 3,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-69835",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            },
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-71128",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            },
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-71338",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": -1,
+                "z": 0
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-71128",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 11.281666667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-69852",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-17499",
+              "endpoint": "start",
+              "residualFt": 0.083333333,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-71338",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.385,
+            "z": 11
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 6,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-69852",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-3279",
+              "endpoint": "start",
+              "residualFt": 0.083333333,
+              "direction": {
+                "x": 0,
+                "y": -1,
+                "z": 0
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-71354",
+          "subCategory": "Tee",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 4.156666667
+          },
+          "expectedSystemPortCount": 3,
+          "candidateCount": 2,
+          "rawCandidateCount": 6,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 2,
+          "selectedConnections": [],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-71371",
+          "subCategory": "Elbow",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 38.749166667,
+            "z": 3.291666667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.333334333,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-72019",
+              "residualFt": 0.333333333,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            },
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-72456",
+              "residualFt": 0.333333334,
+              "direction": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              }
+            }
+          ],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-72019",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 38.749166667,
+            "z": 3.625
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 1,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.125001,
+          "distinctRayCount": 1,
+          "selectedConnections": [],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-72229",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.385,
+            "z": 4.156666667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 1,
+          "rawCandidateCount": 7,
+          "adjacencyHorizonFt": 0.177084333,
+          "distinctRayCount": 1,
+          "selectedConnections": [],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-72246",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.030833333,
+            "z": 4.156666667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 1,
+          "rawCandidateCount": 5,
+          "adjacencyHorizonFt": 0.177084334,
+          "distinctRayCount": 1,
+          "selectedConnections": [],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-72456",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.541666667,
+            "y": 38.749166667,
+            "z": 3.291666667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 3,
+          "adjacencyHorizonFt": 0.333334334,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-71371",
+              "residualFt": 0.333333334,
+              "direction": {
+                "x": -1,
+                "y": 0,
+                "z": 0
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22446",
+              "endpoint": "start",
+              "residualFt": 0.089583333,
+              "direction": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-72473",
+          "subCategory": "Inspectors Test & Drain",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 40.840954932,
+            "z": 6.99
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 2,
+          "adjacencyHorizonFt": 0.5,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22402",
+              "endpoint": "end",
+              "residualFt": 0.21875,
+              "direction": {
+                "x": 0,
+                "y": -1,
+                "z": 0
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22468",
+              "endpoint": "end",
+              "residualFt": 0.322916667,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-72935",
+          "subCategory": "Elbow",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 38.749166667,
+            "z": 4.156666667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.281667666,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-72246",
+              "residualFt": 0.281666666,
+              "direction": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              }
+            },
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-73700",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            }
+          ],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-73684",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 4.443541667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 3,
+          "adjacencyHorizonFt": 0.286876,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-71354",
+              "residualFt": 0.286875,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22275",
+              "endpoint": "start",
+              "residualFt": 0.078125,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            }
+          ],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-73700",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 38.749166667,
+            "z": 3.875
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 1,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.125001,
+          "distinctRayCount": 1,
+          "selectedConnections": [],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-73716",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 3.875
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 3,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-71354",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-23024",
+              "endpoint": "start",
+              "residualFt": 0.083333333,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            }
+          ],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-73733",
+          "subCategory": "Elbow",
+          "pointFt": {
+            "x": 175.991153505,
+            "y": 40.840954932,
+            "z": 1.677059048
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 1,
+          "rawCandidateCount": 1,
+          "adjacencyHorizonFt": 0.5,
+          "distinctRayCount": 1,
+          "selectedConnections": [],
+          "status": "held-insufficient-source-rays",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-74585",
+          "subCategory": "Elbow",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 40.840954932,
+            "z": 1.677059048
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 2,
+          "adjacencyHorizonFt": 0.5,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22424",
+              "endpoint": "start",
+              "residualFt": 0.1875,
+              "direction": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22468",
+              "endpoint": "start",
+              "residualFt": 0.1875,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-75434",
+          "subCategory": "Check",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.207916667,
+            "z": 4.156666667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.177084333,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-72229",
+              "residualFt": 0.177083333,
+              "direction": {
+                "x": 0,
+                "y": 1,
+                "z": 0
+              }
+            },
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-72246",
+              "residualFt": 0.177083334,
+              "direction": {
+                "x": 0,
+                "y": -1,
+                "z": 0
+              }
+            }
+          ],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-75663",
+          "subCategory": "Switch/Sensor",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 5.010833333
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 1,
+          "rawCandidateCount": 1,
+          "adjacencyHorizonFt": 0.5,
+          "distinctRayCount": 1,
+          "selectedConnections": [],
+          "status": "held-insufficient-source-rays",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-75693",
+          "subCategory": "Two-Way Inlet",
+          "pointFt": {
+            "x": 175.991153505,
+            "y": 38.749166667,
+            "z": 3.291666667
+          },
+          "expectedSystemPortCount": 1,
+          "candidateCount": 1,
+          "rawCandidateCount": 1,
+          "adjacencyHorizonFt": 0.5,
+          "distinctRayCount": 1,
+          "selectedConnections": [
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22446",
+              "endpoint": "end",
+              "residualFt": 0.291666666,
+              "direction": {
+                "x": -1,
+                "y": 0,
+                "z": 0
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-78603",
+          "subCategory": "Reducer/Adapter",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 38.749166667,
+            "z": 3.75
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 5,
+          "adjacencyHorizonFt": 0.125001,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-72019",
+              "residualFt": 0.125,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            },
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-73700",
+              "residualFt": 0.125,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            }
+          ],
+          "status": "held-cross-junction-conflict",
+          "sourceCenterlineAdjacencyReady": false
+        },
+        {
+          "fittingId": "fitting-78774",
+          "subCategory": "Elbow",
+          "pointFt": {
+            "x": 174.208333333,
+            "y": 39.666666667,
+            "z": 1.218333333
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-69385",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            },
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-78790",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-78790",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 174.49,
+            "y": 39.666666667,
+            "z": 1.218333333
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-78774",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": -1,
+                "y": 0,
+                "z": 0
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22492",
+              "endpoint": "start",
+              "residualFt": 0.083333333,
+              "direction": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-78806",
+          "subCategory": "Elbow",
+          "pointFt": {
+            "x": 177.598713214,
+            "y": 39.666666667,
+            "z": 1.218333333
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.281667666,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-78822",
+              "residualFt": 0.281666666,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            },
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-78838",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": -1,
+                "y": 0,
+                "z": 0
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-78822",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 177.598713214,
+            "y": 39.666666667,
+            "z": 0.936666667
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 6,
+          "adjacencyHorizonFt": 0.281667666,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-78806",
+              "residualFt": 0.281666666,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": 1
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22250",
+              "endpoint": "end",
+              "residualFt": 0.083333334,
+              "direction": {
+                "x": 0,
+                "y": 0,
+                "z": -1
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        },
+        {
+          "fittingId": "fitting-78838",
+          "subCategory": "Rigid Coupling",
+          "pointFt": {
+            "x": 177.317046547,
+            "y": 39.666666667,
+            "z": 1.218333333
+          },
+          "expectedSystemPortCount": 2,
+          "candidateCount": 2,
+          "rawCandidateCount": 4,
+          "adjacencyHorizonFt": 0.281667667,
+          "distinctRayCount": 2,
+          "selectedConnections": [
+            {
+              "kind": "fitting-center",
+              "fittingId": "fitting-78806",
+              "residualFt": 0.281666667,
+              "direction": {
+                "x": 1,
+                "y": 0,
+                "z": 0
+              }
+            },
+            {
+              "kind": "pipe-endpoint",
+              "pipeId": "pipe-22492",
+              "endpoint": "end",
+              "residualFt": 0.083333333,
+              "direction": {
+                "x": -1,
+                "y": 0,
+                "z": 0
+              }
+            }
+          ],
+          "status": "source-centerline-rays-resolved",
+          "sourceCenterlineAdjacencyReady": true
+        }
+      ],
+      "fittingLinks": [
+        {
+          "edgeId": "fitting-69385|fitting-78774",
+          "fittingIds": [
+            "fitting-69385",
+            "fitting-78774"
+          ],
+          "sourceCenterDistanceFt": 0.281666667
+        },
+        {
+          "edgeId": "fitting-69835|fitting-69852",
+          "fittingIds": [
+            "fitting-69835",
+            "fitting-69852"
+          ],
+          "sourceCenterDistanceFt": 0.281666667
+        },
+        {
+          "edgeId": "fitting-69852|fitting-71128",
+          "fittingIds": [
+            "fitting-69852",
+            "fitting-71128"
+          ],
+          "sourceCenterDistanceFt": 0.281666667
+        },
+        {
+          "edgeId": "fitting-69852|fitting-71338",
+          "fittingIds": [
+            "fitting-69852",
+            "fitting-71338"
+          ],
+          "sourceCenterDistanceFt": 0.281666667
+        },
+        {
+          "edgeId": "fitting-71371|fitting-72456",
+          "fittingIds": [
+            "fitting-71371",
+            "fitting-72456"
+          ],
+          "sourceCenterDistanceFt": 0.333333334
+        },
+        {
+          "edgeId": "fitting-78774|fitting-78790",
+          "fittingIds": [
+            "fitting-78774",
+            "fitting-78790"
+          ],
+          "sourceCenterDistanceFt": 0.281666667
+        },
+        {
+          "edgeId": "fitting-78806|fitting-78822",
+          "fittingIds": [
+            "fitting-78806",
+            "fitting-78822"
+          ],
+          "sourceCenterDistanceFt": 0.281666666
+        },
+        {
+          "edgeId": "fitting-78806|fitting-78838",
+          "fittingIds": [
+            "fitting-78806",
+            "fitting-78838"
+          ],
+          "sourceCenterDistanceFt": 0.281666667
+        }
+      ],
+      "pipeEndpointLinks": [
+        {
+          "endpointId": "pipe-17499:start",
+          "fittingId": "fitting-71128",
+          "residualFt": 0.083333333
+        },
+        {
+          "endpointId": "pipe-22250:end",
+          "fittingId": "fitting-78822",
+          "residualFt": 0.083333334
+        },
+        {
+          "endpointId": "pipe-22250:start",
+          "fittingId": "fitting-69616",
+          "residualFt": 0.114583333
+        },
+        {
+          "endpointId": "pipe-22275:end",
+          "fittingId": "fitting-69835",
+          "residualFt": 0.078333333
+        },
+        {
+          "endpointId": "pipe-22275:start",
+          "fittingId": "fitting-73684",
+          "residualFt": 0.078125
+        },
+        {
+          "endpointId": "pipe-22402:end",
+          "fittingId": "fitting-72473",
+          "residualFt": 0.21875
+        },
+        {
+          "endpointId": "pipe-22424:start",
+          "fittingId": "fitting-74585",
+          "residualFt": 0.1875
+        },
+        {
+          "endpointId": "pipe-22446:end",
+          "fittingId": "fitting-75693",
+          "residualFt": 0.291666666
+        },
+        {
+          "endpointId": "pipe-22446:start",
+          "fittingId": "fitting-72456",
+          "residualFt": 0.089583333
+        },
+        {
+          "endpointId": "pipe-22468:end",
+          "fittingId": "fitting-72473",
+          "residualFt": 0.322916667
+        },
+        {
+          "endpointId": "pipe-22468:start",
+          "fittingId": "fitting-74585",
+          "residualFt": 0.1875
+        },
+        {
+          "endpointId": "pipe-22492:end",
+          "fittingId": "fitting-78838",
+          "residualFt": 0.083333333
+        },
+        {
+          "endpointId": "pipe-22492:start",
+          "fittingId": "fitting-78790",
+          "residualFt": 0.083333333
+        },
+        {
+          "endpointId": "pipe-22515:start",
+          "fittingId": "fitting-69616",
+          "residualFt": 0.020833334
+        },
+        {
+          "endpointId": "pipe-23024:end",
+          "fittingId": "fitting-69385",
+          "residualFt": 0.078333333
+        },
+        {
+          "endpointId": "pipe-23024:start",
+          "fittingId": "fitting-73716",
+          "residualFt": 0.083333333
+        },
+        {
+          "endpointId": "pipe-3279:start",
+          "fittingId": "fitting-71338",
+          "residualFt": 0.083333333
+        }
+      ],
+      "issues": [
+        {
+          "severity": "blocking",
+          "code": "SOURCE_FITTING_JUNCTION_NONRECIPROCAL_LINK",
+          "message": "A fitting-to-fitting source adjacency must be selected from both fitting centers.",
+          "entityId": "fitting-71371|fitting-72019"
+        },
+        {
+          "severity": "blocking",
+          "code": "SOURCE_FITTING_JUNCTION_NONRECIPROCAL_LINK",
+          "message": "A fitting-to-fitting source adjacency must be selected from both fitting centers.",
+          "entityId": "fitting-72935|fitting-72246"
+        },
+        {
+          "severity": "blocking",
+          "code": "SOURCE_FITTING_JUNCTION_NONRECIPROCAL_LINK",
+          "message": "A fitting-to-fitting source adjacency must be selected from both fitting centers.",
+          "entityId": "fitting-72935|fitting-73700"
+        },
+        {
+          "severity": "blocking",
+          "code": "SOURCE_FITTING_JUNCTION_NONRECIPROCAL_LINK",
+          "message": "A fitting-to-fitting source adjacency must be selected from both fitting centers.",
+          "entityId": "fitting-73684|fitting-71354"
+        },
+        {
+          "severity": "blocking",
+          "code": "SOURCE_FITTING_JUNCTION_NONRECIPROCAL_LINK",
+          "message": "A fitting-to-fitting source adjacency must be selected from both fitting centers.",
+          "entityId": "fitting-73716|fitting-71354"
+        },
+        {
+          "severity": "blocking",
+          "code": "SOURCE_FITTING_JUNCTION_NONRECIPROCAL_LINK",
+          "message": "A fitting-to-fitting source adjacency must be selected from both fitting centers.",
+          "entityId": "fitting-75434|fitting-72229"
+        },
+        {
+          "severity": "blocking",
+          "code": "SOURCE_FITTING_JUNCTION_NONRECIPROCAL_LINK",
+          "message": "A fitting-to-fitting source adjacency must be selected from both fitting centers.",
+          "entityId": "fitting-75434|fitting-72246"
+        },
+        {
+          "severity": "blocking",
+          "code": "SOURCE_FITTING_JUNCTION_NONRECIPROCAL_LINK",
+          "message": "A fitting-to-fitting source adjacency must be selected from both fitting centers.",
+          "entityId": "fitting-78603|fitting-72019"
+        },
+        {
+          "severity": "blocking",
+          "code": "SOURCE_FITTING_JUNCTION_NONRECIPROCAL_LINK",
+          "message": "A fitting-to-fitting source adjacency must be selected from both fitting centers.",
+          "entityId": "fitting-78603|fitting-73700"
+        }
+      ],
+      "metrics": {
+        "fittingCount": 98,
+        "rigidFittingCount": 28,
+        "flexibleDropCount": 70,
+        "resolvedRigidFittingCount": 15,
+        "unresolvedRigidFittingCount": 13,
+        "fittingToFittingEdgeCount": 8,
+        "fittingToPipeEndpointEdgeCount": 17
+      },
+      "claims": {
+        "sourceCenterlineAdjacencyCompleteReady": false,
+        "manufacturerExactTakeoutReady": false,
+        "flexibleHoseCenterlineReady": false,
+        "properPipeLayoutReady": false
+      }
+    },
+    "boundedSupplyTeeAssembly": {
+      "status": "passed",
+      "issues": [],
+      "fittingIds": [
+        "fitting-69835",
+        "fitting-69852",
+        "fitting-71128",
+        "fitting-71338"
+      ],
+      "pipeEndpointIds": [
+        "pipe-17499:start",
+        "pipe-22275:end",
+        "pipe-3279:start"
+      ],
+      "fittingLinks": [
+        {
+          "edgeId": "fitting-69835|fitting-69852",
+          "fittingIds": [
+            "fitting-69835",
+            "fitting-69852"
+          ],
+          "sourceCenterDistanceFt": 0.281666667
+        },
+        {
+          "edgeId": "fitting-69852|fitting-71128",
+          "fittingIds": [
+            "fitting-69852",
+            "fitting-71128"
+          ],
+          "sourceCenterDistanceFt": 0.281666667
+        },
+        {
+          "edgeId": "fitting-69852|fitting-71338",
+          "fittingIds": [
+            "fitting-69852",
+            "fitting-71338"
+          ],
+          "sourceCenterDistanceFt": 0.281666667
+        }
+      ],
+      "pipeEndpointLinks": [
+        {
+          "endpointId": "pipe-17499:start",
+          "fittingId": "fitting-71128",
+          "residualFt": 0.083333333
+        },
+        {
+          "endpointId": "pipe-22275:end",
+          "fittingId": "fitting-69835",
+          "residualFt": 0.078333333
+        },
+        {
+          "endpointId": "pipe-3279:start",
+          "fittingId": "fitting-71338",
+          "residualFt": 0.083333333
+        }
+      ],
+      "sourceCenterlineAdjacencyReady": true,
+      "manufacturerExactTakeoutReady": false,
+      "properPipeLayoutReady": false
+    },
+    "boundedInspectorTestDrainAssembly": {
+      "status": "passed",
+      "issues": [],
+      "fittingIds": [
+        "fitting-72473"
+      ],
+      "pipeEndpointIds": [
+        "pipe-22402:end",
+        "pipe-22468:end"
+      ],
+      "fittingLinks": [],
+      "pipeEndpointLinks": [
+        {
+          "endpointId": "pipe-22402:end",
+          "fittingId": "fitting-72473",
+          "residualFt": 0.21875
+        },
+        {
+          "endpointId": "pipe-22468:end",
+          "fittingId": "fitting-72473",
+          "residualFt": 0.322916667
+        }
+      ],
+      "sourceCenterlineAdjacencyReady": true,
+      "manufacturerExactTakeoutReady": false,
+      "properPipeLayoutReady": false
+    },
     "supplyTeeConnectedPipeIds": [
       "pipe-22275",
       "pipe-3279",
@@ -15369,6 +17534,10 @@
     "inspectorTestDrainDeviceReady": true,
     "supplyTeePipeBridgeReady": true,
     "inspectorTestDrainPipeBridgeReady": true,
+    "boundedSupplyTeeInterPieceAdjacencyReady": true,
+    "boundedInspectorTestDrainInterPieceAdjacencyReady": true,
+    "sourceFittingCenterlineAdjacencyCompleteReady": false,
+    "manufacturerExactFittingTakeoutReady": false,
     "mainDrainCalloutReady": true,
     "roofRelativePipeGradeGeometryReady": true,
     "calculatedSprinklerLeafToDwgPipeBindingReady": true,
@@ -15394,5 +17563,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "receiptSha256": "7EF5F02FCF4837371DAFE7CC4B380C68E01D57C540DF4F7962C8884F2E322294"
+  "receiptSha256": "5E7FE5CB0F7EB34956C590BEA63CA0F341FFF50E8BD2ECAB98097887DD946767"
 }

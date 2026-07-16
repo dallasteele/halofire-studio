@@ -142,6 +142,7 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('../../new-hope-attic-specific-application-calibration.json');
     expect(script).toContain('../../new-hope-pitched-holdout-answer-evidence.json');
     expect(script).toContain('../../new-hope-asbuilt-source-feed-riser-registration.json');
+    expect(script).toContain('../../polaris-pitched-hydraulic-network.json');
     expect(script).toContain('evaluateNewHopeRidgeBranchGradeEnvelope');
     expect(script).toContain('evaluateNewHopeLongBranchDrainage');
     expect(script).toContain('evaluateNewHopeSideBranchDrainage');
@@ -278,6 +279,8 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('dataset.primaryPipeRoleAssignmentReady = String(governedSkeleton.primaryPipeRoleAssignmentReady)');
     expect(script).toContain('dataset.wholeSystemVectorExtractionReady = String(governedSkeleton.wholeSystemVectorExtractionReady)');
     expect(script).toContain('dataset.properPipeLayoutReady = String(properPipeLayout.properPipeLayoutReady)');
+    expect(script).toContain('dataset.fittingAdjacencyMethodCalibrationReady = String(properPipeLayout.fittingAdjacencyMethodCalibrationReady)');
+    expect(script).toContain('dataset.completedProjectGeometryTransferred = String(properPipeLayout.completedProjectGeometryTransferred)');
     expect(script).toContain('dataset.branchGradeDirectionReady = String(properPipeLayout.wholeFp20RelativeGradeDirectionReady)');
     expect(script).toContain('dataset.endpointElevationsReady = String(properPipeLayout.exactPipeCenterlineZReady)');
     expect(script).toContain('dataset.route21HydraulicNodeBindingReady = String(hydraulicRoute21.route21HydraulicNodeBindingReady)');

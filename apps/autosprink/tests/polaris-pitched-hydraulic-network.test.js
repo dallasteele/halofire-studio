@@ -12,6 +12,7 @@ import {
   buildPhysicalPipeGraph,
   buildPolarisPitchedHydraulicNetwork,
 } from '../src/engine/polaris-pitched-hydraulic-network.js';
+import { assertPolarisReplayUpstreamHashes } from '../scripts/replay-polaris-pitched-hydraulic-network.mjs';
 
 const build = (overrides = {}) => buildPolarisPitchedHydraulicNetwork({
   pipeCalibration: overrides.pipeCalibration ?? pipeCalibration,
@@ -24,6 +25,18 @@ const build = (overrides = {}) => buildPolarisPitchedHydraulicNetwork({
 });
 
 describe('Polaris completed pitched hydraulic and drainage network', () => {
+  it('hash-gates every embedded upstream source used by the deterministic replay', () => {
+    expect(assertPolarisReplayUpstreamHashes(expected)).toEqual({
+      fireLineCad: 'EE9B22E5235AC137882BDB680A0295AFF87C53D444ED939E28CDA0A7EAAB9C9A',
+      sitePlan: '05580889F5D855EED5A54C76DE1CFB5371B984B52F1C2822DF6838ECE8C314EC',
+      sourceCandidate: 'D31FCA25A97FCAE42950C8B489988BC6B3A683A34D4673ED07561BF686BF50F5',
+    });
+    const attacked = structuredClone(expected);
+    attacked.sourceBoundary.fireLineRegistration.sources.sitePlan.sha256 = '0'.repeat(64);
+    expect(() => assertPolarisReplayUpstreamHashes(attacked))
+      .toThrow('POLARIS_REPLAY_UPSTREAM_HASH_INVALID:sitePlan');
+  });
+
   it('replays the committed packet deterministically', () => {
     expect(JSON.parse(JSON.stringify(build()))).toEqual(expected);
   });
@@ -187,6 +200,35 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       supplyTeeConnectedPipeIds: ['pipe-22275', 'pipe-3279', 'pipe-17499'],
       inspectorTestDrainConnectedPipeIds: ['pipe-22402', 'pipe-22468'],
       mainDrainCallout: { text: 'MAIN DRAIN', leaderSegmentCount: 2 },
+      sourceJunctionGraph: {
+        metrics: {
+          fittingCount: 98,
+          rigidFittingCount: 28,
+          flexibleDropCount: 70,
+          resolvedRigidFittingCount: 15,
+          unresolvedRigidFittingCount: 13,
+          fittingToFittingEdgeCount: 8,
+          fittingToPipeEndpointEdgeCount: 17,
+        },
+        claims: {
+          sourceCenterlineAdjacencyCompleteReady: false,
+          manufacturerExactTakeoutReady: false,
+          flexibleHoseCenterlineReady: false,
+          properPipeLayoutReady: false,
+        },
+      },
+      boundedSupplyTeeAssembly: {
+        status: 'passed',
+        sourceCenterlineAdjacencyReady: true,
+        fittingIds: ['fitting-69835', 'fitting-69852', 'fitting-71128', 'fitting-71338'],
+        pipeEndpointIds: ['pipe-17499:start', 'pipe-22275:end', 'pipe-3279:start'],
+      },
+      boundedInspectorTestDrainAssembly: {
+        status: 'passed',
+        sourceCenterlineAdjacencyReady: true,
+        fittingIds: ['fitting-72473'],
+        pipeEndpointIds: ['pipe-22402:end', 'pipe-22468:end'],
+      },
     });
     expect(expected.fittingSemantics.subCategoryCounts).toMatchObject({
       Tee: 2,
@@ -201,6 +243,10 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       fullFittingIdentityReady: true,
       supplyTeePipeBridgeReady: true,
       inspectorTestDrainPipeBridgeReady: true,
+      boundedSupplyTeeInterPieceAdjacencyReady: true,
+      boundedInspectorTestDrainInterPieceAdjacencyReady: true,
+      sourceFittingCenterlineAdjacencyCompleteReady: false,
+      manufacturerExactFittingTakeoutReady: false,
       mainDrainCalloutReady: true,
       drainDestinationReady: true,
     });
@@ -389,6 +435,15 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
     expect(html).toContain('exact cross-drawing endpoint geometry stays false');
     expect(html).toContain('718.821 inches from node 116');
     expect(html).toContain('whole-network flow directed');
+    expect(html).toContain('Bounded source fitting adjacency — plan, elevation, and 3D');
+    expect(html).toContain('4 supply fittings resolved');
+    expect(html).toContain('3 mutual fitting links');
+    expect(html).toContain('13 other rigid fittings unresolved');
+    expect(html).toContain('manufacturer takeout held');
+    expect(html).toContain('supplyJunctionPlan');
+    expect(html).toContain('supplyJunctionElevation');
+    expect(html).toContain('supplyJunction3d');
+    expect(html).toContain('dataset.boundedSupplyTeeInterPieceAdjacencyReady');
     expect(html).toContain('proper pipe layout held');
     expect(html).toContain('polaris-final-fl3-source-chain.png');
     expect(html).toContain('polaris-asbuilt-fp1-riser-source-chain.png');
@@ -406,6 +461,12 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
         exactFeedMainSpanRoutes: 1,
         exactCalculatedSprinklerTerminalBindings: 29,
         buildingComponentPipes: 177,
+        resolvedRigidFittingJunctions: 15,
+        unresolvedRigidFittingJunctions: 13,
+        boundedSupplyTeeFittings: 4,
+        boundedSupplyTeeFittingLinks: 3,
+        boundedSupplyTeePipeEndpointLinks: 3,
+        boundedInspectorTestDrainPipeEndpointLinks: 2,
         slopedPlanRuns: 14,
         uniqueWetPipeTrappedBasins: 9,
         codeBasisBoundWetPipeBasins: 8,
@@ -429,6 +490,9 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
         wetPipeBasinRegisterVisible: true,
         diagnosticToggleVerified: true,
         sourceContinuityImagesVisible: true,
+        boundedSupplyTeePlanProjectionVisible: true,
+        boundedSupplyTeeElevationProjectionVisible: true,
+        boundedSupplyTee3dProjectionVisible: true,
         browserErrorCount: 0,
       },
       claims: {
@@ -442,6 +506,10 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
         buildingRigidPipeSpanHydraulicDirectionReady: true,
         riserHydraulicSemanticBindingReady: true,
         wholeNetworkHydraulicFlowDirectionReady: true,
+        boundedSupplyTeeInterPieceAdjacencyReady: true,
+        boundedInspectorTestDrainInterPieceAdjacencyReady: true,
+        sourceFittingCenterlineAdjacencyCompleteReady: false,
+        manufacturerExactFittingTakeoutReady: false,
         exactWetPipeDrainageBasinGeometryReady: true,
         wetPipeDrainageCorrectionPlanReady: false,
         properPipeLayoutReady: false,

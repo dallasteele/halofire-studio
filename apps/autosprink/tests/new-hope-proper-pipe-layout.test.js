@@ -31,6 +31,7 @@ const sourceFeedAsbuiltRiserRegistration = read('new-hope-asbuilt-source-feed-ri
 const fabricationEndScheduleSource = read('new-hope-fabrication-end-schedule.json')
 const nativeFabTopology = read('new-hope-native-fab-topology.json')
 const nativeFabAttachmentGraphSource = read('new-hope-native-fab-attachment-graph.json')
+const completedProjectFittingAdjacencyCalibration = read('polaris-pitched-hydraulic-network.json')
 const hydraulicRoutes = ['2-1', '2-2', '2-3'].map((id) =>
   read(`new-hope-approved-fp20-hydraulic-route-${id}.json`),
 )
@@ -154,6 +155,7 @@ const inputs = {
   sourceFeedAsbuiltRiser,
   fabricationEndSchedule,
   nativeFabAttachmentGraph,
+  completedProjectFittingAdjacencyCalibration,
   lowPointFabrication,
   cmi05Cmi08Fabrication,
   cmi06VerticalOutlet,
@@ -223,6 +225,17 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.nativeFabAttachmentGraphReady).toBe(true)
     expect(result.nativeFabListedFittingIdentityCoverageReady).toBe(true)
     expect(result.nativeFabFittingAttachmentCount).toBe(97)
+    expect(result.fittingAdjacencyMethodCalibrationReady).toBe(true)
+    expect(result.completedProjectGeometryTransferred).toBe(false)
+    expect(result.fittingAdjacencyCalibration).toMatchObject({
+      projectId: 'polaris-academy-mesa-az',
+      resolvedRigidFittingCount: 15,
+      unresolvedRigidFittingCount: 13,
+      boundedSupplyTeeInterPieceAdjacencyReady: true,
+      boundedInspectorTestDrainInterPieceAdjacencyReady: true,
+      manufacturerExactFittingTakeoutReady: false,
+      projectSpecificGeometryTransferred: false,
+    })
     expect(result.interPieceFittingTopologyReady).toBe(false)
     expect(result.exactFittingTakeoutReady).toBe(false)
     expect(result.completeVerticalOffsetScheduleReady).toBe(false)
@@ -361,6 +374,18 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     const result = evaluateNewHopeProperPipeLayout(copy)
     expect(result.status).toBe('blocked')
     expect(result.blockerCodes).toContain('NH_PROPER_PIPE_CALCULATION_ELEVATION_CONFLICT')
+    expect(result.properPipeLayoutReady).toBe(false)
+  })
+
+  it('rejects cross-project fitting calibration drift without transferring its geometry', () => {
+    const attacked = structuredClone(inputs)
+    attacked.completedProjectFittingAdjacencyCalibration.claims.manufacturerExactFittingTakeoutReady = true
+    const result = evaluateNewHopeProperPipeLayout(attacked)
+    expect(result.status).toBe('blocked')
+    expect(result.blockerCodes).toContain('NH_PROPER_PIPE_FITTING_ADJACENCY_CALIBRATION_INVALID')
+    expect(result.fittingAdjacencyMethodCalibrationReady).toBe(false)
+    expect(result.completedProjectGeometryTransferred).toBe(false)
+    expect(result.interPieceFittingTopologyReady).toBe(false)
     expect(result.properPipeLayoutReady).toBe(false)
   })
 
