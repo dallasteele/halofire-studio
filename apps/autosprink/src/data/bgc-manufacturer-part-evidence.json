@@ -1,0 +1,174 @@
+{
+  "artifactType": "halofire.bgc-manufacturer-part-evidence.v1",
+  "projectId": "boys-girls-club-community-center-brigham-city-ut",
+  "sources": {
+    "fabricationList": {
+      "path": "02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/BGC_LIST.PDF",
+      "sha256": "7fe066904709725abd407c786b28b87e2b34dbc3071dcf6462b66d11f7e7d141",
+      "bytes": 862711,
+      "physicalPages": [9, 10]
+    },
+    "nativeFab": {
+      "path": "02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/BGC_LIST.FAB",
+      "sha256": "8968b6865194af5c5b64fed81c221958c9fa1c9974754c3e08dd91f0dfc22a52",
+      "bytes": 16800
+    },
+    "seismicBom": {
+      "path": "02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/SEISMIC BRACE BOM-04-25-2025.xlsx",
+      "sha256": "0e7b416df69e961474d8641401fcb7548c66a4eb891af8bd8e22390b54caf6f6",
+      "bytes": 21406,
+      "sheet": "BOM",
+      "range": "A1:M12"
+    },
+    "r2MaterialData": {
+      "path": "02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/07-AHJ Submittals/R2 4-23-25/BGC CC - Brigham City UT_mat data v2.pdf",
+      "sha256": "2e0b3e467a2abcff59faafc5de42fce69d5c8c178c87f6faeae0b8d4932ed6a8",
+      "bytes": 12745981,
+      "physicalPages": [154, 155, 157]
+    },
+    "approvedMaterialData": {
+      "path": "02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/PCI/BGC CC - Brigham City UT_app mat data.pdf",
+      "sha256": "9e7833d014c5b7625310504ce2dbe90613ac36918c02a9fbb3160ba4e7479212",
+      "bytes": 9897793,
+      "physicalPages": [24, 71, 73, 74, 108]
+    },
+    "victaulic1054": {
+      "url": "https://assets.victaulic.com/assets/uploads/literature/10.54.pdf",
+      "revision": "10161 Rev Q Updated 07/2022",
+      "sha256": "c085b8cfccc92e878aa94f0a597f2801751e7e4408067139ce53053ea75fe97d",
+      "bytes": 2697380,
+      "physicalPage": 4
+    },
+    "victaulicI142": {
+      "url": "https://assets.victaulic.com/assets/uploads/literature/I-142.pdf",
+      "revision": "12900 Rev B Updated 10/2019",
+      "sha256": "c0d125572a871f1f5a0eb2479b5df13da75d47fefe72b314669ee02123e3e110",
+      "bytes": 253798
+    },
+    "victaulicIgsCadZip": {
+      "url": "https://www.victaulic.com/assets/uploads/software-content/Autodesk_AutoCAD_3D_Blocks/Adsk_ACAD_FP_FireLock%20IGS_3D.zip",
+      "sha256": "07654e77286b22f44c93d27a6c762b98cb3ff0bfc849a7c6997636d114b0d806",
+      "bytes": 3940745
+    },
+    "victaulicNo142Dwg": {
+      "fileName": "Victaulic_FP-IGS_Outlet Welded_No 142 (IGS)_[3D].dwg",
+      "sha256": "7cf2771c58f1f69b58d04ad9a5391a960847c92fcd8e53d4af1afdf49c59c1dd",
+      "bytes": 129453
+    }
+  },
+  "gymGroovedOutlet": {
+    "lineName": "#E",
+    "pieceIds": ["#E.09", "#E.10", "#E.11", "#E.12", "#E.13"],
+    "nativeOutletUniqueIds": [29, 33, 32, 36, 35, 38, 44, 43],
+    "installedQuantity": 8,
+    "runNominalDiameterIn": 3,
+    "branchNominalDiameterIn": 1.25,
+    "listingToken": "3 x 1 1/4 GOL (Up:0)",
+    "fabricationReportTitle": "Welded Mains - Fabrication Report",
+    "nativeAttachedFittingCount": 0,
+    "catalogPartNumber": null,
+    "manufacturer": null,
+    "identityClassification": "native-fabricated-grooved-outlet-identity-only"
+  },
+  "wrongPartControls": {
+    "victaulicNo142": {
+      "manufacturer": "Victaulic",
+      "model": "No. 142 Welded Outlet",
+      "officialBranchNominalDiameterIn": 1,
+      "officialBranchActualOutsideDiameterIn": 1.315,
+      "officialEndToEndIn": 1,
+      "bgcRequiredBranchNominalDiameterIn": 1.25,
+      "bgcRequiredBranchActualOutsideDiameterIn": 1.66,
+      "sizeCompatible": false,
+      "projectSelectionVerified": false,
+      "rejectedForBgcGym": true,
+      "rejectionCode": "BRANCH_NOMINAL_SIZE_MISMATCH_1_VS_1_25"
+    }
+  },
+  "seismicBraceBom": {
+    "catalogRows": [
+      { "quantity": 18, "partNumber": "13520712", "description": "1/2 in Fig.980 - 3/8 in Universal Swivel" },
+      { "quantity": 3, "partNumber": "Y379010020", "description": "2 in Fig. 1001 Clamp" }
+    ],
+    "unresolvedEquivalentRowCount": 9,
+    "unresolvedEquivalentQuantity": 33,
+    "unresolvedEquivalentDescriptions": [
+      "Fig.825 Across Beam",
+      "3 in Fig. 4L Clamp",
+      "Fig.825 Across Beam",
+      "3 in Fig. 1001 Clamp",
+      "Fig. 131 - Across Beam",
+      "Fig.825 Across Beam",
+      "2 in Fig. 4L Clamp",
+      "Fig.825 Across Beam",
+      "2 in Fig. 1001 Clamp"
+    ]
+  },
+  "seismicBraceFamilies": {
+    "fig980": {
+      "manufacturer": "Eaton B-Line series TOLCO",
+      "figure": "980",
+      "r2PhysicalPage": 154,
+      "publishedCommonEnvelopeIn": { "A": 4.5625, "B": 2.0625 },
+      "exactRodVariantResolved": false,
+      "exactMountingHoleDResolved": false,
+      "exactBodySolidReady": false
+    },
+    "fig1001": {
+      "manufacturer": "Eaton B-Line series TOLCO",
+      "figure": "1001",
+      "r2PhysicalPage": 155,
+      "bracedPipeNominalDiameterIn": 2,
+      "bracePipeNominalDiameterIn": null,
+      "exactBodySolidReady": false
+    },
+    "fig4L": {
+      "manufacturer": "unresolved equivalent",
+      "submittedFamily": "Eaton B-Line series TOLCO Fig. 4L",
+      "r2PhysicalPage": 157,
+      "projectPartNumber": null,
+      "exactBodySolidReady": false
+    }
+  },
+  "approvedCandidateFamilies": {
+    "crossMainCoupling": {
+      "manufacturer": "Victaulic",
+      "submittedStyles": ["009N", "109"],
+      "nominalDiameterIn": 3,
+      "published009NDimensionsIn": { "actualOd": 3.5, "allowableSeparation": 0.12, "preassembledX": 5.13, "preassembledY": 6.75, "assembledX": 4.63, "assembledY": 6.75, "Z": 2 },
+      "published109DimensionsIn": { "actualOd": 3.5, "allowableSeparation": 0.12, "preassembledX": 5.13, "preassembledYL": 2.93, "preassembledYB": 3.53, "assembledX": 4.67, "assembledYL": 2.89, "assembledYB": 3.78, "Z": 2.07 },
+      "selectedStyle": null,
+      "projectStyleSelectionReady": false,
+      "exactInstalledCouplingSolidReady": false
+    },
+    "ringHanger": {
+      "manufacturer": "AFCON",
+      "figure": "300",
+      "nominalDiameterIn": 3,
+      "rodNominalDiameterIn": 0.375,
+      "publishedDimensionsIn": { "A": 3.7845, "B": 4.4311 },
+      "projectManufacturerMappingReady": false,
+      "exactInstalledHangerSolidReady": false
+    }
+  },
+  "modelingBoundary": {
+    "sourceEvidenceReady": true,
+    "wrongPartRejectionReady": true,
+    "catalogMaterialCodeEvidenceReady": true,
+    "gymOutletCatalogIdentityReady": false,
+    "gymOutletExactBodyGeometryReady": false,
+    "gymOutletWeldProfileReady": false,
+    "gymOutletBranchTakeoutReady": false,
+    "couplingStyleSelectionReady": false,
+    "manufacturerPartSolidVerified": false,
+    "exactBracketGeometryVerified": false,
+    "exactThreadGeometryVerified": false,
+    "threadEngagementAndToleranceVerified": false,
+    "matingFitVerified": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsReleaseReady": false
+  },
+  "claimStatus": "source-sealed-bgc-part-selection-and-wrong-part-rejection-not-exact-solids-threads-fit-fabrication-or-release",
+  "receiptSha256": "d9a909ab769e1798cafcd21a00652f9470e0498c15d7feaad8adcaf310447e79"
+}

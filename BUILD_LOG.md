@@ -19,6 +19,33 @@ reference log entries by date; log entries reference commits by short hash.
 
 ---
 
+## 2026-07-16
+
+### Entry 01 - BGC exact-part evidence and wrong-size CAD rejection
+
+- Bound the eight BGC gym welded grooved outlets on pieces `#E.09` through
+  `#E.13` to the protected listing and native FAB evidence: 3-inch run,
+  1-1/4-inch branch. The source package does not name the outlet manufacturer
+  or catalog body, so exact body geometry, weld profile, and takeout remain
+  fail-closed.
+- Downloaded and sealed Victaulic's official IGS catalog and AutoCAD 3D block.
+  The available No. 142 model is only a 1-inch branch and is therefore retained
+  as a dimensionally incompatible negative control, never as BGC geometry.
+- Preserved exact seismic BOM codes for Fig. 980 and Fig. 1001 while keeping
+  unresolved equivalent manufacturers, exact variants, full body solids,
+  coupling selection, brackets, threads, engagement, tolerances, and mating fit
+  false. Added an authenticated evidence route and a direct-source visual proof
+  with eight source renders.
+- Verification passed 20/20 adversarial mutations, 9/9 focused and API tests,
+  all 315 Vitest files / 2407 tests, all 20 Node-runner tests, Vite production
+  build, JavaScript syntax, focused Biome, GX10 Lean 4.13.0 proof, agent-loop
+  guard, authoritative rules verification, browser inspection, and brain
+  postflight episode `154470`.
+- No VPS deploy was attempted. Next: acquire the selected 3 x 1-1/4 outlet body
+  and weld-profile evidence plus exact installed coupling and brace variants;
+  only then generate source-bound BREP, helical threads, mating, and installed
+  assembly receipts.
+
 ## 2026-07-15
 
 ### Entry 03 - Building J topology-aware placement v2 (commit `aff59aa3`)

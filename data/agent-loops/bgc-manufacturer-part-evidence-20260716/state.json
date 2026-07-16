@@ -1,0 +1,98 @@
+{
+  "loop": "bgc-manufacturer-part-evidence-20260716",
+  "stage": "ITERATE",
+  "status": "source-sealed-wrong-part-rejected-exact-solids-held-closed",
+  "iteration": 2,
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "formal", "browser", "brain"]
+  },
+  "brainPreflight": {
+    "status": "passed",
+    "recalledEpisodes": [154150, 154100, 154299],
+    "appliedBoundary": "Part identity, dimensions, thread form, engagement, tolerances, mating interfaces, and installed placement are independent source facts; no partial evidence promotes an exact solid."
+  },
+  "claims": {
+    "sourceEvidenceReady": true,
+    "wrongPartRejectionReady": true,
+    "catalogMaterialCodeEvidenceReady": true,
+    "gymOutletCatalogIdentityReady": false,
+    "manufacturerPartSolidVerified": false,
+    "exactBracketGeometryVerified": false,
+    "exactThreadGeometryVerified": false,
+    "threadEngagementAndToleranceVerified": false,
+    "matingFitVerified": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsReleaseReady": false
+  },
+  "artifact": {
+    "receipt": "d9a909ab769e1798cafcd21a00652f9470e0498c15d7feaad8adcaf310447e79",
+    "evidenceJson": {
+      "path": "apps/autosprink/src/data/bgc-manufacturer-part-evidence.json",
+      "bytes": 7324,
+      "sha256": "084930292232F0EE3E73A271A6335AB19E309234060C4E6885DFBDBEE81A2B77"
+    },
+    "engine": {
+      "path": "apps/autosprink/src/engine/bgc-manufacturer-part-evidence.js",
+      "bytes": 11098,
+      "sha256": "A8DDC98AA7C809AD2B843D66296ACC7377518D7C5772F9DD7C26A35F2E9B3AC6"
+    },
+    "proofPage": {
+      "path": "apps/autosprink/src/data/proofs/bgc-manufacturer-part-evidence/index.html",
+      "bytes": 6647,
+      "sha256": "F73F7C598FEBC2CB81DF61A860EC1C05C74B2281FC6214D0497B63838592D40B"
+    },
+    "directSourceRenderSha256": {
+      "bgc-approved-afcon-300.png": "5D7058E08ADF5DFC5CA4B31C7C83FE49E7BEF24FC2DBBE86B0BF7BA96EBCF70D",
+      "bgc-approved-victaulic-009n.png": "9F2CEBBD66B6F70C380C860EB4913BC286DD899BD6BF4C9032A0418B85E117D7",
+      "bgc-listing-page-10.png": "5C2756A44CB51E59D7E8659613D33FC613A48FEC5BB2CB2CB7854CBC42F5BF06",
+      "bgc-listing-page-9.png": "3CCF47FA8A6E340DA6F4CE19F86D82FA1FDEEE6C74E1C739C4E5C71D85A5E840",
+      "bgc-r2-fig-1001.png": "F1D6C5E7BB1C098EA20F702F8C0D717608249F37B973885A7053CF6BAEC11388",
+      "bgc-r2-fig-4l.png": "00DAD13F1E26C997B5D08DFF160815F6B7BD7B1B76CD52CAD825C619DEEC99D4",
+      "bgc-r2-fig-980.png": "4D343A96936EF398F6C2BE44702C3405E25341067C3694EB753F678683CAE8A6",
+      "victaulic-no142-dimensions.png": "4EACD86EC227D882F72E5DA41D1E97A2083657B5C3D6D416F0C4BFD057BA721B"
+    }
+  },
+  "verification": {
+    "focusedTests": "2 files / 9 tests passed including authenticated API",
+    "authenticatedApi": "anonymous request rejected with 401; authenticated response returned source-sealed rejection and all exact-part/release claims false",
+    "fullRegression": "315 Vitest files / 2407 tests passed in 550.49 seconds; 20 Node-runner tests passed in 6.32 seconds",
+    "productionBuild": "passed Vite production build",
+    "javascriptSyntax": "passed",
+    "biomeFocusedLint": "passed",
+    "gitDiffCheck": "passed",
+    "adversarial": "20 semantic source, selection, geometry, thread, fit, and false-release mutations rejected after recomputing each receipt",
+    "formalProof": {
+      "status": "verified",
+      "prover": "Lean 4.13.0 on GX10",
+      "elapsedMs": 762,
+      "theoremCount": 3,
+      "receiptPath": "data/agent-loops/bgc-manufacturer-part-evidence-20260716/lean-proof.json",
+      "receiptSha256": "C45826AB13B267E70469020C880704AD073CB509AA2EE4F96DDEE3EF5FA7DDDA"
+    },
+    "browser": {
+      "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/bgc-manufacturer-part-evidence/index.html",
+      "title": "BGC manufacturer part evidence",
+      "directSourceRenderCount": 8,
+      "consoleErrorsOrWarnings": 0,
+      "visualInspection": "passed; all eight direct source renders visible and legible, proof labels the wrong-size control and unresolved exact-part boundary"
+    },
+    "agentLoopGuard": "AGENT_LOOP_GUARD ok",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "brainPostflight": {
+      "status": "recorded",
+      "episodeId": 154470,
+      "title": "BGC wrong-size manufacturer CAD rejected and exact-part gate sealed"
+    }
+  },
+  "remainingBlockers": [
+    "BGC_GYM_GROOVED_OUTLET_MANUFACTURER_AND_CATALOG_PART_UNRESOLVED",
+    "BGC_GYM_GROOVED_OUTLET_EXACT_BODY_WELD_PROFILE_AND_TAKEOUT_UNRESOLVED",
+    "BGC_EXACT_COUPLING_STYLE_SELECTION_UNRESOLVED",
+    "BGC_SEISMIC_EQUIVALENT_MANUFACTURERS_AND_EXACT_VARIANTS_UNRESOLVED",
+    "BGC_EXACT_PART_AND_BRACKET_SOLIDS_UNRESOLVED",
+    "BGC_THREAD_STANDARD_ENGAGEMENT_TOLERANCE_AND_MATING_FIT_UNRESOLVED"
+  ],
+  "nextAction": "Acquire the selected 3 x 1-1/4 grooved outlet body and weld-profile source, resolve installed coupling and brace-component variants from procurement or fabrication records, then bind exact manufacturer CAD or fully dimensioned drawings before generating BREP, helical threads, mating, or installed assembly receipts."
+}

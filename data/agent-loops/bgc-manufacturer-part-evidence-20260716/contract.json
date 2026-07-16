@@ -1,0 +1,56 @@
+{
+  "name": "bgc-manufacturer-part-evidence-20260716",
+  "owner": "codex",
+  "goal": "Bind the BGC gym outlet and seismic-support evidence to immutable project and manufacturer sources, reject dimensionally incompatible CAD, and prevent catalog families or partial envelopes from being promoted into exact solids, threads, fit, fabrication, field, or VPS readiness.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "apps/autosprink/src/data/bgc-manufacturer-part-evidence.json",
+    "apps/autosprink/src/engine/bgc-manufacturer-part-evidence.js",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/BGC_LIST.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/BGC_LIST.FAB",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/SEISMIC BRACE BOM-04-25-2025.xlsx",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/07-AHJ Submittals/R2 4-23-25/BGC CC - Brigham City UT_mat data v2.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/PCI/BGC CC - Brigham City UT_app mat data.pdf",
+    "https://assets.victaulic.com/assets/uploads/literature/10.54.pdf",
+    "https://assets.victaulic.com/assets/uploads/software-content/Autodesk_AutoCAD_3D_Blocks.html"
+  ],
+  "exit_criteria": [
+    "the eight BGC gym outlets remain bound to their exact native FAB identities, 3-inch run, 1-1/4-inch branch, and unresolved manufacturer body",
+    "the official 1-inch Victaulic No. 142 CAD remains rejected as dimensionally incompatible with the 1-1/4-inch BGC branch",
+    "exact seismic BOM material codes remain distinct from unresolved non-TOLCO equivalent rows and unresolved product variants",
+    "submitted coupling and hanger families remain candidates rather than selected installed parts",
+    "no source identity, catalog page, partial envelope, or CAD download can promote exact solids, brackets, threads, engagement, tolerance, mating fit, fabrication, field release, or VPS readiness",
+    "primary, cross-source, adversarial, authenticated API, browser, full regression, production build, formal invariant, rules, loop-guard, and brain postflight checks pass"
+  ],
+  "verification_gates": [
+    "source hashes and byte counts",
+    "native FAB identity and listing reconciliation",
+    "official manufacturer dimension mismatch control",
+    "seismic BOM material-code and submitted-family reconciliation",
+    "twenty adversarial source, selection, geometry, thread, fit, and release mutations",
+    "authenticated API fail-closed smoke",
+    "direct source-render browser inspection",
+    "full AutoSprink regression and production build",
+    "GX10 Lean invariant proof",
+    "authoritative agentic-rule check",
+    "agent loop guard",
+    "brain close writeback"
+  ],
+  "state_path": "data/agent-loops/bgc-manufacturer-part-evidence-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/bgc-manufacturer-part-evidence.json",
+    "apps/autosprink/src/data/proofs/bgc-manufacturer-part-evidence/index.html",
+    "apps/autosprink/tests/bgc-manufacturer-part-evidence.test.js",
+    "apps/autosprink/tests/pitched-placement-calibration-corpus-v5-api.test.js",
+    "data/agent-loops/bgc-manufacturer-part-evidence-20260716/lean-request.json",
+    "data/agent-loops/bgc-manufacturer-part-evidence-20260716/lean-proof.json",
+    "data/agent-loops/bgc-manufacturer-part-evidence-20260716/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 180000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

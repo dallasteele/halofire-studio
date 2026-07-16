@@ -46,6 +46,7 @@ describe('authenticated BGC failure and pitched calibration revision five', () =
   it('rejects anonymous access to every answer-exposed BGC route', async () => {
     expect((await fetch(`${BASE}/api/evidence/boys-girls-club-pitched-heldout-comparison`)).status).toBe(401);
     expect((await fetch(`${BASE}/api/evidence/bgc-source-plan-section-3d-registration`)).status).toBe(401);
+    expect((await fetch(`${BASE}/api/evidence/bgc-manufacturer-part-evidence`)).status).toBe(401);
     expect((await fetch(`${BASE}/api/evidence/pitched-placement-calibration-corpus-v5`)).status).toBe(401);
   });
 
@@ -98,6 +99,31 @@ describe('authenticated BGC failure and pitched calibration revision five', () =
       adversarialLoop: { status: 'passed', attemptedCases: 33 },
     });
     expect(new Set(Object.values(body.viewBindings).map((view) => view.geometryGraphSha256)).size).toBe(1);
+  });
+
+  it('returns the BGC wrong-part rejection without promoting unresolved exact solids', async () => {
+    const response = await fetch(`${BASE}/api/evidence/bgc-manufacturer-part-evidence`, { headers: { Authorization: `Bearer ${token}` } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    const body = await response.json();
+    expect(body).toMatchObject({
+      status: 'passed',
+      artifactType: 'halofire.bgc-manufacturer-part-evidence.v1',
+      receiptSha256: 'd9a909ab769e1798cafcd21a00652f9470e0498c15d7feaad8adcaf310447e79',
+      gymGroovedOutlet: { installedQuantity: 8, runNominalDiameterIn: 3, branchNominalDiameterIn: 1.25, catalogPartNumber: null, manufacturer: null },
+      wrongPartControls: { victaulicNo142: { officialBranchNominalDiameterIn: 1, bgcRequiredBranchNominalDiameterIn: 1.25, sizeCompatible: false, rejectedForBgcGym: true } },
+      adversarialLoop: { status: 'passed', mutationCount: 20, escapedMutationCount: 0 },
+      sourceEvidenceReady: true,
+      wrongPartRejectionReady: true,
+      manufacturerPartSolidVerified: false,
+      exactBracketGeometryVerified: false,
+      exactThreadGeometryVerified: false,
+      threadEngagementAndToleranceVerified: false,
+      matingFitVerified: false,
+      fabricationReady: false,
+      fieldReleaseReady: false,
+      vpsReleaseReady: false,
+    });
   });
 
   it('returns v5 with the calibrated-domain hard gate and preserved failure', async () => {
