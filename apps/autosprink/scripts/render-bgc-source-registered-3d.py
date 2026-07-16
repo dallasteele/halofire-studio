@@ -97,6 +97,8 @@ def main():
     roof.data.materials.append(roof_mat)
 
     blue = material("Source-covered branch halves", (0.01, 0.28, 1.0), metallic=0.25, roughness=0.25, emission=(0.01, 0.15, 1.0))
+    green = material("Source-covered branch feeds", (0.01, 0.72, 0.48), metallic=0.25, roughness=0.25, emission=(0.0, 0.45, 0.24))
+    magenta = material("Source-registered cross-main axis", (0.95, 0.02, 0.55), metallic=0.28, roughness=0.24, emission=(0.72, 0.0, 0.32))
     orange = material("Source guarded head centers", (1.0, 0.22, 0.015), metallic=0.2, roughness=0.3, emission=(1.0, 0.08, 0.0))
     gold = material("Ridge", (1.0, 0.55, 0.02), metallic=0.5, roughness=0.28, emission=(1.0, 0.22, 0.0))
 
@@ -104,8 +106,16 @@ def main():
         a, b = by_id[edge["from"]], by_id[edge["to"]]
         start = (*a["planPointFt"], a["roofSurfaceTargetElevationFt"] + 0.35)
         end = (*b["planPointFt"], b["roofSurfaceTargetElevationFt"] + 0.35)
-        cylinder_between(edge["id"], start, end, 0.16, blue)
+        if edge["kind"] == "source-registered-gym-cross-main-axis":
+            edge_material, radius = magenta, 0.22
+        elif "branch-feed" in edge["kind"]:
+            edge_material, radius = green, 0.16
+        else:
+            edge_material, radius = blue, 0.16
+        cylinder_between(edge["id"] + "_TARGET_CENTERLINE_NOT_PART_SOLID", start, end, radius, edge_material)
     for node in nodes:
+        if not node["id"].startswith("BGC-H-"):
+            continue
         bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=0.5, location=(*node["planPointFt"], node["roofSurfaceTargetElevationFt"] + 0.5))
         head = bpy.context.object
         head.name = node["id"] + "_TARGET_MARKER_NOT_PART_GEOMETRY"

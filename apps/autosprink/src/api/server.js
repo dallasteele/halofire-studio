@@ -2682,14 +2682,20 @@ app.get('/api/evidence/bgc-source-plan-section-3d-registration', authMiddleware,
   try {
     const packet = JSON.parse(fs.readFileSync(BGC_SOURCE_PLAN_SECTION_3D_REGISTRATION_PATH, 'utf8'));
     const [validation, adversarialLoop] = await Promise.all([validateBgcSourcePlanSection3dRegistration(packet), verifyBgcSourcePlanSection3dAdversarialLoop(packet)]);
-    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') return res.status(422).json({ status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop, exactInstalledPipeElevationVerified: false, pipeGradeVerified: false, complianceReady: false, vpsReleaseReady: false });
+    if (validation.status !== 'passed' || adversarialLoop.status !== 'passed') return res.status(422).json({ status: 'blocked', artifactType: packet.artifactType, issues: validation.issues, adversarialLoop, sourceBranchFeedTopologyVerified: false, sourceCrossMainPlanAxisVerified: false, pipeSizeVerified: false, exactInstalledPipeElevationVerified: false, exactBracketGeometryVerified: false, exactThreadGeometryVerified: false, threadEngagementAndToleranceVerified: false, matingFitVerified: false, pipeDirectionVerified: false, pipeGradeVerified: false, complianceReady: false, vpsReleaseReady: false });
     res.setHeader('Cache-Control', 'private, no-store');
     return res.json({
       status: 'passed', artifactType: packet.artifactType, receiptSha256: packet.receiptSha256,
       sourceBindings: packet.sourceBindings, detectors: packet.detectors, registration: packet.registration,
+      fabricationEvidence: packet.fabricationEvidence, networkRegistration: packet.networkRegistration,
       geometryGraph: packet.geometryGraph, viewBindings: packet.viewBindings, adversarialLoop,
-      sourcePlanCoordinatesVerified: true, sourceBranchHalfAdjacencyVerified: true, roofSurfaceTargetProjectionVerified: true,
+      sourcePlanCoordinatesVerified: true, sourceBranchHalfAdjacencyVerified: true,
+      sourceBranchFeedTopologyVerified: true, sourceCrossMainPlanAxisVerified: true, pipeSizeVerified: true,
+      roofSurfaceTargetProjectionVerified: true,
       exactInstalledSprinklerElevationVerified: false, exactInstalledPipeElevationVerified: false,
+      exactCrossMainPieceOrderVerified: false, exactFittingTakeoutVerified: false,
+      manufacturerPartSolidVerified: false, exactBracketGeometryVerified: false,
+      exactThreadGeometryVerified: false, threadEngagementAndToleranceVerified: false, matingFitVerified: false,
       pipeDirectionVerified: false, pipeGradeVerified: false, hydraulicCalculationReady: false,
       complianceReady: false, fabricationReady: false, fieldReleaseReady: false, vpsReleaseReady: false,
       claimStatus: packet.claimStatus,

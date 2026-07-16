@@ -1,0 +1,155 @@
+{
+  "loop": "bgc-cross-main-branch-feed-topology-20260716",
+  "stage": "ITERATE",
+  "status": "source-network-expanded-exact-parts-and-release-held-closed",
+  "iteration": 1,
+  "brainPreflight": {
+    "status": "passed",
+    "recalledEpisodes": [148709, 148734, 150493, 148790, 148237],
+    "appliedBoundary": "Hydraulic flow, drainage direction, grade, installed Z, fitting identity, manufacturer geometry, thread geometry, and mating fit remain independent source facts."
+  },
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "formal", "browser", "brain"]
+  },
+  "sourceEvidence": {
+    "asBuiltFp10Sha256": "6F20B0F9BE54A858F15DCDB196F457FD34607BB2075E17E7C615E52027A6F252",
+    "installPlanSha256": "6F20B0F9BE54A858F15DCDB196F457FD34607BB2075E17E7C615E52027A6F252",
+    "nativeFabSha256": "8968B6865194AF5C5B64FED81C221958C9FA1C9974754C3E08DD91F0DFC22A52",
+    "embeddedProjectSeidbSha256": "9F8A3B06597C94DFAFB39AA2FC970A82073B04433420472E0845ADDF48A78EA9",
+    "listingPdfSha256": "7FE066904709725ABD407C786B28B87E2B34DBC3071DCF6462B66D11F7E7D141",
+    "nativeFabCounts": {
+      "pipes": 121,
+      "lines": 20,
+      "outlets": 87,
+      "fittings": 50,
+      "hangerRows": 22
+    }
+  },
+  "canonicalNetwork": {
+    "nodeCount": 90,
+    "edgeCount": 89,
+    "graphDigest": "933f26d76ef50327e1be07abab8148a0c00e2f051e9d9bf694f022311b220443",
+    "headNodes": 64,
+    "branchFeedAxisNodes": 16,
+    "sharedCrossMainJunctions": 8,
+    "mainLimitNodes": 2,
+    "branchHalfEdges": 48,
+    "branchFeedEdges": 32,
+    "crossMainEdges": 9,
+    "registeredGymAxisFeet": 93.333327,
+    "preservedBranchHalfOffsetPoints": 4.162476,
+    "branchFeedNominalSize": "1.25 in",
+    "branchFeedSchedule": "SCH 10",
+    "crossMainNominalSize": "3 in",
+    "crossMainSchedule": "SCH 10",
+    "sameGraphDrivesPlanElevationAnd3d": true
+  },
+  "artifact": {
+    "receipt": "1d1f1ecb1e0fb17a8f81c5ff048f146647a0a3db191008dafdab08668f5a355d",
+    "registrationJson": {
+      "path": "apps/autosprink/src/data/bgc-source-plan-section-3d-registration.json",
+      "bytes": 129861,
+      "sha256": "BA94FBC26E6D07C24D2587D14F82A56379FB798725C151E88E0025C805BE2EC8"
+    },
+    "planOverlay": {
+      "path": "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-plan-overlay.png",
+      "bytes": 567974,
+      "sha256": "94647D2E2D79E47FF552496084600BA1C9C3FBA74270428EC8B433DDB63E93A8"
+    },
+    "sectionOverlay": {
+      "path": "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-section-overlay.png",
+      "bytes": 224496,
+      "sha256": "D71931F622FA6792182CD5A3572626FEFC8EFAEF923CED080915655CDD8E9DA3"
+    },
+    "blenderRender": {
+      "path": "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.png",
+      "bytes": 1984505,
+      "sha256": "282B6A669056554D43598C43ABB9348E40C0DA3D0C0BCE8C3677B53F718574CA"
+    },
+    "blend": {
+      "path": "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.blend",
+      "bytes": 161591,
+      "sha256": "80C95FADB0CF3CC8CC662FC2B299D2F97EC61B69BD77786EAF27F5A8681B613D"
+    },
+    "glb": {
+      "path": "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.glb",
+      "bytes": 2057020,
+      "sha256": "7BF76B957714FACF7DBB6F484A22AF5BC746F37FC8610BBD1BB9FDB650687921"
+    }
+  },
+  "verification": {
+    "deterministicReplay": "passed with unchanged JSON and two PDF-overlay SHA-256 hashes",
+    "focusedTests": "11 passed across BGC registration, heldout comparison, and corpus-v5 API",
+    "fullRegression": "314 test files and 2403 tests passed in 500.44 seconds on the final bracket and thread-fit schema",
+    "productionBuild": "passed Vite build",
+    "pythonSyntax": "passed",
+    "biome": "passed for the new engine and focused BGC test",
+    "adversarial": "27 mutations rejected, including source hash, FAB row/count/length/crosswalk, graph, size, direction, grade, Z, part-solid, bracket geometry, thread geometry, thread engagement/tolerance, fit, release, and receipt attacks",
+    "formalProof": {
+      "status": "verified",
+      "prover": "Lean 4.13.0 on GX10",
+      "elapsedMs": 193,
+      "receiptPath": "data/agent-loops/bgc-cross-main-branch-feed-topology-20260716/lean-proof.json",
+      "receiptSha256": "7110F415B4805E6281B81559CD87411B3F2F4CE743C605DAA6CD16D112D3856D"
+    },
+    "browser": {
+      "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/index.html",
+      "title": "BGC source-bound pitched-roof pipe registration",
+      "actualPdfUnderlayVisible": true,
+      "decodedImageCount": 3,
+      "naturalImageSizes": [[2080, 1880], [1080, 600], [1800, 1200]],
+      "horizontalOverflow": false,
+      "consoleErrorsOrWarnings": 0,
+      "truthBoundaryVisible": true,
+      "visualInspection": "passed actual FP 1.0 plan underlay with blue branches, green branch feeds, magenta cross-main and junctions; actual A301 section; and Blender graph over the actual plan raster"
+    },
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed"
+  },
+  "attempts": [
+    {
+      "action": "Full-page browser screenshot",
+      "result": "The browser capture produced a duplicated stitched preview, while the DOM contained one page and direct layout/image measurements showed all three source images decoded, a 1265-pixel page width, no horizontal overflow, and no console warnings or errors. The individual proof assets were inspected directly."
+    }
+  ],
+  "claims": {
+    "sourcePlanCoordinatesReady": true,
+    "branchFeedTopologyReady": true,
+    "crossMainAxisReady": true,
+    "nominalPipeSizeAndScheduleReady": true,
+    "nativeFabParentAttachmentsReady": true,
+    "crossMainPieceOrderReady": false,
+    "planToFabOutletMappingReady": false,
+    "exactFittingIdentityReady": false,
+    "exactFittingTakeoutReady": false,
+    "manufacturerPartSolidReady": false,
+    "exactBracketGeometryReady": false,
+    "helicalThreadGeometryReady": false,
+    "threadEngagementAndToleranceReady": false,
+    "matingFitReady": false,
+    "flowDirectionReady": false,
+    "drainageDirectionReady": false,
+    "gradeReady": false,
+    "installedPipeCenterlineZReady": false,
+    "codeComplianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsReleaseReady": false
+  },
+  "remainingBlockers": [
+    "BGC_CROSS_MAIN_PIECE_ORDER_UNRESOLVED",
+    "BGC_NINE_FAB_OUTLET_CANDIDATES_NOT_YET_BOUND_TO_EIGHT_PLAN_JUNCTIONS",
+    "BGC_EXACT_FITTING_IDENTITY_AND_TAKEOUT_UNRESOLVED",
+    "BGC_MANUFACTURER_PART_AND_BRACKET_DRAWINGS_UNRESOLVED",
+    "BGC_HELICAL_THREAD_STANDARD_ENGAGEMENT_TOLERANCE_AND_MATING_FIT_UNRESOLVED",
+    "BGC_EXACT_VERTICAL_OFFSETS_AND_INSTALLED_Z_UNRESOLVED",
+    "BGC_DIRECTION_AND_GRADE_HAVE_NO_EXPLICIT_SOURCE_EVIDENCE"
+  ],
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 154150,
+    "title": "BGC exact bracket and thread-fit gates sealed"
+  },
+  "nextAction": "Bind the #E cross-main piece order and nine native FAB outlet candidates to the eight plan junctions using listing, FAB, plan, and alternate completed-project evidence. Then source exact manufacturer fitting and bracket drawings plus thread standard, engagement, tolerances, mating interfaces, and installed vertical offsets before creating any part solid. Keep direction and grade false unless an explicit arrow, low-point chain, slope note, or dimensioned elevation chain proves them."
+}

@@ -1,0 +1,59 @@
+{
+  "name": "bgc-cross-main-branch-feed-topology-20260716",
+  "owner": "codex",
+  "goal": "Extend the source-bound BGC pitched-roof proof with the actual cross-main, branch-feed, fitting, size, direction, and drain facts carried by the protected FP 1.0 and native fabrication package, while refusing every unsupported grade, elevation, manufacturer-solid, thread, mating-fit, fabrication-release, field-release, or VPS claim.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "apps/autosprink/src/data/bgc-source-plan-section-3d-registration.json",
+    "apps/autosprink/scripts/extract-bgc-source-plan-section-3d.py",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/1-Bid Documents/GC - Bid Plans/Building/Boys and Girls Club Community Center Permit Set.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/Brigham City/BGC CC - Brigham City UT_app plans.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/BGC_INSTALL PLAN.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/BGC_LIST.FAB",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/09-Listings/BGC_LIST.PDF",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club Community Center - Brigham City UT/2-Internal Ops/01-Design/11-As-Built Set/BGC_INSTALL PLAN.pdf"
+  ],
+  "exit_criteria": [
+    "the actual as-built FP 1.0 remains visibly legible under the top-plan overlay and every extracted main or feed coordinate is traceable to its exact source page and immutable hash",
+    "the native FAB archive and embedded Project.seidb hashes remain exact and only their explicitly stored line, piece, outlet, fitting, size-code, end-code, length, angle, and distance fields are promoted",
+    "the cross-main and each branch feed are joined to the existing 64-head canonical graph only when native plan geometry and fabrication identity agree",
+    "pipe nominal sizes are promoted only through a source-proven legend, list, or native crosswalk; opaque size codes remain opaque",
+    "flow direction, drainage direction, and grade are separate facts and are promoted only from explicit source arrows, low-point notes, slope notes, or dimensioned elevation chains",
+    "exact pipe and fitting Z remain false unless a source dimension or source-bound vertical chain closes the coordinate",
+    "manufacturer part solids, bracket geometry, helical threads, engagement, tolerances, and mating fit remain false until exact manufacturer drawings or source models prove them",
+    "the same canonical network and truth boundary drive the top plan, roof elevation, and Blender 3D proof",
+    "wrong source hash, page, native-table boundary, parent relation, line or piece identity, size crosswalk, coordinate, graph digest, direction, grade, Z, part-solid, thread, mating-fit, and false-readiness mutations all fail closed",
+    "focused regression, deterministic replay, primary, cross-source, adversarial, production build, browser visual inspection, formal invariant, rules verification, loop guard, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source hash and physical-page replay",
+    "native PDF text and vector extraction tests",
+    "native FAB typed-row and parent-attachment replay",
+    "install-plan to listing and FAB cross-source reconciliation",
+    "canonical plan, elevation, and Blender graph identity check",
+    "adversarial source, table, identity, coordinate, direction, grade, Z, manufacturer-solid, thread, mating-fit, and release mutations",
+    "actual-PDF plan, section, and 3D browser screenshot inspection",
+    "focused AutoSprink tests and production build",
+    "GX10 Lean 4 invariant proof",
+    "authoritative agentic-rule check",
+    "brain close writeback with confirmed episode or exact failure"
+  ],
+  "state_path": "data/agent-loops/bgc-cross-main-branch-feed-topology-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/bgc-source-plan-section-3d-registration.json",
+    "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/index.html",
+    "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-plan-overlay.png",
+    "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-section-overlay.png",
+    "apps/autosprink/src/data/proofs/bgc-source-plan-section-3d-registration/bgc-source-registered-3d.png",
+    "data/agent-loops/bgc-cross-main-branch-feed-topology-20260716/state.json",
+    "data/agent-loops/bgc-cross-main-branch-feed-topology-20260716/lean-proof.json"
+  ],
+  "max_iterations": 12,
+  "max_tokens": 500000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

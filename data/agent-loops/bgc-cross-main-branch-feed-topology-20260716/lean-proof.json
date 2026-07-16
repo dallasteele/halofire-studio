@@ -1,0 +1,18 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/bgc-cross-main-branch-feed-topology-20260716/lean-request.json",
+  "theoremNames": [
+    "bgcExtendedSourceGraphCardinalityCloses",
+    "bgcNativeFabricationCountsClose",
+    "sourceTopologyAndSizeDoNotPromoteExactPartsOrRelease"
+  ],
+  "claim": "The BGC source graph closes at 90 nodes and 89 edges; the native FAB closes at 121 pipe, 20 line, 87 outlet, 50 fitting, and 22 hanger rows; source topology and nominal size cannot promote unresolved part solids, bracket geometry, thread geometry, engagement or tolerances, mating fit, direction, grade, installed Z, or VPS release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 193,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}
