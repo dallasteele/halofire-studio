@@ -21,6 +21,7 @@ describe('New Hope purchased support components', () => {
       fig69PublishedVariantCount: 7,
       sammyCandidateCount: 2,
       sammyOfficialCadArchiveCount: 2,
+      sammyIgesEntityCount: 294,
       sammyInstalledDetailCalloutCount: 2,
       hangerAnchorQuantityParityCount: 212,
       ascSeismicOfficialSourceCount: 4,
@@ -45,6 +46,7 @@ describe('New Hope purchased support components', () => {
     expect(result.sammyAnchorManufacturerIdentityReady).toBe(false)
     expect(result.manufacturerAuthoredSammyFamilyCadAcquired).toBe(true)
     expect(result.sammyCadLineArtOnly).toBe(true)
+    expect(result.sammyIgesTopologyAuditReady).toBe(true)
     expect(result.sammyProjectSubstrateConflictResolved).toBe(false)
     expect(result.sammyPartNumberSpecificSolidReady).toBe(false)
     expect(result.sammyThreadFormGeometryReady).toBe(false)
@@ -168,6 +170,12 @@ describe('New Hope purchased support components', () => {
     const badSammyCad = structuredClone(source)
     badSammyCad.manufacturerCadAcquisition.sammy.archives[0].sha256 = 'BAD'
     expect(evaluateNewHopePurchasedSupportComponents(badSammyCad).blockerCodes).toContain(
+      'NH_SUPPORT_SAMMY_CAD_SOURCE_INVALID',
+    )
+
+    const fakeSammySolidTopology = structuredClone(source)
+    fakeSammySolidTopology.manufacturerCadAcquisition.sammy.igesTopologyAudit.solidTopologyEntityCount = 1
+    expect(evaluateNewHopePurchasedSupportComponents(fakeSammySolidTopology).blockerCodes).toContain(
       'NH_SUPPORT_SAMMY_CAD_SOURCE_INVALID',
     )
 

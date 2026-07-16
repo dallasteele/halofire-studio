@@ -1,0 +1,41 @@
+{
+  "artifactType": "halofire.iges-topology-audit.v1",
+  "sourceFileName": "SWDR.igs",
+  "sourceFileSha256": "EF67A6869314B08220F0C2F831B95D5951110E139D36CC8D41FF54BB3EBEF7BA",
+  "sections": {
+    "S": 1,
+    "G": 9,
+    "D": 588,
+    "P": 609,
+    "T": 1
+  },
+  "entityCount": 294,
+  "entityTypeCounts": {
+    "100": 18,
+    "110": 256,
+    "124": 3,
+    "128": 2,
+    "212": 6,
+    "308": 2,
+    "406": 5,
+    "408": 2
+  },
+  "curveEntityCount": 274,
+  "surfaceEntityCount": 2,
+  "solidPrimitiveEntityCount": 0,
+  "solidTopologyEntityCount": 0,
+  "sampledGeometryZValueCount": 540,
+  "maximumAbsoluteZIn": 0,
+  "allSampledGeometryPlanar": true,
+  "header": {
+    "declaresLineArtSource": true,
+    "declaresDxfSource": true,
+    "declaresInchUnits": true,
+    "translator": "Autodesk IGES Translator Mechanical Desktop 2005 (Jun  8 2004) from Autodesk"
+  },
+  "closedWatertightSolidTopologyReady": false,
+  "threadBearingSolidReady": false,
+  "classification": "curve-dominant-planar-drawing-without-solid-topology",
+  "exactPartGeometryEligible": false,
+  "receiptSha256": "677156b9d7bbaf70619aded8805d4fd19bd3aa5f17770a960fa421446be61bc9"
+}

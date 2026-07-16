@@ -28,6 +28,8 @@ const EXPECTED_SAMMY_CAD_FILES = Object.freeze({
     sha256: 'DAD6BCD2C048FF121A68F65E20D4A42F8AB54FC4BCEBC1DA2862DE7CEB5B46EC',
   },
 })
+const EXPECTED_SAMMY_IGES_TOPOLOGY_RECEIPT =
+  '677156b9d7bbaf70619aded8805d4fd19bd3aa5f17770a960fa421446be61bc9'
 
 const EXPECTED_AB2_SOURCE_FILES = Object.freeze({
   'Sprinkler-Victaulic-Conc_Pendent_VicFlex-AB2.rfa': {
@@ -531,6 +533,31 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
       )
     },
   )
+  const sammyIgesAudit = sammyCad?.igesTopologyAudit
+  const sammyIgesAuditReady = (
+    sammyIgesAudit?.artifactPath ===
+      'apps/autosprink/src/data/new-hope-swdr-iges-topology-audit.json' &&
+    sammyIgesAudit?.sourceFileSha256 === EXPECTED_SAMMY_CAD_FILES['SWDR.igs'].sha256 &&
+    sammyIgesAudit?.receiptSha256 === EXPECTED_SAMMY_IGES_TOPOLOGY_RECEIPT &&
+    sammyIgesAudit?.entityCount === 294 &&
+    JSON.stringify(sammyIgesAudit?.entityTypeCounts) ===
+      JSON.stringify({ 100: 18, 110: 256, 124: 3, 128: 2, 212: 6, 308: 2, 406: 5, 408: 2 }) &&
+    sammyIgesAudit?.curveEntityCount === 274 &&
+    sammyIgesAudit?.surfaceEntityCount === 2 &&
+    sammyIgesAudit?.solidPrimitiveEntityCount === 0 &&
+    sammyIgesAudit?.solidTopologyEntityCount === 0 &&
+    sammyIgesAudit?.sampledGeometryZValueCount === 540 &&
+    sammyIgesAudit?.maximumAbsoluteZIn === 0 &&
+    sammyIgesAudit?.allSampledGeometryPlanar === true &&
+    sammyIgesAudit?.headerDeclaresLineArtSource === true &&
+    sammyIgesAudit?.headerDeclaresDxfSource === true &&
+    sammyIgesAudit?.headerDeclaresInchUnits === true &&
+    sammyIgesAudit?.closedWatertightSolidTopologyReady === false &&
+    sammyIgesAudit?.threadBearingSolidReady === false &&
+    sammyIgesAudit?.classification ===
+      'curve-dominant-planar-drawing-without-solid-topology' &&
+    sammyIgesAudit?.exactPartGeometryEligible === false
+  )
   if (
     JSON.stringify(sammyCad?.officialProductUrls) !==
       JSON.stringify(EXPECTED_SAMMY_CANDIDATES.map((entry) => entry.officialProductUrl)) ||
@@ -540,13 +567,14 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     sammyFiles.size !== Object.keys(EXPECTED_SAMMY_CAD_FILES).length ||
     sammyArchiveInvalid ||
     sammyFileInvalid ||
+    !sammyIgesAuditReady ||
     sammyCad?.manufacturerAuthoredFamilyCadAcquired !== true ||
     sammyCad?.sourceClassification !== 'line-art-and-application-drawings'
   ) {
     issues.push(
       issue(
         'NH_SUPPORT_SAMMY_CAD_SOURCE_INVALID',
-        'The official ITW SWDR family IGS/DWG archives and extracted file hashes must remain exact and explicitly classified as line art.',
+        'The official ITW SWDR family IGS/DWG archives, extracted file hashes, and reproducible IGES entity-topology receipt must remain exact and explicitly classified as planar line art without solid topology.',
         'SWDR1-1/2',
       ),
     )
@@ -827,6 +855,7 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     boundary?.sammyAnchorManufacturerIdentityReady !== false ||
     boundary?.manufacturerAuthoredSammyFamilyCadAcquired !== true ||
     boundary?.sammyCadIsLineArtOnly !== true ||
+    boundary?.sammyIgesTopologyAuditReady !== true ||
     boundary?.sammyPartNumberSpecificSolidReady !== false ||
     boundary?.sammyProjectSubstrateConflictResolved !== false ||
     boundary?.sammyThreadFormGeometryReady !== false ||
@@ -880,6 +909,9 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
       sammyOfficialCadArchiveCount: purchaseReady
         ? Object.keys(EXPECTED_SAMMY_CAD_ARCHIVES).length
         : 0,
+      sammyIgesEntityCount: purchaseReady && sammyIgesAuditReady
+        ? sammyIgesAudit.entityCount
+        : 0,
       sammyInstalledDetailCalloutCount: purchaseReady
         ? installedDetail.callouts.length
         : 0,
@@ -925,6 +957,7 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     sammyAnchorManufacturerIdentityReady: false,
     manufacturerAuthoredSammyFamilyCadAcquired: purchaseReady,
     sammyCadLineArtOnly: purchaseReady,
+    sammyIgesTopologyAuditReady: purchaseReady && sammyIgesAuditReady,
     sammyProjectSubstrateConflictResolved: false,
     sammyPartNumberSpecificSolidReady: false,
     sammyThreadFormGeometryReady: false,

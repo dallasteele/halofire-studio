@@ -2,7 +2,7 @@
   "loop": "new-hope-purchased-support-components-20260716",
   "stage": "VERIFY",
   "status": "reusable-exact-assembly-verifier-bound-release-rejected",
-  "iteration": 7,
+  "iteration": 8,
   "evidence": {
     "looseMaterialQuote": {
       "quoteNumber": "0133821",
@@ -65,6 +65,17 @@
       },
       "manufacturerAuthoredFamilyCadAcquired": true,
       "sourceClassification": "line-art-and-application-drawings",
+      "igesTopologyAudit": {
+        "receiptSha256": "677156b9d7bbaf70619aded8805d4fd19bd3aa5f17770a960fa421446be61bc9",
+        "entityCount": 294,
+        "curveEntityCount": 274,
+        "surfaceEntityCount": 2,
+        "solidPrimitiveEntityCount": 0,
+        "solidTopologyEntityCount": 0,
+        "sampledGeometryZValueCount": 540,
+        "maximumAbsoluteZIn": 0,
+        "classification": "curve-dominant-planar-drawing-without-solid-topology"
+      },
       "partNumberSpecificGeometryVerified": false,
       "threeDimensionalSolidVerified": false,
       "threadFormGeometryVerified": false
@@ -124,6 +135,7 @@
     "focusedTests": "27 files / 174 tests passed",
     "exactAssemblyFocusedTests": "2 files / 6 tests passed",
     "exactAssemblyAndProofTests": "4 files / 16 tests passed",
+    "manufacturerCadTopologyTests": "1 file / 3 tests passed",
     "adversarialCases": 41,
     "autosprinkBuild": "passed",
     "browser": {
@@ -163,7 +175,7 @@
     },
     "brainPostflight": {
       "endpoint": "canonical hal-brain /remember",
-      "episodeId": 153562
+      "episodeId": 153589
     }
   },
   "nextAction": "After explicit first-launch confirmation, inspect the official SWDR DWG, Victaulic AB2 RFA, and ASC Fig. 69 RFA with ODA; continue acquiring part-number-specific AF730, AF035, AF076, and AF779 solids or complete manufacturing geometry; resolve the Sammy part and substrate conflict; then use Blender/OpenGeometry to create true thread solids and produce independently trusted geometry hashes, critical-dimension audits, thread-profile/lead/crest/root and engaged-turn receipts, brace insertion, rod engagement, fastener fit, H1/H2 structure attachment, installed placement, and collision-free listed assemblies before model release."

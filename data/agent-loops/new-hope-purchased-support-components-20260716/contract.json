@@ -29,6 +29,7 @@
     "as-built FP0.1 wood Sammy details remain explicitly contradictory to the side-steel purchase description until installed substrate evidence resolves them",
     "SWDR 516 versus SWDR 1-1/2 stays unresolved until a project record selects the exact manufacturer part number",
     "ITW SWDR IGS/DWG files remain classified as family line art and cannot clear part-solid, thread-form, mating, or placement gates",
+    "the SWDR IGES topology audit must reproduce 294 entities, 274 curves, two planar surfaces, zero solid primitives, zero BREP/topology entities, and zero sampled Z extent from the exact manufacturer file hash",
     "official ASC AF730, AF035, AF076, and AF779 submittal hashes, quote variants, and published mating rules remain exact",
     "ASC price-sheet page 108 maps purchased product 0500604541 to AF779 catalog size 2 rather than a fabricated size 2-1/2 identity",
     "published ASC dimensions and installation rules cannot clear part-solid, fastener-thread, brace-insertion, structure-attachment, collision, or listed-assembly-fit gates",
@@ -58,7 +59,7 @@
     "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
     "data/agent-loops/new-hope-purchased-support-components-20260716/state.json"
   ],
-  "max_iterations": 7,
+  "max_iterations": 8,
   "max_tokens": 250000,
   "model_tier": "balanced",
   "human_gate_required": false,
