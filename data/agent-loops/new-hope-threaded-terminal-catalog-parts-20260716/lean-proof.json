@@ -1,0 +1,17 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-threaded-terminal-catalog-parts-20260716/lean-request.json",
+  "theoremNames": [
+    "catalogPartPrimaryDimensions",
+    "purchaseBoundCatalogEvidenceDoesNotPromoteTakeout"
+  ],
+  "claim": "The two purchase-bound ASC/SCI catalog parts retain their published 1.50-inch and 1.69-inch primary dimensions, while Blender component geometry does not promote secondary manufacturing envelope, internal thread form, installed thread engagement, fitting takeout, or proper layout.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 121,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

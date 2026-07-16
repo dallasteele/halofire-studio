@@ -1,0 +1,72 @@
+{
+  "artifactType": "halofire.new-hope-threaded-terminal-catalog-parts.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "projectPurchaseEvidence": {
+    "path": "02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/03-Fabrication Quotes/Response/New Hope Crisis Center Fab Quote.pdf",
+    "sha256": "B663D9C2492F50C244D83B886556CF5E5C09F6005325BCF670C906C66D1D6014",
+    "quoteNumber": "0133820",
+    "quoteDate": "2025-02-21",
+    "physicalPage": 2,
+    "pageCount": 3
+  },
+  "parts": [
+    {
+      "catalogPartId": "asc-sci-3201-1in-black",
+      "role": "threaded-90-elbow",
+      "nativeAutoSprinkItemCode": 1096,
+      "purchaseDescription": "DI 1 90 SCREWED BEND",
+      "purchaseProductNumber": "0840000004",
+      "purchasedQuantity": 57,
+      "manufacturer": "ASC Engineered Solutions",
+      "brand": "SCI",
+      "figure": "3201",
+      "nominalSizesIn": [1, 1],
+      "connection": "FNPT x FNPT",
+      "material": "ASTM A536 Grade 65-45-12 ductile iron",
+      "finish": "black",
+      "maxWorkingPressurePsi": 500,
+      "publishedDimensionsIn": {
+        "centerToEndA": 1.5
+      },
+      "publishedWeightLb": 0.62,
+      "officialProductUrl": "https://bim-catalog.asc-es.com/item/sci-ductile-iron/fig-3201-90-elbow/1-3201-black",
+      "officialSubmittalUrl": "https://www.asc-es.com/resources-and-downloads/3201-90-elbow-submittal",
+      "officialImageUrl": "https://s3.us-east-1.amazonaws.com/ue1.asc-es.com/images/products/10416_3201.jpg",
+      "officialImageSha256": "42840C46CDB8A9313E331C9FA6219E7CF24E8C0A529E3C195CD7EA5FD4D0EA56"
+    },
+    {
+      "catalogPartId": "asc-sci-3221r-1x3_4-black",
+      "role": "threaded-reducer",
+      "nativeAutoSprinkItemCode": 1149,
+      "purchaseDescription": "DI 1X3/4 SCREWED RED CPLG",
+      "purchaseProductNumber": "0840010763",
+      "purchasedQuantity": 18,
+      "manufacturer": "ASC Engineered Solutions",
+      "brand": "SCI",
+      "figure": "3221R",
+      "nominalSizesIn": [1, 0.75],
+      "connection": "FNPT x FNPT",
+      "material": "ASTM A536 Grade 65-45-12 ductile iron",
+      "finish": "black",
+      "maxWorkingPressurePsi": 500,
+      "publishedDimensionsIn": {
+        "overallLengthA": 1.69
+      },
+      "publishedWeightLb": 0.53,
+      "officialProductUrl": "https://www.asc-es.com/products/3221r-reducing-coupling",
+      "officialSubmittalUrl": "https://www.asc-es.com/resources-and-downloads/3221r-reducing-coupling-submittal",
+      "officialImageUrl": "https://s3.us-east-1.amazonaws.com/ue1.asc-es.com/images/products/10424_3221R.jpg",
+      "officialImageSha256": "059351AB29BC76A52F6042CAF36097FD9041E4D66D8D7E105C8DD3AF6BA4262B"
+    }
+  ],
+  "modelingBoundary": {
+    "manufacturerPartIdentityReady": true,
+    "manufacturerPrimaryDimensionsReady": true,
+    "officialProductImageProfileReady": true,
+    "manufacturerSecondaryEnvelopeReady": false,
+    "exactInternalThreadFormReady": false,
+    "exactThreadEngagementReady": false,
+    "exactFittingTakeoutReady": false,
+    "reason": "The purchase quote and ASC product/submittal sources identify the supplied parts and primary dimensions, but the un-gated sources do not publish the complete manufacturing solid, secondary body envelope, or installed thread engagement/takeout."
+  }
+}

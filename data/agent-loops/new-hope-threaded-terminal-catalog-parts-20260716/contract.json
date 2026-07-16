@@ -1,0 +1,54 @@
+{
+  "name": "new-hope-threaded-terminal-catalog-parts-20260716",
+  "owner": "codex",
+  "goal": "Crosswalk the New Hope fabrication quote to the exact ASC/SCI one-inch threaded elbow and 1 x 3/4 threaded reducing coupling, bind their published primary dimensions, create catalog-identified Blender MCP component meshes, and keep unproved thread engagement, fitting takeout, placement, grade, fabrication, and field release fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/03-Fabrication Quotes/Response/New Hope Crisis Center Fab Quote.pdf",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/data/new-hope-native-fab-attachment-graph.json",
+    "https://bim-catalog.asc-es.com/item/sci-ductile-iron/fig-3201-90-elbow/1-3201-black",
+    "https://www.asc-es.com/resources-and-downloads/3201-90-elbow-submittal",
+    "https://www.asc-es.com/products/3221r-reducing-coupling",
+    "https://www.asc-es.com/resources-and-downloads/3221r-reducing-coupling-submittal"
+  ],
+  "exit_criteria": [
+    "the protected New Hope quote hash, quote number, page, product descriptions, product numbers, and quantities are explicit",
+    "the 1-inch elbow resolves to ASC/SCI Fig. 3201 product 0840000004 with published 1.50-inch center-to-end dimension",
+    "the 1 x 3/4 reducer resolves to ASC/SCI Fig. 3221R product 0840010763 with published 1.69-inch overall length",
+    "the Blender MCP scene contains distinct catalog-identified elbow and reducer component meshes plus the twenty protected pipe bodies",
+    "adversarial quote, product-number, dimension, and false-green mutations fail closed",
+    "secondary body envelope, internal thread form, engagement, takeout, exact placement, grade, fabrication, and release remain false"
+  ],
+  "verification_gates": [
+    "brain preflight and postflight",
+    "protected quote SHA-256 and cross-source product-number match",
+    "official ASC product and submittal identity",
+    "focused adversarial tests",
+    "Blender MCP bridge execution, BLEND and GLB export, and rendered visual inspection",
+    "scoped regression, build, loop guard, agentic rules, and browser proof"
+  ],
+  "state_path": "data/agent-loops/new-hope-threaded-terminal-catalog-parts-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-threaded-terminal-catalog-parts.json",
+    "apps/autosprink/src/engine/new-hope-threaded-terminal-catalog-parts.js",
+    "apps/autosprink/tests/new-hope-threaded-terminal-catalog-parts.test.js",
+    "apps/autosprink/scripts/render-new-hope-threaded-terminal-blender.py",
+    "output/3d/new-hope-threaded-terminal-parts.blend",
+    "output/3d/new-hope-threaded-terminal-parts.glb",
+    "output/3d/new-hope-threaded-terminal-parts.png",
+    "output/3d/new-hope-asc-threaded-terminal-catalog-parts.glb",
+    "output/3d/new-hope-asc-threaded-terminal-catalog-parts.png",
+    "data/agent-loops/new-hope-threaded-terminal-catalog-parts-20260716/lean-request.json",
+    "data/agent-loops/new-hope-threaded-terminal-catalog-parts-20260716/lean-proof.json",
+    "data/agent-loops/new-hope-threaded-terminal-catalog-parts-20260716/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 180000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

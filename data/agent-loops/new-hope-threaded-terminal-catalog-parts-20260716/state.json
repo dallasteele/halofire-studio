@@ -1,0 +1,115 @@
+{
+  "loop": "new-hope-threaded-terminal-catalog-parts-20260716",
+  "stage": "VERIFY",
+  "status": "purchase-bound-catalog-components-verified",
+  "iteration": 4,
+  "acceptanceAuthority": {
+    "humanReviewRequired": false,
+    "loops": ["primary", "crossSource", "adversarial", "blenderMcp", "browser", "formal"]
+  },
+  "sourceEvidence": {
+    "projectFabricationQuote": {
+      "quoteNumber": "0133820",
+      "physicalPage": 2,
+      "sha256": "B663D9C2492F50C244D83B886556CF5E5C09F6005325BCF670C906C66D1D6014"
+    },
+    "parts": [
+      {
+        "figure": "3201",
+        "purchaseProductNumber": "0840000004",
+        "publishedCenterToEndAIn": 1.5
+      },
+      {
+        "figure": "3221R",
+        "purchaseProductNumber": "0840010763",
+        "publishedOverallLengthAIn": 1.69
+      }
+    ]
+  },
+  "artifacts": {
+    "blenderMcpScene": {
+      "configuration": "E:/ClaudeBot/.mcp.json",
+      "mcpExecutable": "C:/Python312/Scripts/blender-mcp.exe",
+      "blenderExecutable": "C:/Program Files/Blender Foundation/Blender 5.0/blender.exe",
+      "addon": "C:/Users/dalla/AppData/Roaming/Blender Foundation/Blender/5.0/scripts/addons/BlenderMCP_addon.py",
+      "port": 9876,
+      "pipeObjectCount": 20,
+      "catalogPartCount": 2,
+      "catalogComponentMeshCount": 11,
+      "blend": {
+        "path": "output/3d/new-hope-threaded-terminal-parts.blend",
+        "bytes": 182190,
+        "sha256": "3F9DBA7C273C25C45E2F1EBE1CE7BB8A54B8A0FF5AF3FB3A957A27369EE24B5B"
+      },
+      "combinedGlb": {
+        "path": "output/3d/new-hope-threaded-terminal-parts.glb",
+        "bytes": 532060,
+        "sha256": "A7B8CA08A5A9C12BC0B2C216908119D16E52FC01EF9361F2896FAAAF11F074AF",
+        "deterministicReplay": true
+      },
+      "catalogGlb": {
+        "path": "output/3d/new-hope-asc-threaded-terminal-catalog-parts.glb",
+        "bytes": 269716,
+        "sha256": "BE770AE7C67E76A97F69FCFD6DFA05C2D3288EF58D914FF3688311FF2FD8C815",
+        "deterministicReplay": true
+      },
+      "catalogPng": {
+        "path": "output/3d/new-hope-asc-threaded-terminal-catalog-parts.png",
+        "bytes": 786700,
+        "sha256": "582B3A9B7E69869319C1753CF6F744F18CC7119187517FE2FE68CACF259D0BB1",
+        "visualInspection": "passed after rejecting two clipped or axis-invalid close-up renders"
+      }
+    }
+  },
+  "verification": {
+    "focusedTests": "2 files / 4 tests passed",
+    "newHopeRegression": "26 files / 172 tests passed",
+    "autosprinkProductionBuild": "passed",
+    "editorProductionBuild": "8 tasks successful / 8 total",
+    "fullRootBuild": "11 of 12 tasks passed; pre-existing halofire-studio-desktop Tauri build alone failed because bin/halofire-pipeline-x86_64-pc-windows-msvc.exe is absent",
+    "biomeLint": "passed with one pre-existing noUselessEscapeInString warning in proof.js",
+    "pythonCompile": "passed",
+    "gitDiffCheck": "passed",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "agenticRules": "AGENTIC_RULES_VERIFY ok",
+    "browser": {
+      "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html#threaded-terminal-catalog-part-evidence",
+      "title": "New Hope PDF-bound truss and pipe proof",
+      "proofReady": true,
+      "catalogPartIdentityReady": true,
+      "manufacturerPrimaryDimensionsReady": true,
+      "manufacturerSecondaryEnvelopeReady": false,
+      "exactInternalThreadFormReady": false,
+      "exactThreadEngagementReady": false,
+      "exactFittingTakeoutReady": false,
+      "properPipeLayoutReady": false,
+      "imageNaturalSize": "1600x900",
+      "brokenImages": 0
+    },
+    "formalProof": {
+      "status": "verified",
+      "prover": "Lean 4.13.0 on GX10",
+      "elapsedMs": 121,
+      "receipt": "data/agent-loops/new-hope-threaded-terminal-catalog-parts-20260716/lean-proof.json"
+    },
+    "brainPostflight": {
+      "status": "recorded",
+      "episodeId": 151500
+    }
+  },
+  "claims": {
+    "catalogPartIdentityReady": true,
+    "manufacturerPrimaryDimensionsReady": true,
+    "blenderCatalogComponentGeometryReady": true,
+    "manufacturerSecondaryEnvelopeReady": false,
+    "exactThreadFormReady": false,
+    "exactThreadEngagementReady": false,
+    "exactFittingTakeoutReady": false,
+    "exactBuildingPlacementReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsDeploymentReady": false
+  },
+  "nextAction": "Use the verified catalog identities only after a source-native CMI.23-CMI.42 connection record or installed takeout source binds each part to an exact pipe endpoint, then place the verified true-scale components into the pitched-roof building model with side-view Z and grade evidence."
+}
