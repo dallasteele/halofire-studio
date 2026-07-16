@@ -2,6 +2,30 @@ const EXPECTED_QUOTE_SHA = '844981467740F66D9847B356C2B44BE7CB8D0F77825B453E40C9
 const EXPECTED_VICTAULIC_ARCHIVE_SHA = 'B467AFEF240738F478E5C55F48639064B66AD9036D103FE7F7D2FC7034A20495'
 const EXPECTED_FIG69_RFA_SHA = 'B079BA1D50E1F96279E96561208AAA25918472793F4029B261448A2B0D557F17'
 const EXPECTED_FIG69_CATALOG_SHA = '69DDBD5E3C87C50142AABBC71A17B4BE089249FE1858202B4C8F5751D4D91061'
+const EXPECTED_ASBUILT_SHA = 'ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B'
+const EXPECTED_ASBUILT_RENDER_SHA = 'A921601967128BC8192CAA20A36149F0A0205497879577950342B5B39405B4A2'
+
+const EXPECTED_SAMMY_CAD_ARCHIVES = Object.freeze({
+  'SWDR_IGS.zip': {
+    byteLength: 9678,
+    sha256: '3FC47622361E3A3DBB98E46B5E2F85487977A7A8ED6EEC8D87B5D0835A2304E5',
+  },
+  'SWDR_DWG.zip': {
+    byteLength: 18849,
+    sha256: 'F4DD626997860A4C0A3F0E4D30392712144DE03F8F7E464FFABDFB5146D97547',
+  },
+})
+
+const EXPECTED_SAMMY_CAD_FILES = Object.freeze({
+  'SWDR.igs': {
+    byteLength: 99056,
+    sha256: 'EF67A6869314B08220F0C2F831B95D5951110E139D36CC8D41FF54BB3EBEF7BA',
+  },
+  'SWDR.dwg': {
+    byteLength: 50920,
+    sha256: 'DAD6BCD2C048FF121A68F65E20D4A42F8AB54FC4BCEBC1DA2862DE7CEB5B46EC',
+  },
+})
 
 const EXPECTED_AB2_SOURCE_FILES = Object.freeze({
   'Sprinkler-Victaulic-Conc_Pendent_VicFlex-AB2.rfa': {
@@ -95,6 +119,32 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     )
   }
 
+  const installedDetail = source.installedDetailControl
+  if (
+    installedDetail?.fileName !== 'New Hope BGC - Brigham City UT_as builts.pdf' ||
+    installedDetail?.sha256 !== EXPECTED_ASBUILT_SHA ||
+    installedDetail?.byteLength !== 19209229 ||
+    installedDetail?.pageCount !== 4 ||
+    installedDetail?.physicalPage !== 1 ||
+    installedDetail?.sheet !== 'FP0.1' ||
+    installedDetail?.renderSha256 !== EXPECTED_ASBUILT_RENDER_SHA ||
+    installedDetail?.renderPixelWidth !== 6120 ||
+    installedDetail?.renderPixelHeight !== 3960 ||
+    JSON.stringify(installedDetail?.callouts) !==
+      JSON.stringify(['WOOD SIDE SAMMY SCREW', 'WOOD VERTICAL SAMMY SCREW']) ||
+    installedDetail?.detailSubstrate !== 'wood' ||
+    installedDetail?.purchaseDescriptionSubstrate !== 'steel' ||
+    installedDetail?.substrateApplicationConflictResolved !== false
+  ) {
+    issues.push(
+      issue(
+        'NH_SUPPORT_SAMMY_INSTALLED_DETAIL_CONFLICT_INVALID',
+        'As-built FP0.1 must retain both wood Sammy details and the unresolved conflict with the purchased side-steel anchor description.',
+        'SWDR1-1/2',
+      ),
+    )
+  }
+
   if (
     source.purchaseEvidence?.sha256 !== EXPECTED_QUOTE_SHA ||
     source.purchaseEvidence?.quoteNumber !== '0133821' ||
@@ -166,6 +216,8 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     sammyConflict?.selectedManufacturerPartNumber !== null ||
     sammyConflict?.manufacturerCadAvailable !== true ||
     sammyConflict?.manufacturerCadAcquired !== false ||
+    sammyConflict?.manufacturerFamilyCadAcquired !== true ||
+    sammyConflict?.manufacturerExactPartCadAcquired !== false ||
     sammyConflict?.exactGeometryEligible !== false
   ) {
     issues.push(
@@ -282,6 +334,81 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     }
   }
 
+  const sammyCad = acquisition?.sammy
+  const sammyArchives = new Map(
+    (sammyCad?.archives || []).map((entry) => [entry.fileName, entry]),
+  )
+  const sammyFiles = new Map(
+    (sammyCad?.extractedFiles || []).map((entry) => [entry.fileName, entry]),
+  )
+  const sammyArchiveInvalid = Object.entries(EXPECTED_SAMMY_CAD_ARCHIVES).some(
+    ([fileName, expected]) => {
+      const actualFile = sammyArchives.get(fileName)
+      return (
+        actualFile?.byteLength !== expected.byteLength ||
+        actualFile?.sha256 !== expected.sha256
+      )
+    },
+  )
+  const sammyFileInvalid = Object.entries(EXPECTED_SAMMY_CAD_FILES).some(
+    ([fileName, expected]) => {
+      const actualFile = sammyFiles.get(fileName)
+      return (
+        actualFile?.byteLength !== expected.byteLength ||
+        actualFile?.sha256 !== expected.sha256
+      )
+    },
+  )
+  if (
+    JSON.stringify(sammyCad?.officialProductUrls) !==
+      JSON.stringify(EXPECTED_SAMMY_CANDIDATES.map((entry) => entry.officialProductUrl)) ||
+    sammyCad?.officialAssetBaseUrl !==
+      'https://fastening-solutions.itwbuildex.com/Asset/' ||
+    sammyArchives.size !== Object.keys(EXPECTED_SAMMY_CAD_ARCHIVES).length ||
+    sammyFiles.size !== Object.keys(EXPECTED_SAMMY_CAD_FILES).length ||
+    sammyArchiveInvalid ||
+    sammyFileInvalid ||
+    sammyCad?.manufacturerAuthoredFamilyCadAcquired !== true ||
+    sammyCad?.sourceClassification !== 'line-art-and-application-drawings'
+  ) {
+    issues.push(
+      issue(
+        'NH_SUPPORT_SAMMY_CAD_SOURCE_INVALID',
+        'The official ITW SWDR family IGS/DWG archives and extracted file hashes must remain exact and explicitly classified as line art.',
+        'SWDR1-1/2',
+      ),
+    )
+  }
+  if (
+    sammyCad?.partNumberSpecificGeometryVerified !== false ||
+    sammyCad?.threeDimensionalSolidVerified !== false ||
+    sammyCad?.threadFormGeometryVerified !== false ||
+    sammyCad?.candidateSelectionResolved !== false ||
+    sammyCad?.installedSubstrateApplicationResolved !== false
+  ) {
+    issues.push(
+      issue(
+        'NH_SUPPORT_SAMMY_CAD_VERIFICATION_BOUNDARY_INVALID',
+        'Family line art cannot promote a candidate identity, substrate application, part-number solid, or thread form.',
+        'SWDR1-1/2',
+      ),
+    )
+  }
+
+  const fig69HangerQuantity = Object.keys(EXPECTED_FIG69_VARIANTS).reduce(
+    (sum, productNumber) => sum + (actual.get(productNumber)?.quantity || 0),
+    0,
+  )
+  const sammyAnchorQuantity = actual.get('SWDR1-1/2')?.quantity || 0
+  if (fig69HangerQuantity !== 212 || sammyAnchorQuantity !== 212) {
+    issues.push(
+      issue(
+        'NH_SUPPORT_HANGER_ANCHOR_QUANTITY_PARITY_INVALID',
+        'The quote must retain 212 Fig. 69 hangers and 212 Sammy anchors without treating quantity parity as installed identity proof.',
+      ),
+    )
+  }
+
   const boundary = source.modelingBoundary
   if (
     boundary?.purchaseIdentityReady !== true ||
@@ -295,6 +422,11 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     boundary?.exactFig69ThreadSolidReady !== false ||
     boundary?.fig69MatingAssemblyReady !== false ||
     boundary?.sammyAnchorManufacturerIdentityReady !== false ||
+    boundary?.manufacturerAuthoredSammyFamilyCadAcquired !== true ||
+    boundary?.sammyCadIsLineArtOnly !== true ||
+    boundary?.sammyPartNumberSpecificSolidReady !== false ||
+    boundary?.sammyProjectSubstrateConflictResolved !== false ||
+    boundary?.sammyThreadFormGeometryReady !== false ||
     boundary?.manufacturerCadCoverageComplete !== false ||
     boundary?.fullyDimensionedManufacturingDrawingsAcquired !== false ||
     boundary?.exactThreadSolidsReady !== false ||
@@ -324,6 +456,14 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
       fig69PublishedVariantCount: purchaseReady
         ? Object.values(EXPECTED_FIG69_VARIANTS).reduce((sum, variants) => sum + variants.length, 0)
         : 0,
+      sammyCandidateCount: purchaseReady ? EXPECTED_SAMMY_CANDIDATES.length : 0,
+      sammyOfficialCadArchiveCount: purchaseReady
+        ? Object.keys(EXPECTED_SAMMY_CAD_ARCHIVES).length
+        : 0,
+      sammyInstalledDetailCalloutCount: purchaseReady
+        ? installedDetail.callouts.length
+        : 0,
+      hangerAnchorQuantityParityCount: purchaseReady ? sammyAnchorQuantity : 0,
     },
     purchaseIdentityReady: purchaseReady,
     manufacturerAuthoredAb2SourceAcquired: purchaseReady,
@@ -334,6 +474,12 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     exactFig69ThreadSolidReady: false,
     fig69MatingAssemblyReady: false,
     sammyAnchorManufacturerIdentityReady: false,
+    manufacturerAuthoredSammyFamilyCadAcquired: purchaseReady,
+    sammyCadLineArtOnly: purchaseReady,
+    sammyProjectSubstrateConflictResolved: false,
+    sammyPartNumberSpecificSolidReady: false,
+    sammyThreadFormGeometryReady: false,
+    hangerAnchorQuantityParityReady: purchaseReady,
     manufacturerCadCoverageComplete: false,
     exactManufacturerGeometryReady: false,
     exactThreadSolidsReady: false,

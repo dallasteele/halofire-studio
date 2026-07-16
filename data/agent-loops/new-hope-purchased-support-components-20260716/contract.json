@@ -1,42 +1,48 @@
 {
-  "loop": "new-hope-purchased-support-components-20260716",
-  "objective": "Bind every purchased New Hope hanger, bracket, anchor, clamp, brace fitting, adapter, and swivel to its exact quote identity and auto-reject generic geometry.",
-  "acceptanceAuthority": "machine-loops",
-  "humanReviewRequired": false,
-  "sourceGates": [
-    "Loose-material quote 0133821 SHA-256 and all 16 support product lines match",
-    "Approved AFCON 300 submittal imagery is explicitly non-interchangeable with purchased Anvil Fig. 69 geometry",
-    "Official Victaulic AB2 Revit archive and family file hashes match before source acquisition is credited",
-    "Official ASC/Anvil Fig. 69 RFA plus catalog hash, page 45 revision PH-1.18, and all seven purchased size variants match",
-    "Exact manufacturer CAD or complete manufacturing drawings are required per product number",
-    "Thread solids and mating assemblies must be geometrically verified before Blender model promotion"
+  "name": "new-hope-purchased-support-components-20260716",
+  "owner": "codex",
+  "goal": "Bind the acquired New Hope support-component evidence to exact source hashes and reject any promotion of ambiguous identities, mismatched substrates, family line art, or incomplete dimensions as installed thread-bearing geometry.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/03-Fabrication Quotes/Response/New Hope Crisis Center Loose Quote.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/04-Close-Out Docs/New Hope BGC - Brigham City UT_as builts.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/09-Listings/New Hope Crisis Center/SEISMIC BRACING BOM-02-20-2025.xlsx",
+    "https://fastening-solutions.itwbuildex.com/item/sammys-threaded-rod-anchors-3-8-/sammys-3-8-horizontal-threaded-rod-anchor/8056957",
+    "https://fastening-solutions.itwbuildex.com/item/sammys-threaded-rod-anchors-3-8-/sammys-3-8-horizontal-threaded-rod-anchor/8054957",
+    "https://fastening-solutions.itwbuildex.com/Asset/SWDR_IGS.zip",
+    "https://fastening-solutions.itwbuildex.com/Asset/SWDR_DWG.zip",
+    "https://www.asc-es.com/products/69-adjustable-swivel-ring",
+    "apps/autosprink/src/data/new-hope-purchased-support-components.json",
+    "apps/autosprink/src/engine/new-hope-purchased-support-components.js"
   ],
-  "adversarialMutations": [
-    "remove a purchased support line",
-    "change a purchased quantity",
-    "change the official Victaulic archive or either AB2 RFA hash",
-    "promote acquired AB2 source to extracted geometry without a dimension audit",
-    "change a Fig. 69 RFA or catalog hash",
-    "change any published Fig. 69 B/C/F/G dimension, rod size, load, or weight",
-    "promote Fig. 69 project pipe-size assignment before the installed hanger-to-pipe graph is proven",
-    "collapse the SWDR 516 versus SWDR 1-1/2 quote conflict without project evidence",
-    "allow generic AFCON 300 substitution",
-    "promote exact thread geometry without evidence"
+  "exit_criteria": [
+    "all sixteen quote lines and quantities remain exact, including 212 Fig. 69 hangers and 212 Sammy anchors",
+    "official Victaulic AB2, ASC/Anvil Fig. 69, and ITW SWDR source hashes match",
+    "as-built FP0.1 wood Sammy details remain explicitly contradictory to the side-steel purchase description until installed substrate evidence resolves them",
+    "SWDR 516 versus SWDR 1-1/2 stays unresolved until a project record selects the exact manufacturer part number",
+    "ITW SWDR IGS/DWG files remain classified as family line art and cannot clear part-solid, thread-form, mating, or placement gates",
+    "focused and New Hope regression tests pass, the AutoSPRINK build passes, the proof surface reports the same fail-closed truth, and the brain postflight records the evidence"
   ],
-  "releaseGate": {
-    "purchaseIdentityReady": true,
-    "manufacturerAuthoredAb2SourceAcquired": true,
-    "manufacturerAuthoredFig69SourceAcquired": true,
-    "manufacturerPublishedFig69DimensionsReady": true,
-    "projectPipeSizeAssignmentForFig69Ready": false,
-    "fig69RfaDimensionAuditReady": false,
-    "exactFig69ThreadSolidReady": false,
-    "fig69MatingAssemblyReady": false,
-    "sammyAnchorManufacturerIdentityReady": false,
-    "manufacturerCadCoverageComplete": false,
-    "exactManufacturerGeometryReady": false,
-    "exactThreadSolidsReady": false,
-    "verifiedMatingAssembliesReady": false,
-    "supportModelReleaseReady": false
-  }
+  "verification_gates": [
+    "npx vitest run apps/autosprink/tests/new-hope-purchased-support-components.test.js",
+    "npx vitest run new-hope",
+    "npm run build in apps/autosprink",
+    "browser proof at apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "canonical hal-brain remember postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-purchased-support-components-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-purchased-support-components.json",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/index.html",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/proof.js",
+    "data/agent-loops/new-hope-purchased-support-components-20260716/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 250000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
 }

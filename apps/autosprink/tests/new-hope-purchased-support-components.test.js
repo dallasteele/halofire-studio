@@ -19,6 +19,10 @@ describe('New Hope purchased support components', () => {
       purchasedSupportUnitCount: 977,
       fig69QuoteProductCount: 5,
       fig69PublishedVariantCount: 7,
+      sammyCandidateCount: 2,
+      sammyOfficialCadArchiveCount: 2,
+      sammyInstalledDetailCalloutCount: 2,
+      hangerAnchorQuantityParityCount: 212,
     })
     expect(result.purchaseIdentityReady).toBe(true)
     expect(result.manufacturerAuthoredAb2SourceAcquired).toBe(true)
@@ -29,6 +33,12 @@ describe('New Hope purchased support components', () => {
     expect(result.exactFig69ThreadSolidReady).toBe(false)
     expect(result.fig69MatingAssemblyReady).toBe(false)
     expect(result.sammyAnchorManufacturerIdentityReady).toBe(false)
+    expect(result.manufacturerAuthoredSammyFamilyCadAcquired).toBe(true)
+    expect(result.sammyCadLineArtOnly).toBe(true)
+    expect(result.sammyProjectSubstrateConflictResolved).toBe(false)
+    expect(result.sammyPartNumberSpecificSolidReady).toBe(false)
+    expect(result.sammyThreadFormGeometryReady).toBe(false)
+    expect(result.hangerAnchorQuantityParityReady).toBe(true)
     expect(result.manufacturerCadCoverageComplete).toBe(false)
     expect(result.exactManufacturerGeometryReady).toBe(false)
     expect(result.exactThreadSolidsReady).toBe(false)
@@ -107,5 +117,30 @@ describe('New Hope purchased support components', () => {
     expect(
       evaluateNewHopePurchasedSupportComponents(falseSammyResolution).blockerCodes,
     ).toContain('NH_SUPPORT_SAMMY_IDENTITY_CONFLICT_INVALID')
+
+    const badAsbuilt = structuredClone(source)
+    badAsbuilt.installedDetailControl.sha256 = 'BAD'
+    expect(evaluateNewHopePurchasedSupportComponents(badAsbuilt).blockerCodes).toContain(
+      'NH_SUPPORT_SAMMY_INSTALLED_DETAIL_CONFLICT_INVALID',
+    )
+
+    const falseSubstrateResolution = structuredClone(source)
+    falseSubstrateResolution.installedDetailControl.substrateApplicationConflictResolved = true
+    expect(
+      evaluateNewHopePurchasedSupportComponents(falseSubstrateResolution).blockerCodes,
+    ).toContain('NH_SUPPORT_SAMMY_INSTALLED_DETAIL_CONFLICT_INVALID')
+
+    const badSammyCad = structuredClone(source)
+    badSammyCad.manufacturerCadAcquisition.sammy.archives[0].sha256 = 'BAD'
+    expect(evaluateNewHopePurchasedSupportComponents(badSammyCad).blockerCodes).toContain(
+      'NH_SUPPORT_SAMMY_CAD_SOURCE_INVALID',
+    )
+
+    const falseSammySolid = structuredClone(source)
+    falseSammySolid.manufacturerCadAcquisition.sammy.threeDimensionalSolidVerified = true
+    falseSammySolid.manufacturerCadAcquisition.sammy.threadFormGeometryVerified = true
+    expect(evaluateNewHopePurchasedSupportComponents(falseSammySolid).blockerCodes).toContain(
+      'NH_SUPPORT_SAMMY_CAD_VERIFICATION_BOUNDARY_INVALID',
+    )
   })
 })

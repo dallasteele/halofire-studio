@@ -17,6 +17,21 @@
     "purchaseEquivalent": "Anvil Fig. 69 adjustable swivel ring",
     "geometryInterchangeableWithoutProductSpecificEvidence": false
   },
+  "installedDetailControl": {
+    "fileName": "New Hope BGC - Brigham City UT_as builts.pdf",
+    "sha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B",
+    "byteLength": 19209229,
+    "pageCount": 4,
+    "physicalPage": 1,
+    "sheet": "FP0.1",
+    "renderSha256": "A921601967128BC8192CAA20A36149F0A0205497879577950342B5B39405B4A2",
+    "renderPixelWidth": 6120,
+    "renderPixelHeight": 3960,
+    "callouts": ["WOOD SIDE SAMMY SCREW", "WOOD VERTICAL SAMMY SCREW"],
+    "detailSubstrate": "wood",
+    "purchaseDescriptionSubstrate": "steel",
+    "substrateApplicationConflictResolved": false
+  },
   "manufacturerIdentityConflicts": [
     {
       "quoteProductNumber": "SWDR1-1/2",
@@ -45,6 +60,8 @@
       "selectedManufacturerPartNumber": null,
       "manufacturerCadAvailable": true,
       "manufacturerCadAcquired": false,
+      "manufacturerFamilyCadAcquired": true,
+      "manufacturerExactPartCadAcquired": false,
       "exactGeometryEligible": false
     }
   ],
@@ -99,6 +116,44 @@
       "threadSolidVerified": false,
       "matingAssemblyVerified": false,
       "installedPlacementVerified": false
+    },
+    "sammy": {
+      "officialProductUrls": [
+        "https://fastening-solutions.itwbuildex.com/item/sammys-threaded-rod-anchors-3-8-/sammys-3-8-horizontal-threaded-rod-anchor/8056957",
+        "https://fastening-solutions.itwbuildex.com/item/sammys-threaded-rod-anchors-3-8-/sammys-3-8-horizontal-threaded-rod-anchor/8054957"
+      ],
+      "officialAssetBaseUrl": "https://fastening-solutions.itwbuildex.com/Asset/",
+      "archives": [
+        {
+          "fileName": "SWDR_IGS.zip",
+          "byteLength": 9678,
+          "sha256": "3FC47622361E3A3DBB98E46B5E2F85487977A7A8ED6EEC8D87B5D0835A2304E5"
+        },
+        {
+          "fileName": "SWDR_DWG.zip",
+          "byteLength": 18849,
+          "sha256": "F4DD626997860A4C0A3F0E4D30392712144DE03F8F7E464FFABDFB5146D97547"
+        }
+      ],
+      "extractedFiles": [
+        {
+          "fileName": "SWDR.igs",
+          "byteLength": 99056,
+          "sha256": "EF67A6869314B08220F0C2F831B95D5951110E139D36CC8D41FF54BB3EBEF7BA"
+        },
+        {
+          "fileName": "SWDR.dwg",
+          "byteLength": 50920,
+          "sha256": "DAD6BCD2C048FF121A68F65E20D4A42F8AB54FC4BCEBC1DA2862DE7CEB5B46EC"
+        }
+      ],
+      "manufacturerAuthoredFamilyCadAcquired": true,
+      "sourceClassification": "line-art-and-application-drawings",
+      "partNumberSpecificGeometryVerified": false,
+      "threeDimensionalSolidVerified": false,
+      "threadFormGeometryVerified": false,
+      "candidateSelectionResolved": false,
+      "installedSubstrateApplicationResolved": false
     }
   },
   "components": [
@@ -143,11 +198,16 @@
     "exactFig69ThreadSolidReady": false,
     "fig69MatingAssemblyReady": false,
     "sammyAnchorManufacturerIdentityReady": false,
+    "manufacturerAuthoredSammyFamilyCadAcquired": true,
+    "sammyCadIsLineArtOnly": true,
+    "sammyPartNumberSpecificSolidReady": false,
+    "sammyProjectSubstrateConflictResolved": false,
+    "sammyThreadFormGeometryReady": false,
     "manufacturerCadCoverageComplete": false,
     "fullyDimensionedManufacturingDrawingsAcquired": false,
     "exactThreadSolidsReady": false,
     "verifiedMatingAssembliesReady": false,
     "blenderInstalledSupportGeometryReady": false,
-    "reason": "The quote fixes the purchased line identities and quantities. Official Victaulic AB2 and ASC/Anvil Fig. 69 Revit sources are acquired, and the Fig. 69 manufacturer dimension table is bound. The Sammy line is manufacturer-ambiguous between SWDR 516 and SWDR 1-1/2, which have different screw threads and lengths. RFA dimensions, project pipe-size assignment, threads, mating, placement, and the remaining rod, clamp, brace fitting, adapter, and swivel solids are not verified."
+    "reason": "The quote fixes the purchased line identities and quantities. Official Victaulic AB2 and ASC/Anvil Fig. 69 Revit sources are acquired, and the Fig. 69 manufacturer dimension table is bound. Official ITW SWDR IGS/DWG archives are acquired but contain family line art/application drawings, not a verified part-number-specific thread-bearing solid. The quote says side steel while as-built FP0.1 shows wood-side and wood-vertical Sammy details. SWDR 516 versus SWDR 1-1/2 identity, substrate application, RFA dimensions, project pipe-size assignment, threads, mating, placement, and the remaining rod, clamp, brace fitting, adapter, and swivel solids are not verified."
   }
 }

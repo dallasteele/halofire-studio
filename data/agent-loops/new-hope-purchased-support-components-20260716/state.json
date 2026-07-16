@@ -2,7 +2,7 @@
   "loop": "new-hope-purchased-support-components-20260716",
   "stage": "VERIFY",
   "status": "purchase-identities-bound-installed-geometry-rejected",
-  "iteration": 3,
+  "iteration": 4,
   "evidence": {
     "looseMaterialQuote": {
       "quoteNumber": "0133821",
@@ -47,11 +47,38 @@
       "candidateLengthsIn": [1.25, 1.5],
       "resolved": false,
       "exactGeometryEligible": false
+    },
+    "sammyInstalledDetailConflict": {
+      "asBuiltSha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B",
+      "sheet": "FP0.1",
+      "physicalPage": 1,
+      "renderSha256": "A921601967128BC8192CAA20A36149F0A0205497879577950342B5B39405B4A2",
+      "callouts": ["WOOD SIDE SAMMY SCREW", "WOOD VERTICAL SAMMY SCREW"],
+      "detailSubstrate": "wood",
+      "purchaseDescriptionSubstrate": "steel",
+      "resolved": false
+    },
+    "sammyManufacturerCad": {
+      "officialArchiveSha256": {
+        "SWDR_IGS.zip": "3FC47622361E3A3DBB98E46B5E2F85487977A7A8ED6EEC8D87B5D0835A2304E5",
+        "SWDR_DWG.zip": "F4DD626997860A4C0A3F0E4D30392712144DE03F8F7E464FFABDFB5146D97547"
+      },
+      "manufacturerAuthoredFamilyCadAcquired": true,
+      "sourceClassification": "line-art-and-application-drawings",
+      "partNumberSpecificGeometryVerified": false,
+      "threeDimensionalSolidVerified": false,
+      "threadFormGeometryVerified": false
+    },
+    "hangerAnchorQuantityParity": {
+      "fig69HangerCount": 212,
+      "sammyAnchorCount": 212,
+      "quantityParityReady": true,
+      "installedIdentityInferred": false
     }
   },
   "verification": {
     "focusedTests": "27 files / 174 tests passed",
-    "adversarialCases": 11,
+    "adversarialCases": 15,
     "autosprinkBuild": "passed",
     "browser": {
       "proofReady": true,
@@ -61,6 +88,12 @@
       "projectPipeSizeAssignmentForFig69Ready": false,
       "fig69RfaDimensionAuditReady": false,
       "sammyAnchorManufacturerIdentityReady": false,
+      "manufacturerAuthoredSammyFamilyCadAcquired": true,
+      "sammyCadLineArtOnly": true,
+      "sammyProjectSubstrateConflictResolved": false,
+      "sammyPartNumberSpecificSolidReady": false,
+      "sammyThreadFormGeometryReady": false,
+      "hangerAnchorQuantityParityReady": true,
       "exactSupportManufacturerGeometryReady": false,
       "exactSupportThreadSolidsReady": false,
       "verifiedSupportMatingAssembliesReady": false,
@@ -69,8 +102,8 @@
     },
     "brainPostflight": {
       "endpoint": "canonical hal-brain /remember",
-      "episodeId": 151661
+      "episodeId": 151738
     }
   },
-  "nextAction": "Resolve the Sammy SWDR manufacturer identity from project evidence; verify and extract the official Victaulic AB2 and ASC/Anvil Fig. 69 RFA geometry; audit Fig. 69 B/C/F/G dimensions; bind each installed hanger to its actual pipe size; acquire exact manufacturer CAD or complete manufacturing dimensions for every remaining support; then use Blender MCP to assemble thread-bearing solids and run mating, envelope, connector, and collision checks before pitched-roof placement."
+  "nextAction": "Resolve the Sammy SWDR manufacturer part number and wood-versus-steel installed substrate from project procurement or field evidence; inspect the official SWDR DWG and both RFA families with ODA after launch confirmation; acquire part-number-specific solid geometry or complete manufacturing dimensions; then use Blender/OpenGeometry to create true thread solids and verify rod engagement, substrate fastener fit, hanger/bracket mating, installed placement, and collisions before model release."
 }
