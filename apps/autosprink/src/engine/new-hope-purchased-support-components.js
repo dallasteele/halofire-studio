@@ -41,6 +41,13 @@ const EXPECTED_AB2_SOURCE_FILES = Object.freeze({
     sha256: '75F0AAC075483B6EF43F032F59E3A949B109A1759ED7B53CF0B6241D6C0AD27C',
   },
 })
+const EXPECTED_RFA_METADATA_AUDIT_RECEIPT =
+  '33ddb082194f5473752d6c999fb7d993aa0759a16e8a17f4ece2938ff0ab87af'
+const EXPECTED_RFA_SOURCE_RECEIPTS = Object.freeze([
+  'e006f66694fe9eaf7a3642c88613cc4fa3d26cb1c3391c7754e50ec1a193ecbb',
+  '8547fc4c4d8d0a9ccf2f3977b6695fe7eab65e9aba9dfc1dea9dc772ad84b72f',
+  '4683bc8379d11d25094180151811066736fb3e324b5f67c256ba5db1ff2d8ae2',
+])
 
 const EXPECTED_COMPONENTS = Object.freeze({
   A240AB200N: 152,
@@ -416,6 +423,23 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
       )
     },
   )
+  const rfaAudit = acquisition?.revitMetadataAudit
+  const ab2RfaMetadataAuditReady = (
+    rfaAudit?.artifactPath ===
+      'apps/autosprink/src/data/new-hope-manufacturer-rfa-metadata-audit.json' &&
+    rfaAudit?.receiptSha256 === EXPECTED_RFA_METADATA_AUDIT_RECEIPT &&
+    rfaAudit?.validRevitFamilyCount === 2 &&
+    rfaAudit?.manufacturerAuthoredFamilyMetadataReadyCount === 2 &&
+    rfaAudit?.declaredVariationCount === 146 &&
+    rfaAudit?.parsedPartCount === 146 &&
+    rfaAudit?.quoteBoundProductNumberOccurrences === 0 &&
+    rfaAudit?.threadGeometryParameterCount === 0 &&
+    rfaAudit?.mislabeledHtmlResponseCount === 1 &&
+    rfaAudit?.geometryKernelInspectionVerifiedCount === 0 &&
+    rfaAudit?.threadBearingSolidReadyCount === 0 &&
+    rfaAudit?.exactPartGeometryEligibleCount === 0 &&
+    JSON.stringify(rfaAudit?.sourceReceiptSha256) === JSON.stringify(EXPECTED_RFA_SOURCE_RECEIPTS)
+  )
   if (
     acquisition?.officialLibraryUrl !==
       'https://assets.victaulic.com/assets/uploads/software-content/Autodesk_Revit_MEP.html' ||
@@ -427,12 +451,13 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     acquisition?.manufacturerAuthoredSourceAcquired !== true ||
     acquisition?.sourceFormat !== 'Autodesk Revit family' ||
     acquiredFiles.size !== Object.keys(EXPECTED_AB2_SOURCE_FILES).length ||
-    invalidAcquiredFile
+    invalidAcquiredFile ||
+    !ab2RfaMetadataAuditReady
   ) {
     issues.push(
       issue(
         'NH_SUPPORT_AB2_CAD_SOURCE_INVALID',
-        'The quote-bound AB2 source must retain the exact official Victaulic archive and RFA hashes.',
+        'The quote-bound AB2 source must retain the exact official Victaulic archive, RFA hashes, and reproducible metadata audit.',
         'A240AB200N',
       ),
     )
@@ -462,19 +487,22 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     fig69?.sourceFile?.fileName !== 'Hanger-Swivel_Ring-Anvil-69_60.rfa' ||
     fig69?.sourceFile?.byteLength !== 204352 ||
     fig69?.sourceFile?.sha256 !== EXPECTED_FIG69_RFA_SHA ||
+    fig69?.sourceFile?.sourceClassification !== 'html-response-mislabeled-as-rfa' ||
+    fig69?.sourceFile?.validRevitFamilyContainer !== false ||
+    fig69?.sourceFile?.metadataAuditReceiptSha256 !== EXPECTED_RFA_SOURCE_RECEIPTS[2] ||
     fig69?.dimensionSource?.fileName !== 'Anvil-Pipe-Hangers-Supports-Submittal-Catalog.pdf' ||
     fig69?.dimensionSource?.byteLength !== 31616364 ||
     fig69?.dimensionSource?.sha256 !== EXPECTED_FIG69_CATALOG_SHA ||
     fig69?.dimensionSource?.physicalPage !== 45 ||
     fig69?.dimensionSource?.revision !== 'PH-1.18' ||
     JSON.stringify(fig69?.quoteBoundProductNumbers) !== JSON.stringify(fig69ProductNumbers) ||
-    fig69?.manufacturerAuthoredSourceAcquired !== true ||
+    fig69?.manufacturerAuthoredSourceAcquired !== false ||
     fig69?.publishedDimensionTableAcquired !== true
   ) {
     issues.push(
       issue(
         'NH_SUPPORT_FIG69_SOURCE_INVALID',
-        'Fig. 69 evidence must retain the exact official RFA, catalog hash, page, revision, and quote-bound products.',
+        'Fig. 69 evidence must retain the rejected HTML download receipt, catalog hash, page, revision, and quote-bound products without promoting the mislabeled response to RFA.',
         'Fig. 69',
       ),
     )
@@ -846,7 +874,7 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     boundary?.genericSupportSubstitutionAllowed !== false ||
     boundary?.manufacturerExactCadAcquired !== false ||
     boundary?.manufacturerAuthoredAb2SourceAcquired !== true ||
-    boundary?.manufacturerAuthoredFig69SourceAcquired !== true ||
+    boundary?.manufacturerAuthoredFig69SourceAcquired !== false ||
     boundary?.manufacturerPublishedFig69DimensionsReady !== true ||
     boundary?.projectPipeSizeAssignmentForFig69Ready !== false ||
     boundary?.fig69RfaDimensionAuditReady !== false ||
@@ -905,6 +933,9 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
       fig69PublishedVariantCount: purchaseReady
         ? Object.values(EXPECTED_FIG69_VARIANTS).reduce((sum, variants) => sum + variants.length, 0)
         : 0,
+      ab2ValidRevitFamilyCount: purchaseReady && ab2RfaMetadataAuditReady ? 2 : 0,
+      ab2QuoteBoundProductNumberOccurrenceCount: 0,
+      fig69RejectedHtmlDownloadCount: purchaseReady && ab2RfaMetadataAuditReady ? 1 : 0,
       sammyCandidateCount: purchaseReady ? EXPECTED_SAMMY_CANDIDATES.length : 0,
       sammyOfficialCadArchiveCount: purchaseReady
         ? Object.keys(EXPECTED_SAMMY_CAD_ARCHIVES).length
@@ -948,7 +979,10 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     },
     purchaseIdentityReady: purchaseReady,
     manufacturerAuthoredAb2SourceAcquired: purchaseReady,
-    manufacturerAuthoredFig69SourceAcquired: purchaseReady,
+    ab2RfaMetadataAuditReady: purchaseReady && ab2RfaMetadataAuditReady,
+    ab2QuoteBoundProductMetadataReady: false,
+    manufacturerAuthoredFig69SourceAcquired: false,
+    fig69RfaDownloadRejected: purchaseReady && ab2RfaMetadataAuditReady,
     manufacturerPublishedFig69DimensionsReady: purchaseReady,
     projectPipeSizeAssignmentForFig69Ready: false,
     fig69RfaDimensionAuditReady: false,

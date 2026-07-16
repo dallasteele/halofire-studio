@@ -296,6 +296,9 @@ describe('New Hope PDF-bound visual proof', () => {
     expect(script).toContain('independently trusted geometry hashes and critical-dimension audit hashes');
     expect(script).toContain('modeled thread profile/lead/crest/root solids');
     expect(script).toContain('verified engaged turns');
+    expect(script).toContain('dataset.ab2RfaMetadataAuditReady = String(purchasedSupportComponents.ab2RfaMetadataAuditReady)');
+    expect(script).toContain('dataset.ab2QuoteBoundProductMetadataReady = String(purchasedSupportComponents.ab2QuoteBoundProductMetadataReady)');
+    expect(script).toContain('dataset.fig69RfaDownloadRejected = String(purchasedSupportComponents.fig69RfaDownloadRejected)');
     expect(script).toContain('dataset.sammyIgesTopologyAuditReady = String(purchasedSupportComponents.sammyIgesTopologyAuditReady)');
     expect(script).toContain('zero BREP/topology entities');
   });

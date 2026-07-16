@@ -19,6 +19,9 @@ describe('New Hope purchased support components', () => {
       purchasedSupportUnitCount: 977,
       fig69QuoteProductCount: 5,
       fig69PublishedVariantCount: 7,
+      ab2ValidRevitFamilyCount: 2,
+      ab2QuoteBoundProductNumberOccurrenceCount: 0,
+      fig69RejectedHtmlDownloadCount: 1,
       sammyCandidateCount: 2,
       sammyOfficialCadArchiveCount: 2,
       sammyIgesEntityCount: 294,
@@ -37,7 +40,10 @@ describe('New Hope purchased support components', () => {
     })
     expect(result.purchaseIdentityReady).toBe(true)
     expect(result.manufacturerAuthoredAb2SourceAcquired).toBe(true)
-    expect(result.manufacturerAuthoredFig69SourceAcquired).toBe(true)
+    expect(result.ab2RfaMetadataAuditReady).toBe(true)
+    expect(result.ab2QuoteBoundProductMetadataReady).toBe(false)
+    expect(result.manufacturerAuthoredFig69SourceAcquired).toBe(false)
+    expect(result.fig69RfaDownloadRejected).toBe(true)
     expect(result.manufacturerPublishedFig69DimensionsReady).toBe(true)
     expect(result.projectPipeSizeAssignmentForFig69Ready).toBe(false)
     expect(result.fig69RfaDimensionAuditReady).toBe(false)
@@ -121,6 +127,12 @@ describe('New Hope purchased support components', () => {
       'NH_SUPPORT_AB2_CAD_SOURCE_INVALID',
     )
 
+    const badRfaAudit = structuredClone(source)
+    badRfaAudit.manufacturerCadAcquisition.revitMetadataAudit.receiptSha256 = 'BAD'
+    expect(evaluateNewHopePurchasedSupportComponents(badRfaAudit).blockerCodes).toContain(
+      'NH_SUPPORT_AB2_CAD_SOURCE_INVALID',
+    )
+
     const unverifiedPromotion = structuredClone(source)
     unverifiedPromotion.manufacturerCadAcquisition.geometryExtractionVerified = true
     expect(
@@ -130,6 +142,12 @@ describe('New Hope purchased support components', () => {
     const badFig69Rfa = structuredClone(source)
     badFig69Rfa.manufacturerCadAcquisition.fig69.sourceFile.sha256 = 'BAD'
     expect(evaluateNewHopePurchasedSupportComponents(badFig69Rfa).blockerCodes).toContain(
+      'NH_SUPPORT_FIG69_SOURCE_INVALID',
+    )
+
+    const promotedFig69Html = structuredClone(source)
+    promotedFig69Html.manufacturerCadAcquisition.fig69.manufacturerAuthoredSourceAcquired = true
+    expect(evaluateNewHopePurchasedSupportComponents(promotedFig69Html).blockerCodes).toContain(
       'NH_SUPPORT_FIG69_SOURCE_INVALID',
     )
 

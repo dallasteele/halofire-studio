@@ -86,6 +86,25 @@
         "sha256": "75F0AAC075483B6EF43F032F59E3A949B109A1759ED7B53CF0B6241D6C0AD27C"
       }
     ],
+    "revitMetadataAudit": {
+      "artifactPath": "apps/autosprink/src/data/new-hope-manufacturer-rfa-metadata-audit.json",
+      "receiptSha256": "33ddb082194f5473752d6c999fb7d993aa0759a16e8a17f4ece2938ff0ab87af",
+      "validRevitFamilyCount": 2,
+      "manufacturerAuthoredFamilyMetadataReadyCount": 2,
+      "declaredVariationCount": 146,
+      "parsedPartCount": 146,
+      "quoteBoundProductNumberOccurrences": 0,
+      "threadGeometryParameterCount": 0,
+      "mislabeledHtmlResponseCount": 1,
+      "geometryKernelInspectionVerifiedCount": 0,
+      "threadBearingSolidReadyCount": 0,
+      "exactPartGeometryEligibleCount": 0,
+      "sourceReceiptSha256": [
+        "e006f66694fe9eaf7a3642c88613cc4fa3d26cb1c3391c7754e50ec1a193ecbb",
+        "8547fc4c4d8d0a9ccf2f3977b6695fe7eab65e9aba9dfc1dea9dc772ad84b72f",
+        "4683bc8379d11d25094180151811066736fb3e324b5f67c256ba5db1ff2d8ae2"
+      ]
+    },
     "manufacturerAuthoredSourceAcquired": true,
     "sourceFormat": "Autodesk Revit family",
     "geometryExtractionVerified": false,
@@ -99,7 +118,10 @@
       "sourceFile": {
         "fileName": "Hanger-Swivel_Ring-Anvil-69_60.rfa",
         "byteLength": 204352,
-        "sha256": "B079BA1D50E1F96279E96561208AAA25918472793F4029B261448A2B0D557F17"
+        "sha256": "B079BA1D50E1F96279E96561208AAA25918472793F4029B261448A2B0D557F17",
+        "sourceClassification": "html-response-mislabeled-as-rfa",
+        "validRevitFamilyContainer": false,
+        "metadataAuditReceiptSha256": "4683bc8379d11d25094180151811066736fb3e324b5f67c256ba5db1ff2d8ae2"
       },
       "dimensionSource": {
         "fileName": "Anvil-Pipe-Hangers-Supports-Submittal-Catalog.pdf",
@@ -109,7 +131,7 @@
         "revision": "PH-1.18"
       },
       "quoteBoundProductNumbers": ["0500301692", "0500301742", "0500301759", "0500301767", "0500301775"],
-      "manufacturerAuthoredSourceAcquired": true,
+      "manufacturerAuthoredSourceAcquired": false,
       "publishedDimensionTableAcquired": true,
       "projectPipeSizeAssignmentVerified": false,
       "rfaDimensionAuditVerified": false,
@@ -386,7 +408,7 @@
     "genericSupportSubstitutionAllowed": false,
     "manufacturerExactCadAcquired": false,
     "manufacturerAuthoredAb2SourceAcquired": true,
-    "manufacturerAuthoredFig69SourceAcquired": true,
+    "manufacturerAuthoredFig69SourceAcquired": false,
     "manufacturerPublishedFig69DimensionsReady": true,
     "projectPipeSizeAssignmentForFig69Ready": false,
     "fig69RfaDimensionAuditReady": false,
@@ -421,6 +443,6 @@
     "exactThreadSolidsReady": false,
     "verifiedMatingAssembliesReady": false,
     "blenderInstalledSupportGeometryReady": false,
-    "reason": "The quote fixes the purchased line identities and quantities. Official Victaulic AB2 and ASC/Anvil Fig. 69 Revit sources are acquired, and the Fig. 69 manufacturer dimension table is bound. Official ASC AF730, AF035, AF076, and AF779 submittals are now hash-bound to the quote variants, including the AF779 product-number-to-size-2 correction and the manufacturer-required mating sequence. Those submittals do not supply part-number-specific solids, complete manufacturing dimensions, or exact fastener thread solids. Official ITW SWDR IGS/DWG archives contain family line art/application drawings, not a verified part-number-specific thread-bearing solid. The quote says side steel while as-built FP0.1 shows wood-side and wood-vertical Sammy details. SWDR identity, substrate application, exact solids, thread engagement, brace insertion, structure attachment, collision analysis, installed placement, and listed assembly fit remain unverified."
+    "reason": "The quote fixes the purchased line identities and quantities. Two official Victaulic AB2 Revit family containers are hash-bound and their PartAtom metadata is audited, but neither contains the quote-bound A240AB200N product number or thread-geometry parameters. The supposed ASC/Anvil Fig. 69 RFA is a catalog HTML response saved under an RFA filename and is rejected; only the Fig. 69 manufacturer dimension table is currently bound. Official ASC AF730, AF035, AF076, and AF779 submittals are hash-bound to the quote variants, including the AF779 product-number-to-size-2 correction and the manufacturer-required mating sequence. Those sources do not supply part-number-specific solids, complete manufacturing dimensions, or exact fastener thread solids. Official ITW SWDR IGS/DWG archives contain planar family line art/application drawings, not a verified part-number-specific thread-bearing solid. The quote says side steel while as-built FP0.1 shows wood-side and wood-vertical Sammy details. SWDR identity, substrate application, exact solids, thread engagement, brace insertion, structure attachment, collision analysis, installed placement, and listed assembly fit remain unverified."
   }
 }
