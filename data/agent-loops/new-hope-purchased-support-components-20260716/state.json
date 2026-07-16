@@ -41,7 +41,7 @@
     },
     "brainPostflight": {
       "endpoint": "canonical hal-brain /remember",
-      "episodeId": 151561
+      "episodeId": 151604
     }
   },
   "nextAction": "Verify and extract the official Victaulic AB2 RFA geometry, audit its dimensions, acquire exact manufacturer CAD or complete manufacturing dimensions for every remaining quote-bound support, then use Blender MCP to assemble thread-bearing solids and run mating, envelope, connector, and collision checks before pitched-roof placement."
