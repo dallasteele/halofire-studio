@@ -1,0 +1,9 @@
+{
+  "status": "verified",
+  "output": "",
+  "elapsed_ms": 370,
+  "prover": "lean4",
+  "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+  "returncode": 0,
+  "claim": "The source-bound plan-horizontal length plus vertical calculation delta reconciles to the approved 118-to-414 physical length within one-eighth inch, while as-built riser identity, shared axis, and calculation decomposition cannot promote exact installed station, fabrication mapping, grade, or source-feed 3D readiness."
+}

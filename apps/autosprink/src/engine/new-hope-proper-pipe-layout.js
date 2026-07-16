@@ -165,6 +165,7 @@ function collectElevationPorts(hydraulicRoutes, issues) {
  * @param {object} inputs.elevationDatum - Evaluated FP0.1/A102/calculation datum registration.
  * @param {object} inputs.sourceFeedFabrication - Evaluated CML.01 plan/listing/outlet registration.
  * @param {object} inputs.sourceFeedCalculationChain - Evaluated node-118/BOR/valve calculation chain.
+ * @param {object} inputs.sourceFeedAsbuiltRiser - Evaluated FP1.0 riser and calculation decomposition.
  * @param {object} inputs.lowPointFabrication - Evaluated CMI.09 low-point/listing/grade registration.
  * @param {object} inputs.cmi05Cmi08Fabrication - Evaluated CMI.05, CMI.07, and CMI.08 fitting schedule.
  * @param {object} inputs.cmi06VerticalOutlet - Evaluated CMI.06 outlet and head-057 vertical leg.
@@ -190,6 +191,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     elevationDatum,
     sourceFeedFabrication,
     sourceFeedCalculationChain,
+    sourceFeedAsbuiltRiser,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -212,6 +214,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     elevationDatum,
     sourceFeedFabrication,
     sourceFeedCalculationChain,
+    sourceFeedAsbuiltRiser,
     lowPointFabrication,
     cmi05Cmi08Fabrication,
     cmi06VerticalOutlet,
@@ -246,6 +249,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ['calculation-elevation-datum', elevationDatum?.status],
     ['source-feed-fabrication', sourceFeedFabrication?.status],
     ['source-feed-calculation-chain', sourceFeedCalculationChain?.status],
+    ['source-feed-asbuilt-riser', sourceFeedAsbuiltRiser?.status],
     ['low-point-fabrication', lowPointFabrication?.status],
     ['cmi05-cmi08-fabrication', cmi05Cmi08Fabrication?.status],
     ['cmi06-vertical-outlet', cmi06VerticalOutlet?.status],
@@ -384,7 +388,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
   const acceptanceBlockers = [
     issue(
       'NH_PROPER_PIPE_SUPPLY_3D_PATH_UNRESOLVED',
-      'CML.01, node 118, the base-of-riser endpoint Z, and the downstream valve/backflow calculation chain are source-bound; the concealed XY route, fabrication-piece-to-calculation-leg decomposition, and installed geometry remain unresolved.',
+      'CML.01, node 118, the base-of-riser endpoint Z, the device chain, the as-built riser identity, and the orthogonal plan-plus-Z calculation decomposition are source-bound; the exact installed riser station, fabrication-piece-to-calculation mapping, and installed grade remain unresolved.',
       'source-edge-001,source-edge-002',
     ),
     issue(
@@ -481,6 +485,8 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
         sourceFeedCalculationChain?.exactCalculationElevationPortCount || 0,
       sourceFeedExternalCalculationPortCount:
         sourceFeedCalculationChain?.exactExternalCalculationPortCount || 0,
+      sourceFeedOrthogonalCalculationResidualIn:
+        sourceFeedAsbuiltRiser?.decomposition?.calculationLengthResidualIn ?? null,
       fieldDrainIntentCount: fieldRouteDrainIntents.length,
     },
     planTopologyReady: ready && canonicalEdges.length === 143,
@@ -505,6 +511,13 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
             sourceFeedCalculationChain.sourceOutletToBaseOfRiserDeltaZFt,
           sourceOutletToBaseOfRiserPhysicalLengthFt:
             sourceFeedCalculationChain.sourceOutletToBaseOfRiserPhysicalLengthFt,
+        }
+      : null,
+    sourceFeedAsbuiltRiser: sourceFeedAsbuiltRiser
+      ? {
+          source: sourceFeedAsbuiltRiser.source,
+          riserEvidence: sourceFeedAsbuiltRiser.riserEvidence,
+          decomposition: sourceFeedAsbuiltRiser.decomposition,
         }
       : null,
     lowPointFabrication: lowPointFabrication
@@ -625,6 +638,14 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
       ready && sourceFeedCalculationChain?.dryPipeValveIdentityReady === true,
     sourceFeedDownstreamValveBackflowElevationChainReady:
       ready && sourceFeedCalculationChain?.downstreamValveBackflowElevationChainReady === true,
+    sourceFeedAsBuiltRiserIdentityReady:
+      ready && sourceFeedAsbuiltRiser?.asBuiltRiserIdentityReady === true,
+    sourceFeedSharedTransferAxisReady:
+      ready && sourceFeedAsbuiltRiser?.sharedTransferAxisReady === true,
+    sourceFeedOrthogonalCalculationDecompositionReady:
+      ready && sourceFeedAsbuiltRiser?.orthogonalCalculationDecompositionReady === true,
+    sourceFeedConcealedRiserContinuationIdentityReady:
+      ready && sourceFeedAsbuiltRiser?.concealedRiserContinuationIdentityReady === true,
     sourceFeedCalculationLegEndpointElevationsReady:
       ready && sourceFeedCalculationChain?.baseOfRiserEndpointZReady === true,
     sourceFeedEndpointElevationsReady: false,

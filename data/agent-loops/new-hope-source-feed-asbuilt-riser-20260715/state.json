@@ -1,0 +1,60 @@
+{
+  "loop": "new-hope-source-feed-asbuilt-riser-20260715",
+  "stage": "VERIFY",
+  "status": "asbuilt-riser-and-orthogonal-calculation-decomposition-verified",
+  "iteration": 2,
+  "brainPreflight": {
+    "status": "passed",
+    "topEpisodes": [150514, 150493, 150048, 149978]
+  },
+  "brainPostflight": {
+    "status": "passed",
+    "episodeId": 150555
+  },
+  "claims": {
+    "asBuiltRiserIdentityReady": true,
+    "sharedTransferAxisReady": true,
+    "orthogonalCalculationDecompositionReady": true,
+    "concealedRiserContinuationIdentityReady": true,
+    "exactInstalledRiserPlanStationReady": false,
+    "fabricationPieceToCalculationLegDecompositionReady": false,
+    "installedGradeReady": false,
+    "sourceFeed3dPathReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "evidence": {
+    "asBuiltPdfSha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B",
+    "asBuiltSheetCount": 2,
+    "externalCalculationNodeCount": 3,
+    "planHorizontalLengthFt": 2.367806,
+    "verticalElevationDeltaFt": 6.041667,
+    "orthogonalSumFt": 8.409473,
+    "approvedCalculationPhysicalLengthFt": 8.416667,
+    "calculationLengthResidualIn": 0.086322,
+    "transferAxisResidualPt": 0.000451,
+    "adversarialTestCount": 10,
+    "newHopeTestFiles": 21,
+    "newHopeTestCount": 140,
+    "productionBuild": "passed",
+    "leanStatus": "verified",
+    "leanElapsedMs": 370,
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "browser": {
+      "proofReady": true,
+      "actualSourceImagesLoaded": 3,
+      "asBuiltRiserIdentityReady": true,
+      "sharedTransferAxisReady": true,
+      "orthogonalCalculationDecompositionReady": true,
+      "concealedRiserContinuationIdentityReady": true,
+      "sourceFeedEndpointElevationsReady": false,
+      "sourceFeedInstalledGradeReady": false,
+      "sourceFeed3dPathReady": false,
+      "properPipeLayoutReady": false,
+      "consoleWarningsOrErrors": 0
+    }
+  },
+  "nextAction": "Commit and push this bounded slice, then resolve the exact installed riser station/fabrication mapping or move to field drum-drip routes and complete piece-end/inter-piece fitting and vertical-offset topology without promoting installed grade or full 3D readiness."
+}

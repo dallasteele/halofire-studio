@@ -1,0 +1,53 @@
+{
+  "name": "new-hope-source-feed-asbuilt-riser-20260715",
+  "owner": "codex",
+  "goal": "Bind the actual New Hope as-built FP1.0 riser plan and scaled section to the FP2.0 CML source anchor and approved node-118-to-414 calculation leg, proving a bounded orthogonal plan-plus-Z calculation decomposition while refusing exact installed station, fabrication-cut mapping, grade, full 3D, fabrication, or field release.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "AGENTS.md",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/04-Close-Out Docs/New Hope BGC - Brigham City UT_as builts.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/Eckman/Boys & Girls Club New Hope - Brigham City UT/2-Internal Ops/01-Design/08-AHJ Approval DWG & Permit/New Hope Crisis Center - Approved/New Hope Calcs.PDF",
+    "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
+    "apps/autosprink/src/data/new-hope-asbuilt-source-feed-riser-registration.json",
+    "apps/autosprink/src/engine/new-hope-source-feed-calculation-chain.js"
+  ],
+  "exit_criteria": [
+    "exact as-built PDF hash, FP1.0/FP2.0 sheet identities, page box, riser text, section text, device labels, node labels, and leader extraction are bound",
+    "FP2.0 pipe-001 source anchor and node-118 outlet remain exact source-plan points",
+    "FP1.0 riser and FP2.0 source evidence retain one transfer axis",
+    "plan-horizontal distance plus node-118-to-414 Z change reconciles to approved hydraulic physical length within one-eighth inch",
+    "exact installed riser station, fabrication mapping, installed grade, source-feed 3D, fabrication, and field release remain fail-closed",
+    "actual as-built plan and riser-section crops are visually inspected",
+    "adversarial tests, full New Hope tests, production build, formal proof, loop guard, browser proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected as-built and approved-plan hashes",
+    "source sheet and device identity",
+    "calculation-node callout and leader identity",
+    "canonical FP2 transfer points",
+    "shared transfer axis",
+    "orthogonal length reconciliation",
+    "false readiness rejection",
+    "actual-PDF visual and browser proof",
+    "Lean invariant receipt",
+    "agentic rules and brain postflight"
+  ],
+  "state_path": "data/agent-loops/new-hope-source-feed-asbuilt-riser-20260715/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-asbuilt-source-feed-riser-registration.json",
+    "apps/autosprink/src/engine/new-hope-source-feed-asbuilt-riser.js",
+    "apps/autosprink/tests/new-hope-source-feed-asbuilt-riser.test.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/asbuilt-fp10-riser-plan.png",
+    "apps/autosprink/src/data/proofs/new-hope-truss-clearance/asbuilt-fp10-riser-section.png",
+    "data/agent-loops/new-hope-source-feed-asbuilt-riser-20260715/lean-proof.json",
+    "data/agent-loops/new-hope-source-feed-asbuilt-riser-20260715/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 160000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

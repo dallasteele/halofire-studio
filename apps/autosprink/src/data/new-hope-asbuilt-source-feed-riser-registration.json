@@ -1,0 +1,80 @@
+{
+  "artifactType": "halofire.new-hope-asbuilt-source-feed-riser-registration.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "source": {
+    "role": "as-built-fire-sprinkler-plan-and-riser-detail",
+    "sha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B",
+    "fileName": "New Hope BGC - Brigham City UT_as builts.pdf",
+    "pageBoxPdfPt": { "width": 3024, "height": 2160 },
+    "sheets": [
+      { "physicalPage": 3, "sheet": "FP1.0", "title": "FIRE SPRINKLER LAYOUT - LEVEL 1" },
+      { "physicalPage": 4, "sheet": "FP2.0", "title": "FIRE SPRINKLER LAYOUT - ATTIC" }
+    ]
+  },
+  "fp10RiserEvidence": {
+    "physicalPage": 3,
+    "sheet": "FP1.0",
+    "riserLocationText": "RISER LOCATION",
+    "dryAtticSystemText": "4 INCH TO DRY ATTIC SYSTEM",
+    "sectionTitle": "FIRE SPRINKLER RISER SECTION DETAIL",
+    "sectionScale": "1/2 INCH = 1 FOOT",
+    "deviceTexts": [
+      "4 INCH DRY VALVE",
+      "4 INCH GROOVED BUTTERFLY VALVE",
+      "4 INCH BACKFLOW PREVENTER",
+      "2 INCH DRAIN TO EXTERIOR"
+    ],
+    "calculationNodeTextBboxesPdfPt": [
+      { "calculationNodeId": "414", "bbox": { "x0": 678.037964, "y0": 1135.625, "x1": 689.713684, "y1": 1145.532959 } },
+      { "calculationNodeId": "560", "bbox": { "x0": 678.037964, "y0": 1152.489868, "x1": 689.713684, "y1": 1162.397827 } },
+      { "calculationNodeId": "554", "bbox": { "x0": 678.037964, "y0": 1135.625, "x1": 689.713684, "y1": 1145.532959 } }
+    ],
+    "riserLeader": {
+      "drawingIndex": 16997,
+      "targetPdfPt": { "x": 656.875854, "y": 1118.512451 },
+      "calloutPdfPt": { "x": 679.659607, "y": 1132.012451 }
+    }
+  },
+  "fp20TransferEvidence": {
+    "approvedPlanSha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+    "physicalPage": 5,
+    "sheet": "FP2.0",
+    "pdfPtPerFt": 8.999890909,
+    "sourceAnchor": {
+      "planNodeId": "pipe-001-node-01",
+      "sourceSegmentId": "pipe-001",
+      "sourceDrawingIndex": 3520,
+      "pdfPt": { "x": 660.675, "y": 1118.512 }
+    },
+    "outlet": {
+      "canonicalNodeId": "canonical-node-002",
+      "planMemberNodeId": "pipe-001-node-02",
+      "calculationNodeId": "118",
+      "pdfPt": { "x": 681.985, "y": 1118.512 },
+      "localElevationFt": 11.5
+    }
+  },
+  "calculationDecomposition": {
+    "baseOfRiserCalculationNodeId": "414",
+    "baseOfRiserLocalElevationFt": 5.458333,
+    "calculationPhysicalLengthFt": 8.416667,
+    "planHorizontalLengthFt": 2.367806,
+    "verticalElevationDeltaFt": 6.041667,
+    "orthogonalSumFt": 8.409473,
+    "calculationLengthResidualIn": 0.086322,
+    "listedOutletFromPieceStartIn": 29.5,
+    "planToListingHorizontalResidualIn": 1.086322,
+    "maximumCalculationLengthResidualIn": 0.125
+  },
+  "claims": {
+    "asBuiltRiserIdentityReady": true,
+    "sharedTransferAxisReady": true,
+    "orthogonalCalculationDecompositionReady": true,
+    "exactInstalledRiserPlanStationReady": false,
+    "fabricationPieceToCalculationLegDecompositionReady": false,
+    "installedGradeReady": false,
+    "sourceFeed3dPathReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}
