@@ -21,6 +21,8 @@ const EXPECTED = Object.freeze({
 const issue = (code, message) => ({ code, message });
 const pointFinite = (point) => point && ['x', 'y', 'z'].every((axis) => Number.isFinite(point[axis]));
 const close = (left, right, tolerance = 1e-6) => Number.isFinite(left) && Math.abs(left - right) <= tolerance;
+const unitVector = (value) => pointFinite(value)
+  && close(Math.hypot(value.x, value.y, value.z), 1, 1e-6);
 const countsBy = (items, key) => items.reduce((counts, item) => {
   const value = String(item[key]);
   counts[value] = (counts[value] ?? 0) + 1;
@@ -122,6 +124,37 @@ export function evaluatePolarisPitchedPipeCalibration(packet) {
   if (fittings.some((fitting) => !pointFinite(fitting.pointFt) || typeof fitting.family !== 'string')) {
     issues.push(issue('POLARIS_FITTING_XYZ_INVALID', 'A fitting has invalid source geometry or family identity.'));
   }
+  if (fittings.some((fitting) => !Number.isFinite(fitting.sourceTransform?.rotationRadians)
+    || !pointFinite(fitting.sourceTransform?.scale)
+    || !unitVector(fitting.sourceTransform?.extrusionDirection)
+    || !Array.isArray(fitting.sourcePortDirections)
+    || fitting.sourcePortDirections.some((value) => !unitVector(value)))) {
+    issues.push(issue('POLARIS_FITTING_SOURCE_TRANSFORM_INVALID', 'A fitting lost its exact DWG insert transform or source port direction.'));
+  }
+  const expectedOrientedPortCounts = new Map([
+    ['Elbow', 2],
+    ['Inspectors Test & Drain', 2],
+    ['Tee', 3],
+  ]);
+  if (fittings.some((fitting) => expectedOrientedPortCounts.has(fitting.sourceAttributes?.['Sub Category'])
+    && fitting.sourcePortDirections.length !== expectedOrientedPortCounts.get(fitting.sourceAttributes['Sub Category']))) {
+    issues.push(issue('POLARIS_FITTING_SOURCE_PORT_CARDINALITY_INVALID', 'An elbow, tee, or test-and-drain lost an exact source-oriented port.'));
+  }
+  const terminalElbow = fittings.find((fitting) => fitting.id === 'fitting-73733');
+  const expectedTerminalDirections = [
+    { x: -1, y: 0, z: 0 },
+    { x: Math.SQRT1_2, y: 0, z: -Math.SQRT1_2 },
+  ];
+  if (!terminalElbow || expectedTerminalDirections.some((expectedDirection) => !terminalElbow.sourcePortDirections
+    .some((actualDirection) => close(
+      actualDirection.x * expectedDirection.x
+        + actualDirection.y * expectedDirection.y
+        + actualDirection.z * expectedDirection.z,
+      1,
+      1e-6,
+    )))) {
+    issues.push(issue('POLARIS_TEST_DRAIN_TERMINAL_ORIENTATION_INVALID', 'The source-oriented 45-degree test-drain terminal changed.'));
+  }
   if (hydraulicNodeLabels.length !== EXPECTED.hydraulicNodeCount
     || new Set(hydraulicNodeLabels.map((label) => label.nodeId)).size !== EXPECTED.hydraulicNodeCount
     || hydraulicNodeLabels.some((label) => !pointFinite(label.connectionPointFt)
@@ -182,6 +215,8 @@ export function verifyPolarisPitchedPipeAdversarialLoop(packet) {
     ['downhill-direction', (value) => { value.pipes.find((pipe) => pipe.downhillDirection !== 'level').downhillDirection = 'level'; }],
     ['grade', (value) => { value.pipes.find((pipe) => pipe.gradeInPer10Ft !== null).gradeInPer10Ft += 1; }],
     ['fitting-removal', (value) => { value.fittings.pop(); }],
+    ['fitting-transform', (value) => { value.fittings[0].sourceTransform.rotationRadians = Number.NaN; }],
+    ['terminal-port-orientation', (value) => { value.fittings.find((fitting) => fitting.id === 'fitting-73733').sourcePortDirections[1] = { x: 0, y: 1, z: 0 }; }],
     ['hydraulic-node-tip', (value) => { value.hydraulicNodeLabels[0].connectionPointFt.z += 1; value.hydraulicNodeLabels[0].connectionPointFt = null; }],
   ];
   const rejectedCases = attacks.map(([name, mutate]) => {

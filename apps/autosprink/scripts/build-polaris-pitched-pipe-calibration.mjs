@@ -85,6 +85,8 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
       ? 'Flex Drop'
       : fitting.blockName.match(/^Fitting(\d+)/)?.[0] ?? 'Fitting',
     pointFt: projectPoint(fitting.point),
+    sourceTransform: fitting.sourceTransform,
+    sourcePortDirections: fitting.sourcePortDirections,
     sourceAttributes: fitting.attributes,
   }));
   const sprinklers = dwg.sprinklers.map((sprinkler) => ({
@@ -185,6 +187,8 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
       hydraulicNodeConnectionPointCount: hydraulicNodeLabels.filter((label) => label.connectionPointFt).length,
       attributedPipeCount: pipes.filter((pipe) => Object.keys(pipe.sourceAttributes).length > 0).length,
       attributedFittingCount: fittings.filter((fitting) => Object.keys(fitting.sourceAttributes).length > 0).length,
+      sourceTransformedFittingCount: fittings.filter((fitting) => fitting.sourceTransform).length,
+      sourceOrientedFittingCount: fittings.filter((fitting) => fitting.sourcePortDirections.length > 0).length,
       sourceNoteCount: sourceNotes.length,
     },
     pipes,
@@ -207,6 +211,9 @@ export async function buildPolarisPitchedPipeCalibration({ dwgPath, nativeCadPat
         && fittings.every((fitting) => fitting.sourceAttributes['Sub Category']
           && fitting.sourceAttributes.Description
           && fitting.sourceAttributes.Size),
+      exactFittingInsertTransformReady: fittings.length > 0
+        && fittings.every((fitting) => fitting.sourceTransform),
+      sourceOrientedFittingPortReady: fittings.some((fitting) => fitting.sourcePortDirections.length > 0),
       drainDestinationReady: false,
       nativeElementGeometryRecordDecodeReady: false,
       newHopeExactPipeCenterlineZReady: false,

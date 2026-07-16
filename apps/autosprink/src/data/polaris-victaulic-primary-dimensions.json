@@ -1,0 +1,71 @@
+{
+  "schema": "halofire.polaris-victaulic-primary-dimensions.v1",
+  "projectId": "polaris-academy-mesa-az",
+  "sources": [
+    {
+      "publication": "10.03",
+      "revision": "1539 Rev R",
+      "updated": "2024-08",
+      "url": "https://assets.victaulic.com/assets/uploads/literature/10.03.pdf",
+      "scope": "FireLock No. 001 elbows and No. 002 tees"
+    },
+    {
+      "publication": "10.64",
+      "revision": "7072 Rev W",
+      "updated": "2026-01",
+      "url": "https://assets.victaulic.com/assets/uploads/literature/10.64.pdf",
+      "scope": "Style 009N rigid couplings"
+    },
+    {
+      "publication": "06.05",
+      "revision": "1470 Rev S",
+      "updated": "2025-09",
+      "url": "https://assets.victaulic.com/assets/uploads/literature/06.05.pdf",
+      "scope": "Style 75 flexible couplings"
+    },
+    {
+      "publication": "06.08",
+      "revision": "1536 Rev N",
+      "updated": "2022-07",
+      "url": "https://assets.victaulic.com/assets/uploads/literature/06.08.pdf",
+      "scope": "Style 750 reducing couplings"
+    },
+    {
+      "publication": "10.08",
+      "revision": "1479 Rev Y",
+      "updated": "2024-07",
+      "url": "https://assets.victaulic.com/assets/uploads/literature/10.08.pdf",
+      "scope": "Series 717 check valves"
+    },
+    {
+      "publication": "07.01",
+      "revision": "1449 Rev AP",
+      "updated": "2026-06",
+      "url": "https://assets.victaulic.com/assets/uploads/literature/07.01.pdf",
+      "scope": "No. 50 concentric reducers"
+    }
+  ],
+  "dimensions": [
+    { "id": "no001-3", "product": "No. 001 90-degree elbow", "size": "3", "dimensionKind": "center-to-end", "valueInches": 3.38, "publication": "10.03", "sourceInstanceCount": 3 },
+    { "id": "no001-4", "product": "No. 001 90-degree elbow", "size": "4", "dimensionKind": "center-to-end", "valueInches": 4, "publication": "10.03", "sourceInstanceCount": 1 },
+    { "id": "no002-3", "product": "No. 002 straight tee", "size": "3", "dimensionKind": "center-to-end", "valueInches": 3.38, "publication": "10.03", "sourceInstanceCount": 2 },
+    { "id": "style009n-3", "product": "Style 009N rigid coupling", "size": "3", "dimensionKind": "layout-separation-and-envelope", "allowablePipeEndSeparationInches": 0.12, "assembledEnvelopeInches": { "x": 4.63, "y": 6.75, "z": 2 }, "publication": "10.64", "sourceInstanceCount": 8 },
+    { "id": "style009n-4", "product": "Style 009N rigid coupling", "size": "4", "dimensionKind": "layout-separation-and-envelope", "allowablePipeEndSeparationInches": 0.17, "assembledEnvelopeInches": { "x": 5.63, "y": 7.5, "z": 2.13 }, "publication": "10.64", "sourceInstanceCount": 2 },
+    { "id": "style75-3", "product": "Style 75 flexible coupling", "size": "3", "dimensionKind": "layout-separation-and-envelope", "allowablePipeEndSeparationInches": 0.06, "assembledEnvelopeInches": { "x": 4.5, "y": 7, "z": 1.88 }, "publication": "06.05", "sourceInstanceCount": 2 },
+    { "id": "style750-3x2.5", "product": "Style 750 reducing coupling", "size": "3x2.5", "dimensionKind": "layout-separation-and-envelope", "allowablePipeEndSeparationInches": 0.07, "assembledEnvelopeInches": { "x": 4.75, "y": 7.13, "z": 1.88 }, "publication": "06.08", "sourceInstanceCount": 2 },
+    { "id": "series717-3", "product": "Series 717 check valve", "size": "3", "dimensionKind": "end-to-end", "valueInches": 4.25, "publication": "10.08", "sourceInstanceCount": 1 },
+    { "id": "no50-4x3", "product": "No. 50 concentric reducer", "size": "4x3", "dimensionKind": "end-to-end", "valueInches": 3, "publication": "07.01", "sourceInstanceCount": 1 }
+  ],
+  "boundary": {
+    "identifiedVictaulicInstanceCount": 22,
+    "genericUnresolvedInstanceCount": 6,
+    "primaryDimensionScheduleReady": true,
+    "sourceInsertOriginToPortOffsetReady": false,
+    "manufacturerExactTakeoutReady": false,
+    "flexibleHoseCenterlineReady": false,
+    "properPipeLayoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "reason": "Manufacturer catalog dimensions are evidence, not applied takeout. Coupling envelopes are not center-to-end takeout; source insertion-origin port offsets and six generic fitting identities remain unresolved."
+  }
+}

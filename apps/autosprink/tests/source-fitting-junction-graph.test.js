@@ -73,20 +73,37 @@ describe('source fitting junction graph', () => {
     ]);
   });
 
-  it('keeps incomplete rigid fittings and all flexible hose centerlines fail-closed', () => {
+  it('resolves every rigid source junction while keeping hose centerlines and takeout fail-closed', () => {
     const graph = buildPolaris();
     expect(graph.metrics).toEqual({
       fittingCount: 98,
       rigidFittingCount: 28,
       flexibleDropCount: 70,
-      resolvedRigidFittingCount: 15,
-      unresolvedRigidFittingCount: 13,
-      fittingToFittingEdgeCount: 8,
-      fittingToPipeEndpointEdgeCount: 17,
+      resolvedRigidFittingCount: 28,
+      unresolvedRigidFittingCount: 0,
+      fittingToFittingEdgeCount: 18,
+      fittingToPipeEndpointEdgeCount: 18,
+      inlineDeviceAttachmentCount: 1,
+      sourceOrientedOpenTerminalCount: 1,
     });
-    expect(graph.issues).toHaveLength(9);
+    expect(graph.issues).toHaveLength(0);
+    expect(graph.pipeSpanAttachments).toEqual([{
+      fittingId: 'fitting-75663',
+      kind: 'pipe-span',
+      pipeId: 'pipe-22275',
+      stationFt: 0.489166666,
+      spanFraction: 0.079950967,
+      residualFt: 0,
+    }]);
+    expect(graph.openTerminals).toEqual([{
+      fittingId: 'fitting-73733',
+      kind: 'open-terminal',
+      semantic: 'inspectors-test-drain-discharge',
+      sourcePortIndex: 1,
+      direction: { x: 0.707106781, y: 0, z: -0.707106781 },
+    }]);
     expect(graph.claims).toEqual({
-      sourceCenterlineAdjacencyCompleteReady: false,
+      sourceCenterlineAdjacencyCompleteReady: true,
       manufacturerExactTakeoutReady: false,
       flexibleHoseCenterlineReady: false,
       properPipeLayoutReady: false,

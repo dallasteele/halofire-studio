@@ -229,10 +229,13 @@ describe('New Hope proper pitched-roof pipe-layout acceptance', () => {
     expect(result.completedProjectGeometryTransferred).toBe(false)
     expect(result.fittingAdjacencyCalibration).toMatchObject({
       projectId: 'polaris-academy-mesa-az',
-      resolvedRigidFittingCount: 15,
-      unresolvedRigidFittingCount: 13,
+      resolvedRigidFittingCount: 28,
+      unresolvedRigidFittingCount: 0,
       boundedSupplyTeeInterPieceAdjacencyReady: true,
       boundedInspectorTestDrainInterPieceAdjacencyReady: true,
+      sourceFittingCenterlineAdjacencyCompleteReady: true,
+      inlineDeviceAttachmentCount: 1,
+      sourceOrientedOpenTerminalCount: 1,
       manufacturerExactFittingTakeoutReady: false,
       projectSpecificGeometryTransferred: false,
     })

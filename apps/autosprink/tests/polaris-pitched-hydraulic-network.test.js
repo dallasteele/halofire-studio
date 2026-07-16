@@ -7,6 +7,7 @@ import belowCeilingReport from '../src/data/polaris-hydraulic-calcs-below-ceilin
 import expected from '../src/data/polaris-pitched-hydraulic-network.json';
 import sourceContinuityEvidence from '../src/data/polaris-pipe-layout-source-continuity.json';
 import drainageCodeBasis from '../src/data/polaris-wet-pipe-drainage-code-basis.json';
+import manufacturerDimensionSchedule from '../src/data/polaris-victaulic-primary-dimensions.json';
 import {
   bindCalculationSprinklerLeaves,
   buildPhysicalPipeGraph,
@@ -22,6 +23,7 @@ const build = (overrides = {}) => buildPolarisPitchedHydraulicNetwork({
   fireLineRegistration: overrides.fireLineRegistration ?? expected.sourceBoundary.fireLineRegistration,
   sourceContinuityEvidence: overrides.sourceContinuityEvidence ?? sourceContinuityEvidence,
   drainageCodeBasis: overrides.drainageCodeBasis ?? drainageCodeBasis,
+  manufacturerDimensionSchedule: overrides.manufacturerDimensionSchedule ?? manufacturerDimensionSchedule,
 });
 
 describe('Polaris completed pitched hydraulic and drainage network', () => {
@@ -205,15 +207,31 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
           fittingCount: 98,
           rigidFittingCount: 28,
           flexibleDropCount: 70,
-          resolvedRigidFittingCount: 15,
-          unresolvedRigidFittingCount: 13,
-          fittingToFittingEdgeCount: 8,
-          fittingToPipeEndpointEdgeCount: 17,
+          resolvedRigidFittingCount: 28,
+          unresolvedRigidFittingCount: 0,
+          fittingToFittingEdgeCount: 18,
+          fittingToPipeEndpointEdgeCount: 18,
+          inlineDeviceAttachmentCount: 1,
+          sourceOrientedOpenTerminalCount: 1,
         },
         claims: {
-          sourceCenterlineAdjacencyCompleteReady: false,
+          sourceCenterlineAdjacencyCompleteReady: true,
           manufacturerExactTakeoutReady: false,
           flexibleHoseCenterlineReady: false,
+          properPipeLayoutReady: false,
+        },
+      },
+      primaryManufacturerDimensions: {
+        evaluation: {
+          status: 'passed',
+          metrics: {
+            rigidFittingCount: 28,
+            identifiedVictaulicInstanceCount: 22,
+            genericUnresolvedInstanceCount: 6,
+            primaryDimensionRecordCount: 9,
+          },
+          primaryDimensionScheduleReady: true,
+          manufacturerExactTakeoutReady: false,
           properPipeLayoutReady: false,
         },
       },
@@ -245,7 +263,8 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
       inspectorTestDrainPipeBridgeReady: true,
       boundedSupplyTeeInterPieceAdjacencyReady: true,
       boundedInspectorTestDrainInterPieceAdjacencyReady: true,
-      sourceFittingCenterlineAdjacencyCompleteReady: false,
+      sourceFittingCenterlineAdjacencyCompleteReady: true,
+      primaryManufacturerDimensionScheduleReady: true,
       manufacturerExactFittingTakeoutReady: false,
       mainDrainCalloutReady: true,
       drainDestinationReady: true,
@@ -435,11 +454,14 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
     expect(html).toContain('exact cross-drawing endpoint geometry stays false');
     expect(html).toContain('718.821 inches from node 116');
     expect(html).toContain('whole-network flow directed');
-    expect(html).toContain('Bounded source fitting adjacency — plan, elevation, and 3D');
-    expect(html).toContain('4 supply fittings resolved');
-    expect(html).toContain('3 mutual fitting links');
-    expect(html).toContain('13 other rigid fittings unresolved');
-    expect(html).toContain('manufacturer takeout held');
+    expect(html).toContain('Whole-project source fitting adjacency — plan, elevation, and 3D');
+    expect(html).toContain('28/28 rigid fittings source-resolved');
+    expect(html).toContain('18 mutual fitting links');
+    expect(html).toContain('28/28 rigid fittings source-resolved');
+    expect(html).toContain('22 Victaulic instances / 9 primary dimension records bound');
+    expect(html).toContain('applied manufacturer takeout held');
+    expect(html).toContain('dataset.primaryManufacturerDimensionScheduleReady');
+    expect(html).toContain('dataset.properPipeLayoutReady');
     expect(html).toContain('supplyJunctionPlan');
     expect(html).toContain('supplyJunctionElevation');
     expect(html).toContain('supplyJunction3d');
@@ -461,8 +483,10 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
         exactFeedMainSpanRoutes: 1,
         exactCalculatedSprinklerTerminalBindings: 29,
         buildingComponentPipes: 177,
-        resolvedRigidFittingJunctions: 15,
-        unresolvedRigidFittingJunctions: 13,
+        resolvedRigidFittingJunctions: 28,
+        unresolvedRigidFittingJunctions: 0,
+        inlineDeviceAttachments: 1,
+        sourceOrientedOpenTerminals: 1,
         boundedSupplyTeeFittings: 4,
         boundedSupplyTeeFittingLinks: 3,
         boundedSupplyTeePipeEndpointLinks: 3,
@@ -508,7 +532,8 @@ describe('Polaris completed pitched hydraulic and drainage network', () => {
         wholeNetworkHydraulicFlowDirectionReady: true,
         boundedSupplyTeeInterPieceAdjacencyReady: true,
         boundedInspectorTestDrainInterPieceAdjacencyReady: true,
-        sourceFittingCenterlineAdjacencyCompleteReady: false,
+        sourceFittingCenterlineAdjacencyCompleteReady: true,
+        primaryManufacturerDimensionScheduleReady: true,
         manufacturerExactFittingTakeoutReady: false,
         exactWetPipeDrainageBasinGeometryReady: true,
         wetPipeDrainageCorrectionPlanReady: false,

@@ -15,6 +15,7 @@ export async function buildFromSources({
   sourceCandidatePath,
   sourceContinuityPath,
   drainageCodeBasisPath,
+  manufacturerDimensionSchedulePath,
 }) {
   const [fireLineEvidence, fireLineRegistration] = await Promise.all([
     extractPolarisFireLineSource(fireLinePath),
@@ -28,6 +29,7 @@ export async function buildFromSources({
     fireLineRegistration,
     sourceContinuityEvidence: readJson(sourceContinuityPath),
     drainageCodeBasis: readJson(drainageCodeBasisPath),
+    manufacturerDimensionSchedule: readJson(manufacturerDimensionSchedulePath),
   });
 }
 
@@ -41,10 +43,11 @@ if (import.meta.url === `file:///${process.argv[1]?.replaceAll('\\', '/')}`) {
     sourceCandidatePath,
     sourceContinuityPath,
     drainageCodeBasisPath,
+    manufacturerDimensionSchedulePath,
     outputPath,
   ] = process.argv.slice(2);
   if (!outputPath) {
-    throw new Error('USAGE: build-polaris-pitched-hydraulic-network.mjs <pipe-calibration.json> <attic-report.json> <below-ceiling-report.json> <fire-line.dwg> <site-plan.dwg> <source-candidate.json> <source-continuity.json> <drainage-code-basis.json> <output.json>');
+    throw new Error('USAGE: build-polaris-pitched-hydraulic-network.mjs <pipe-calibration.json> <attic-report.json> <below-ceiling-report.json> <fire-line.dwg> <site-plan.dwg> <source-candidate.json> <source-continuity.json> <drainage-code-basis.json> <manufacturer-dimensions.json> <output.json>');
   }
   const packet = await buildFromSources({
     pipeCalibrationPath,
@@ -55,6 +58,7 @@ if (import.meta.url === `file:///${process.argv[1]?.replaceAll('\\', '/')}`) {
     sourceCandidatePath,
     sourceContinuityPath,
     drainageCodeBasisPath,
+    manufacturerDimensionSchedulePath,
   });
   fs.writeFileSync(outputPath, `${JSON.stringify(packet, null, 2)}\n`);
   process.stdout.write(`${JSON.stringify({ outputPath, receiptSha256: packet.receiptSha256, claims: packet.claims }, null, 2)}\n`);

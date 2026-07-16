@@ -157,7 +157,24 @@ scalar-patch block or make it derive from the real arrays. The studio 3D then re
 ### N3 — Walls-aware sprinkler layout
 Heads clipped to the envelope polygon (never outside — currently they spill), per-room placement where
 partitions exist (small-room NFPA rules), open-floor single grid retained where the wall network proves
-the floor is open (now a *derived* fact, not a classification bypass). Pipe routing respects walls.
+the floor is open (now a *derived* fact, not a classification bypass).
+
+**"Sprinkler layout" means the complete project-specific pipe graph, not a head grid.** Every pipe edge
+must carry a source-bound role (`riser`, `cross-main`, `branch-line`, `arm-over`, `drop`, `sprig`, or
+`drain`), ordered plan endpoints and bearing, nominal size, hydraulic flow direction, and pipe-centerline
+Z at both ends. Dry-system horizontal edges additionally require the project-specific grade magnitude,
+explicit high and low endpoints, and elevations that close against that grade. Junctions, size
+transitions, terminals, low points, and drain destinations require exact fitting identity and
+manufacturer-bound takeout. The graph must connect every sprinkler to the riser/source, preserve loops
+where the completed design has loops, respect walls/trusses/roof planes, and route each governed low
+point to its source-approved drain disposition.
+
+**N3 HARD GATE:** the actual source PDF remains the visible underlay; plan, elevation, and 3D are three
+projections of the same scaled graph. The gate rejects missing or conflicting layout direction, flow
+direction, grade, Z, role, size, fitting/takeout, drainage, obstruction, or riser-closure evidence. A
+head-placement holdout, colored polyline, source-adjacency calibration, or completed-project answer
+overlay can never earn `properPipeLayoutReady` for a new project. No surface may call the output a
+"pipe layout" or "sprinkler layout" until this gate passes.
 
 ### N4 — Honest gate v2 + truth-in-labeling (DO FIRST, it's cheap)
 Immediately: fix `confidence.py:59` note to the truth ("footprint-verified uniform NFPA grid; not yet
@@ -196,7 +213,7 @@ retired. No second extraction pipeline.
 | **0** | N4-lite (truth-in-labeling) + N7 (sheet-index repair) | Badge text honest in prod; AZAZ/254/766/Cooperative all resolve the correct physical floor-plan page from the DB |
 | **1** | N1 on AZAZ until the overlay is RIGHT, then hold on 766 (must recover the missing office wing / full 217′-4″), 254, Cooperative A-101 | Per-plate overlay gate (recall ≥90%, phantom=0, footprint ±5% of printed dims) + human eye-gate on the stored overlay |
 | **2** | N2 model3d wiring | Studio 3D shows walls+rooms matching the overlay; Cooperative renders 8 floors; `levelPlans[*].plan.rooms` non-empty for every geometry bid |
-| **3** | N3 layout + N4 gate v2 | Zero heads outside envelope; per-room placement where partitions exist; bid-grade re-earned ONLY through the overlay gate (expect a temporary honest downgrade of current bid-grade bids) |
+| **3** | N3 complete sprinkler graph + N4 gate v2 | Actual source-PDF underlay; zero heads outside envelope; per-room placement where partitions exist; every pipe has governed role, ordered bearing, size, separate hydraulic direction, and (for dry horizontal pipe) explicit high-to-low grade; exact endpoint Z, fittings/takeout, drains, obstructions, and riser closure agree in plan/elevation/3D; adversarial mutations remain fail-closed; bid-grade re-earned ONLY through the overlay gate |
 | **4** | N5 density priors | Corpus backtest head_err: AZAZ-class bids within band of actuals (134-class, not 61); every density has provenance |
 | **5** | N6 FP vector-symbol digitization | strict_posgate on held-out FP-truth jobs: recall ≥95%, precision ≥90%, zero fabrication |
 | **6** | N8 unification + end-to-end acceptance walk | Full live flow (board → open → 3D/layout/price/verification/governance → send) with real per-bid overlays visible in the review UI |

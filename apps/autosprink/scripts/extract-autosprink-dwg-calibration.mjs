@@ -49,6 +49,21 @@ function transformBlockPoint(value, insert, basePoint) {
   );
 }
 
+function transformBlockVector(value, insert) {
+  const scaled = {
+    x: value.x * insert.xScale,
+    y: value.y * insert.yScale,
+    z: value.z * insert.zScale,
+  };
+  const cosine = Math.cos(insert.rotation || 0);
+  const sine = Math.sin(insert.rotation || 0);
+  return normalize(ocsPointToWcs({
+    x: scaled.x * cosine - scaled.y * sine,
+    y: scaled.x * sine + scaled.y * cosine,
+    z: scaled.z,
+  }, insert.extrusionDirection));
+}
+
 function sourceSha256(bytes) {
   return createHash('sha256').update(bytes).digest('hex').toUpperCase();
 }
@@ -136,14 +151,45 @@ export async function extractAutosprinkDwgCalibration(inputPath, expectedSha256 
     blockName: entity.name,
     layer: entity.layer,
     point: point(ocsPointToWcs(entity.insertionPoint, entity.extrusionDirection)),
+    sourceTransform: {
+      rotationRadians: round(entity.rotation || 0),
+      scale: {
+        x: round(entity.xScale),
+        y: round(entity.yScale),
+        z: round(entity.zScale),
+      },
+      extrusionDirection: point(entity.extrusionDirection),
+    },
     attributes: insertAttributes(entity),
   });
   const sprinklers = inserts
     .filter((entity) => entity.layer === 'AS_SPRINKLER SYSTEM_SPRINKLERS' && entity.name?.startsWith('Fitting'))
     .map((entity) => pointInsert(entity, 'sprinkler'));
+  const sourcePipeRadii = [...new Set(pipes.flatMap((pipe) => pipe.maxSectionRadius ?? []))];
   const fittings = inserts
     .filter((entity) => entity.layer === 'AS_SPRINKLER SYSTEM_FITTINGS')
-    .map((entity) => pointInsert(entity, 'fitting'));
+    .map((entity) => {
+      const block = blocks.get(entity.name);
+      const sourcePortDirections = [];
+      for (const circle of block?.entities.filter((child) => child.type === 'CIRCLE') ?? []) {
+        const centerOffset = magnitude({
+          x: circle.center.x - block.basePoint.x,
+          y: circle.center.y - block.basePoint.y,
+          z: circle.center.z - block.basePoint.z,
+        });
+        const matchesSourcePipeRadius = sourcePipeRadii.some((radius) => Math.abs(radius - circle.radius) <= 1e-6);
+        if (centerOffset > 1e-6 || !matchesSourcePipeRadius) continue;
+        const value = transformBlockVector(circle.extrusionDirection, entity);
+        if (sourcePortDirections.some((candidate) => (
+          candidate.x * value.x + candidate.y * value.y + candidate.z * value.z
+        ) >= 1 - 1e-9)) continue;
+        sourcePortDirections.push(point(value));
+      }
+      return {
+        ...pointInsert(entity, 'fitting'),
+        sourcePortDirections,
+      };
+    });
   const hydraulicAreaLines = database.entities.filter((entity) => entity.type === 'LINE'
     && entity.layer === 'AS_SPRINKLER SYSTEM_AREAS');
   const hydraulicLineIndicesByEndpoint = new Map();

@@ -86,6 +86,8 @@
     "hydraulicNodeConnectionPointCount": 59,
     "attributedPipeCount": 186,
     "attributedFittingCount": 98,
+    "sourceTransformedFittingCount": 98,
+    "sourceOrientedFittingCount": 12,
     "sourceNoteCount": 2
   },
   "pipes": [
@@ -9586,6 +9588,20 @@
         "y": 10.159632742,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9607,6 +9623,20 @@
         "y": 43.32863145,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9628,6 +9658,20 @@
         "y": 43.754416701,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9649,6 +9693,20 @@
         "y": 44.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9670,6 +9728,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9691,6 +9763,20 @@
         "y": 19.854166667,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9712,6 +9798,20 @@
         "y": 9.748616106,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9733,6 +9833,20 @@
         "y": 6.166666667,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9754,6 +9868,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9775,6 +9903,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9796,6 +9938,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9817,6 +9973,20 @@
         "y": 6.166666667,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9838,6 +10008,20 @@
         "y": 13.428051432,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9859,6 +10043,20 @@
         "y": 55.75,
         "z": 13
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9880,6 +10078,20 @@
         "y": 11.666566762,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9901,6 +10113,20 @@
         "y": 33.600209822,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9922,6 +10148,20 @@
         "y": 0.25,
         "z": 11.317708333
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9943,6 +10183,20 @@
         "y": 11.484612283,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9964,6 +10218,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -9985,6 +10253,20 @@
         "y": 44.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10006,6 +10288,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10027,6 +10323,20 @@
         "y": 9.326299408,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10048,6 +10358,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10069,6 +10393,20 @@
         "y": 45.583333333,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10090,6 +10428,20 @@
         "y": 34.583333333,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10111,6 +10463,20 @@
         "y": 0.25,
         "z": 11.317708333
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10132,6 +10498,20 @@
         "y": 43.419989991,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10153,6 +10533,20 @@
         "y": 43.657033318,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10174,6 +10568,20 @@
         "y": 44.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10195,6 +10603,20 @@
         "y": 55.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10216,6 +10638,20 @@
         "y": 23.583333333,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10237,6 +10673,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10258,6 +10708,20 @@
         "y": 24.71912526,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10279,6 +10743,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10300,6 +10778,20 @@
         "y": 44.75,
         "z": 13
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10321,6 +10813,20 @@
         "y": 7.228431264,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10342,6 +10848,20 @@
         "y": 11.254787348,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10363,6 +10883,20 @@
         "y": 44.75,
         "z": 13
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10384,6 +10918,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10405,6 +10953,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10426,6 +10988,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10447,6 +11023,20 @@
         "y": 45.583333333,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10468,6 +11058,20 @@
         "y": 45.583333333,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10489,6 +11093,20 @@
         "y": 11.66659104,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10510,6 +11128,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10531,6 +11163,20 @@
         "y": 43.568354667,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10552,6 +11198,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10573,6 +11233,20 @@
         "y": 34.583333333,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10594,6 +11268,20 @@
         "y": 44.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10615,6 +11303,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10636,6 +11338,20 @@
         "y": 33.114208074,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10657,6 +11373,20 @@
         "y": 10.159632742,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10678,6 +11408,20 @@
         "y": 17.166666667,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10699,6 +11443,20 @@
         "y": 17.958333333,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10720,6 +11478,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10741,6 +11513,20 @@
         "y": 17.125,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10762,6 +11548,20 @@
         "y": 55.75,
         "z": 13
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10783,6 +11583,20 @@
         "y": 22.760968737,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10804,6 +11618,20 @@
         "y": 44.75,
         "z": 13
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10825,6 +11653,20 @@
         "y": 9.326299408,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10846,6 +11688,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10867,6 +11723,20 @@
         "y": 55.75,
         "z": 13
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10888,6 +11758,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10909,6 +11793,20 @@
         "y": 44.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10930,6 +11828,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10951,6 +11863,20 @@
         "y": 45.583333333,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10972,6 +11898,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -10993,6 +11933,20 @@
         "y": 22.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11014,6 +11968,20 @@
         "y": 45.581542177,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11035,6 +12003,20 @@
         "y": 33.75,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11056,6 +12038,20 @@
         "y": 39.666666667,
         "z": 1.5
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11077,6 +12073,20 @@
         "y": 39.666666667,
         "z": 0.436666667
       },
+      "sourceTransform": {
+        "rotationRadians": 1.570796327,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Generic",
         "Category": "Fitting",
@@ -11098,6 +12108,20 @@
         "y": 39.666666667,
         "z": 10.718333333
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11119,6 +12143,36 @@
         "y": 39.666666667,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 1.570796327,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11140,6 +12194,20 @@
         "y": 39.666666667,
         "z": 11.281666667
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11161,6 +12229,20 @@
         "y": 39.385,
         "z": 11
       },
+      "sourceTransform": {
+        "rotationRadians": 1.570796327,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11182,6 +12264,36 @@
         "y": 39.666666667,
         "z": 4.156666667
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11203,6 +12315,31 @@
         "y": 38.749166667,
         "z": 3.291666667
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11224,6 +12361,20 @@
         "y": 38.749166667,
         "z": 3.625
       },
+      "sourceTransform": {
+        "rotationRadians": 1.570796327,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11245,6 +12396,20 @@
         "y": 39.385,
         "z": 4.156666667
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11266,6 +12431,20 @@
         "y": 39.030833333,
         "z": 4.156666667
       },
+      "sourceTransform": {
+        "rotationRadians": 1.570796327,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11287,6 +12466,20 @@
         "y": 38.749166667,
         "z": 3.291666667
       },
+      "sourceTransform": {
+        "rotationRadians": 3.141592654,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11308,6 +12501,31 @@
         "y": 40.840954932,
         "z": 6.99
       },
+      "sourceTransform": {
+        "rotationRadians": 3.141592654,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Generic",
         "Category": "Fitting",
@@ -11329,6 +12547,31 @@
         "y": 38.749166667,
         "z": 4.156666667
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11350,6 +12593,20 @@
         "y": 39.666666667,
         "z": 4.443541667
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11371,6 +12628,20 @@
         "y": 38.749166667,
         "z": 3.875
       },
+      "sourceTransform": {
+        "rotationRadians": 1.570796327,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11392,6 +12663,20 @@
         "y": 39.666666667,
         "z": 3.875
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11413,6 +12698,31 @@
         "y": 40.840954932,
         "z": 1.677059048
       },
+      "sourceTransform": {
+        "rotationRadians": 3.141592654,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 0.707106781,
+          "y": 0,
+          "z": -0.707106781
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Generic",
         "Category": "Fitting",
@@ -11434,6 +12744,31 @@
         "y": 40.840954932,
         "z": 1.677059048
       },
+      "sourceTransform": {
+        "rotationRadians": 1.570796327,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        },
+        {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Generic",
         "Category": "Fitting",
@@ -11455,6 +12790,20 @@
         "y": 39.207916667,
         "z": 4.156666667
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11476,6 +12825,26 @@
         "y": 39.666666667,
         "z": 5.010833333
       },
+      "sourceTransform": {
+        "rotationRadians": 1.570796327,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Generic",
         "Category": "Fitting",
@@ -11497,6 +12866,41 @@
         "y": 38.749166667,
         "z": 3.291666667
       },
+      "sourceTransform": {
+        "rotationRadians": 3.141592654,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 0.707106781,
+          "y": -0.707106781,
+          "z": 0
+        },
+        {
+          "x": 0.707106781,
+          "y": 0.707106781,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Generic",
         "Category": "Fitting",
@@ -11518,6 +12922,26 @@
         "y": 38.749166667,
         "z": 3.75
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11539,6 +12963,31 @@
         "y": 39.666666667,
         "z": 1.218333333
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 1,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11560,6 +13009,20 @@
         "y": 39.666666667,
         "z": 1.218333333
       },
+      "sourceTransform": {
+        "rotationRadians": 3.141592654,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11581,6 +13044,31 @@
         "y": 39.666666667,
         "z": 1.218333333
       },
+      "sourceTransform": {
+        "rotationRadians": 4.71238898,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": -1
+        },
+        {
+          "x": -1,
+          "y": 0,
+          "z": 0
+        }
+      ],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11602,6 +13090,20 @@
         "y": 39.666666667,
         "z": 0.936666667
       },
+      "sourceTransform": {
+        "rotationRadians": 1.570796327,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 1,
+          "z": 0
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -11623,6 +13125,20 @@
         "y": 39.666666667,
         "z": 1.218333333
       },
+      "sourceTransform": {
+        "rotationRadians": 0,
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        },
+        "extrusionDirection": {
+          "x": 0,
+          "y": 0,
+          "z": 1
+        }
+      },
+      "sourcePortDirections": [],
       "sourceAttributes": {
         "Manufacturer": "Victaulic",
         "Category": "Fitting",
@@ -13684,6 +15200,8 @@
     "hydraulicFlowDirectionReady": false,
     "drainageGradeSemanticsReady": false,
     "fullFittingIdentityReady": true,
+    "exactFittingInsertTransformReady": true,
+    "sourceOrientedFittingPortReady": true,
     "drainDestinationReady": false,
     "nativeElementGeometryRecordDecodeReady": false,
     "newHopeExactPipeCenterlineZReady": false,
@@ -13691,5 +15209,5 @@
     "fabricationReady": false,
     "fieldReleaseReady": false
   },
-  "receiptSha256": "3F9528A0F964579411A17E933334D07F1E3DEB973A75477102B2E5D49BA23CC5"
+  "receiptSha256": "8E61FFF79180AF511668ACA05A7CA439E9D4A917DF924E4E6D5098E662CD5321"
 }

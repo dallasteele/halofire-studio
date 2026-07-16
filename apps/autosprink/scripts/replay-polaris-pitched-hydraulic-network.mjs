@@ -37,6 +37,7 @@ export function replayPolarisPitchedHydraulicNetwork() {
     fireLineRegistration: previous.sourceBoundary.fireLineRegistration,
     sourceContinuityEvidence: read('polaris-pipe-layout-source-continuity.json'),
     drainageCodeBasis: read('polaris-wet-pipe-drainage-code-basis.json'),
+    manufacturerDimensionSchedule: read('polaris-victaulic-primary-dimensions.json'),
   });
 }
 

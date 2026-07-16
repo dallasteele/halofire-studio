@@ -32,15 +32,15 @@
     </div>
   </section>
   <section class="glass" id="sourceJunctionProof">
-    <h2>Bounded source fitting adjacency — plan, elevation, and 3D</h2>
-    <p class="lede">The completed source CAD resolves the supply tee as one three-port tee, three adjacent couplings, and three uniquely owned pipe endpoints. The same junction graph resolves the inspector's test-and-drain to two pipe endpoints. These views are three projections of the exact exported XYZ graph used on the approved FP2 underlay below; they are not a decorative fitting sketch.</p>
-    <div class="badges"><span class="badge pass">4 supply fittings resolved</span><span class="badge pass">3 mutual fitting links</span><span class="badge pass">3 uniquely owned supply pipe ends</span><span class="badge pass">2 test-and-drain pipe ends</span><span class="badge hold">13 other rigid fittings unresolved</span><span class="badge hold">manufacturer takeout held</span></div>
+    <h2>Whole-project source fitting adjacency — plan, elevation, and 3D</h2>
+    <p class="lede">The completed source CAD now resolves all 28 rigid fitting records. Exact DWG insert rotation, extrusion, and block port vectors orient every tee, elbow, and inspector's test-and-drain. Fitting-shape constraints resolve the straight-through couplings, check, and reducer without skipping a nearer component on another ray. The waterflow detector binds to the interior of its exact three-inch pipe span, and the inspector discharge terminates through the source-oriented 45-degree open elbow. These views are three projections of the exact exported XYZ graph used on the approved FP2 underlay below; they are not a decorative fitting sketch.</p>
+    <div class="badges"><span class="badge pass">28/28 rigid fittings source-resolved</span><span class="badge pass">18 mutual fitting links</span><span class="badge pass">18 uniquely owned pipe ends</span><span class="badge pass">1 inline waterflow detector</span><span class="badge pass">1 source-oriented open terminal</span><span class="badge pass">22 Victaulic instances / 9 primary dimension records bound</span><span class="badge hold">6 generic fitting identities held</span><span class="badge hold">70 flex hose centerlines held</span><span class="badge hold">applied manufacturer takeout held</span></div>
     <div class="junction-grid">
       <figure class="junction-view"><svg id="supplyJunctionPlan" viewBox="0 0 480 320" aria-label="Top-down plan projection of the exact Polaris supply tee junction"></svg><figcaption>Top-down XY: the side branch is visible; vertical pieces correctly collapse to the same plan station.</figcaption></figure>
       <figure class="junction-view"><svg id="supplyJunctionElevation" viewBox="0 0 480 320" aria-label="Elevation projection of the exact Polaris supply tee junction"></svg><figcaption>Elevation YZ: tee, three couplings, and vertical/side pipe ends remain distinct.</figcaption></figure>
       <figure class="junction-view"><svg id="supplyJunction3d" viewBox="0 0 480 320" aria-label="Isometric projection of the exact Polaris supply tee junction"></svg><figcaption>Isometric XYZ: the same source graph, with no invented hose curve or fitting takeout.</figcaption></figure>
     </div>
-    <p class="boundary">Bounded inter-piece adjacency is proven for these completed-project controls only. The full graph still has 13 unresolved rigid fittings and 70 flex drops without exported hose centerlines. Manufacturer-exact takeout, whole-system fitting adjacency, proper layout, fabrication, and field release remain false.</p>
+    <p class="boundary">Whole-project rigid source adjacency is proven for this completed-project control. Official Victaulic publications bind nine dimension records covering 22 identified rigid instances, but catalog C-to-E, E-to-E, coupling envelope, and allowable pipe-end separation are kept distinct. The six generic fittings lack exact product identity, the source insertion origin is not yet proven as each manufacturer's port datum, and the 70 flex-drop records do not export their bent hose centerlines. Applied manufacturer takeout, flexible hose geometry, proper layout, fabrication, and field release remain false.</p>
   </section>
   <section class="glass">
     <h2>Approved FP2 + exact pipe model + governed direction layers</h2>
@@ -80,7 +80,9 @@ const supplyAssembly = network.fittingSemantics.boundedSupplyTeeAssembly;
 document.documentElement.dataset.boundedSupplyTeeInterPieceAdjacencyReady = String(network.claims.boundedSupplyTeeInterPieceAdjacencyReady);
 document.documentElement.dataset.boundedInspectorTestDrainInterPieceAdjacencyReady = String(network.claims.boundedInspectorTestDrainInterPieceAdjacencyReady);
 document.documentElement.dataset.sourceFittingCenterlineAdjacencyCompleteReady = String(network.claims.sourceFittingCenterlineAdjacencyCompleteReady);
+document.documentElement.dataset.primaryManufacturerDimensionScheduleReady = String(network.claims.primaryManufacturerDimensionScheduleReady);
 document.documentElement.dataset.manufacturerExactFittingTakeoutReady = String(network.claims.manufacturerExactFittingTakeoutReady);
+document.documentElement.dataset.properPipeLayoutReady = String(network.claims.properPipeLayoutReady);
 function drawSupplyJunctionProjection(svgId, project, {collapseCoincidentLabels=false}={}) {
   const target = document.querySelector(`#${svgId}`);
   const fittingPoints = new Map(supplyAssembly.fittingIds.map(id => [id, calibration.fittings.find(fitting => fitting.id === id).pointFt]));

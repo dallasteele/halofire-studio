@@ -5,6 +5,7 @@ import {
   buildSourceFittingJunctionGraph,
   evaluateBoundedSourceFittingJunction,
 } from './source-fitting-junction-graph.js';
+import { evaluatePolarisManufacturerDimensionSchedule } from './polaris-manufacturer-dimension-schedule.js';
 import { evaluateWetPipeDrainageBasins } from './wet-pipe-drainage-basins.js';
 
 const round = (value, precision = 9) => Number(value.toFixed(precision));
@@ -886,6 +887,7 @@ export function buildPolarisPitchedHydraulicNetwork({
   fireLineRegistration,
   sourceContinuityEvidence,
   drainageCodeBasis,
+  manufacturerDimensionSchedule,
 }) {
   const graph = buildPhysicalPipeGraph(pipeCalibration.pipes);
   const semanticFittings = pipeCalibration.fittings.filter((fitting) => fitting.sourceAttributes?.['Sub Category']);
@@ -992,6 +994,10 @@ export function buildPolarisPitchedHydraulicNetwork({
     pipes: pipeCalibration.pipes,
     fittings: pipeCalibration.fittings,
   });
+  const manufacturerDimensionEvaluation = evaluatePolarisManufacturerDimensionSchedule(
+    manufacturerDimensionSchedule,
+    pipeCalibration,
+  );
   const sourceJunctionById = new Map(sourceFittingJunctionGraph.junctions
     .map((junction) => [junction.fittingId, junction]));
   const supplyTeeJunction = sourceJunctionById.get(supplyTee.id);
@@ -1168,6 +1174,11 @@ export function buildPolarisPitchedHydraulicNetwork({
       mainDrainCallout: mainDrainNote,
       sourceEndpointBridgeAudit: fittingBridgeAudit,
       sourceJunctionGraph: sourceFittingJunctionGraph,
+      primaryManufacturerDimensions: {
+        sources: manufacturerDimensionSchedule?.sources ?? [],
+        dimensions: manufacturerDimensionSchedule?.dimensions ?? [],
+        evaluation: manufacturerDimensionEvaluation,
+      },
       boundedSupplyTeeAssembly: supplyAssembly,
       boundedInspectorTestDrainAssembly: inspectorTestDrainAssembly,
       supplyTeeConnectedPipeIds: [...new Set(supplyTeeBridge.connectedPipeEndpoints.map((endpoint) => endpoint.pipeId))],
@@ -1212,6 +1223,8 @@ export function buildPolarisPitchedHydraulicNetwork({
         && inspectorTestDrainAssembly.pipeEndpointLinks.length === 2,
       sourceFittingCenterlineAdjacencyCompleteReady:
         sourceFittingJunctionGraph.claims.sourceCenterlineAdjacencyCompleteReady,
+      primaryManufacturerDimensionScheduleReady:
+        manufacturerDimensionEvaluation.primaryDimensionScheduleReady,
       manufacturerExactFittingTakeoutReady: false,
       mainDrainCalloutReady: mainDrainNote.leaderSegmentCount === 2,
       roofRelativePipeGradeGeometryReady: geometricGrades.length === 14,

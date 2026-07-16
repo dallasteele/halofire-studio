@@ -4,12 +4,12 @@
   "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
   "requestPath": "data/agent-loops/polaris-pitched-hydraulic-network-20260715/lean-request.json",
   "theoremNames": [
-    "polarisWetPipeDrainageBoundary"
+    "polarisRigidAdjacencyAndManufacturerBoundary"
   ],
-  "claim": "The source-gated evidence preserves 82 report segments and 65 exact rigid span routes; four geometrically drainable runs plus ten remote downhill candidates account for all 14 sloped runs. The ten candidates resolve into nine exact trapped wet-pipe basins totaling 37.962174 gallons, including one shared 25.035649-gallon basin. Only eight basins have a locally bound sizing rule and zero have source-approved disposition, so correction-plan, drainage-semantics, and proper-layout readiness remain fail-closed.",
+  "claim": "All 28 rigid fitting junctions resolve with zero unresolved. The 22 identified Victaulic plus six generic fittings partition the same rigid inventory, and nine official dimension records make the bounded primary schedule ready. Because source insertion-origin port offsets, six generic product identities, flexible hose centerlines, and drainage disposition remain unresolved, manufacturer-exact takeout and proper-pipe-layout readiness remain false.",
   "result": {
     "status": "verified",
-    "elapsedMs": 120,
+    "elapsedMs": 527,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

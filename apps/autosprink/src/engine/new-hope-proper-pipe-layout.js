@@ -400,19 +400,23 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     completedProjectFittingAdjacencyCalibration?.claims
       ?.boundedInspectorTestDrainInterPieceAdjacencyReady === true &&
     completedProjectFittingAdjacencyCalibration?.claims
-      ?.sourceFittingCenterlineAdjacencyCompleteReady === false &&
+      ?.sourceFittingCenterlineAdjacencyCompleteReady === true &&
     completedProjectFittingAdjacencyCalibration?.claims
       ?.manufacturerExactFittingTakeoutReady === false &&
     completedProjectFittingAdjacencyCalibration?.claims?.properPipeLayoutReady === false &&
     completedProjectFittingAdjacencyCalibration?.fittingSemantics?.sourceJunctionGraph?.metrics
-      ?.resolvedRigidFittingCount === 15 &&
+      ?.resolvedRigidFittingCount === 28 &&
     completedProjectFittingAdjacencyCalibration?.fittingSemantics?.sourceJunctionGraph?.metrics
-      ?.unresolvedRigidFittingCount === 13
+      ?.unresolvedRigidFittingCount === 0 &&
+    completedProjectFittingAdjacencyCalibration?.fittingSemantics?.sourceJunctionGraph?.metrics
+      ?.inlineDeviceAttachmentCount === 1 &&
+    completedProjectFittingAdjacencyCalibration?.fittingSemantics?.sourceJunctionGraph?.metrics
+      ?.sourceOrientedOpenTerminalCount === 1
   if (!fittingAdjacencyMethodCalibrationReady) {
     issues.push(
       issue(
         'NH_PROPER_PIPE_FITTING_ADJACENCY_CALIBRATION_INVALID',
-        'The reusable fitting-adjacency method must remain bound to the fail-closed completed Polaris source junction control.',
+        'The reusable fitting-adjacency method must remain bound to the completed, source-oriented Polaris junction control while manufacturer takeout and proper-layout promotion remain fail-closed.',
       ),
     )
   }
@@ -432,7 +436,7 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
     ),
     issue(
       'NH_PROPER_PIPE_FITTING_SCHEDULE_INCOMPLETE',
-      'The approved listing closes all 257 pipe-piece identities and end preparations across 264 fabricated units. Native Project.seidb parent IDs now attach all 97 fitting records to their exact listed pipe-piece identity and fitting family. A completed Polaris control calibrates source-centerline adjacency on a four-fitting supply tee and a two-port test-and-drain, while retaining 13 unresolved rigid fittings and false manufacturer takeout. New Hope still does not publish its other-piece adjacency or raw fitting takeout, so same-project inter-piece topology and the complete vertical-offset schedule remain unresolved.',
+      'The approved listing closes all 257 pipe-piece identities and end preparations across 264 fabricated units. Native Project.seidb parent IDs now attach all 97 fitting records to their exact listed pipe-piece identity and fitting family. The completed Polaris control now calibrates all 28 rigid source junctions, including one pipe-mounted detector and one source-oriented open test-drain terminal, while manufacturer takeout remains false. New Hope still does not publish its own complete inter-piece adjacency or raw fitting takeout, so same-project topology and the complete vertical-offset schedule remain unresolved.',
     ),
   ]
   const ready = issues.length === 0
@@ -470,6 +474,9 @@ export function evaluateNewHopeProperPipeLayout(inputs = {}) {
               .unresolvedRigidFittingCount,
           boundedSupplyTeeInterPieceAdjacencyReady: true,
           boundedInspectorTestDrainInterPieceAdjacencyReady: true,
+          sourceFittingCenterlineAdjacencyCompleteReady: true,
+          inlineDeviceAttachmentCount: 1,
+          sourceOrientedOpenTerminalCount: 1,
           manufacturerExactFittingTakeoutReady: false,
           projectSpecificGeometryTransferred: false,
         }

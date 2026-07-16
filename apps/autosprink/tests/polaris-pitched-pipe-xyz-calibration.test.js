@@ -37,6 +37,16 @@ describe('Polaris completed pitched-attic pipe XYZ calibration', () => {
       headXyMaxResidualFt: 0.000000648,
       headLabelZMaxResidualInches: 0.24555,
     });
+    expect(calibration.summary).toMatchObject({
+      sourceTransformedFittingCount: 98,
+      sourceOrientedFittingCount: 12,
+    });
+    expect(calibration.fittings.find((fitting) => fitting.id === 'fitting-73733')).toMatchObject({
+      sourcePortDirections: [
+        { x: -1, y: 0, z: 0 },
+        { x: 0.707106781, y: 0, z: -0.707106781 },
+      ],
+    });
   });
 
   it('preserves the exact pipe sizes, plan directions, roof-relative grades, and vertical transitions', () => {
@@ -78,7 +88,7 @@ describe('Polaris completed pitched-attic pipe XYZ calibration', () => {
   it('rejects source, registration, inventory, coordinate, size, direction, grade, and promotion attacks', () => {
     expect(verifyPolarisPitchedPipeAdversarialLoop(calibration)).toMatchObject({
       status: 'passed',
-      attemptedCases: 14,
+      attemptedCases: 16,
       falsePromotionRejected: true,
     });
   });

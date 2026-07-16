@@ -25,6 +25,14 @@ const EXPECTED_SYSTEM_PORTS = Object.freeze({
   'Two-Way Inlet': 1,
 });
 
+const STRAIGHT_THROUGH_CATEGORIES = new Set([
+  'Check',
+  'Flange',
+  'Flexible Coupling',
+  'Reducer/Adapter',
+  'Rigid Coupling',
+]);
+
 const round = (value, digits = 9) => Number(value.toFixed(digits));
 
 function distance(left, right) {
@@ -45,6 +53,90 @@ function direction(from, to, residualFt) {
 
 function dot(left, right) {
   return left.x * right.x + left.y * right.y + left.z * right.z;
+}
+
+function angleDegrees(left, right) {
+  return Math.acos(Math.max(-1, Math.min(1, dot(left, right)))) * 180 / Math.PI;
+}
+
+function combinations(values, count, start = 0, prefix = []) {
+  if (count === 0) return [prefix];
+  const result = [];
+  for (let index = start; index <= values.length - count; index += 1) {
+    result.push(...combinations(values, count - 1, index + 1, [...prefix, values[index]]));
+  }
+  return result;
+}
+
+function angleNear(value, target, tolerance) {
+  return Math.abs(value - target) <= tolerance;
+}
+
+function exactSourcePortsMatch(sourcePortDirections, candidates, rayCosine) {
+  if (sourcePortDirections.length !== candidates.length) return false;
+  const assign = (portIndex, used) => {
+    if (portIndex === sourcePortDirections.length) return true;
+    return candidates.some((candidate, candidateIndex) => !used.has(candidateIndex)
+      && dot(sourcePortDirections[portIndex], candidate.direction) >= rayCosine
+      && assign(portIndex + 1, new Set([...used, candidateIndex])));
+  };
+  return assign(0, new Set());
+}
+
+function fittingPortTopologyReady(fitting, candidates, rayAngleDeg, rayCosine) {
+  const subCategory = fittingCategory(fitting);
+  const sourcePortDirections = Array.isArray(fitting.sourcePortDirections)
+    ? fitting.sourcePortDirections.filter(finitePoint)
+    : [];
+  if (sourcePortDirections.length === candidates.length) {
+    return exactSourcePortsMatch(sourcePortDirections, candidates, rayCosine);
+  }
+  const pairAngles = combinations(candidates, 2)
+    .map(([left, right]) => angleDegrees(left.direction, right.direction));
+  if (STRAIGHT_THROUGH_CATEGORIES.has(subCategory)) {
+    return pairAngles.length === 1 && angleNear(pairAngles[0], 180, rayAngleDeg);
+  }
+  if (subCategory === 'Tee') {
+    return pairAngles.filter((value) => angleNear(value, 180, rayAngleDeg)).length === 1
+      && pairAngles.filter((value) => angleNear(value, 90, rayAngleDeg)).length === 2;
+  }
+  if (subCategory === 'Elbow') {
+    const nominalAngle = fitting.sourceAttributes?.Description?.includes('45°') ? 45 : 90;
+    return pairAngles.length === 1
+      && (angleNear(pairAngles[0], nominalAngle, rayAngleDeg)
+        || (nominalAngle === 45 && angleNear(pairAngles[0], 135, rayAngleDeg)));
+  }
+  return true;
+}
+
+function closestPointOnSegment(pointValue, start, end) {
+  const vector = { x: end.x - start.x, y: end.y - start.y, z: end.z - start.z };
+  const lengthSquared = dot(vector, vector);
+  if (lengthSquared <= POINT_EPSILON_FT ** 2) return null;
+  const offset = { x: pointValue.x - start.x, y: pointValue.y - start.y, z: pointValue.z - start.z };
+  const fraction = dot(offset, vector) / lengthSquared;
+  const projected = {
+    x: start.x + fraction * vector.x,
+    y: start.y + fraction * vector.y,
+    z: start.z + fraction * vector.z,
+  };
+  return {
+    fraction,
+    residualFt: distance(pointValue, projected),
+    stationFt: Math.sqrt(lengthSquared) * fraction,
+  };
+}
+
+function serializeConnection(candidate) {
+  return {
+    kind: candidate.kind,
+    ...(candidate.kind === 'pipe-endpoint'
+      ? { pipeId: candidate.pipeId, endpoint: candidate.endpoint }
+      : { fittingId: candidate.fittingId }),
+    residualFt: candidate.residualFt,
+    direction: Object.fromEntries(Object.entries(candidate.direction)
+      .map(([axis, value]) => [axis, round(value, 6)])),
+  };
 }
 
 function issue(code, message, entityId = null) {
@@ -120,7 +212,7 @@ export function buildSourceFittingJunctionGraph({
   }));
   const rayCosine = Math.cos((rayAngleDeg * Math.PI) / 180);
 
-  const junctions = fittings.map((fitting) => {
+  let junctions = fittings.map((fitting) => {
     const subCategory = fittingCategory(fitting);
     if (subCategory === 'Flex Drop') {
       return {
@@ -131,6 +223,36 @@ export function buildSourceFittingJunctionGraph({
         selectedConnections: [],
         status: 'held-flexible-centerline-not-exported',
         sourceCenterlineAdjacencyReady: false,
+      };
+    }
+    if (subCategory === 'Switch/Sensor') {
+      const spanAttachments = pipes.map((pipe) => {
+        const projection = closestPointOnSegment(fitting.pointFt, pipe.startFt, pipe.endFt);
+        return projection ? { pipe, ...projection } : null;
+      }).filter((entry) => entry
+        && entry.residualFt <= POINT_EPSILON_FT
+        && entry.fraction > POINT_EPSILON_FT
+        && entry.fraction < 1 - POINT_EPSILON_FT);
+      const ready = spanAttachments.length === 1;
+      return {
+        fittingId: fitting.id,
+        subCategory,
+        pointFt: fitting.pointFt,
+        expectedSystemPortCount: 0,
+        topologyRole: 'inline-device-attachment',
+        selectedConnections: ready ? [{
+          kind: 'pipe-span',
+          pipeId: spanAttachments[0].pipe.id,
+          stationFt: round(spanAttachments[0].stationFt),
+          spanFraction: round(spanAttachments[0].fraction),
+          residualFt: round(spanAttachments[0].residualFt),
+        }] : [],
+        status: ready
+          ? 'source-inline-device-attachment-resolved'
+          : spanAttachments.length === 0
+            ? 'held-inline-device-pipe-span-missing'
+            : 'held-inline-device-pipe-span-ambiguous',
+        sourceCenterlineAdjacencyReady: ready,
       };
     }
     const expectedSystemPortCount = EXPECTED_SYSTEM_PORTS[subCategory] ?? null;
@@ -161,28 +283,15 @@ export function buildSourceFittingJunctionGraph({
       .filter((candidate) => candidate.residualFt <= maxGapFt)
       .sort((left, right) => left.residualFt - right.residualFt
         || candidateKey(left).localeCompare(candidateKey(right)));
-    const nearestFittingCenterFt = rawCandidates
-      .filter((candidate) => candidate.kind === 'fitting-center'
-        && candidate.residualFt > POINT_EPSILON_FT)
-      .reduce((best, candidate) => Math.min(best, candidate.residualFt), Number.POSITIVE_INFINITY);
-    // A nearer fitting center terminates this fitting's direct adjacency horizon.
-    // Pipe ends and other fitting centers beyond that component cannot skip over
-    // the nearer fitting. Equal-distance tee arms remain visible together.
-    const adjacencyHorizonFt = Number.isFinite(nearestFittingCenterFt)
-      ? nearestFittingCenterFt + POINT_EPSILON_FT
-      : maxGapFt;
-    const candidates = rawCandidates.filter((candidate) => candidate.residualFt <= adjacencyHorizonFt);
-
-    const coincidentCandidates = candidates.filter((candidate) => candidate.direction === null);
+    const coincidentCandidates = rawCandidates.filter((candidate) => candidate.direction === null);
     if (coincidentCandidates.length > 0) {
       return {
         fittingId: fitting.id,
         subCategory,
         pointFt: fitting.pointFt,
         expectedSystemPortCount,
-        candidateCount: candidates.length,
+        candidateCount: rawCandidates.length,
         rawCandidateCount: rawCandidates.length,
-        adjacencyHorizonFt: round(adjacencyHorizonFt),
         coincidentCandidateIds: coincidentCandidates.map(candidateKey),
         selectedConnections: [],
         status: 'held-coincident-source-entities',
@@ -191,7 +300,7 @@ export function buildSourceFittingJunctionGraph({
     }
 
     const rays = [];
-    for (const candidate of candidates) {
+    for (const candidate of rawCandidates) {
       const ray = rays.find((entry) => dot(entry.direction, candidate.direction) >= rayCosine);
       if (ray) {
         ray.candidates.push(candidate);
@@ -200,37 +309,120 @@ export function buildSourceFittingJunctionGraph({
       }
     }
     const nearestByRay = rays.map((ray) => ray.candidates[0]);
-    const ready = nearestByRay.length === expectedSystemPortCount;
+    const validCandidateSets = combinations(nearestByRay, expectedSystemPortCount)
+      .filter((candidates) => fittingPortTopologyReady(fitting, candidates, rayAngleDeg, rayCosine));
+    const ready = validCandidateSets.length === 1;
+    const sourcePortDirections = Array.isArray(fitting.sourcePortDirections)
+      ? fitting.sourcePortDirections.filter(finitePoint)
+      : [];
+    const matchedSourcePortConnections = [];
+    const usedCandidateKeys = new Set();
+    sourcePortDirections.forEach((portDirection, sourcePortIndex) => {
+      const matches = nearestByRay.filter((candidate) => !usedCandidateKeys.has(candidateKey(candidate))
+        && dot(portDirection, candidate.direction) >= rayCosine);
+      if (matches.length !== 1) return;
+      usedCandidateKeys.add(candidateKey(matches[0]));
+      matchedSourcePortConnections.push({
+        ...serializeConnection(matches[0]),
+        sourcePortIndex,
+        sourcePortDirection: portDirection,
+      });
+    });
+    const selectedConnections = ready
+      ? validCandidateSets[0].map(serializeConnection).sort((left, right) => {
+        const leftId = left.kind === 'pipe-endpoint' ? `${left.pipeId}:${left.endpoint}` : left.fittingId;
+        const rightId = right.kind === 'pipe-endpoint' ? `${right.pipeId}:${right.endpoint}` : right.fittingId;
+        return leftId.localeCompare(rightId);
+      })
+      : [];
     return {
       fittingId: fitting.id,
       subCategory,
       pointFt: fitting.pointFt,
       expectedSystemPortCount,
-      candidateCount: candidates.length,
+      candidateCount: nearestByRay.length,
       rawCandidateCount: rawCandidates.length,
-      adjacencyHorizonFt: round(adjacencyHorizonFt),
       distinctRayCount: nearestByRay.length,
-      selectedConnections: ready
-        ? nearestByRay.map((candidate) => ({
-          kind: candidate.kind,
-          ...(candidate.kind === 'pipe-endpoint'
-            ? { pipeId: candidate.pipeId, endpoint: candidate.endpoint }
-            : { fittingId: candidate.fittingId }),
-          residualFt: candidate.residualFt,
-          direction: Object.fromEntries(Object.entries(candidate.direction)
-            .map(([axis, value]) => [axis, round(value, 6)])),
-        })).sort((left, right) => {
-          const leftId = left.kind === 'pipe-endpoint' ? `${left.pipeId}:${left.endpoint}` : left.fittingId;
-          const rightId = right.kind === 'pipe-endpoint' ? `${right.pipeId}:${right.endpoint}` : right.fittingId;
-          return leftId.localeCompare(rightId);
-        })
-        : [],
+      validPortTopologyCount: validCandidateSets.length,
+      sourcePortDirections,
+      matchedSourcePortConnections,
+      selectedConnections,
       status: ready
         ? 'source-centerline-rays-resolved'
-        : nearestByRay.length < expectedSystemPortCount
+        : sourcePortDirections.length === expectedSystemPortCount
+          && matchedSourcePortConnections.length > 0
+          ? 'held-unconnected-exact-source-port'
+          : nearestByRay.length < expectedSystemPortCount
           ? 'held-insufficient-source-rays'
-          : 'held-excess-source-rays',
+          : validCandidateSets.length > 1
+            ? 'held-ambiguous-fitting-port-topology'
+            : 'held-invalid-fitting-port-topology',
       sourceCenterlineAdjacencyReady: ready,
+    };
+  });
+
+  const preliminaryAdjacency = new Map();
+  const addPreliminaryEdge = (left, right) => {
+    if (!preliminaryAdjacency.has(left)) preliminaryAdjacency.set(left, new Set());
+    if (!preliminaryAdjacency.has(right)) preliminaryAdjacency.set(right, new Set());
+    preliminaryAdjacency.get(left).add(right);
+    preliminaryAdjacency.get(right).add(left);
+  };
+  for (const junction of junctions) {
+    const connections = junction.sourceCenterlineAdjacencyReady
+      ? junction.selectedConnections
+      : junction.matchedSourcePortConnections ?? [];
+    for (const connection of connections) {
+      if (connection.kind === 'fitting-center') {
+        addPreliminaryEdge(`fitting:${junction.fittingId}`, `fitting:${connection.fittingId}`);
+      } else if (connection.kind === 'pipe-endpoint' || connection.kind === 'pipe-span') {
+        addPreliminaryEdge(`fitting:${junction.fittingId}`, `pipe:${connection.pipeId}`);
+      }
+    }
+  }
+  const testDrainNodes = new Set(junctions
+    .filter((junction) => junction.subCategory === 'Inspectors Test & Drain')
+    .map((junction) => `fitting:${junction.fittingId}`));
+  const reachesTestDrain = (fittingId) => {
+    const pending = [`fitting:${fittingId}`];
+    const visited = new Set(pending);
+    while (pending.length > 0) {
+      const current = pending.shift();
+      if (testDrainNodes.has(current)) return true;
+      for (const adjacent of preliminaryAdjacency.get(current) ?? []) {
+        if (visited.has(adjacent)) continue;
+        visited.add(adjacent);
+        pending.push(adjacent);
+      }
+    }
+    return false;
+  };
+  junctions = junctions.map((junction) => {
+    const matchedPortIndices = new Set((junction.matchedSourcePortConnections ?? [])
+      .map((connection) => connection.sourcePortIndex));
+    const unmatchedSourcePorts = (junction.sourcePortDirections ?? [])
+      .map((directionValue, sourcePortIndex) => ({ direction: directionValue, sourcePortIndex }))
+      .filter((port) => !matchedPortIndices.has(port.sourcePortIndex));
+    const inspectorDischargeTerminalReady = junction.subCategory === 'Elbow'
+      && junction.status === 'held-unconnected-exact-source-port'
+      && junction.matchedSourcePortConnections?.length === 1
+      && unmatchedSourcePorts.length === 1
+      && reachesTestDrain(junction.fittingId);
+    if (!inspectorDischargeTerminalReady) return junction;
+    return {
+      ...junction,
+      topologyRole: 'inspectors-test-drain-open-discharge-terminal',
+      selectedConnections: [
+        ...junction.matchedSourcePortConnections,
+        {
+          kind: 'open-terminal',
+          semantic: 'inspectors-test-drain-discharge',
+          sourcePortIndex: unmatchedSourcePorts[0].sourcePortIndex,
+          direction: unmatchedSourcePorts[0].direction,
+        },
+      ],
+      status: 'source-oriented-open-terminal-resolved',
+      sourceCenterlineAdjacencyReady: true,
     };
   });
 
@@ -238,6 +430,8 @@ export function buildSourceFittingJunctionGraph({
   const issues = [];
   const fittingLinks = new Map();
   const pipeEndpointOwners = new Map();
+  const pipeSpanAttachments = [];
+  const openTerminals = [];
   for (const junction of junctions.filter((entry) => entry.sourceCenterlineAdjacencyReady)) {
     for (const connection of junction.selectedConnections) {
       if (connection.kind === 'fitting-center') {
@@ -259,10 +453,14 @@ export function buildSourceFittingJunctionGraph({
           fittingIds: [junction.fittingId, connection.fittingId].sort(),
           sourceCenterDistanceFt: connection.residualFt,
         });
-      } else {
+      } else if (connection.kind === 'pipe-endpoint') {
         const endpointId = `${connection.pipeId}:${connection.endpoint}`;
         if (!pipeEndpointOwners.has(endpointId)) pipeEndpointOwners.set(endpointId, []);
         pipeEndpointOwners.get(endpointId).push({ fittingId: junction.fittingId, residualFt: connection.residualFt });
+      } else if (connection.kind === 'pipe-span') {
+        pipeSpanAttachments.push({ fittingId: junction.fittingId, ...connection });
+      } else if (connection.kind === 'open-terminal') {
+        openTerminals.push({ fittingId: junction.fittingId, ...connection });
       }
     }
   }
@@ -296,6 +494,8 @@ export function buildSourceFittingJunctionGraph({
       .filter(([, owners]) => owners.length === 1)
       .map(([endpointId, [owner]]) => ({ endpointId, ...owner }))
       .sort((left, right) => left.endpointId.localeCompare(right.endpointId)),
+    pipeSpanAttachments: pipeSpanAttachments.sort((left, right) => left.fittingId.localeCompare(right.fittingId)),
+    openTerminals: openTerminals.sort((left, right) => left.fittingId.localeCompare(right.fittingId)),
     issues,
     metrics: {
       fittingCount: fittings.length,
@@ -305,6 +505,8 @@ export function buildSourceFittingJunctionGraph({
       unresolvedRigidFittingCount: rigidJunctions.length - resolvedRigidJunctions.length,
       fittingToFittingEdgeCount: fittingLinks.size,
       fittingToPipeEndpointEdgeCount: [...pipeEndpointOwners.values()].filter((owners) => owners.length === 1).length,
+      inlineDeviceAttachmentCount: pipeSpanAttachments.length,
+      sourceOrientedOpenTerminalCount: openTerminals.length,
     },
     claims: {
       sourceCenterlineAdjacencyCompleteReady: rigidJunctions.length > 0
