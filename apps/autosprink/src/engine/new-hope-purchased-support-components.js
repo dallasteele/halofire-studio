@@ -98,6 +98,97 @@ const EXPECTED_SAMMY_CANDIDATES = Object.freeze([
   },
 ])
 
+const EXPECTED_ASC_SEISMIC_SOURCES = Object.freeze({
+  AF730: {
+    officialProductUrl: 'https://www.asc-es.com/products/af730-longitudinal-lateral-seismic-clamp',
+    officialSubmittalUrl: 'https://www.asc-es.com/resource/AF730%20Longitudinal%20%26%20Lateral%20Seismic%20Clamp%20Submittal',
+    fileName: 'AF730-submittal.pdf',
+    byteLength: 489980,
+    sha256: 'D25616C54C860C83D2977C18B56FCD72BEAAE7E8A15F160D94109090AE487A12',
+    pageCount: 4,
+    revision: 'SS-SUB-AF730-v04 20221228',
+    sourceClassification: 'dimensioned-submittal-and-product-views',
+  },
+  AF035: {
+    officialProductUrl: 'https://www.asc-es.com/products/af035-model-k-brace-clamp',
+    officialSubmittalUrl: 'https://www.asc-es.com/resource/AF035%20Model%20K%20Brace%20Clamp%20Submittal',
+    fileName: 'AF035-submittal.pdf',
+    byteLength: 1121589,
+    sha256: '9D3B56ED9FA9B201C977D9B7A874208E77DEE780A4817CC31F0DBA724AF3D24F',
+    pageCount: 6,
+    revision: 'SS-SUB-AF035-v03 20220408',
+    sourceClassification: 'installation-and-load-submittal-without-complete-part-dimensions',
+  },
+  AF076: {
+    officialProductUrl: 'https://www.asc-es.com/products/af076-sway-brace-swivel-attachment',
+    officialSubmittalUrl: 'https://www.asc-es.com/resource/AF076%20Sway%20Brace%20Swivel%20Attachment%20Submittal',
+    fileName: 'AF076-submittal.pdf',
+    byteLength: 489529,
+    sha256: '8FE56DC39DF9214DD10BBB3D86660C649811FF9B0F110DB423FA9AD49A1D9AB6',
+    pageCount: 4,
+    revision: 'SS-SUB-AF076-v05 20260421',
+    sourceClassification: 'dimensioned-submittal-and-installation-views',
+  },
+  AF779: {
+    officialProductUrl: 'https://www.asc-es.com/products/af779-multi-connector-adapter',
+    officialSubmittalUrl: 'https://www.asc-es.com/resource/AF779%20Multi-Connector%20Adapter%20Submittal',
+    fileName: 'AF779-submittal.pdf',
+    byteLength: 526542,
+    sha256: 'D72A8BA0A5393805FA5981B345B8B77439186A6D46F2C63A3871DDD4C475B29A',
+    pageCount: 2,
+    revision: 'SS-SUB-AF779-v02 20220412',
+    sourceClassification: 'dimensioned-submittal-and-installation-views',
+  },
+})
+
+const EXPECTED_ASC_QUOTE_VARIANTS = Object.freeze({
+  AF730: [
+    { productNumber: '0502005708', servicePipeSizeIn: 2.5, braceMemberSizeRangeIn: [1, 2], finish: 'plain', quantity: 2, aIn: 9.2, bIn: 1.5, yIn: 1.91 },
+    { productNumber: '0502005710', servicePipeSizeIn: 3, braceMemberSizeRangeIn: [1, 2], finish: 'plain', quantity: 5, aIn: 9.8, bIn: 1.5, yIn: 1.91 },
+    { productNumber: '0502005712', servicePipeSizeIn: 4, braceMemberSizeRangeIn: [1, 2], finish: 'plain', quantity: 1, aIn: 10.8, bIn: 1.5, yIn: 1.91 },
+  ],
+  AF035: [
+    { productNumber: '0502000408', servicePipeSizeIn: 2.5, braceMemberSizeIn: 1, quantity: 31 },
+    { productNumber: '0502000410', servicePipeSizeIn: 3, braceMemberSizeIn: 1, quantity: 17 },
+    { productNumber: '0502000414', servicePipeSizeIn: 4, braceMemberSizeIn: 1, quantity: 1 },
+  ],
+  AF076: [
+    { productNumber: '0502000830', braceMemberSizeRangeIn: [1, 2], anchorSizeIn: 0.5, finish: 'plain', quantity: 57 },
+  ],
+  AF779: [
+    { productNumber: '0500604541', catalogSize: 2, mountingBoltIn: 0.5, structureFastenerCount: 2, structureFastenerDiameterIn: 0.5, h1DiameterIn: 0.56, h2DiameterIn: 0.56, finish: 'plain', quantity: 57 },
+  ],
+})
+
+const EXPECTED_ASC_MATING_REQUIREMENTS = Object.freeze({
+  AF730: {
+    servicePipeClampRequired: true,
+    braceMemberMustBottomAgainstJawBackWall: true,
+    braceMemberStandard: 'Schedule 40 NPS pipe',
+    torqueOffFastenersRequired: true,
+  },
+  AF035: {
+    servicePipeClampRequired: true,
+    braceMemberStandard: 'Schedule 40 NPS pipe',
+    minimumBracePipeExtensionPastCastHoopsIn: 1,
+    setScrewBottomOutRequired: true,
+  },
+  AF076: {
+    braceMemberMustBottomAgainstJawBackWall: true,
+    braceMemberStandard: 'Schedule 40 NPS pipe',
+    structureOrListedStructuralAttachmentRequired: true,
+    af779ListedCombination: true,
+    minimumExposedCrossBoltThreads: 1,
+    torqueOffFastenerRequired: true,
+  },
+  AF779: {
+    af076ListedCombination: true,
+    twoStructureFastenersRequired: true,
+    braceAttachmentThroughH1Required: true,
+    structureSubstrateAndFastenerManufacturerEvidenceRequired: true,
+  },
+})
+
 const issue = (code, message, entityId = null) => ({
   severity: 'blocking',
   code,
@@ -395,6 +486,125 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     )
   }
 
+  const ascSeismic = acquisition?.ascSeismicBracing
+  const ascSources = new Map(
+    (ascSeismic?.sources || []).map((entry) => [entry.figure, entry]),
+  )
+  const invalidAscSource = Object.entries(EXPECTED_ASC_SEISMIC_SOURCES).some(
+    ([figure, expected]) => {
+      const actualSource = ascSources.get(figure)
+      return Object.entries(expected).some(
+        ([key, value]) => actualSource?.[key] !== value,
+      )
+    },
+  )
+  if (
+    ascSeismic?.manufacturer !== 'ASC Engineered Solutions / AFCON' ||
+    ascSeismic?.officialAssemblyRule !==
+      'ASC Engineered Solutions brand bracing components are designed to be compatible only with other ASC Engineered Solutions brand bracing components for a listed seismic bracing assembly.' ||
+    ascSeismic?.officialSourceCount !== 4 ||
+    ascSources.size !== Object.keys(EXPECTED_ASC_SEISMIC_SOURCES).length ||
+    invalidAscSource
+  ) {
+    issues.push(
+      issue(
+        'NH_SUPPORT_ASC_SEISMIC_SOURCE_INVALID',
+        'AF730, AF035, AF076, and AF779 must retain their exact official ASC product URLs, submittal hashes, page counts, revisions, and source classifications.',
+        'ASC seismic bracing',
+      ),
+    )
+  }
+
+  const invalidAscVariant = Object.entries(EXPECTED_ASC_QUOTE_VARIANTS).some(
+    ([figure, expected]) =>
+      JSON.stringify(ascSources.get(figure)?.quoteBoundVariants) !== JSON.stringify(expected),
+  )
+  const af779Purchase = actual.get('0500604541')
+  if (
+    invalidAscVariant ||
+    ascSeismic?.quoteVariantIdentityVerified !== true ||
+    af779Purchase?.model !==
+      'AF779 size 2; 1/2-inch mounting bolt; two 1/2-inch structure fasteners'
+  ) {
+    issues.push(
+      issue(
+        'NH_SUPPORT_ASC_SEISMIC_VARIANT_INVALID',
+        'Each ASC seismic item must retain its quote-bound service-pipe, brace-pipe, fastener, finish, quantity, and AF779 catalog-size identity.',
+        'ASC seismic bracing',
+      ),
+    )
+  }
+
+  const af076 = ascSources.get('AF076')
+  const af779 = ascSources.get('AF779')
+  const invalidAscMatingRule = Object.entries(EXPECTED_ASC_MATING_REQUIREMENTS).some(
+    ([figure, expected]) =>
+      JSON.stringify(ascSources.get(figure)?.matingRequirements) !== JSON.stringify(expected),
+  )
+  if (
+    invalidAscMatingRule ||
+    JSON.stringify(af076?.publishedDimensionsIn) !==
+      JSON.stringify({ a: 1, b: 1.83, c: 1.25, d: 1.38, x: 2.25, l: 4.58, y: 0.762 }) ||
+    JSON.stringify(af779?.publishedDimensionsIn) !==
+      JSON.stringify({ length: 12, legHeight: 2, legDepth: 2, thickness: 0.25, h2CenterSpacing: 9, h1CenterFromEnd: 6, h2CenterFromEnd: 1.5 }) ||
+    ascSeismic?.publishedAssemblyRulesReady !== true
+  ) {
+    issues.push(
+      issue(
+        'NH_SUPPORT_ASC_SEISMIC_MATING_RULE_INVALID',
+        'ASC mating rules must preserve brace insertion, jaw bottom-out, minimum extension, H1/H2, structure attachment, exposed-thread, and torque-off requirements.',
+        'ASC seismic bracing',
+      ),
+    )
+  }
+
+  if (
+    af779?.productNumberControl?.officialPriceSheetUrl !==
+      'https://s3.us-east-2.amazonaws.com/asc-es.com/price-sheets/pdf/PH-7.21-pdf.pdf' ||
+    af779?.productNumberControl?.fileName !== 'ASC-PH-7.21-price-sheet.pdf' ||
+    af779?.productNumberControl?.byteLength !== 6091710 ||
+    af779?.productNumberControl?.sha256 !==
+      '813118B2D9417B6A25D021D1ADAD9064A7EFE3ADA284CB3A0AF5E113735A5DBA' ||
+    af779?.productNumberControl?.physicalPage !== 108 ||
+    af779?.productNumberControl?.renderSha256 !==
+      'E5F896BC48BCFA6C9E32628A868957EF4A97139E949CC51718BB2BC79A4F9CC0' ||
+    af779?.productNumberControl?.mapsProductNumberToCatalogSize !== true
+  ) {
+    issues.push(
+      issue(
+        'NH_SUPPORT_AF779_PRODUCT_SIZE_INVALID',
+        'ASC price-sheet page 108 must continue to map purchased product 0500604541 to AF779 catalog size 2.',
+        '0500604541',
+      ),
+    )
+  }
+
+  const falseAscPromotion = [...ascSources.values()].some(
+    (entry) =>
+      entry?.partNumberSpecificSolidAcquired !== false ||
+      entry?.completeManufacturingDimensionsReady !== false ||
+      entry?.fastenerThreadGeometryReady !== false ||
+      entry?.matingAssemblyVerified !== false,
+  )
+  if (
+    falseAscPromotion ||
+    ascSeismic?.partNumberSpecificSolidCoverageComplete !== false ||
+    ascSeismic?.completeManufacturingDimensionCoverage !== false ||
+    ascSeismic?.fastenerThreadSolidCoverage !== false ||
+    ascSeismic?.braceMemberInsertionVerified !== false ||
+    ascSeismic?.structureAttachmentVerified !== false ||
+    ascSeismic?.collisionAnalysisVerified !== false ||
+    ascSeismic?.listedAssemblyFitVerified !== false
+  ) {
+    issues.push(
+      issue(
+        'NH_SUPPORT_ASC_SEISMIC_VERIFICATION_BOUNDARY_INVALID',
+        'Published ASC dimensions and installation rules cannot promote exact solids, thread geometry, insertion, structure attachment, collisions, or listed assembly fit without CAD-kernel evidence.',
+        'ASC seismic bracing',
+      ),
+    )
+  }
+
   const fig69HangerQuantity = Object.keys(EXPECTED_FIG69_VARIANTS).reduce(
     (sum, productNumber) => sum + (actual.get(productNumber)?.quantity || 0),
     0,
@@ -427,6 +637,13 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     boundary?.sammyPartNumberSpecificSolidReady !== false ||
     boundary?.sammyProjectSubstrateConflictResolved !== false ||
     boundary?.sammyThreadFormGeometryReady !== false ||
+    boundary?.ascSeismicQuoteVariantIdentityReady !== true ||
+    boundary?.ascSeismicPublishedAssemblyRulesReady !== true ||
+    boundary?.ascSeismicPartNumberSpecificSolidCoverageComplete !== false ||
+    boundary?.ascSeismicFastenerThreadSolidCoverageComplete !== false ||
+    boundary?.ascSeismicStructureAttachmentVerified !== false ||
+    boundary?.ascSeismicCollisionAnalysisVerified !== false ||
+    boundary?.ascSeismicListedAssemblyFitVerified !== false ||
     boundary?.manufacturerCadCoverageComplete !== false ||
     boundary?.fullyDimensionedManufacturingDrawingsAcquired !== false ||
     boundary?.exactThreadSolidsReady !== false ||
@@ -464,6 +681,16 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
         ? installedDetail.callouts.length
         : 0,
       hangerAnchorQuantityParityCount: purchaseReady ? sammyAnchorQuantity : 0,
+      ascSeismicOfficialSourceCount: purchaseReady
+        ? Object.keys(EXPECTED_ASC_SEISMIC_SOURCES).length
+        : 0,
+      ascSeismicQuoteBoundProductCount: purchaseReady
+        ? Object.values(EXPECTED_ASC_QUOTE_VARIANTS).reduce(
+          (sum, variants) => sum + variants.length,
+          0,
+        )
+        : 0,
+      ascSeismicDimensionedFamilyCount: purchaseReady ? 3 : 0,
     },
     purchaseIdentityReady: purchaseReady,
     manufacturerAuthoredAb2SourceAcquired: purchaseReady,
@@ -480,6 +707,13 @@ export function evaluateNewHopePurchasedSupportComponents(source = {}) {
     sammyPartNumberSpecificSolidReady: false,
     sammyThreadFormGeometryReady: false,
     hangerAnchorQuantityParityReady: purchaseReady,
+    ascSeismicQuoteVariantIdentityReady: purchaseReady,
+    ascSeismicPublishedAssemblyRulesReady: purchaseReady,
+    ascSeismicPartNumberSpecificSolidCoverageComplete: false,
+    ascSeismicFastenerThreadSolidCoverageComplete: false,
+    ascSeismicStructureAttachmentVerified: false,
+    ascSeismicCollisionAnalysisVerified: false,
+    ascSeismicListedAssemblyFitVerified: false,
     manufacturerCadCoverageComplete: false,
     exactManufacturerGeometryReady: false,
     exactThreadSolidsReady: false,

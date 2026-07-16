@@ -23,6 +23,9 @@ describe('New Hope purchased support components', () => {
       sammyOfficialCadArchiveCount: 2,
       sammyInstalledDetailCalloutCount: 2,
       hangerAnchorQuantityParityCount: 212,
+      ascSeismicOfficialSourceCount: 4,
+      ascSeismicQuoteBoundProductCount: 8,
+      ascSeismicDimensionedFamilyCount: 3,
     })
     expect(result.purchaseIdentityReady).toBe(true)
     expect(result.manufacturerAuthoredAb2SourceAcquired).toBe(true)
@@ -39,6 +42,13 @@ describe('New Hope purchased support components', () => {
     expect(result.sammyPartNumberSpecificSolidReady).toBe(false)
     expect(result.sammyThreadFormGeometryReady).toBe(false)
     expect(result.hangerAnchorQuantityParityReady).toBe(true)
+    expect(result.ascSeismicQuoteVariantIdentityReady).toBe(true)
+    expect(result.ascSeismicPublishedAssemblyRulesReady).toBe(true)
+    expect(result.ascSeismicPartNumberSpecificSolidCoverageComplete).toBe(false)
+    expect(result.ascSeismicFastenerThreadSolidCoverageComplete).toBe(false)
+    expect(result.ascSeismicStructureAttachmentVerified).toBe(false)
+    expect(result.ascSeismicCollisionAnalysisVerified).toBe(false)
+    expect(result.ascSeismicListedAssemblyFitVerified).toBe(false)
     expect(result.manufacturerCadCoverageComplete).toBe(false)
     expect(result.exactManufacturerGeometryReady).toBe(false)
     expect(result.exactThreadSolidsReady).toBe(false)
@@ -141,6 +151,42 @@ describe('New Hope purchased support components', () => {
     falseSammySolid.manufacturerCadAcquisition.sammy.threadFormGeometryVerified = true
     expect(evaluateNewHopePurchasedSupportComponents(falseSammySolid).blockerCodes).toContain(
       'NH_SUPPORT_SAMMY_CAD_VERIFICATION_BOUNDARY_INVALID',
+    )
+
+    const badAscSource = structuredClone(source)
+    badAscSource.manufacturerCadAcquisition.ascSeismicBracing.sources[0].sha256 = 'BAD'
+    expect(evaluateNewHopePurchasedSupportComponents(badAscSource).blockerCodes).toContain(
+      'NH_SUPPORT_ASC_SEISMIC_SOURCE_INVALID',
+    )
+
+    const badAscVariant = structuredClone(source)
+    badAscVariant.manufacturerCadAcquisition.ascSeismicBracing.sources
+      .find((entry) => entry.figure === 'AF730').quoteBoundVariants[0].servicePipeSizeIn = 3
+    expect(evaluateNewHopePurchasedSupportComponents(badAscVariant).blockerCodes).toContain(
+      'NH_SUPPORT_ASC_SEISMIC_VARIANT_INVALID',
+    )
+
+    const badAf779ProductSize = structuredClone(source)
+    badAf779ProductSize.manufacturerCadAcquisition.ascSeismicBracing.sources
+      .find((entry) => entry.figure === 'AF779').productNumberControl.physicalPage = 107
+    expect(evaluateNewHopePurchasedSupportComponents(badAf779ProductSize).blockerCodes).toContain(
+      'NH_SUPPORT_AF779_PRODUCT_SIZE_INVALID',
+    )
+
+    const badMatingRule = structuredClone(source)
+    badMatingRule.manufacturerCadAcquisition.ascSeismicBracing.sources
+      .find((entry) => entry.figure === 'AF035')
+      .matingRequirements.minimumBracePipeExtensionPastCastHoopsIn = 0.5
+    expect(evaluateNewHopePurchasedSupportComponents(badMatingRule).blockerCodes).toContain(
+      'NH_SUPPORT_ASC_SEISMIC_MATING_RULE_INVALID',
+    )
+
+    const falseAscFit = structuredClone(source)
+    falseAscFit.manufacturerCadAcquisition.ascSeismicBracing.sources
+      .find((entry) => entry.figure === 'AF076').matingAssemblyVerified = true
+    falseAscFit.manufacturerCadAcquisition.ascSeismicBracing.listedAssemblyFitVerified = true
+    expect(evaluateNewHopePurchasedSupportComponents(falseAscFit).blockerCodes).toContain(
+      'NH_SUPPORT_ASC_SEISMIC_VERIFICATION_BOUNDARY_INVALID',
     )
   })
 })

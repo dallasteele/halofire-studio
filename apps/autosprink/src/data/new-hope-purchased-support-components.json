@@ -154,6 +154,135 @@
       "threadFormGeometryVerified": false,
       "candidateSelectionResolved": false,
       "installedSubstrateApplicationResolved": false
+    },
+    "ascSeismicBracing": {
+      "manufacturer": "ASC Engineered Solutions / AFCON",
+      "officialAssemblyRule": "ASC Engineered Solutions brand bracing components are designed to be compatible only with other ASC Engineered Solutions brand bracing components for a listed seismic bracing assembly.",
+      "officialSourceCount": 4,
+      "sources": [
+        {
+          "figure": "AF730",
+          "officialProductUrl": "https://www.asc-es.com/products/af730-longitudinal-lateral-seismic-clamp",
+          "officialSubmittalUrl": "https://www.asc-es.com/resource/AF730%20Longitudinal%20%26%20Lateral%20Seismic%20Clamp%20Submittal",
+          "fileName": "AF730-submittal.pdf",
+          "byteLength": 489980,
+          "sha256": "D25616C54C860C83D2977C18B56FCD72BEAAE7E8A15F160D94109090AE487A12",
+          "pageCount": 4,
+          "revision": "SS-SUB-AF730-v04 20221228",
+          "sourceClassification": "dimensioned-submittal-and-product-views",
+          "quoteBoundVariants": [
+            { "productNumber": "0502005708", "servicePipeSizeIn": 2.5, "braceMemberSizeRangeIn": [1, 2], "finish": "plain", "quantity": 2, "aIn": 9.2, "bIn": 1.5, "yIn": 1.91 },
+            { "productNumber": "0502005710", "servicePipeSizeIn": 3, "braceMemberSizeRangeIn": [1, 2], "finish": "plain", "quantity": 5, "aIn": 9.8, "bIn": 1.5, "yIn": 1.91 },
+            { "productNumber": "0502005712", "servicePipeSizeIn": 4, "braceMemberSizeRangeIn": [1, 2], "finish": "plain", "quantity": 1, "aIn": 10.8, "bIn": 1.5, "yIn": 1.91 }
+          ],
+          "matingRequirements": {
+            "servicePipeClampRequired": true,
+            "braceMemberMustBottomAgainstJawBackWall": true,
+            "braceMemberStandard": "Schedule 40 NPS pipe",
+            "torqueOffFastenersRequired": true
+          },
+          "partNumberSpecificSolidAcquired": false,
+          "completeManufacturingDimensionsReady": false,
+          "fastenerThreadGeometryReady": false,
+          "matingAssemblyVerified": false
+        },
+        {
+          "figure": "AF035",
+          "officialProductUrl": "https://www.asc-es.com/products/af035-model-k-brace-clamp",
+          "officialSubmittalUrl": "https://www.asc-es.com/resource/AF035%20Model%20K%20Brace%20Clamp%20Submittal",
+          "fileName": "AF035-submittal.pdf",
+          "byteLength": 1121589,
+          "sha256": "9D3B56ED9FA9B201C977D9B7A874208E77DEE780A4817CC31F0DBA724AF3D24F",
+          "pageCount": 6,
+          "revision": "SS-SUB-AF035-v03 20220408",
+          "sourceClassification": "installation-and-load-submittal-without-complete-part-dimensions",
+          "quoteBoundVariants": [
+            { "productNumber": "0502000408", "servicePipeSizeIn": 2.5, "braceMemberSizeIn": 1, "quantity": 31 },
+            { "productNumber": "0502000410", "servicePipeSizeIn": 3, "braceMemberSizeIn": 1, "quantity": 17 },
+            { "productNumber": "0502000414", "servicePipeSizeIn": 4, "braceMemberSizeIn": 1, "quantity": 1 }
+          ],
+          "matingRequirements": {
+            "servicePipeClampRequired": true,
+            "braceMemberStandard": "Schedule 40 NPS pipe",
+            "minimumBracePipeExtensionPastCastHoopsIn": 1,
+            "setScrewBottomOutRequired": true
+          },
+          "partNumberSpecificSolidAcquired": false,
+          "completeManufacturingDimensionsReady": false,
+          "fastenerThreadGeometryReady": false,
+          "matingAssemblyVerified": false
+        },
+        {
+          "figure": "AF076",
+          "officialProductUrl": "https://www.asc-es.com/products/af076-sway-brace-swivel-attachment",
+          "officialSubmittalUrl": "https://www.asc-es.com/resource/AF076%20Sway%20Brace%20Swivel%20Attachment%20Submittal",
+          "fileName": "AF076-submittal.pdf",
+          "byteLength": 489529,
+          "sha256": "8FE56DC39DF9214DD10BBB3D86660C649811FF9B0F110DB423FA9AD49A1D9AB6",
+          "pageCount": 4,
+          "revision": "SS-SUB-AF076-v05 20260421",
+          "sourceClassification": "dimensioned-submittal-and-installation-views",
+          "quoteBoundVariants": [
+            { "productNumber": "0502000830", "braceMemberSizeRangeIn": [1, 2], "anchorSizeIn": 0.5, "finish": "plain", "quantity": 57 }
+          ],
+          "publishedDimensionsIn": { "a": 1, "b": 1.83, "c": 1.25, "d": 1.38, "x": 2.25, "l": 4.58, "y": 0.762 },
+          "matingRequirements": {
+            "braceMemberMustBottomAgainstJawBackWall": true,
+            "braceMemberStandard": "Schedule 40 NPS pipe",
+            "structureOrListedStructuralAttachmentRequired": true,
+            "af779ListedCombination": true,
+            "minimumExposedCrossBoltThreads": 1,
+            "torqueOffFastenerRequired": true
+          },
+          "partNumberSpecificSolidAcquired": false,
+          "completeManufacturingDimensionsReady": false,
+          "fastenerThreadGeometryReady": false,
+          "matingAssemblyVerified": false
+        },
+        {
+          "figure": "AF779",
+          "officialProductUrl": "https://www.asc-es.com/products/af779-multi-connector-adapter",
+          "officialSubmittalUrl": "https://www.asc-es.com/resource/AF779%20Multi-Connector%20Adapter%20Submittal",
+          "fileName": "AF779-submittal.pdf",
+          "byteLength": 526542,
+          "sha256": "D72A8BA0A5393805FA5981B345B8B77439186A6D46F2C63A3871DDD4C475B29A",
+          "pageCount": 2,
+          "revision": "SS-SUB-AF779-v02 20220412",
+          "sourceClassification": "dimensioned-submittal-and-installation-views",
+          "quoteBoundVariants": [
+            { "productNumber": "0500604541", "catalogSize": 2, "mountingBoltIn": 0.5, "structureFastenerCount": 2, "structureFastenerDiameterIn": 0.5, "h1DiameterIn": 0.56, "h2DiameterIn": 0.56, "finish": "plain", "quantity": 57 }
+          ],
+          "publishedDimensionsIn": { "length": 12, "legHeight": 2, "legDepth": 2, "thickness": 0.25, "h2CenterSpacing": 9, "h1CenterFromEnd": 6, "h2CenterFromEnd": 1.5 },
+          "productNumberControl": {
+            "officialPriceSheetUrl": "https://s3.us-east-2.amazonaws.com/asc-es.com/price-sheets/pdf/PH-7.21-pdf.pdf",
+            "fileName": "ASC-PH-7.21-price-sheet.pdf",
+            "byteLength": 6091710,
+            "sha256": "813118B2D9417B6A25D021D1ADAD9064A7EFE3ADA284CB3A0AF5E113735A5DBA",
+            "physicalPage": 108,
+            "renderSha256": "E5F896BC48BCFA6C9E32628A868957EF4A97139E949CC51718BB2BC79A4F9CC0",
+            "mapsProductNumberToCatalogSize": true
+          },
+          "matingRequirements": {
+            "af076ListedCombination": true,
+            "twoStructureFastenersRequired": true,
+            "braceAttachmentThroughH1Required": true,
+            "structureSubstrateAndFastenerManufacturerEvidenceRequired": true
+          },
+          "partNumberSpecificSolidAcquired": false,
+          "completeManufacturingDimensionsReady": false,
+          "fastenerThreadGeometryReady": false,
+          "matingAssemblyVerified": false
+        }
+      ],
+      "quoteVariantIdentityVerified": true,
+      "publishedAssemblyRulesReady": true,
+      "partNumberSpecificSolidCoverageComplete": false,
+      "completeManufacturingDimensionCoverage": false,
+      "fastenerThreadSolidCoverage": false,
+      "braceMemberInsertionVerified": false,
+      "structureAttachmentVerified": false,
+      "collisionAnalysisVerified": false,
+      "listedAssemblyFitVerified": false
     }
   },
   "components": [
@@ -183,7 +312,7 @@
     { "family": "sway-brace-fitting", "manufacturer": "ASC Engineered Solutions", "model": "AF035 3 x 1", "productNumber": "0502000410", "quantity": 17, "purchasedDescription": "AF035 3X1 SWAY BRACE FTG" },
     { "family": "sway-brace-fitting", "manufacturer": "ASC Engineered Solutions", "model": "AF035 2-1/2 x 1", "productNumber": "0502000408", "quantity": 31, "purchasedDescription": "AF035 2-1/2X1 SWAY BRACE FTG" },
     { "family": "sway-brace-fitting", "manufacturer": "ASC Engineered Solutions", "model": "AF035 4 x 1", "productNumber": "0502000414", "quantity": 1, "purchasedDescription": "AF035 4X1 SWAY BRACE FTG" },
-    { "family": "brace-adapter", "manufacturer": "ASC Engineered Solutions", "model": "AF779 size 2-1/2", "productNumber": "0500604541", "quantity": 57, "purchasedDescription": "AF779 SIZE 2-1/2 BOLT, (2) 1/2 PLAIN ADPTR" },
+    { "family": "brace-adapter", "manufacturer": "ASC Engineered Solutions", "model": "AF779 size 2; 1/2-inch mounting bolt; two 1/2-inch structure fasteners", "productNumber": "0500604541", "quantity": 57, "purchasedDescription": "AF779 SIZE 2-1/2 BOLT, (2) 1/2 PLAIN ADPTR" },
     { "family": "swivel-attachment", "manufacturer": "ASC Engineered Solutions", "model": "AF076 universal", "productNumber": "0502000830", "quantity": 57, "purchasedDescription": "AF076 UL/FM UNIV SWIVEL ATTACHMENT" }
   ],
   "modelingBoundary": {
@@ -203,11 +332,18 @@
     "sammyPartNumberSpecificSolidReady": false,
     "sammyProjectSubstrateConflictResolved": false,
     "sammyThreadFormGeometryReady": false,
+    "ascSeismicQuoteVariantIdentityReady": true,
+    "ascSeismicPublishedAssemblyRulesReady": true,
+    "ascSeismicPartNumberSpecificSolidCoverageComplete": false,
+    "ascSeismicFastenerThreadSolidCoverageComplete": false,
+    "ascSeismicStructureAttachmentVerified": false,
+    "ascSeismicCollisionAnalysisVerified": false,
+    "ascSeismicListedAssemblyFitVerified": false,
     "manufacturerCadCoverageComplete": false,
     "fullyDimensionedManufacturingDrawingsAcquired": false,
     "exactThreadSolidsReady": false,
     "verifiedMatingAssembliesReady": false,
     "blenderInstalledSupportGeometryReady": false,
-    "reason": "The quote fixes the purchased line identities and quantities. Official Victaulic AB2 and ASC/Anvil Fig. 69 Revit sources are acquired, and the Fig. 69 manufacturer dimension table is bound. Official ITW SWDR IGS/DWG archives are acquired but contain family line art/application drawings, not a verified part-number-specific thread-bearing solid. The quote says side steel while as-built FP0.1 shows wood-side and wood-vertical Sammy details. SWDR 516 versus SWDR 1-1/2 identity, substrate application, RFA dimensions, project pipe-size assignment, threads, mating, placement, and the remaining rod, clamp, brace fitting, adapter, and swivel solids are not verified."
+    "reason": "The quote fixes the purchased line identities and quantities. Official Victaulic AB2 and ASC/Anvil Fig. 69 Revit sources are acquired, and the Fig. 69 manufacturer dimension table is bound. Official ASC AF730, AF035, AF076, and AF779 submittals are now hash-bound to the quote variants, including the AF779 product-number-to-size-2 correction and the manufacturer-required mating sequence. Those submittals do not supply part-number-specific solids, complete manufacturing dimensions, or exact fastener thread solids. Official ITW SWDR IGS/DWG archives contain family line art/application drawings, not a verified part-number-specific thread-bearing solid. The quote says side steel while as-built FP0.1 shows wood-side and wood-vertical Sammy details. SWDR identity, substrate application, exact solids, thread engagement, brace insertion, structure attachment, collision analysis, installed placement, and listed assembly fit remain unverified."
   }
 }

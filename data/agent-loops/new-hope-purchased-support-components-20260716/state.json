@@ -1,8 +1,8 @@
 {
   "loop": "new-hope-purchased-support-components-20260716",
   "stage": "VERIFY",
-  "status": "purchase-identities-bound-installed-geometry-rejected",
-  "iteration": 4,
+  "status": "asc-assembly-rules-bound-exact-solids-rejected",
+  "iteration": 5,
   "evidence": {
     "looseMaterialQuote": {
       "quoteNumber": "0133821",
@@ -74,11 +74,35 @@
       "sammyAnchorCount": 212,
       "quantityParityReady": true,
       "installedIdentityInferred": false
+    },
+    "ascSeismicBracingEvidence": {
+      "officialSubmittalSources": {
+        "AF730": "D25616C54C860C83D2977C18B56FCD72BEAAE7E8A15F160D94109090AE487A12",
+        "AF035": "9D3B56ED9FA9B201C977D9B7A874208E77DEE780A4817CC31F0DBA724AF3D24F",
+        "AF076": "8FE56DC39DF9214DD10BBB3D86660C649811FF9B0F110DB423FA9AD49A1D9AB6",
+        "AF779": "D72A8BA0A5393805FA5981B345B8B77439186A6D46F2C63A3871DDD4C475B29A"
+      },
+      "officialSourceCount": 4,
+      "quoteBoundProductCount": 8,
+      "dimensionedFamilyCount": 3,
+      "af779ProductNumber": "0500604541",
+      "af779CatalogSize": 2,
+      "af779PriceSheetSha256": "813118B2D9417B6A25D021D1ADAD9064A7EFE3ADA284CB3A0AF5E113735A5DBA",
+      "af779PriceSheetPhysicalPage": 108,
+      "af779PriceSheetRenderSha256": "E5F896BC48BCFA6C9E32628A868957EF4A97139E949CC51718BB2BC79A4F9CC0",
+      "publishedMatingRulesReady": true,
+      "ascOnlyListedAssemblyRequired": true,
+      "partNumberSpecificSolidCoverageComplete": false,
+      "fastenerThreadSolidCoverageComplete": false,
+      "braceMemberInsertionVerified": false,
+      "structureAttachmentVerified": false,
+      "collisionAnalysisVerified": false,
+      "listedAssemblyFitVerified": false
     }
   },
   "verification": {
     "focusedTests": "27 files / 174 tests passed",
-    "adversarialCases": 15,
+    "adversarialCases": 20,
     "autosprinkBuild": "passed",
     "browser": {
       "proofReady": true,
@@ -94,6 +118,13 @@
       "sammyPartNumberSpecificSolidReady": false,
       "sammyThreadFormGeometryReady": false,
       "hangerAnchorQuantityParityReady": true,
+      "ascSeismicQuoteVariantIdentityReady": true,
+      "ascSeismicPublishedAssemblyRulesReady": true,
+      "ascSeismicExactSolidCoverageComplete": false,
+      "ascSeismicThreadSolidCoverageComplete": false,
+      "ascSeismicStructureAttachmentVerified": false,
+      "ascSeismicCollisionAnalysisVerified": false,
+      "ascSeismicListedAssemblyFitVerified": false,
       "exactSupportManufacturerGeometryReady": false,
       "exactSupportThreadSolidsReady": false,
       "verifiedSupportMatingAssembliesReady": false,
@@ -102,8 +133,8 @@
     },
     "brainPostflight": {
       "endpoint": "canonical hal-brain /remember",
-      "episodeId": 151738
+      "episodeId": 151816
     }
   },
-  "nextAction": "Resolve the Sammy SWDR manufacturer part number and wood-versus-steel installed substrate from project procurement or field evidence; inspect the official SWDR DWG and both RFA families with ODA after launch confirmation; acquire part-number-specific solid geometry or complete manufacturing dimensions; then use Blender/OpenGeometry to create true thread solids and verify rod engagement, substrate fastener fit, hanger/bracket mating, installed placement, and collisions before model release."
+  "nextAction": "After explicit first-launch confirmation, inspect the official SWDR DWG, Victaulic AB2 RFA, and ASC Fig. 69 RFA with ODA; continue acquiring part-number-specific AF730, AF035, AF076, and AF779 solids or complete manufacturing geometry; resolve the Sammy part and substrate conflict; then use Blender/OpenGeometry to create true thread solids and verify brace insertion, rod engagement, fastener fit, H1/H2 structure attachment, installed placement, and collision-free listed assemblies before model release."
 }

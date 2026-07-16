@@ -14,6 +14,11 @@
     "https://fastening-solutions.itwbuildex.com/Asset/SWDR_IGS.zip",
     "https://fastening-solutions.itwbuildex.com/Asset/SWDR_DWG.zip",
     "https://www.asc-es.com/products/69-adjustable-swivel-ring",
+    "https://www.asc-es.com/products/af730-longitudinal-lateral-seismic-clamp",
+    "https://www.asc-es.com/products/af035-model-k-brace-clamp",
+    "https://www.asc-es.com/products/af076-sway-brace-swivel-attachment",
+    "https://www.asc-es.com/products/af779-multi-connector-adapter",
+    "https://s3.us-east-2.amazonaws.com/asc-es.com/price-sheets/pdf/PH-7.21-pdf.pdf",
     "apps/autosprink/src/data/new-hope-purchased-support-components.json",
     "apps/autosprink/src/engine/new-hope-purchased-support-components.js"
   ],
@@ -23,6 +28,9 @@
     "as-built FP0.1 wood Sammy details remain explicitly contradictory to the side-steel purchase description until installed substrate evidence resolves them",
     "SWDR 516 versus SWDR 1-1/2 stays unresolved until a project record selects the exact manufacturer part number",
     "ITW SWDR IGS/DWG files remain classified as family line art and cannot clear part-solid, thread-form, mating, or placement gates",
+    "official ASC AF730, AF035, AF076, and AF779 submittal hashes, quote variants, and published mating rules remain exact",
+    "ASC price-sheet page 108 maps purchased product 0500604541 to AF779 catalog size 2 rather than a fabricated size 2-1/2 identity",
+    "published ASC dimensions and installation rules cannot clear part-solid, fastener-thread, brace-insertion, structure-attachment, collision, or listed-assembly-fit gates",
     "focused and New Hope regression tests pass, the AutoSPRINK build passes, the proof surface reports the same fail-closed truth, and the brain postflight records the evidence"
   ],
   "verification_gates": [
