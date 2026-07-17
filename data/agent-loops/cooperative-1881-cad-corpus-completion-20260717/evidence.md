@@ -30,11 +30,44 @@ canonicalizer is bypassed, and no synthetic column grid is inserted.
 ## Release boundary retained
 
 This evidence removes the split-view registration blocker; it does not call the
-generated design code-compliant or employee-ready. The corrected replay exposes
+generated design code-compliant or employee-ready. At iteration 4 that replay exposed
 217 rule errors and 12 warnings, requires source-extracted columns/beams/soffits
 and a real flow test, emits no hydraulic results without that supply, has
 proposal HTML/submittal/prefab exporter errors, only placeholder DWG without ODA
 File Converter, and eleven stubbed cut sheets. Those failures remain the next
-system-owned correction loops and prevent VPS promotion. The old rejected proof
+system-owned correction loops and prevented VPS promotion. The old rejected proof
 is retained as regression evidence, while the accepted proof shows both real
 A-101 viewports registered on the underlying architectural PDF.
+
+## Iteration 5 - source-grounded Bluebeam sheet repair
+
+The proposal/submittal/prefab exceptions were traced to a real typed boundary:
+the orchestrator passed `cad.schema.Design`, while all three renderers expected
+a mapping. The proposal agent now normalizes that boundary once, registers the
+dynamic prefab module correctly, and removes stale outputs before every export
+attempt. Missing ODA tooling no longer creates a 173-byte file with a forged DWG
+header; the bundle keeps the validated DXF and records an explicit `dwg_error`.
+
+Visual inspection rejected the first regenerated FP-N sheet because its geometry
+was a collapsed schematic on blank paper. The cause was a coordinate-axis bug:
+the Z-up schema was drawn as XZ plan geometry and pipes were filtered by Y as if
+Y were elevation. The repaired sheet uses XY plan geometry, filters floors by Z,
+fits to each registered floor plate, and embeds the exact source PDF crop beneath
+the sprinkler overlay. Every registered source is SHA-256 checked before render;
+missing, substituted, page-invalid, or crop-invalid inputs reject the submittal.
+
+- 13-page 36x24 submittal parses successfully; all 8 FP-N floor pages contain a
+  printed `SOURCE UNDERLAY` receipt with source page and hash prefix.
+- Accepted rendered proof:
+  `output/visual-proof/1881-bluebeam-grounded-fp-n1.png` (SHA-256
+  `f98cc4284e2de8ca49217f9d0d826de415f6655e6163493de317fc8678f19e69`).
+- Native-parser audit: 5 PDFs/106 pages, XLSX, DXF (5,590 entities/13 layers),
+  GLB (4,656 geometries), and IFC (40,133 entities) all open.
+- Full CAD suite: 401 passed, no failures or skips.
+
+The corpus contains a 1,500 GPM civil fire-flow demand and a 107 PSI plumbing
+city-pressure note, but no static/residual/test-flow tuple was found in the
+currently mounted source set. Those facts do not create a supply curve, so
+hydraulics remain fail-closed. Eleven cut sheets are still stubs, ODA is absent,
+beam/joist sections remain incomplete, and rule/design/riser/drain acceptance is
+not promoted.

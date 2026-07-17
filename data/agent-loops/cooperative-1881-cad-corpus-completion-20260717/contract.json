@@ -34,6 +34,7 @@
     "missing, altered, substituted, scale-less, page-mismatched, and incomplete structural manifests reject before obstruction acceptance",
     "missing, mutated, substituted, synthetic, and coordinate-shifted artifact attacks reject",
     "all formerly skipped tests are counted separately as passed, failed, or still skipped with exact reasons",
+    "proposal HTML, proposal PDF, submittal PDF, prefab PDF/CSV, cut sheets, DXF, GLB, IFC, and hydraulic report are opened with native parsers; stale or placeholder outputs are rejected rather than advertised",
     "full services/halofire-cad test suite and focused cruel/intake suites run",
     "Lean proves the sealed count and artifact-state invariants"
   ],

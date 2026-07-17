@@ -4,9 +4,8 @@ Covers:
 1. Back-compat ``export_dxf`` still produces a DXF ezdxf can reload.
 2. ``export_dxf_with_sheets`` emits one paper-space layout per sheet.
 3. Dimensions in a sheet become DIMENSION entities on the layout.
-4. ``export_dwg`` with ODA absent emits a placeholder (no raise).
-5. The placeholder DWG starts with the AC1024 magic bytes.
-6. ``agent.export_all`` drops both DXF and DWG into the bundle dir.
+4. ``export_dwg`` with ODA absent fails closed and removes stale output.
+5. ``agent.export_all`` retains DXF and reports an explicit DWG error.
 """
 from __future__ import annotations
 
@@ -158,35 +157,21 @@ def test_sheet_dimensions_emit_dimension_entities(
     assert len(dims) >= 2, f"expected >=2 DIMENSION entities, got {len(dims)}"
 
 
-def test_export_dwg_without_oda_emits_placeholder(
-    tiny_design, tmp_path: Path, monkeypatch, caplog,
+def test_export_dwg_without_oda_fails_closed(
+    tiny_design, tmp_path: Path, monkeypatch,
 ) -> None:
-    # Force ODA lookup to fail regardless of host state.
     monkeypatch.setattr(DWG_EXPORT, "_oda_binary", lambda: None)
     out = tmp_path / "design.dwg"
-    with caplog.at_level("WARNING", logger="submittal.dwg"):
-        result = DWG_EXPORT.export_dwg(tiny_design, out)
-    assert result == out
-    assert out.exists() and out.stat().st_size > 20
-    assert any("placeholder" in rec.message.lower()
-               or "oda file converter" in rec.message.lower()
-               for rec in caplog.records)
+    out.write_bytes(b"stale fake dwg")
+    with pytest.raises(FileNotFoundError, match="no DWG was emitted"):
+        DWG_EXPORT.export_dwg(tiny_design, out)
+    assert not out.exists()
 
 
-def test_placeholder_dwg_has_ac1024_magic(
+def test_export_all_retains_dxf_and_reports_missing_dwg_tool(
     tiny_design, tmp_path: Path, monkeypatch,
 ) -> None:
-    monkeypatch.setattr(DWG_EXPORT, "_oda_binary", lambda: None)
-    out = tmp_path / "magic.dwg"
-    DWG_EXPORT.export_dwg(tiny_design, out)
-    head = out.read_bytes()[:6]
-    assert head == b"AC1024", f"bad magic: {head!r}"
-
-
-def test_export_all_produces_dxf_and_dwg(
-    tiny_design, tmp_path: Path, monkeypatch,
-) -> None:
-    # Force placeholder path so the test runs on hosts without ODA.
+    # Force the missing-tool path so the test runs consistently without ODA.
     # agent.export_all loads dwg_export via importlib, which imports
     # the module fresh — patch shutil.which at that layer instead.
     import shutil as _shutil
@@ -202,6 +187,7 @@ def test_export_all_produces_dxf_and_dwg(
     out_dir = tmp_path / "bundle"
     result = AGENT.export_all(tiny_design, out_dir)
     assert "dxf" in result, f"dxf missing from export_all: {result}"
-    assert "dwg" in result, f"dwg missing from export_all: {result}"
+    assert "dwg" not in result, f"invalid DWG advertised: {result}"
+    assert "dwg_error" in result, f"DWG blocker missing: {result}"
     assert (out_dir / "design.dxf").exists()
-    assert (out_dir / "design.dwg").exists()
+    assert not (out_dir / "design.dwg").exists()

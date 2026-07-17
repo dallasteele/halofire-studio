@@ -1,11 +1,10 @@
 """halofire DWG export — R9.2.
 
 Pragmatic path: write a DXF first (via ``agent.export_dxf``), then
-convert to DWG with ODA File Converter if it's on PATH. If ODA is
-not installed, we emit a clearly-marked placeholder file whose first
-bytes are a fake DWG magic (AC1024 = AutoCAD 2010) so downstream
-pipeline steps can round-trip without crashing, and a human gets a
-plain-text note explaining how to install the real converter.
+convert to DWG with ODA File Converter if it is on PATH. If ODA is
+not installed, export fails explicitly. A text placeholder with a
+forged DWG header is unsafe because downstream manifests and users
+can mistake it for a usable CAD deliverable.
 
 We deliberately avoid libredwg on Windows — it's fragile there and
 ships no usable prebuilt wheels as of 2026-04.
@@ -23,12 +22,6 @@ from cad.schema import Design  # noqa: E402
 
 log = logging.getLogger("submittal.dwg")
 
-# AutoCAD 2010 DWG magic (6 bytes + 5 null padding). Picked because
-# AC1024 is what ODA emits for our target ACAD2018 output too (the
-# version string goes in the first 6 bytes regardless).
-_DWG_PLACEHOLDER_MAGIC = b"AC1024\x00\x00\x00\x00\x00"
-
-
 def _oda_binary() -> str | None:
     return (
         shutil.which("ODAFileConverter")
@@ -40,30 +33,20 @@ def _oda_binary() -> str | None:
 def export_dwg_from_dxf(dxf_path: Path, dwg_path: Path) -> Path:
     """Convert DXF → DWG via ODA File Converter if available.
 
-    When ODA is not on PATH, write a placeholder DWG (starting with
-    the AC1024 magic bytes) and log a warning. Returns ``dwg_path``
-    either way. Never raises for the missing-tool case — the
-    pipeline should keep flowing.
+    When ODA is not on PATH, remove any stale DWG and raise. The caller
+    records ``dwg_error`` while retaining the valid DXF deliverable.
     """
     oda = _oda_binary()
     dwg_path.parent.mkdir(parents=True, exist_ok=True)
 
     if not oda:
-        log.warning(
-            "ODA File Converter not on PATH; writing placeholder DWG at %s. "
-            "Install from https://www.opendesign.com/guestfiles/oda_file_converter "
-            "for real DWG output.",
-            dwg_path,
+        if dwg_path.is_file():
+            dwg_path.unlink()
+        raise FileNotFoundError(
+            "ODA File Converter not on PATH; no DWG was emitted. "
+            "Install it from https://www.opendesign.com/guestfiles/"
+            "oda_file_converter or use the validated DXF deliverable."
         )
-        dwg_path.write_bytes(
-            _DWG_PLACEHOLDER_MAGIC
-            + b"HALOFIRE STUDIO DWG PLACEHOLDER\n"
-            + f"DXF source: {dxf_path.name}\n".encode("utf-8")
-            + b"Install ODA File Converter "
-              b"(https://www.opendesign.com/guestfiles/oda_file_converter) "
-              b"for real DWG output.\n"
-        )
-        return dwg_path
 
     in_dir = dxf_path.parent
     tmp_dir = dwg_path.parent / "_oda_tmp"

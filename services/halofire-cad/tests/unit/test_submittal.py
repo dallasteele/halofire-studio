@@ -1,6 +1,7 @@
 """Unit test — submittal sheet-set PDF generation (reportlab)."""
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import sys
 from pathlib import Path
@@ -78,6 +79,10 @@ def test_submittal_pdf_produces_multipage_file(tmp_path: Path) -> None:
     # ≥ 6 sheets of the expected set
     pages = data.count(b"/Type /Page ") + data.count(b"/Type /Page\n")
     assert pages >= 6
+    from pypdf import PdfReader
+    media = PdfReader(str(out)).pages[0].mediabox
+    assert float(media.width) == pytest.approx(36 * 72)
+    assert float(media.height) == pytest.approx(24 * 72)
 
 
 @pytest.mark.skipif(not _HAS_REPORTLAB, reason="reportlab not installed")
@@ -162,6 +167,83 @@ def test_extract_level_geometry_filters_by_room_id() -> None:
     heads_l0, _ = SUB._extract_level_geometry({"id": "L0"}, design)
     assert len(heads_l0) == 1
     assert heads_l0[0]["x"] == 1
+    assert heads_l0[0]["y"] == 2
+    assert "z" not in heads_l0[0]
+
+
+def test_extract_level_geometry_is_xy_plan_and_z_floor_filter() -> None:
+    design = {
+        "building": {
+            "levels": [{
+                "id": "L0",
+                "elevation_m": 0.0,
+                "height_m": 3.0,
+                "rooms": [],
+            }],
+        },
+        "systems": [{
+            "heads": [],
+            "pipes": [
+                {
+                    "start_m": [1, 2, 2.8],
+                    "end_m": [4, 5, 2.8],
+                    "size_in": 2.0,
+                },
+                {
+                    "start_m": [10, 20, 6.0],
+                    "end_m": [40, 50, 6.0],
+                    "size_in": 2.0,
+                },
+            ],
+        }],
+    }
+
+    _, pipes = SUB._extract_level_geometry({"id": "L0"}, design)
+
+    assert pipes == [{
+        "x1": 1,
+        "y1": 2,
+        "x2": 4,
+        "y2": 5,
+        "size_in": 2.0,
+    }]
+
+
+def test_registered_underlay_is_hash_bound(tmp_path: Path) -> None:
+    fitz = pytest.importorskip("fitz")
+    source = tmp_path / "source.pdf"
+    doc = fitz.open()
+    page = doc.new_page(width=200, height=100)
+    page.draw_rect(fitz.Rect(10, 10, 190, 90))
+    doc.save(source)
+    doc.close()
+    digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    level = {
+        "polygon_m": [[-5, -2], [5, -2], [5, 2], [-5, 2]],
+        "metadata": {
+            "registered_source_geometry": True,
+            "registered_source_pdf_sha256": digest,
+            "source_page_index": 0,
+            "source_viewports": [{
+                "geometry_bbox_pt": [10, 10, 190, 90],
+                "printed_long_ft": 32.8084,
+                "printed_short_ft": 13.1234,
+            }],
+        },
+    }
+    design = {
+        "sources": [{"kind": "pdf", "path": str(source)}],
+    }
+
+    underlays = SUB._render_registered_underlays(level, design)
+
+    assert len(underlays) == 1
+    assert underlays[0]["sha256"] == digest
+    assert underlays[0]["source_name"] == "source.pdf"
+
+    level["metadata"]["registered_source_pdf_sha256"] = "0" * 64
+    with pytest.raises(RuntimeError, match="hash mismatch"):
+        SUB._render_registered_underlays(level, design)
 
 
 def test_extract_level_geometry_no_design_returns_empty() -> None:

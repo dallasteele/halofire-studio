@@ -1,8 +1,8 @@
 {
   "name": "cooperative-1881-cad-corpus-completion-20260717",
-  "iteration": 4,
+  "iteration": 5,
   "status": "in_progress",
-  "updatedAt": "2026-07-17T02:27:19-07:00",
+  "updatedAt": "2026-07-17T02:49:32-07:00",
   "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY", "ITERATE"],
   "nextStage": "ITERATE",
   "brainPreflight": {
@@ -42,11 +42,13 @@
   },
   "verification": {
     "formerlyDormantCorpusChecks": "29 passed, 0 failed, 0 skipped",
-    "fullCadSuite": "398 passed, 0 failed, 0 skipped, 25 dependency deprecation warnings",
+    "fullCadSuite": "401 passed, 0 failed, 0 skipped, 25 dependency deprecation warnings",
     "focusedCruelAndIntake": "29 passed, 0 failed, 0 skipped",
     "registeredStructureAndViewAdversarial": "8 passed, 0 failed, 0 skipped",
     "structureEngine": "33 passed, 0 failed, 0 skipped",
-    "submittalExporter": "7 passed, 0 failed, 0 skipped",
+    "submittalExporter": "13 passed, 0 failed, 0 skipped; typed proposal/DWG focused lane 18 passed",
+    "deliverableNativeParsers": "5 PDFs opened (106 pages total), XLSX 3 sheets, DXF 5590 entities/13 layers, GLB 4656 geometries, IFC 40133 entities",
+    "submittalSheetSet": "13 pages at 36x24 inches; all 8 FP-N floor pages carry hash-bound SOURCE UNDERLAY labels",
     "actualGlbParse": "4656 geometry meshes including 588 named source obstruction meshes",
     "independentEnvelopeIou": 0.7363351986929664,
     "lean": "verified by Lean 4.13.0",
@@ -67,6 +69,21 @@
     "pngSha256": "c35a788bac7e94e07c72a6a44e5023691cdf351498a3e06694a4abf2419397a8",
     "finding": "Rendered S-150.B/C and S-190.B/C source sheets visibly retain the underlying PDF. Cyan source marker envelopes align with structural column evidence. The first extraction leaked framing into partial plans/legends and was rejected; main-plan grid filtering plus endpoint body clipping corrected that. Untagged magenta/green framing remains centerline evidence only and is not promoted to physical 3D obstruction sections."
   },
+  "bluebeamVisualGate": {
+    "status": "accepted-source-grounded-layout-only-release-still-blocked",
+    "evidence": "output/visual-proof/1881-bluebeam-grounded-fp-n1.png",
+    "reviewEvidence": "output/visual-proof/1881-bluebeam-grounded-fp-n1-review.jpg",
+    "pngSha256": "f98cc4284e2de8ca49217f9d0d826de415f6655e6163493de317fc8678f19e69",
+    "finding": "The prior blank Z-as-plan schematic was rejected. FP-N now uses XY plan coordinates with Z as elevation, fits to the independently registered floor plate, renders the exact hash-bound architectural source crop beneath the pipe/head overlay, and prints source page/hash provenance on a 36x24 CAD sheet. This proves source registration and layout rendering only; pipe sizing/labels, drains, riser geometry, hydraulics, and 217 rule errors remain release blockers."
+  },
+  "partialWaterSupplyEvidence": {
+    "civilFireFlowDemandGpm": 1500,
+    "civilSource": "1881 - Civils.pdf page 3",
+    "plumbingCityPressurePsi": 107,
+    "plumbingSource": "1881 - Plumbing.pdf page 1",
+    "hydraulicSupplyCurveAccepted": false,
+    "reason": "Neither source supplies the required hydrant flow-test static pressure, residual pressure, and test flow tuple."
+  },
   "failClosedReleaseBoundary": {
     "flowTestRequired": true,
     "hydraulicResultsEmitted": false,
@@ -76,10 +93,11 @@
     "sourceObstructionDimensionsRequired": true,
     "nfpaRuleErrors": 217,
     "nfpaRuleWarnings": 12,
-    "proposalHtmlError": "Design object has no attribute get",
-    "submittalError": "Design object has no attribute get",
-    "prefabError": "NoneType object has no attribute __dict__",
-    "dwgIsPlaceholder": true,
+    "proposalHtmlError": null,
+    "submittalError": null,
+    "prefabError": null,
+    "dwgIsPlaceholder": false,
+    "dwgError": "ODA File Converter not on PATH; no DWG emitted; validated DXF retained",
     "cutSheetsStubbed": 11,
     "splitViewRegistrationRequired": false,
     "employeeUseReady": false,
@@ -89,7 +107,7 @@
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 157533,
-    "prePostflightCommit": "f8d7d286"
+    "episodeId": 157630,
+    "prePostflightCommit": "4fa5b64f"
   }
 }

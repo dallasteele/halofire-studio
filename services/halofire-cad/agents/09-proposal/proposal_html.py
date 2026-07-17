@@ -1317,10 +1317,10 @@ def write_proposal_html(
                 render_data['violations'] = json.loads(violations_path.read_text(encoding='utf-8'))
             except json.JSONDecodeError:
                 render_data['violations'] = []
-    out.write_text(
-        build_proposal_html(render_data, design=design, design_glb=design_glb),
-        encoding='utf-8',
-    )
+    with out.open('w', encoding='utf-8', newline='\n') as stream:
+        stream.write(
+            build_proposal_html(render_data, design=design, design_glb=design_glb),
+        )
     return out
 
 

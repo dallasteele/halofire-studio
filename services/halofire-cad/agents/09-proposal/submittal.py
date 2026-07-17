@@ -15,20 +15,23 @@ the pipeline never silently loses a deliverable.
 """
 from __future__ import annotations
 
+import hashlib
+from io import BytesIO
 from pathlib import Path
 from typing import Any
 
 try:
-    from reportlab.lib.pagesizes import LETTER, landscape
     from reportlab.lib.units import inch
     from reportlab.pdfgen import canvas as pdfcanvas
     from reportlab.lib import colors
+    from reportlab.lib.utils import ImageReader
     _REPORTLAB = True
 except ImportError:  # pragma: no cover
     _REPORTLAB = False
 
 
 BRAND_RED = "#c8322a"
+SHEET_SIZE = (36 * 72, 24 * 72)  # 36 x 24 in production CAD sheet
 
 # NFPA / AutoSprink pipe-size colors (same keys as proposal_html)
 _PIPE_COLORS: dict[str, str] = {
@@ -55,10 +58,11 @@ def _nfpa_pipe_color_rl(size_in):  # noqa: ANN001
 def _extract_level_geometry(
     level: dict, design: dict | None,
 ) -> tuple[list[dict], list[dict]]:
-    """Return (heads, pipes) for a single level in plan-view XZ.
+    """Return (heads, pipes) for a single level in plan-view XY.
 
-    `heads`: list of {x, z}
-    `pipes`: list of {x1, z1, x2, z2, size_in}
+    The CAD schema is explicitly Z-up. Treating Z as a plan coordinate
+    collapses a whole floor into one nearly horizontal line, which is the
+    exact blank/schematic failure this sheet must prevent.
     """
     if not design:
         return [], []
@@ -71,28 +75,112 @@ def _extract_level_geometry(
         for lvl in levels for r in (lvl.get("rooms") or [])
     }
     target_elev = None
+    target_height = 3.0
     for lvl in levels:
         if lvl.get("id") == target_id:
             target_elev = lvl.get("elevation_m")
+            target_height = float(lvl.get("height_m") or 3.0)
             break
     heads: list[dict] = []
     pipes: list[dict] = []
     for s in systems:
         for h in (s.get("heads") or []):
             if room_level.get(h.get("room_id", "")) == target_id:
-                heads.append({"x": h["position_m"][0], "z": h["position_m"][2]})
+                heads.append({"x": h["position_m"][0], "y": h["position_m"][1]})
         for p in (s.get("pipes") or []):
             start = p.get("start_m") or [0, 0, 0]
             end = p.get("end_m") or [0, 0, 0]
-            y_mid = (start[1] + end[1]) / 2
-            if target_elev is not None and abs(y_mid - target_elev) > 1.5:
+            z_mid = (start[2] + end[2]) / 2
+            if target_elev is not None and not (
+                target_elev - 0.25 <= z_mid <= target_elev + target_height + 0.5
+            ):
                 continue
             pipes.append({
-                "x1": start[0], "z1": start[2],
-                "x2": end[0], "z2": end[2],
+                "x1": start[0], "y1": start[1],
+                "x2": end[0], "y2": end[1],
                 "size_in": p.get("size_in"),
             })
     return heads, pipes
+
+
+def _source_pdf_path(design: dict | None) -> Path | None:
+    if not design:
+        return None
+    for source in design.get("sources") or []:
+        if source.get("kind") == "pdf" and source.get("path"):
+            return Path(str(source["path"]))
+    return None
+
+
+def _render_registered_underlays(
+    level_design: dict,
+    design: dict | None,
+) -> list[dict[str, Any]]:
+    """Render hash-bound source plan crops with model-space bounds."""
+    metadata = level_design.get("metadata") or {}
+    if not metadata.get("registered_source_geometry"):
+        return []
+    source_pdf = _source_pdf_path(design)
+    if source_pdf is None or not source_pdf.is_file():
+        raise RuntimeError("registered source PDF is unavailable for FP-N underlay")
+    expected_hash = str(metadata.get("registered_source_pdf_sha256") or "")
+    actual_hash = hashlib.sha256(source_pdf.read_bytes()).hexdigest()
+    if not expected_hash or actual_hash != expected_hash:
+        raise RuntimeError(
+            "registered source PDF hash mismatch for FP-N underlay: "
+            f"expected {expected_hash or 'missing'}, got {actual_hash}"
+        )
+    try:
+        import fitz
+    except ImportError as exc:  # pragma: no cover - deployment guard
+        raise RuntimeError("PyMuPDF is required for registered FP-N underlays") from exc
+
+    polygon = level_design.get("polygon_m") or []
+    if len(polygon) < 3:
+        raise RuntimeError("registered level has no model-space footprint")
+    xmin = min(float(point[0]) for point in polygon)
+    ymin = min(float(point[1]) for point in polygon)
+    viewports = metadata.get("source_viewports") or []
+    if not viewports:
+        raise RuntimeError("registered level has no source viewport provenance")
+
+    page_index = int(metadata.get("source_page_index"))
+    doc = fitz.open(source_pdf)
+    try:
+        if page_index < 0 or page_index >= doc.page_count:
+            raise RuntimeError(f"source page {page_index} is outside the PDF")
+        page = doc[page_index]
+        rendered: list[dict[str, Any]] = []
+        for viewport in viewports:
+            bbox = viewport.get("geometry_bbox_pt") or viewport.get("source_bbox_pt")
+            if not isinstance(bbox, list) or len(bbox) != 4:
+                raise RuntimeError("registered source viewport lacks a crop box")
+            width_ft = float(viewport.get("printed_long_ft") or 0)
+            height_ft = float(viewport.get("printed_short_ft") or 0)
+            if width_ft <= 0 or height_ft <= 0:
+                raise RuntimeError("registered source viewport lacks printed dimensions")
+            registration = viewport.get("registration_transform_ft") or [0.0, 0.0]
+            origin = viewport.get("composite_origin_ft") or [0.0, 0.0]
+            local_x_ft = float(registration[0]) - float(origin[0])
+            local_y_ft = float(registration[1]) - float(origin[1])
+            pix = page.get_pixmap(
+                matrix=fitz.Matrix(1.5, 1.5),
+                clip=fitz.Rect(*[float(value) for value in bbox]),
+                alpha=False,
+            )
+            rendered.append({
+                "image": ImageReader(BytesIO(pix.tobytes("png"))),
+                "xmin_m": xmin + local_x_ft * 0.3048,
+                "ymin_m": ymin + local_y_ft * 0.3048,
+                "width_m": width_ft * 0.3048,
+                "height_m": height_ft * 0.3048,
+                "page_index": page_index,
+                "sha256": actual_hash,
+                "source_name": source_pdf.name,
+            })
+        return rendered
+    finally:
+        doc.close()
 
 
 def _fmt_usd(x: Any) -> str:
@@ -110,7 +198,7 @@ def _fmt_n(x: Any) -> str:
 
 
 def _draw_header(c, sheet_id: str, title: str, project: dict[str, Any]) -> None:
-    w, h = landscape(LETTER)
+    w, h = SHEET_SIZE
     # Sheet border
     c.setStrokeColor(colors.black)
     c.setLineWidth(1.4)
@@ -137,7 +225,7 @@ def _draw_header(c, sheet_id: str, title: str, project: dict[str, Any]) -> None:
 def _draw_fp0_cover(c, data: dict) -> None:
     project = data.get("project") or {}
     pricing = data.get("pricing") or {}
-    w, h = landscape(LETTER)
+    w, h = SHEET_SIZE
     _draw_header(c, "FP-0", "Cover sheet", project)
     c.setFont("Helvetica-Bold", 24)
     c.drawCentredString(w / 2, h / 2 + 0.8 * inch,
@@ -182,7 +270,7 @@ def _draw_fph_placard(c, data: dict) -> None:
     project = data.get("project") or {}
     systems = data.get("systems") or []
     _draw_header(c, "FP-H", "Hydraulic data placard", project)
-    w, h = landscape(LETTER)
+    w, h = SHEET_SIZE
     c.setFont("Helvetica-Bold", 12)
     c.drawString(1.0 * inch, h - 1.9 * inch, "Hydraulic summary")
     c.setFont("Helvetica", 9)
@@ -222,7 +310,7 @@ def _draw_level_plan(
     sheet_id = f"FP-N.{idx}"
     title = f"{level.get('name', level.get('id', ''))} — plan"
     _draw_header(c, sheet_id, title, project)
-    w, h = landscape(LETTER)
+    w, h = SHEET_SIZE
     # Stats block
     c.setFont("Helvetica", 9)
     stats = (
@@ -254,29 +342,66 @@ def _draw_level_plan(
         c.setFillColor(colors.black)
         return
 
-    # Bounds + fit
-    xs: list[float] = []
-    zs: list[float] = []
-    for p in pipes:
-        xs.extend([p["x1"], p["x2"]])
-        zs.extend([p["z1"], p["z2"]])
-    for hd in heads:
-        xs.append(hd["x"])
-        zs.append(hd["z"])
+    level_design = next(
+        (
+            candidate
+            for candidate in ((design or {}).get("building") or {}).get("levels") or []
+            if candidate.get("id") == level.get("id")
+        ),
+        None,
+    )
+    polygon = (level_design or {}).get("polygon_m") or []
+    xs: list[float] = [float(point[0]) for point in polygon]
+    ys: list[float] = [float(point[1]) for point in polygon]
+    if not xs or not ys:
+        for p in pipes:
+            xs.extend([p["x1"], p["x2"]])
+            ys.extend([p["y1"], p["y2"]])
+        for hd in heads:
+            xs.append(hd["x"])
+            ys.append(hd["y"])
     xmin, xmax = min(xs), max(xs)
-    zmin, zmax = min(zs), max(zs)
+    ymin, ymax = min(ys), max(ys)
     span_x = max(xmax - xmin, 1.0)
-    span_z = max(zmax - zmin, 1.0)
+    span_y = max(ymax - ymin, 1.0)
     pad = 12
-    scale = min((plan_w - 2 * pad) / span_x, (plan_h - 2 * pad) / span_z)
+    scale = min((plan_w - 2 * pad) / span_x, (plan_h - 2 * pad) / span_y)
     ox = plan_x + (plan_w - span_x * scale) / 2
-    oy = plan_y + (plan_h - span_z * scale) / 2
+    oy = plan_y + (plan_h - span_y * scale) / 2
 
     def tx(x: float) -> float:
         return ox + (x - xmin) * scale
 
-    def ty_(z: float) -> float:
-        return oy + (z - zmin) * scale
+    def ty_(y: float) -> float:
+        # Source PDF plan coordinates increase downward. Preserve that
+        # orientation so the source raster and model geometry coincide.
+        return oy + (ymax - y) * scale
+
+    underlays = _render_registered_underlays(level_design or {}, design)
+    for underlay in underlays:
+        image_x = tx(float(underlay["xmin_m"]))
+        image_y = ty_(float(underlay["ymin_m"]) + float(underlay["height_m"]))
+        c.drawImage(
+            underlay["image"],
+            image_x,
+            image_y,
+            width=float(underlay["width_m"]) * scale,
+            height=float(underlay["height_m"]) * scale,
+            preserveAspectRatio=False,
+            mask="auto",
+        )
+    if underlays:
+        proof = underlays[0]
+        c.setFont("Helvetica", 6.5)
+        c.setFillColor(colors.HexColor("#444444"))
+        c.drawString(
+            plan_x + 4,
+            plan_y + 4,
+            "SOURCE UNDERLAY: "
+            f"{proof['source_name']} p.{int(proof['page_index']) + 1} "
+            f"sha256 {str(proof['sha256'])[:12]}... registered",
+        )
+        c.setFillColor(colors.black)
 
     # Pipes first (under heads)
     for p in pipes:
@@ -284,13 +409,13 @@ def _draw_level_plan(
         c.setStrokeColor(col)
         sz = float(p.get("size_in") or 0)
         c.setLineWidth(1.6 if sz >= 3 else 0.9)
-        c.line(tx(p["x1"]), ty_(p["z1"]), tx(p["x2"]), ty_(p["z2"]))
+        c.line(tx(p["x1"]), ty_(p["y1"]), tx(p["x2"]), ty_(p["y2"]))
     # Heads on top
     c.setFillColor(colors.HexColor(BRAND_RED))
     c.setStrokeColor(colors.white)
     c.setLineWidth(0.4)
     for hd in heads:
-        c.circle(tx(hd["x"]), ty_(hd["z"]), 2.0, stroke=1, fill=1)
+        c.circle(tx(hd["x"]), ty_(hd["y"]), 2.0, stroke=1, fill=1)
     c.setFillColor(colors.black)
     c.setStrokeColor(colors.black)
     c.setLineWidth(1.0)
@@ -309,7 +434,7 @@ def _draw_fpr_riser(c, data: dict) -> None:
     project = data.get("project") or {}
     systems = data.get("systems") or []
     _draw_header(c, "FP-R", "Riser detail", project)
-    w, h = landscape(LETTER)
+    w, h = SHEET_SIZE
     c.setFont("Helvetica", 9)
     y = h - 1.9 * inch
     for s in systems:
@@ -337,7 +462,7 @@ def _draw_fpb_bom(c, data: dict) -> None:
     project = data.get("project") or {}
     bom = data.get("bom") or []
     _draw_header(c, "FP-B", "Bill of materials", project)
-    w, h = landscape(LETTER)
+    w, h = SHEET_SIZE
     c.setFont("Helvetica-Bold", 9)
     y = h - 1.9 * inch
     c.drawString(1.0 * inch, y, "SKU")
@@ -373,7 +498,7 @@ def _draw_fpb_bom(c, data: dict) -> None:
 def _draw_fpd_details(c, data: dict) -> None:
     project = data.get("project") or {}
     _draw_header(c, "FP-D", "Details + cut-sheet index", project)
-    w, h = landscape(LETTER)
+    w, h = SHEET_SIZE
     c.setFont("Helvetica", 9)
     y = h - 1.9 * inch
     c.drawString(1.0 * inch, y, "Cut sheets are bundled alongside this submittal.")
@@ -406,7 +531,7 @@ def write_submittal_pdf(
             encoding="utf-8",
         )
         return out
-    c = pdfcanvas.Canvas(str(out), pagesize=landscape(LETTER))
+    c = pdfcanvas.Canvas(str(out), pagesize=SHEET_SIZE)
     _draw_fp0_cover(c, data); c.showPage()
     _draw_fph_placard(c, data); c.showPage()
     for i, lvl in enumerate(data.get("levels") or [], 1):

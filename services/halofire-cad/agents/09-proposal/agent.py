@@ -221,9 +221,33 @@ def build_proposal_data(
     }
 
 
+def _normalize_design_payload(
+    design_payload: Design | dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Return the proposal renderers' stable mapping representation."""
+    if design_payload is None:
+        return None
+    if isinstance(design_payload, dict):
+        return design_payload
+    if isinstance(design_payload, Design):
+        return design_payload.model_dump()
+    raise TypeError(
+        "design_payload must be a cad.schema.Design, mapping, or None; "
+        f"got {type(design_payload).__name__}"
+    )
+
+
+def _remove_stale(out_dir: Path, *filenames: str) -> None:
+    """Remove outputs from an earlier run before a fresh export attempt."""
+    for filename in filenames:
+        path = out_dir / filename
+        if path.is_file():
+            path.unlink()
+
+
 def write_proposal_files(
     data: dict[str, Any], out_dir: Path,
-    design_payload: dict[str, Any] | None = None,
+    design_payload: Design | dict[str, Any] | None = None,
 ) -> dict[str, str]:
     """Emit proposal.json + HTML + PDF + XLSX. Returns file paths.
 
@@ -233,14 +257,17 @@ def write_proposal_files(
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     paths: dict[str, str] = {}
+    render_design = _normalize_design_payload(design_payload)
 
     # JSON (the canonical artifact)
     json_path = out_dir / "proposal.json"
-    json_path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
+    with json_path.open("w", encoding="utf-8", newline="\n") as stream:
+        stream.write(json.dumps(data, indent=2, default=str))
     paths["json"] = str(json_path)
 
     # HTML — self-contained, embeds design.glb via <model-viewer>.
     # This is the artifact the VPS halo-fire client demo consumes.
+    _remove_stale(out_dir, "proposal.html")
     try:
         import importlib.util
         _spec = importlib.util.spec_from_file_location(
@@ -265,7 +292,7 @@ def write_proposal_files(
 
         html_path = write_proposal_html(
             render_data, out_dir,
-            design=design_payload,
+            design=render_design,
             design_glb="design.glb",
         )
         paths["html"] = str(html_path)
@@ -273,6 +300,7 @@ def write_proposal_files(
         paths["html_error"] = str(e)
 
     # Submittal sheet set — what the AHJ reviews
+    _remove_stale(out_dir, "submittal.pdf")
     try:
         import importlib.util as _ilu
         _sspec = _ilu.spec_from_file_location(
@@ -284,13 +312,14 @@ def write_proposal_files(
         _sspec.loader.exec_module(_smod)
         # The caller may pass design_payload; it's also used below.
         sub_path = _smod.write_submittal_pdf(
-            data, out_dir, design=design_payload,
+            data, out_dir, design=render_design,
         )
         paths["submittal"] = str(sub_path)
     except Exception as e:
         paths["submittal_error"] = str(e)
 
     # Prefab report + cut list (fab-shop deliverable)
+    _remove_stale(out_dir, "prefab.pdf", "cut_list.csv")
     try:
         import importlib.util as _ilu
         _pspec = _ilu.spec_from_file_location(
@@ -299,10 +328,11 @@ def write_proposal_files(
         )
         assert _pspec is not None and _pspec.loader is not None
         _pmod = _ilu.module_from_spec(_pspec)
+        sys.modules[_pspec.name] = _pmod
         _pspec.loader.exec_module(_pmod)
         prefab_src = {
             "project": data.get("project", {}),
-            "systems": (design_payload or {}).get("systems", []),
+            "systems": (render_design or {}).get("systems", []),
         }
         pf_res = _pmod.write_prefab_pdf(prefab_src, out_dir)
         paths["prefab_pdf"] = pf_res.get("pdf", "")

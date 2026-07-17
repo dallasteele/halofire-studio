@@ -428,8 +428,8 @@ def export_all(design: Design, out_dir: Path,
     ``dxf_export.export_dxf_with_sheets`` (paper-space + dimensions).
     Otherwise the back-compat model-space-only ``export_dxf`` runs.
     DWG is produced via ``dwg_export.export_dwg_from_dxf`` against
-    the DXF that was just written; when ODA File Converter is absent
-    a placeholder DWG lands in the bundle (pipeline stays green).
+    the DXF that was just written; when ODA File Converter is absent,
+    the valid DXF remains and ``dwg_error`` records the missing tool.
 
     Export failures are collected as error entries rather than raised
     so a partial submittal bundle can still be returned. Per §1.3 each
