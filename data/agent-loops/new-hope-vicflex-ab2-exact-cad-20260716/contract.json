@@ -1,0 +1,52 @@
+{
+  "name": "new-hope-vicflex-ab2-exact-cad-20260716",
+  "owner": "codex",
+  "goal": "Acquire, audit, convert, and prove the exact manufacturer-authored Victaulic VicFlex Style AB2 geometry used by the New Hope purchased-part schedule without substituting a visual proxy, and keep release fail-closed until dimensions, fastener threads, mating fit, collision, and installed configuration are proven.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "apps/autosprink/src/data/new-hope-purchased-support-components.json",
+    "apps/autosprink/src/data/trusted-exact-part-receipts.json",
+    "https://www.victaulic.com/products/vicflex-style-ab2-bracket/",
+    "https://assets.victaulic.com/assets/uploads/software-content/Autodesk_AutoCAD_3D_Blocks.html",
+    "https://assets.victaulic.com/assets/uploads/literature/I-VICFLEX.pdf",
+    "tmp/Adsk_ACAD_FP_Sprinklers_3D.zip",
+    "tmp/manufacturer-cad/vicflex-ab2/Victaulic_VicFlex_Style_AB2_[3D].dwg"
+  ],
+  "exit_criteria": [
+    "the official Victaulic archive and exact AB2 DWG are hash-bound to their manufacturer download URLs",
+    "quoted product A240AB200N is bound to the correct AB2 family and 24-inch configuration by quote and manufacturer evidence",
+    "DWG entity topology, exact BREP or solid count, coordinate units, extents, and interface datums are independently audited",
+    "all published and interface-critical dimensions are represented and verified against manufacturer evidence with explicit tolerance",
+    "every modeled screw or threaded connection is bound to its exact thread standard, diameter, pitch, handedness, engagement, and manufacturer source; simplified or missing threads remain fail-closed",
+    "neutral geometry and Blender render meshes preserve the source solids and carry byte-hash receipts without generated replacement geometry",
+    "assembled end brackets, square bar, center gate, fasteners, ceiling-grid or structure interfaces, and attached sprinkler components pass collision, insertion, clamp, and mating-datum fit checks",
+    "the trusted exact-part registry remains unchanged unless every mandatory source, dimension, thread, kernel, collision, mating-fit, and render receipt is real and hash-valid",
+    "primary, adversarial, focused regression, build, rulebook, loop-guard, visual, and formal invariant checks pass"
+  ],
+  "verification_gates": [
+    "official-source URL and byte-hash audit",
+    "DWG topology and extents audit with adversarial fixture mutations",
+    "dimension and thread completeness audit",
+    "Blender MCP source-preserving import and visual inspection",
+    "exact assembly collision and mating-fit verification",
+    "New Hope purchased-support and exact-part receipt regression tests",
+    "AutoSPRINK production build",
+    "GX10 formal invariant proof or exact GX10_PROVER_UNAVAILABLE evidence",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate contract"
+  ],
+  "state_path": "data/agent-loops/new-hope-vicflex-ab2-exact-cad-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-purchased-support-components.json",
+    "apps/autosprink/src/data/trusted-exact-part-receipts.json",
+    "apps/autosprink/src/data/exact-part-evidence/victaulic-vicflex-ab2",
+    "data/agent-loops/new-hope-vicflex-ab2-exact-cad-20260716/state.json"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 160000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

@@ -1,0 +1,47 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "new-hope-vicflex-ab2-exact-cad-20260716",
+  "iteration": 1,
+  "status": "active",
+  "lastUpdated": "2026-07-16T17:12:00-07:00",
+  "truth": {
+    "officialArchiveHashBound": true,
+    "officialDwgHashBound": true,
+    "odaDxfHashBound": true,
+    "exactThreeDSolidCount": 15,
+    "allSolidBodiesDecoded": true,
+    "allSabTopologiesValid": true,
+    "assemblyOverallXInches": 28,
+    "quotePurchaseIdentityBound": true,
+    "manufacturerDwgSkuVariantBound": false,
+    "threadStandardsComplete": false,
+    "neutralMeshExported": false,
+    "blenderMcpAvailableThisSession": false,
+    "collisionVerified": false,
+    "matingFitVerified": false,
+    "trustedRegistryPromoted": false,
+    "vpsDeploymentAllowed": false
+  },
+  "completedGates": [
+    "official source URL and byte-hash audit",
+    "client quote purchase identity A240AB200N to AB2 24-inch configuration and quantity 152",
+    "15-of-15 DXF AcDs ASM body binding",
+    "15-of-15 SAB topology validation with zero structural errors",
+    "ODA source rendering and overall measurement inspection",
+    "adversarial missing-body length-mismatch invalid-hex and expectation-drift tests"
+  ],
+  "remainingGates": [
+    "bind the manufacturer family DWG to purchased SKU A240AB200N and its explicit 24-inch variant",
+    "bind each fastener to exact diameter pitch handedness engagement and source",
+    "export source-preserving neutral mesh with byte-hash receipt",
+    "make Blender MCP callable and inspect the imported source mesh",
+    "verify collision insertion clamp range and all mating datums",
+    "run exact-part registry regression build rulebook and formal invariant gates"
+  ],
+  "nextAction": "Acquire manufacturer evidence binding the family DWG to SKU A240AB200N and its 24-inch variant plus exact fastener specifications before any registry promotion; then complete neutral export and Blender MCP fit verification.",
+  "evidence": [
+    "apps/autosprink/src/data/exact-part-evidence/victaulic-vicflex-ab2/source-audit.json",
+    "apps/autosprink/scripts/lib/dxf-acds-audit.mjs",
+    "apps/autosprink/tests/dxf-acds-audit.test.js"
+  ]
+}

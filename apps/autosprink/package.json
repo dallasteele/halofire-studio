@@ -11,6 +11,7 @@
     "build": "vite build",
     "build:parts": "node scripts/build-parts.mjs",
     "audit:new-hope-support-cad": "node scripts/audit-new-hope-support-cad-corpus.mjs",
+    "audit:victaulic-ab2-cad": "node scripts/audit-victaulic-ab2-dxf.mjs",
     "auto-source": "node scripts/auto-source-run.mjs",
     "sam31:bridge": "node scripts/sam31-bridge.mjs",
     "smoke:sam31-workbench": "node scripts/smoke-sam31-workbench.mjs",

@@ -1,0 +1,86 @@
+{
+  "artifactType": "halofire.manufacturer-exact-cad-source-audit.v1",
+  "partFamily": "Victaulic VicFlex Style AB2",
+  "status": "source_geometry_verified_release_blocked",
+  "manufacturerSources": {
+    "product": "https://www.victaulic.com/products/vicflex-style-ab2-bracket/",
+    "cadIndex": "https://assets.victaulic.com/assets/uploads/software-content/Autodesk_AutoCAD_3D_Blocks.html",
+    "installationManual": "https://assets.victaulic.com/assets/uploads/literature/I-VICFLEX.pdf",
+    "archive": "https://www.victaulic.com/assets/uploads/software-content/Autodesk_AutoCAD_3D_Blocks/Adsk_ACAD_FP_Sprinklers_3D.zip"
+  },
+  "clientPurchaseEvidence": {
+    "path": "apps/autosprink/src/data/new-hope-purchased-support-components.json",
+    "productNumber": "A240AB200N",
+    "model": "VicFlex AB2 24-inch",
+    "quantity": 152,
+    "quoteVariantIdentityVerified": true,
+    "purchaseIdentityReady": true,
+    "boundary": "This proves the purchased identity and configuration, but it does not prove that the family-level manufacturer DWG is the A240AB200N 24-inch variant."
+  },
+  "sourceFiles": {
+    "archive": {
+      "name": "Adsk_ACAD_FP_Sprinklers_3D.zip",
+      "bytes": 259057126,
+      "sha256": "1AFEB13DCA020E15CCA1DC333184833BBD2DE35172FD3178666C8452E7605A9D"
+    },
+    "dwg": {
+      "name": "Victaulic_VicFlex_Style_AB2_[3D].dwg",
+      "bytes": 1884765,
+      "sha256": "98D24815AF41A5C52FED051952A1319B9FE158729F25A508CA56458A24DB76E0"
+    },
+    "odaAsciiDxf": {
+      "name": "Victaulic_VicFlex_Style_AB2_[3D].dxf",
+      "bytes": 7289759,
+      "sha256": "25EA1E5AF414C41EC6E1FF40B61205BDB7C7888FC358D480C2906D680AFB3DC3"
+    },
+    "odaVisualizeStream": {
+      "name": "Victaulic_AB2.vsfx",
+      "bytes": 1121194,
+      "status": "source_preserving_visualize_stream_not_neutral_mesh"
+    }
+  },
+  "dwgIdentity": {
+    "blockName": "Bracket_1 (25)_AB2",
+    "description": "1\" (25) VIC BRACKET VICFLEX AB2",
+    "insertionUnits": "inches",
+    "modelSpaceObjects": 28,
+    "threeDSolidCount": 15,
+    "solidHandles": ["1B6", "1B7", "1B8", "1B9", "1BA", "1BB", "1BC", "1BD", "1BE", "1BF", "1C0", "1C1", "1C2", "1C3", "1C4"]
+  },
+  "assemblyBoundsInches": {
+    "min": [-0.5, -1.8799739846206376, -3.83588725086637],
+    "max": [27.5, 1.2499999999999991, 1.303971696961905],
+    "overallX": 28,
+    "odaMeasuredOverallMeters": 0.699,
+    "note": "The nominal 24-inch configuration is not the same as overall assembly length and remains separately source-bound."
+  },
+  "decodedBodies": [
+    {"handle":"1B6","sabBytes":487938,"sha256":"ED56B070D93E28DBF68686D6C5F524030437D56F0C21E74AE552C83DB69CA734","records":2136,"vertices":77,"edges":169,"brepFaces":98,"boundsMin":[24.811876534596692,-0.1308073006784012,0.2950000000000001],"boundsMax":[25.96802020479271,0.13080730067840154,1.303971696961905]},
+    {"handle":"1B7","sabBytes":68033,"sha256":"074AA425981F9968E2E64D59A80C77A794BCD660915A670DA63451F5E64C96DE","records":459,"vertices":36,"edges":54,"brepFaces":25,"boundsMin":[-0.206692913385827,-0.11811023622047186,-0.47864575221093897],"boundsMax":[0.0767148487604325,0.12795275590551192,0.62744094488189]},
+    {"handle":"1B8","sabBytes":7351,"sha256":"22631C5BDF337A453979AD7B0750BC3BE31521C6E20C8D5998DEBFF2A8EAF94F","records":109,"vertices":8,"edges":12,"brepFaces":6,"boundsMin":[0.119080292965429,-0.01545275590551188,-0.35681102362204725],"boundsMax":[0.23729265776275302,0.015452755905511796,-0.2949999999999999]},
+    {"handle":"1B9","sabBytes":7145,"sha256":"B438240E157CD9851E1AD00CA2AC12A82FB2C4D75E44232D01010B1464C10F14","records":109,"vertices":8,"edges":12,"brepFaces":6,"boundsMin":[0.364,-0.7450000000000007,-2.80508187912902],"boundsMax":[0.367,0.7449999999999996,-2.05508187912902]},
+    {"handle":"1BA","sabBytes":98207,"sha256":"484C5198F5E42802543E0B9C74B353A07D135FA531CDC6329A161AB2CE43EA51","records":1549,"vertices":144,"edges":160,"brepFaces":92,"boundsMin":[-0.49999999999999994,-0.29500000000000015,-0.29500000000000015],"boundsMax":[27.499999999999996,0.29500000000000015,0.29500000000000015]},
+    {"handle":"1BB","sabBytes":114531,"sha256":"5DCDA203A12C44508A1DADECD2A6A67388E6EDAE75DC428F5AD2899EA7BF8DC0","records":1696,"vertices":146,"edges":218,"brepFaces":75,"boundsMin":[24.0499483696947,-0.20341854407188373,-3.5173057949382622],"boundsMax":[24.0739483696947,0.20341854407188226,-3.1104687067944967]},
+    {"handle":"1BC","sabBytes":100529,"sha256":"A8210A105419B589F7782928F6D8D39F0101E73B67ED61B739B53439712E1649","records":712,"vertices":56,"edges":86,"brepFaces":38,"boundsMin":[23.9169483696947,-0.18650000000000075,-3.4024674293791444],"boundsMax":[24.6749483696947,0.18649999999999925,-3.225307072353614]},
+    {"handle":"1BD","sabBytes":170776,"sha256":"34A3415A9C73F08AA3B04EBAF54F1880CABF6621CE37F403FABE08C5BE9771C4","records":2444,"vertices":186,"edges":296,"brepFaces":120,"boundsMin":[24.4259483696947,-1.2500000000000004,-3.83588725086637],"boundsMax":[25.7539483696947,1.2499999999999991,0.6260000000000002]},
+    {"handle":"1BE","sabBytes":114418,"sha256":"29B59371C632FC9FBB06D23B3E2B91BEC6841D9D886710B34B4B0150CA5C1C2B","records":1696,"vertices":146,"edges":218,"brepFaces":75,"boundsMin":[1.316,-0.20341854407188373,-3.5173057949382622],"boundsMax":[1.34,0.20341854407188226,-3.1104687067944967]},
+    {"handle":"1BF","sabBytes":100419,"sha256":"57C2E6F55A075F827C7E491DB974DF71C467969CDB74A870A372C1D733E2FBCD","records":712,"vertices":56,"edges":86,"brepFaces":38,"boundsMin":[0.7150000000000002,-0.18650000000000075,-3.4024674293791444],"boundsMax":[1.473,0.18649999999999925,-3.225307072353614]},
+    {"handle":"1C0","sabBytes":170803,"sha256":"6B2333133B4C9334F5139E9C48136AA19F474DBA21DF8D9BEE434659033A88E6","records":2448,"vertices":186,"edges":296,"brepFaces":120,"boundsMin":[-0.36399999999999993,-1.2500000000000004,-3.83588725086637],"boundsMax":[0.964,1.2499999999999991,0.6260000000000002]},
+    {"handle":"1C1","sabBytes":270715,"sha256":"03AD49A245D43A40ED125A51A9A7E15F1E6318519F532AFAB4B0429E3F260B27","records":2377,"vertices":199,"edges":301,"brepFaces":112,"boundsMin":[11.431582868654273,-1.670158648421794,-0.8354496062990158],"boundsMax":[11.947582485695625,-1.1580236220472402,0.251951968504134]},
+    {"handle":"1C2","sabBytes":5250,"sha256":"955C4FF10522273CD6FC7D0F2AE4F5E4E17A357342B32BA0E4D60B2FCA9232F6","records":81,"vertices":6,"edges":6,"brepFaces":6,"boundsMin":[13.701,-1.405,-0.5937173228344488],"boundsMax":[13.856,-1.4049999999999996,0.5472275590553113]},
+    {"handle":"1C3","sabBytes":274144,"sha256":"176085DD886A51DAD7116728BBFED1A26C7CC4753DB3E2ACC3EFB47F431815F2","records":2682,"vertices":165,"edges":308,"brepFaces":132,"boundsMin":[10.956896830343304,-1.8799739846206376,-0.535449606299019],"boundsMax":[13.949022814595274,-1.0153283121796892,0.6963503937009807]},
+    {"handle":"1C4","sabBytes":850356,"sha256":"758DB64A1BF24D4F824409D6A1AC360750517B903E49A7CE88EEB3ED442B10DA","records":7409,"vertices":510,"edges":864,"brepFaces":369,"boundsMin":[11.30446456440945,-1.66799212598425,-0.46512992125964503],"boundsMax":[13.95407086614173,0.39342519685039373,0.456129921260039]}
+  ],
+  "verification": {
+    "dxfAcdsAudit": "pass",
+    "sabTopologyValidation": "pass_15_of_15_zero_errors",
+    "odaVisualInspection": "pass_source_rendered",
+    "quotePurchaseIdentityBinding": "pass_A240AB200N_AB2_24in_qty152",
+    "manufacturerDwgSkuVariantBinding": "blocked_dwg_family_identity_does_not_embed_A240AB200N_or_explicit_24in_variant",
+    "threadStandardCompleteness": "blocked_detailed_fastener_geometry_not_yet_bound_to_diameter_pitch_handedness_and_engagement",
+    "neutralMeshExport": "blocked_oda_viewer_only_emitted_vsfx",
+    "blenderMcp": "blocked_not_exposed_in_current_codex_tool_session",
+    "assemblyCollisionAndMatingFit": "pending_neutral_geometry_and_interface_datum_receipts",
+    "trustedRegistryPromotion": "blocked"
+  }
+}
