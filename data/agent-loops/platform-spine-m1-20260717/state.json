@@ -17,5 +17,11 @@
     "typedPlatformCore": "packages/platform-core/src/spine.ts",
     "records": ["Customer", "Site", "Job", "Employee", "Document", "AuditEvent", "ReviewItem", "ModuleRegistry"],
     "verification": "platform-core check-types and build passed"
+  },
+  "iteration2": {
+    "copyOnlyMigration": "packages/platform-core/scripts/migrate_sqlite.py",
+    "sourceSha256": "5c2ac127b37d570edf73f097b1c4eeb1df338d65f4ef3c8f3046b867c2828546",
+    "copiedCounts": {"customers": 274, "jobs": 2677, "documents": 455150, "sites": 0, "employees": 0},
+    "next": "exercise reversible down migration on disposable copy"
   }
 }
