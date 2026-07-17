@@ -1,5 +1,6 @@
 import { validateNewHopeWetLevel1NetworkEvidence } from './new-hope-wet-level1-network-evidence.js';
 import { buildNewHopeWetListingCrosswalk } from './new-hope-wet-listing-crosswalk.js';
+import { evaluateNewHopeWetQuantityPlacementEvidence } from './new-hope-wet-quantity-placement-evidence.js';
 
 const PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut';
 const APPROVED_PLAN_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5';
@@ -164,18 +165,21 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     waterSupplyAndWetRiser,
     wetLevel1NetworkEvidence,
     fabricationEndSchedule,
+    wetQuantityPlacementEvidence,
   } = inputs;
   const wetNetwork = validateNewHopeWetLevel1NetworkEvidence(wetLevel1NetworkEvidence);
   const wetListingCrosswalk = buildNewHopeWetListingCrosswalk({
     wetLevel1NetworkEvidence,
     fabricationEndSchedule,
   });
+  const wetQuantityPlacement = evaluateNewHopeWetQuantityPlacementEvidence(wetQuantityPlacementEvidence);
   if (wetNetwork.status !== 'passed') {
     issues.push(...wetNetwork.issues);
   }
   if (wetListingCrosswalk.status !== 'passed') {
     issues.push(...wetListingCrosswalk.issues);
   }
+  if (wetQuantityPlacement.status !== 'passed') issues.push(...wetQuantityPlacement.issues);
 
   if (
     registration?.projectId !== PROJECT_ID
@@ -338,6 +342,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       approvedDesignSupply: clone(waterSupplyAndWetRiser.sourceBindings.hydraulicCalculation.approvedDesignSupply),
       wetLevel1Network: clone(wetNetwork.sourceBindings),
       approvedFabricationListing: clone(wetListingCrosswalk.source),
+      wetQuantityPlacement: clone(wetQuantityPlacementEvidence.sources),
     } : null,
     systems: evidenceReady ? [
       {
@@ -429,6 +434,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
         lineFamilies: clone(wetNetwork.nativeFabricationLines),
         sprinklerSchedule: clone(wetNetwork.sprinklerSchedule),
         listingCrosswalk: clone(wetListingCrosswalk),
+        quantityPlacement: clone(wetQuantityPlacement),
       } : null,
       systemComponents: [
         { key: 'wet_riser_manifold', description: '3-inch wet riser manifold', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
@@ -454,6 +460,8 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     sprinklerHeadPositions2dReady: wetNetworkReady,
     nativeFabricationTakeoffReady: wetNetworkReady,
     wetSystemListingDefinitionCrosswalkReady: evidenceReady && wetListingCrosswalk.nativeRowToListingDefinitionReady,
+    wetSystemQuantityExpandedLineAnchorsReady: evidenceReady && wetQuantityPlacement.quantityExpandedLineLabelAnchorsReady,
+    wetSystemQuantityExpandedEndpointMappingReady: false,
     wetSystemThreadedCutLengthCrossSourceReady: evidenceReady && wetListingCrosswalk.threadedCutLengthCrossSourceReady,
     wetSystemListingQuantityExpansionReady: false,
     wetSystemWeldedCutLengthCrossSourceReady: false,

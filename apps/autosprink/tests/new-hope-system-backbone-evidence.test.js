@@ -12,6 +12,7 @@ const sources = () => ({
   waterSupplyAndWetRiser: load('../src/data/new-hope-approved-water-supply-wet-riser-evidence.json'),
   wetLevel1NetworkEvidence: load('../src/data/new-hope-wet-level1-network-evidence.json'),
   fabricationEndSchedule: load('../src/data/new-hope-fabrication-end-schedule.json'),
+  wetQuantityPlacementEvidence: load('../src/data/new-hope-wet-quantity-placement-evidence.json'),
 });
 
 describe('New Hope source-bound system backbone evidence', () => {
@@ -87,6 +88,8 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.wetSystemHeadTypeAssignmentReady).toBe(true);
     expect(result.nativeFabricationTakeoffReady).toBe(true);
     expect(result.wetSystemListingDefinitionCrosswalkReady).toBe(true);
+    expect(result.wetSystemQuantityExpandedLineAnchorsReady).toBe(true);
+    expect(result.wetSystemQuantityExpandedEndpointMappingReady).toBe(false);
     expect(result.wetSystemThreadedCutLengthCrossSourceReady).toBe(true);
     expect(result.wetSystemListingQuantityExpansionReady).toBe(false);
     expect(result.wetSystemWeldedCutLengthCrossSourceReady).toBe(false);
@@ -112,6 +115,7 @@ describe('New Hope source-bound system backbone evidence', () => {
       listingFabricatedUnitCount: 169,
       unexpandedListingUnitCount: 2,
     }));
+    expect(result.takeoff.wetLevel1NativeFabrication.quantityPlacement.definitions.flatMap((row) => row.instances)).toHaveLength(4);
     expect(result.takeoff.systemComponents).toEqual(expect.arrayContaining([
       expect.objectContaining({ key: 'wet_test_and_drain_prv', quantity: 1 }),
       expect.objectContaining({ key: 'fire_pump', quantity: 0 }),

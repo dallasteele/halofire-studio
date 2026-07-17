@@ -1,0 +1,9 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-wet-quantity-placement-20260716/lean-request.json",
+  "theoremNames": ["repeatedListingQuantitiesCloseAtFourAnchors", "lineAnchorsDoNotProvePieceEndpoints"],
+  "claim": "Two BL34 plus two BL35 listing quantities close at four exact field-plan line anchors, while missing piece endpoints keeps fabrication false.",
+  "result": { "status": "verified", "elapsedMs": 91, "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)", "returncode": 0 }
+}

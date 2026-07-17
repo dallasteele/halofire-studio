@@ -1,0 +1,47 @@
+{
+  "artifactType": "halofire.new-hope-wet-quantity-placement-evidence.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "sources": {
+    "fieldInstall": { "fileName": "24-052_NHCC_INSTALL PLAN.pdf", "sheet": "FP1.0", "physicalPage": 3, "sha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5" },
+    "approvedListing": { "fileName": "24-052_NHCC_LIST.PDF", "sha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734" },
+    "nativeFab": { "archiveSha256": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9", "memberSha256": "0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135" }
+  },
+  "definitions": [
+    {
+      "pieceId": "BL34.01",
+      "lineName": "BL34",
+      "listingPhysicalPage": 32,
+      "listingQuantity": 2,
+      "nativePipeUniqueId": 539,
+      "nativeCutLengthFt": 14.916667,
+      "printedDimensionText": "14'-11",
+      "printedDimensionIn": 179,
+      "instances": [
+        { "instanceId": "BL34.01-A", "lineLabelBoxPdfPt": [1564.134888, 756.518433, 1598.918457, 776.95343], "dimensionBoxPdfPt": [1463.744751, 781.661804, 1486.596191, 793.427429] },
+        { "instanceId": "BL34.01-B", "lineLabelBoxPdfPt": [1564.134888, 1606.643433, 1598.918457, 1627.078369], "dimensionBoxPdfPt": [1463.744751, 1631.786865, 1486.596191, 1643.552368] }
+      ]
+    },
+    {
+      "pieceId": "BL35.01",
+      "lineName": "BL35",
+      "listingPhysicalPage": 33,
+      "listingQuantity": 2,
+      "nativePipeUniqueId": 535,
+      "nativeCutLengthFt": 13.291667,
+      "printedDimensionText": "13'-3½",
+      "printedDimensionIn": 159.5,
+      "instances": [
+        { "instanceId": "BL35.01-A", "lineLabelBoxPdfPt": [1549.503418, 681.097961, 1584.286987, 701.532959], "dimensionBoxPdfPt": [1474.101074, 706.241333, 1499.776733, 718.006958] },
+        { "instanceId": "BL35.01-B", "lineLabelBoxPdfPt": [1510.326538, 1682.068359, 1545.110107, 1702.503296], "dimensionBoxPdfPt": [1465.707642, 1707.211792, 1491.383301, 1718.977295] }
+      ]
+    }
+  ],
+  "claims": {
+    "quantityExpandedLineLabelAnchorsReady": true,
+    "quantityExpandedPrintedDimensionsReady": true,
+    "quantityExpandedPieceEndpointMappingReady": false,
+    "pieceToPlanVectorMappingReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

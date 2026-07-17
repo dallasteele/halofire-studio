@@ -31,6 +31,7 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(script).toContain('../../new-hope-approved-water-supply-wet-riser-evidence.json');
     expect(script).toContain('../../new-hope-wet-level1-network-evidence.json');
     expect(script).toContain('../../new-hope-fabrication-end-schedule.json');
+    expect(script).toContain('../../new-hope-wet-quantity-placement-evidence.json');
   });
 
   it('surfaces release-state truth in the DOM and hides the unreleased 3D source leg', () => {
@@ -58,6 +59,8 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(html).toContain('../new-hope-truss-clearance/listing-complete-welded-page20.png');
     expect(html).toContain('../new-hope-truss-clearance/listing-complete-threaded-page42.png');
     expect(html).toContain('Native records to approved AutoSPRINK listing');
+    expect(html).toContain('wet-quantity-placement-source.png');
+    expect(fs.statSync(new URL('wet-quantity-placement-source.png', proofRoot)).size).toBeGreaterThan(100_000);
     expect(fs.statSync(new URL('wet-listing-crosswalk-browser.png', proofRoot)).size).toBeGreaterThan(100_000);
     expect(script).toContain("document.querySelector('#crosswalk-rows')");
     expect(script).toContain('crosswalk.quantityExpansionGaps');

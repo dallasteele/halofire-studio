@@ -10,6 +10,7 @@ const urls = {
   waterSupplyAndWetRiser: '../../new-hope-approved-water-supply-wet-riser-evidence.json',
   wetLevel1NetworkEvidence: '../../new-hope-wet-level1-network-evidence.json',
   fabricationEndSchedule: '../../new-hope-fabrication-end-schedule.json',
+  wetQuantityPlacementEvidence: '../../new-hope-wet-quantity-placement-evidence.json',
 };
 
 async function fetchJson(url) {
@@ -100,6 +101,7 @@ function renderProof(result) {
   root.wetSystemHeadTypeAssignmentReady = String(result.wetSystemHeadTypeAssignmentReady);
   root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady);
   root.wetSystemListingDefinitionCrosswalkReady = String(result.wetSystemListingDefinitionCrosswalkReady);
+  root.wetSystemQuantityExpandedLineAnchorsReady = String(result.wetSystemQuantityExpandedLineAnchorsReady);
   root.wetSystemListingQuantityExpansionReady = String(result.wetSystemListingQuantityExpansionReady);
   root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved);
   root.quoteReady = String(result.quoteReady);
@@ -117,6 +119,7 @@ export const proofPromise = Promise.all(Object.values(urls).map(fetchJson)).then
   waterSupplyAndWetRiser,
   wetLevel1NetworkEvidence,
   fabricationEndSchedule,
+  wetQuantityPlacementEvidence,
 ]) => buildNewHopeSystemBackboneEvidence({
   registration,
   operationalAnnotations,
@@ -125,6 +128,7 @@ export const proofPromise = Promise.all(Object.values(urls).map(fetchJson)).then
   waterSupplyAndWetRiser,
   wetLevel1NetworkEvidence,
   fabricationEndSchedule,
+  wetQuantityPlacementEvidence,
 }));
 
 proofPromise.then((result) => {

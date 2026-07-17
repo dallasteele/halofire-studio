@@ -37,6 +37,8 @@
     "threadedCutLengthCrossSourceReady": true,
     "exactThreadedCutLengthMatchCount": 67,
     "listingQuantityExpansionReady": false,
+    "quantityExpandedLineLabelAnchorsReady": true,
+    "quantityExpandedPieceEndpointMappingReady": false,
     "unexpandedApprovedListingUnitCount": 2,
     "weldedCutLengthCrossSourceReady": false,
     "pieceToPlanVectorMappingReady": false,
@@ -66,5 +68,5 @@
     "browser": "passed through Playwright CLI at local HTTP 127.0.0.1:3312; proofReady true, crosswalk true, quantity expansion false, quote/field release false, 12 sample rows rendered, and console reported zero errors and zero warnings",
     "brainPostflight": "passed; episode 156373"
   },
-  "nextAction": "Recover welded listing dimensions and quantity-expanded plan placements for BL34.01 and BL35.01 from the protected listing/source sheets or a traceable completed-project calibration without guessing. Then resolve the remaining exact piece-to-plan mapping, pipe direction/grade, installed elevations, field drain routes, and source-feed route geometry. Use Addendum 02 for the auth-gated client reveal only after the shared real geometry is release-worthy; require a current flow test for every new quote."
+  "nextAction": "Use the now-proven duplicate BL34.01 and BL35.01 line/dimension anchors to register exact source endpoints and vectors without label-proximity inference. Then resolve the remaining exact piece-to-plan mapping, pipe direction/grade, installed elevations, field drain routes, and source-feed route geometry. Use Addendum 02 for the auth-gated client reveal only after the shared real geometry is release-worthy; require a current flow test for every new quote."
 }

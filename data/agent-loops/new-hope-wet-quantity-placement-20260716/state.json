@@ -1,0 +1,30 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "new-hope-wet-quantity-placement-20260716",
+  "iteration": 1,
+  "status": "active",
+  "brainPreflight": { "status": "passed", "episodes": [156373, 149894, 150639] },
+  "truth": {
+    "bl34ListingQuantity": 2,
+    "bl35ListingQuantity": 2,
+    "bl34ExactPlanLabelAnchorCount": 2,
+    "bl35ExactPlanLabelAnchorCount": 2,
+    "printedDimensionNativeLengthParityReady": true,
+    "quantityExpandedLineLabelAnchorsReady": true,
+    "quantityExpandedPieceEndpointMappingReady": false,
+    "pieceToPlanVectorMappingReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "verification": {
+    "focusedTests": "22 passed across four files; moved-label, missing-instance, and four false-promotion mutations reject",
+    "build": "passed",
+    "rulebook": "passed",
+    "loopGuard": "passed",
+    "lean": "verified by Lean 4.13.0 in 91 ms",
+    "visual": "wet-quantity-placement-source.png inspected at original 1180 by 760 resolution over actual FP1.0; both BL34 and both BL35 labels and dimensions are legible",
+    "browser": "proofReady true, quantity anchors true, source image loaded at natural width 1180, zero errors, zero warnings",
+    "brainPostflight": "passed; episode 156396"
+  },
+  "nextAction": "Register exact pipe endpoints and source vectors for these four occurrences, then continue the remaining piece-to-plan, direction, grade, and installed-elevation work without inferring geometry from label proximity alone."
+}

@@ -1,0 +1,39 @@
+{
+  "name": "new-hope-wet-quantity-placement-20260716",
+  "owner": "codex",
+  "goal": "Bind the two BL34.01 and two BL35.01 approved listing quantities to exact repeated FP1.0 line-label and printed-dimension anchors without promoting unproven piece endpoints, vectors, fabrication, or field release.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "tmp/pdfs/new-hope-live/field-install.pdf",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/data/new-hope-wet-level1-network-evidence.json",
+    "apps/autosprink/src/data/new-hope-wet-quantity-placement-evidence.json",
+    "hal-brain episodes 156373, 149894, 150639"
+  ],
+  "exit_criteria": [
+    "two exact BL34 and two exact BL35 field-plan label anchors are retained",
+    "both BL34 dimensions are 14 feet 11 inches and both BL35 dimensions are 13 feet 3.5 inches",
+    "printed dimensions reconcile to native cut lengths and listing quantities",
+    "piece endpoints, piece-to-vector mapping, fabrication, and field release remain false",
+    "focused tests, build, browser/source visual inspection, rulebook, loop guard, formal proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "exact field and listing source hashes",
+    "fixed label and dimension box fingerprint",
+    "adversarial moved-label and missing-instance rejection",
+    "false-promotion rejection",
+    "actual-PDF visual inspection",
+    "production build",
+    "formal fail-closed proof"
+  ],
+  "state_path": "data/agent-loops/new-hope-wet-quantity-placement-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-quantity-placement-source.png",
+    "data/agent-loops/new-hope-wet-quantity-placement-20260716/lean-proof.json"
+  ],
+  "max_iterations": 3,
+  "max_tokens": 40000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
