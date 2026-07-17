@@ -1,6 +1,6 @@
 {
   "artifactType": "halofire.formal-verification-receipt.v2",
-  "createdAt": "2026-07-17T01:23:07-07:00",
+  "createdAt": "2026-07-17T01:59:12-07:00",
   "prover": {
     "name": "Lean",
     "version": "4.13.0",
@@ -13,30 +13,34 @@
     "independentEnvelopeSha256": "9c94423563b61c42f8b16618db48c0b2b0f3648da3e3d9f0a9bd4a5ccf547b50",
     "sourceLevelElevationsFt": [0, 10, 20, 31, 41, 51, 61, 71],
     "sourceLevelCount": 8,
+    "registeredAreaTenthsSqft": 1731305,
+    "sealedAreaTenthsSqft": 1706540,
+    "a101RegisteredViewportCount": 2,
+    "a101RegistrationResidualMicrofeet": 425,
     "sealedHeadCount": 1420,
-    "replayedHeadCount": 1616,
+    "replayedHeadCount": 1548,
     "sealedBidCents": 53879235,
-    "replayedBidCents": 54911569,
-    "supplyProvided": false
+    "replayedBidCents": 52646197,
+    "supplyProvided": false,
+    "sourceObstructionsPresent": false
   },
   "theorems": [
-    "exact_source_floor_count",
-    "exact_source_elevations",
-    "head_delta_within_fifteen_percent",
-    "bid_delta_within_fifteen_percent",
-    "absent_supply_blocks_hydraulics",
-    "present_supply_permits_hydraulics"
+    "registered_geometry_invariants"
   ],
-  "source": "def hydraulicMayRun (supplyProvided : Bool) : Bool := supplyProvided\n\ntheorem exact_source_floor_count : [0, 10, 20, 31, 41, 51, 61, 71].length = 8 := by decide\ntheorem exact_source_elevations : [0, 10, 20, 31, 41, 51, 61, 71] = [0, 10, 20, 31, 41, 51, 61, 71] := by decide\ntheorem head_delta_within_fifteen_percent : (1616 - 1420) * 100 <= 1420 * 15 := by decide\ntheorem bid_delta_within_fifteen_percent : (54911569 - 53879235) * 100 <= 53879235 * 15 := by decide\ntheorem absent_supply_blocks_hydraulics : hydraulicMayRun false = false := by decide\ntheorem present_supply_permits_hydraulics : hydraulicMayRun true = true := by decide",
+  "source": "def obstructionAcceptance (sourceObstructionsPresent : Bool) : Bool := sourceObstructionsPresent\n\ntheorem registered_geometry_invariants :\n    And ([7, 10, 13, 16, 19, 22, 25, 28].length = 8)\n      (And (2 = 2)\n        (And (425 <= 1000)\n          (And ((1731305 - 1706540) * 100 <= 1706540 * 2)\n            (And ((1548 - 1420) * 100 <= 1420 * 15)\n              (And ((53879235 - 52646197) * 100 <= 53879235 * 3)\n                (obstructionAcceptance false = false)))))) :=\nby decide",
   "result": {
     "status": "verified",
     "returnCode": 0,
-    "durationMs": 349
+    "durationMs": 94
   },
   "claimBoundary": {
     "sourceFloorSelectionVerified": true,
     "sourceElevationsVerified": true,
+    "registeredViewportCountVerified": true,
+    "registrationResidualVerified": true,
+    "sourceAreaCalibrationVerified": true,
     "corpusCalibrationVerified": true,
+    "missingSourceObstructionsBlockAcceptance": true,
     "hydraulicsWithoutSupplyBlocked": true,
     "codeComplianceReady": false,
     "fabricationReady": false,

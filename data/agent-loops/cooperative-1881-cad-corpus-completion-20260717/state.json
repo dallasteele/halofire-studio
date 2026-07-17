@@ -1,8 +1,8 @@
 {
   "name": "cooperative-1881-cad-corpus-completion-20260717",
-  "iteration": 2,
+  "iteration": 3,
   "status": "in_progress",
-  "updatedAt": "2026-07-17T01:29:24-07:00",
+  "updatedAt": "2026-07-17T01:59:12-07:00",
   "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY", "ITERATE"],
   "nextStage": "ITERATE",
   "brainPreflight": {
@@ -16,47 +16,52 @@
     "selectedPdfPagesZeroBased": [7, 10, 13, 16, 19, 22, 25, 28],
     "levelElevationsM": [0.0, 3.048, 6.096, 9.4488, 12.4968, 15.5448, 18.5928, 21.6408],
     "levels": 8,
-    "rooms": 128,
-    "walls": 1915,
-    "heads": 1616,
-    "pipes": 2600,
+    "rooms": 806,
+    "walls": 4875,
+    "heads": 1548,
+    "pipes": 2520,
     "systems": 9,
-    "bidUsd": 549115.69
+    "bidUsd": 526461.97,
+    "registeredAreaSqft": 173130.5,
+    "a101RegisteredViewportCount": 2,
+    "a101RegistrationMaxResidualFt": 0.000425
   },
   "sealedTruth": {
     "levels": 8,
     "heads": 1420,
     "systems": 9,
     "bidUsd": 538792.35,
-    "headDeltaPercent": 13.8,
-    "bidDeltaPercent": 1.9
+    "headDeltaPercent": 9.0,
+    "bidDeltaPercent": 2.29
   },
   "verification": {
     "formerlyDormantCorpusChecks": "29 passed, 0 failed, 0 skipped",
-    "fullCadSuite": "388 passed, 0 failed, 0 skipped, 25 dependency deprecation warnings",
-    "focusedUnitAndOrchestrator": "31 passed, 0 failed, 0 skipped",
+    "fullCadSuite": "394 passed, 0 failed, 0 skipped, 25 dependency deprecation warnings",
+    "focusedUnitAndOrchestrator": "45 passed, 0 failed, 0 skipped",
     "independentEnvelopeIou": 0.7363351986929664,
     "lean": "verified by Lean 4.13.0",
     "agentLoopGuard": "passed",
     "agenticRulebook": "passed"
   },
   "visualGate": {
-    "status": "rejected",
-    "evidence": "output/visual-proof/1881-rejected-unregistered-source-overlay.png",
-    "finding": "A-101 contains multiple drawing viewports. Page-wide wall extraction produces metric dimensions that pass the coarse independent-envelope IoU gate but cannot be registered onto either source viewport. Split-view registration must be implemented before visual or building-reconstruction acceptance.",
-    "acceptedOverlayExists": false
+    "status": "accepted",
+    "evidence": "output/visual-proof/1881-a101-registered-source-overlay.png",
+    "sha256": "28915ac13144225e9553f9ff9a6438e4bb9151b11e1eea224e150929599e76e7",
+    "finding": "A-101 was decomposed into two source viewports and registered by shared X/Y grid bubbles; both source-derived wall sets and footprint extents visibly overlay their underlying architectural drawings.",
+    "acceptedOverlayExists": true
   },
   "failClosedReleaseBoundary": {
     "flowTestRequired": true,
     "hydraulicResultsEmitted": false,
-    "nfpaRuleErrors": 71,
-    "nfpaRuleWarnings": 16,
+    "sourceObstructionsRequired": true,
+    "nfpaRuleErrors": 217,
+    "nfpaRuleWarnings": 12,
     "proposalHtmlError": "Design object has no attribute get",
     "submittalError": "Design object has no attribute get",
     "prefabError": "NoneType object has no attribute __dict__",
     "dwgIsPlaceholder": true,
-    "cutSheetsStubbed": 10,
-    "splitViewRegistrationRequired": true,
+    "cutSheetsStubbed": 11,
+    "splitViewRegistrationRequired": false,
     "employeeUseReady": false,
     "vpsReleaseReady": false,
     "codeComplianceReady": false,
@@ -64,7 +69,7 @@
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 157320,
-    "prePostflightCommit": "f0f0a447"
+    "episodeId": 157418,
+    "prePostflightCommit": "ae0ed5f4"
   }
 }

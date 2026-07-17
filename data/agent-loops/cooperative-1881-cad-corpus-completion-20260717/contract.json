@@ -37,6 +37,7 @@
     "services/halopenclaw-gateway/data/1881-cooperative/deliverables/manifest.json",
     "services/halofire-cad/tests/fixtures/intake/1881-outer-boundary.geojson",
     "output/visual-proof/1881-rejected-unregistered-source-overlay.png",
+    "output/visual-proof/1881-a101-registered-source-overlay.png",
     "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/state.json",
     "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/lean-proof.json"
   ],

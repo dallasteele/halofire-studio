@@ -93,6 +93,21 @@ def _load_title_block():
     return mod
 
 
+def _load_registered_views():
+    """Load the source-geometry adapter beside this intake agent."""
+    import importlib.util as _iu
+    _spec = _iu.spec_from_file_location(
+        "_hf_registered_views",
+        Path(__file__).parent / "registered_views.py",
+    )
+    if not _spec or not _spec.loader:
+        return None
+    mod = _iu.module_from_spec(_spec)
+    sys.modules["_hf_registered_views"] = mod
+    _spec.loader.exec_module(mod)
+    return mod
+
+
 def _classify_plan_pages(
     pdf_path: str, n_pages: int, hard_cap: int,
 ) -> list[int]:
@@ -412,6 +427,11 @@ def _enrich_levels_from_area_plans(
     for page_index, floor_index, area_name in detail_pages:
         level = by_floor.get(floor_index)
         if level is None or len(level.polygon_m) < 3:
+            continue
+        # A registered sheet already carries rooms in the same source-bound
+        # coordinate frame as its walls and footprint. Re-projecting child
+        # views into equal-width zones would destroy that registration.
+        if (level.metadata or {}).get("registered_source_geometry"):
             continue
         page_result = intake_pdf_page(pdf_path, page_index).model_dump()
         rooms = page_result.get("rooms") or []
@@ -1427,6 +1447,90 @@ def _canonicalize_floor_plates(
     if not levels:
         return levels
     from shapely.geometry import Polygon as _PG
+
+    registered_levels = [
+        lv for lv in levels
+        if (lv.metadata or {}).get("registered_source_geometry")
+    ]
+    if registered_levels:
+        if len(registered_levels) != len(levels):
+            metadata["issues"].append({
+                "code": "INTAKE_MIXED_REGISTRATION_BLOCKED",
+                "severity": "error",
+                "message": (
+                    "Source registration covered only some kept levels; "
+                    "canonical plate substitution is disabled so registered "
+                    "geometry cannot be overwritten."
+                ),
+                "refs": [lv.id for lv in levels],
+                "source": Path(pdf_path).name,
+            })
+            return levels
+
+        # Preserve every floor's own source-derived footprint. The only
+        # transformation allowed here is a rigid translation to a common
+        # model origin; walls, rooms, and footprint receive the exact same
+        # translation so their relative geometry is invariant.
+        for lv in levels:
+            polygon = list(lv.polygon_m)
+            if len(polygon) < 3:
+                metadata["issues"].append({
+                    "code": "INTAKE_REGISTERED_FOOTPRINT_MISSING",
+                    "severity": "error",
+                    "message": f"Registered level {lv.id} has no footprint.",
+                    "refs": [lv.id],
+                    "source": Path(pdf_path).name,
+                })
+                continue
+            xs = [point[0] for point in polygon]
+            ys = [point[1] for point in polygon]
+            cx = (min(xs) + max(xs)) / 2.0
+            cy = (min(ys) + max(ys)) / 2.0
+            lv.polygon_m = [(x - cx, y - cy) for x, y in polygon]
+            for wall in lv.walls:
+                wall.start_m = (
+                    wall.start_m[0] - cx,
+                    wall.start_m[1] - cy,
+                )
+                wall.end_m = (
+                    wall.end_m[0] - cx,
+                    wall.end_m[1] - cy,
+                )
+            for room in lv.rooms:
+                room.polygon_m = [
+                    (x - cx, y - cy) for x, y in room.polygon_m
+                ]
+            # Do not invent a generic structural grid on a source-registered
+            # drawing. Obstructions must be extracted from drawing evidence
+            # or remain absent/fail-closed for later obstruction review.
+            lv.obstructions = []
+
+        metadata["issues"].append({
+            "code": "INTAKE_REGISTERED_FLOOR_PLATES",
+            "severity": "info",
+            "message": (
+                f"Preserved {len(levels)} independently registered floor "
+                "plates and translated each rigidly to the model origin; "
+                "no canonical plate or synthetic columns were substituted."
+            ),
+            "refs": [lv.id for lv in levels],
+            "source": Path(pdf_path).name,
+        })
+        metadata["issues"].append({
+            "code": "SOURCE_OBSTRUCTIONS_REQUIRED",
+            "severity": "error",
+            "message": (
+                "Registered floor plans do not yet contain source-extracted "
+                "columns, beams, soffits, or other sprinkler obstructions. "
+                "The preliminary layout may run for measurement and pricing "
+                "comparison, but coverage and obstruction-clearance acceptance "
+                "is blocked; no generic column grid was fabricated."
+            ),
+            "refs": [lv.id for lv in levels],
+            "source": Path(pdf_path).name,
+        })
+        return levels
+
     def score(lv: Level) -> float:
         try:
             a = _PG(lv.polygon_m).area if len(lv.polygon_m) >= 3 else 0
@@ -1772,26 +1876,53 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
     metadata["plan_page_count"] = len(plan_page_indices)
     metadata["total_page_count"] = n_pages
 
+    registered_views = _load_registered_views()
     for i in plan_page_indices:
-        page_result = intake_pdf_page(pdf_path, i)
-        # Convert to dict for uniform handling with raster fallback
-        # (which still returns dict). PageIntakeResult.model_dump()
-        # yields a stable JSON-safe shape.
-        page_out: dict[str, Any] = page_result.model_dump()
-        if page_out.get("wall_count", 0) < 20:
-            raster_out = _raster_pdf_page(pdf_path, i)
-            if raster_out.get("wall_count", 0) < 20:
-                metadata["sources"][0]["warnings"].extend(page_out.get("warnings", []))
-                metadata["sources"][0]["warnings"].extend(raster_out.get("warnings", []))
-                continue
-            page_out = raster_out
-            metadata["sources"].append({
-                "id": f"{Path(pdf_path).name}:page:{i + 1}:raster",
-                "kind": "raster_pdf",
-                "path": pdf_path,
-                "confidence": 0.45,
-                "warnings": raster_out.get("warnings", []),
-            })
+        tb_cls = get_page_classification(pdf_path, i)
+        sheet_no = str(tb_cls.get("sheet_no") or "")
+        registered = (
+            registered_views.load_registered_sheet(pdf_path, i, sheet_no)
+            if registered_views is not None and sheet_no
+            else None
+        )
+        if registered is not None:
+            page_out = {
+                "wall_count": len(registered.walls_ft),
+                "room_count": len(registered.rooms_ft),
+                # Registered plan geometry is expressed directly in feet.
+                "scale_ft_per_pt": 1.0,
+                "walls": [
+                    {"x0": wall[0], "y0": wall[1],
+                     "x1": wall[2], "y1": wall[3]}
+                    for wall in registered.walls_ft
+                ],
+                "rooms": [
+                    {"polygon_pt": list(room),
+                     "area_pt2": float(Polygon(room).area)}
+                    for room in registered.rooms_ft
+                ],
+                "warnings": [],
+            }
+        else:
+            page_result = intake_pdf_page(pdf_path, i)
+            # Convert to dict for uniform handling with raster fallback
+            # (which still returns dict). PageIntakeResult.model_dump()
+            # yields a stable JSON-safe shape.
+            page_out = page_result.model_dump()
+            if page_out.get("wall_count", 0) < 20:
+                raster_out = _raster_pdf_page(pdf_path, i)
+                if raster_out.get("wall_count", 0) < 20:
+                    metadata["sources"][0]["warnings"].extend(page_out.get("warnings", []))
+                    metadata["sources"][0]["warnings"].extend(raster_out.get("warnings", []))
+                    continue
+                page_out = raster_out
+                metadata["sources"].append({
+                    "id": f"{Path(pdf_path).name}:page:{i + 1}:raster",
+                    "kind": "raster_pdf",
+                    "path": pdf_path,
+                    "confidence": 0.45,
+                    "warnings": raster_out.get("warnings", []),
+                })
         scale = page_out.get("scale_ft_per_pt") or (24 / 72)
         m_per_pt = scale * 0.3048  # ft → m
         # Phase E: pull level_name + elevation from the cached
@@ -1801,7 +1932,6 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
         # Confidence < 0.6 is flagged with source="ocr-uncertain" and
         # falls back to the synthetic placeholder so downstream
         # agents can tell the difference.
-        tb_cls = get_page_classification(pdf_path, i)
         tb_elev_ft = tb_cls.get("elevation_ft")
         tb_elev_source = tb_cls.get("elevation_evidence_source")
         tb_name = tb_cls.get("level_name")
@@ -1863,6 +1993,18 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
                 polygon_m=poly_m,
                 area_sqm=area_sqm,
             ))
+        if registered is not None:
+            # Footprints are already a true registered polygon union in plan
+            # feet. Select the largest exterior when a source has multiple
+            # disjoint buildings; all members remain disclosed in metadata.
+            footprint = max(
+                registered.footprint_polygons_ft,
+                key=lambda polygon: Polygon(polygon).area,
+            )
+            level.polygon_m = [
+                (float(x) * 0.3048, float(y) * 0.3048)
+                for x, y in footprint
+            ]
         # Level outline: real outer-boundary trace from detected
         # walls (NOT a bounding rectangle). See
         # `_trace_outer_boundary_m` below. Bbox path over-reads
@@ -1925,6 +2067,15 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
             level.metadata["sheet_no"] = tb_cls["sheet_no"]
         if tb_cls.get("floor_index") is not None:
             level.metadata["floor_index"] = int(tb_cls["floor_index"])
+        if registered is not None:
+            level.metadata.update({
+                "registered_source_geometry": True,
+                "registered_method": registered.method,
+                "registered_dimension_error": registered.dimension_error,
+                "registered_source_pdf_sha256": registered.source_pdf_sha256,
+                "source_viewports": list(registered.source_viewports),
+                "sibling_registration": registered.registration,
+            })
         levels.append(level)
 
     # Gap-fill: when a contiguous span of pages was rejected between

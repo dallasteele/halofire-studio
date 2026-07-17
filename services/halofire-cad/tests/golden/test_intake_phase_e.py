@@ -259,6 +259,51 @@ def test_1881_section_elevations_are_preserved() -> None:
     )
 
 
+@pytest.mark.slow
+@pytest.mark.golden
+def test_1881_preserves_independent_registered_floor_plates() -> None:
+    """Every overall plan must survive intake in its own source frame."""
+    from shapely.geometry import Polygon
+
+    raw = _get_building()
+    levels = raw.get("levels") or []
+    assert len(levels) == 8
+    assert all(
+        (level.get("metadata") or {}).get("registered_source_geometry")
+        for level in levels
+    )
+    areas_sqft = [
+        Polygon(level["polygon_m"]).area * 10.7639104167
+        for level in levels
+    ]
+    # Independent source dimensions produce four distinct floor areas; the
+    # retired canonicalizer would collapse all eight to one identical plate.
+    assert len({round(area, 1) for area in areas_sqft}) == 4
+    assert sum(areas_sqft) == pytest.approx(173_130.5, rel=0.001)
+    # Historical completed-bid workbook is comparison-only, not an input.
+    # Source-derived area should independently land within 2% of its 170,654
+    # sqft answer-key total.
+    assert abs(sum(areas_sqft) - 170_654.0) / 170_654.0 <= 0.02
+
+
+@pytest.mark.slow
+@pytest.mark.golden
+def test_1881_a101_records_two_axis_sibling_registration() -> None:
+    raw = _get_building()
+    a101 = next(
+        level for level in raw.get("levels") or []
+        if (level.get("metadata") or {}).get("sheet_no") == "A101"
+    )
+    metadata = a101["metadata"]
+    assert len(metadata["source_viewports"]) == 2
+    assert metadata["registered_method"] == "registered-sibling-polygon-union"
+    assert metadata["sibling_registration"]["shared_axes"] == ["x", "y"]
+    assert metadata["sibling_registration"]["max_residual_ft"] <= 0.001
+    assert not a101.get("obstructions"), (
+        "registered architectural intake must not invent a generic column grid"
+    )
+
+
 def test_intake_elevations_require_explicit_section_callouts() -> None:
     """Run classify_page directly against the title-block text of 3
     reference pages and confirm ≥ 80% carry a parsable elevation.
