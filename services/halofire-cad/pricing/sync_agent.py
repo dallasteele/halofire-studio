@@ -268,8 +268,10 @@ def run_sync(
     Returns {'accepted': n, 'errors': [...], 'run_id': N}.
     """
     _require_gemma(model)
-    sha = sha256_of(source_path)
     ext = source_path.suffix.lower()
+    if ext not in {".csv", ".pdf", ".html", ".htm"}:
+        raise ValueError(f"unsupported source extension: {ext}")
+    sha = sha256_of(source_path)
     with open_db() as db:
         run_id = db.start_sync_run(
             SyncRun(
@@ -293,9 +295,6 @@ def run_sync(
                 updates = extract_updates_from_text(
                     supplier_id, text, sha, model=model,
                 )
-            else:
-                raise ValueError(f"unsupported source extension: {ext}")
-
             if dry_run:
                 db.finish_sync_run(
                     run_id,

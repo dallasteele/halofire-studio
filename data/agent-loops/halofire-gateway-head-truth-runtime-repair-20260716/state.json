@@ -1,0 +1,40 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "halofire-gateway-head-truth-runtime-repair-20260716",
+  "iteration": 2,
+  "status": "completed",
+  "brainPreflight": {
+    "status": "passed",
+    "episodes": [156812, 156373, 150639]
+  },
+  "truth": {
+    "externalMissingImportRemoved": true,
+    "repositoryOwnedTruthLookupReady": true,
+    "absentTruthReadIsSideEffectFree": true,
+    "typedTruthStateCount": 5,
+    "onlySealedMatchPromotes": true,
+    "unsupportedCatalogExtensionRejectsBeforeDbOpen": true,
+    "sourceControlledRfiGoldenUsesRepositoryDefaultRuntime": true,
+    "vpsDeploymentAllowed": false
+  },
+  "verification": {
+    "primary": "exact repository truth-store path, sourced 1881 aliases, and existing alpha portal warning behavior passed",
+    "crossSource": "gateway comparison target comes only from the CAD truth record; absent storage returns explicit truth-unavailable without creating truth.duckdb",
+    "adversarial": "missing record, missing expected count, invalid actual count, match, mismatch, source exception, absent-store side effect, unsupported extension, and false-promotion cases reject",
+    "focusedTests": "13 passed across head-count truth and existing alpha API tests; 8 passed across the two repaired CAD verifier files",
+    "gatewaySuite": "103 passed, 1 skipped",
+    "cadSuite": "355 passed, 30 explicit missing-corpus skips in 343.64 seconds",
+    "liveRuntime": "GET http://127.0.0.1:18080/health returned 200 with halopenclaw-gateway and ten registered tools",
+    "formal": "Lean 4.13.0 verified five theorems in 166 ms",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "rulebook": "AGENTIC_RULES_VERIFY ok",
+    "python": "gateway adapter, main module, adapter tests, and pricing sync agent bytecode compilation passed",
+    "brainPostflight": "passed; episode 156960"
+  },
+  "evidence": {
+    "adapter": "services/halopenclaw-gateway/head_count_truth.py",
+    "tests": "services/halopenclaw-gateway/tests/test_head_count_truth.py",
+    "formalReceipt": "data/agent-loops/halofire-gateway-head-truth-runtime-repair-20260716/lean-proof.json"
+  },
+  "nextAction": "Resolve BL08 field/as-built revision lineage and the 29 same-line threaded piece equivalence sets from source-native topology or same-project side/elevation evidence. Complete network, direction, grade, installed elevations, field drains, riser-room geometry, installation 3D, client cinematic reveal, quote, fabrication, field release, and VPS deployment remain fail-closed."
+}

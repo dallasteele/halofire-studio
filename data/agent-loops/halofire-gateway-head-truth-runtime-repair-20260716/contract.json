@@ -1,0 +1,46 @@
+{
+  "name": "halofire-gateway-head-truth-runtime-repair-20260716",
+  "owner": "codex",
+  "goal": "Restore the HaloFire gateway test and runtime import path by replacing its nonexistent external head-count summary dependency with a typed, fail-closed adapter to the repository-owned sealed HaloFire CAD truth database.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "services/halopenclaw-gateway/main.py",
+    "services/halopenclaw-gateway/tests/test_alpha_api.py",
+    "services/halofire-cad/truth/db.py",
+    "services/halofire-cad/truth/seed_1881.py",
+    "services/halofire-cad/tests/fixtures/intake/fire-rfis-page0.json",
+    "services/halofire-cad/pricing/sync_agent.py",
+    "hal-brain episode 156812"
+  ],
+  "exit_criteria": [
+    "the gateway imports without core.hal.halofire_v2 or another missing external package",
+    "head-count truth reads the repository-owned truth DB lazily and never invents an expected count when a sealed record is absent",
+    "missing truth returns an explicit Head count truth mismatch warning instead of suppressing the condition",
+    "matching truth returns no warning and mismatching truth reports expected, actual, delta, and sealed truth project identity",
+    "gateway and CAD tests collect and pass, the 18080 gateway health route starts, and no existing portal warning or signed-download behavior regresses",
+    "formal truth-state partition, rulebook, loop guard, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "strict typed result shape for match, mismatch, truth-unavailable, and truth-source-unavailable states",
+    "sealed truth lookup uses exact identity plus explicitly sourced 1881 aliases only",
+    "adversarial missing record, missing expected head count, invalid actual count, matching count, and mismatching count tests",
+    "existing gateway portal bundle and warning tests",
+    "combined HaloFire CAD and gateway pytest suite",
+    "live local gateway health smoke on port 18080",
+    "Lean truth-state exclusivity proof"
+  ],
+  "state_path": "data/agent-loops/halofire-gateway-head-truth-runtime-repair-20260716/state.json",
+  "evidence_paths": [
+    "services/halopenclaw-gateway/head_count_truth.py",
+    "services/halopenclaw-gateway/tests/test_head_count_truth.py",
+    "services/halofire-cad/tests/fixtures/intake/fire-rfis-page0.json",
+    "services/halofire-cad/pricing/sync_agent.py",
+    "data/agent-loops/halofire-gateway-head-truth-runtime-repair-20260716/lean-proof.json",
+    "data/agent-loops/halofire-gateway-head-truth-runtime-repair-20260716/state.json"
+  ],
+  "max_iterations": 3,
+  "max_tokens": 30000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

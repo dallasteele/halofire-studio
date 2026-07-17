@@ -1740,3 +1740,31 @@ User direction across 4 messages this session:
 - This consumed iteration 12 of the current pitched-placement contract. The
   next corrective work must open a successor loop for cricket topology and
   section/elevation constraints before any plane or Z assignment.
+
+### Entry 47 - Gateway sealed head-count truth and deterministic CAD verifier
+
+- Replaced the gateway's nonexistent `core.hal.halofire_v2` dependency with a
+  typed, lazy adapter to the repository-owned CAD truth store. Missing records,
+  missing expected counts, invalid actual counts, and source failures remain
+  explicit `Head count truth mismatch` warnings; only a sealed match promotes.
+- Proved the absent-store path is read-only. A missing `truth.duckdb` returns
+  `truth-unavailable` without creating an empty database that could resemble a
+  sealed corpus. Exact and repository-sourced 1881 aliases are the only identity
+  normalization; the expected count is never hardcoded in the gateway.
+- The full CAD verification pass exposed and repaired two deterministic test
+  blockers. Unsupported catalog extensions now reject before opening DuckDB,
+  and the Fire RFI golden records the source-controlled L1 fallback rather than
+  depending on an optional untracked CubiCasa vendor and weight installation.
+- Verification passed 13 focused gateway/API tests, 8 focused CAD tests,
+  103/103 runnable gateway tests with one skip, and 355/355 runnable CAD tests
+  with 30 explicit missing-corpus skips. The final local gateway started on
+  port 18080 and returned health 200 with the expected ten-tool registry.
+- Lean 4.13.0 formally verified that only a sealed match promotes, every
+  non-match state warns, unavailable states remain false, the 1881 mismatch
+  delta is exact, and unsupported sources cannot open the pricing DB. The loop
+  guard and agentic rulebook passed; brain postflight is episode `156960`.
+- This unblocks the runtime and verifier path but does not release the product.
+  BL08 revision lineage and 29 threaded identity equivalence sets remain next;
+  full network, direction, grade, elevations, drains, riser room, installation
+  3D, cinematic client reveal, quote, fabrication, field release, and VPS
+  deployment remain fail-closed.

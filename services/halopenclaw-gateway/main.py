@@ -34,10 +34,10 @@ from pydantic import BaseModel, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 import auth as hf_auth
+from head_count_truth import build_head_count_truth
 from tools import registry
 from scene_store import SceneStore, SceneDelta, get_event_bus
 import single_ops
-from core.hal.halofire_v2.presentation.summary import build_head_count_truth
 
 # V2 step 4 — real OpenSCAD runtime. Lazy-instantiated at first use so
 # the gateway starts even when OpenSCAD isn't installed; it'll fall
