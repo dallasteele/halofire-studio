@@ -33,7 +33,8 @@ describe('Victaulic VicFlex AB2 exact CAD source audit', () => {
   it('keeps threads neutral geometry Blender and fit fail-closed', () => {
     expect(audit.verification.threadStandardCompleteness).toMatch(/^blocked_/);
     expect(audit.verification.neutralMeshExport).toMatch(/^blocked_/);
-    expect(audit.verification.blenderMcp).toMatch(/^blocked_/);
+    expect(audit.verification.blenderMcpConfiguration).toMatch(/^pass_/);
+    expect(audit.verification.blenderMcpCurrentSession).toMatch(/^blocked_/);
     expect(audit.verification.assemblyCollisionAndMatingFit).toMatch(/^pending_/);
     expect(audit.verification.trustedRegistryPromotion).toBe('blocked');
   });

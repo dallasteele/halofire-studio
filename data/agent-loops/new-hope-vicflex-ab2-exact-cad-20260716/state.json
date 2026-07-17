@@ -17,6 +17,8 @@
     "threadStandardsComplete": false,
     "neutralMeshExported": false,
     "blenderMcpAvailableThisSession": false,
+    "blenderMcpConfiguredForNextSession": true,
+    "blenderAddonTcp9876Reachable": true,
     "collisionVerified": false,
     "matingFitVerified": false,
     "trustedRegistryPromoted": false,
@@ -28,17 +30,18 @@
     "15-of-15 DXF AcDs ASM body binding",
     "15-of-15 SAB topology validation with zero structural errors",
     "ODA source rendering and overall measurement inspection",
+    "Blender MCP registered and enabled in Codex with telemetry disabled and live Blender endpoint connection",
     "adversarial missing-body length-mismatch invalid-hex and expectation-drift tests"
   ],
   "remainingGates": [
     "bind the manufacturer family DWG to purchased SKU A240AB200N and its explicit 24-inch variant",
     "bind each fastener to exact diameter pitch handedness engagement and source",
     "export source-preserving neutral mesh with byte-hash receipt",
-    "make Blender MCP callable and inspect the imported source mesh",
+    "restart Codex to load the Blender MCP namespace and inspect the imported source mesh",
     "verify collision insertion clamp range and all mating datums",
     "run exact-part registry regression build rulebook and formal invariant gates"
   ],
-  "nextAction": "Acquire manufacturer evidence binding the family DWG to SKU A240AB200N and its 24-inch variant plus exact fastener specifications before any registry promotion; then complete neutral export and Blender MCP fit verification.",
+  "nextAction": "Restart Codex to load the now-enabled Blender MCP namespace; acquire manufacturer evidence binding the family DWG to SKU A240AB200N and its 24-inch variant plus exact fastener specifications before any registry promotion; then complete neutral export and Blender MCP fit verification.",
   "evidence": [
     "apps/autosprink/src/data/exact-part-evidence/victaulic-vicflex-ab2/source-audit.json",
     "apps/autosprink/scripts/lib/dxf-acds-audit.mjs",

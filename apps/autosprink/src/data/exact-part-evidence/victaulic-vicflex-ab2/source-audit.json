@@ -79,7 +79,8 @@
     "manufacturerDwgSkuVariantBinding": "blocked_dwg_family_identity_does_not_embed_A240AB200N_or_explicit_24in_variant",
     "threadStandardCompleteness": "blocked_detailed_fastener_geometry_not_yet_bound_to_diameter_pitch_handedness_and_engagement",
     "neutralMeshExport": "blocked_oda_viewer_only_emitted_vsfx",
-    "blenderMcp": "blocked_not_exposed_in_current_codex_tool_session",
+    "blenderMcpConfiguration": "pass_registered_enabled_telemetry_disabled_and_blender_tcp_9876_reachable",
+    "blenderMcpCurrentSession": "blocked_tool_namespace_requires_codex_restart",
     "assemblyCollisionAndMatingFit": "pending_neutral_geometry_and_interface_datum_receipts",
     "trustedRegistryPromotion": "blocked"
   }
