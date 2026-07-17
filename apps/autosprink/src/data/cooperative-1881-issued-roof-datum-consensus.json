@@ -1,0 +1,873 @@
+{
+  "artifactType": "halofire.cooperative-1881-issued-roof-datum-consensus.v1",
+  "projectName": "The Cooperative 1881 - Salt Lake City UT",
+  "sourceRoot": "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural",
+  "status": "passed",
+  "sheets": [
+    {
+      "sheetId": "S-201",
+      "pairs": [
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-201",
+          "source": {
+            "sha256": "F40BFA05B7F6887E9DE5704C98C42BEC96A08F59B20E6A627567505CAEC2F5D8",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-201 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "3601",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": -3743.6034708280595,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "3602",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": -3709.907385852421,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-201",
+          "source": {
+            "sha256": "F40BFA05B7F6887E9DE5704C98C42BEC96A08F59B20E6A627567505CAEC2F5D8",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-201 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "3604",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": -3782.336069253256,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "3605",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": -3696.8554173484845,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-201",
+          "source": {
+            "sha256": "F40BFA05B7F6887E9DE5704C98C42BEC96A08F59B20E6A627567505CAEC2F5D8",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-201 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "365A",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": -623.0660803637902,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "365B",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": -589.3699953881514,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-201",
+          "source": {
+            "sha256": "F40BFA05B7F6887E9DE5704C98C42BEC96A08F59B20E6A627567505CAEC2F5D8",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-201 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "365D",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": -661.7986787889868,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "365E",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": -576.3180268842152,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-201",
+          "source": {
+            "sha256": "F40BFA05B7F6887E9DE5704C98C42BEC96A08F59B20E6A627567505CAEC2F5D8",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-201 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "36D0",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 604.6651638768653,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "36D1",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 638.3612488525036,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-201",
+          "source": {
+            "sha256": "F40BFA05B7F6887E9DE5704C98C42BEC96A08F59B20E6A627567505CAEC2F5D8",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-201 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "36D3",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 565.9325654516684,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "36D4",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 651.4132173564408,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        }
+      ],
+      "issues": []
+    },
+    {
+      "sheetId": "S-202",
+      "pairs": [
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-202",
+          "source": {
+            "sha256": "519CFEBB6CDD9DB84427AB7BC28F9CB1E5C2F9E25602A81E80C8C67E10085790",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-202 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "4329",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": -16.86464687400612,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "432A",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 16.83143810163228,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-202",
+          "source": {
+            "sha256": "519CFEBB6CDD9DB84427AB7BC28F9CB1E5C2F9E25602A81E80C8C67E10085790",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-202 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "432C",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": -55.59724529920296,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "432D",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 29.883406605569238,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-202",
+          "source": {
+            "sha256": "519CFEBB6CDD9DB84427AB7BC28F9CB1E5C2F9E25602A81E80C8C67E10085790",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-202 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "437E",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 3218.46255019978,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "437F",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 3252.1586351754186,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-202",
+          "source": {
+            "sha256": "519CFEBB6CDD9DB84427AB7BC28F9CB1E5C2F9E25602A81E80C8C67E10085790",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-202 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "4381",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 3179.7299517745832,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "4382",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 3265.210603679355,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-202",
+          "source": {
+            "sha256": "519CFEBB6CDD9DB84427AB7BC28F9CB1E5C2F9E25602A81E80C8C67E10085790",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-202 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "43F8",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 5186.253676091269,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "43F9",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 5219.949761066907,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-202",
+          "source": {
+            "sha256": "519CFEBB6CDD9DB84427AB7BC28F9CB1E5C2F9E25602A81E80C8C67E10085790",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-202 - ELEVATIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "43FB",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 5147.521077666072,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "43FC",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 5233.001729570844,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        }
+      ],
+      "issues": []
+    },
+    {
+      "sheetId": "S-301",
+      "pairs": [
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-301",
+          "source": {
+            "sha256": "B175D43570EC9BCB7E413E1FC8020AC3855D243C94ED14BA0158659279D01ED5",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-301 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "39D8",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 1036.9758149899312,
+              "y": 1023.5491418037561,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "39D9",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 1070.6718999655698,
+              "y": 1005.5100974189468,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-301",
+          "source": {
+            "sha256": "B175D43570EC9BCB7E413E1FC8020AC3855D243C94ED14BA0158659279D01ED5",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-301 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "39DB",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 998.2432165647344,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "39DC",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 1083.723868469507,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-301",
+          "source": {
+            "sha256": "B175D43570EC9BCB7E413E1FC8020AC3855D243C94ED14BA0158659279D01ED5",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-301 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "3B18",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 2429.328691715411,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "3B19",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 2463.0247766910497,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-301",
+          "source": {
+            "sha256": "B175D43570EC9BCB7E413E1FC8020AC3855D243C94ED14BA0158659279D01ED5",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-301 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "3B1B",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 2390.596093290214,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "3B1C",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 2476.0767451949864,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-301",
+          "source": {
+            "sha256": "B175D43570EC9BCB7E413E1FC8020AC3855D243C94ED14BA0158659279D01ED5",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-301 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "3CB5",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 3787.1450667796025,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "3CB6",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 3820.8411517552404,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-301",
+          "source": {
+            "sha256": "B175D43570EC9BCB7E413E1FC8020AC3855D243C94ED14BA0158659279D01ED5",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-301 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "3CB8",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 3748.4124683544055,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "3CB9",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 3833.8931202591775,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        }
+      ],
+      "issues": []
+    },
+    {
+      "sheetId": "S-302",
+      "pairs": [
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-302",
+          "source": {
+            "sha256": "CC87B484071D2FEABB6D0223C8ED807106EB7B322BAB713CD272F557AFC6ED56",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-302 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "C00E",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 1060.6177125949584,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "C00F",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 1094.313797570597,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-302",
+          "source": {
+            "sha256": "CC87B484071D2FEABB6D0223C8ED807106EB7B322BAB713CD272F557AFC6ED56",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-302 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "C011",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 1021.8851141697616,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "C012",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 1107.365766074534,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-302",
+          "source": {
+            "sha256": "CC87B484071D2FEABB6D0223C8ED807106EB7B322BAB713CD272F557AFC6ED56",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-302 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "C16A",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 2398.929042796983,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "C16B",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 2432.6251277726215,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-302",
+          "source": {
+            "sha256": "CC87B484071D2FEABB6D0223C8ED807106EB7B322BAB713CD272F557AFC6ED56",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-302 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "C16D",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 2360.196444371786,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "C16E",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 2445.6770962765586,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        }
+      ],
+      "issues": []
+    },
+    {
+      "sheetId": "S-303",
+      "pairs": [
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-303",
+          "source": {
+            "sha256": "511A62E28262B5D64D2EDEDD3A1A36C932A8989D00581144EC3E8E80EC27C34C",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-303 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "616A",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 8027.790772813653,
+              "y": 1023.549141803756,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "616B",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 8061.486857789292,
+              "y": 1005.5100974189467,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-303",
+          "source": {
+            "sha256": "511A62E28262B5D64D2EDEDD3A1A36C932A8989D00581144EC3E8E80EC27C34C",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-303 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "616D",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 7989.058174388457,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "616E",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 8074.538826293228,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-eave",
+          "sheetId": "S-303",
+          "source": {
+            "sha256": "511A62E28262B5D64D2EDEDD3A1A36C932A8989D00581144EC3E8E80EC27C34C",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-303 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "63BD",
+            "text": "9. ROOF EAVE",
+            "insertionPoint": {
+              "x": 9319.77669756685,
+              "y": 1023.5491418037561,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "63BE",
+            "text": "84'-1 1/8\"",
+            "elevationInches": 1009.125,
+            "insertionPoint": {
+              "x": 9353.472782542487,
+              "y": 1005.5100974189468,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 38.220849,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        },
+        {
+          "kind": "roof-ridge",
+          "sheetId": "S-303",
+          "source": {
+            "sha256": "511A62E28262B5D64D2EDEDD3A1A36C932A8989D00581144EC3E8E80EC27C34C",
+            "fileName": "240069_1881 W North Temple_ST25-Sheet - S-303 - BUILDING SECTIONS.dwg",
+            "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+            "unknownEntityCount": 0
+          },
+          "label": {
+            "handle": "63C0",
+            "text": "10. T.O. ROOF RIDGE",
+            "insertionPoint": {
+              "x": 9281.04409914165,
+              "y": 1044.424141803768,
+              "z": 0
+            }
+          },
+          "value": {
+            "handle": "63C1",
+            "text": "85'-10\"",
+            "elevationInches": 1030,
+            "insertionPoint": {
+              "x": 9366.524751046423,
+              "y": 1026.3850974189586,
+              "z": 0
+            }
+          },
+          "pairDistanceDrawingUnits": 87.363316,
+          "labelToValueVerticalGapDrawingUnits": 18.039044
+        }
+      ],
+      "issues": []
+    }
+  ],
+  "consensus": {
+    "eave": {
+      "elevationInches": 1009.125,
+      "observationCount": 13
+    },
+    "ridge": {
+      "elevationInches": 1030,
+      "observationCount": 13
+    },
+    "ridgeAboveEaveInches": 20.875
+  },
+  "issues": [],
+  "claims": {
+    "sourceDatumConsensusReady": true,
+    "roofPitchReady": false,
+    "perMemberVerticalDatumReady": false,
+    "exactPhysicalFramingPromoted": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "fabricationReady": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "Roof-ridge-minus-eave vertical separation is source-observed only; a roof pitch needs an independently source-bound horizontal run.",
+    "No emitted datum is associated with a particular S-190 member, roof face, section cut, or sprinkler.",
+    "No physical framing, obstruction, clearance, fabrication, code, employee, or VPS release claim is cleared."
+  ]
+}

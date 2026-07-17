@@ -1,0 +1,40 @@
+{
+  "name": "cooperative-1881-issued-roof-datum-consensus-20260717",
+  "owner": "codex",
+  "goal": "Recover and cross-check only the repeated issued-structural roof-eave and roof-ridge elevation datums from the hash-bound Cooperative 1881 elevation and section DWGs, without inferring a roof-member association, roof pitch, physical obstruction, sprinkler clearance, or fabrication detail.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "apps/autosprink/src/data/cooperative-1881-issued-structural-dwg-geometry.json",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-201 - ELEVATIONS.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-202 - ELEVATIONS.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-301 - BUILDING SECTIONS.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-302 - BUILDING SECTIONS.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-303 - BUILDING SECTIONS.dwg",
+    "apps/autosprink/scripts/extract-cooperative-1881-issued-structural-dwg-geometry.mjs"
+  ],
+  "exit_criteria": [
+    "each emitted roof-eave or roof-ridge datum is bound to a source sheet hash, native DWG text handles, source coordinates, and a deterministic feet/inches parse",
+    "every included sheet independently supplies a complete label/value pair and all observations agree before a consensus datum is emitted",
+    "missing pair, source-hash substitution, malformed elevation text, label/value distance drift, or conflicting source value rejects",
+    "the artifact explicitly keeps roof pitch, per-member elevation, physical obstruction, sprinkler clearance, fabrication, code, employee, and VPS claims false",
+    "a source-only elevation/section proof visibly shows the actual datum labels and values used"
+  ],
+  "verification_gates": [
+    "pinned native DWG hashes and zero unknown parser entities are rechecked before datum extraction",
+    "adversarial source, label, value, pairing, and consensus mutations reject",
+    "two extraction runs produce identical source receipt content",
+    "focused tests, production build, loop guard, rulebook, browser visual inspection, formal-prover health/proof, and brain postflight are recorded"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-issued-roof-datum-consensus-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/cooperative-1881-issued-roof-datum-consensus.json",
+    "output/visual-proof/1881-issued-roof-datum-consensus.svg",
+    "data/agent-loops/cooperative-1881-issued-roof-datum-consensus-20260717/state.json",
+    "data/agent-loops/cooperative-1881-issued-roof-datum-consensus-20260717/evidence.md"
+  ],
+  "max_iterations": 5,
+  "max_tokens": 50000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

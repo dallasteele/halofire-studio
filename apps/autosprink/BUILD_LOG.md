@@ -1,5 +1,26 @@
 # HaloFire Build Log
 
+## 2026-07-17 - Cooperative 1881 cross-sheet roof datum consensus
+
+- Began the successor gate that reads repeated roof-eave and roof-ridge labels
+  and printed elevations from the sealed issued elevation/section DWGs. It is
+  deliberately limited to source-datum consensus: it cannot calculate pitch,
+  associate a particular S-190 member with a section, or clear physical,
+  clearance, fabrication, code, employee, or VPS claims.
+- Completed the hash-bound native-DWG consensus: thirteen independently
+  paired source observations across S-201/S-202/S-301/S-302/S-303 agree on
+  roof eave `84'-1 1/8"` (1009.125 inches) and roof ridge `85'-10"` (1030
+  inches), yielding only the source-observed 20.875-inch vertical separation.
+  An adversarial test caught and prevented a nearest-text eave-to-ridge false
+  pairing; the final rule requires the printed value to be below the label and
+  within the exact native drawing-gap budget.
+- Replayed the receipt byte-identically, passed 83 focused JS tests and 25
+  Python structural tests, production build, loop guard, and rulebook. The
+  source S-201 visual was inspected from a fresh Chrome raster with readable
+  separate eave/ridge callouts. GX10 prover remains unavailable. Pitch,
+  individual member datum, physical framing, clearance, fabrication, code,
+  employee, and VPS claims remain false.
+
 ## 2026-07-17 - Cooperative 1881 native issued structural DWG geometry receipt
 
 - Started a separate closed-loop source lane after locating the active-project
