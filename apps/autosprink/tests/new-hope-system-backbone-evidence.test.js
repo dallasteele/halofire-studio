@@ -14,6 +14,7 @@ const sources = () => ({
   fabricationEndSchedule: load('../src/data/new-hope-fabrication-end-schedule.json'),
   wetQuantityPlacementEvidence: load('../src/data/new-hope-wet-quantity-placement-evidence.json'),
   wetWeldedBranchRegistrationEvidence: load('../src/data/new-hope-wet-welded-branch-registration-evidence.json'),
+  wetWeldedMainRegistrationEvidence: load('../src/data/new-hope-wet-welded-main-registration-evidence.json'),
 });
 
 describe('New Hope source-bound system backbone evidence', () => {
@@ -94,6 +95,11 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.wetSystemWeldedBranchLabelInventoryReady).toBe(true);
     expect(result.wetSystemWeldedBranchPieceVectorBijectionReady).toBe(true);
     expect(result.wetSystemScopedFabricationStationDirectionReady).toBe(true);
+    expect(result.wetSystemWeldedMainLabelInventoryReady).toBe(true);
+    expect(result.wetSystemWeldedMainLabeledPieceToPlanMappingReady).toBe(true);
+    expect(result.wetSystemCompleteWeldedMainPieceMappingReady).toBe(false);
+    expect(result.wetSystemSourceRegisteredPieceCount).toBe(99);
+    expect(result.wetSystemUnmappedPieceCount).toBe(70);
     expect(result.wetSystemThreadedCutLengthCrossSourceReady).toBe(true);
     expect(result.wetSystemListingQuantityExpansionReady).toBe(true);
     expect(result.wetSystemWeldedCutLengthCrossSourceReady).toBe(false);
@@ -103,6 +109,13 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.plan2d.wetLevel1.pipeVectors).toHaveLength(300);
     expect(result.plan2d.wetLevel1.sprinklerHeads).toHaveLength(174);
     expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors).toHaveLength(71);
+    expect(result.plan2d.wetLevel1.scopedWeldedMainPieceVectors).toHaveLength(28);
+    expect(result.plan2d.wetLevel1.sourceRegisteredFabricationPieceVectors).toHaveLength(99);
+    expect(result.plan2d.wetLevel1.scopedWeldedMainPieceVectors.find((row) => row.instanceId === 'CMC.06')).toEqual(expect.objectContaining({
+      nativeStationDirectionStatus: 'unresolved',
+      sourceCenterline: expect.objectContaining({ representation: 'red-white-twin-centerline', widthPt: 0.01389 }),
+      geometryStatus: 'exact-field-and-as-built-centerline-plus-native-cut-length-station-direction-unresolved',
+    }));
     expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors.find((row) => row.instanceId === 'BL03.01')).toEqual(expect.objectContaining({
       nativeStationDirection: null,
       nativeStationDirectionStatus: 'unresolved',
@@ -121,6 +134,7 @@ describe('New Hope source-bound system backbone evidence', () => {
     }));
     expect(result.model3d.unresolvedWetLevel1.pipeVectors).toHaveLength(300);
     expect(result.model3d.unresolvedWetLevel1.scopedFabricationPieceVectors).toHaveLength(71);
+    expect(result.model3d.unresolvedWetLevel1.scopedWeldedMainPieceVectors).toHaveLength(28);
     expect(result.model3d.unresolvedWetLevel1.scopedFabricationPieceVectors[0].installedElevationFt).toBeNull();
     expect(result.model3d.unresolvedWetLevel1.pipeVectors[0].installedElevationFt).toBeNull();
     expect(result.model3d.unresolvedWetLevel1.sprinklerHeads.find((head) => head.headType.sin === 'V3506')).toBeTruthy();
@@ -150,6 +164,12 @@ describe('New Hope source-bound system backbone evidence', () => {
       mappedNativeOutletCount: 36,
       unresolvedUnitCount: 56,
       globalPieceVectorUnmappedUnitCount: 98,
+    }));
+    expect(result.takeoff.wetLevel1NativeFabrication.weldedMainRegistration.metrics).toEqual(expect.objectContaining({
+      mappedLabeledUnitCount: 28,
+      combinedMappedUnitCount: 99,
+      globalPieceVectorUnmappedUnitCount: 70,
+      threadedHoldoutCount: 67,
     }));
     expect(result.wetSystemCompleteWeldedBranchPieceMappingReady).toBe(true);
     expect(result.wetSystemPieceToPlanMappingReady).toBe(false);

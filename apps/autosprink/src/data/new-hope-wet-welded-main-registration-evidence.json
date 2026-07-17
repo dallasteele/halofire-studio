@@ -1,0 +1,1392 @@
+{
+  "artifactType": "halofire.new-hope-wet-welded-main-registration-evidence.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "sources": {
+    "fieldInstall": {
+      "fileName": "24-052_NHCC_INSTALL PLAN.pdf",
+      "sheet": "FP1.0",
+      "physicalPage": 3,
+      "sha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5"
+    },
+    "asBuilt": {
+      "fileName": "New Hope BGC - Brigham City UT_as builts.pdf",
+      "sheet": "FP1.0",
+      "physicalPage": 3,
+      "sha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B"
+    },
+    "nativeFab": {
+      "archiveSha256": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9",
+      "memberSha256": "0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135"
+    },
+    "approvedListing": {
+      "sha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734"
+    }
+  },
+  "registration": {
+    "pdfPointsPerFoot": 9.0,
+    "planOriginPdfPt": [
+      660.674561,
+      1118.512451
+    ],
+    "pieceLabelCenterlineDistanceGatePt": 60.0,
+    "pieceLabelCenterlineUniquenessGapPt": 20.0,
+    "heavyCutSpanGateIn": 3.0,
+    "alternateCutSpanGateIn": 6.0,
+    "heavyCenterlineWidthByNominalDiameterIn": {
+      "2.5": 2.06766,
+      "3": 2.48119
+    }
+  },
+  "mappings": [
+    {
+      "instanceId": "CMA.01",
+      "pieceId": "CMA.01",
+      "lineName": "CMA",
+      "rawSourceText": "CMA.01",
+      "pieceLabelBoxPdfPt": [
+        888.790894,
+        1606.063965,
+        922.277222,
+        1619.067993
+      ],
+      "sourceBlock": 681,
+      "nativePipeUniqueId": 499,
+      "nativeCutLengthFt": 19.5,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          851.021118,
+          1621.018311
+        ],
+        "toPdfPt": [
+          1025.228638,
+          1621.018311
+        ],
+        "fromPlanFt": [
+          21.149617,
+          55.833984
+        ],
+        "toPlanFt": [
+          40.506009,
+          55.833984
+        ],
+        "fieldDrawingIndex": 38062,
+        "asBuiltDrawingIndex": 38499,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 8.452332,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.723307,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMA.02",
+      "pieceId": "CMA.02",
+      "lineName": "CMA",
+      "rawSourceText": "CMA.02",
+      "pieceLabelBoxPdfPt": [
+        1044.424561,
+        1608.124512,
+        1077.911011,
+        1621.12854
+      ],
+      "sourceBlock": 681,
+      "nativePipeUniqueId": 471,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1026.728638,
+          1621.018311
+        ],
+        "toPdfPt": [
+          1214.273682,
+          1621.018311
+        ],
+        "fromPlanFt": [
+          40.672675,
+          55.833984
+        ],
+        "toPlanFt": [
+          61.511013,
+          55.833984
+        ],
+        "fieldDrawingIndex": 38577,
+        "asBuiltDrawingIndex": 38296,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391785,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.939941,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMA.03",
+      "pieceId": "CMA.03",
+      "lineName": "CMA",
+      "rawSourceText": "CMA.03",
+      "pieceLabelBoxPdfPt": [
+        1233.469482,
+        1608.124512,
+        1266.955933,
+        1621.12854
+      ],
+      "sourceBlock": 681,
+      "nativePipeUniqueId": 483,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1215.773682,
+          1621.018311
+        ],
+        "toPdfPt": [
+          1403.273682,
+          1621.018311
+        ],
+        "fromPlanFt": [
+          61.67768,
+          55.833984
+        ],
+        "toPlanFt": [
+          82.511013,
+          55.833984
+        ],
+        "fieldDrawingIndex": 38548,
+        "asBuiltDrawingIndex": 38236,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391785,
+      "pieceLabelCenterlineUniquenessGapPt": 30.111208,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMA.04",
+      "pieceId": "CMA.04",
+      "lineName": "CMA",
+      "rawSourceText": "CMA.04",
+      "pieceLabelBoxPdfPt": [
+        1393.379883,
+        1629.88855,
+        1406.383911,
+        1663.375
+      ],
+      "sourceBlock": 682,
+      "nativePipeUniqueId": 497,
+      "nativeCutLengthFt": 4.458333333333333,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1406.273682,
+          1624.018311
+        ],
+        "toPdfPt": [
+          1406.273682,
+          1662.612915
+        ],
+        "fromPlanFt": [
+          82.844347,
+          56.167318
+        ],
+        "toPlanFt": [
+          82.844347,
+          60.455607
+        ],
+        "fieldDrawingIndex": 38407,
+        "asBuiltDrawingIndex": 38671,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391785,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.040528,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMA.05",
+      "pieceId": "CMA.05",
+      "lineName": "CMA",
+      "rawSourceText": "CMA.05",
+      "pieceLabelBoxPdfPt": [
+        1393.379883,
+        1678.051392,
+        1406.383911,
+        1711.537842
+      ],
+      "sourceBlock": 682,
+      "nativePipeUniqueId": 476,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1406.273682,
+          1664.112915
+        ],
+        "toPdfPt": [
+          1406.273682,
+          1851.612915
+        ],
+        "fromPlanFt": [
+          82.844347,
+          60.622274
+        ],
+        "toPlanFt": [
+          82.844347,
+          81.455607
+        ],
+        "fieldDrawingIndex": 38555,
+        "asBuiltDrawingIndex": 38308,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391785,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMA.06",
+      "pieceId": "CMA.06",
+      "lineName": "CMA",
+      "rawSourceText": "CMA.06",
+      "pieceLabelBoxPdfPt": [
+        1450.652344,
+        1595.81311,
+        1463.656372,
+        1629.299561
+      ],
+      "sourceBlock": 683,
+      "nativePipeUniqueId": 470,
+      "nativeCutLengthFt": 0.5833333333333333,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1406.273682,
+          1614.248535
+        ],
+        "toPdfPt": [
+          1406.273682,
+          1618.018311
+        ],
+        "fromPlanFt": [
+          82.844347,
+          55.081787
+        ],
+        "toPlanFt": [
+          82.844347,
+          55.500651
+        ],
+        "fieldDrawingIndex": 38670,
+        "asBuiltDrawingIndex": 38424,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 50.908808,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.973633,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMA.07",
+      "pieceId": "CMA.07",
+      "lineName": "CMA",
+      "rawSourceText": "CMA.07",
+      "pieceLabelBoxPdfPt": [
+        1393.379883,
+        1455.56665,
+        1406.383911,
+        1489.053101
+      ],
+      "sourceBlock": 684,
+      "nativePipeUniqueId": 502,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1406.273682,
+          1425.248535
+        ],
+        "toPdfPt": [
+          1406.273682,
+          1612.748535
+        ],
+        "fromPlanFt": [
+          82.844347,
+          34.081787
+        ],
+        "toPlanFt": [
+          82.844347,
+          54.91512
+        ],
+        "fieldDrawingIndex": 38054,
+        "asBuiltDrawingIndex": 38062,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391785,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMB.01",
+      "pieceId": "CMB.01",
+      "lineName": "CMB",
+      "rawSourceText": "CMB.01",
+      "pieceLabelBoxPdfPt": [
+        886.985291,
+        768.477417,
+        920.187805,
+        781.481506
+      ],
+      "sourceBlock": 685,
+      "nativePipeUniqueId": 467,
+      "nativeCutLengthFt": 13.5,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          872.993652,
+          781.371094
+        ],
+        "toPdfPt": [
+          993.186829,
+          781.371094
+        ],
+        "fromPlanFt": [
+          23.59101,
+          -37.460151
+        ],
+        "toPlanFt": [
+          36.945808,
+          -37.460151
+        ],
+        "fieldDrawingIndex": 38041,
+        "asBuiltDrawingIndex": 38166,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391633,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.742432,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMB.02",
+      "pieceId": "CMB.02",
+      "lineName": "CMB",
+      "rawSourceText": "CMB.02",
+      "pieceLabelBoxPdfPt": [
+        996.747253,
+        792.194214,
+        1029.949829,
+        805.198303
+      ],
+      "sourceBlock": 686,
+      "nativePipeUniqueId": 454,
+      "nativeCutLengthFt": 3.625,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          999.186829,
+          781.371094
+        ],
+        "toPdfPt": [
+          1030.272217,
+          781.371094
+        ],
+        "fromPlanFt": [
+          37.612474,
+          -37.460151
+        ],
+        "toPlanFt": [
+          41.066406,
+          -37.460151
+        ],
+        "fieldDrawingIndex": 38395,
+        "asBuiltDrawingIndex": 38306,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 17.325165,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.052816,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMB.03",
+      "pieceId": "CMB.03",
+      "lineName": "CMB",
+      "rawSourceText": "CMB.03",
+      "pieceLabelBoxPdfPt": [
+        1049.326294,
+        768.477417,
+        1082.528931,
+        781.481506
+      ],
+      "sourceBlock": 687,
+      "nativePipeUniqueId": 436,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1031.772217,
+          781.371094
+        ],
+        "toPdfPt": [
+          1219.317261,
+          781.371094
+        ],
+        "fromPlanFt": [
+          41.233073,
+          -37.460151
+        ],
+        "toPlanFt": [
+          62.071411,
+          -37.460151
+        ],
+        "fieldDrawingIndex": 38569,
+        "asBuiltDrawingIndex": 38076,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391633,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.939941,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMB.04",
+      "pieceId": "CMB.04",
+      "lineName": "CMB",
+      "rawSourceText": "CMB.04",
+      "pieceLabelBoxPdfPt": [
+        1238.371216,
+        768.477417,
+        1271.573853,
+        781.481506
+      ],
+      "sourceBlock": 687,
+      "nativePipeUniqueId": 441,
+      "nativeCutLengthFt": 20.416666666666664,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1220.817261,
+          781.371094
+        ],
+        "toPdfPt": [
+          1403.273682,
+          781.371094
+        ],
+        "fromPlanFt": [
+          62.238078,
+          -37.460151
+        ],
+        "toPlanFt": [
+          82.511013,
+          -37.460151
+        ],
+        "fieldDrawingIndex": 38527,
+        "asBuiltDrawingIndex": 38133,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391633,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.724772,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMB.05",
+      "pieceId": "CMB.05",
+      "lineName": "CMB",
+      "rawSourceText": "CMB.05",
+      "pieceLabelBoxPdfPt": [
+        1393.379883,
+        793.702209,
+        1406.383911,
+        826.904724
+      ],
+      "sourceBlock": 688,
+      "nativePipeUniqueId": 439,
+      "nativeCutLengthFt": 4.875,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1406.273682,
+          784.371094
+        ],
+        "toPdfPt": [
+          1406.273682,
+          826.716431
+        ],
+        "fromPlanFt": [
+          82.844347,
+          -37.126817
+        ],
+        "toPlanFt": [
+          82.844347,
+          -32.42178
+        ],
+        "fieldDrawingIndex": 38537,
+        "asBuiltDrawingIndex": 38130,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391785,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.039551,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMB.06",
+      "pieceId": "CMB.06",
+      "lineName": "CMB",
+      "rawSourceText": "CMB.06",
+      "pieceLabelBoxPdfPt": [
+        1393.379883,
+        873.703796,
+        1406.383911,
+        906.906311
+      ],
+      "sourceBlock": 688,
+      "nativePipeUniqueId": 460,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1406.273682,
+          828.216431
+        ],
+        "toPdfPt": [
+          1406.273682,
+          1015.716431
+        ],
+        "fromPlanFt": [
+          82.844347,
+          -32.255113
+        ],
+        "toPlanFt": [
+          82.844347,
+          -11.42178
+        ],
+        "fieldDrawingIndex": 38046,
+        "asBuiltDrawingIndex": 38370,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391785,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMB.07",
+      "pieceId": "CMB.07",
+      "lineName": "CMB",
+      "rawSourceText": "CMB.07",
+      "pieceLabelBoxPdfPt": [
+        1449.7146,
+        734.783508,
+        1462.718628,
+        767.986084
+      ],
+      "sourceBlock": 689,
+      "nativePipeUniqueId": 453,
+      "nativeCutLengthFt": 0.7083333333333333,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1406.273682,
+          773.482178
+        ],
+        "toPdfPt": [
+          1406.273682,
+          778.371094
+        ],
+        "fromPlanFt": [
+          82.844347,
+          -38.336697
+        ],
+        "toPlanFt": [
+          82.844347,
+          -37.793484
+        ],
+        "fieldDrawingIndex": 38397,
+        "asBuiltDrawingIndex": 38695,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 54.613101,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.981445,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMB.08",
+      "pieceId": "CMB.08",
+      "lineName": "CMB",
+      "rawSourceText": "CMB.08",
+      "pieceLabelBoxPdfPt": [
+        1393.379883,
+        725.910339,
+        1406.383911,
+        759.112854
+      ],
+      "sourceBlock": 690,
+      "nativePipeUniqueId": 429,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          1406.273682,
+          584.482178
+        ],
+        "toPdfPt": [
+          1406.273682,
+          771.982178
+        ],
+        "fromPlanFt": [
+          82.844347,
+          -59.336697
+        ],
+        "toPlanFt": [
+          82.844347,
+          -38.503364
+        ],
+        "fieldDrawingIndex": 38662,
+        "asBuiltDrawingIndex": 38217,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391785,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMB.09",
+      "pieceId": "CMB.09",
+      "lineName": "CMB",
+      "rawSourceText": "CMB.09",
+      "pieceLabelBoxPdfPt": [
+        983.293152,
+        729.864563,
+        996.297241,
+        763.067078
+      ],
+      "sourceBlock": 691,
+      "nativePipeUniqueId": 455,
+      "nativeCutLengthFt": 16.416666666666664,
+      "nativeNominalDiameterIn": 2.5,
+      "sourceCenterline": {
+        "widthPt": 2.06766,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          996.186829,
+          631.828369
+        ],
+        "toPdfPt": [
+          996.186829,
+          778.371094
+        ],
+        "fromPlanFt": [
+          37.279141,
+          -54.076009
+        ],
+        "toPlanFt": [
+          37.279141,
+          -37.793484
+        ],
+        "fieldDrawingIndex": 38070,
+        "asBuiltDrawingIndex": 38254,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.391633,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.6097,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.01",
+      "pieceId": "CMC.01",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.01",
+      "pieceLabelBoxPdfPt": [
+        692.296692,
+        1089.334351,
+        725.78302,
+        1102.338379
+      ],
+      "sourceBlock": 692,
+      "nativePipeUniqueId": 426,
+      "nativeCutLengthFt": 1.9583333333333333,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 2.48119,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          660.160828,
+          1102.434814
+        ],
+        "toPdfPt": [
+          676.396179,
+          1102.434814
+        ],
+        "fromPlanFt": [
+          -0.057081,
+          -1.786404
+        ],
+        "toPlanFt": [
+          1.746846,
+          -1.786404
+        ],
+        "fieldDrawingIndex": 38036,
+        "asBuiltDrawingIndex": 38617,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 33.303891,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.852864,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.02",
+      "pieceId": "CMC.02",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.02",
+      "pieceLabelBoxPdfPt": [
+        761.780029,
+        1089.334351,
+        795.266357,
+        1102.338379
+      ],
+      "sourceBlock": 692,
+      "nativePipeUniqueId": 376,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 2.48119,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          677.896179,
+          1102.434814
+        ],
+        "toPdfPt": [
+          865.396179,
+          1102.434814
+        ],
+        "fromPlanFt": [
+          1.913513,
+          -1.786404
+        ],
+        "toPlanFt": [
+          22.746846,
+          -1.786404
+        ],
+        "fieldDrawingIndex": 38645,
+        "asBuiltDrawingIndex": 38567,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.598449,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.03",
+      "pieceId": "CMC.03",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.03",
+      "pieceLabelBoxPdfPt": [
+        823.200012,
+        1109.897095,
+        836.204102,
+        1143.383545
+      ],
+      "sourceBlock": 693,
+      "nativePipeUniqueId": 414,
+      "nativeCutLengthFt": 2.458333333333333,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 2.48119,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          868.681152,
+          1105.719849
+        ],
+        "toPdfPt": [
+          868.681152,
+          1126.571289
+        ],
+        "fromPlanFt": [
+          23.111843,
+          -1.4214
+        ],
+        "toPlanFt": [
+          23.111843,
+          0.895426
+        ],
+        "fieldDrawingIndex": 38399,
+        "asBuiltDrawingIndex": 38475,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 38.979156,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.69808,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.05",
+      "pieceId": "CMC.05",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.05",
+      "pieceLabelBoxPdfPt": [
+        897.112427,
+        1128.928223,
+        930.598755,
+        1141.932251
+      ],
+      "sourceBlock": 784,
+      "nativePipeUniqueId": 425,
+      "nativeCutLengthFt": 0.4583333333333333,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 2.48119,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          871.966187,
+          1129.856201
+        ],
+        "toPdfPt": [
+          874.838867,
+          1129.856201
+        ],
+        "fromPlanFt": [
+          23.476847,
+          1.260417
+        ],
+        "toPlanFt": [
+          23.796034,
+          1.260417
+        ],
+        "fieldDrawingIndex": 54162,
+        "asBuiltDrawingIndex": 54164,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 39.412874,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.669759,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.06",
+      "pieceId": "CMC.06",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.06",
+      "pieceLabelBoxPdfPt": [
+        865.410706,
+        1140.758057,
+        877.990173,
+        1173.150879
+      ],
+      "sourceBlock": 788,
+      "printedDimensionEvidence": {
+        "rawSourceText": "9'-6\u00bd",
+        "normalizedText": "9'-6 1/2\"",
+        "dimensionIn": 114.5,
+        "boxPdfPt": [
+          855.66217,
+          1145.051514,
+          867.043579,
+          1165.418091
+        ]
+      },
+      "nativePipeUniqueId": 422,
+      "nativeCutLengthFt": 9.541666666666666,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 0.01389,
+        "representation": "red-white-twin-centerline",
+        "fromPdfPt": [
+          878.123901,
+          1133.034058
+        ],
+        "toPdfPt": [
+          878.123901,
+          1214.897217
+        ],
+        "fromPlanFt": [
+          24.161038,
+          1.613512
+        ],
+        "toPlanFt": [
+          24.161038,
+          10.709418
+        ],
+        "fieldRedDrawingIndex": 54200,
+        "fieldWhiteDrawingIndex": 54141,
+        "asBuiltRedDrawingIndex": 54200,
+        "asBuiltWhiteDrawingIndex": 54147,
+        "redItemIndex": 0,
+        "whiteItemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.423462,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 5.349121,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-red-white-twin-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.08",
+      "pieceId": "CMC.08",
+      "lineName": "CMC",
+      "rawSourceText": "9'-6\u00bdCMC.08",
+      "pieceLabelBoxPdfPt": [
+        852.846558,
+        1235.919067,
+        865.426025,
+        1285.074219
+      ],
+      "sourceBlock": 788,
+      "printedDimensionEvidence": {
+        "rawSourceText": "9'-6\u00bdCMC.08",
+        "normalizedText": "9'-6 1/2\"",
+        "dimensionIn": 114.5,
+        "boxPdfPt": [
+          852.846558,
+          1235.919067,
+          865.426025,
+          1285.074219
+        ]
+      },
+      "nativePipeUniqueId": 418,
+      "nativeCutLengthFt": 9.541666666666666,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 0.01389,
+        "representation": "red-white-twin-centerline",
+        "fromPdfPt": [
+          865.559753,
+          1221.252808
+        ],
+        "toPdfPt": [
+          865.559753,
+          1303.116333
+        ],
+        "fromPlanFt": [
+          22.765021,
+          11.415595
+        ],
+        "toPlanFt": [
+          22.765021,
+          20.511542
+        ],
+        "fieldRedDrawingIndex": 56231,
+        "fieldWhiteDrawingIndex": 56135,
+        "asBuiltRedDrawingIndex": 56189,
+        "asBuiltWhiteDrawingIndex": 56093,
+        "redItemIndex": 0,
+        "whiteItemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.423462,
+      "pieceLabelCenterlineUniquenessGapPt": 42.971244,
+      "sourceCenterlineVsCutSpanDeltaIn": 5.348633,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-red-white-twin-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.09",
+      "pieceId": "CMC.09",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.09",
+      "pieceLabelBoxPdfPt": [
+        894.555298,
+        1298.803467,
+        928.04187,
+        1311.808105
+      ],
+      "sourceBlock": 786,
+      "nativePipeUniqueId": 417,
+      "nativeCutLengthFt": 1.5,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 0.01389,
+        "representation": "red-white-twin-centerline",
+        "fromPdfPt": [
+          849.993652,
+          1306.293823
+        ],
+        "toPdfPt": [
+          862.27478,
+          1306.294067
+        ],
+        "fromPlanFt": [
+          21.035455,
+          20.864597
+        ],
+        "toPlanFt": [
+          22.400024,
+          20.864624
+        ],
+        "fieldRedDrawingIndex": 54173,
+        "fieldWhiteDrawingIndex": 54136,
+        "asBuiltRedDrawingIndex": 54174,
+        "asBuiltWhiteDrawingIndex": 54142,
+        "redItemIndex": 0,
+        "whiteItemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 49.033764,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.625163,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-red-white-twin-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.11",
+      "pieceId": "CMC.11",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.11",
+      "pieceLabelBoxPdfPt": [
+        832.371948,
+        1353.460815,
+        845.376038,
+        1386.379639
+      ],
+      "sourceBlock": 694,
+      "nativePipeUniqueId": 409,
+      "nativeCutLengthFt": 13.375,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 2.48119,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          846.708618,
+          1309.578735
+        ],
+        "toPdfPt": [
+          846.708618,
+          1428.723633
+        ],
+        "fromPlanFt": [
+          20.670451,
+          21.229587
+        ],
+        "toPlanFt": [
+          20.670451,
+          34.467909
+        ],
+        "fieldDrawingIndex": 38401,
+        "asBuiltDrawingIndex": 38277,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 7.834625,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.640137,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.12",
+      "pieceId": "CMC.12",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.12",
+      "pieceLabelBoxPdfPt": [
+        833.608154,
+        1447.919678,
+        846.612244,
+        1481.406128
+      ],
+      "sourceBlock": 694,
+      "nativePipeUniqueId": 384,
+      "nativeCutLengthFt": 20.541666666666664,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 2.48119,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          846.708618,
+          1430.223633
+        ],
+        "toPdfPt": [
+          846.708618,
+          1613.629639
+        ],
+        "fromPlanFt": [
+          20.670451,
+          34.634576
+        ],
+        "toPlanFt": [
+          20.670451,
+          55.013021
+        ],
+        "fieldDrawingIndex": 38563,
+        "asBuiltDrawingIndex": 38171,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.598419,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.958659,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.13",
+      "pieceId": "CMC.13",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.13",
+      "pieceLabelBoxPdfPt": [
+        856.716919,
+        1716.915649,
+        869.721008,
+        1750.4021
+      ],
+      "sourceBlock": 695,
+      "nativePipeUniqueId": 389,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 2.48119,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          846.708618,
+          1615.129639
+        ],
+        "toPdfPt": [
+          846.708618,
+          1802.629639
+        ],
+        "fromPlanFt": [
+          20.670451,
+          55.179688
+        ],
+        "toPlanFt": [
+          20.670451,
+          76.013021
+        ],
+        "fieldDrawingIndex": 38519,
+        "asBuiltDrawingIndex": 38241,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 16.510345,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.14",
+      "pieceId": "CMC.14",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.14",
+      "pieceLabelBoxPdfPt": [
+        855.58075,
+        1026.537842,
+        868.584839,
+        1060.024292
+      ],
+      "sourceBlock": 695,
+      "nativePipeUniqueId": 379,
+      "nativeCutLengthFt": 14.916666666666666,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 2.48119,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          868.681152,
+          966.262512
+        ],
+        "toPdfPt": [
+          868.681152,
+          1099.14978
+        ],
+        "fromPlanFt": [
+          23.111843,
+          -16.91666
+        ],
+        "toPlanFt": [
+          23.111843,
+          -2.151408
+        ],
+        "fieldDrawingIndex": 38592,
+        "asBuiltDrawingIndex": 38418,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.598358,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.816976,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "CMC.15",
+      "pieceId": "CMC.15",
+      "lineName": "CMC",
+      "rawSourceText": "CMC.15",
+      "pieceLabelBoxPdfPt": [
+        855.58075,
+        843.968811,
+        868.584839,
+        877.455139
+      ],
+      "sourceBlock": 695,
+      "nativePipeUniqueId": 400,
+      "nativeCutLengthFt": 21.0,
+      "nativeNominalDiameterIn": 3.0,
+      "sourceCenterline": {
+        "widthPt": 2.48119,
+        "representation": "diameter-scaled-heavy-red-centerline",
+        "fromPdfPt": [
+          868.681152,
+          777.246094
+        ],
+        "toPdfPt": [
+          868.681152,
+          964.762512
+        ],
+        "fromPlanFt": [
+          23.111843,
+          -37.918484
+        ],
+        "toPlanFt": [
+          23.111843,
+          -17.083327
+        ],
+        "fieldDrawingIndex": 38486,
+        "asBuiltDrawingIndex": 38190,
+        "itemIndex": 0
+      },
+      "pieceLabelToCenterlineDistancePt": 6.598358,
+      "pieceLabelCenterlineUniquenessGapPt": null,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.978109,
+      "mappingBasis": "exact-field-as-built-label-native-cut-length-and-diameter-scaled-centerline",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    }
+  ],
+  "holdouts": [
+    {
+      "instanceId": "T-1-415",
+      "pieceId": "T-1",
+      "lineName": "CMC",
+      "nativePipeUniqueId": 415,
+      "nativeCutLengthFt": 0.8333333333333333,
+      "nativeNominalDiameterIn": 3.0,
+      "reason": "typical-definition-has-no-distinct-source-label-or-occurrence-station"
+    },
+    {
+      "instanceId": "T-1-416",
+      "pieceId": "T-1",
+      "lineName": "CMC",
+      "nativePipeUniqueId": 416,
+      "nativeCutLengthFt": 0.8333333333333333,
+      "nativeNominalDiameterIn": 3.0,
+      "reason": "typical-definition-has-no-distinct-source-label-or-occurrence-station"
+    },
+    {
+      "instanceId": "T-1-421",
+      "pieceId": "T-1",
+      "lineName": "CMC",
+      "nativePipeUniqueId": 421,
+      "nativeCutLengthFt": 0.8333333333333333,
+      "nativeNominalDiameterIn": 3.0,
+      "reason": "typical-definition-has-no-distinct-source-label-or-occurrence-station"
+    }
+  ],
+  "metrics": {
+    "weldedMainDefinitionCount": 29,
+    "weldedMainListedUnitCount": 31,
+    "exactFieldPieceLabelCount": 28,
+    "mappedLabeledUnitCount": 28,
+    "mappedHeavyCenterlineCount": 25,
+    "mappedAlternateCenterlineCount": 3,
+    "unlabeledTypicalHoldoutCount": 3,
+    "maxPieceLabelToCenterlineDistancePt": 54.613101,
+    "maxSourceCenterlineVsCutSpanDeltaIn": 5.349121,
+    "globalListedUnitCount": 169,
+    "priorMappedWeldedBranchUnitCount": 71,
+    "combinedMappedUnitCount": 99,
+    "globalPieceVectorUnmappedUnitCount": 70,
+    "threadedHoldoutCount": 67
+  },
+  "claims": {
+    "fieldWeldedMainLabelInventoryReady": true,
+    "fieldAsBuiltWeldedMainCenterlineParityReady": true,
+    "weldedMainLabeledPieceToPlanMappingReady": true,
+    "completeWeldedMainPieceToPlanMappingReady": false,
+    "pieceToPlanVectorMappingReady": false,
+    "nativeStationDirectionReady": false,
+    "hydraulicFlowDirectionReady": false,
+    "gradeReady": false,
+    "fittingTakeoutReady": false,
+    "installedElevationReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

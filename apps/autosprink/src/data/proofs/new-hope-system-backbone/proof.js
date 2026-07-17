@@ -12,6 +12,7 @@ const urls = {
   fabricationEndSchedule: '../../new-hope-fabrication-end-schedule.json',
   wetQuantityPlacementEvidence: '../../new-hope-wet-quantity-placement-evidence.json',
   wetWeldedBranchRegistrationEvidence: '../../new-hope-wet-welded-branch-registration-evidence.json',
+  wetWeldedMainRegistrationEvidence: '../../new-hope-wet-welded-main-registration-evidence.json',
 };
 
 async function fetchJson(url) {
@@ -84,8 +85,9 @@ function renderProof(result) {
   document.querySelector('#crosswalk-summary').textContent = `${crosswalk.metrics.nativePipeRecordCount} native records -> ${crosswalk.metrics.uniqueListingDefinitionCount} exact listing definitions -> ${crosswalk.metrics.listingFabricatedUnitCount} listed units. ${crosswalk.metrics.exactThreadedLengthMatchCount} threaded lengths reconcile exactly; both repeated definitions are expanded into four source-registered units.`;
   document.querySelector('#crosswalk-rows').innerHTML = crosswalk.rows.slice(0, 12).map((row) => `<tr><td>${row.nativePipeUniqueId}</td><td>${row.pieceId}</td><td>${row.listingDefinitionType}</td><td>${row.listingPhysicalPage}</td><td>${row.listingQuantity}</td><td>${row.lengthReconciliationStatus.replaceAll('-', ' ')}</td></tr>`).join('');
   const branchRegistration = result.takeoff.wetLevel1NativeFabrication.weldedBranchRegistration;
-  document.querySelector('#quantity-gaps').textContent = `${branchRegistration.metrics.pieceVectorMappedUnitCount} of 71 welded branch units consume ${branchRegistration.metrics.pieceVectorMappedHeavyCenterlineCount} exact heavy centerlines plus ${branchRegistration.metrics.pieceVectorMappedAlternateCenterlineCount} exact black/white-twin centerlines once; ${branchRegistration.metrics.registeredUnitCount} units also retain native station direction through ${branchRegistration.metrics.mappedNativeOutletCount} mapped outlets; 98 of 169 global listed units remain unmapped`;
-  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions and native symbol types, all 167 native wet records mapped to 165 approved listing definitions, and all 71 welded branch piece vectors pass top-down source registration. Fifteen of those vectors also retain native station direction through 36 registered outlets. The other 98 global listed units, welded cross-source dimensions, fitting takeout, hydraulic flow direction, grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
+  const mainRegistration = result.takeoff.wetLevel1NativeFabrication.weldedMainRegistration;
+  document.querySelector('#quantity-gaps').textContent = `${mainRegistration.metrics.combinedMappedUnitCount} of ${mainRegistration.metrics.globalListedUnitCount} global listed units now consume unique field/as-built source centerlines: ${branchRegistration.metrics.pieceVectorMappedUnitCount} welded branch units plus ${mainRegistration.metrics.mappedLabeledUnitCount} labeled welded-main units. ${branchRegistration.metrics.registeredUnitCount} branch units retain native station direction through ${branchRegistration.metrics.mappedNativeOutletCount} mapped outlets. The remaining ${mainRegistration.metrics.globalPieceVectorUnmappedUnitCount} units are ${mainRegistration.metrics.threadedHoldoutCount} threaded pieces plus three unlabeled T-1 welded occurrences`;
+  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions and native symbol types, all 167 native wet records mapped to 165 approved listing definitions, and 99 of 169 quantity-expanded fabrication units pass top-down source registration. Fifteen branch units retain native station direction through 36 registered outlets. The remaining 67 threaded units and three unlabeled T-1 welded occurrences, welded cross-source dimensions, fitting takeout, hydraulic flow direction, grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
   document.querySelector('#gate-codes').textContent = result.systemDesignGate.blockers.join(' | ');
 
   const root = document.documentElement.dataset;
@@ -110,6 +112,11 @@ function renderProof(result) {
   root.wetSystemCompleteWeldedBranchPieceMappingReady = String(result.wetSystemCompleteWeldedBranchPieceMappingReady);
   root.wetSystemScopedPieceToPlanMappingReady = String(result.wetSystemScopedPieceToPlanMappingReady);
   root.wetSystemScopedFabricationStationDirectionReady = String(result.wetSystemScopedFabricationStationDirectionReady);
+  root.wetSystemWeldedMainLabelInventoryReady = String(result.wetSystemWeldedMainLabelInventoryReady);
+  root.wetSystemWeldedMainLabeledPieceToPlanMappingReady = String(result.wetSystemWeldedMainLabeledPieceToPlanMappingReady);
+  root.wetSystemCompleteWeldedMainPieceMappingReady = String(result.wetSystemCompleteWeldedMainPieceMappingReady);
+  root.wetSystemSourceRegisteredPieceCount = String(result.wetSystemSourceRegisteredPieceCount);
+  root.wetSystemUnmappedPieceCount = String(result.wetSystemUnmappedPieceCount);
   root.wetSystemListingQuantityExpansionReady = String(result.wetSystemListingQuantityExpansionReady);
   root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved);
   root.quoteReady = String(result.quoteReady);
@@ -129,6 +136,7 @@ export const proofPromise = Promise.all(Object.values(urls).map(fetchJson)).then
   fabricationEndSchedule,
   wetQuantityPlacementEvidence,
   wetWeldedBranchRegistrationEvidence,
+  wetWeldedMainRegistrationEvidence,
 ]) => buildNewHopeSystemBackboneEvidence({
   registration,
   operationalAnnotations,
@@ -139,6 +147,7 @@ export const proofPromise = Promise.all(Object.values(urls).map(fetchJson)).then
   fabricationEndSchedule,
   wetQuantityPlacementEvidence,
   wetWeldedBranchRegistrationEvidence,
+  wetWeldedMainRegistrationEvidence,
 }));
 
 proofPromise.then((result) => {

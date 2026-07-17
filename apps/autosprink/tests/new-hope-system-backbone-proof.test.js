@@ -33,6 +33,7 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(script).toContain('../../new-hope-fabrication-end-schedule.json');
     expect(script).toContain('../../new-hope-wet-quantity-placement-evidence.json');
     expect(script).toContain('../../new-hope-wet-welded-branch-registration-evidence.json');
+    expect(script).toContain('../../new-hope-wet-welded-main-registration-evidence.json');
   });
 
   it('surfaces release-state truth in the DOM and hides the unreleased 3D source leg', () => {
@@ -51,6 +52,8 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(proofScript).toContain("root.wetSystemWeldedBranchPieceVectorBijectionReady = String(result.wetSystemWeldedBranchPieceVectorBijectionReady)");
     expect(proofScript).toContain("root.wetSystemCompleteWeldedBranchPieceMappingReady = String(result.wetSystemCompleteWeldedBranchPieceMappingReady)");
     expect(proofScript).toContain("root.wetSystemScopedFabricationStationDirectionReady = String(result.wetSystemScopedFabricationStationDirectionReady)");
+    expect(proofScript).toContain("root.wetSystemWeldedMainLabeledPieceToPlanMappingReady = String(result.wetSystemWeldedMainLabeledPieceToPlanMappingReady)");
+    expect(proofScript).toContain("root.wetSystemSourceRegisteredPieceCount = String(result.wetSystemSourceRegisteredPieceCount)");
     expect(proofScript).toContain("root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved)");
     expect(proofScript).toContain("root.quoteReady = String(result.quoteReady)");
     expect(viewer).toContain("sourceLeg.visible = false");
@@ -66,9 +69,12 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(html).toContain('Native records to approved AutoSPRINK listing');
     expect(html).toContain('wet-quantity-placement-source.png');
     expect(html).toContain('wet-welded-branch-registration-source.png');
+    expect(html).toContain('wet-welded-main-registration-source.png');
     expect(html).toContain('All 71 welded branch units');
+    expect(html).toContain('99 of 169 quantity-expanded units');
     expect(fs.statSync(new URL('wet-quantity-placement-source.png', proofRoot)).size).toBeGreaterThan(100_000);
     expect(fs.statSync(new URL('wet-welded-branch-registration-source.png', proofRoot)).size).toBeGreaterThan(1_000_000);
+    expect(fs.statSync(new URL('wet-welded-main-registration-source.png', proofRoot)).size).toBeGreaterThan(1_000_000);
     expect(html).toContain('eight field/as-built head centers');
     expect(script).toContain('wetSystemQuantityExpandedEndpointMappingReady');
     expect(script).toContain('wetSystemScopedPieceToPlanMappingReady');
@@ -76,6 +82,7 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(script).toContain("document.querySelector('#crosswalk-rows')");
     expect(script).toContain('branchRegistration.metrics.mappedNativeOutletCount');
     expect(script).toContain('branchRegistration.metrics.pieceVectorMappedUnitCount');
+    expect(script).toContain('mainRegistration.metrics.combinedMappedUnitCount');
   });
 
   it('describes primary cross-source and adversarial loops without an independent human gate', () => {

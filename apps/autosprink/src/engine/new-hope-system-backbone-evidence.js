@@ -2,6 +2,7 @@ import { validateNewHopeWetLevel1NetworkEvidence } from './new-hope-wet-level1-n
 import { buildNewHopeWetListingCrosswalk } from './new-hope-wet-listing-crosswalk.js';
 import { evaluateNewHopeWetQuantityPlacementEvidence } from './new-hope-wet-quantity-placement-evidence.js';
 import { evaluateNewHopeWetWeldedBranchRegistrationEvidence } from './new-hope-wet-welded-branch-registration.js';
+import { evaluateNewHopeWetWeldedMainRegistrationEvidence } from './new-hope-wet-welded-main-registration.js';
 
 const PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut';
 const APPROVED_PLAN_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5';
@@ -168,6 +169,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     fabricationEndSchedule,
     wetQuantityPlacementEvidence,
     wetWeldedBranchRegistrationEvidence,
+    wetWeldedMainRegistrationEvidence,
   } = inputs;
   const wetNetwork = validateNewHopeWetLevel1NetworkEvidence(wetLevel1NetworkEvidence);
   const wetListingCrosswalk = buildNewHopeWetListingCrosswalk({
@@ -176,6 +178,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
   });
   const wetQuantityPlacement = evaluateNewHopeWetQuantityPlacementEvidence(wetQuantityPlacementEvidence);
   const wetWeldedBranchRegistration = evaluateNewHopeWetWeldedBranchRegistrationEvidence(wetWeldedBranchRegistrationEvidence);
+  const wetWeldedMainRegistration = evaluateNewHopeWetWeldedMainRegistrationEvidence(wetWeldedMainRegistrationEvidence);
   if (wetNetwork.status !== 'passed') {
     issues.push(...wetNetwork.issues);
   }
@@ -184,6 +187,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
   }
   if (wetQuantityPlacement.status !== 'passed') issues.push(...wetQuantityPlacement.issues);
   if (wetWeldedBranchRegistration.status !== 'passed') issues.push(...wetWeldedBranchRegistration.issues);
+  if (wetWeldedMainRegistration.status !== 'passed') issues.push(...wetWeldedMainRegistration.issues);
 
   if (
     registration?.projectId !== PROJECT_ID
@@ -348,6 +352,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       approvedFabricationListing: clone(wetListingCrosswalk.source),
       wetQuantityPlacement: clone(wetQuantityPlacementEvidence.sources),
       wetWeldedBranchRegistration: clone(wetWeldedBranchRegistrationEvidence.sources),
+      wetWeldedMainRegistration: clone(wetWeldedMainRegistrationEvidence.sources),
     } : null,
     systems: evidenceReady ? [
       {
@@ -397,6 +402,21 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
             ? 'exact-field-and-as-built-centerline-plus-native-cut-length-and-station-direction'
             : 'exact-field-and-as-built-centerline-plus-native-cut-length-station-direction-unresolved',
         }))),
+        scopedWeldedMainPieceVectors: clone(wetWeldedMainRegistration.mappings.map((instance) => ({
+          instanceId: instance.instanceId,
+          pieceId: instance.pieceId,
+          nativePipeUniqueId: instance.nativePipeUniqueId,
+          nativeCutLengthFt: instance.nativeCutLengthFt,
+          sourceCenterline: instance.sourceCenterline,
+          nativeStationDirection: instance.nativeStationDirection,
+          nativeStationDirectionStatus: instance.nativeStationDirectionStatus,
+          sourceCenterlineVsCutSpanDeltaIn: instance.sourceCenterlineVsCutSpanDeltaIn,
+          geometryStatus: 'exact-field-and-as-built-centerline-plus-native-cut-length-station-direction-unresolved',
+        }))),
+        sourceRegisteredFabricationPieceVectors: clone([
+          ...wetWeldedBranchRegistration.pieceVectorMappings,
+          ...wetWeldedMainRegistration.mappings,
+        ]),
         geometryStatus: 'exact-field-install-and-as-built-plan-xy',
       } : null,
     },
@@ -454,11 +474,21 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
             ? 'exact-plan-xy-native-cut-length-and-station-direction-installed-z-and-hydraulic-flow-unresolved'
             : 'exact-plan-xy-and-native-cut-length-station-direction-installed-z-and-hydraulic-flow-unresolved',
         })),
+        scopedWeldedMainPieceVectors: wetWeldedMainRegistration.mappings.map((instance) => ({
+          instanceId: instance.instanceId,
+          pieceId: instance.pieceId,
+          fromPlanFt: clone(instance.sourceCenterline.fromPlanFt),
+          toPlanFt: clone(instance.sourceCenterline.toPlanFt),
+          nativeStationDirection: null,
+          nativeStationDirectionStatus: 'unresolved',
+          installedElevationFt: null,
+          geometryStatus: 'exact-plan-xy-and-native-cut-length-station-direction-installed-z-and-hydraulic-flow-unresolved',
+        })),
       } : null,
     },
     systemDesignGate: { status: 'blocked', blockers },
     takeoff: evidenceReady ? {
-      status: wetNetworkReady ? 'native-records-to-approved-listing-definitions-and-quantity-expansion-reconciled-seventy-one-welded-branch-units-source-registered-global-piece-to-plan-unresolved' : 'source-identities-only-no-route-quantities',
+      status: wetNetworkReady ? 'native-records-to-approved-listing-definitions-and-quantity-expansion-reconciled-ninety-nine-welded-units-source-registered-seventy-global-units-unresolved' : 'source-identities-only-no-route-quantities',
       wetLevel1NativeFabrication: wetNetworkReady ? {
         metrics: clone(wetNetwork.metrics),
         lineFamilies: clone(wetNetwork.nativeFabricationLines),
@@ -466,6 +496,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
         listingCrosswalk: clone(wetListingCrosswalk),
         quantityPlacement: clone(wetQuantityPlacement),
         weldedBranchRegistration: clone(wetWeldedBranchRegistration),
+        weldedMainRegistration: clone(wetWeldedMainRegistration),
       } : null,
       systemComponents: [
         { key: 'wet_riser_manifold', description: '3-inch wet riser manifold', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
@@ -498,6 +529,11 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     wetSystemCompleteWeldedBranchPieceMappingReady: evidenceReady && wetWeldedBranchRegistration.completeWeldedBranchPieceMappingReady,
     wetSystemScopedPieceToPlanMappingReady: evidenceReady && wetWeldedBranchRegistration.scopedPieceToPlanVectorMappingReady,
     wetSystemScopedFabricationStationDirectionReady: evidenceReady && wetWeldedBranchRegistration.scopedFabricationStationDirectionReady,
+    wetSystemWeldedMainLabelInventoryReady: evidenceReady && wetWeldedMainRegistration.fieldWeldedMainLabelInventoryReady,
+    wetSystemWeldedMainLabeledPieceToPlanMappingReady: evidenceReady && wetWeldedMainRegistration.weldedMainLabeledPieceToPlanMappingReady,
+    wetSystemCompleteWeldedMainPieceMappingReady: evidenceReady && wetWeldedMainRegistration.completeWeldedMainPieceToPlanMappingReady,
+    wetSystemSourceRegisteredPieceCount: evidenceReady ? wetWeldedMainRegistration.metrics.combinedMappedUnitCount : 0,
+    wetSystemUnmappedPieceCount: evidenceReady ? wetWeldedMainRegistration.metrics.globalPieceVectorUnmappedUnitCount : 169,
     wetSystemThreadedCutLengthCrossSourceReady: evidenceReady && wetListingCrosswalk.threadedCutLengthCrossSourceReady,
     wetSystemListingQuantityExpansionReady: evidenceReady && wetQuantityPlacement.listingQuantityExpansionReady,
     wetSystemWeldedCutLengthCrossSourceReady: false,

@@ -1,0 +1,47 @@
+{
+  "name": "new-hope-welded-main-plan-registration-20260716",
+  "owner": "codex",
+  "goal": "Register every source-labeled New Hope welded wet-system main piece to its exact field/as-built plan centerline, while retaining all three unlabeled T-1 typical units and all threaded, direction, grade, elevation, fabrication, quote, field, and VPS claims as explicit holdouts.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "tmp/pdfs/new-hope-live/field-install.pdf",
+    "tmp/pdfs/new-hope-live/as-builts.pdf",
+    "apps/autosprink/src/data/new-hope-native-fab-attachment-graph.json",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/data/new-hope-wet-level1-network-evidence.json",
+    "apps/autosprink/src/data/new-hope-wet-welded-main-registration-evidence.json",
+    "hal-brain episodes 156636, 156286, 148790"
+  ],
+  "exit_criteria": [
+    "all 28 visible CMA, CMB, and CMC welded-main piece labels replay at exact field-install FP1.0 coordinates",
+    "25 diameter-scaled heavy red centerlines and three alternate red/white-twin centerlines replay exactly across field and as-built PDFs",
+    "all 28 labeled main definitions map one-to-one to unique source centerlines with native cut-length and source-label closure",
+    "CMC.06 and CMC.08 retain exact printed 9-foot 6-1/2-inch dimension evidence for their greater fitting-takeout span delta",
+    "all three native T-1 records remain explicit unlabeled typical-placement holdouts",
+    "combined global plan coverage becomes 99 of 169 listed wet-system units and 70 remain unmapped",
+    "station direction, hydraulic flow direction, grade, fitting takeout, installed Z, riser/drain field routes, installation 3D, fabrication, quote, field, and VPS release remain false",
+    "deterministic replay, focused adversarial tests, production build, actual-PDF visual inspection, browser inspection, rulebook, loop guard, formal proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected field, as-built, listing, and native FAB hashes",
+    "full evidence-artifact fingerprint",
+    "exact field-install label-box inventory plus field/as-built centerline parity",
+    "nominal-diameter to heavy-centerline-width closure",
+    "native cut-length to source-span closure plus exact printed-dimension exception for CMC.06 and CMC.08",
+    "28 unique labeled definitions consume 28 unique source segments exactly once",
+    "three unique T-1 native records remain unmapped and unpromoted",
+    "adversarial source-label, source-segment, dimension, duplicate, holdout, direction, elevation, and release rejection",
+    "actual-PDF overlay, browser truth surface, and formal scoped-versus-global invariants"
+  ],
+  "state_path": "data/agent-loops/new-hope-welded-main-plan-registration-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-wet-welded-main-registration-evidence.json",
+    "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-welded-main-registration-source.png",
+    "data/agent-loops/new-hope-welded-main-plan-registration-20260716/lean-proof.json"
+  ],
+  "max_iterations": 3,
+  "max_tokens": 50000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

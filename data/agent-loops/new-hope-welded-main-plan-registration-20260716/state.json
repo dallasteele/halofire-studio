@@ -1,0 +1,53 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "new-hope-welded-main-plan-registration-20260716",
+  "iteration": 3,
+  "status": "completed",
+  "brainPreflight": {
+    "status": "passed",
+    "episodes": [156636, 156286, 148790]
+  },
+  "truth": {
+    "globalListedUnitCount": 169,
+    "previousMappedUnitCount": 71,
+    "labeledWeldedMainUnitCount": 28,
+    "unlabeledTypicalMainHoldoutCount": 3,
+    "threadedHoldoutCount": 67,
+    "mappedLabeledWeldedMainUnitCount": 28,
+    "combinedMappedUnitCount": 99,
+    "globalPieceVectorUnmappedUnitCount": 70,
+    "pieceToPlanVectorMappingReady": false,
+    "directionReady": false,
+    "gradeReady": false,
+    "installedElevationReady": false,
+    "fabricationReady": false,
+    "quoteReady": false,
+    "fieldReleaseReady": false,
+    "vpsReleaseReady": false
+  },
+  "verification": {
+    "evidenceSha256": "A51088BE4DD6EC39ECA07C508B6E0A39424BAB3D48774B76B875972CFF830CFE",
+    "proofPngSha256": "3B58B2421E557562C725A70F4D3C884A30B40A6207EBDB9CFF03701FD1647264",
+    "deterministicReplay": "passed-byte-identical",
+    "focusedAndAdversarialTests": "71 passed",
+    "productionBuild": "passed",
+    "actualPdfVisualInspection": "passed",
+    "browserProof": {
+      "status": "passed",
+      "consoleErrors": 0,
+      "mapped": 99,
+      "unmapped": 70,
+      "quoteReady": false,
+      "fieldReleaseReady": false,
+      "screenshot": "output/playwright/new-hope-99-piece-browser.png"
+    },
+    "agentLoopGuard": "passed",
+    "agenticRules": "passed",
+    "lean4": {
+      "status": "verified",
+      "receipt": "data/agent-loops/new-hope-welded-main-plan-registration-20260716/lean-proof.json"
+    },
+    "brainPostflightEpisode": 156714
+  },
+  "nextAction": "Resolve the 67 threaded placement mappings and three unlabeled T-1 occurrence stations from source evidence; retain direction, grade, takeout, installed Z, fabrication, quote, field, and VPS gates until independently closed by system-owned loops."
+}

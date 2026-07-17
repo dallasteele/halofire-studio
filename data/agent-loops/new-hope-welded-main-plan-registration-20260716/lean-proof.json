@@ -1,0 +1,19 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-welded-main-plan-registration-20260716/lean-request.json",
+  "theoremNames": [
+    "weldedMainVectorCoverage",
+    "combinedSourceRegisteredCoverage",
+    "remainingInventoryPartitions",
+    "scopedPlanVectorsDoNotProveInstallationRelease"
+  ],
+  "claim": "Twenty-five heavy plus three alternate source vectors map 28 labeled welded-main units; together with 71 welded branches, 99 of 169 units are source registered; the remaining 70 partition into three unlabeled T-1 welded occurrences and 67 threaded units; scoped plan vectors cannot promote fabrication without flow direction, grade, installed elevation, and fitting takeout.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 371,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}
