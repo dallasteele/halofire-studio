@@ -1,0 +1,37 @@
+{
+  "name": "cooperative-1881-a121-slope-boundary-association-20260717",
+  "owner": "codex",
+  "goal": "Associate an A-121 slope callout target to a canonical source roof region only when its native target point has exactly one containing plan boundary after exact-geometry aliases are collapsed; retain every non-identical overlap as a blocker.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "apps/autosprink/src/data/cooperative-1881-roof-slope-registration.json",
+    "apps/autosprink/src/data/cooperative-1881-a121-roof-face-boundaries.json",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/arch/A-121 ROOF PLAN.dwg"
+  ],
+  "exit_criteria": [
+    "Every slope target is either tied to exactly one canonical source boundary or carries an explicit no-match/non-identical-overlap issue.",
+    "Exact geometry aliases are retained with their source handles rather than treated as separate physical faces.",
+    "A smaller nested boundary never wins by heuristic; any non-identical concurrent containment rejects association.",
+    "The output does not infer slope direction, roof plane, vertical datum, member, head, pipe, clearance, fabrication, code, employee, or VPS claims."
+  ],
+  "verification_gates": [
+    "agent_loop_guard validate before implementation",
+    "focused Vitest coverage for containment, boundary semantics, exact alias collapse, and overlap rejection",
+    "deterministic two-run artifact replay",
+    "Autosprink production build",
+    "GX10 prover health/check or explicit formal-proof blocker",
+    "Chrome screenshot capture and visual inspection of resolved versus blocked source targets",
+    "verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-a121-slope-boundary-association-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/cooperative-1881-a121-slope-boundary-association.json",
+    "output/visual-proof/1881-a121-slope-boundary-association.svg",
+    "data/agent-loops/cooperative-1881-a121-slope-boundary-association-20260717/evidence.md"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 30000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

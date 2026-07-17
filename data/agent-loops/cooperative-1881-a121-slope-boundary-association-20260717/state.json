@@ -1,0 +1,17 @@
+{
+  "name": "cooperative-1881-a121-slope-boundary-association-20260717",
+  "iteration": 1,
+  "status": "completed",
+  "nextStage": "OPEN_A121_SOURCE_REGION_TO_SECTION_ELEVATION_AND_SLOPE_DIRECTION_LOOP",
+  "claims": {
+    "partialSourceSlopeMagnitudeRegionAssociationReady": true,
+    "sourceSlopeMagnitudeRegionAssociationReady": false,
+    "slopeDirectionReady": false,
+    "roofSurfaceReconstructionReady": false,
+    "perMemberVerticalDatumReady": false,
+    "automaticPipeRoutingAllowed": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  }
+}
