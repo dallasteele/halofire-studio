@@ -1,0 +1,90 @@
+{
+  "name": "cooperative-1881-supplier-lead-continuation-20260717",
+  "iteration": 6,
+  "status": "successor_loop_required",
+  "nextStage": "PIVOT_TO_PLATFORM_SPINE_M1_WHILE_RETAINING_SOURCE_FRONTIER_FOR_NEW_EVIDENCE",
+  "predecessor": "cooperative-1881-supplier-lead-identity-20260717",
+  "brainPreflight": {
+    "status": "passed",
+    "relevantEpisodes": [159909, 159899, 157533],
+    "decision": "Resume only the predecessor's saved in-root frontier; preserve project identity and do not translate a source-discovery lead into physical framing proof."
+  },
+  "baseline": {
+    "predecessorArtifact": "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration6.json",
+    "predecessorArtifactSha256": "ad3d1d6f8368612a83c61e6705b27ad2dac48a9c374db0e621e117e2d50684e0",
+    "sharedFrontierEntries": 90,
+    "supplierSubmittalCandidates": 0,
+    "physicalPromotionAllowed": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "validReplayChain": [
+    {
+      "artifact": "shared-source-discovery-iteration1.json",
+      "sha256": "4b7bf71a6623544699e32ef30a7346856c98db3fe6537f75277be25a9e1508fa",
+      "sharedDirectoriesScanned": 300,
+      "sharedFilesScanned": 548,
+      "nextFrontierEntries": 85,
+      "supplierSubmittalCandidates": 0
+    },
+    {
+      "artifact": "shared-source-discovery-window2.json",
+      "sha256": "4a18186572406ca618b369da3e9e0c40f1382378b262249f0462d628ef479b1e",
+      "sharedDirectoriesScanned": 50,
+      "sharedFilesScanned": 294,
+      "nextFrontierEntries": 93,
+      "supplierSubmittalCandidates": 0
+    },
+    {
+      "artifact": "shared-source-discovery-window3.json",
+      "sha256": "f537288b1b2e03dd7538f8393bf1ddfe297fed20008c1c0cb2337ba2ab371932",
+      "sharedDirectoriesScanned": 50,
+      "sharedFilesScanned": 6,
+      "nextFrontierEntries": 86,
+      "supplierSubmittalCandidates": 0
+    },
+    {
+      "artifact": "shared-source-discovery-window4.json",
+      "sha256": "ee71345fcd5fc8f3a8d62595d2e6234465d3ecf939b8036d443b108aabf137de",
+      "sharedDirectoriesScanned": 50,
+      "sharedFilesScanned": 18,
+      "nextFrontierEntries": 104,
+      "supplierSubmittalCandidates": 0
+    },
+    {
+      "artifact": "shared-source-discovery-window5.json",
+      "sha256": "2955a5df3f5bdaac8963c2ef70704c04e9249343c9a5a89681b7cd758b79c472",
+      "sharedDirectoriesScanned": 50,
+      "sharedFilesScanned": 46,
+      "nextFrontierEntries": 89,
+      "supplierSubmittalCandidates": 0
+    },
+    {
+      "artifact": "shared-source-discovery-window6.json",
+      "sha256": "7b753c8e8201c4d43fce2a5961d21d4dbdbfa153fb8b032011780a88459c7f74",
+      "sharedDirectoriesScanned": 50,
+      "sharedFilesScanned": 58,
+      "nextFrontierEntries": 92,
+      "supplierSubmittalCandidates": 0
+    }
+  ],
+  "quarantinedArtifacts": [
+    {
+      "artifacts": ["shared-source-discovery-iteration2.json", "shared-source-discovery-iteration3.json", "shared-source-discovery-iteration4.json"],
+      "reason": "An earlier oversized process wrote iteration1 after a same-path small-window retry, so these receipt names do not form the predecessor-linked replay chain and must not be consumed by CAD promotion."
+    }
+  ],
+  "result": {
+    "validSharedDirectoriesScanned": 550,
+    "supplierSubmittalCandidates": 0,
+    "physicalPromotionAllowed": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "codeComplianceReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  }
+}

@@ -1,0 +1,2092 @@
+{
+  "artifactType": "halofire.cooperative-1881-roof-framing-source-discovery.v2",
+  "status": "blocked",
+  "scanComplete": false,
+  "scanWindows": {
+    "local": {
+      "scanComplete": true,
+      "scannedRoots": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881",
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents"
+      ],
+      "missingRoots": [],
+      "scannedFileCount": 577,
+      "scannedDirectoryCount": 110,
+      "traversedDirectoryCount": 110,
+      "maxFiles": 15000,
+      "maxDirectories": 5000,
+      "directoryOffset": 0,
+      "nextDirectoryOffset": null,
+      "nextDirectoryFrontier": null
+    },
+    "shared": {
+      "scanComplete": false,
+      "scannedRoots": [
+        "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
+      ],
+      "missingRoots": [],
+      "scannedFileCount": 46,
+      "scannedDirectoryCount": 50,
+      "traversedDirectoryCount": 51,
+      "maxFiles": 15000,
+      "maxDirectories": 50,
+      "directoryOffset": 0,
+      "nextDirectoryOffset": 50,
+      "nextDirectoryFrontier": {
+        "Y:\\Shared\\HaloOps\\01-Bids\\Kier": [
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\17th St Apts - Ogden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\311 Utah Las Vegas - Las Vegas NV",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\5300 State Apartments Salt Lake City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\5300 State Apts SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Airport Terminal Restroom - Ogden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Antelope Island visitor center-Utah",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Arctic Circle - Midvale UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\BDO 955 Cubiscan Ogden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Big O Tires - West Point UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Bonneville Center-Terrace UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Boondocks Food & Fun - Kaysville UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Boondocks Johnstown CO",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Boys & Girls Center - Brigham City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Brickmoor Townhomes Farmington UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Bridgetower - Meridian ID",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Building H5A Draper UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Building H5A The Point Draper UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Canyon Rim Academy - Millcreek UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Canyon View Townhomes Ogden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Capital Hill Apts - SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Cemetery - Heber City",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Choice Learning Center - Woods Cross UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Connection Center - Ogden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Daggett County Health - Manila UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\DATC Support Service Reno Kaysville UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Davis Behavioral Health - Layton UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Davis School G4 Cook Reno Clearfield UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\DBH Prevention & Maintenance Layton UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\DBH Prevention and Maintenance Facility Layton UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\DFI-USHE Gateway - SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Dirk's Field Apts - SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Farr West Marketplace Far West UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Felipe Cabral Center - Twin Falls ID",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Fremont Teen Center - Ogden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\GEM - West Jordan UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Goldenwest Credit Union Roy UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Goldenwest Credit Untion - Payson UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Granary Lofts Final Pricing SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Granary Lofts Phase 2 SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Granary Lofts Salt Lake City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Guns & Gold - Salt Lake City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Harrisville DI Harrisville UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Hercules Warehouse Reno - Ogden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Herriman Commons Towne Center 75% Herriman UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Herriman Commons Towne Center Herriman UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Herriman Fire Station - Herriman UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Highland Heights - Pocatello ID",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Holladay City Hall Holladay UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Iron County School Bus Barn Cedar City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Jasper @ Millcreek - Moab UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Jasper @ Millcreek Phase 1 - Moab UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\JSSD Office Building Addition Heber City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\JSSD Shop Bldg - Heber City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\KLM Woodworks - Ogden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Kozo Apartments SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Kozo Apts Final Pricing SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\LDS Meeting House - Shelley ID",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Ledges at Moab UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Lofts North Salt Lake UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Magna Elementary - Magna UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Maverik 802 Clearfield UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\MIdvale Townhomes - Midvale UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Mnt West Cidar Bar SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Mo'Bettah's - Pocatello ID",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Mountainland Technical College Provo UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Museum of Illusions - Salt Lake City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\North Salt Lake Lofts - N. Salt Lake UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\OTECH Event Center Remodel Ogden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Pacific Yard Apts SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Park City Outlets - Park City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\PCHA Mountain View & Valley Villa Provo UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\PCHA Scattered Sites Provo UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Powder Mountain Fire Station Eden UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Provo City Fire Station #1 - Provo UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Public Works Complex - Harrisville UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\River Park Retail Riverdale UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Sandy Shulsen Apartments Sandy UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Silo Park Apt Bldg 3 - SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Silos Bldg 2 - SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Silos Bldg 2 Rebid - SLC UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Silver Creek Self Storage - Park City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Stratford Apts-Salt Lake City UT",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Sundown Lodge at Powder Mnt Resort Eden UT\\Alarm",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Sundown Lodge at Powder Mnt Resort Eden UT\\Fire Sprinkler\\1-Bid Documents",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Sundown Lodge at Powder Mnt Resort Eden UT\\Fire Sprinkler\\2-Internal Ops\\00-Contracts & Schedule",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Sundown Lodge at Powder Mnt Resort Eden UT\\Fire Sprinkler\\2-Internal Ops\\01-Design Support Docs",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Sundown Lodge at Powder Mnt Resort Eden UT\\Fire Sprinkler\\2-Internal Ops\\02-Submittals\\AHJ",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Sundown Lodge at Powder Mnt Resort Eden UT\\Fire Sprinkler\\2-Internal Ops\\02-Submittals\\ENG\\R1",
+          "Y:\\Shared\\HaloOps\\01-Bids\\Kier\\Sundown Lodge at Powder Mnt Resort Eden UT\\Fire Sprinkler\\2-Internal Ops\\02-Submittals\\ENG\\R2"
+        ]
+      }
+    }
+  },
+  "scannedRoots": [
+    "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents",
+    "E:\\ClaudeBot\\data\\halofire\\bids\\1881",
+    "E:\\ClaudeBot\\data\\halofire\\golden\\1881",
+    "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
+  ],
+  "missingRoots": [],
+  "scannedFileCount": 623,
+  "scannedDirectoryCount": 160,
+  "traversedDirectoryCount": 161,
+  "candidates": [
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf",
+      "relativeToRoot": "artifacts/1881_proposal.pdf",
+      "extension": ".pdf",
+      "bytes": 149943,
+      "sha256": "3da1ca01ff519123bfa3c865700d67db01f47077df0f4a9efffe3dfffc46e4d2",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_shop_drawings.pdf",
+      "relativeToRoot": "artifacts/1881_shop_drawings.pdf",
+      "extension": ".pdf",
+      "bytes": 15324352,
+      "sha256": "50d94a8b0440a8895ca5a25cddab9100dff90d13bf274c3248ff8d300a10893f",
+      "roles": [
+        "sprinkler-shop-drawing"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881.xlsx",
+      "relativeToRoot": "artifacts/1881.xlsx",
+      "extension": ".xlsx",
+      "bytes": 902582,
+      "sha256": "20f0dc5501d496fd624f10932a3dfd63c875c20a5d1f4bc82cca5f465a7791d9",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\design.dxf",
+      "relativeToRoot": "artifacts/design.dxf",
+      "extension": ".dxf",
+      "bytes": 284703,
+      "sha256": "bfe8aa2727de40551f969e1e139b60598c4c22d8229e397b4bc51a90cdb36d80",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\design.ifc",
+      "relativeToRoot": "artifacts/design.ifc",
+      "extension": ".ifc",
+      "bytes": 3470,
+      "sha256": "de23723c0a1f3fcda620cf5b3a4981ff4fa68057a9e8fe98b2e573cef9efca6f",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\cad_model_promote\\reviewed-cad-model.dxf",
+      "relativeToRoot": "halo_forge/cad_model_promote/reviewed-cad-model.dxf",
+      "extension": ".dxf",
+      "bytes": 40322,
+      "sha256": "716e5ec2057c9c42cea269b33f8097c7ae09c8d653cdb215dbedc4a8be1e2366",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\kernel_artifact_determinism_probe\\probe_runs\\run_0001\\run1\\cad_model_promote\\reviewed-cad-model.dxf",
+      "relativeToRoot": "halo_forge/kernel_artifact_determinism_probe/probe_runs/run_0001/run1/cad_model_promote/reviewed-cad-model.dxf",
+      "extension": ".dxf",
+      "bytes": 41051,
+      "sha256": "ab4f51cb94bb47aee549b24752b46f336f9f5a8d6863f969e3da1077444e9711",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\kernel_artifact_determinism_probe\\probe_runs\\run_0001\\run2\\cad_model_promote\\reviewed-cad-model.dxf",
+      "relativeToRoot": "halo_forge/kernel_artifact_determinism_probe/probe_runs/run_0001/run2/cad_model_promote/reviewed-cad-model.dxf",
+      "extension": ".dxf",
+      "bytes": 41051,
+      "sha256": "ab4f51cb94bb47aee549b24752b46f336f9f5a8d6863f969e3da1077444e9711",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\013566.13-RIB-Sustainability Certification Project Procedures - Enterprise Green 7-22-2025 3-38-55 AM.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/013566.13-RIB-Sustainability Certification Project Procedures - Enterprise Green 7-22-2025 3-38-55 AM.pdf",
+      "extension": ".pdf",
+      "bytes": 539857,
+      "sha256": "d62dc6bf5531218ed2e78dc6765e3e04df5fb746246001f649684ea986fa0a2f",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\062000-RIB-Finish Carpentry-07-22-2025.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/062000-RIB-Finish Carpentry-07-22-2025.pdf",
+      "extension": ".pdf",
+      "bytes": 52951,
+      "sha256": "ce78d5bda3dfae74b672f3389f79d04e6a8516d9f0f88f676746e5d7765b8d9a",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Architecturals.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Architecturals.pdf",
+      "extension": ".pdf",
+      "bytes": 173343728,
+      "sha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Civils.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Civils.pdf",
+      "extension": ".pdf",
+      "bytes": 14000240,
+      "sha256": "086b3610bb6cebef00254aa3e58bb3d93f7884b8dcb8edd7c337944e38e6f5d0",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Electrical.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Electrical.pdf",
+      "extension": ".pdf",
+      "bytes": 22677970,
+      "sha256": "b31b706ad936922995d84472b985d978f8a477abb152020b6a7b42595b817557",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Generals.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Generals.pdf",
+      "extension": ".pdf",
+      "bytes": 19659393,
+      "sha256": "38520743b627523d7b903d3b5cfda8980c7a629a49c4986e0d756e5046de961a",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Geopiers.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Geopiers.pdf",
+      "extension": ".pdf",
+      "bytes": 1701404,
+      "sha256": "838fe65279556564d5e28df8994cc165f88a8a518724cd3aa5134ac03b16737c",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Landscape.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Landscape.pdf",
+      "extension": ".pdf",
+      "bytes": 8268101,
+      "sha256": "b341cebb42b78d2e35bc6adf9ef25a58d0695fc31a6e690c46b1e31367ffd476",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Mechanical.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Mechanical.pdf",
+      "extension": ".pdf",
+      "bytes": 46512561,
+      "sha256": "f2aa3329951b29ea7829fa56ff30866c0f3fa7e46ecd7f8c0377556da1e4a3d7",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Plumbing.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Plumbing.pdf",
+      "extension": ".pdf",
+      "bytes": 119951650,
+      "sha256": "eb9cfb0410f1b022b7b445c24e241c54ca9ffa858c914e5a471cd46323ee89c2",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Structurals.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Structurals.pdf",
+      "extension": ".pdf",
+      "bytes": 48927453,
+      "sha256": "bdc561986ef710791ddb3c1928d445596b0a5de5cf131b6adf9d929dc5a36e80",
+      "roles": [
+        "issued-structural-design"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Architecture RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Architecture RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 184560,
+      "sha256": "f0fe42f50f330e6de6a0f6bd003c42f7b0898f9b73a6ff6540c8faa6785d32ba",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Civil RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Civil RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 43279,
+      "sha256": "4b163bbf901e76c8b591574d85779b55f6a9a74d8040780db75d98734dfb8581",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Electrical RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Electrical RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 49196,
+      "sha256": "e9e42ff6078ee097deaed6943ad1631df272e43463edee2a41697827d71199cc",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Fire RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Fire RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 48612,
+      "sha256": "4fb9d48ffdd5666e489616b218ef2ce52d1a2d2588b7272aea56ad9c3862f400",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Landscape RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Landscape RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 38866,
+      "sha256": "f5296672ea7330f25570a7cb85444fe35ecc6f6c3e2414c997ddea0e2d90f303",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 MP RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 MP RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 59110,
+      "sha256": "d175a6b822344f19692cbd1c2c4cba848be660658eda035445f616b7ab8f119a",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Structural RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Structural RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 50781,
+      "sha256": "51ce7122a870d1edadbbeef5297862d321c47b2307a26b9a1dffe3495d0883c6",
+      "roles": [
+        "issued-structural-design"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
+      "extension": ".pdf",
+      "bytes": 910937,
+      "sha256": "57ef699772e15f9772881cc41162e7a832c2fea2e36c71f034539dabac791a84",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 02 Draft Cover Page.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/Addendum 02 Draft Cover Page.pdf",
+      "extension": ".pdf",
+      "bytes": 177545,
+      "sha256": "336b14617bd4929613a6b438d15ff6ad56002913175859feda3204b383df42d5",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 1 Memo.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/Addendum 1 Memo.pdf",
+      "extension": ".pdf",
+      "bytes": 269064,
+      "sha256": "846aaa8d68a6ea9dbf73fd227fb7dacc2e6c91cf30c0886efbd4aaa9dcd832ee",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
+      "relativeToRoot": "input/Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
+      "extension": ".pdf",
+      "bytes": 309726,
+      "sha256": "43f3c37e5b9246c0c6656ca249d4bd5dc3681167d211037303b8f763173fc693",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
+      "relativeToRoot": "input/Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
+      "extension": ".xlsx",
+      "bytes": 1503325,
+      "sha256": "54ad8651390a9cdc0fea23cc27b43ee06cec82eb20a3ef1c09e5e126598687ed",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025 copy.pdf",
+      "relativeToRoot": "input/Statement of Qualifications 2025 copy.pdf",
+      "extension": ".pdf",
+      "bytes": 203048,
+      "sha256": "a77691661ad5fb22f76e9bfe01f1dcde71ea3a45ba714b14b1743a4dcc2d9bdf",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025.docx",
+      "relativeToRoot": "input/Statement of Qualifications 2025.docx",
+      "extension": ".docx",
+      "bytes": 193900,
+      "sha256": "8ca28ecc0950317df1c2f9e57acbe6332098c8ce431700b09ba233ef0146b549",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Architecturals.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 - Architecturals.pdf",
+      "extension": ".pdf",
+      "bytes": 173343728,
+      "sha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Civils.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 - Civils.pdf",
+      "extension": ".pdf",
+      "bytes": 14000240,
+      "sha256": "086b3610bb6cebef00254aa3e58bb3d93f7884b8dcb8edd7c337944e38e6f5d0",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Electrical.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 - Electrical.pdf",
+      "extension": ".pdf",
+      "bytes": 22677970,
+      "sha256": "b31b706ad936922995d84472b985d978f8a477abb152020b6a7b42595b817557",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Generals.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 - Generals.pdf",
+      "extension": ".pdf",
+      "bytes": 19659393,
+      "sha256": "38520743b627523d7b903d3b5cfda8980c7a629a49c4986e0d756e5046de961a",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Geopiers.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 - Geopiers.pdf",
+      "extension": ".pdf",
+      "bytes": 1701404,
+      "sha256": "838fe65279556564d5e28df8994cc165f88a8a518724cd3aa5134ac03b16737c",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Landscape.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 - Landscape.pdf",
+      "extension": ".pdf",
+      "bytes": 8268101,
+      "sha256": "b341cebb42b78d2e35bc6adf9ef25a58d0695fc31a6e690c46b1e31367ffd476",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Mechanical.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 - Mechanical.pdf",
+      "extension": ".pdf",
+      "bytes": 46512561,
+      "sha256": "f2aa3329951b29ea7829fa56ff30866c0f3fa7e46ecd7f8c0377556da1e4a3d7",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Plumbing.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 - Plumbing.pdf",
+      "extension": ".pdf",
+      "bytes": 119951650,
+      "sha256": "eb9cfb0410f1b022b7b445c24e241c54ca9ffa858c914e5a471cd46323ee89c2",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Structurals.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 - Structurals.pdf",
+      "extension": ".pdf",
+      "bytes": 48927453,
+      "sha256": "bdc561986ef710791ddb3c1928d445596b0a5de5cf131b6adf9d929dc5a36e80",
+      "roles": [
+        "issued-structural-design"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Architecture RFI's.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 Architecture RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 184560,
+      "sha256": "f0fe42f50f330e6de6a0f6bd003c42f7b0898f9b73a6ff6540c8faa6785d32ba",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Civil RFI's.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 Civil RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 43279,
+      "sha256": "4b163bbf901e76c8b591574d85779b55f6a9a74d8040780db75d98734dfb8581",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Electrical RFI's.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 Electrical RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 49196,
+      "sha256": "e9e42ff6078ee097deaed6943ad1631df272e43463edee2a41697827d71199cc",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Fire RFI's.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 Fire RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 48612,
+      "sha256": "4fb9d48ffdd5666e489616b218ef2ce52d1a2d2588b7272aea56ad9c3862f400",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Landscape RFI's.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 Landscape RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 38866,
+      "sha256": "f5296672ea7330f25570a7cb85444fe35ecc6f6c3e2414c997ddea0e2d90f303",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 MP RFI's.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 MP RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 59110,
+      "sha256": "d175a6b822344f19692cbd1c2c4cba848be660658eda035445f616b7ab8f119a",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Structural RFI's.pdf",
+      "relativeToRoot": "GC - Bid Plans/1881 Structural RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 50781,
+      "sha256": "51ce7122a870d1edadbbeef5297862d321c47b2307a26b9a1dffe3495d0883c6",
+      "roles": [
+        "issued-structural-design"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
+      "relativeToRoot": "GC - Bid Plans/900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
+      "extension": ".pdf",
+      "bytes": 910937,
+      "sha256": "57ef699772e15f9772881cc41162e7a832c2fea2e36c71f034539dabac791a84",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
+      "relativeToRoot": "Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
+      "extension": ".pdf",
+      "bytes": 309726,
+      "sha256": "43f3c37e5b9246c0c6656ca249d4bd5dc3681167d211037303b8f763173fc693",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    },
+    {
+      "path": "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
+      "relativeToRoot": "Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
+      "extension": ".xlsx",
+      "bytes": 1503325,
+      "sha256": "54ad8651390a9cdc0fea23cc27b43ee06cec82eb20a3ef1c09e5e126598687ed",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "code": "SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED",
+      "severity": "blocking",
+      "message": "Discovery stopped after the 15000-file or 50-directory budget; narrow the corpus root or resume at directory offset 50.",
+      "refs": [
+        "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
+      ],
+      "scanScope": "shared"
+    },
+    {
+      "code": "STRUCTURAL_SUPPLIER_SUBMITTAL_NOT_MATERIALIZED",
+      "severity": "blocking",
+      "message": "No candidate structural supplier/truss/lumber submittal is materialized in the scanned corpus.",
+      "refs": []
+    }
+  ],
+  "projectName": "Cooperative 1881",
+  "sourceStructuralPdfSha256": "bdc561986ef710791ddb3c1928d445596b0a5de5cf131b6adf9d929dc5a36e80",
+  "extractionPolicy": {
+    "maxPdfTextPages": 4,
+    "note": "Discovery text is deliberately bounded. A truncated document can identify a candidate but cannot supply exact member dimensions, orientation, or vertical-datum proof."
+  },
+  "projectIdentity": {
+    "tokens": [
+      "1881",
+      "cooperative"
+    ],
+    "projectIdentifiedDocumentCount": 32,
+    "unverifiedSupplierLeadCount": 0,
+    "note": "A generic supplier lead is not project evidence unless its path or bounded extracted source text identifies the project."
+  },
+  "documents": [
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf",
+      "relativeToRoot": "artifacts/1881_proposal.pdf",
+      "extension": ".pdf",
+      "bytes": 149943,
+      "sha256": "3da1ca01ff519123bfa3c865700d67db01f47077df0f4a9efffe3dfffc46e4d2",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_shop_drawings.pdf",
+      "relativeToRoot": "artifacts/1881_shop_drawings.pdf",
+      "extension": ".pdf",
+      "bytes": 15324352,
+      "sha256": "50d94a8b0440a8895ca5a25cddab9100dff90d13bf274c3248ff8d300a10893f",
+      "roles": [
+        "sprinkler-shop-drawing"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_shop_drawings.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881.xlsx",
+      "relativeToRoot": "artifacts/1881.xlsx",
+      "extension": ".xlsx",
+      "bytes": 902582,
+      "sha256": "20f0dc5501d496fd624f10932a3dfd63c875c20a5d1f4bc82cca5f465a7791d9",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881.xlsx"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\design.dxf",
+      "relativeToRoot": "artifacts/design.dxf",
+      "extension": ".dxf",
+      "bytes": 284703,
+      "sha256": "bfe8aa2727de40551f969e1e139b60598c4c22d8229e397b4bc51a90cdb36d80",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\design.dxf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\design.ifc",
+      "relativeToRoot": "artifacts/design.ifc",
+      "extension": ".ifc",
+      "bytes": 3470,
+      "sha256": "de23723c0a1f3fcda620cf5b3a4981ff4fa68057a9e8fe98b2e573cef9efca6f",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\design.ifc"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\cad_model_promote\\reviewed-cad-model.dxf",
+      "relativeToRoot": "halo_forge/cad_model_promote/reviewed-cad-model.dxf",
+      "extension": ".dxf",
+      "bytes": 40322,
+      "sha256": "716e5ec2057c9c42cea269b33f8097c7ae09c8d653cdb215dbedc4a8be1e2366",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\cad_model_promote\\reviewed-cad-model.dxf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\kernel_artifact_determinism_probe\\probe_runs\\run_0001\\run1\\cad_model_promote\\reviewed-cad-model.dxf",
+      "relativeToRoot": "halo_forge/kernel_artifact_determinism_probe/probe_runs/run_0001/run1/cad_model_promote/reviewed-cad-model.dxf",
+      "extension": ".dxf",
+      "bytes": 41051,
+      "sha256": "ab4f51cb94bb47aee549b24752b46f336f9f5a8d6863f969e3da1077444e9711",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\kernel_artifact_determinism_probe\\probe_runs\\run_0001\\run1\\cad_model_promote\\reviewed-cad-model.dxf",
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\kernel_artifact_determinism_probe\\probe_runs\\run_0001\\run2\\cad_model_promote\\reviewed-cad-model.dxf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\013566.13-RIB-Sustainability Certification Project Procedures - Enterprise Green 7-22-2025 3-38-55 AM.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/013566.13-RIB-Sustainability Certification Project Procedures - Enterprise Green 7-22-2025 3-38-55 AM.pdf",
+      "extension": ".pdf",
+      "bytes": 539857,
+      "sha256": "d62dc6bf5531218ed2e78dc6765e3e04df5fb746246001f649684ea986fa0a2f",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\013566.13-RIB-Sustainability Certification Project Procedures - Enterprise Green 7-22-2025 3-38-55 AM.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\062000-RIB-Finish Carpentry-07-22-2025.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/062000-RIB-Finish Carpentry-07-22-2025.pdf",
+      "extension": ".pdf",
+      "bytes": 52951,
+      "sha256": "ce78d5bda3dfae74b672f3389f79d04e6a8516d9f0f88f676746e5d7765b8d9a",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\062000-RIB-Finish Carpentry-07-22-2025.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Architecturals.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Architecturals.pdf",
+      "extension": ".pdf",
+      "bytes": 173343728,
+      "sha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Architecturals.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Architecturals.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Civils.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Civils.pdf",
+      "extension": ".pdf",
+      "bytes": 14000240,
+      "sha256": "086b3610bb6cebef00254aa3e58bb3d93f7884b8dcb8edd7c337944e38e6f5d0",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Civils.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Civils.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Electrical.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Electrical.pdf",
+      "extension": ".pdf",
+      "bytes": 22677970,
+      "sha256": "b31b706ad936922995d84472b985d978f8a477abb152020b6a7b42595b817557",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Electrical.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Electrical.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Generals.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Generals.pdf",
+      "extension": ".pdf",
+      "bytes": 19659393,
+      "sha256": "38520743b627523d7b903d3b5cfda8980c7a629a49c4986e0d756e5046de961a",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Generals.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Generals.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Geopiers.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Geopiers.pdf",
+      "extension": ".pdf",
+      "bytes": 1701404,
+      "sha256": "838fe65279556564d5e28df8994cc165f88a8a518724cd3aa5134ac03b16737c",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Geopiers.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Geopiers.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Landscape.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Landscape.pdf",
+      "extension": ".pdf",
+      "bytes": 8268101,
+      "sha256": "b341cebb42b78d2e35bc6adf9ef25a58d0695fc31a6e690c46b1e31367ffd476",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Landscape.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Landscape.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Mechanical.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Mechanical.pdf",
+      "extension": ".pdf",
+      "bytes": 46512561,
+      "sha256": "f2aa3329951b29ea7829fa56ff30866c0f3fa7e46ecd7f8c0377556da1e4a3d7",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Mechanical.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Mechanical.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Plumbing.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Plumbing.pdf",
+      "extension": ".pdf",
+      "bytes": 119951650,
+      "sha256": "eb9cfb0410f1b022b7b445c24e241c54ca9ffa858c914e5a471cd46323ee89c2",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Plumbing.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Plumbing.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Structurals.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 - Structurals.pdf",
+      "extension": ".pdf",
+      "bytes": 48927453,
+      "sha256": "bdc561986ef710791ddb3c1928d445596b0a5de5cf131b6adf9d929dc5a36e80",
+      "roles": [
+        "issued-structural-design"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "passed",
+      "pageCount": 104,
+      "extractedPageCount": 4,
+      "extractedTextComplete": false,
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Structurals.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Structurals.pdf"
+      ],
+      "extractedTextSha256": "4f986bbc86cd797fff514689c9ab7dc14b353a15733eb49020fcf59d0bb0779b"
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Architecture RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Architecture RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 184560,
+      "sha256": "f0fe42f50f330e6de6a0f6bd003c42f7b0898f9b73a6ff6540c8faa6785d32ba",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Architecture RFI's.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Architecture RFI's.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Civil RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Civil RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 43279,
+      "sha256": "4b163bbf901e76c8b591574d85779b55f6a9a74d8040780db75d98734dfb8581",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Civil RFI's.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Civil RFI's.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Electrical RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Electrical RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 49196,
+      "sha256": "e9e42ff6078ee097deaed6943ad1631df272e43463edee2a41697827d71199cc",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Electrical RFI's.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Electrical RFI's.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Fire RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Fire RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 48612,
+      "sha256": "4fb9d48ffdd5666e489616b218ef2ce52d1a2d2588b7272aea56ad9c3862f400",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Fire RFI's.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Fire RFI's.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Landscape RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Landscape RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 38866,
+      "sha256": "f5296672ea7330f25570a7cb85444fe35ecc6f6c3e2414c997ddea0e2d90f303",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Landscape RFI's.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Landscape RFI's.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 MP RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 MP RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 59110,
+      "sha256": "d175a6b822344f19692cbd1c2c4cba848be660658eda035445f616b7ab8f119a",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 MP RFI's.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 MP RFI's.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Structural RFI's.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/1881 Structural RFI's.pdf",
+      "extension": ".pdf",
+      "bytes": 50781,
+      "sha256": "51ce7122a870d1edadbbeef5297862d321c47b2307a26b9a1dffe3495d0883c6",
+      "roles": [
+        "issued-structural-design"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "passed",
+      "pageCount": 2,
+      "extractedPageCount": 2,
+      "extractedTextComplete": true,
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [
+        "1881"
+      ],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Structural RFI's.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Structural RFI's.pdf"
+      ],
+      "extractedTextSha256": "8a563e4fa47bca149e17ea0d394faaa46ca5ad0833fee97998246c141c6ddbc6"
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
+      "extension": ".pdf",
+      "bytes": 910937,
+      "sha256": "57ef699772e15f9772881cc41162e7a832c2fea2e36c71f034539dabac791a84",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 02 Draft Cover Page.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/Addendum 02 Draft Cover Page.pdf",
+      "extension": ".pdf",
+      "bytes": 177545,
+      "sha256": "336b14617bd4929613a6b438d15ff6ad56002913175859feda3204b383df42d5",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 02 Draft Cover Page.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 1 Memo.pdf",
+      "relativeToRoot": "input/GC - Bid Plans/Addendum 1 Memo.pdf",
+      "extension": ".pdf",
+      "bytes": 269064,
+      "sha256": "846aaa8d68a6ea9dbf73fd227fb7dacc2e6c91cf30c0886efbd4aaa9dcd832ee",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 1 Memo.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
+      "relativeToRoot": "input/Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
+      "extension": ".pdf",
+      "bytes": 309726,
+      "sha256": "43f3c37e5b9246c0c6656ca249d4bd5dc3681167d211037303b8f763173fc693",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
+      "relativeToRoot": "input/Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
+      "extension": ".xlsx",
+      "bytes": 1503325,
+      "sha256": "54ad8651390a9cdc0fea23cc27b43ee06cec82eb20a3ef1c09e5e126598687ed",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025 copy.pdf",
+      "relativeToRoot": "input/Statement of Qualifications 2025 copy.pdf",
+      "extension": ".pdf",
+      "bytes": 203048,
+      "sha256": "a77691661ad5fb22f76e9bfe01f1dcde71ea3a45ba714b14b1743a4dcc2d9bdf",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025 copy.pdf"
+      ],
+      "extractedTextSha256": null
+    },
+    {
+      "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025.docx",
+      "relativeToRoot": "input/Statement of Qualifications 2025.docx",
+      "extension": ".docx",
+      "bytes": 193900,
+      "sha256": "8ca28ecc0950317df1c2f9e57acbe6332098c8ce431700b09ba233ef0146b549",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025.docx"
+      ],
+      "extractedTextSha256": null
+    }
+  ],
+  "memberEvidence": {
+    "witnesses": [
+      {
+        "memberId": "S-190.B-beam-3",
+        "memberTag": "2X10",
+        "matchingDocumentSha256": [],
+        "supplierDocumentSha256": [],
+        "issuedDesignDocumentSha256": [],
+        "sprinklerShopDrawingDocumentSha256": [],
+        "exactPhysicalPromotionAllowed": false,
+        "promotionBlockedReason": "No materialized structural supplier/truss/lumber submittal contains this member tag; issued plans and sprinkler shop drawings are not fabrication proof."
+      },
+      {
+        "memberId": "S-190.B-beam-4",
+        "memberTag": "2X10",
+        "matchingDocumentSha256": [],
+        "supplierDocumentSha256": [],
+        "issuedDesignDocumentSha256": [],
+        "sprinklerShopDrawingDocumentSha256": [],
+        "exactPhysicalPromotionAllowed": false,
+        "promotionBlockedReason": "No materialized structural supplier/truss/lumber submittal contains this member tag; issued plans and sprinkler shop drawings are not fabrication proof."
+      },
+      {
+        "memberId": "S-190.B-beam-5",
+        "memberTag": "2X10",
+        "matchingDocumentSha256": [],
+        "supplierDocumentSha256": [],
+        "issuedDesignDocumentSha256": [],
+        "sprinklerShopDrawingDocumentSha256": [],
+        "exactPhysicalPromotionAllowed": false,
+        "promotionBlockedReason": "No materialized structural supplier/truss/lumber submittal contains this member tag; issued plans and sprinkler shop drawings are not fabrication proof."
+      },
+      {
+        "memberId": "S-190.B-joist-2",
+        "memberTag": "2X10",
+        "matchingDocumentSha256": [],
+        "supplierDocumentSha256": [],
+        "issuedDesignDocumentSha256": [],
+        "sprinklerShopDrawingDocumentSha256": [],
+        "exactPhysicalPromotionAllowed": false,
+        "promotionBlockedReason": "No materialized structural supplier/truss/lumber submittal contains this member tag; issued plans and sprinkler shop drawings are not fabrication proof."
+      },
+      {
+        "memberId": "S-190.C-joist-27",
+        "memberTag": "2X12",
+        "matchingDocumentSha256": [],
+        "supplierDocumentSha256": [],
+        "issuedDesignDocumentSha256": [],
+        "sprinklerShopDrawingDocumentSha256": [],
+        "exactPhysicalPromotionAllowed": false,
+        "promotionBlockedReason": "No materialized structural supplier/truss/lumber submittal contains this member tag; issued plans and sprinkler shop drawings are not fabrication proof."
+      },
+      {
+        "memberId": "S-190.C-joist-28",
+        "memberTag": "2X12",
+        "matchingDocumentSha256": [],
+        "supplierDocumentSha256": [],
+        "issuedDesignDocumentSha256": [],
+        "sprinklerShopDrawingDocumentSha256": [],
+        "exactPhysicalPromotionAllowed": false,
+        "promotionBlockedReason": "No materialized structural supplier/truss/lumber submittal contains this member tag; issued plans and sprinkler shop drawings are not fabrication proof."
+      },
+      {
+        "memberId": "S-190.C-joist-30",
+        "memberTag": "2X12",
+        "matchingDocumentSha256": [],
+        "supplierDocumentSha256": [],
+        "issuedDesignDocumentSha256": [],
+        "sprinklerShopDrawingDocumentSha256": [],
+        "exactPhysicalPromotionAllowed": false,
+        "promotionBlockedReason": "No materialized structural supplier/truss/lumber submittal contains this member tag; issued plans and sprinkler shop drawings are not fabrication proof."
+      }
+    ],
+    "physicalPromotionAllowed": false,
+    "codeComplianceReady": false,
+    "fabricationReady": false,
+    "issues": [
+      {
+        "code": "STRUCTURAL_MEMBER_EVIDENCE_NOT_SUFFICIENT_FOR_PHYSICAL_PROMOTION",
+        "severity": "blocking",
+        "message": "Discovery can locate source candidates, but it cannot turn plan labels into exact fabricated members.",
+        "refs": []
+      }
+    ]
+  },
+  "claims": {
+    "sourceDiscoveryComplete": false,
+    "structuralSupplierSubmittalMaterialized": false,
+    "roofBoundedMemberCount": 7,
+    "exactPhysicalFramingPromoted": false,
+    "obstructionClearanceVerified": false,
+    "codeComplianceReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  }
+}

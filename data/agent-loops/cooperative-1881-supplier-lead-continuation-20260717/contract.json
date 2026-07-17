@@ -1,0 +1,41 @@
+{
+  "name": "cooperative-1881-supplier-lead-continuation-20260717",
+  "owner": "codex",
+  "goal": "Finish the remaining bounded Cooperative 1881 Kier shared-corpus supplier/truss/lumber lead discovery from the predecessor's exact frontier, admitting a document as project evidence only when its path or extracted source text proves Cooperative 1881 identity.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/01-Bids/Kier",
+    "apps/autosprink/src/engine/source-evidence-corpus.js",
+    "apps/autosprink/scripts/build-1881-source-evidence-discovery.mjs",
+    "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration6.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/state.json"
+  ],
+  "exit_criteria": [
+    "each resumed window consumes only the predecessor or immediately prior hash-bound directory frontier",
+    "a generic supplier lead remains non-project evidence unless a configured project identity token appears in its path or bounded extracted text",
+    "no document promotes physical member, routing, clearance, fabrication, code, employee, or VPS gates without separate exact member-dimension, orientation, and vertical-datum proof",
+    "the continuation either completes the remaining shared frontier or records its bounded residual as a typed source-evidence issue"
+  ],
+  "verification_gates": [
+    "every replay receipt parses and hashes to its recorded digest",
+    "each shared window reports explicit file, directory, frontier, and supplier-candidate counts",
+    "source identity omission and outside-root frontier substitution remain rejected",
+    "focused source tests, production build, loop guard, rulebook, and brain postflight pass"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-supplier-lead-continuation-20260717/state.json",
+  "evidence_paths": [
+    "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration6.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-continuation-20260717/shared-source-discovery-iteration1.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-continuation-20260717/shared-source-discovery-window2.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-continuation-20260717/shared-source-discovery-window3.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-continuation-20260717/shared-source-discovery-window4.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-continuation-20260717/shared-source-discovery-window5.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-continuation-20260717/shared-source-discovery-window6.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-continuation-20260717/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

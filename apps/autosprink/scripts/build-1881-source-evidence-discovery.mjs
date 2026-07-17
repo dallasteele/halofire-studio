@@ -24,6 +24,8 @@ const sharedRootPaths = process.env.HALOFIRE_SHARED_CORPUS_ROOTS
     'Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT',
   ];
 const sharedDirectoryOffset = Number.parseInt(process.env.HALOFIRE_SHARED_CORPUS_DIRECTORY_OFFSET || process.env.HALOFIRE_CORPUS_DIRECTORY_OFFSET || '0', 10);
+const requestedSharedMaxDirectories = Number.parseInt(process.env.HALOFIRE_SHARED_CORPUS_MAX_DIRECTORIES || '300', 10);
+const sharedMaxDirectories = Number.isFinite(requestedSharedMaxDirectories) ? Math.max(1, Math.min(requestedSharedMaxDirectories, 5_000)) : 300;
 const sharedDirectoryFrontier = process.env.HALOFIRE_SHARED_CORPUS_DIRECTORY_FRONTIER_JSON
   ? JSON.parse(process.env.HALOFIRE_SHARED_CORPUS_DIRECTORY_FRONTIER_JSON)
   : null;
@@ -41,7 +43,7 @@ const requestedPdfTextPages = Number.parseInt(process.env.HALOFIRE_CORPUS_PDF_TE
 const maxPdfTextPages = Number.isFinite(requestedPdfTextPages) ? Math.max(1, Math.min(requestedPdfTextPages, 250)) : 4;
 const localDiscovery = discoverMaterializedSourceEvidence({ roots: localRootPaths, projectTokens: ['1881', 'cooperative'], maxFiles: 15_000, maxDirectories: 5_000 });
 const projectIdentityTokens = ['1881', 'cooperative'];
-const sharedDiscovery = discoverMaterializedSourceEvidence({ roots: sharedRootPaths, projectTokens: projectIdentityTokens, maxFiles: 15_000, maxDirectories: 300, directoryOffset: Number.isFinite(sharedDirectoryOffset) ? sharedDirectoryOffset : 0, directoryFrontier: sharedDirectoryFrontier, includeSupplierLeadsWithoutProjectToken: true });
+const sharedDiscovery = discoverMaterializedSourceEvidence({ roots: sharedRootPaths, projectTokens: projectIdentityTokens, maxFiles: 15_000, maxDirectories: sharedMaxDirectories, directoryOffset: Number.isFinite(sharedDirectoryOffset) ? sharedDirectoryOffset : 0, directoryFrontier: sharedDirectoryFrontier, includeSupplierLeadsWithoutProjectToken: true });
 const discovery = mergeMaterializedSourceEvidenceDiscoveries({ discoveries: { local: localDiscovery, shared: sharedDiscovery } });
 
 function requiresCandidateTextExtraction(document) {
