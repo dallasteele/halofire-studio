@@ -1,0 +1,34 @@
+{
+  "name": "mit-riverside-dugout-h-hydraulic-3d-proof-20260717",
+  "status": "passed",
+  "iteration": 2,
+  "completedAt": "2026-07-17",
+  "sourceInspection": {
+    "fieldPlan": "Visually inspected: FP-3 retains the completed piping plan, cross-section, 2.5-inch fire-riser callout, and TOR/BOR/UG references.",
+    "hydraulics": "Visually inspected: HASS page 2 retains active-node elevations plus TOR/BOR/UG/BF/SRC topology.",
+    "listing": "Visually inspected: the completed SprinkCad listing retains branch and main sections; no drain route was promoted from it."
+  },
+  "renderDecision": {
+    "first3dProjection": "rejected: graph was clipped and visually uninformative",
+    "second3dProjection": "accepted: all sealed route runs are visible with source-plan X/Y, HASS Z, and hydraulic-I.D. colors"
+  },
+  "outcome": {
+    "completedPlanHydraulicRouteReplayReady": true,
+    "hydraulicElevationReplayReady": true,
+    "hydraulicInsideDiameterReplayReady": true,
+    "installedRiserGeometryReady": false,
+    "fieldDrainRouteReady": false,
+    "fabricationReady": false,
+    "complianceReady": false
+  },
+  "verification": {
+    "agentLoopGuard": "passed",
+    "focusedVitest": "passed: 4 files, 21 tests",
+    "autosprinkBuild": "passed: vite build",
+    "browserVisual": "passed after rejected first 3D projection; screenshot has zero console messages",
+    "agenticRules": "passed",
+    "formalProver": "unavailable: GX10_PROVER_UNAVAILABLE: Unable to connect to the remote server",
+    "diffCheck": "passed"
+  },
+  "nextEvidenceNeed": "A project-specific drain source plus field-resolution evidence is required before drain geometry can be emitted or priced."
+}

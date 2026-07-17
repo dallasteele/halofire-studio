@@ -1,0 +1,42 @@
+{
+  "name": "mit-riverside-dugout-h-hydraulic-3d-proof-20260717",
+  "owner": "codex",
+  "goal": "Render an inspectable source-underlay proof for the completed Dugout H hydraulic plan registration: exact completed-plan branch routes, HASS elevations and hydraulic inside diameters, the actual 2.5-inch riser reference, and a separate fail-closed boundary for drains and unregistered riser geometry.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Field Operations/Field Plans/DUGOUT H BLDG FIELD.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/Submittals/20172-DUGOUT H HYDRAULICS.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Field Operations/Listings Files/DUGOUT H/MIT DUGOUT H BLDG LISTING.pdf",
+    "apps/autosprink/src/data/mit-riverside-hydraulic-routed-plan-registration.json",
+    "apps/autosprink/src/data/mit-riverside-hydraulic-sized-3d-registration.json",
+    "apps/autosprink/src/data/mit-riverside-hydraulic-network-vertical.json"
+  ],
+  "exit_criteria": [
+    "The displayed plan remains an actual completed Dugout H field-plan underlay with only its 20 sealed hydraulic route segments overlaid.",
+    "The proof retains the source cross-section and 2.5-inch riser callout without claiming an installed riser XY, fitting schedule, or drain route.",
+    "The 3D view uses completed-plan X/Y, exact HASS report Z, and HASS hydraulic inside diameter for only the 20 sealed on-plan edges.",
+    "Assets and proof metadata verify the source hashes, declared metrics, and fail-closed claims."
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source digest replay",
+    "proof builder replay and asset integrity test",
+    "existing completed hydraulic routed-plan and sized-3D adversarial tests",
+    "AutoSprink production build",
+    "browser visual inspection of the proof page",
+    "formal prover check or exact unavailable receipt",
+    "authoritative rulebook verification",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/mit-riverside-dugout-h-hydraulic-3d-proof-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/scripts/build-mit-riverside-dugout-h-hydraulic-3d-proof.py",
+    "apps/autosprink/src/data/proofs/mit-riverside-dugout-h-hydraulic-3d-proof",
+    "apps/autosprink/tests/mit-riverside-dugout-h-hydraulic-3d-proof.test.js"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 30000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

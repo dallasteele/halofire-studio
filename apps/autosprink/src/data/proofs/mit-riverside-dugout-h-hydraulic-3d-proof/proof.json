@@ -1,0 +1,66 @@
+{
+  "artifactType": "halofire.mit-riverside-dugout-h-hydraulic-3d-proof.v1",
+  "projectId": "mit-riverside-dugout-h",
+  "status": "passed-source-bound-hydraulic-edge-replay-only",
+  "sources": {
+    "fieldPlan": {
+      "sha256": "dbde3554b995d9ceb16d6829d683306e9a60f2dbc9b05ab87a3c60b548c0538c"
+    },
+    "hydraulics": {
+      "sha256": "c961ffd468c0af1433e93755be4b8b388625824e259f9b52d0b61e44b6792621"
+    },
+    "listing": {
+      "sha256": "9078f2e439aa01d8dd1c082a36939a217dea7c45ba918b7d52fefbd47cbc33b1"
+    }
+  },
+  "metrics": {
+    "registeredNodeCount": 21,
+    "registeredOnPlanEdgeCount": 20,
+    "samePlanAnchorVerticalEdgeCount": 3,
+    "hydraulicInsideDiameterClassesIn": [
+      1.515,
+      2.729
+    ],
+    "maximumScaledPlanLengthResidualFt": 0.053333333333334565
+  },
+  "riserReference": {
+    "rawText": "2.5 in FIRE RISER REFER TO FP7 FOR DETAIL",
+    "source": "completed-field-plan FP-3",
+    "installedRiserGeometryReady": false
+  },
+  "claims": {
+    "completedPlanHydraulicRouteReplayReady": true,
+    "hydraulicElevationReplayReady": true,
+    "hydraulicInsideDiameterReplayReady": true,
+    "installedRiserGeometryReady": false,
+    "fieldDrainRouteReady": false,
+    "nominalFabricationSizeReady": false,
+    "fabricationReady": false,
+    "complianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "The 2.5-inch riser callout is a visible source reference only. Its installed XY, fittings, and detailed FP-7 geometry are not registered.",
+    "No drain is shown or inferred. A project-specific drain source and field-resolution evidence remain required.",
+    "HASS diameter values are hydraulic inside diameters, not nominal fabrication sizes."
+  ],
+  "assets": {
+    "field-plan-cross-section.png": {
+      "sha256": "ff863e17fc49a3214b4c6dd38c9d574f0c10fb5fa31f042672be657f6208d78d",
+      "bytes": 184314
+    },
+    "field-plan-hydraulic-overlay.png": {
+      "sha256": "1dcbe687ba60ad6c1a25075a5d1c98c25dbb3526d0bfdfc8859774c72343c90b",
+      "bytes": 1008179
+    },
+    "field-plan-riser-reference.png": {
+      "sha256": "0859ab58d9fc909e8462fe86fb7a67db4774d081b3bd1bbb9913db99f4189b97",
+      "bytes": 152284
+    },
+    "sealed-hydraulic-3d.svg": {
+      "sha256": "9fdb9bf32e6bc35d43f651d404ab3c1e5f829dcc69b7b534894fe714415e566c",
+      "bytes": 4006
+    }
+  }
+}
