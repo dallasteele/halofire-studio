@@ -7552,8 +7552,31 @@
         "y": 46.146077
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-002",
@@ -7568,8 +7591,31 @@
         "y": -35.187493
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-003",
@@ -7584,8 +7630,31 @@
         "y": -23.187493
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-004",
@@ -7600,8 +7669,31 @@
         "y": 58.541911
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-005",
@@ -7616,8 +7708,31 @@
         "y": 14.074341
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3131",
+        "model": "TY-FRB",
+        "type": "upright"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "upright-open-circle-center-mark",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 8.100586
+          },
+          "maxInternalDarkFillRectAreaPt2": 0.506202
+        },
+        "asBuilt": {
+          "family": "upright-open-circle-center-mark",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 8.100586
+          },
+          "maxInternalDarkFillRectAreaPt2": 0.506202
+        }
+      }
     },
     {
       "id": "wet-head-006",
@@ -7632,8 +7747,31 @@
         "y": 8.053406
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3131",
+        "model": "TY-FRB",
+        "type": "upright"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "upright-open-circle-center-mark",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 8.137085
+          },
+          "maxInternalDarkFillRectAreaPt2": 0.510159
+        },
+        "asBuilt": {
+          "family": "upright-open-circle-center-mark",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 8.137085
+          },
+          "maxInternalDarkFillRectAreaPt2": 0.510159
+        }
+      }
     },
     {
       "id": "wet-head-007",
@@ -7648,8 +7786,31 @@
         "y": 58.541911
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-008",
@@ -7664,8 +7825,31 @@
         "y": 7.811306
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-009",
@@ -7680,8 +7864,31 @@
         "y": 14.298041
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-010",
@@ -7696,8 +7903,31 @@
         "y": -13.203159
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Victaulic",
+        "sin": "V3506",
+        "model": "VS1",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        },
+        "asBuilt": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        }
+      }
     },
     {
       "id": "wet-head-011",
@@ -7712,8 +7942,31 @@
         "y": -1.1875
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Victaulic",
+        "sin": "V3506",
+        "model": "VS1",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        },
+        "asBuilt": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        }
+      }
     },
     {
       "id": "wet-head-012",
@@ -7728,8 +7981,31 @@
         "y": 23.3125
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Victaulic",
+        "sin": "V3506",
+        "model": "VS1",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        },
+        "asBuilt": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        }
+      }
     },
     {
       "id": "wet-head-013",
@@ -7744,8 +8020,31 @@
         "y": 35.3125
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Victaulic",
+        "sin": "V3506",
+        "model": "VS1",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        },
+        "asBuilt": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        }
+      }
     },
     {
       "id": "wet-head-014",
@@ -7760,8 +8059,31 @@
         "y": 46.146077
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-015",
@@ -7776,8 +8098,31 @@
         "y": -35.187493
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-016",
@@ -7792,8 +8137,31 @@
         "y": -23.187493
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-017",
@@ -7808,8 +8176,31 @@
         "y": 58.541911
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-018",
@@ -7824,8 +8215,31 @@
         "y": -11.645827
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-019",
@@ -7840,8 +8254,31 @@
         "y": 21.812568
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-020",
@@ -7856,8 +8293,31 @@
         "y": 32.598985
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-021",
@@ -7872,8 +8332,31 @@
         "y": 0.026055
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-022",
@@ -7888,8 +8371,31 @@
         "y": 9.561306
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-023",
@@ -7904,8 +8410,31 @@
         "y": 46.146077
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-024",
@@ -7920,8 +8449,31 @@
         "y": -43.85416
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-025",
@@ -7936,8 +8488,31 @@
         "y": 52.293538
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-026",
@@ -7952,8 +8527,31 @@
         "y": -36.970601
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-027",
@@ -7968,8 +8566,31 @@
         "y": -33.442322
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-028",
@@ -7984,8 +8605,31 @@
         "y": 57.979167
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-029",
@@ -8000,8 +8644,31 @@
         "y": 63.979167
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-030",
@@ -8016,8 +8683,31 @@
         "y": -25.7913
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-031",
@@ -8032,8 +8722,31 @@
         "y": -19.541416
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-032",
@@ -8048,8 +8761,31 @@
         "y": -11.812493
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-033",
@@ -8064,8 +8800,31 @@
         "y": -0.140611
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-034",
@@ -8080,8 +8839,31 @@
         "y": 73.797011
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Victaulic",
+        "sin": "V3506",
+        "model": "VS1",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        },
+        "asBuilt": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        }
+      }
     },
     {
       "id": "wet-head-035",
@@ -8096,8 +8878,31 @@
         "y": -51.238356
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Victaulic",
+        "sin": "V3506",
+        "model": "VS1",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        },
+        "asBuilt": {
+          "family": "pendent-four-quadrant-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 20.25
+        }
+      }
     },
     {
       "id": "wet-head-036",
@@ -8112,8 +8917,31 @@
         "y": 32.598985
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-037",
@@ -8128,8 +8956,31 @@
         "y": 44.146077
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-038",
@@ -8144,8 +8995,31 @@
         "y": 9.561306
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 8.978455,
+            "height": 8.978516
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.847821
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 8.978455,
+            "height": 8.978516
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.847821
+        }
+      }
     },
     {
       "id": "wet-head-039",
@@ -8160,8 +9034,31 @@
         "y": 20.979194
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-040",
@@ -8176,8 +9073,31 @@
         "y": 50.984863
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-041",
@@ -8192,8 +9112,31 @@
         "y": 67.079766
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-042",
@@ -8208,8 +9151,31 @@
         "y": -51.888156
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-043",
@@ -8224,8 +9190,31 @@
         "y": 73.027032
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-044",
@@ -8240,8 +9229,31 @@
         "y": -41.85416
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-045",
@@ -8256,8 +9268,31 @@
         "y": 63.979167
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-046",
@@ -8272,8 +9307,31 @@
         "y": -35.85416
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-047",
@@ -8288,8 +9346,31 @@
         "y": -23.85416
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-048",
@@ -8304,8 +9385,31 @@
         "y": -13.85416
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-049",
@@ -8320,8 +9424,31 @@
         "y": -3.854167
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-050",
@@ -8336,8 +9463,31 @@
         "y": 6.279975
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-051",
@@ -8352,8 +9502,31 @@
         "y": 15.798041
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-052",
@@ -8368,8 +9541,31 @@
         "y": 23.979167
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-053",
@@ -8384,8 +9580,31 @@
         "y": 35.979167
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-054",
@@ -8400,8 +9619,31 @@
         "y": 45.979167
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-055",
@@ -8416,8 +9658,31 @@
         "y": 57.979167
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-056",
@@ -8432,8 +9697,31 @@
         "y": -42.97916
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-057",
@@ -8448,8 +9736,31 @@
         "y": 64.624946
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-058",
@@ -8464,8 +9775,31 @@
         "y": 36.375
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-059",
@@ -8480,8 +9814,31 @@
         "y": 50.375
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-060",
@@ -8496,8 +9853,31 @@
         "y": -26.499993
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-061",
@@ -8512,8 +9892,31 @@
         "y": -16.499993
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-062",
@@ -8528,8 +9931,31 @@
         "y": 65.02653
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-063",
@@ -8544,8 +9970,31 @@
         "y": 73.027032
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-064",
@@ -8560,8 +10009,31 @@
         "y": -51.888156
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-065",
@@ -8576,8 +10048,31 @@
         "y": 5.863322
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-066",
@@ -8592,8 +10087,31 @@
         "y": 16.261692
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-067",
@@ -8608,8 +10126,31 @@
         "y": -2.915324
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-068",
@@ -8624,8 +10165,31 @@
         "y": 25.051242
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-069",
@@ -8640,8 +10204,31 @@
         "y": -44.140123
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-070",
@@ -8656,8 +10243,31 @@
         "y": -36.16666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-071",
@@ -8672,8 +10282,31 @@
         "y": 58.291667
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-072",
@@ -8688,8 +10321,31 @@
         "y": 36.375
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-073",
@@ -8704,8 +10360,31 @@
         "y": 50.375
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-074",
@@ -8720,8 +10399,31 @@
         "y": -26.499993
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-075",
@@ -8736,8 +10438,31 @@
         "y": -16.499993
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-076",
@@ -8752,8 +10477,31 @@
         "y": 75.589098
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-077",
@@ -8768,8 +10516,31 @@
         "y": -46.665968
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-078",
@@ -8784,8 +10555,31 @@
         "y": 68.791477
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890338
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890338
+        }
+      }
     },
     {
       "id": "wet-head-079",
@@ -8800,8 +10594,31 @@
         "y": -54.479058
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-080",
@@ -8816,8 +10633,31 @@
         "y": 5.863322
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-081",
@@ -8832,8 +10672,31 @@
         "y": 16.261692
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-082",
@@ -8848,8 +10711,31 @@
         "y": -9.915324
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-083",
@@ -8864,8 +10750,31 @@
         "y": -2.915324
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-084",
@@ -8880,8 +10789,31 @@
         "y": 25.051242
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-085",
@@ -8896,8 +10828,31 @@
         "y": 32.051242
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-086",
@@ -8912,8 +10867,31 @@
         "y": -28.41666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-087",
@@ -8928,8 +10906,31 @@
         "y": -18.596347
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-088",
@@ -8944,8 +10945,31 @@
         "y": 40.598958
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-089",
@@ -8960,8 +10984,31 @@
         "y": -44.151035
       },
       "crossSourceResidualPt": 0.0094,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-090",
@@ -8976,8 +11023,31 @@
         "y": 66.27653
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-091",
@@ -8992,8 +11062,31 @@
         "y": -36.16666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-092",
@@ -9008,8 +11101,31 @@
         "y": 58.291667
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-093",
@@ -9024,8 +11140,31 @@
         "y": 48.445313
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-094",
@@ -9040,8 +11179,31 @@
         "y": -53.651035
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-095",
@@ -9056,8 +11218,31 @@
         "y": 75.77653
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-096",
@@ -9072,8 +11257,31 @@
         "y": -44.151035
       },
       "crossSourceResidualPt": 0.0094,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-097",
@@ -9088,8 +11296,31 @@
         "y": 66.27653
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-098",
@@ -9104,8 +11335,31 @@
         "y": -44.151035
       },
       "crossSourceResidualPt": 0.0094,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-099",
@@ -9120,8 +11374,31 @@
         "y": 66.27653
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-100",
@@ -9136,8 +11413,31 @@
         "y": -9.915324
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-101",
@@ -9152,8 +11452,31 @@
         "y": -2.915324
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-102",
@@ -9168,8 +11491,31 @@
         "y": 25.051242
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890338
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890338
+        }
+      }
     },
     {
       "id": "wet-head-103",
@@ -9184,8 +11530,31 @@
         "y": 32.051242
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890338
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890338
+        }
+      }
     },
     {
       "id": "wet-head-104",
@@ -9200,8 +11569,31 @@
         "y": 5.863322
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-105",
@@ -9216,8 +11608,31 @@
         "y": 16.261692
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-106",
@@ -9232,8 +11647,31 @@
         "y": -28.16666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-107",
@@ -9248,8 +11686,31 @@
         "y": -18.16666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-108",
@@ -9264,8 +11725,31 @@
         "y": 40.291667
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-109",
@@ -9280,8 +11764,31 @@
         "y": 52.291667
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-110",
@@ -9296,8 +11803,31 @@
         "y": -53.651035
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-111",
@@ -9312,8 +11842,31 @@
         "y": 75.77653
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-112",
@@ -9328,8 +11881,31 @@
         "y": -44.151035
       },
       "crossSourceResidualPt": 0.0094,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-113",
@@ -9344,8 +11920,31 @@
         "y": 66.27653
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-114",
@@ -9360,8 +11959,31 @@
         "y": 58.291667
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-115",
@@ -9376,8 +11998,31 @@
         "y": -18.979099
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-116",
@@ -9392,8 +12037,31 @@
         "y": -36.16666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-117",
@@ -9408,8 +12076,31 @@
         "y": 8.053406
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3131",
+        "model": "TY-FRB",
+        "type": "upright"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "upright-open-circle-center-mark",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 8.137085
+          },
+          "maxInternalDarkFillRectAreaPt2": 0.663317
+        },
+        "asBuilt": {
+          "family": "upright-open-circle-center-mark",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 8.137085
+          },
+          "maxInternalDarkFillRectAreaPt2": 0.663317
+        }
+      }
     },
     {
       "id": "wet-head-118",
@@ -9424,8 +12115,31 @@
         "y": 14.074341
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3131",
+        "model": "TY-FRB",
+        "type": "upright"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "upright-open-circle-center-mark",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 8.100586
+          },
+          "maxInternalDarkFillRectAreaPt2": 0.506202
+        },
+        "asBuilt": {
+          "family": "upright-open-circle-center-mark",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 8.100586
+          },
+          "maxInternalDarkFillRectAreaPt2": 0.506202
+        }
+      }
     },
     {
       "id": "wet-head-119",
@@ -9440,8 +12154,31 @@
         "y": 34.520779
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-120",
@@ -9456,8 +12193,31 @@
         "y": -11.848952
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-121",
@@ -9472,8 +12232,31 @@
         "y": -44.151035
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-122",
@@ -9488,8 +12271,31 @@
         "y": 66.27653
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-123",
@@ -9504,8 +12310,31 @@
         "y": 50.400987
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-124",
@@ -9520,8 +12349,31 @@
         "y": -28.333265
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-125",
@@ -9536,8 +12388,31 @@
         "y": 45.048598
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-126",
@@ -9552,8 +12427,31 @@
         "y": -51.10494
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-127",
@@ -9568,8 +12466,31 @@
         "y": 73.230442
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-128",
@@ -9584,8 +12505,31 @@
         "y": -58.904494
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-129",
@@ -9600,8 +12544,31 @@
         "y": -18.979099
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-130",
@@ -9616,8 +12583,31 @@
         "y": 81.030002
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-131",
@@ -9632,8 +12622,31 @@
         "y": 73.818698
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-132",
@@ -9648,8 +12661,31 @@
         "y": -51.794732
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-133",
@@ -9664,8 +12700,31 @@
         "y": -25.895827
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-134",
@@ -9680,8 +12739,31 @@
         "y": 47.95931
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-135",
@@ -9696,8 +12778,31 @@
         "y": -36.16666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-136",
@@ -9712,8 +12817,31 @@
         "y": 58.291667
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-137",
@@ -9728,8 +12856,31 @@
         "y": -58.904494
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-138",
@@ -9744,8 +12895,31 @@
         "y": 81.030002
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-139",
@@ -9760,8 +12934,31 @@
         "y": -44.151035
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-140",
@@ -9776,8 +12973,31 @@
         "y": 66.27653
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-141",
@@ -9792,8 +13012,31 @@
         "y": -30.29166
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-142",
@@ -9808,8 +13051,31 @@
         "y": 52.333333
       },
       "crossSourceResidualPt": 0.0094,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-143",
@@ -9824,8 +13090,31 @@
         "y": -23.288466
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-144",
@@ -9840,8 +13129,31 @@
         "y": -11.288466
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-145",
@@ -9856,8 +13168,31 @@
         "y": 33.566908
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-146",
@@ -9872,8 +13207,31 @@
         "y": 45.566908
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-147",
@@ -9888,8 +13246,31 @@
         "y": -58.904494
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-148",
@@ -9904,8 +13285,31 @@
         "y": 81.030002
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-149",
@@ -9920,8 +13324,31 @@
         "y": -44.546712
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-150",
@@ -9936,8 +13363,31 @@
         "y": 66.672214
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-151",
@@ -9952,8 +13402,31 @@
         "y": 73.818698
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-152",
@@ -9968,8 +13441,31 @@
         "y": -51.794732
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-153",
@@ -9984,8 +13480,31 @@
         "y": 50.291667
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-154",
@@ -10000,8 +13519,31 @@
         "y": -58.904494
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-155",
@@ -10016,8 +13558,31 @@
         "y": 81.030002
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-156",
@@ -10032,8 +13597,31 @@
         "y": -36.16666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-157",
@@ -10048,8 +13636,31 @@
         "y": -28.16666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-158",
@@ -10064,8 +13675,31 @@
         "y": 58.291667
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-159",
@@ -10080,8 +13714,31 @@
         "y": -44.546712
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890487
+        }
+      }
     },
     {
       "id": "wet-head-160",
@@ -10096,8 +13753,31 @@
         "y": 66.672214
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     },
     {
       "id": "wet-head-161",
@@ -10112,8 +13792,31 @@
         "y": -23.288466
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-162",
@@ -10128,8 +13831,31 @@
         "y": -11.288466
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-163",
@@ -10144,8 +13870,31 @@
         "y": 33.566908
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-164",
@@ -10160,8 +13909,31 @@
         "y": 45.566908
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-165",
@@ -10176,8 +13948,31 @@
         "y": -30.29166
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-166",
@@ -10192,8 +13987,31 @@
         "y": 52.333333
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-167",
@@ -10208,8 +14026,31 @@
         "y": 81.030002
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-168",
@@ -10224,8 +14065,31 @@
         "y": -58.904494
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-169",
@@ -10240,8 +14104,31 @@
         "y": -44.546712
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-170",
@@ -10256,8 +14143,31 @@
         "y": 66.672214
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-171",
@@ -10272,8 +14182,31 @@
         "y": -36.16666
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-172",
@@ -10288,8 +14221,31 @@
         "y": 58.291667
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890931
+        }
+      }
     },
     {
       "id": "wet-head-173",
@@ -10304,8 +14260,31 @@
         "y": -25.895827
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890783
+        }
+      }
     },
     {
       "id": "wet-head-174",
@@ -10320,8 +14299,31 @@
         "y": 47.95931
       },
       "crossSourceResidualPt": 0.0,
-      "headType": null,
-      "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved"
+      "headType": {
+        "manufacturer": "Tyco",
+        "sin": "TY3231",
+        "model": "TY-FRB",
+        "type": "pendent"
+      },
+      "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+      "symbolEvidence": {
+        "fieldInstall": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        },
+        "asBuilt": {
+          "family": "pendent-radial-fill",
+          "outerBoxPt": {
+            "width": 9.0,
+            "height": 9.0
+          },
+          "maxInternalDarkFillRectAreaPt2": 5.890635
+        }
+      }
     }
   ],
   "sprinklerSchedule": [
@@ -12574,6 +16576,11 @@
     "sprinklerHeadCount": 174,
     "crossSourceHeadMatchCount": 174,
     "crossSourceHeadMaxResidualPt": 0.0094,
+    "headTypeCounts": {
+      "TY3231": 164,
+      "V3506": 6,
+      "TY3131": 4
+    },
     "lineFamilyCount": 50,
     "pieceCount": 167,
     "outletCount": 217,
@@ -12609,7 +16616,7 @@
   },
   "fingerprints": {
     "wetPipeVectorsFnv1a64": "ebf9cccee2f87cca",
-    "sprinklerHeadsFnv1a64": "404e9b7a323f1c1f",
+    "sprinklerHeadsFnv1a64": "50dcae26658d3cad",
     "nativeFabricationFnv1a64": "49038b8ef1140714"
   },
   "claims": {
@@ -12618,7 +16625,7 @@
     "sprinklerScheduleQuantitiesReady": true,
     "nativeFabricationTakeoffReady": true,
     "pieceToPlanVectorMappingReady": false,
-    "headTypeAssignmentReady": false,
+    "headTypeAssignmentReady": true,
     "pipeDirectionReady": false,
     "pipeGradeReady": false,
     "installedElevationReady": false,
@@ -12631,5 +16638,5 @@
     "crossSource": "field-install-to-as-built-exact-pipe-and-toleranced-head-coordinate-reconciliation-plus-native-FAB-takeoff",
     "adversarial": "hash-count-coordinate-residual-line-family-piece-length-and-false-promotion-rejection"
   },
-  "evidenceReceiptSha256": "b365141f3175e516a68c7940d09a66c1dc8e56d69c6deb8ec5a493d2cf528c1b"
+  "evidenceReceiptSha256": "4fdd05ed323869a47e0a968a1c4f568a85a5f8d9fefcdaaf142e3e4bc29686e5"
 }

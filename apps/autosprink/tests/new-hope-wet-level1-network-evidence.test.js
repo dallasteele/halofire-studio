@@ -11,6 +11,7 @@ describe('New Hope Level 1 wet-network evidence', () => {
     expect(result.status).toBe('passed');
     expect(result.wetSystemNetwork2dReady).toBe(true);
     expect(result.sprinklerHeadPositions2dReady).toBe(true);
+    expect(result.headTypeAssignmentReady).toBe(true);
     expect(result.nativeFabricationTakeoffReady).toBe(true);
     expect(result.wetPipeVectors).toHaveLength(300);
     expect(result.sprinklerHeads).toHaveLength(174);
@@ -20,6 +21,7 @@ describe('New Hope Level 1 wet-network evidence', () => {
       crossSourcePipeMaxResidualPt: 0,
       crossSourceHeadMatchCount: 174,
       crossSourceHeadMaxResidualPt: 0.0094,
+      headTypeCounts: { TY3231: 164, V3506: 6, TY3131: 4 },
       pieceCount: 167,
       outletCount: 217,
       totalCutLengthFt: 1477.333333,
@@ -44,6 +46,23 @@ describe('New Hope Level 1 wet-network evidence', () => {
     expect(result.sprinklerHeadPositions2dReady).toBe(false);
   });
 
+  it('rejects a per-head native symbol type mutation', () => {
+    const evidence = source();
+    evidence.sprinklerHeads[0].headType.sin = 'V3506';
+    const result = validateNewHopeWetLevel1NetworkEvidence(evidence);
+    expect(result.status).toBe('blocked');
+    expect(result.issues.map((entry) => entry.code)).toContain('NH_WET_LEVEL1_HEAD_EVIDENCE_INVALID');
+    expect(result.headTypeAssignmentReady).toBe(false);
+  });
+
+  it('rejects demotion of the proven per-head type assignment', () => {
+    const evidence = source();
+    evidence.claims.headTypeAssignmentReady = false;
+    const result = validateNewHopeWetLevel1NetworkEvidence(evidence);
+    expect(result.status).toBe('blocked');
+    expect(result.issues.map((entry) => entry.code)).toContain('NH_WET_LEVEL1_FALSE_PROMOTION');
+  });
+
   it('rejects native fabrication length drift', () => {
     const evidence = source();
     evidence.nativeFabricationLines[0].pieces[0].cutLengthFt += 1;
@@ -55,7 +74,6 @@ describe('New Hope Level 1 wet-network evidence', () => {
 
   it.each([
     'pieceToPlanVectorMappingReady',
-    'headTypeAssignmentReady',
     'pipeDirectionReady',
     'pipeGradeReady',
     'installedElevationReady',

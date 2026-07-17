@@ -63,7 +63,6 @@ describe('New Hope source-bound system backbone evidence', () => {
       blockers: expect.arrayContaining([
         'BACKBONE_NEW_QUOTE_FLOW_TEST_REQUIRED',
         'NH_WET_SYSTEM_PIECE_TO_PLAN_MAPPING_REQUIRED',
-        'NH_WET_SYSTEM_HEAD_TYPE_ASSIGNMENT_REQUIRED',
         'NH_WET_SYSTEM_DIRECTION_AND_GRADE_REQUIRED',
         'NH_WET_SYSTEM_INSTALLATION_3D_PATH_REQUIRED',
         'NH_FIELD_ROUTE_DRUM_DRIP_GEOMETRY_REQUIRED',
@@ -82,12 +81,15 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.wetRiserAndDrainEvidenceReady).toBe(true);
     expect(result.wetSystemNetwork2dReady).toBe(true);
     expect(result.sprinklerHeadPositions2dReady).toBe(true);
+    expect(result.wetSystemHeadTypeAssignmentReady).toBe(true);
     expect(result.nativeFabricationTakeoffReady).toBe(true);
     expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED');
+    expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_HEAD_TYPE_ASSIGNMENT_REQUIRED');
     expect(result.plan2d.wetLevel1.pipeVectors).toHaveLength(300);
     expect(result.plan2d.wetLevel1.sprinklerHeads).toHaveLength(174);
     expect(result.model3d.unresolvedWetLevel1.pipeVectors).toHaveLength(300);
     expect(result.model3d.unresolvedWetLevel1.pipeVectors[0].installedElevationFt).toBeNull();
+    expect(result.model3d.unresolvedWetLevel1.sprinklerHeads.find((head) => head.headType.sin === 'V3506')).toBeTruthy();
     expect(result.wetSystemBackboneReady).toBe(false);
     expect(result.takeoff.wetLevel1NativeFabrication.metrics).toEqual(expect.objectContaining({
       lineFamilyCount: 50,

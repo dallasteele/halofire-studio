@@ -40,6 +40,7 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(proofScript).toContain("root.wetRiserAndDrainEvidenceReady = String(result.wetRiserAndDrainEvidenceReady)");
     expect(proofScript).toContain("root.wetSystemNetwork2dReady = String(result.wetSystemNetwork2dReady)");
     expect(proofScript).toContain("root.sprinklerHeadPositions2dReady = String(result.sprinklerHeadPositions2dReady)");
+    expect(proofScript).toContain("root.wetSystemHeadTypeAssignmentReady = String(result.wetSystemHeadTypeAssignmentReady)");
     expect(proofScript).toContain("root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady)");
     expect(proofScript).toContain("root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved)");
     expect(proofScript).toContain("root.quoteReady = String(result.quoteReady)");

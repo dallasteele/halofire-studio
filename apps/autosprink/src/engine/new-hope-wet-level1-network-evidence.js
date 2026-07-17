@@ -5,7 +5,7 @@ const ASBUILT_SHA = 'ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F800
 const FAB_SHA = 'A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9';
 const SEIDB_SHA = '0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135';
 const VECTOR_FINGERPRINT = 'ebf9cccee2f87cca';
-const HEAD_FINGERPRINT = '404e9b7a323f1c1f';
+const HEAD_FINGERPRINT = '50dcae26658d3cad';
 const NATIVE_FINGERPRINT = '49038b8ef1140714';
 const BRANCH_LINES = Object.freeze(Array.from({ length: 47 }, (_, index) => `BL${String(index + 1).padStart(2, '0')}`));
 const NATIVE_LINES = Object.freeze([...BRANCH_LINES, 'CMA', 'CMB', 'CMC'].sort());
@@ -14,6 +14,10 @@ const SCHEDULE = Object.freeze([
   Object.freeze({ manufacturer: 'Victaulic', sin: 'V3506', model: 'VS1', type: 'pendent', quantity: 6 }),
   Object.freeze({ manufacturer: 'Tyco', sin: 'TY3131', model: 'TY-FRB', type: 'upright', quantity: 4 }),
 ]);
+const HEAD_TYPE_BY_SIN = Object.freeze(Object.fromEntries(SCHEDULE.map(({ quantity: _quantity, ...headType }) => [
+  headType.sin,
+  Object.freeze(headType),
+])));
 const SIZE_TOTALS = Object.freeze([
   Object.freeze({ sizeCode: 13, nominalDiameterIn: 1, pieceCount: 67, cutLengthFt: 62.125 }),
   Object.freeze({ sizeCode: 17, nominalDiameterIn: 1.5, pieceCount: 69, cutLengthFt: 1044.333333 }),
@@ -45,7 +49,7 @@ function vectorFingerprint(vectors) {
 function headFingerprint(heads) {
   return fnv1a64(heads.map((row) => (
     `${row.id}:${Number(row.pdfPt?.x).toFixed(6)},${Number(row.pdfPt?.y).toFixed(6)},`
-    + `${Number(row.crossSourceResidualPt).toFixed(6)}`
+    + `${Number(row.crossSourceResidualPt).toFixed(6)},${row.headType?.sin}`
   )).join('|'));
 }
 
@@ -99,17 +103,48 @@ function validateVectors(evidence, issues) {
 function validateHeads(evidence, issues) {
   const heads = evidence?.sprinklerHeads ?? [];
   const expectedIds = Array.from({ length: 174 }, (_, index) => `wet-head-${String(index + 1).padStart(3, '0')}`);
+  const typeCounts = Object.fromEntries(['TY3231', 'V3506', 'TY3131'].map((sin) => [
+    sin,
+    heads.filter((head) => head.headType?.sin === sin).length,
+  ]));
+  const symbolRuleInvalid = heads.some((head) => {
+    const field = head.symbolEvidence?.fieldInstall;
+    const asBuilt = head.symbolEvidence?.asBuilt;
+    if (!field || !asBuilt || field.family !== asBuilt.family) return true;
+    if (head.headType?.sin === 'TY3131') {
+      return field.family !== 'upright-open-circle-center-mark'
+        || field.outerBoxPt?.height >= 8.5
+        || asBuilt.outerBoxPt?.height >= 8.5;
+    }
+    if (head.headType?.sin === 'V3506') {
+      return field.family !== 'pendent-four-quadrant-fill'
+        || field.maxInternalDarkFillRectAreaPt2 < 20
+        || asBuilt.maxInternalDarkFillRectAreaPt2 < 20;
+    }
+    if (head.headType?.sin === 'TY3231') {
+      return field.family !== 'pendent-radial-fill'
+        || field.outerBoxPt?.height < 8.5
+        || asBuilt.outerBoxPt?.height < 8.5
+        || field.maxInternalDarkFillRectAreaPt2 >= 20
+        || asBuilt.maxInternalDarkFillRectAreaPt2 >= 20;
+    }
+    return true;
+  });
   if (
     heads.length !== 174
     || !same(heads.map((row) => row.id), expectedIds)
-    || heads.some((row) => row.headType !== null || row.headTypeAssignmentStatus !== 'schedule-quantity-known-coordinate-assignment-unresolved')
+    || heads.some((row) => row.headTypeAssignmentStatus !== 'exact-native-symbol-family-cross-source-verified')
+    || heads.some((row) => !same(row.headType, HEAD_TYPE_BY_SIN[row.headType?.sin]))
+    || !same(typeCounts, { TY3231: 164, V3506: 6, TY3131: 4 })
+    || !same(evidence?.metrics?.headTypeCounts, { TY3231: 164, V3506: 6, TY3131: 4 })
+    || symbolRuleInvalid
     || heads.some((row) => !(row.crossSourceResidualPt >= 0 && row.crossSourceResidualPt <= 0.01))
     || headFingerprint(heads) !== HEAD_FINGERPRINT
     || evidence?.fingerprints?.sprinklerHeadsFnv1a64 !== HEAD_FINGERPRINT
     || !same(evidence?.sprinklerSchedule, SCHEDULE)
     || evidence?.sprinklerSchedule?.reduce((sum, row) => sum + row.quantity, 0) !== 174
   ) {
-    issues.push(issue('NH_WET_LEVEL1_HEAD_EVIDENCE_INVALID', 'sprinklerHeads', 'All 174 cross-source head positions and the 164/6/4 source schedule are required without guessing per-coordinate head types.'));
+    issues.push(issue('NH_WET_LEVEL1_HEAD_EVIDENCE_INVALID', 'sprinklerHeads', 'All 174 cross-source head positions and exact native symbol-family assignments must reconcile to the 164/6/4 source schedule.'));
   }
 }
 
@@ -145,7 +180,7 @@ function validateTruthBoundary(evidence, issues) {
     || claims?.sprinklerScheduleQuantitiesReady !== true
     || claims?.nativeFabricationTakeoffReady !== true
     || claims?.pieceToPlanVectorMappingReady !== false
-    || claims?.headTypeAssignmentReady !== false
+    || claims?.headTypeAssignmentReady !== true
     || claims?.pipeDirectionReady !== false
     || claims?.pipeGradeReady !== false
     || claims?.installedElevationReady !== false
@@ -153,7 +188,7 @@ function validateTruthBoundary(evidence, issues) {
     || claims?.fabricationReleaseReady !== false
     || claims?.fieldReleaseReady !== false
   ) {
-    issues.push(issue('NH_WET_LEVEL1_FALSE_PROMOTION', 'claims', 'Unproven piece mapping, head assignment, direction, grade, installed elevation, 3D installation, fabrication, and field release must remain false.'));
+    issues.push(issue('NH_WET_LEVEL1_FALSE_PROMOTION', 'claims', 'Proven per-head native symbol assignment must remain true, while unproven piece mapping, direction, grade, installed elevation, 3D installation, fabrication, and field release remain false.'));
   }
 }
 
@@ -183,7 +218,7 @@ export function validateNewHopeWetLevel1NetworkEvidence(evidence) {
     sprinklerHeadPositions2dReady: passed,
     nativeFabricationTakeoffReady: passed,
     pieceToPlanVectorMappingReady: false,
-    headTypeAssignmentReady: false,
+    headTypeAssignmentReady: passed,
     pipeDirectionReady: false,
     pipeGradeReady: false,
     installedElevationReady: false,

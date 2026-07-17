@@ -1,7 +1,7 @@
 {
   "artifactType": "halofire.agent-loop-state.v1",
   "loop": "new-hope-system-backbone-20260716",
-  "iteration": 4,
+  "iteration": 5,
   "status": "active",
   "brainPreflight": { "status": "passed", "episodes": [150514, 150555, 149978, 155497] },
   "truth": {
@@ -31,7 +31,10 @@
     "nativeWetFittingRecordCount": 67,
     "nativeWetCutLengthFt": 1477.333333,
     "pieceToPlanVectorMappingReady": false,
-    "headTypeAssignmentReady": false,
+    "headTypeAssignmentReady": true,
+    "ty3231PendentHeadCount": 164,
+    "v3506PendentHeadCount": 6,
+    "ty3131UprightHeadCount": 4,
     "pipeDirectionReady": false,
     "pipeGradeReady": false,
     "installedElevationReady": false,
@@ -45,14 +48,14 @@
     "vpsDeploymentAllowed": false
   },
   "verification": {
-    "focusedTests": "24 passed across 3 files; pipe-vector, head-coordinate, native-piece-length, source-hash, hydraulic-margin, and eight false-promotion mutations reject",
+    "focusedTests": "25 passed across 3 files; pipe-vector, head-coordinate, per-head type, proven-claim demotion, native-piece-length, source-hash, hydraulic-margin, and seven false-promotion mutations reject",
     "build": "passed",
     "loopGuard": "passed",
     "rulebook": "passed",
-    "lean": "verified by Lean 4.13.0 in 391 ms; complete 2D plan and native takeoff cannot promote unresolved installed 3D, quote, or fabrication; receipt lean-proof.json",
-    "deterministicVisual": "passed; wet-level1-source-network.png inspected at original resolution over actual FP1.0",
-    "browser": "prior iteration passed; iteration 4 interactive audit pending because the in-app browser runtime exposed zero controllable browsers; local HTTP served HTML, PNG, JSON, and validator with 200 responses and exact evidence receipt b365141f3175e516a68c7940d09a66c1dc8e56d69c6deb8ec5a493d2cf528c1b",
-    "brainPostflight": "passed; episode 156286"
+    "lean": "verified by Lean 4.13.0 in 113 ms; 164 plus 6 plus 4 closes the 174-head schedule while remaining geometry gaps still block installed 3D and fabrication; receipt lean-proof.json",
+    "deterministicVisual": "passed; wet-level1-source-network.png inspected at original resolution over actual FP1.0 with three type colors and exact 164/6/4 caption",
+    "browser": "prior iteration passed; iteration 5 interactive audit still unavailable because the in-app browser runtime exposed zero controllable browsers; local HTTP served typed HTML and exact evidence receipt 4fdd05ed323869a47e0a968a1c4f568a85a5f8d9fefcdaaf142e3e4bc29686e5 with 164/6/4 types true and piece mapping/installed elevation false",
+    "brainPostflight": "passed; episode 156335"
   },
-  "nextAction": "Resolve exact piece-to-plan mapping, per-head type assignment, pipe direction/grade, and installed elevations from the source corpus; then resolve field drain and source-feed route geometry. Use Addendum 02 for the auth-gated client reveal only after the shared real geometry is release-worthy; require a current flow test for every new quote."
+  "nextAction": "Resolve exact piece-to-plan mapping, pipe direction/grade, and installed elevations from the source corpus; the field sheet exposes only 98 visible piece-label anchors for 167 native pieces, so use the listing package rather than guessing the missing registrations. Then resolve field drain and source-feed route geometry. Use Addendum 02 for the auth-gated client reveal only after the shared real geometry is release-worthy; require a current flow test for every new quote."
 }

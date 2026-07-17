@@ -77,7 +77,7 @@ function renderProof(result) {
   document.querySelector('#section-identities').innerHTML = `<b>Source section identities</b><br>${result.elevation2d.sectionIdentities.join('<br>')}`;
   document.querySelector('#supply-results').innerHTML = result.approvedWaterSupply.calculationAreas.map((area) => `<div><b>Area ${area.id}</b><span>${area.totalFlowGpm.toFixed(1)} gpm at ${area.totalPressurePsi.toFixed(1)} psi</span><em>+${area.safetyMarginPsi.toFixed(1)} psi margin</em></div>`).join('');
   document.querySelector('#pump-basis').textContent = `NO FIRE PUMP - completed approved configuration; minimum source margin ${result.pumpDecision.minimumSafetyMarginPsi.toFixed(1)} psi. A new quote still requires a current flow test.`;
-  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions, and the native fabrication takeoff pass. New-quote flow freshness, piece-to-plan mapping, per-head type assignment, pipe direction/grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
+  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions and native symbol types, and the native fabrication takeoff pass. New-quote flow freshness, piece-to-plan mapping, pipe direction/grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
   document.querySelector('#gate-codes').textContent = result.systemDesignGate.blockers.join(' | ');
 
   const root = document.documentElement.dataset;
@@ -92,6 +92,7 @@ function renderProof(result) {
   root.wetRiserAndDrainEvidenceReady = String(result.wetRiserAndDrainEvidenceReady);
   root.wetSystemNetwork2dReady = String(result.wetSystemNetwork2dReady);
   root.sprinklerHeadPositions2dReady = String(result.sprinklerHeadPositions2dReady);
+  root.wetSystemHeadTypeAssignmentReady = String(result.wetSystemHeadTypeAssignmentReady);
   root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady);
   root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved);
   root.quoteReady = String(result.quoteReady);

@@ -51,13 +51,16 @@
     "pipeCrossSourceMaxResidualPt": 0,
     "headCount": 174,
     "headCrossSourceMaxResidualPt": 0.0094,
+    "headTypeCounts": { "TY3231": 164, "V3506": 6, "TY3131": 4 },
+    "headTypeColorKey": { "TY3231": "magenta", "V3506": "amber", "TY3131": "green" },
     "interactiveBrowserAudit": "pending; in-app browser runtime exposed no controllable browser on iteration 4"
   },
   "iterations": [
     { "iteration": 1, "decision": "rejected", "reason": "riser and node-118 labels collided at their real close spacing" },
     { "iteration": 2, "decision": "passed", "reason": "optical label offsets separate both identities while preserving exact marker coordinates" },
     { "iteration": 3, "decision": "passed-for-bounded-evidence", "reason": "live Egnyte supply and as-built sources prove the historical no-pump decision and wet-riser identities while unreleased wet-network and field routes remain visibly absent" },
-    { "iteration": 4, "decision": "passed-for-deterministic-source-render", "reason": "the complete field-install wet layout was replayed over the actual FP1.0 source and inspected at original resolution; new interactive browser audit remains pending because no browser binding was exposed" }
+    { "iteration": 4, "decision": "passed-for-deterministic-source-render", "reason": "the complete field-install wet layout was replayed over the actual FP1.0 source and inspected at original resolution; new interactive browser audit remains pending because no browser binding was exposed" },
+    { "iteration": 5, "decision": "passed-for-native-head-type-assignment", "reason": "four open-circle center-mark symbols, six quadrant-fill symbols, and 164 radial-fill symbols reconcile exactly across field-install, as-built, and the 164/6/4 source schedule; the proof image uses distinct type colors without changing source geometry" }
   ],
   "decision": "passed-for-source-evidence-only",
   "releaseDecision": "blocked"

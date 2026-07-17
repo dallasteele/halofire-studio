@@ -50,6 +50,7 @@ HEAD_SCHEDULE = [
     {"manufacturer": "Victaulic", "sin": "V3506", "model": "VS1", "type": "pendent", "quantity": 6},
     {"manufacturer": "Tyco", "sin": "TY3131", "model": "TY-FRB", "type": "upright", "quantity": 4},
 ]
+HEAD_TYPE_BY_SIN = {row["sin"]: row for row in HEAD_SCHEDULE}
 
 
 def sha256_file(path: Path) -> tuple[str, int]:
@@ -140,7 +141,8 @@ def plan_ft(point: dict[str, float]) -> dict[str, float]:
 
 def extract_heads(page: fitz.Page) -> list[dict[str, object]]:
     heads = []
-    for drawing_index, drawing in enumerate(page.get_drawings()):
+    drawings = page.get_drawings()
+    for drawing_index, drawing in enumerate(drawings):
         rect = drawing["rect"]
         center = fitz.Point((rect.x0 + rect.x1) / 2, (rect.y0 + rect.y1) / 2)
         if not PLAN_CLIP.contains(center):
@@ -153,10 +155,42 @@ def extract_heads(page: fitz.Page) -> list[dict[str, object]]:
             continue
         if not (7.5 <= rect.width <= 9.5 and 7.5 <= rect.height <= 9.5):
             continue
+        max_internal_dark_fill_rect_area = 0.0
+        for candidate in drawings:
+            if candidate.get("fill") is None:
+                continue
+            candidate_rect = candidate["rect"]
+            candidate_center = (
+                (candidate_rect.x0 + candidate_rect.x1) / 2,
+                (candidate_rect.y0 + candidate_rect.y1) / 2,
+            )
+            if math.hypot(candidate_center[0] - center.x, candidate_center[1] - center.y) > 4.3:
+                continue
+            if candidate_rect.width > 9.2 or candidate_rect.height > 9.2:
+                continue
+            darkness = 1 - sum(candidate["fill"]) / 3
+            if darkness <= 0.05:
+                continue
+            max_internal_dark_fill_rect_area = max(
+                max_internal_dark_fill_rect_area,
+                candidate_rect.width * candidate_rect.height,
+            )
+        if rect.height < 8.5:
+            sin = "TY3131"
+            symbol_family = "upright-open-circle-center-mark"
+        elif max_internal_dark_fill_rect_area >= 20:
+            sin = "V3506"
+            symbol_family = "pendent-four-quadrant-fill"
+        else:
+            sin = "TY3231"
+            symbol_family = "pendent-radial-fill"
         heads.append({
             "sourceDrawingIndex": drawing_index,
             "pdfPt": {"x": round(center.x, 6), "y": round(center.y, 6)},
             "symbolBoxPt": {"width": round(rect.width, 6), "height": round(rect.height, 6)},
+            "sin": sin,
+            "symbolFamily": symbol_family,
+            "maxInternalDarkFillRectAreaPt2": round(max_internal_dark_fill_rect_area, 6),
         })
     heads.sort(key=lambda row: (row["pdfPt"]["x"], row["pdfPt"]["y"]))
     return heads
@@ -178,6 +212,13 @@ def nearest_head_matches(field_heads: list[dict[str, object]], asbuilt_heads: li
         residual = math.hypot(matched["pdfPt"]["x"] - fx, matched["pdfPt"]["y"] - fy)
         if residual > 0.02:
             raise RuntimeError(f"head {index} cross-source residual {residual:.6f} pt exceeds 0.02 pt")
+        if matched["sin"] != field["sin"] or matched["symbolFamily"] != field["symbolFamily"]:
+            raise RuntimeError(
+                f"head {index} type differs across sources: "
+                f"field={field['sin']}/{field['symbolFamily']} "
+                f"asBuilt={matched['sin']}/{matched['symbolFamily']}"
+            )
+        schedule = HEAD_TYPE_BY_SIN[field["sin"]]
         remaining.remove(match_index)
         matches.append({
             "id": f"wet-head-{index:03d}",
@@ -186,8 +227,25 @@ def nearest_head_matches(field_heads: list[dict[str, object]], asbuilt_heads: li
             "pdfPt": field["pdfPt"],
             "planFt": plan_ft(field["pdfPt"]),
             "crossSourceResidualPt": round(residual, 6),
-            "headType": None,
-            "headTypeAssignmentStatus": "schedule-quantity-known-coordinate-assignment-unresolved",
+            "headType": {
+                "manufacturer": schedule["manufacturer"],
+                "sin": schedule["sin"],
+                "model": schedule["model"],
+                "type": schedule["type"],
+            },
+            "headTypeAssignmentStatus": "exact-native-symbol-family-cross-source-verified",
+            "symbolEvidence": {
+                "fieldInstall": {
+                    "family": field["symbolFamily"],
+                    "outerBoxPt": field["symbolBoxPt"],
+                    "maxInternalDarkFillRectAreaPt2": field["maxInternalDarkFillRectAreaPt2"],
+                },
+                "asBuilt": {
+                    "family": matched["symbolFamily"],
+                    "outerBoxPt": matched["symbolBoxPt"],
+                    "maxInternalDarkFillRectAreaPt2": matched["maxInternalDarkFillRectAreaPt2"],
+                },
+            },
         })
     if remaining:
         raise RuntimeError(f"{len(remaining)} as-built head symbols were not reconciled")
@@ -285,7 +343,7 @@ def vector_fingerprint(vectors: list[dict[str, object]]) -> str:
 def head_fingerprint(heads: list[dict[str, object]]) -> str:
     return fnv1a64("|".join(
         f"{row['id']}:{row['pdfPt']['x']:.6f},{row['pdfPt']['y']:.6f},"
-        f"{row['crossSourceResidualPt']:.6f}"
+        f"{row['crossSourceResidualPt']:.6f},{row['headType']['sin']}"
         for row in heads
     ))
 
@@ -306,10 +364,11 @@ def render_proof(page: fitz.Page, vectors: list[dict[str, object]], heads: list[
     for vector in vectors:
         start, end = vector["fromPdfPt"], vector["toPdfPt"]
         draw.line((start["x"] * scale, start["y"] * scale, end["x"] * scale, end["y"] * scale), fill=(0, 210, 255, 230), width=4)
+    head_colors = {"TY3231": (255, 55, 130, 245), "V3506": (255, 170, 35, 255), "TY3131": (50, 220, 155, 255)}
     for head in heads:
         x, y = head["pdfPt"]["x"] * scale, head["pdfPt"]["y"] * scale
         radius = 5.2
-        draw.ellipse((x - radius, y - radius, x + radius, y + radius), outline=(255, 55, 130, 245), width=3)
+        draw.ellipse((x - radius, y - radius, x + radius, y + radius), outline=head_colors[head["headType"]["sin"]], width=3)
     try:
         font = ImageFont.truetype("C:/Windows/Fonts/segoeuib.ttf", 31)
         small = ImageFont.truetype("C:/Windows/Fonts/segoeui.ttf", 23)
@@ -317,7 +376,7 @@ def render_proof(page: fitz.Page, vectors: list[dict[str, object]], heads: list[
         font = small = ImageFont.load_default()
     draw.rounded_rectangle((24, 24, 1045, 150), radius=18, fill=(3, 11, 20, 228), outline=(77, 231, 255, 230), width=3)
     draw.text((48, 43), "New Hope FP1.0 - source-native wet network", font=font, fill=(245, 250, 255, 255))
-    draw.text((48, 96), "300 pipe vectors | 174 head centers | field-install = as-built", font=small, fill=(175, 232, 245, 255))
+    draw.text((48, 96), "300 pipe vectors | 164 TY3231 | 6 V3506 | 4 TY3131 | field-install = as-built", font=small, fill=(175, 232, 245, 255))
     output.parent.mkdir(parents=True, exist_ok=True)
     source.save(output, optimize=True)
 
@@ -374,6 +433,12 @@ def main() -> None:
     max_head_residual = max(row["crossSourceResidualPt"] for row in heads)
     if max_head_residual > 0.01:
         raise RuntimeError(f"unexpected maximum head residual: {max_head_residual}")
+    head_type_counts = {
+        sin: sum(head["headType"]["sin"] == sin for head in heads)
+        for sin in ("TY3231", "V3506", "TY3131")
+    }
+    if head_type_counts != {"TY3231": 164, "V3506": 6, "TY3131": 4}:
+        raise RuntimeError(f"native symbol-family schedule reconciliation changed: {head_type_counts}")
 
     branch_labels, cross_main_piece_labels = line_labels(field_page)
     if branch_labels != [f"BL{index:02d}" for index in range(1, 48)]:
@@ -432,6 +497,7 @@ def main() -> None:
             "sprinklerHeadCount": len(heads),
             "crossSourceHeadMatchCount": len(heads),
             "crossSourceHeadMaxResidualPt": max_head_residual,
+            "headTypeCounts": head_type_counts,
             **native_summary,
         },
         "fingerprints": {
@@ -445,7 +511,7 @@ def main() -> None:
             "sprinklerScheduleQuantitiesReady": True,
             "nativeFabricationTakeoffReady": True,
             "pieceToPlanVectorMappingReady": False,
-            "headTypeAssignmentReady": False,
+            "headTypeAssignmentReady": True,
             "pipeDirectionReady": False,
             "pipeGradeReady": False,
             "installedElevationReady": False,
