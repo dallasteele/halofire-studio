@@ -1,0 +1,19 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-wet-network-semantic-repair-20260716/lean-request.json",
+  "theoremNames": [
+    "threadedSourceClassificationCloses",
+    "acceptedThreadedIdentityPartition",
+    "rejectedAnnotationClassCannotPromoteNetwork",
+    "boundedPlanEvidenceDoesNotReleaseInstallation"
+  ],
+  "claim": "The 58 diameter-scaled one-inch source candidates partition into 53 accepted, four native-cut rejections, and one field/as-built drift rejection. The 53 accepted segments partition into 24 singleton piece identities and 29 same-line equivalence sets. Rejecting the former 300 annotation-like hairlines keeps complete network and installation release false.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 90,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

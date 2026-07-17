@@ -1,0 +1,33 @@
+{
+  "artifactType": "halofire.visual-review-receipt.v1",
+  "surface": "new-hope-wet-network-semantic-repair",
+  "url": "http://127.0.0.1:3312/apps/autosprink/src/data/proofs/new-hope-system-backbone/index.html?v=semantic-repair-2",
+  "sourceUnderlay": "tmp/pdfs/new-hope-live/field-install.pdf physical page 3 sheet FP1.0",
+  "sourceUnderlaySha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5",
+  "deterministicOverlay": {
+    "path": "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-level1-source-network.png",
+    "bytes": 2570125,
+    "sha256": "1F66C86C8BB654E07FD804DC4BD242F79534924C0AA01A56D47F2751FA884105",
+    "inspection": "passed at original resolution; the actual FP1.0 sheet remains visible, cyan is limited to 53 accepted diameter-scaled one-inch segments, magenta preserves five rejected source strokes, and the title explicitly rejects the former 300-vector annotation class"
+  },
+  "browserEvidence": {
+    "screenshot": "output/playwright/new-hope-wet-network-semantic-repair-browser-corrected.png",
+    "screenshotSha256": "26458DA26FF16CAE6EFC9B9BA5FAB8520AD8625F412678ABC0DF3CF83D37EBFF",
+    "proofReady": true,
+    "wetSystemNetwork2dReady": false,
+    "wetSystemSourceTypedThreadedPlanSegmentsReady": true,
+    "wetSystemLegacyAnnotationVectorsRejected": true,
+    "horizontalOverflow": false,
+    "consoleErrors": 0,
+    "consoleWarnings": 0
+  },
+  "compositionAudit": {
+    "underlay": "actual protected FP1.0 PDF render, not a synthetic plan",
+    "acceptedColor": "cyan",
+    "rejectedColor": "magenta",
+    "headTypeColors": { "TY3231": "magenta ring", "V3506": "amber ring", "TY3131": "green ring" },
+    "truthBoundary": "complete network, direction, grade, elevation, drains, riser-room geometry, 3D installation, fabrication, quote, field release, and deployment remain visibly blocked"
+  },
+  "decision": "passed-for-bounded-source-typed-evidence",
+  "releaseDecision": "blocked"
+}

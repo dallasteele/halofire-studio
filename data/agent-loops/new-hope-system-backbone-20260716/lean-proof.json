@@ -1,5 +1,7 @@
 {
   "artifactType": "halofire.formal-proof-receipt.v1",
+  "semanticStatus": "superseded-premise-invalid",
+  "supersededBy": "data/agent-loops/new-hope-wet-network-semantic-repair-20260716/lean-proof.json",
   "prover": "lean4",
   "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
   "requestPath": "data/agent-loops/new-hope-system-backbone-20260716/lean-request.json",
@@ -12,7 +14,7 @@
     "twoExactPointsDoNotProveAReleasedRoute",
     "unresolvedFieldDrainBlocksRelease"
   ],
-  "claim": "The reduced 79 psi approved supply clears the worst 73.6 psi demand by 5.4 psi for the completed configuration. The 164 TY3231, 6 V3506, and 4 TY3131 native head families total exactly 174. Even with those typed heads, 300 exact plan vectors, 50 native line families, 167 cut pieces, 217 outlets, and 67 fitting records, missing current flow, piece-to-plan mapping, direction/grade, installed elevation, and field drain routes keep 3D installation, quote, fabrication, and field release false.",
+  "claim": "Historical arithmetic receipt only. Its 300-vector premise is semantically invalid because the selected black hairlines include annotation, dimension, and symbol strokes; the semantic-repair formal receipt is authoritative for plan geometry. The supply, head-family, and fail-closed arithmetic remain historical evidence only.",
   "result": {
     "status": "verified",
     "elapsedMs": 113,

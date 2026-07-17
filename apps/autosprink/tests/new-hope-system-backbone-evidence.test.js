@@ -60,7 +60,7 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.model3d.releasedRoutes).toEqual([]);
   });
 
-  it('proves the historical no-pump decision and complete wet plan while keeping new quotes and installation geometry blocked', () => {
+  it('proves the historical no-pump decision and bounded source geometry while keeping the complete wet network blocked', () => {
     const result = buildNewHopeSystemBackboneEvidence(sources());
     expect(result.systemDesignGate).toEqual({
       status: 'blocked',
@@ -84,7 +84,9 @@ describe('New Hope source-bound system backbone evidence', () => {
       minimumSafetyMarginPsi: 5.4,
     }));
     expect(result.wetRiserAndDrainEvidenceReady).toBe(true);
-    expect(result.wetSystemNetwork2dReady).toBe(true);
+    expect(result.wetSystemNetwork2dReady).toBe(false);
+    expect(result.wetSystemSourceTypedThreadedPlanSegmentsReady).toBe(true);
+    expect(result.wetSystemLegacyAnnotationVectorsRejected).toBe(true);
     expect(result.sprinklerHeadPositions2dReady).toBe(true);
     expect(result.wetSystemHeadTypeAssignmentReady).toBe(true);
     expect(result.nativeFabricationTakeoffReady).toBe(true);
@@ -103,10 +105,10 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.wetSystemThreadedCutLengthCrossSourceReady).toBe(true);
     expect(result.wetSystemListingQuantityExpansionReady).toBe(true);
     expect(result.wetSystemWeldedCutLengthCrossSourceReady).toBe(false);
-    expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED');
+    expect(result.systemDesignGate.blockers).toContain('NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED');
     expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_HEAD_TYPE_ASSIGNMENT_REQUIRED');
     expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_LISTING_QUANTITY_EXPANSION_REQUIRED');
-    expect(result.plan2d.wetLevel1.pipeVectors).toHaveLength(300);
+    expect(result.plan2d.wetLevel1.pipeVectors).toHaveLength(53);
     expect(result.plan2d.wetLevel1.sprinklerHeads).toHaveLength(174);
     expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors).toHaveLength(71);
     expect(result.plan2d.wetLevel1.scopedWeldedMainPieceVectors).toHaveLength(28);
@@ -132,7 +134,7 @@ describe('New Hope source-bound system backbone evidence', () => {
       nativeStationDirectionStatus: 'native-outlet-registered',
       geometryStatus: 'exact-field-and-as-built-centerline-plus-native-cut-length-and-station-direction',
     }));
-    expect(result.model3d.unresolvedWetLevel1.pipeVectors).toHaveLength(300);
+    expect(result.model3d.unresolvedWetLevel1.pipeVectors).toHaveLength(53);
     expect(result.model3d.unresolvedWetLevel1.scopedFabricationPieceVectors).toHaveLength(71);
     expect(result.model3d.unresolvedWetLevel1.scopedWeldedMainPieceVectors).toHaveLength(28);
     expect(result.model3d.unresolvedWetLevel1.scopedFabricationPieceVectors[0].installedElevationFt).toBeNull();

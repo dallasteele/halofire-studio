@@ -1,6 +1,7 @@
 {
   "artifactType": "halofire.visual-review-receipt.v1",
   "surface": "new-hope-system-backbone",
+  "supersededBy": "data/agent-loops/new-hope-wet-network-semantic-repair-20260716/visual-review.json",
   "url": "http://127.0.0.1:3312/apps/autosprink/src/data/proofs/new-hope-system-backbone/index.html",
   "viewport": { "width": 1440, "height": 1000 },
   "sourceUnderlays": {
@@ -55,10 +56,13 @@
   },
   "deterministicRenderEvidence": {
     "path": "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-level1-source-network.png",
-    "inspection": "passed at original resolution; cyan vectors trace the complete wet layout over the actual FP1.0 source and magenta rings coincide with native sprinkler symbols",
+    "inspection": "superseded after semantic audit; cyan now shows only source-typed threaded segments that pass PDF parity and native-cut reconciliation, while the former black-hairline class is explicitly rejected",
     "fieldInstallSha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5",
     "asBuiltSha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B",
-    "pipeVectorCount": 300,
+    "acceptedThreadedPlanSegmentCount": 53,
+    "legacyAnnotationLikeVectorCount": 300,
+    "legacyAnnotationVectorsRejected": true,
+    "rejectedBlueSourceLineworkCount": 5,
     "pipeCrossSourceMaxResidualPt": 0,
     "headCount": 174,
     "headCrossSourceMaxResidualPt": 0.0094,
@@ -78,8 +82,9 @@
     { "iteration": 3, "decision": "passed-for-bounded-evidence", "reason": "live Egnyte supply and as-built sources prove the historical no-pump decision and wet-riser identities while unreleased wet-network and field routes remain visibly absent" },
     { "iteration": 4, "decision": "passed-for-deterministic-source-render", "reason": "the complete field-install wet layout was replayed over the actual FP1.0 source and inspected at original resolution; new interactive browser audit remains pending because no browser binding was exposed" },
     { "iteration": 5, "decision": "passed-for-native-head-type-assignment", "reason": "four open-circle center-mark symbols, six quadrant-fill symbols, and 164 radial-fill symbols reconcile exactly across field-install, as-built, and the 164/6/4 source schedule; the proof image uses distinct type colors without changing source geometry" },
-    { "iteration": 6, "decision": "passed-for-listing-definition-crosswalk", "reason": "all 167 native wet pipe records reconcile to 165 exact definitions in the protected listing, 67 threaded lengths match exactly, and the browser proof explicitly preserves the 169-unit listing total plus two unexpanded quantity units without promoting plan placement or fabrication" }
+    { "iteration": 6, "decision": "passed-for-listing-definition-crosswalk", "reason": "all 167 native wet pipe records reconcile to 165 exact definitions in the protected listing, 67 threaded lengths match exactly, and the browser proof explicitly preserves the 169-unit listing total plus two unexpanded quantity units without promoting plan placement or fabrication" },
+    { "iteration": 7, "decision": "rejected-former-complete-network-claim", "reason": "visual and source-style audit proved the former 300 black 0.5-point vectors include dimension leaders and symbol strokes; 53 threaded segments pass corrected classification, five blue strokes remain rejected, and complete network readiness is false" }
   ],
-  "decision": "passed-for-source-evidence-only",
+  "decision": "superseded-by-semantic-repair-source-evidence-only",
   "releaseDecision": "blocked"
 }

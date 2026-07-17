@@ -87,7 +87,7 @@ function renderProof(result) {
   const branchRegistration = result.takeoff.wetLevel1NativeFabrication.weldedBranchRegistration;
   const mainRegistration = result.takeoff.wetLevel1NativeFabrication.weldedMainRegistration;
   document.querySelector('#quantity-gaps').textContent = `${mainRegistration.metrics.combinedMappedUnitCount} of ${mainRegistration.metrics.globalListedUnitCount} global listed units now consume unique field/as-built source centerlines: ${branchRegistration.metrics.pieceVectorMappedUnitCount} welded branch units plus ${mainRegistration.metrics.mappedLabeledUnitCount} labeled welded-main units. ${branchRegistration.metrics.registeredUnitCount} branch units retain native station direction through ${branchRegistration.metrics.mappedNativeOutletCount} mapped outlets. The remaining ${mainRegistration.metrics.globalPieceVectorUnmappedUnitCount} units are ${mainRegistration.metrics.threadedHoldoutCount} threaded pieces plus three unlabeled T-1 welded occurrences`;
-  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions and native symbol types, all 167 native wet records mapped to 165 approved listing definitions, and 99 of 169 quantity-expanded fabrication units pass top-down source registration. Fifteen branch units retain native station direction through 36 registered outlets. The remaining 67 threaded units and three unlabeled T-1 welded occurrences, welded cross-source dimensions, fitting takeout, hydraulic flow direction, grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
+  document.querySelector('#gate-copy').textContent = 'The former 300 black-hairline vectors are rejected because they include dimension leaders and symbol strokes, not a pipe network. Fifty-three diameter-scaled one-inch source segments pass field/as-built parity and same-line native cut reconciliation; 24 have singleton piece identities and 29 remain same-line equivalence sets. Five blue strokes are rejected, including one real field/as-built endpoint discrepancy. The 99 welded source registrations, 174 source-typed heads, native/listing takeoff, historical pump decision, and riser identities remain valid, but the complete wet network, remaining piece identities, fitting takeout, flow direction, grade, elevations, field-routed drains, riser-room installation geometry, fabrication, pricing, permitting, and field release remain blocked.';
   document.querySelector('#gate-codes').textContent = result.systemDesignGate.blockers.join(' | ');
 
   const root = document.documentElement.dataset;
@@ -101,6 +101,8 @@ function renderProof(result) {
   root.pumpDecisionReady = String(result.pumpDecisionReady);
   root.wetRiserAndDrainEvidenceReady = String(result.wetRiserAndDrainEvidenceReady);
   root.wetSystemNetwork2dReady = String(result.wetSystemNetwork2dReady);
+  root.wetSystemSourceTypedThreadedPlanSegmentsReady = String(result.wetSystemSourceTypedThreadedPlanSegmentsReady);
+  root.wetSystemLegacyAnnotationVectorsRejected = String(result.wetSystemLegacyAnnotationVectorsRejected);
   root.sprinklerHeadPositions2dReady = String(result.sprinklerHeadPositions2dReady);
   root.wetSystemHeadTypeAssignmentReady = String(result.wetSystemHeadTypeAssignmentReady);
   root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady);

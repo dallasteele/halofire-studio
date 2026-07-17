@@ -325,6 +325,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
 
   const evidenceReady = issues.length === 0;
   const wetNetworkReady = evidenceReady && wetNetwork.wetSystemNetwork2dReady;
+  const wetSourceTypedReady = evidenceReady && wetNetwork.sourceTypedThreadedPlanSegmentsReady;
   const blockers = [
     'BACKBONE_NEW_QUOTE_FLOW_TEST_REQUIRED',
     ...(wetNetworkReady ? [] : ['NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED']),
@@ -384,7 +385,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       components: evidenceReady ? planComponents : [],
       releasedRoutes: [],
       sourceReferenceVectors: evidenceReady ? clone(operationalAnnotations.operationalReferenceVectors ?? []) : [],
-      wetLevel1: wetNetworkReady ? {
+      wetLevel1: wetSourceTypedReady ? {
         sourceSheet: 'FP1.0',
         pipeVectors: clone(wetNetwork.wetPipeVectors),
         sprinklerHeads: clone(wetNetwork.sprinklerHeads),
@@ -417,7 +418,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
           ...wetWeldedBranchRegistration.pieceVectorMappings,
           ...wetWeldedMainRegistration.mappings,
         ]),
-        geometryStatus: 'exact-field-install-and-as-built-plan-xy',
+        geometryStatus: 'bounded-source-typed-threaded-plan-xy-complete-network-unresolved',
       } : null,
     },
     elevation2d: {
@@ -447,13 +448,13 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       sourceIntersectionPoints: evidenceReady ? modelPoints : [],
       releasedRoutes: [],
       unresolvedPlanIntents: evidenceReady ? planComponents.filter((component) => component.geometryStatus.includes('unresolved')) : [],
-      unresolvedWetLevel1: wetNetworkReady ? {
+      unresolvedWetLevel1: wetSourceTypedReady ? {
         pipeVectors: wetNetwork.wetPipeVectors.map((vector) => ({
           id: vector.id,
           fromPlanFt: clone(vector.fromPlanFt),
           toPlanFt: clone(vector.toPlanFt),
           installedElevationFt: null,
-          geometryStatus: 'exact-plan-xy-installed-z-unresolved',
+          geometryStatus: 'source-typed-threaded-plan-xy-installed-z-and-complete-network-unresolved',
         })),
         sprinklerHeads: wetNetwork.sprinklerHeads.map((head) => ({
           id: head.id,
@@ -488,8 +489,8 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     },
     systemDesignGate: { status: 'blocked', blockers },
     takeoff: evidenceReady ? {
-      status: wetNetworkReady ? 'native-records-to-approved-listing-definitions-and-quantity-expansion-reconciled-ninety-nine-welded-units-source-registered-seventy-global-units-unresolved' : 'source-identities-only-no-route-quantities',
-      wetLevel1NativeFabrication: wetNetworkReady ? {
+      status: wetSourceTypedReady ? 'native-records-to-approved-listing-definitions-and-quantity-expansion-reconciled-ninety-nine-welded-units-source-registered-complete-network-unresolved' : 'source-identities-only-no-route-quantities',
+      wetLevel1NativeFabrication: wetSourceTypedReady ? {
         metrics: clone(wetNetwork.metrics),
         lineFamilies: clone(wetNetwork.nativeFabricationLines),
         sprinklerSchedule: clone(wetNetwork.sprinklerSchedule),
@@ -519,8 +520,10 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     pumpDecisionScope: evidenceReady ? 'completed-approved-new-hope-configuration' : null,
     wetRiserAndDrainEvidenceReady: evidenceReady,
     wetSystemNetwork2dReady: wetNetworkReady,
-    sprinklerHeadPositions2dReady: wetNetworkReady,
-    nativeFabricationTakeoffReady: wetNetworkReady,
+    wetSystemSourceTypedThreadedPlanSegmentsReady: wetSourceTypedReady,
+    wetSystemLegacyAnnotationVectorsRejected: evidenceReady && wetNetwork.legacyAnnotationVectorsRejected,
+    sprinklerHeadPositions2dReady: evidenceReady && wetNetwork.sprinklerHeadPositions2dReady,
+    nativeFabricationTakeoffReady: evidenceReady && wetNetwork.nativeFabricationTakeoffReady,
     wetSystemListingDefinitionCrosswalkReady: evidenceReady && wetListingCrosswalk.nativeRowToListingDefinitionReady,
     wetSystemQuantityExpandedLineAnchorsReady: evidenceReady && wetQuantityPlacement.quantityExpandedLineLabelAnchorsReady,
     wetSystemQuantityExpandedEndpointMappingReady: evidenceReady && wetQuantityPlacement.quantityExpandedPieceEndpointMappingReady,
@@ -538,7 +541,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     wetSystemListingQuantityExpansionReady: evidenceReady && wetQuantityPlacement.listingQuantityExpansionReady,
     wetSystemWeldedCutLengthCrossSourceReady: false,
     wetSystemPieceToPlanMappingReady: false,
-    wetSystemHeadTypeAssignmentReady: wetNetworkReady && wetNetwork.headTypeAssignmentReady,
+    wetSystemHeadTypeAssignmentReady: evidenceReady && wetNetwork.headTypeAssignmentReady,
     wetSystemDirectionReady: false,
     wetSystemGradeReady: false,
     wetSystemBackboneReady: false,

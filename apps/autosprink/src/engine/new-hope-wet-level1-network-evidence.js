@@ -1,10 +1,12 @@
 const PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut';
-const ARTIFACT_TYPE = 'halofire.new-hope-wet-level1-network-evidence.v1';
+const ARTIFACT_TYPE = 'halofire.new-hope-wet-level1-network-evidence.v2';
 const FIELD_SHA = '4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5';
 const ASBUILT_SHA = 'ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B';
 const FAB_SHA = 'A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9';
 const SEIDB_SHA = '0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135';
-const VECTOR_FINGERPRINT = 'ebf9cccee2f87cca';
+const VECTOR_FINGERPRINT = 'd1f7f223328c026c';
+const REJECTED_BLUE_FINGERPRINT = '57b1e6b6caf52a91';
+const LEGACY_ANNOTATION_FINGERPRINT = '9caa67de413633ea';
 const HEAD_FINGERPRINT = '50dcae26658d3cad';
 const NATIVE_FINGERPRINT = '49038b8ef1140714';
 const BRANCH_LINES = Object.freeze(Array.from({ length: 47 }, (_, index) => `BL${String(index + 1).padStart(2, '0')}`));
@@ -42,7 +44,9 @@ function fnv1a64(text) {
 function vectorFingerprint(vectors) {
   return fnv1a64(vectors.map((row) => (
     `${row.id}:${Number(row.fromPdfPt?.x).toFixed(6)},${Number(row.fromPdfPt?.y).toFixed(6)},`
-    + `${Number(row.toPdfPt?.x).toFixed(6)},${Number(row.toPdfPt?.y).toFixed(6)}`
+    + `${Number(row.toPdfPt?.x).toFixed(6)},${Number(row.toPdfPt?.y).toFixed(6)}:`
+    + `${row.associatedLineName}:${row.exactPieceId || '-'}:`
+    + `${(row.candidatePieces || []).map((piece) => piece.pieceId).join(',')}`
   )).join('|'));
 }
 
@@ -87,16 +91,68 @@ function validateSources(evidence, issues) {
 
 function validateVectors(evidence, issues) {
   const vectors = evidence?.wetPipeVectors ?? [];
+  const rejected = evidence?.rejectedBlueSourceLinework ?? [];
   const ids = vectors.map((row) => row.id);
-  const expectedIds = Array.from({ length: 300 }, (_, index) => `wet-vector-${String(index + 1).padStart(3, '0')}`);
+  const expectedIds = Array.from({ length: 53 }, (_, index) => `threaded-plan-segment-${String(index + 1).padStart(3, '0')}`);
+  const expectedRejectedIds = Array.from({ length: 5 }, (_, index) => `rejected-blue-linework-${String(index + 1).padStart(2, '0')}`);
+  const exactMappings = vectors.filter((row) => row.mappingStatus === 'exact-singleton-piece');
+  const ambiguousMappings = vectors.filter((row) => row.mappingStatus === 'same-line-piece-equivalence-set');
+  const metrics = evidence?.metrics;
+  const candidateInvalid = vectors.some((row) => (
+    row.crossSourceResidualPt !== 0
+    || !(row.sourceSpanIn > 0)
+    || !(row.lineAssociationDistancePt >= 0 && row.lineAssociationDistancePt <= 45)
+    || !(row.lineAssociationUniquenessGapPt >= 4)
+    || !row.candidatePieces?.length
+    || row.candidatePieces.some((piece) => (
+      !piece.pieceId?.startsWith(row.associatedLineName)
+      || !(piece.sourceSpanVsCutDeltaIn >= -0.2 && piece.sourceSpanVsCutDeltaIn <= 3.2)
+    ))
+    || (row.mappingStatus === 'exact-singleton-piece'
+      ? row.candidatePieces.length !== 1 || row.exactPieceId !== row.candidatePieces[0].pieceId
+      : row.mappingStatus !== 'same-line-piece-equivalence-set'
+        || row.candidatePieces.length < 2
+        || row.exactPieceId !== null)
+  ));
   if (
-    vectors.length !== 300
+    vectors.length !== 53
     || !same(ids, expectedIds)
-    || vectors.some((row) => row.crossSourceResidualPt !== 0 || !(row.lengthFt > 0))
+    || exactMappings.length !== 24
+    || ambiguousMappings.length !== 29
+    || candidateInvalid
     || vectorFingerprint(vectors) !== VECTOR_FINGERPRINT
     || evidence?.fingerprints?.wetPipeVectorsFnv1a64 !== VECTOR_FINGERPRINT
+    || metrics?.acceptedThreadedPlanSegmentCount !== 53
+    || metrics?.exactThreadedPiecePlanMappingCount !== 24
+    || metrics?.ambiguousThreadedPiecePlanSegmentCount !== 29
+    || metrics?.crossSourcePipeVectorMatchCount !== 53
+    || metrics?.crossSourcePipeMaxResidualPt !== 0
   ) {
-    issues.push(issue('NH_WET_LEVEL1_PIPE_GEOMETRY_INVALID', 'wetPipeVectors', 'All 300 exact field-to-as-built wet pipe vectors and their fixed geometry fingerprint are required.'));
+    issues.push(issue('NH_WET_LEVEL1_PIPE_GEOMETRY_INVALID', 'wetPipeVectors', 'All 53 accepted diameter-scaled one-inch plan segments must retain exact PDF parity, same-line native cut candidates, ambiguity status, and the fixed semantic fingerprint.'));
+  }
+  const rejectionReasons = rejected.map((row) => row.rejectionReason);
+  if (
+    rejected.length !== 5
+    || !same(rejected.map((row) => row.id), expectedRejectedIds)
+    || rejectionReasons.filter((reason) => reason === 'no-same-line-native-threaded-cut-within-takeout-gate').length !== 4
+    || rejectionReasons.filter((reason) => reason === 'field-to-as-built-endpoint-drift-exceeds-0.02-point-gate').length !== 1
+    || rejected.filter((row) => row.crossSourceResidualPt > 0.02).length !== 1
+    || vectorFingerprint(rejected) !== REJECTED_BLUE_FINGERPRINT
+    || evidence?.fingerprints?.rejectedBlueSourceLineworkFnv1a64 !== REJECTED_BLUE_FINGERPRINT
+    || metrics?.rejectedBlueSourceLineworkCount !== 5
+  ) {
+    issues.push(issue('NH_WET_LEVEL1_REJECTED_LINEWORK_INVALID', 'rejectedBlueSourceLinework', 'Four non-reconciling blue strokes and the one field/as-built endpoint drift must remain rejected.'));
+  }
+  const legacy = evidence?.legacyAnnotationLikeVectorClass;
+  if (
+    legacy?.fieldCandidateCount !== 300
+    || legacy?.asBuiltCandidateCount !== 317
+    || legacy?.fieldToAsBuiltExactMatchCount !== 300
+    || legacy?.classification !== 'rejected-annotation-dimension-and-symbol-linework-not-pipe-network'
+    || legacy?.fingerprintFnv1a64 !== LEGACY_ANNOTATION_FINGERPRINT
+    || metrics?.legacyAnnotationLikeVectorCount !== 300
+  ) {
+    issues.push(issue('NH_WET_LEVEL1_LEGACY_ANNOTATION_REJECTION_INVALID', 'legacyAnnotationLikeVectorClass', 'The former 300-vector black-hairline class must remain explicitly rejected as annotation, dimension, and symbol linework.'));
   }
 }
 
@@ -175,7 +231,10 @@ function validateNativeFabrication(evidence, issues) {
 function validateTruthBoundary(evidence, issues) {
   const claims = evidence?.claims;
   if (
-    claims?.wetSystemNetwork2dReady !== true
+    claims?.wetSystemNetwork2dReady !== false
+    || claims?.sourceTypedThreadedPlanSegmentsReady !== true
+    || claims?.legacyAnnotationVectorsRejected !== true
+    || claims?.completeThreadedPiecePlanMappingReady !== false
     || claims?.sprinklerHeadPositions2dReady !== true
     || claims?.sprinklerScheduleQuantitiesReady !== true
     || claims?.nativeFabricationTakeoffReady !== true
@@ -188,7 +247,7 @@ function validateTruthBoundary(evidence, issues) {
     || claims?.fabricationReleaseReady !== false
     || claims?.fieldReleaseReady !== false
   ) {
-    issues.push(issue('NH_WET_LEVEL1_FALSE_PROMOTION', 'claims', 'Proven per-head native symbol assignment must remain true, while unproven piece mapping, direction, grade, installed elevation, 3D installation, fabrication, and field release remain false.'));
+    issues.push(issue('NH_WET_LEVEL1_FALSE_PROMOTION', 'claims', 'Source-typed threaded segments, legacy rejection, and per-head native symbol assignment remain proven, while complete network, piece mapping, direction, grade, elevation, 3D installation, fabrication, and field release remain false.'));
   }
 }
 
@@ -214,7 +273,9 @@ export function validateNewHopeWetLevel1NetworkEvidence(evidence) {
     sprinklerSchedule: passed ? clone(evidence.sprinklerSchedule) : [],
     nativeFabricationLines: passed ? clone(evidence.nativeFabricationLines) : [],
     metrics: passed ? clone(evidence.metrics) : null,
-    wetSystemNetwork2dReady: passed,
+    wetSystemNetwork2dReady: false,
+    sourceTypedThreadedPlanSegmentsReady: passed,
+    legacyAnnotationVectorsRejected: passed,
     sprinklerHeadPositions2dReady: passed,
     nativeFabricationTakeoffReady: passed,
     pieceToPlanVectorMappingReady: false,

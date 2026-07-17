@@ -1,7 +1,7 @@
 {
   "name": "new-hope-system-backbone-20260716",
   "owner": "codex",
-  "goal": "Instantiate and visibly prove the source-backed New Hope water supply, historical pump decision, complete Level 1 wet plan, wet/dry risers, native fabrication takeoff, native-to-approved-listing definition crosswalk, and drainage backbone in top plan, elevation, and bounded 3D while keeping current-flow, listing quantity expansion, welded cross-source dimensions, piece mapping, direction/grade, installed-Z, field-route, quote, fabrication, and field-release claims fail-closed.",
+  "goal": "Instantiate and visibly prove the source-backed New Hope water supply, historical pump decision, bounded source-typed Level 1 wet evidence, wet/dry riser identities, native fabrication takeoff, native-to-approved-listing definition crosswalk, and drainage intent while keeping the complete network, current-flow, welded cross-source dimensions, piece mapping, direction/grade, installed-Z, field-route, quote, fabrication, and field-release claims fail-closed.",
   "loop_type": "closed",
   "sources_of_truth": [
     "apps/autosprink/src/data/new-hope-asbuilt-source-feed-riser-registration.json",
@@ -22,7 +22,7 @@
     "raw hydrant-test values remain distinct from the approved plan table and the reduced hydraulic calculation supply",
     "every approved calculation area retains a positive source margin before the completed-configuration no-pump decision is accepted",
     "actual as-built FP1.0 wet and dry riser section remains visible beside the hydraulic elevation chain",
-    "all 300 field-install wet pipe vectors exist exactly in the as-built source and all 174 head centers reconcile within 0.01 PDF point",
+    "the former 300 black 0.5-point vectors remain rejected as annotation, dimension, and symbol linework; only diameter-scaled segments that pass PDF parity and same-line native-cut reconciliation may be shown as bounded pipe evidence",
     "BL01 through BL47 plus CMA, CMB, and CMC retain 167 native pieces, 217 outlets, 67 fitting records, and 1477.333333 feet",
     "all 174 per-head native symbol families reconcile across field-install and as-built to exactly 164 TY3231, 6 V3506, and 4 TY3131 schedule identities",
     "all 167 native wet pipe records reconcile to 165 exact approved listing definitions while 169 listed fabricated units and two unexpanded quantity units remain explicit",
@@ -57,7 +57,7 @@
     "data/agent-loops/new-hope-system-backbone-20260716/lean-listing-crosswalk-proof.json",
     "data/agent-loops/new-hope-system-backbone-20260716/lean-proof.json"
   ],
-  "max_iterations": 6,
+  "max_iterations": 7,
   "max_tokens": 120000,
   "model_tier": "balanced",
   "human_gate_required": false,

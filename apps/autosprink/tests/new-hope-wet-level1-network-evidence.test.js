@@ -6,18 +6,25 @@ import { validateNewHopeWetLevel1NetworkEvidence } from '../src/engine/new-hope-
 const source = () => JSON.parse(readFileSync(fileURLToPath(new URL('../src/data/new-hope-wet-level1-network-evidence.json', import.meta.url)), 'utf8'));
 
 describe('New Hope Level 1 wet-network evidence', () => {
-  it('replays the complete cross-source plan and native fabrication quantities', () => {
+  it('replays source-typed threaded plan evidence while keeping the complete network blocked', () => {
     const result = validateNewHopeWetLevel1NetworkEvidence(source());
     expect(result.status).toBe('passed');
-    expect(result.wetSystemNetwork2dReady).toBe(true);
+    expect(result.wetSystemNetwork2dReady).toBe(false);
+    expect(result.sourceTypedThreadedPlanSegmentsReady).toBe(true);
+    expect(result.legacyAnnotationVectorsRejected).toBe(true);
     expect(result.sprinklerHeadPositions2dReady).toBe(true);
     expect(result.headTypeAssignmentReady).toBe(true);
     expect(result.nativeFabricationTakeoffReady).toBe(true);
-    expect(result.wetPipeVectors).toHaveLength(300);
+    expect(result.wetPipeVectors).toHaveLength(53);
     expect(result.sprinklerHeads).toHaveLength(174);
     expect(result.nativeFabricationLines).toHaveLength(50);
     expect(result.metrics).toEqual(expect.objectContaining({
-      crossSourcePipeVectorMatchCount: 300,
+      acceptedThreadedPlanSegmentCount: 53,
+      exactThreadedPiecePlanMappingCount: 24,
+      ambiguousThreadedPiecePlanSegmentCount: 29,
+      rejectedBlueSourceLineworkCount: 5,
+      legacyAnnotationLikeVectorCount: 300,
+      crossSourcePipeVectorMatchCount: 53,
       crossSourcePipeMaxResidualPt: 0,
       crossSourceHeadMatchCount: 174,
       crossSourceHeadMaxResidualPt: 0.0094,
@@ -30,11 +37,27 @@ describe('New Hope Level 1 wet-network evidence', () => {
 
   it('rejects one changed pipe coordinate', () => {
     const evidence = source();
-    evidence.wetPipeVectors[149].fromPdfPt.y += 0.5;
+    evidence.wetPipeVectors[24].fromPdfPt.y += 0.5;
     const result = validateNewHopeWetLevel1NetworkEvidence(evidence);
     expect(result.status).toBe('blocked');
     expect(result.issues.map((entry) => entry.code)).toContain('NH_WET_LEVEL1_PIPE_GEOMETRY_INVALID');
     expect(result.wetSystemNetwork2dReady).toBe(false);
+  });
+
+  it('rejects promotion of the former 300 annotation vectors', () => {
+    const evidence = source();
+    evidence.legacyAnnotationLikeVectorClass.classification = 'pipe-network';
+    const result = validateNewHopeWetLevel1NetworkEvidence(evidence);
+    expect(result.status).toBe('blocked');
+    expect(result.issues.map((entry) => entry.code)).toContain('NH_WET_LEVEL1_LEGACY_ANNOTATION_REJECTION_INVALID');
+  });
+
+  it('rejects acceptance of a non-reconciling blue source stroke', () => {
+    const evidence = source();
+    evidence.rejectedBlueSourceLinework[0].rejectionReason = 'accepted';
+    const result = validateNewHopeWetLevel1NetworkEvidence(evidence);
+    expect(result.status).toBe('blocked');
+    expect(result.issues.map((entry) => entry.code)).toContain('NH_WET_LEVEL1_REJECTED_LINEWORK_INVALID');
   });
 
   it('rejects a missing or moved sprinkler head', () => {
@@ -73,6 +96,8 @@ describe('New Hope Level 1 wet-network evidence', () => {
   });
 
   it.each([
+    'wetSystemNetwork2dReady',
+    'completeThreadedPiecePlanMappingReady',
     'pieceToPlanVectorMappingReady',
     'pipeDirectionReady',
     'pipeGradeReady',

@@ -15,7 +15,8 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(fs.statSync(new URL('hydrant-flow-test-data.png', proofRoot)).size).toBeGreaterThan(200_000);
     expect(fs.statSync(new URL('approved-water-supply-table.png', proofRoot)).size).toBeGreaterThan(200_000);
     expect(fs.statSync(new URL('wet-level1-source-network.png', proofRoot)).size).toBeGreaterThan(1_000_000);
-    expect(html).toContain('Complete Level 1 wet layout on the actual field drawing');
+    expect(html).toContain('Corrected bounded Level 1 evidence on the actual field drawing');
+    expect(html).toContain('former 300 black 0.5-point candidates are annotation');
     expect(html).toContain('wet-level1-source-network.png');
   });
 
@@ -43,6 +44,8 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(proofScript).toContain("root.approvedDesignWaterSupplyReady = String(result.approvedDesignWaterSupplyReady)");
     expect(proofScript).toContain("root.wetRiserAndDrainEvidenceReady = String(result.wetRiserAndDrainEvidenceReady)");
     expect(proofScript).toContain("root.wetSystemNetwork2dReady = String(result.wetSystemNetwork2dReady)");
+    expect(proofScript).toContain("root.wetSystemSourceTypedThreadedPlanSegmentsReady = String(result.wetSystemSourceTypedThreadedPlanSegmentsReady)");
+    expect(proofScript).toContain("root.wetSystemLegacyAnnotationVectorsRejected = String(result.wetSystemLegacyAnnotationVectorsRejected)");
     expect(proofScript).toContain("root.sprinklerHeadPositions2dReady = String(result.sprinklerHeadPositions2dReady)");
     expect(proofScript).toContain("root.wetSystemHeadTypeAssignmentReady = String(result.wetSystemHeadTypeAssignmentReady)");
     expect(proofScript).toContain("root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady)");

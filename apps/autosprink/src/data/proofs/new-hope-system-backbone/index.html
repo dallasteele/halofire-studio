@@ -13,7 +13,7 @@
   <header class="reveal">
     <span class="badge">PUMP DECISION PROVED - RELEASE STILL BLOCKED</span>
     <h1>The supply, no-pump decision, wet riser, dry riser, and drains are tied to the actual approved job</h1>
-    <p class="lede">The raw hydrant test, conservative approved calculation supply, four hydraulic demand areas, field-install and as-built FP1.0 wet network, native fabrication archive, wet/dry riser section, and approved FP2.0 drainage plan now agree. The completed New Hope configuration did not require a fire pump. That historical result is calibration evidence; it is not a substitute for a current flow test on a new quote. Piece-to-plan mapping, direction, grade, installed elevations, and field-route geometry still fail closed.</p>
+    <p class="lede">The raw hydrant test, conservative approved calculation supply, four hydraulic demand areas, source-typed FP1.0 segments, native fabrication archive, wet/dry riser section, and approved FP2.0 drainage intent are bound to the same job. The completed New Hope configuration did not require a fire pump. That historical result is calibration evidence; it is not a substitute for a current flow test on a new quote. The complete wet network, piece mapping, direction, grade, installed elevations, and field-route geometry still fail closed.</p>
   </header>
   <main>
     <section class="metrics reveal">
@@ -21,12 +21,12 @@
       <div class="metric"><strong class="ok">4 calc areas</strong><span>all retain positive approved source margin</span></div>
       <div class="metric"><strong class="ok">+5.4 psi</strong><span>minimum conservative safety margin</span></div>
       <div class="metric"><strong class="ok">No pump</strong><span>completed approved configuration</span></div>
-      <div class="metric"><strong class="ok">300 vectors</strong><span>wet pipe plan geometry, exact across two PDFs</span></div>
+      <div class="metric"><strong class="warn">53 accepted</strong><span>source-typed threaded segments; complete network blocked</span></div>
       <div class="metric"><strong class="stop">Quote blocked</strong><span>new flow test plus route geometry required</span></div>
     </section>
 
     <section class="panel reveal">
-      <div class="panel-head"><div><h2>Complete Level 1 wet layout on the actual field drawing</h2></div><p>Cyan replays all 300 native 0.5-point wet-pipe centerline vectors. Head rings preserve the native symbol families: magenta for 164 TY3231 pendents, amber for six V3506 pendents, and green for four TY3131 uprights. Every pipe vector exists exactly in the as-built; every head and type reconciles within 0.01 PDF point.</p></div>
+      <div class="panel-head"><div><h2>Corrected bounded Level 1 evidence on the actual field drawing</h2></div><p>Cyan marks 53 diameter-scaled one-inch segments that pass exact field/as-built parity and a same-line native cut gate. Magenta marks five rejected blue strokes: four have no matching native cut and one differs between field and as-built. The former 300 black 0.5-point candidates are annotation, dimension, and symbol linework—not a pipe network. Head rings preserve the 164 TY3231, six V3506, and four TY3131 native symbol families.</p></div>
       <div class="source-card" style="margin:22px"><img src="wet-level1-source-network.png" style="height:auto;max-height:none" alt="New Hope FP1.0 field-install plan with source-native wet pipe and typed sprinkler-head overlay"><p>50 native line families | 167 cut pieces | 217 outlets | 67 fitting records | 1,477.333 ft. Piece-to-vector mapping, direction, grade, and installed Z remain unresolved.</p></div>
     </section>
 
@@ -72,7 +72,7 @@
       <div class="model-shell"><div class="model-label"><b>Truthful 3D boundary</b><span id="model-status">Loading source-bound evidence...</span></div><canvas id="model-canvas" aria-label="Interactive 3D source evidence model over actual approved plan"></canvas></div>
     </section>
 
-    <section class="panel reveal"><div class="panel-head"><div><h2>System-owned verification loops</h2></div></div><div class="checks"><div class="check"><b>Primary</b>Exact project IDs, PDF hashes, page boxes, plan nodes, raw flow values, conservative calculation supply, device identities, and repeated hydraulic legs are validated before rendering.</div><div class="check"><b>Cross-source</b>The hydrant test, FP0.1 supply table, hydraulic report, FP1.0 wet/dry riser section, and FP2.0 plan must agree before the completed-project pump decision can pass.</div><div class="check"><b>Adversarial</b>Wrong hashes, changed supply margins, changed hydraulic elevations, or promoting FIELD ROUTE to source-resolved rejects the proof and cannot clear quote, fabrication, or field release.</div></div></section>
+    <section class="panel reveal"><div class="panel-head"><div><h2>System-owned verification loops</h2></div></div><div class="checks"><div class="check"><b>Primary</b>Exact project IDs, PDF hashes, diameter-scaled source styles, native cuts, plan nodes, flow values, device identities, and hydraulic legs are validated before rendering.</div><div class="check"><b>Cross-source</b>Each accepted threaded segment must agree between field-install and as-built PDFs and reconcile to a same-line native cut; supply, calculation, riser, and drainage sources are validated separately.</div><div class="check"><b>Adversarial</b>Annotation-class promotion, changed segment coordinates, non-reconciling source strokes, wrong hashes, altered margins or elevations, and promoted FIELD ROUTE geometry all reject the proof.</div></div></section>
     <section class="gate reveal"><h2>Acceptance boundary</h2><p id="gate-copy">Loading blockers...</p><code id="gate-codes"></code></section>
   </main>
   <script type="importmap">{"imports":{"three":"/apps/autosprink/node_modules/three/build/three.module.js","three/addons/":"/apps/autosprink/node_modules/three/examples/jsm/"}}</script>

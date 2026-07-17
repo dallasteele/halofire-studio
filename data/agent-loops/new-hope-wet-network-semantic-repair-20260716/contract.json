@@ -1,0 +1,46 @@
+{
+  "name": "new-hope-wet-network-semantic-repair-20260716",
+  "owner": "codex",
+  "goal": "Remove the false 300-vector wet-network promotion, classify the actual diameter-scaled one-inch FP1.0 source segments against the native wet fabrication inventory, and preserve only source-verified plan geometry while keeping complete network, direction, grade, elevation, riser/drain routing, 3D installation, fabrication, quote, and field release fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "tmp/pdfs/new-hope-live/field-install.pdf",
+    "tmp/pdfs/new-hope-live/as-builts.pdf",
+    "apps/autosprink/src/data/new-hope-native-fab-attachment-graph.json",
+    "apps/autosprink/src/data/new-hope-wet-welded-branch-registration-evidence.json",
+    "apps/autosprink/src/data/new-hope-wet-welded-main-registration-evidence.json",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "hal-brain episodes 125242, 150048, 150121, 150936, 150192"
+  ],
+  "exit_criteria": [
+    "the legacy 300-vector set is explicitly classified as rejected annotation-like linework and wetSystemNetwork2dReady remains false",
+    "every accepted threaded plan segment reproduces across field-install and as-built PDFs and reconciles to at least one same-line native one-inch cut",
+    "every rejected dark-blue source stroke either fails the native same-line cut gate or exceeds the bounded field/as-built endpoint parity gate",
+    "ambiguous same-line repeated fabrication identities remain candidate sets and cannot be promoted to exact piece mappings",
+    "the proof image visibly overlays accepted and rejected geometry on the actual FP1.0 PDF",
+    "complete network, direction, grade, elevation, riser/drain routes, 3D installation, fabrication, quote, field release, and VPS deployment remain false",
+    "primary, cross-source, adversarial, deterministic visual, formal, browser, build, rulebook, loop-guard, and brain-postflight checks pass without an independent human gate"
+  ],
+  "verification_gates": [
+    "protected field-install, as-built, native FAB, and approved listing hashes",
+    "diameter-scaled dark-blue source style and exact 58-candidate inventory",
+    "field-to-as-built endpoint residual plus same-line native cut-length reconciliation",
+    "line-association distance and uniqueness gates against the 99 accepted welded source registrations",
+    "fixed semantic fingerprints for 53 accepted and five rejected blue source segments",
+    "explicit fingerprint and rejection status for the former 300 black 0.5-point annotation-like vectors",
+    "adversarial coordinate, classification, rejection, head-type, native-length, and false-promotion mutations",
+    "actual-PDF overlay, browser DOM and console truth, deterministic replay, production build, and Lean truth-boundary proof"
+  ],
+  "state_path": "data/agent-loops/new-hope-wet-network-semantic-repair-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-wet-level1-network-evidence.json",
+    "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-level1-source-network.png",
+    "data/agent-loops/new-hope-wet-network-semantic-repair-20260716/visual-review.json",
+    "data/agent-loops/new-hope-wet-network-semantic-repair-20260716/lean-proof.json"
+  ],
+  "max_iterations": 3,
+  "max_tokens": 50000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

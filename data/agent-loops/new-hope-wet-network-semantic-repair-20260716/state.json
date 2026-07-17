@@ -1,0 +1,65 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "new-hope-wet-network-semantic-repair-20260716",
+  "iteration": 2,
+  "status": "semantic-repair-passed-complete-network-blocked",
+  "brainPreflight": {
+    "status": "passed",
+    "episodes": [125242, 150048, 150121, 150936, 150192]
+  },
+  "truth": {
+    "legacyAnnotationLikeVectorCount": 300,
+    "legacyAnnotationVectorsRejected": true,
+    "threadedSourceStyleCandidateCount": 58,
+    "acceptedThreadedPlanSegmentCount": 53,
+    "exactThreadedPiecePlanMappingCount": 24,
+    "ambiguousThreadedPiecePlanSegmentCount": 29,
+    "rejectedNoNativeCutCount": 4,
+    "rejectedCrossSourceDriftCount": 1,
+    "bl08FieldAsBuiltEndpointDriftPt": 0.5625,
+    "sourceTypedThreadedPlanSegmentsReady": true,
+    "completeWetSystemNetwork2dReady": false,
+    "sprinklerHeadPositions2dReady": true,
+    "headTypeAssignmentReady": true,
+    "nativeFabricationTakeoffReady": true,
+    "globalWeldedSourceRegisteredUnitCount": 99,
+    "completeThreadedPiecePlanMappingReady": false,
+    "pipeDirectionReady": false,
+    "pipeGradeReady": false,
+    "installedElevationReady": false,
+    "fieldDrainRoutesResolved": false,
+    "completeRiserRoomInstallationGeometryReady": false,
+    "wetSystemInstallation3dReady": false,
+    "quoteReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "vpsDeploymentAllowed": false
+  },
+  "verification": {
+    "primary": "exact source hashes, diameter-scaled style, 58-candidate inventory, and native line association replay passed",
+    "crossSource": "53 accepted segments have zero endpoint residual across field-install and as-built PDFs and at least one same-line native threaded cut within the takeout gate",
+    "adversarial": "coordinate, legacy-classification, rejected-linework, head-type, native-length, and false-promotion mutations reject",
+    "focusedTests": "241 passed across all 35 New Hope test files",
+    "build": "Vite production build passed",
+    "loopGuard": "strict closed-loop contract validation passed after the first informal contract shape was rejected and corrected",
+    "rulebook": "AGENTIC_RULES verification passed",
+    "python": "extractor bytecode compilation passed",
+    "deterministicReplay": {
+      "jsonStable": true,
+      "jsonSha256": "FD660FC66B957EDC19EC3C6BD5FE8CCA7D7150DC218106F6EF4662C76BA92EE6",
+      "pngStable": true,
+      "pngSha256": "1F66C86C8BB654E07FD804DC4BD242F79534924C0AA01A56D47F2751FA884105"
+    },
+    "formal": "Lean 4.13.0 verified the 53+4+1 candidate partition, 24+29 accepted identity partition, and fail-closed installation boundary in 90 ms",
+    "browser": "Playwright CLI proofReady true, complete network false, source-typed threaded segments true, legacy annotation rejection true, no horizontal overflow, zero console errors, zero console warnings",
+    "brainPostflight": "passed; episode 156812"
+  },
+  "evidence": {
+    "json": "apps/autosprink/src/data/new-hope-wet-level1-network-evidence.json",
+    "actualPdfOverlay": "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-level1-source-network.png",
+    "browserScreenshot": "output/playwright/new-hope-wet-network-semantic-repair-browser-corrected.png",
+    "browserScreenshotSha256": "26458DA26FF16CAE6EFC9B9BA5FAB8520AD8625F412678ABC0DF3CF83D37EBFF",
+    "formalReceipt": "data/agent-loops/new-hope-wet-network-semantic-repair-20260716/lean-proof.json"
+  },
+  "nextAction": "Resolve the BL08 field/as-built endpoint discrepancy and the 29 same-line threaded identity equivalence sets from source-native topology or side-view evidence. Then integrate only exact threaded piece mappings with the 99 welded registrations before advancing direction, grade, installed elevations, field drains, riser-room geometry, 3D installation, client reveal, fabrication, quote, or VPS release."
+}

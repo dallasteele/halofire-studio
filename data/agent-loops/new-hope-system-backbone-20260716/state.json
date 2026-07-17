@@ -1,8 +1,9 @@
 {
   "artifactType": "halofire.agent-loop-state.v1",
   "loop": "new-hope-system-backbone-20260716",
-  "iteration": 6,
-  "status": "active",
+  "iteration": 7,
+  "status": "superseded-by-semantic-repair",
+  "supersededBy": "data/agent-loops/new-hope-wet-network-semantic-repair-20260716/state.json",
   "brainPreflight": { "status": "passed", "episodes": [150514, 150555, 149978, 155497, 150639] },
   "truth": {
     "newHopeDrySystemEvidenceAdapterReady": true,
@@ -22,8 +23,14 @@
     "pumpDecisionReady": true,
     "pumpDecisionScope": "completed-approved-new-hope-configuration",
     "wetRiserAndDrainIdentityReady": true,
-    "wetSystemNetwork2dReady": true,
-    "wetPipeVectorCount": 300,
+    "wetSystemNetwork2dReady": false,
+    "legacyAnnotationLikeVectorCount": 300,
+    "legacyAnnotationVectorsRejected": true,
+    "sourceTypedThreadedPlanSegmentsReady": true,
+    "acceptedThreadedPlanSegmentCount": 53,
+    "exactThreadedPiecePlanMappingCount": 24,
+    "ambiguousThreadedPiecePlanSegmentCount": 29,
+    "rejectedBlueSourceLineworkCount": 5,
     "sprinklerHeadPositionCount": 174,
     "nativeWetLineFamilyCount": 50,
     "nativeWetPieceCount": 167,
@@ -59,14 +66,14 @@
     "vpsDeploymentAllowed": false
   },
   "verification": {
-    "focusedTests": "31 passed across 4 files; pipe-vector, head-coordinate, per-head type, native-piece-length, listing hash, missing listing definition, listing page, threaded length, hydraulic margin, and false-promotion mutations reject",
+    "focusedTests": "historical 31-test receipt superseded for plan semantics; corrected semantic-repair focused suite is authoritative",
     "build": "passed",
     "loopGuard": "passed",
     "rulebook": "passed",
     "lean": "verified by Lean 4.13.0 in 75 ms; 167 native records, 165 unique listing definitions, 169 listed units, and two unexpanded units are formally distinct, and missing welded length, quantity expansion, and plan placement keep fabrication false; receipt lean-listing-crosswalk-proof.json",
-    "deterministicVisual": "passed; wet-level1-source-network.png and wet-listing-crosswalk-browser.png inspected at original resolution over actual FP1.0 and actual approved listing renders; screenshot SHA256 1DD922B7396BA12CFC01318EDA9041E83F5DF03AA5AFC1074A1D2F585BAD075F",
+    "deterministicVisual": "superseded; the listing screenshot remains valid, but the former complete-network interpretation of wet-level1-source-network.png was rejected by the semantic-repair loop",
     "browser": "passed through Playwright CLI at local HTTP 127.0.0.1:3312; proofReady true, crosswalk true, quantity expansion false, quote/field release false, 12 sample rows rendered, and console reported zero errors and zero warnings",
     "brainPostflight": "passed; episode 156373"
   },
-  "nextAction": "Use the now-proven duplicate BL34.01 and BL35.01 line/dimension anchors to register exact source endpoints and vectors without label-proximity inference. Then resolve the remaining exact piece-to-plan mapping, pipe direction/grade, installed elevations, field drain routes, and source-feed route geometry. Use Addendum 02 for the auth-gated client reveal only after the shared real geometry is release-worthy; require a current flow test for every new quote."
+  "nextAction": "Continue from the semantic-repair loop. Resolve the BL08 field/as-built endpoint discrepancy, disambiguate the 29 same-line threaded identity sets from native topology or side views, and recover the remaining exact piece-to-plan mapping before direction, grade, installed elevations, field drains, riser-room geometry, client reveal, fabrication, quote, or VPS release."
 }
