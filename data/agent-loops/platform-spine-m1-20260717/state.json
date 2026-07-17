@@ -2,7 +2,7 @@
   "name": "platform-spine-m1-20260717",
   "iteration": 1,
   "status": "in_progress",
-  "nextStage": "IMPLEMENT_COPY_ONLY_ADDITIVE_SQLITE_MIGRATION",
+  "nextStage": "BIND_AUTOBID_PRIVATE_TABLES_TO_PLATFORM_LINKS",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [141704, 60905],
@@ -23,5 +23,11 @@
     "sourceSha256": "5c2ac127b37d570edf73f097b1c4eeb1df338d65f4ef3c8f3046b867c2828546",
     "copiedCounts": {"customers": 274, "jobs": 2677, "documents": 455150, "sites": 0, "employees": 0},
     "next": "exercise reversible down migration on disposable copy"
+  },
+  "iteration3": {
+    "rollbackTarget": "tmp/platform-m1-reversible.db",
+    "remainingPlatformTables": 0,
+    "sourceDigestUnchanged": "5c2ac127b37d570edf73f097b1c4eeb1df338d65f4ef3c8f3046b867c2828546",
+    "verification": "apply plus rollback on disposable copy passed"
   }
 }

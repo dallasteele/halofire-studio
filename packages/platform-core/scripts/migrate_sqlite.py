@@ -53,6 +53,22 @@ def apply(source: Path, target: Path, receipt: Path) -> dict[str, object]:
     result = {"migration": MIGRATION_ID, "source": str(source), "target": str(target), "source_sha256": source_sha, "target_sha256": digest(target), "counts": counts, "source_writable": False}
     receipt.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8"); return result
 
+def rollback(target: Path) -> dict[str, object]:
+    if not target.is_file(): raise ValueError("PLATFORM_MIGRATION_TARGET_MISSING")
+    conn = sqlite3.connect(target)
+    try:
+        applied = conn.execute("SELECT source_sha256 FROM platform_migrations WHERE id=?", (MIGRATION_ID,)).fetchone()
+        if applied is None: raise ValueError("PLATFORM_MIGRATION_NOT_APPLIED")
+        for table in ("platform_module_registry", "platform_review_items", "platform_audit_events", "platform_documents", "platform_employees", "platform_jobs", "platform_sites", "platform_customers", "platform_migrations"):
+            conn.execute(f"DROP TABLE {table}")
+        conn.commit()
+        remaining = conn.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE 'platform_%'").fetchone()[0]
+    finally: conn.close()
+    return {"migration": MIGRATION_ID, "target": str(target), "rolled_back": True, "remaining_platform_tables": remaining}
+
 def main() -> None:
-    p = argparse.ArgumentParser(); p.add_argument("--source", type=Path, required=True); p.add_argument("--target", type=Path, required=True); p.add_argument("--receipt", type=Path, required=True); args = p.parse_args(); print(json.dumps(apply(args.source, args.target, args.receipt)))
+    p = argparse.ArgumentParser(); p.add_argument("--source", type=Path); p.add_argument("--target", type=Path); p.add_argument("--receipt", type=Path); p.add_argument("--rollback-target", type=Path); args = p.parse_args()
+    if args.rollback_target: print(json.dumps(rollback(args.rollback_target))); return
+    if not (args.source and args.target and args.receipt): p.error("--source, --target, and --receipt are required unless --rollback-target is supplied")
+    print(json.dumps(apply(args.source, args.target, args.receipt)))
 if __name__ == "__main__": main()
