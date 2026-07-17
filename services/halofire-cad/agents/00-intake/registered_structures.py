@@ -199,6 +199,7 @@ class RegisteredLevelStructure:
     page_coverage_gate: dict[str, Any]
     dimensional_gate: dict[str, Any]
     material_conditions: dict[str, Any]
+    framing_condition_gate: dict[str, Any]
 
 
 def _sha256(path: Path) -> str:
@@ -252,6 +253,35 @@ def _decode(payload: dict[str, Any], page_index: int, sheet_no: str) -> Register
     columns = _enrich_members(match.get("columns") or [], material_conditions)
     if not columns or any(len(value.get("polygon_ft") or []) != 4 for value in columns):
         raise ValueError(f"registered structure has no measured column polygons: {sheet_no}")
+    framing_condition_gate = dict(match.get("framing_condition_gate") or {})
+    if framing_condition_gate:
+        if framing_condition_gate.get("source_pdf_sha256") != payload.get("source_structural_pdf_sha256"):
+            raise ValueError("registered structure framing condition source hash mismatch")
+        if framing_condition_gate.get("condition") != "flush-framed-unless-noted":
+            raise ValueError("registered structure framing condition is unresolved")
+        if framing_condition_gate.get("governing_text") != (
+            "BEAMS SHOWN ON THIS SHEET OCCUR WITHIN THE ROOF FRAMING SHOWN "
+            "(FLUSH-FRAMED), UNO."
+        ):
+            raise ValueError("registered structure framing condition text mismatch")
+        if framing_condition_gate.get("passed") is not True:
+            raise ValueError("registered structure framing condition gate is not passed")
+        if framing_condition_gate.get("plan_specific_drop_markers"):
+            raise ValueError("registered structure has unassociated plan-specific DROP markers")
+        source_pages = framing_condition_gate.get("source_pages") or []
+        expected_pages = {
+            (value.get("page_index"), value.get("sheet"), value.get("pdf_sha256"))
+            for value in (match.get("overhead_sources") or [])
+        }
+        actual_pages = {
+            (value.get("page_index"), value.get("sheet"), value.get("pdf_sha256"))
+            for value in source_pages
+        }
+        if len(source_pages) != 2 or any(
+            value.get("pdf_sha256") != payload.get("source_structural_pdf_sha256")
+            for value in source_pages
+        ) or actual_pages != expected_pages:
+            raise ValueError("registered structure framing condition pages are not hash bound")
     return RegisteredLevelStructure(
         sheet_no=sheet_no,
         page_index=page_index,
@@ -264,6 +294,7 @@ def _decode(payload: dict[str, Any], page_index: int, sheet_no: str) -> Register
         page_coverage_gate=dict(coverage),
         dimensional_gate=dict(match.get("dimensional_gate") or {}),
         material_conditions=material_conditions,
+        framing_condition_gate=framing_condition_gate,
     )
 
 

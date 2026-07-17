@@ -4,6 +4,7 @@ import {
   deriveScaleFromText,
   extractStructuralGrid,
   parseMemberTags,
+  parseFramingConditionMarkers,
   detectColumns,
   detectColumnMarkers,
   detectBeams,
@@ -107,6 +108,39 @@ describe('parseMemberTags', () => {
     expect(r.members.length).toBe(3);
     expect(r.byRole.column).toBe(1);
     expect(r.byRole.beam).toBe(2);
+  });
+});
+
+describe('parseFramingConditionMarkers', () => {
+  const rowPair = (label, yFt, left = 0, right = 100) => [
+    { s: label, xFt: left, yFt }, { s: label, xFt: right, yFt },
+  ];
+
+  it('keeps a legend DROP out of the primary framing-plan body', () => {
+    const rows = ['A', 'B', 'C', 'D', 'E'].flatMap((label, index) => rowPair(label, 80 + index * 10));
+    const result = parseFramingConditionMarkers([
+      ...rows,
+      { s: 'DROP', xFt: 40, yFt: 30 },
+      { s: 'GT - DROP TOP CHORD', xFt: 40, yFt: 20 },
+    ]);
+    expect(result.primaryPlanBodyFt.method).toBe('widest-paired-row-grid-bubbles');
+    expect(result.planSpecificDropMarkers).toHaveLength(0);
+    expect(result.legendDropMarkers).toHaveLength(1);
+  });
+
+  it('flags an exact DROP token inside the main plan even when a detail repeats row bubbles', () => {
+    const main = ['A', 'B', 'C', 'D', 'E'].flatMap((label, index) => rowPair(label, 80 + index * 10));
+    const detail = ['A', 'B', 'C', 'D', 'E'].flatMap((label, index) => rowPair(label, 20 + index * 5, 40, 60));
+    const result = parseFramingConditionMarkers([...main, ...detail, { s: 'DROP', xFt: 45, yFt: 95 }]);
+    expect(result.planSpecificDropMarkers).toHaveLength(1);
+    expect(result.planSpecificDropMarkers[0]).toMatchObject({ type: 'beam-below-framing', inPrimaryPlanBody: true });
+  });
+
+  it('fails closed when there are too few paired row datums to establish the plan body', () => {
+    const result = parseFramingConditionMarkers([...rowPair('A', 10), { s: 'DROP', xFt: 20, yFt: 10 }]);
+    expect(result.primaryPlanBodyFt).toBeNull();
+    expect(result.planSpecificDropMarkers).toHaveLength(0);
+    expect(result.legendDropMarkers).toHaveLength(1);
   });
 });
 

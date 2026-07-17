@@ -42,3 +42,52 @@ trusses at 24 inches on center and delegates roof height/slope to architecture.
 The next build slice must register actual S-190 framing centerlines into these
 current A-121/A-201/A-301 datums. Truss profile, bearing, connection, and any
 member without direct plan orientation and Z evidence remain unresolved.
+
+## Iteration 3 explicit placement accounting and DROP adversary
+
+The S-190 parser now distinguishes an exact `DROP` condition inside the primary
+framing-plan body from the same token printed in the marks-and-symbols legend.
+The primary body is recovered from the widest paired row-grid bubbles, so the
+smaller elevator/amenity details and the legend cannot set a member's vertical
+condition. Both S-190.B and S-190.C contain the governing hash-bound note
+`BEAMS SHOWN ON THIS SHEET OCCUR WITHIN THE ROOF FRAMING SHOWN
+(FLUSH-FRAMED), UNO.` Their two exact `DROP` tokens are both outside the main
+plan body; zero plan-specific DROP associations remain.
+
+The new continuous projection gate accounts for all 127 A-108 beam/joist
+centerlines at 1/96-foot intervals against the sealed A-121 roof planes,
+features, and exclusions. It reports 0 hidden skips:
+
+- 7 source-bounded dry minimum-dressed wood members project continuously, but
+  remain non-physical evidence representations because PS 20-20 minima are not
+  field measurements.
+- 82 centerlines have unresolved sections.
+- 19 resolved members intersect the roof opening exclusion.
+- 19 resolved members leave the verified roof model.
+- The sole exact section, `HSS10X4X3/8`, starts inside the roof opening and is
+  rejected; therefore no physical beam/joist solid is fabricated.
+
+The A-121 proof overlays the seven bounded representations in amber and the
+rejected exact HSS in red on the actual architectural PDF:
+
+- `output/visual-proof/1881-a121-roof-framing-placement-gate.png`
+  SHA-256 `ffb132572bf3ea1384684ed6b67bceb898c29795e635cbadee1a720fd3ac7402`
+- `apps/autosprink/src/data/roof-framing-placement.cooperative-1881.json`
+  records candidates 127, accounted 127, skipped 0, and keeps employee/VPS,
+  code-compliance, and fabrication claims false.
+
+Focused JS verification passes 40/40, including adversarial source-hash drift,
+plan-specific DROP ambiguity, a member crossing an opening despite valid
+endpoints, bounded wood non-promotion, and exact sloped-plane placement. The
+broader roof/coordination/structure JS regression passes 63/63 with zero skips.
+The full CAD Python inventory passes 422/422 with zero skips when run in
+resource-isolated directory shards (357 unit, 41 golden, 9 root parity, 7
+cruel, 3 property, 3 stress, and 2 end-to-end). AutoSprink's Vite production
+build passes. The monorepo build compiles the web packages, then the unrelated
+Tauri packaging lane stops because its pre-existing
+`bin/halofire-pipeline-x86_64-pc-windows-msvc.exe` sidecar is absent.
+
+The
+next loop must find source-specific exact wood dimensions or approve a
+separately labeled conservative obstruction-envelope policy; it may not relabel
+minimum dressed bounds as exact physical parts.

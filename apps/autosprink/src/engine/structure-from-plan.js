@@ -259,6 +259,75 @@ export function parseMemberTags(textItemsFt) {
 }
 
 /**
+ * PURE. Locate explicit DROP tokens and distinguish plan callouts from the symbol legend.
+ *
+ * The primary framing-plan body is identified from paired row-grid bubbles. Detail plans and
+ * legends can repeat the same row letters, but their paired bubbles have a much smaller X span;
+ * the main plan wins independently for each label. This keeps a legend's standalone `DROP`
+ * token from silently classifying a real member as dropped.
+ */
+export function parseFramingConditionMarkers(textItemsFt, opts = {}) {
+  const items = Array.isArray(textItemsFt) ? textItemsFt : [];
+  const rowItems = items
+    .filter((item) => /^(?:[A-M]|L\.6)$/.test(String(item.s || '').trim()))
+    .map((item) => ({ label: String(item.s).trim(), xFt: Number(item.xFt), yFt: Number(item.yFt) }))
+    .filter((item) => Number.isFinite(item.xFt) && Number.isFinite(item.yFt));
+  const yToleranceFt = Number.isFinite(opts.rowPairYToleranceFt)
+    ? Math.abs(opts.rowPairYToleranceFt) : 0.35;
+  const bestPairs = [];
+  for (const label of new Set(rowItems.map((item) => item.label))) {
+    const labelled = rowItems.filter((item) => item.label === label).sort((a, b) => a.yFt - b.yFt);
+    const clusters = [];
+    for (const item of labelled) {
+      const cluster = clusters.find((value) => Math.abs(value[0].yFt - item.yFt) <= yToleranceFt);
+      if (cluster) cluster.push(item); else clusters.push([item]);
+    }
+    const pair = clusters
+      .filter((cluster) => cluster.length >= 2)
+      .map((cluster) => ({
+        label,
+        minXFt: Math.min(...cluster.map((item) => item.xFt)),
+        maxXFt: Math.max(...cluster.map((item) => item.xFt)),
+        yFt: cluster.reduce((sum, item) => sum + item.yFt, 0) / cluster.length,
+      }))
+      .sort((left, right) => (right.maxXFt - right.minXFt) - (left.maxXFt - left.minXFt))[0];
+    if (pair) bestPairs.push(pair);
+  }
+  const minimumRows = Number.isFinite(opts.minimumPrimaryRows) ? Number(opts.minimumPrimaryRows) : 5;
+  const paddingFt = Number.isFinite(opts.primaryBodyPaddingFt) ? Math.abs(opts.primaryBodyPaddingFt) : 2;
+  const primaryPlanBodyFt = bestPairs.length >= minimumRows ? {
+    minX: round(Math.min(...bestPairs.map((pair) => pair.minXFt)) - paddingFt),
+    minY: round(Math.min(...bestPairs.map((pair) => pair.yFt)) - paddingFt),
+    maxX: round(Math.max(...bestPairs.map((pair) => pair.maxXFt)) + paddingFt),
+    maxY: round(Math.max(...bestPairs.map((pair) => pair.yFt)) + paddingFt),
+    rowLabels: bestPairs.map((pair) => pair.label).sort(),
+    method: 'widest-paired-row-grid-bubbles',
+  } : null;
+  const inside = (point) => primaryPlanBodyFt
+    && point.xFt >= primaryPlanBodyFt.minX && point.xFt <= primaryPlanBodyFt.maxX
+    && point.yFt >= primaryPlanBodyFt.minY && point.yFt <= primaryPlanBodyFt.maxY;
+  const markers = items
+    .filter((item) => /^DROP$/i.test(String(item.s || '').trim()))
+    .map((item, index) => {
+      const point = { xFt: round(Number(item.xFt)), yFt: round(Number(item.yFt)) };
+      return {
+        id: `drop-${index + 1}`,
+        type: 'beam-below-framing',
+        sourceText: String(item.s).trim(),
+        ...point,
+        inPrimaryPlanBody: Boolean(inside(point)),
+      };
+    })
+    .filter((marker) => Number.isFinite(marker.xFt) && Number.isFinite(marker.yFt));
+  return {
+    primaryPlanBodyFt,
+    markers,
+    planSpecificDropMarkers: markers.filter((marker) => marker.inPrimaryPlanBody),
+    legendDropMarkers: markers.filter((marker) => !marker.inPrimaryPlanBody),
+  };
+}
+
+/**
  * PURE. Detect REAL COLUMN MARKERS directly from the plan linework — the honest
  * structure-from-raster path that REPLACES the grid-intersection heuristic.
  *
@@ -618,6 +687,7 @@ export function buildStructureLayer(input, opts = {}) {
 
   // 2) MEMBER TAGS.
   const { members, byRole } = parseMemberTags(textItemsFt || []);
+  const framingConditions = parseFramingConditionMarkers(textItemsFt || [], opts.framingConditionOpts || {});
 
   // 3) FRAMING LAYER: the heavier-lineweight band (beams/columns), dropping hairline hatch +
   //    thin grid/dimension annotation. Fall back to all segments if the layer split is weak.
@@ -696,6 +766,25 @@ export function buildStructureLayer(input, opts = {}) {
     ys: grid.ys.map((y) => round(y + offset.dy)),
     labels: grid.labels,
   };
+  const shiftedFramingConditions = {
+    ...framingConditions,
+    primaryPlanBodyFt: framingConditions.primaryPlanBodyFt ? {
+      ...framingConditions.primaryPlanBodyFt,
+      minX: round(framingConditions.primaryPlanBodyFt.minX + offset.dx),
+      minY: round(framingConditions.primaryPlanBodyFt.minY + offset.dy),
+      maxX: round(framingConditions.primaryPlanBodyFt.maxX + offset.dx),
+      maxY: round(framingConditions.primaryPlanBodyFt.maxY + offset.dy),
+    } : null,
+    markers: framingConditions.markers.map((marker) => ({
+      ...marker, xFt: round(marker.xFt + offset.dx), yFt: round(marker.yFt + offset.dy),
+    })),
+    planSpecificDropMarkers: framingConditions.planSpecificDropMarkers.map((marker) => ({
+      ...marker, xFt: round(marker.xFt + offset.dx), yFt: round(marker.yFt + offset.dy),
+    })),
+    legendDropMarkers: framingConditions.legendDropMarkers.map((marker) => ({
+      ...marker, xFt: round(marker.xFt + offset.dx), yFt: round(marker.yFt + offset.dy),
+    })),
+  };
 
   const layer = {
     scaleFtPerUnit: round(scaleFtPerUnit),
@@ -706,6 +795,7 @@ export function buildStructureLayer(input, opts = {}) {
     beams,
     joists,
     members: members.map((m) => ({ size: m.size, kind: m.kind, role: m.role, xFt: round(m.xFt + offset.dx), yFt: round(m.yFt + offset.dy), raw: m.raw })),
+    framingConditions: shiftedFramingConditions,
     gridMatch,
     registrationOffsetFt: offset,
     counts: {

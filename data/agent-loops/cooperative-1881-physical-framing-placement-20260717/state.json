@@ -1,10 +1,10 @@
 {
   "name": "cooperative-1881-physical-framing-placement-20260717",
-  "iteration": 2,
+  "iteration": 3,
   "status": "in_progress",
-  "updatedAt": "2026-07-17T03:34:00-07:00",
-  "completedStages": ["DISCOVER", "PLAN"],
-  "nextStage": "BUILD",
+  "updatedAt": "2026-07-17T03:49:00-07:00",
+  "completedStages": ["DISCOVER", "PLAN", "BUILD", "VERIFY"],
+  "nextStage": "SOURCE_EXACT_WOOD_DIMENSIONS_OR_EXPLICITLY_BOUNDED_OBSTRUCTION_POLICY",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [157533, 46659, 120030, 60864],
@@ -31,7 +31,30 @@
     "mechanicalEquipmentFootprints": 139,
     "plumbingVentPoints": 83,
     "sourceReceiptVerification": "passed",
-    "physicalFramingPromoted": 0
+    "physicalFramingPromoted": 0,
+    "placementAccounting": {
+      "candidates": 127,
+      "exactPhysicalPlacements": 0,
+      "boundedNonPhysicalRepresentations": 7,
+      "rejected": 120,
+      "accounted": 127,
+      "skipped": 0
+    },
+    "dropConditionGate": {
+      "condition": "flush-framed-unless-noted",
+      "planSpecificDropMarkers": 0,
+      "legendDropMarkers": 2,
+      "detection": "exact DROP token inside widest paired row-grid bubble body"
+    },
+    "verification": {
+      "cadPythonTestsPassed": 422,
+      "cadPythonTestsSkipped": 0,
+      "javascriptTestsPassed": 63,
+      "javascriptTestsSkipped": 0,
+      "autosprinkProductionBuild": "passed",
+      "monorepoWebBuild": "passed-before-unrelated-tauri-sidecar-packaging",
+      "tauriPackagingBlocker": "bin/halofire-pipeline-x86_64-pc-windows-msvc.exe missing"
+    }
   },
-  "currentQuestion": "Which S-190 roof framing centerlines can be registered to the now-current A-121 planes and A-201/A-301 vertical datums with an explicit member orientation and top/bottom Z, while leaving truss profile, bearing, and connections unresolved unless directly shown?"
+  "currentQuestion": "Which hash-bound specification, manufacturer submittal, or completed-bid evidence establishes exact dressed dimensions for the seven continuously roof-projectable wood members, so they can become physical solids without treating PS 20-20 minimum dimensions as field measurements?"
 }

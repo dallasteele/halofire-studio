@@ -171,10 +171,22 @@ function projectedLayer(layer, project, source) {
     dimensional_status: member.member ? 'member-tag-present-section-lookup-required' : 'centerline-only-member-dimension-missing',
     source,
   });
+  const conditionMarker = (marker) => ({
+    ...marker,
+    plan_point_ft: project([marker.xFt, marker.yFt]),
+    source,
+  });
   return {
     columns,
     beams: layer.beams.map((member, index) => line(member, 'beam', index)),
     joists: layer.joists.map((member, index) => line(member, 'joist', index)),
+    framing_condition_markers: layer.framingConditions.markers.map(conditionMarker),
+    plan_specific_drop_markers: layer.framingConditions.planSpecificDropMarkers.map(conditionMarker),
+    legend_drop_markers: layer.framingConditions.legendDropMarkers.map(conditionMarker),
+    framing_condition_detection: {
+      primary_plan_body_ft: layer.framingConditions.primaryPlanBodyFt,
+      method: 'exact DROP token inside widest paired row-grid bubble body',
+    },
     counts: layer.counts,
   };
 }
@@ -227,6 +239,8 @@ async function main() {
     if (!cache.has(key)) {
       const page = await structuralDoc.getPage(pageNumber);
       const textContent = await page.getTextContent();
+      const normalizedSheetText = textContent.items.map((item) => item.str).join(' ')
+        .replace(/\s+/g, ' ').trim().toUpperCase();
       const scale = deriveScaleFromText(textContent.items.map((item) => item.str).join(' '));
       if (!scale) throw new Error(`printed scale missing on structural page ${pageNumber}`);
       const gridOverride = cleanStructuralGrid(textContent, page.getViewport({ scale: 1 }).height, scale.feetPerUnit);
@@ -235,6 +249,9 @@ async function main() {
         gridAlign: true,
         gridOverride,
       });
+      layer.flushFramedUnlessNotedSourceText = normalizedSheetText.includes(
+        'BEAMS SHOWN ON THIS SHEET OCCUR WITHIN THE ROOF FRAMING SHOWN (FLUSH-FRAMED), UNO.',
+      ) ? 'BEAMS SHOWN ON THIS SHEET OCCUR WITHIN THE ROOF FRAMING SHOWN (FLUSH-FRAMED), UNO.' : null;
       if (!layer.gridMatch || layer.gridMatch.medianErrFt > 0.1
         || layer.gridMatch.matchedCols < 8 || layer.gridMatch.matchedRows < 5
         || layer.gridMatch.matchedCols + layer.gridMatch.matchedRows < 15) {
@@ -258,6 +275,14 @@ async function main() {
     const columns = uniqueByGeometry([...verticalB.projected.columns, ...verticalC.projected.columns]);
     const beams = uniqueByGeometry([...overheadB.projected.beams, ...overheadC.projected.beams]);
     const joists = uniqueByGeometry([...overheadB.projected.joists, ...overheadC.projected.joists]);
+    const planSpecificDropMarkers = [
+      ...overheadB.projected.plan_specific_drop_markers,
+      ...overheadC.projected.plan_specific_drop_markers,
+    ];
+    const isRoofLevel = spec.sheet === 'A-108';
+    if (isRoofLevel && (!overheadB.raw.flushFramedUnlessNotedSourceText || !overheadC.raw.flushFramedUnlessNotedSourceText)) {
+      throw new Error(`flush-framed source note missing from ${spec.overheadName} B/C sheets`);
+    }
     const lineRows = [...beams, ...joists];
     const exactLineSections = lineRows.filter((row) => row.member
       && /^(?:HSS|W\d|L\d|\(\d+\).+LVL)/i.test(row.member)).length;
@@ -271,6 +296,21 @@ async function main() {
       columns,
       beams,
       joists,
+      ...(isRoofLevel ? { framing_condition_gate: {
+        passed: planSpecificDropMarkers.length === 0,
+        condition: planSpecificDropMarkers.length === 0
+          ? 'flush-framed-unless-noted'
+          : 'plan-specific-drop-association-required',
+        governing_text: overheadB.raw.flushFramedUnlessNotedSourceText,
+        source_pdf_sha256: structuralSha256,
+        source_pages: [overheadB.source, overheadC.source],
+        detection_method: 'exact DROP token inside widest paired row-grid bubble body',
+        plan_specific_drop_markers: planSpecificDropMarkers,
+        legend_drop_markers: [
+          ...overheadB.projected.legend_drop_markers,
+          ...overheadC.projected.legend_drop_markers,
+        ],
+      } } : {}),
       counts: { columns: columns.length, beams: beams.length, joists: joists.length },
       page_coverage_gate: {
         passed: true,

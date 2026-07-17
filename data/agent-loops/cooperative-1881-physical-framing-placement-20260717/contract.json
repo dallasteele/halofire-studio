@@ -7,6 +7,8 @@
     "E:/ClaudeBot/HaloFireBidDocs/1-Bid Documents/GC - Bid Plans/1881 - Structurals.pdf",
     "E:/ClaudeBot/data/halofire/golden/1881/input/GC - Bid Plans/1881 - Architecturals.pdf",
     "services/halofire-cad/agents/00-intake/registered-geometry/1881-structurals.json",
+    "apps/autosprink/src/data/registered-roof-framing.cooperative-1881.json",
+    "apps/autosprink/src/data/roof-framing-placement.cooperative-1881.json",
     "services/halofire-cad/agents/00-intake/registered_structures.py",
     "apps/autosprink/src/engine/structure-from-plan.js",
     "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/evidence.md",
@@ -36,7 +38,7 @@
     "services/halofire-cad/agents/00-intake/registered-geometry/1881-structurals.json",
     "services/halopenclaw-gateway/data/1881-cooperative/deliverables/building_raw.json",
     "services/halopenclaw-gateway/data/1881-cooperative/deliverables/design.glb",
-    "output/visual-proof/1881-physical-framing-source-overlay.png",
+    "output/visual-proof/1881-a121-roof-framing-placement-gate.png",
     "output/visual-proof/1881-physical-framing-3d.png",
     "data/agent-loops/cooperative-1881-physical-framing-placement-20260717/evidence.md"
   ],

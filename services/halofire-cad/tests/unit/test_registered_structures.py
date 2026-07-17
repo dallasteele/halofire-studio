@@ -46,6 +46,49 @@ def test_1881_a101_loads_hash_bound_bc_structure() -> None:
     assert resolved
 
 
+def test_1881_a108_separates_legend_drop_from_plan_conditions() -> None:
+    module = _load_module()
+    result = module.load_registered_structure(str(PDF_1881), 28, "A-108")
+    assert result is not None
+    gate = result.framing_condition_gate
+    assert gate["passed"] is True
+    assert gate["condition"] == "flush-framed-unless-noted"
+    assert gate["plan_specific_drop_markers"] == []
+    assert len(gate["legend_drop_markers"]) == 2
+
+
+def test_plan_specific_drop_marker_rejects(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    module = _load_module()
+    source = ROOT / "agents" / "00-intake" / "registered-geometry" / "1881-structurals.json"
+    payload = json.loads(source.read_text(encoding="utf-8"))
+    payload["levels"]["A-108"]["framing_condition_gate"]["plan_specific_drop_markers"] = [
+        {"id": "adversarial-drop", "inPrimaryPlanBody": True},
+    ]
+    rejected = tmp_path / "drop.json"
+    rejected.write_text(json.dumps(payload), encoding="utf-8")
+    monkeypatch.setenv("HALOFIRE_CAD_REGISTERED_STRUCTURE_MANIFEST", str(rejected))
+    module._CACHE.clear()
+    with pytest.raises(ValueError, match="DROP markers"):
+        module.load_registered_structure(str(PDF_1881), 28, "A-108")
+
+
+def test_framing_condition_page_drift_rejects(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    module = _load_module()
+    source = ROOT / "agents" / "00-intake" / "registered-geometry" / "1881-structurals.json"
+    payload = json.loads(source.read_text(encoding="utf-8"))
+    payload["levels"]["A-108"]["framing_condition_gate"]["source_pages"][0]["page_index"] = 61
+    rejected = tmp_path / "wrong-condition-page.json"
+    rejected.write_text(json.dumps(payload), encoding="utf-8")
+    monkeypatch.setenv("HALOFIRE_CAD_REGISTERED_STRUCTURE_MANIFEST", str(rejected))
+    module._CACHE.clear()
+    with pytest.raises(ValueError, match="pages are not hash bound"):
+        module.load_registered_structure(str(PDF_1881), 28, "A-108")
+
+
 @pytest.mark.parametrize(
     ("tag", "expected"),
     [
