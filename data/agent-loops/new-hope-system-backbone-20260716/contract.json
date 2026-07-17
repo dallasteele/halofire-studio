@@ -1,7 +1,7 @@
 {
   "name": "new-hope-system-backbone-20260716",
   "owner": "codex",
-  "goal": "Instantiate and visibly prove the source-backed New Hope riser and drainage backbone in top plan, elevation, and bounded 3D while keeping current-flow, pump, wet-system, field-route, quote, fabrication, and field-release claims fail-closed.",
+  "goal": "Instantiate and visibly prove the source-backed New Hope water supply, historical pump decision, wet/dry risers, and drainage backbone in top plan, elevation, and bounded 3D while keeping current-flow, unextracted wet-network, field-route, quote, fabrication, and field-release claims fail-closed.",
   "loop_type": "closed",
   "sources_of_truth": [
     "apps/autosprink/src/data/new-hope-asbuilt-source-feed-riser-registration.json",
@@ -10,19 +10,24 @@
     "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-1.json",
     "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-2.json",
     "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-3.json",
+    "apps/autosprink/src/data/new-hope-approved-water-supply-wet-riser-evidence.json",
     "C:/Users/dalla/Downloads/_autobid_transcript.txt",
     "hal-brain episodes 150514, 150555, 149978, 155497"
   ],
   "exit_criteria": [
     "actual approved FP2.0 remains visible beneath top-plan markers",
-    "actual as-built FP1.0 riser section remains visible beside the hydraulic elevation chain",
+    "raw hydrant-test values remain distinct from the approved plan table and the reduced hydraulic calculation supply",
+    "every approved calculation area retains a positive source margin before the completed-configuration no-pump decision is accepted",
+    "actual as-built FP1.0 wet and dry riser section remains visible beside the hydraulic elevation chain",
     "only plan-plus-Z source intersections appear as exact 3D points",
     "no unresolved field-route drum-drip or source-feed path is rendered as released pipe",
+    "a historical completed-configuration pump decision never satisfies the current-flow-test gate for a new quote",
     "quoteReady, fabricationReady, and fieldReleaseReady remain false",
     "focused tests, production build, browser DOM, console, screenshots, and Lean proof pass"
   ],
   "verification_gates": [
-    "source hash and page binding",
+    "flow-test, approved-plan, calculation, and as-built source hash and page binding",
+    "adversarial flow-test hash and hydraulic-margin mutation rejection",
     "hydraulic repeated-leg parity",
     "adversarial source mutation rejection",
     "actual-PDF visual inspection",
@@ -33,9 +38,9 @@
   "state_path": "data/agent-loops/new-hope-system-backbone-20260716/state.json",
   "evidence_paths": [
     "apps/autosprink/src/data/proofs/new-hope-system-backbone/index.html",
-    "output/visual-proof/new-hope-system-backbone-top.png",
-    "output/visual-proof/new-hope-system-backbone-elevation.png",
-    "output/visual-proof/new-hope-system-backbone-3d.png",
+    "output/visual-proof/new-hope-system-backbone-supply.png",
+    "output/visual-proof/new-hope-system-backbone-wet-dry-riser.png",
+    "output/visual-proof/new-hope-system-backbone-3d-current.png",
     "data/agent-loops/new-hope-system-backbone-20260716/visual-review.json",
     "data/agent-loops/new-hope-system-backbone-20260716/lean-proof.json"
   ],

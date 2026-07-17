@@ -8,13 +8,12 @@
     "asBuiltFp10RiserSection": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/asbuilt-fp10-riser-section.png"
   },
   "screenshots": [
-    "output/visual-proof/new-hope-system-backbone-top.png",
-    "output/visual-proof/new-hope-system-backbone-elevation.png",
-    "output/visual-proof/new-hope-system-backbone-3d.png",
-    "output/visual-proof/new-hope-system-backbone-full.png"
+    "output/visual-proof/new-hope-system-backbone-supply.png",
+    "output/visual-proof/new-hope-system-backbone-wet-dry-riser.png",
+    "output/visual-proof/new-hope-system-backbone-3d-current.png"
   ],
   "compositionAudit": {
-    "layout": "actual plan and section dominate; proof annotations remain subordinate",
+    "layout": "raw flow-test crop, approved water table, actual plan, and wet/dry riser section dominate; proof annotations remain subordinate",
     "scale": "plan overlay uses native 3024 by 2160 PDF-point coordinates; source raster is exactly 2 pixels per PDF point",
     "clipping": "no horizontal overflow at 1440px viewport",
     "palette": "cyan source intersection, green low point, red unresolved field route, blue inspector test",
@@ -24,11 +23,16 @@
   },
   "browserEvidence": {
     "proofReady": true,
+    "rawFlowTestEvidenceReady": true,
+    "approvedDesignWaterSupplyReady": true,
     "plan2dEvidenceReady": true,
     "elevation2dEvidenceReady": true,
     "model3dSourceIntersectionEvidenceReady": true,
     "model3dInstallationReady": false,
-    "pumpDecisionReady": false,
+    "pumpDecisionReady": true,
+    "pumpDecisionScope": "completed-approved-new-hope-configuration",
+    "currentFlowTestReady": false,
+    "wetRiserAndDrainEvidenceReady": true,
     "fieldDrainRoutesResolved": false,
     "quoteReady": false,
     "canvasReady": true,
@@ -39,7 +43,8 @@
   },
   "iterations": [
     { "iteration": 1, "decision": "rejected", "reason": "riser and node-118 labels collided at their real close spacing" },
-    { "iteration": 2, "decision": "passed", "reason": "optical label offsets separate both identities while preserving exact marker coordinates" }
+    { "iteration": 2, "decision": "passed", "reason": "optical label offsets separate both identities while preserving exact marker coordinates" },
+    { "iteration": 3, "decision": "passed-for-bounded-evidence", "reason": "live Egnyte supply and as-built sources prove the historical no-pump decision and wet-riser identities while unreleased wet-network and field routes remain visibly absent" }
   ],
   "decision": "passed-for-source-evidence-only",
   "releaseDecision": "blocked"

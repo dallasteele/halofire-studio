@@ -9,6 +9,7 @@ const sources = () => ({
   operationalAnnotations: load('../src/data/new-hope-approved-fp20-operational-annotations.json'),
   planGraph: load('../src/data/new-hope-approved-fp20-plan-graph.json'),
   hydraulicRoutes: ['2-1', '2-2', '2-3'].map((id) => load(`../src/data/new-hope-approved-fp20-hydraulic-route-${id}.json`)),
+  waterSupplyAndWetRiser: load('../src/data/new-hope-approved-water-supply-wet-riser-evidence.json'),
 });
 
 describe('New Hope source-bound system backbone evidence', () => {
@@ -20,17 +21,25 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.model3dSourceIntersectionEvidenceReady).toBe(true);
     expect(result.model3dInstallationReady).toBe(false);
     expect(result.quoteReady).toBe(false);
-    expect(result.systems).toEqual([expect.objectContaining({
+    expect(result.systems).toHaveLength(2);
+    expect(result.systems).toEqual(expect.arrayContaining([expect.objectContaining({
       id: 'new-hope-dry-attic',
       type: 'dry',
       riserNominalDiameterIn: 4,
       protectedAreaSqft: 13700,
       lowPointTieInCount: 4,
       fieldRouteDrumDripCount: 2,
-    })]);
+    }), expect.objectContaining({
+      id: 'new-hope-wet-level-1',
+      type: 'wet',
+      riserNominalDiameterIn: 3,
+      protectedAreaSqft: 13700,
+      testAndDrain: expect.objectContaining({ nominalDiameterIn: 1.25, pressureReducingValve: true }),
+    })]));
 
     const planById = Object.fromEntries(result.plan2d.components.map((component) => [component.id, component]));
     expect(planById['nh-riser-plan-station'].pdfPt).toEqual({ x: 660.675, y: 1118.512 });
+    expect(planById['nh-wet-riser-plan-station'].geometryStatus).toBe('exact-plan-riser-station-section-z-unresolved');
     expect(planById['nh-node-118'].geometryStatus).toBe('exact-plan-xy-and-calculation-z');
     expect(Object.keys(planById).filter((id) => id.startsWith('low-point-'))).toHaveLength(4);
     expect(Object.keys(planById).filter((id) => id.startsWith('field-route-drum-drip-'))).toHaveLength(2);
@@ -46,20 +55,33 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.model3d.releasedRoutes).toEqual([]);
   });
 
-  it('names every make-or-break release blocker instead of interpreting an as-built omission as a pump decision', () => {
+  it('proves the historical no-pump decision but keeps new quotes and unextracted installation geometry blocked', () => {
     const result = buildNewHopeSystemBackboneEvidence(sources());
     expect(result.systemDesignGate).toEqual({
       status: 'blocked',
       blockers: expect.arrayContaining([
-        'BACKBONE_CURRENT_FLOW_TEST_REQUIRED',
-        'BACKBONE_PUMP_DECISION_REQUIRED',
-        'NH_WET_SYSTEM_BACKBONE_REQUIRED',
+        'BACKBONE_NEW_QUOTE_FLOW_TEST_REQUIRED',
+        'NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED',
+        'NH_WET_SYSTEM_INSTALLATION_3D_PATH_REQUIRED',
         'NH_FIELD_ROUTE_DRUM_DRIP_GEOMETRY_REQUIRED',
         'NH_SOURCE_FEED_INSTALLATION_3D_PATH_REQUIRED',
       ]),
     });
     expect(result.currentFlowTestReady).toBe(false);
-    expect(result.pumpDecisionReady).toBe(false);
+    expect(result.currentFlowTestContext).toBe('historical-approved-design-basis-not-current-for-new-quote');
+    expect(result.rawFlowTestEvidenceReady).toBe(true);
+    expect(result.approvedDesignWaterSupplyReady).toBe(true);
+    expect(result.pumpDecisionReady).toBe(true);
+    expect(result.pumpDecision).toEqual(expect.objectContaining({
+      decision: 'not-required',
+      minimumSafetyMarginPsi: 5.4,
+    }));
+    expect(result.wetRiserAndDrainEvidenceReady).toBe(true);
+    expect(result.wetSystemBackboneReady).toBe(false);
+    expect(result.takeoff.systemComponents).toEqual(expect.arrayContaining([
+      expect.objectContaining({ key: 'wet_test_and_drain_prv', quantity: 1 }),
+      expect.objectContaining({ key: 'fire_pump', quantity: 0 }),
+    ]));
     expect(result.fieldDrainRoutesResolved).toBe(false);
     expect(result.fabricationReady).toBe(false);
     expect(result.fieldReleaseReady).toBe(false);
@@ -72,6 +94,24 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.status).toBe('blocked');
     expect(result.issues.map((entry) => entry.code)).toContain('NH_BACKBONE_SOURCE_BINDING_INVALID');
     expect(result.plan2dEvidenceReady).toBe(false);
+  });
+
+  it('rejects a mutated live flow-test hash', () => {
+    const input = sources();
+    input.waterSupplyAndWetRiser.sourceBindings.hydrantFlowTest.sha256 = 'WRONG';
+    const result = buildNewHopeSystemBackboneEvidence(input);
+    expect(result.status).toBe('blocked');
+    expect(result.issues.map((entry) => entry.code)).toContain('NH_BACKBONE_SUPPLY_SOURCE_INVALID');
+    expect(result.pumpDecisionReady).toBe(false);
+  });
+
+  it('rejects a no-pump claim when any approved calculation margin is mutated', () => {
+    const input = sources();
+    input.waterSupplyAndWetRiser.sourceBindings.hydraulicCalculation.calculationAreas[1].safetyMarginPsi = -0.1;
+    const result = buildNewHopeSystemBackboneEvidence(input);
+    expect(result.status).toBe('blocked');
+    expect(result.issues.map((entry) => entry.code)).toContain('NH_BACKBONE_CALCULATION_AREA_SET_INVALID');
+    expect(result.pumpDecisionReady).toBe(false);
   });
 
   it('rejects promotion of field-route drum-drip intent into a source-resolved route', () => {

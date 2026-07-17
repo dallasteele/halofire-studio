@@ -1,0 +1,93 @@
+{
+  "artifactType": "halofire.new-hope-approved-water-supply-wet-riser-evidence.v1",
+  "projectId": "new-hope-crisis-center-brigham-city-ut",
+  "sourceBindings": {
+    "hydrantFlowTest": {
+      "fileName": "Boys and Girls Club - Brigham City UT_Hydrant Flow Test.pdf",
+      "physicalPage": 1,
+      "sha256": "CFC0C70E035A20308A6FAA703E55A0C4A71CB0E6091182312C7227C597B4BC5B",
+      "testDate": "2024-12-10",
+      "rawValues": {
+        "staticPsi": 89,
+        "residualPsi": 89,
+        "testFlowGpm": 1400
+      }
+    },
+    "approvedPlans": {
+      "fileName": "Approved Plans.PDF",
+      "sha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+      "sheets": [
+        { "physicalPage": 2, "sheet": "FP0.1", "role": "approved-water-supply-and-site-feed" },
+        { "physicalPage": 4, "sheet": "FP1.0", "role": "approved-wet-and-dry-riser-section" }
+      ],
+      "waterSupplyTable": {
+        "staticPsi": 89,
+        "residualPsi": 89,
+        "flowRateGpm": 1350,
+        "note": "FLOW TEST DATA USED IN CALCULATIONS REDUCED BY 10 PSI"
+      }
+    },
+    "hydraulicCalculation": {
+      "fileName": "New Hope Calcs.PDF",
+      "sha256": "D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719",
+      "approvedDesignSupply": {
+        "staticPsi": 79,
+        "residualPsi": 79,
+        "flowingGpm": 1350
+      },
+      "calculationAreas": [
+        { "id": "1-1", "totalFlowGpm": 375, "totalPressurePsi": 72.3, "safetyMarginPsi": 6.7 },
+        { "id": "2-1", "totalFlowGpm": 371.5, "totalPressurePsi": 73.6, "safetyMarginPsi": 5.4 },
+        { "id": "2-2", "totalFlowGpm": 438.4, "totalPressurePsi": 69.6, "safetyMarginPsi": 9.4 },
+        { "id": "2-3", "totalFlowGpm": 379.5, "totalPressurePsi": 67.9, "safetyMarginPsi": 11.1 }
+      ]
+    },
+    "asBuilt": {
+      "fileName": "New Hope BGC - Brigham City UT_as builts.pdf",
+      "physicalPage": 3,
+      "sheet": "FP1.0",
+      "sha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B"
+    }
+  },
+  "pumpDecision": {
+    "decision": "not-required",
+    "scope": "completed-approved-new-hope-configuration",
+    "minimumSafetyMarginPsi": 5.4,
+    "basis": "approved-design-supply-exceeds-each-total-demand-pressure"
+  },
+  "wetSystem": {
+    "id": "new-hope-wet-level-1",
+    "type": "wet",
+    "protectedAreaSqft": 13700,
+    "riserNominalDiameterIn": 3,
+    "riserPlanStationPdfPt": { "x": 660.675, "y": 1118.512 },
+    "sectionIdentities": [
+      "3 INCH TO WET SYSTEM",
+      "FIELD LOCATE AIR VENT",
+      "AUDIBLE ALARM",
+      "GAUGE KIT",
+      "3 INCH RISER MANIFOLD",
+      "3 INCH FLOW SWITCH",
+      "3 INCH GRVD CHECK VALVE",
+      "3 INCH GRVD B'FLY VALVE",
+      "1-1/4 INCH TEST-N-DRAIN W/PRV"
+    ],
+    "testAndDrain": {
+      "nominalDiameterIn": 1.25,
+      "pressureReducingValve": true,
+      "routeGeometryStatus": "source-section-identity-only"
+    },
+    "installationGeometryStatus": "plan-riser-station-only"
+  },
+  "claims": {
+    "rawFlowTestEvidenceReady": true,
+    "approvedDesignSupplyReady": true,
+    "completedConfigurationPumpDecisionReady": true,
+    "wetRiserAndDrainIdentityReady": true,
+    "wetSystemNetwork3dReady": false,
+    "newQuoteFlowTestCurrent": false,
+    "quoteReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

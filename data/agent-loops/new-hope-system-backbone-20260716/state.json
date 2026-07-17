@@ -1,7 +1,7 @@
 {
   "artifactType": "halofire.agent-loop-state.v1",
   "loop": "new-hope-system-backbone-20260716",
-  "iteration": 2,
+  "iteration": 3,
   "status": "active",
   "brainPreflight": { "status": "passed", "episodes": [150514, 150555, 149978, 155497] },
   "truth": {
@@ -13,8 +13,15 @@
     "fourPortCalculationChainReady": true,
     "twoExact3dSourceIntersectionPointsReady": true,
     "releasedInstallationRouteCount": 0,
+    "rawHydrantFlowTestEvidenceReady": true,
+    "approvedReducedCalculationSupplyReady": true,
+    "approvedCalculationAreaCount": 4,
+    "minimumApprovedSafetyMarginPsi": 5.4,
     "currentFlowTestReady": false,
-    "pumpDecisionReady": false,
+    "currentFlowTestContext": "historical-approved-design-basis-not-current-for-new-quote",
+    "pumpDecisionReady": true,
+    "pumpDecisionScope": "completed-approved-new-hope-configuration",
+    "wetRiserAndDrainIdentityReady": true,
     "wetSystemBackboneReady": false,
     "fieldDrainRoutesResolved": false,
     "sourceFeed3dPathReady": false,
@@ -25,13 +32,13 @@
     "vpsDeploymentAllowed": false
   },
   "verification": {
-    "focusedTests": "42 passed across 6 files",
+    "focusedTests": "43 passed across 5 files; 11 source-proof tests include mutated hash and negative-margin rejection",
     "build": "passed",
     "loopGuard": "passed",
     "rulebook": "passed",
-    "lean": "verified by Lean 4.13.0 in 122 ms; receipt lean-proof.json",
-    "browser": "passed; zero console errors/warnings, no overflow, four screenshots visually inspected",
-    "brainPostflight": "passed; episode 155544"
+    "lean": "verified by Lean 4.13.0 in 428 ms; conservative supply and historical-vs-current release boundary; receipt lean-proof.json",
+    "browser": "passed; zero console errors/warnings, proof dataset audited, three bounded screenshots visually inspected",
+    "brainPostflight": "passed; episode 155643"
   },
-  "nextAction": "Find and bind the current water-flow test and the Level 1 wet-system riser/drain backbone from the Egnyte corpus; preserve FIELD ROUTE drum-drip intents until field-resolved geometry exists."
+  "nextAction": "Extract the Level 1 wet-system 2D network and its exact 3D installation path from the approved/as-built corpus, then resolve field drain and source-feed route geometry; require a current flow test for every new quote."
 }

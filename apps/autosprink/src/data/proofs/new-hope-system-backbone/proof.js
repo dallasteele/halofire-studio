@@ -7,6 +7,7 @@ const urls = {
   route21: '../../new-hope-approved-fp20-hydraulic-route-2-1.json',
   route22: '../../new-hope-approved-fp20-hydraulic-route-2-2.json',
   route23: '../../new-hope-approved-fp20-hydraulic-route-2-3.json',
+  waterSupplyAndWetRiser: '../../new-hope-approved-water-supply-wet-riser-evidence.json',
 };
 
 async function fetchJson(url) {
@@ -25,7 +26,9 @@ function svgNode(tag, attrs = {}, text = null) {
 function addMarker(svg, component) {
   const { x, y } = component.pdfPt;
   const group = svgNode('g', { 'data-component-id': component.id });
-  if (component.kind === 'riser-plan-station' || component.kind === 'dry-system-source-outlet') {
+  if (component.kind === 'wet-riser-plan-station') {
+    group.append(svgNode('circle', { class: 'wet-riser', cx: x, cy: y, r: 8 }));
+  } else if (component.kind === 'riser-plan-station' || component.kind === 'dry-system-source-outlet') {
     group.append(svgNode('circle', { class: 'riser', cx: x, cy: y, r: component.kind === 'riser-plan-station' ? 15 : 11 }));
   } else if (component.kind === 'low-point-tie-in') {
     group.append(svgNode('circle', { class: 'low', cx: x, cy: y, r: 18 }));
@@ -36,6 +39,7 @@ function addMarker(svg, component) {
   }
   const labels = {
     'nh-riser-plan-station': 'RISER',
+    'nh-wet-riser-plan-station': 'WET RISER',
     'nh-node-118': 'NODE 118',
     'low-point-01': 'LP-01',
     'low-point-02': 'LP-02',
@@ -47,6 +51,7 @@ function addMarker(svg, component) {
   };
   const labelOffset = {
     'nh-riser-plan-station': { x: -90, y: -21 },
+    'nh-wet-riser-plan-station': { x: -112, y: 45 },
     'nh-node-118': { x: 25, y: 17 },
   }[component.id] ?? { x: 23, y: -18 };
   group.append(svgNode('text', { class: 'tag', x: x + labelOffset.x, y: y + labelOffset.y }, labels[component.id] ?? component.id));
@@ -69,7 +74,9 @@ function renderProof(result) {
     chain.append(row);
   }
   document.querySelector('#section-identities').innerHTML = `<b>Source section identities</b><br>${result.elevation2d.sectionIdentities.join('<br>')}`;
-  document.querySelector('#gate-copy').textContent = 'The evidence projections pass, but system design remains blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
+  document.querySelector('#supply-results').innerHTML = result.approvedWaterSupply.calculationAreas.map((area) => `<div><b>Area ${area.id}</b><span>${area.totalFlowGpm.toFixed(1)} gpm at ${area.totalPressurePsi.toFixed(1)} psi</span><em>+${area.safetyMarginPsi.toFixed(1)} psi margin</em></div>`).join('');
+  document.querySelector('#pump-basis').textContent = `NO FIRE PUMP - completed approved configuration; minimum source margin ${result.pumpDecision.minimumSafetyMarginPsi.toFixed(1)} psi. A new quote still requires a current flow test.`;
+  document.querySelector('#gate-copy').textContent = 'The historical pump decision and wet-riser identities pass. New-quote flow freshness, wet-network extraction, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
   document.querySelector('#gate-codes').textContent = result.systemDesignGate.blockers.join(' | ');
 
   const root = document.documentElement.dataset;
@@ -79,7 +86,9 @@ function renderProof(result) {
   root.model3dSourceIntersectionEvidenceReady = String(result.model3dSourceIntersectionEvidenceReady);
   root.model3dInstallationReady = String(result.model3dInstallationReady);
   root.currentFlowTestReady = String(result.currentFlowTestReady);
+  root.approvedDesignWaterSupplyReady = String(result.approvedDesignWaterSupplyReady);
   root.pumpDecisionReady = String(result.pumpDecisionReady);
+  root.wetRiserAndDrainEvidenceReady = String(result.wetRiserAndDrainEvidenceReady);
   root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved);
   root.quoteReady = String(result.quoteReady);
   root.fieldReleaseReady = String(result.fieldReleaseReady);
@@ -93,11 +102,13 @@ export const proofPromise = Promise.all(Object.values(urls).map(fetchJson)).then
   route21,
   route22,
   route23,
+  waterSupplyAndWetRiser,
 ]) => buildNewHopeSystemBackboneEvidence({
   registration,
   operationalAnnotations,
   planGraph,
   hydraulicRoutes: [route21, route22, route23],
+  waterSupplyAndWetRiser,
 }));
 
 proofPromise.then((result) => {

@@ -2,6 +2,7 @@ const PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut';
 const APPROVED_PLAN_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5';
 const ASBUILT_SHA = 'ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B';
 const CALC_SHA = 'D70FA475A0DD32B22B134D2D6161435D9E769D659B320C6F25A3D908AE70D719';
+const FLOW_TEST_SHA = 'CFC0C70E035A20308A6FAA703E55A0C4A71CB0E6091182312C7227C597B4BC5B';
 const REMOTE_AREAS = Object.freeze(['2-1', '2-2', '2-3']);
 const CHAIN = Object.freeze([
   Object.freeze({ id: 'nh-node-118', calculationNodeId: '118', role: 'dry-system-source-outlet', localElevationFt: 11.5, planNodeId: 'pipe-001-node-02' }),
@@ -15,10 +16,28 @@ const REQUIRED_DEVICE_TEXTS = Object.freeze([
   '4 INCH BACKFLOW PREVENTER',
   '2 INCH DRAIN TO EXTERIOR',
 ]);
+const REQUIRED_WET_DEVICE_TEXTS = Object.freeze([
+  '3 INCH TO WET SYSTEM',
+  'FIELD LOCATE AIR VENT',
+  'AUDIBLE ALARM',
+  'GAUGE KIT',
+  '3 INCH RISER MANIFOLD',
+  '3 INCH FLOW SWITCH',
+  '3 INCH GRVD CHECK VALVE',
+  "3 INCH GRVD B'FLY VALVE",
+  '1-1/4 INCH TEST-N-DRAIN W/PRV',
+]);
+const EXPECTED_CALCULATION_AREAS = Object.freeze([
+  Object.freeze({ id: '1-1', totalFlowGpm: 375, totalPressurePsi: 72.3, safetyMarginPsi: 6.7 }),
+  Object.freeze({ id: '2-1', totalFlowGpm: 371.5, totalPressurePsi: 73.6, safetyMarginPsi: 5.4 }),
+  Object.freeze({ id: '2-2', totalFlowGpm: 438.4, totalPressurePsi: 69.6, safetyMarginPsi: 9.4 }),
+  Object.freeze({ id: '2-3', totalFlowGpm: 379.5, totalPressurePsi: 67.9, safetyMarginPsi: 11.1 }),
+]);
 
 const issue = (code, path, message) => ({ severity: 'blocking', code, path, message });
 const same = (left, right) => JSON.stringify(left) === JSON.stringify(right);
 const clone = (value) => JSON.parse(JSON.stringify(value));
+const near = (left, right) => Math.abs(Number(left) - Number(right)) < 0.001;
 
 function nodeById(planGraph, id) {
   return planGraph?.nodes?.find((node) => node.id === id) ?? null;
@@ -60,6 +79,66 @@ function validateSourceChain(hydraulicRoutes, issues) {
   return routes;
 }
 
+function validateWaterSupplyAndWetRiser(evidence, registration, issues) {
+  const issueCount = issues.length;
+  const bindings = evidence?.sourceBindings;
+  if (
+    evidence?.projectId !== PROJECT_ID
+    || bindings?.hydrantFlowTest?.sha256 !== FLOW_TEST_SHA
+    || bindings?.approvedPlans?.sha256 !== APPROVED_PLAN_SHA
+    || bindings?.hydraulicCalculation?.sha256 !== CALC_SHA
+    || bindings?.asBuilt?.sha256 !== ASBUILT_SHA
+  ) {
+    issues.push(issue('NH_BACKBONE_SUPPLY_SOURCE_INVALID', 'waterSupplyAndWetRiser.sourceBindings', 'The flow test, approved plans, calculations, and as-built hashes must remain bound to New Hope.'));
+  }
+
+  if (
+    bindings?.hydrantFlowTest?.testDate !== '2024-12-10'
+    || !same(bindings?.hydrantFlowTest?.rawValues, { staticPsi: 89, residualPsi: 89, testFlowGpm: 1400 })
+    || !same(bindings?.approvedPlans?.waterSupplyTable, {
+      staticPsi: 89,
+      residualPsi: 89,
+      flowRateGpm: 1350,
+      note: 'FLOW TEST DATA USED IN CALCULATIONS REDUCED BY 10 PSI',
+    })
+    || !same(bindings?.hydraulicCalculation?.approvedDesignSupply, { staticPsi: 79, residualPsi: 79, flowingGpm: 1350 })
+  ) {
+    issues.push(issue('NH_BACKBONE_SUPPLY_VALUES_INVALID', 'waterSupplyAndWetRiser.sourceBindings', 'Raw flow-test values and the conservative approved calculation supply must not be conflated or mutated.'));
+  }
+
+  const areas = [...(bindings?.hydraulicCalculation?.calculationAreas ?? [])].sort((a, b) => a.id.localeCompare(b.id));
+  if (!same(areas, EXPECTED_CALCULATION_AREAS)) {
+    issues.push(issue('NH_BACKBONE_CALCULATION_AREA_SET_INVALID', 'waterSupplyAndWetRiser.sourceBindings.hydraulicCalculation.calculationAreas', 'All four approved calculation-area pressure and margin results are required.'));
+  } else if (areas.some((area) => !near(79 - area.totalPressurePsi, area.safetyMarginPsi) || area.safetyMarginPsi <= 0)) {
+    issues.push(issue('NH_BACKBONE_PUMP_MARGIN_INVALID', 'waterSupplyAndWetRiser.pumpDecision', 'Each approved calculation area must retain a positive margin against the 79 psi approved design supply.'));
+  }
+
+  if (
+    evidence?.pumpDecision?.decision !== 'not-required'
+    || evidence?.pumpDecision?.scope !== 'completed-approved-new-hope-configuration'
+    || !near(evidence?.pumpDecision?.minimumSafetyMarginPsi, 5.4)
+    || evidence?.pumpDecision?.basis !== 'approved-design-supply-exceeds-each-total-demand-pressure'
+  ) {
+    issues.push(issue('NH_BACKBONE_PUMP_DECISION_INVALID', 'waterSupplyAndWetRiser.pumpDecision', 'The no-pump result must remain scoped to the completed approved configuration and its minimum 5.4 psi margin.'));
+  }
+
+  const wet = evidence?.wetSystem;
+  if (
+    wet?.id !== 'new-hope-wet-level-1'
+    || wet?.type !== 'wet'
+    || wet?.riserNominalDiameterIn !== 3
+    || wet?.protectedAreaSqft !== 13700
+    || wet?.testAndDrain?.nominalDiameterIn !== 1.25
+    || wet?.testAndDrain?.pressureReducingValve !== true
+    || wet?.testAndDrain?.routeGeometryStatus !== 'source-section-identity-only'
+    || !same(wet?.riserPlanStationPdfPt, registration?.fp20TransferEvidence?.sourceAnchor?.pdfPt)
+    || !REQUIRED_WET_DEVICE_TEXTS.every((text) => wet?.sectionIdentities?.includes(text))
+  ) {
+    issues.push(issue('NH_BACKBONE_WET_RISER_EVIDENCE_INVALID', 'waterSupplyAndWetRiser.wetSystem', 'The three-inch wet riser, 1-1/4-inch test-and-drain with PRV, and exact section identities are required.'));
+  }
+  return issues.length === issueCount;
+}
+
 /**
  * Builds the source-backed portion of New Hope's riser and drainage backbone.
  *
@@ -68,12 +147,13 @@ function validateSourceChain(hydraulicRoutes, issues) {
  * - elevation2d: exact hydraulic elevation ports plus the as-built riser detail;
  * - model3d: only source intersections that have both plan XY and calculation Z.
  *
- * It never fabricates a current flow test, pump decision, wet-system backbone,
- * field-routed drum-drip path, or concealed source-feed installation route.
+ * Historical approved supply is calibration evidence, not a current quote input.
+ * The adapter never fabricates wet-network geometry, field-routed drum-drip paths,
+ * or the concealed source-feed installation route.
  */
 export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
   const issues = [];
-  const { registration, operationalAnnotations, planGraph, hydraulicRoutes } = inputs;
+  const { registration, operationalAnnotations, planGraph, hydraulicRoutes, waterSupplyAndWetRiser } = inputs;
 
   if (
     registration?.projectId !== PROJECT_ID
@@ -95,6 +175,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
   }
 
   const routes = validateSourceChain(hydraulicRoutes, issues);
+  const supplyAndWetRiserReady = validateWaterSupplyAndWetRiser(waterSupplyAndWetRiser, registration, issues);
   const riserPlanNode = nodeById(planGraph, 'pipe-001-node-01');
   const outletPlanNode = nodeById(planGraph, 'pipe-001-node-02');
   if (
@@ -135,6 +216,16 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       sourceRef: riserPlanNode.sourceRef,
       geometryStatus: 'exact-plan-xy',
     });
+    if (supplyAndWetRiserReady) {
+      planComponents.push({
+        id: 'nh-wet-riser-plan-station',
+        kind: 'wet-riser-plan-station',
+        pdfPt: clone(riserPlanNode.pdfPt),
+        planFt: clone(riserPlanNode.plan),
+        sourceRef: 'as-built-fp1.0:fire-sprinkler-riser-section-detail',
+        geometryStatus: 'exact-plan-riser-station-section-z-unresolved',
+      });
+    }
   }
   if (outletPlanNode) {
     planComponents.push({
@@ -200,9 +291,9 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
 
   const evidenceReady = issues.length === 0;
   const blockers = [
-    'BACKBONE_CURRENT_FLOW_TEST_REQUIRED',
-    'BACKBONE_PUMP_DECISION_REQUIRED',
-    'NH_WET_SYSTEM_BACKBONE_REQUIRED',
+    'BACKBONE_NEW_QUOTE_FLOW_TEST_REQUIRED',
+    'NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED',
+    'NH_WET_SYSTEM_INSTALLATION_3D_PATH_REQUIRED',
     'NH_FIELD_ROUTE_DRUM_DRIP_GEOMETRY_REQUIRED',
     'NH_SOURCE_FEED_INSTALLATION_3D_PATH_REQUIRED',
     'NH_COMPLETE_RISER_ROOM_INSTALLATION_GEOMETRY_REQUIRED',
@@ -216,16 +307,34 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       approvedPlan: { sheet: 'FP2.0', physicalPage: 5, sha256: APPROVED_PLAN_SHA, pageBoxPdfPt: { width: 3024, height: 2160 } },
       asBuilt: { sheet: 'FP1.0', physicalPage: 3, sha256: ASBUILT_SHA },
       hydraulicCalculation: { sha256: CALC_SHA, remoteAreaIds: routes.map((route) => route.remoteAreaId) },
+      hydrantFlowTest: { physicalPage: 1, sha256: FLOW_TEST_SHA, testDate: '2024-12-10' },
+      approvedDesignSupply: clone(waterSupplyAndWetRiser.sourceBindings.hydraulicCalculation.approvedDesignSupply),
     } : null,
-    systems: evidenceReady ? [{
-      id: 'new-hope-dry-attic',
-      type: 'dry',
-      riserNominalDiameterIn: 4,
-      protectedAreaSqft: 13700,
-      sourceIdentities: [...REQUIRED_DEVICE_TEXTS],
-      lowPointTieInCount: lowPoints.length,
-      fieldRouteDrumDripCount: fieldRoutes.length,
-    }] : [],
+    systems: evidenceReady ? [
+      {
+        id: 'new-hope-dry-attic',
+        type: 'dry',
+        riserNominalDiameterIn: 4,
+        protectedAreaSqft: 13700,
+        sourceIdentities: [...REQUIRED_DEVICE_TEXTS],
+        lowPointTieInCount: lowPoints.length,
+        fieldRouteDrumDripCount: fieldRoutes.length,
+      },
+      {
+        id: waterSupplyAndWetRiser.wetSystem.id,
+        type: 'wet',
+        riserNominalDiameterIn: waterSupplyAndWetRiser.wetSystem.riserNominalDiameterIn,
+        protectedAreaSqft: waterSupplyAndWetRiser.wetSystem.protectedAreaSqft,
+        sourceIdentities: [...waterSupplyAndWetRiser.wetSystem.sectionIdentities],
+        testAndDrain: clone(waterSupplyAndWetRiser.wetSystem.testAndDrain),
+      },
+    ] : [],
+    pumpDecision: evidenceReady ? clone(waterSupplyAndWetRiser.pumpDecision) : null,
+    approvedWaterSupply: evidenceReady ? {
+      rawFlowTest: clone(waterSupplyAndWetRiser.sourceBindings.hydrantFlowTest),
+      calculationSupply: clone(waterSupplyAndWetRiser.sourceBindings.hydraulicCalculation.approvedDesignSupply),
+      calculationAreas: clone(waterSupplyAndWetRiser.sourceBindings.hydraulicCalculation.calculationAreas),
+    } : null,
     plan2d: {
       sourceSheet: 'FP2.0',
       components: evidenceReady ? planComponents : [],
@@ -242,7 +351,18 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
         '4-inch backflow preventer',
         '4-inch two-way FDC',
         '2-inch drain to exterior',
+        '3-inch wet riser manifold',
+        '3-inch wet flow switch',
+        '3-inch wet check valve',
+        '3-inch wet butterfly valve',
+        '1-1/4-inch wet test-and-drain with PRV',
       ] : [],
+      wetSystem: evidenceReady ? {
+        sourceSheet: 'FP1.0',
+        riserNominalDiameterIn: 3,
+        testAndDrainNominalDiameterIn: 1.25,
+        installationGeometryStatus: 'plan-riser-station-only',
+      } : null,
     },
     model3d: {
       sourceIntersectionPoints: evidenceReady ? modelPoints : [],
@@ -250,12 +370,28 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       unresolvedPlanIntents: evidenceReady ? planComponents.filter((component) => component.geometryStatus.includes('unresolved')) : [],
     },
     systemDesignGate: { status: 'blocked', blockers },
+    takeoff: evidenceReady ? {
+      status: 'source-identities-only-no-route-quantities',
+      systemComponents: [
+        { key: 'wet_riser_manifold', description: '3-inch wet riser manifold', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
+        { key: 'wet_flow_switch', description: '3-inch wet-system flow switch', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
+        { key: 'wet_check_valve', description: '3-inch grooved wet-system check valve', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
+        { key: 'wet_butterfly_valve', description: '3-inch grooved wet-system butterfly valve', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
+        { key: 'wet_test_and_drain_prv', description: '1-1/4-inch test-and-drain with PRV', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
+        { key: 'fire_pump', description: 'Fire pump and controller', unit: 'EA', quantity: 0, systemIds: ['new-hope-dry-attic', 'new-hope-wet-level-1'] },
+      ],
+    } : null,
     plan2dEvidenceReady: evidenceReady,
     elevation2dEvidenceReady: evidenceReady,
     model3dSourceIntersectionEvidenceReady: evidenceReady && modelPoints.length === 2,
     model3dInstallationReady: false,
+    rawFlowTestEvidenceReady: evidenceReady,
+    approvedDesignWaterSupplyReady: evidenceReady,
     currentFlowTestReady: false,
-    pumpDecisionReady: false,
+    currentFlowTestContext: evidenceReady ? 'historical-approved-design-basis-not-current-for-new-quote' : null,
+    pumpDecisionReady: evidenceReady,
+    pumpDecisionScope: evidenceReady ? 'completed-approved-new-hope-configuration' : null,
+    wetRiserAndDrainEvidenceReady: evidenceReady,
     wetSystemBackboneReady: false,
     fieldDrainRoutesResolved: false,
     sourceFeed3dPathReady: false,

@@ -12,6 +12,8 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(html).toContain('../new-hope-truss-clearance/asbuilt-fp10-riser-section.png');
     expect(fs.statSync(new URL('approved-fp20-full-underlay.png', sourceRoot)).size).toBeGreaterThan(2_000_000);
     expect(fs.statSync(new URL('asbuilt-fp10-riser-section.png', sourceRoot)).size).toBeGreaterThan(500_000);
+    expect(fs.statSync(new URL('hydrant-flow-test-data.png', proofRoot)).size).toBeGreaterThan(200_000);
+    expect(fs.statSync(new URL('approved-water-supply-table.png', proofRoot)).size).toBeGreaterThan(200_000);
   });
 
   it('loads every source-bound input through the project evaluator', () => {
@@ -23,12 +25,15 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-1.json');
     expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-2.json');
     expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-3.json');
+    expect(script).toContain('../../new-hope-approved-water-supply-wet-riser-evidence.json');
   });
 
   it('surfaces release-state truth in the DOM and hides the unreleased 3D source leg', () => {
     const proofScript = read('proof.js');
     const viewer = read('viewer.js');
     expect(proofScript).toContain("root.pumpDecisionReady = String(result.pumpDecisionReady)");
+    expect(proofScript).toContain("root.approvedDesignWaterSupplyReady = String(result.approvedDesignWaterSupplyReady)");
+    expect(proofScript).toContain("root.wetRiserAndDrainEvidenceReady = String(result.wetRiserAndDrainEvidenceReady)");
     expect(proofScript).toContain("root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved)");
     expect(proofScript).toContain("root.quoteReady = String(result.quoteReady)");
     expect(viewer).toContain("sourceLeg.visible = false");
