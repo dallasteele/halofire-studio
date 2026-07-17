@@ -2,7 +2,7 @@
   "name": "platform-spine-m1-20260717",
   "iteration": 1,
   "status": "in_progress",
-  "nextStage": "PROMOTE_PLATFORM_SCHEMA_AND_DEFINE_REVIEW_QUEUE_CONTRACT",
+  "nextStage": "ADD_MODULE_MANIFESTS_AND_ADR002_BEFORE_ANY_HARD_REVIEW_CLASS",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [141704, 60905],
@@ -36,5 +36,11 @@
     "linkSources": ["intake_bids", "ready_bids", "bid_summary"],
     "unlinkedRowsPolicy": "remain unlinked until a source-backed Job association exists",
     "verification": "real-copy apply and rollback passed"
+  },
+  "iteration5": {
+    "advisoryReviewQueue": "ReviewItem and ReviewQueueSnapshot schemas",
+    "moduleContract": "ModuleContract schema",
+    "hardGatePolicy": "no new hard review class until ADR-002 is supplied",
+    "verification": "platform-core check-types and build passed"
   }
 }

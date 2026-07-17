@@ -19,6 +19,15 @@ export const Document = RecordBase.extend({ job_id: PlatformId.nullable(), locat
 export const AuditEvent = RecordBase.extend({ actor_employee_id: PlatformId.nullable(), action: z.string().min(1), entity_kind: z.string().min(1), entity_id: PlatformId, payload_sha256: z.string().regex(/^[a-f0-9]{64}$/).nullable() })
 export const ReviewItem = RecordBase.extend({ job_id: PlatformId.nullable(), module_id: z.string().min(1), kind: z.string().min(1), severity: z.enum(['advisory', 'hard']), status: z.enum(['open', 'resolved', 'dismissed']), evidence_sha256: z.string().regex(/^[a-f0-9]{64}$/).nullable() })
 export const ModuleRegistry = RecordBase.extend({ module_id: z.string().min(1), display_name: z.string().min(1), nav_path: z.string().min(1), enabled: z.boolean() })
+export const ModuleContract = z.object({
+  module_id: z.string().min(1),
+  entities_read: z.array(z.string().min(1)).min(1),
+  tables_owned: z.array(z.string().regex(/^platform_|^[a-z][a-z0-9_]*$/)),
+  review_kinds: z.array(z.string().min(1)),
+  roles: z.array(z.string().min(1)).min(1),
+  nav_path: z.string().min(1),
+})
+export const ReviewQueueSnapshot = z.object({ generated_at: IsoTimestamp, items: z.array(ReviewItem) })
 
 export type Customer = z.infer<typeof Customer>
 export type Site = z.infer<typeof Site>
@@ -28,3 +37,5 @@ export type Document = z.infer<typeof Document>
 export type AuditEvent = z.infer<typeof AuditEvent>
 export type ReviewItem = z.infer<typeof ReviewItem>
 export type ModuleRegistry = z.infer<typeof ModuleRegistry>
+export type ModuleContract = z.infer<typeof ModuleContract>
+export type ReviewQueueSnapshot = z.infer<typeof ReviewQueueSnapshot>
