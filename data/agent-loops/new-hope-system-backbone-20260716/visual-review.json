@@ -1,0 +1,46 @@
+{
+  "artifactType": "halofire.visual-review-receipt.v1",
+  "surface": "new-hope-system-backbone",
+  "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/new-hope-system-backbone/index.html",
+  "viewport": { "width": 1440, "height": 1000 },
+  "sourceUnderlays": {
+    "approvedFp20": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/approved-fp20-full-underlay.png",
+    "asBuiltFp10RiserSection": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/asbuilt-fp10-riser-section.png"
+  },
+  "screenshots": [
+    "output/visual-proof/new-hope-system-backbone-top.png",
+    "output/visual-proof/new-hope-system-backbone-elevation.png",
+    "output/visual-proof/new-hope-system-backbone-3d.png",
+    "output/visual-proof/new-hope-system-backbone-full.png"
+  ],
+  "compositionAudit": {
+    "layout": "actual plan and section dominate; proof annotations remain subordinate",
+    "scale": "plan overlay uses native 3024 by 2160 PDF-point coordinates; source raster is exactly 2 pixels per PDF point",
+    "clipping": "no horizontal overflow at 1440px viewport",
+    "palette": "cyan source intersection, green low point, red unresolved field route, blue inspector test",
+    "contrast": "glass headers and dark labels remain readable over white source sheets",
+    "spacingRule": "24px modular card spacing with optical label offsets at the 2.37-foot riser/outlet pair",
+    "motion": "slow background sheen and panel reveal; prefers-reduced-motion disables animation"
+  },
+  "browserEvidence": {
+    "proofReady": true,
+    "plan2dEvidenceReady": true,
+    "elevation2dEvidenceReady": true,
+    "model3dSourceIntersectionEvidenceReady": true,
+    "model3dInstallationReady": false,
+    "pumpDecisionReady": false,
+    "fieldDrainRoutesResolved": false,
+    "quoteReady": false,
+    "canvasReady": true,
+    "releasedRouteCount": 0,
+    "horizontalOverflow": false,
+    "consoleErrors": 0,
+    "consoleWarnings": 0
+  },
+  "iterations": [
+    { "iteration": 1, "decision": "rejected", "reason": "riser and node-118 labels collided at their real close spacing" },
+    { "iteration": 2, "decision": "passed", "reason": "optical label offsets separate both identities while preserving exact marker coordinates" }
+  ],
+  "decision": "passed-for-source-evidence-only",
+  "releaseDecision": "blocked"
+}

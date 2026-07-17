@@ -1,0 +1,37 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "new-hope-system-backbone-20260716",
+  "iteration": 2,
+  "status": "active",
+  "brainPreflight": { "status": "passed", "episodes": [150514, 150555, 149978, 155497] },
+  "truth": {
+    "newHopeDrySystemEvidenceAdapterReady": true,
+    "actualApprovedPlanUnderlayReady": true,
+    "actualAsBuiltRiserSectionReady": true,
+    "fourLowPointTieInsReady": true,
+    "twoFieldRouteDrumDripIntentsReady": true,
+    "fourPortCalculationChainReady": true,
+    "twoExact3dSourceIntersectionPointsReady": true,
+    "releasedInstallationRouteCount": 0,
+    "currentFlowTestReady": false,
+    "pumpDecisionReady": false,
+    "wetSystemBackboneReady": false,
+    "fieldDrainRoutesResolved": false,
+    "sourceFeed3dPathReady": false,
+    "quoteReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "wholeSystemReleaseReady": false,
+    "vpsDeploymentAllowed": false
+  },
+  "verification": {
+    "focusedTests": "42 passed across 6 files",
+    "build": "passed",
+    "loopGuard": "passed",
+    "rulebook": "passed",
+    "lean": "verified by Lean 4.13.0 in 122 ms; receipt lean-proof.json",
+    "browser": "passed; zero console errors/warnings, no overflow, four screenshots visually inspected",
+    "brainPostflight": "passed; episode 155544"
+  },
+  "nextAction": "Find and bind the current water-flow test and the Level 1 wet-system riser/drain backbone from the Egnyte corpus; preserve FIELD ROUTE drum-drip intents until field-resolved geometry exists."
+}

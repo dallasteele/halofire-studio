@@ -1,0 +1,47 @@
+{
+  "name": "new-hope-system-backbone-20260716",
+  "owner": "codex",
+  "goal": "Instantiate and visibly prove the source-backed New Hope riser and drainage backbone in top plan, elevation, and bounded 3D while keeping current-flow, pump, wet-system, field-route, quote, fabrication, and field-release claims fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "apps/autosprink/src/data/new-hope-asbuilt-source-feed-riser-registration.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-plan-graph.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-1.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-2.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-hydraulic-route-2-3.json",
+    "C:/Users/dalla/Downloads/_autobid_transcript.txt",
+    "hal-brain episodes 150514, 150555, 149978, 155497"
+  ],
+  "exit_criteria": [
+    "actual approved FP2.0 remains visible beneath top-plan markers",
+    "actual as-built FP1.0 riser section remains visible beside the hydraulic elevation chain",
+    "only plan-plus-Z source intersections appear as exact 3D points",
+    "no unresolved field-route drum-drip or source-feed path is rendered as released pipe",
+    "quoteReady, fabricationReady, and fieldReleaseReady remain false",
+    "focused tests, production build, browser DOM, console, screenshots, and Lean proof pass"
+  ],
+  "verification_gates": [
+    "source hash and page binding",
+    "hydraulic repeated-leg parity",
+    "adversarial source mutation rejection",
+    "actual-PDF visual inspection",
+    "browser dataset and zero-console audit",
+    "production build",
+    "formal fail-closed proof"
+  ],
+  "state_path": "data/agent-loops/new-hope-system-backbone-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/proofs/new-hope-system-backbone/index.html",
+    "output/visual-proof/new-hope-system-backbone-top.png",
+    "output/visual-proof/new-hope-system-backbone-elevation.png",
+    "output/visual-proof/new-hope-system-backbone-3d.png",
+    "data/agent-loops/new-hope-system-backbone-20260716/visual-review.json",
+    "data/agent-loops/new-hope-system-backbone-20260716/lean-proof.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 120000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
