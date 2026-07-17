@@ -1,0 +1,41 @@
+{
+  "name": "mit-riverside-building-j-hydraulic-riser-trace-20260717",
+  "owner": "codex",
+  "goal": "Bind Transportation J's project-specific hydraulic calculation topology (TOR, BOR, underground and supply chain) to the actual FP-2 three-inch riser callout without promoting calculation-only facts to installed riser or drain geometry.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/City Approved FS Plans/State Fire Marshal Approved Plan Set.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Field Operations/As Builts/State Fire Marshal Approved Plan Set_As Builts.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/Submittals/20172-TRANSPORTATION HYDRAULICS.pdf",
+    "apps/autosprink/src/data/mit-riverside-building-j-fp2-riser-reference.json"
+  ],
+  "exit_criteria": [
+    "all three input source digests match their recorded immutable values",
+    "the proof visibly retains the FP-2 project riser callout and the corresponding Transportation hydraulic node/pipe data",
+    "the artifact records calculated TOR, BOR, underground, supply, diameter, and demand data with source page references",
+    "the artifact explicitly holds installed XY geometry, material, actual fittings, drain routing, fabrication, employee-use, and VPS-release claims false"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "source digest replay",
+    "calculation text/node extraction invariants",
+    "adversarial source-digest and topology tests",
+    "focused test and AutoSprink production build",
+    "actual-PDF visual/browser inspection",
+    "formal prover check or exact unavailable receipt",
+    "authoritative rulebook verification",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/mit-riverside-building-j-hydraulic-riser-trace-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/scripts/build-mit-riverside-building-j-hydraulic-riser-trace-proof.py",
+    "apps/autosprink/src/data/mit-riverside-building-j-hydraulic-riser-trace.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-hydraulic-riser-trace",
+    "apps/autosprink/tests/mit-riverside-building-j-hydraulic-riser-trace.test.js"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 30000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

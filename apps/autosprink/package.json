@@ -24,6 +24,7 @@
     "build:mit-riverside-building-j-approved-pipe-layout-proof": "py -3.12 scripts/build-mit-riverside-building-j-approved-pipe-layout-proof.py",
     "build:mit-riverside-building-j-head-registered-pipe-centerlines": "py -3.12 scripts/build-mit-riverside-building-j-head-registered-pipe-centerlines.py",
     "build:mit-riverside-building-j-fp2-riser-reference": "py -3.12 scripts/build-mit-riverside-building-j-fp2-riser-reference-proof.py",
+    "build:mit-riverside-building-j-hydraulic-riser-trace": "py -3.12 scripts/build-mit-riverside-building-j-hydraulic-riser-trace-proof.py",
     "build:1881-roof-framing-clearance-preflight": "node scripts/build-1881-roof-framing-clearance-preflight.mjs",
     "audit:new-hope-support-cad": "node scripts/audit-new-hope-support-cad-corpus.mjs",
     "audit:victaulic-ab2-cad": "node scripts/audit-victaulic-ab2-dxf.mjs",

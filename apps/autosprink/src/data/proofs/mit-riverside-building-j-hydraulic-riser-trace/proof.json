@@ -1,0 +1,162 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-hydraulic-riser-trace.v1",
+  "projectId": "mit-riverside-building-j",
+  "status": "passed-calculation-topology-only",
+  "sources": {
+    "approved": {
+      "sha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+      "fp2PhysicalPage": 2
+    },
+    "asBuilt": {
+      "sha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+      "fp2PhysicalPage": 2
+    },
+    "transportationHydraulics": {
+      "sha256": "2eaa513af17071a822f98d6be7afb909533bcb7ce2578466414cfc7563f2fce5",
+      "nodeAnalysisPhysicalPage": 2,
+      "pipeDataPhysicalPage": 4
+    }
+  },
+  "approvedAsBuiltFp2CalloutIdentical": true,
+  "fp2Callout": "3 in FIRE RISER REFER TO FP7 FOR DETAIL",
+  "calculatedTrace": {
+    "calculationOnly": true,
+    "jobTitle": "TRANSPORTATION J",
+    "demand": {
+      "sprinklerGpm": 327.4,
+      "withHoseGpm": 577.4,
+      "borPressurePsi": 48.9
+    },
+    "nodes": [
+      {
+        "tag": "TOR",
+        "elevationFt": 11.0,
+        "pressurePsi": 41.7,
+        "sourcePage": 2,
+        "sourceRow": "TOR          11.0         - - - -        41.7       - - -"
+      },
+      {
+        "tag": "BOR",
+        "elevationFt": 1.0,
+        "pressurePsi": 48.9,
+        "sourcePage": 2,
+        "sourceRow": "BOR           1.0         - - - -        48.9       - - -"
+      },
+      {
+        "tag": "UG",
+        "elevationFt": -3.0,
+        "pressurePsi": 51.1,
+        "sourcePage": 2,
+        "sourceRow": "UG           -3.0         - - - -        51.1       - - -"
+      },
+      {
+        "tag": "UG6",
+        "elevationFt": -3.0,
+        "pressurePsi": 52.0,
+        "sourcePage": 2,
+        "sourceRow": "UG6          -3.0         - - - -        52.0       - - -"
+      },
+      {
+        "tag": "BF1",
+        "elevationFt": 3.0,
+        "pressurePsi": 50.0,
+        "sourcePage": 2,
+        "sourceRow": "BF1           3.0         - - - -        50.0       - - -"
+      },
+      {
+        "tag": "BF2",
+        "elevationFt": 3.0,
+        "pressurePsi": 55.0,
+        "sourcePage": 2,
+        "sourceRow": "BF2           3.0         - - - -        55.0       - - -"
+      },
+      {
+        "tag": "SRC",
+        "elevationFt": 1.5,
+        "pressurePsi": 55.8,
+        "sprinklerDemandGpm": 327.4,
+        "sourcePage": 2,
+        "sourceRow": "SRC           1.5         SOURCE         55.8       327.4"
+      }
+    ],
+    "pipeChain": [
+      {
+        "tag": 19,
+        "hydraulicDiameterIn": 3.342,
+        "lengthFt": 50.17,
+        "from": "15",
+        "to": "20",
+        "sourcePage": 4
+      },
+      {
+        "tag": 20,
+        "hydraulicDiameterIn": 3.342,
+        "lengthFt": 36.67,
+        "from": "20",
+        "to": "TOR",
+        "sourcePage": 4
+      },
+      {
+        "tag": 21,
+        "hydraulicDiameterIn": 3.342,
+        "lengthFt": 10.0,
+        "from": "TOR",
+        "to": "BOR",
+        "sourcePage": 4
+      },
+      {
+        "tag": 22,
+        "hydraulicDiameterIn": 4.15,
+        "lengthFt": 4.0,
+        "from": "BOR",
+        "to": "UG",
+        "sourcePage": 4
+      },
+      {
+        "tag": 23,
+        "hydraulicDiameterIn": 4.15,
+        "lengthFt": 10.0,
+        "from": "UG",
+        "to": "UG6",
+        "sourcePage": 4
+      },
+      {
+        "tag": 24,
+        "hydraulicDiameterIn": 8.38,
+        "lengthFt": 717.0,
+        "from": "UG6",
+        "to": "BF1",
+        "sourcePage": 4
+      },
+      {
+        "tag": 26,
+        "hydraulicDiameterIn": 8.38,
+        "lengthFt": 32.0,
+        "from": "BF2",
+        "to": "SRC",
+        "sourcePage": 4
+      }
+    ]
+  },
+  "claims": {
+    "calculatedHydraulicRiserTraceReady": true,
+    "installedRiserGeometryReady": false,
+    "installedRiserLocationBoundToCenterline": false,
+    "installedRiserMaterialReady": false,
+    "installedRiserFittingsReady": false,
+    "fieldDrainRouteReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "The Transportation hydraulic calculation establishes calculated node elevations, pressure, demand, and pipe-chain values only. It does not establish as-built XY geometry, material, actual fitting selection, or field installation.",
+    "No drain is shown or inferred by this hydraulic trace. A dedicated project drain source is required before routing or quoting drains.",
+    "The FP-2 callout's 3 in nominal riser language is retained separately from the hydraulic report's 3.342 in diameter field; neither is converted into installed geometry without source-bound coordinate evidence."
+  ],
+  "image": {
+    "file": "fp2-hydraulic-riser-trace.png",
+    "sha256": "26182f1dca70a1ba9d8de6412db87b2dca36b6501d39e22b196e97802d08f8ac",
+    "bytes": 509583
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "name": "mit-riverside-building-j-hydraulic-riser-trace-20260717",
+  "iteration": 2,
+  "status": "completed-calculation-topology-only",
+  "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY", "ITERATE"],
+  "nextStage": "SOURCE_BOUND_INSTALLED_RISER_AND_DRAIN_GEOMETRY",
+  "sourceReplay": {
+    "approvedSha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+    "asBuiltSha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+    "transportationHydraulicsSha256": "2eaa513af17071a822f98d6be7afb909533bcb7ce2578466414cfc7563f2fce5",
+    "fp2PhysicalPage": 2,
+    "hydraulicNodeAnalysisPhysicalPage": 2,
+    "hydraulicPipeDataPhysicalPage": 4,
+    "approvedAsBuiltFp2CalloutIdentical": true
+  },
+  "result": {
+    "fp2RiserCallout": "3 in FIRE RISER REFER TO FP7 FOR DETAIL",
+    "calculationOnly": true,
+    "torElevationFt": 11.0,
+    "borElevationFt": 1.0,
+    "undergroundElevationFt": -3.0,
+    "calculatedSprinklerDemandGpm": 327.4,
+    "calculatedDemandWithHoseGpm": 577.4,
+    "calculatedHydraulicRiserTraceReady": true,
+    "installedRiserGeometryReady": false,
+    "installedRiserLocationBoundToCenterline": false,
+    "installedRiserMaterialReady": false,
+    "installedRiserFittingsReady": false,
+    "fieldDrainRouteReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "verification": {
+    "sourceReplay": "approved/as-built FP-2 crop is pixel-identical; Transportation calculation digest is immutable",
+    "adversarialTests": "4 focused pytest assertions passed; tampered TOR elevation and pipe 21 diameter are rejected",
+    "artifactTests": "8 focused Vitest assertions passed across the new hydraulic trace and the dependent Building J proof chain",
+    "visual": "Playwright rendered the actual FP-2, hydraulic node, and hydraulic pipe source crops with no console errors or warnings; screenshot accepted at output/playwright/mit-riverside-building-j-hydraulic-riser-trace.png",
+    "composition": "accepted after rejecting the three-column version as too small; vertical stacked source crops keep callout, node rows, and pipe chain readable at standard browser width",
+    "workspaceBuild": "AutoSprink Vite production build passed",
+    "agenticRules": "AGENTIC_RULES verification passed",
+    "formal": "unavailable: GX10 formal prover endpoint at 127.0.0.1:8810 did not accept a connection"
+  },
+  "visualGate": {
+    "status": "accepted-source-calculation-only",
+    "evidence": "apps/autosprink/src/data/proofs/mit-riverside-building-j-hydraulic-riser-trace/fp2-hydraulic-riser-trace.png",
+    "finding": "Actual FP-2 project callout, Transportation hydraulic node data, and Transportation hydraulic pipe-chain data are readable together. The source labels and no-field-geometry/no-drain holds remain visible."
+  },
+  "nextSourceRequirement": "Find an installed/as-built project record that binds the riser endpoint, XY centerline, material, actual fittings, and drain route before generating a riser or drain model, takeoff, fabrication output, quote, employee workflow, or VPS release claim."
+}

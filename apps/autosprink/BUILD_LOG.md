@@ -496,3 +496,10 @@
 - The receipt retains 42 roof-layer source segments entirely inside that viewport plus one source eave and one source ridge annotation from the exact named story marker. It explicitly keeps the annotation-to-profile-edge tie, plan-region-to-view selection, slope direction, roof surface/3D, members, heads, pipes, and all downstream claims closed.
 - Visual proof was captured and inspected in Chrome: it shows the actual viewport-local source profile geometry, exact view title/scale, source eave/ridge annotations, and the no-promotion boundary.
 - Verified with 43 focused source-bound Cooperative 1881 tests, deterministic replay SHA-256 `D711222AFD83227056D590FA154E59F72850F8770DA0374D6F58C2FD42DF1BEF`, Vite production build, loop guard, and `verify_agentic_rules.py`. `GX10_PROVER_UNAVAILABLE`: `http://127.0.0.1:8810/api/provers/health` was unreachable; no formal proof is claimed.
+
+## 2026-07-17 - Transportation J hydraulic riser trace
+
+- Added a replayable source-evidence artifact binding the FP-2 three-inch fire-riser callout to Transportation J's project-specific hydraulic node and pipe calculation records.
+- The artifact holds installed XY, material, fittings, drains, fabrication, employee operation, and VPS release false. The calculation establishes calculated topology only.
+- Verified with source digest replay, 4 focused Python adversarial assertions, 8 dependent Vitest assertions, AutoSprink's Vite production build, Playwright source-page inspection with no console errors, loop-contract validation, and AGENTIC_RULES verification.
+- The GX10 formal-prover health endpoint was unavailable; no formal-proof claim is made.
