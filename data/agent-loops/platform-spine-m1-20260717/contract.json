@@ -1,0 +1,34 @@
+{
+  "name": "platform-spine-m1-20260717",
+  "owner": "codex",
+  "goal": "Create the additive HaloFire platform spine for shared Job, Customer, Site, Employee, Document, AuditEvent, ReviewItem, and ModuleRegistry records without modifying halofire_bids.db in place or rewriting AutoBid private tables.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/halofire-autobid/db/halofire_bids.db",
+    "E:/ClaudeBot/halofire-autobid/engine/intake.py",
+    "E:/ClaudeBot/halofire-autobid/engine/ready_bids.py",
+    "docs/handoffs/2026-07-13-CODEX-MASTER-BUILD-ADDENDUM-01-PLATFORM-SPINE.md",
+    "packages/halofire-schema/src"
+  ],
+  "exit_criteria": [
+    "typed platform-core schemas define all shared records and reject malformed identities",
+    "an additive reversible SQLite migration creates only platform_* tables on an explicit copy with a source digest receipt",
+    "AutoBid-private tables remain unchanged and the source corpus is never opened writable",
+    "the migration emits source-to-spine link records only for source-backed natural keys and never fabricates company data"
+  ],
+  "verification_gates": [
+    "source corpus SHA and schema snapshot are recorded before migration",
+    "migration rejects in-place target and source/target digest mismatch",
+    "up and down migrations are exercised on a disposable copy",
+    "platform package typecheck/build, focused migration test, loop guard, rulebook, and brain postflight pass"
+  ],
+  "state_path": "data/agent-loops/platform-spine-m1-20260717/state.json",
+  "evidence_paths": [
+    "data/agent-loops/platform-spine-m1-20260717/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

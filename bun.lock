@@ -270,6 +270,17 @@
         "@pascal-app/core": "^0.5.1",
       },
     },
+    "packages/platform-core": {
+      "name": "@halofire/platform-core",
+      "version": "0.0.0",
+      "dependencies": {
+        "zod": "^4.3.5",
+      },
+      "devDependencies": {
+        "@pascal/typescript-config": "*",
+        "typescript": "5.9.3",
+      },
+    },
     "packages/typescript-config": {
       "name": "@repo/typescript-config",
       "version": "0.0.0",
@@ -476,6 +487,8 @@
     "@halofire/halopenclaw-client": ["@halofire/halopenclaw-client@workspace:packages/halofire-halopenclaw-client"],
 
     "@halofire/ifc": ["@halofire/ifc@workspace:packages/halofire-ifc"],
+
+    "@halofire/platform-core": ["@halofire/platform-core@workspace:packages/platform-core"],
 
     "@halofire/schema": ["@halofire/schema@workspace:packages/halofire-schema"],
 
@@ -1710,6 +1723,8 @@
     "@eslint-community/eslint-utils/eslint-visitor-keys": ["eslint-visitor-keys@3.4.3", "", {}, "sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag=="],
 
     "@eslint/eslintrc/globals": ["globals@14.0.0", "", {}, "sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ=="],
+
+    "@halofire/platform-core/zod": ["zod@4.3.6", "", {}, "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg=="],
 
     "@halofire/schema/zod": ["zod@4.3.6", "", {}, "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg=="],
 

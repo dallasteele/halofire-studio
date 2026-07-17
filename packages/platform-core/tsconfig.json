@@ -1,0 +1,6 @@
+{
+  "extends": "@pascal/typescript-config/base.json",
+  "compilerOptions": { "outDir": "dist", "rootDir": "src", "noEmit": false, "composite": true, "incremental": true, "declaration": true },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

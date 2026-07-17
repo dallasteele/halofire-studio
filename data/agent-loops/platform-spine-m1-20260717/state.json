@@ -1,0 +1,21 @@
+{
+  "name": "platform-spine-m1-20260717",
+  "iteration": 1,
+  "status": "in_progress",
+  "nextStage": "IMPLEMENT_COPY_ONLY_ADDITIVE_SQLITE_MIGRATION",
+  "brainPreflight": {
+    "status": "passed",
+    "relevantEpisodes": [141704, 60905],
+    "decision": "Preserve AutoBid-private tables; introduce the shared spine additively on an explicit database copy and use source-backed natural keys only."
+  },
+  "sourceCorpus": {
+    "path": "E:/ClaudeBot/halofire-autobid/db/halofire_bids.db",
+    "mode": "read-only",
+    "observedSharedGaps": ["employees", "sites", "audit_events", "review_items", "module_registry"]
+  },
+  "iteration1": {
+    "typedPlatformCore": "packages/platform-core/src/spine.ts",
+    "records": ["Customer", "Site", "Job", "Employee", "Document", "AuditEvent", "ReviewItem", "ModuleRegistry"],
+    "verification": "platform-core check-types and build passed"
+  }
+}
