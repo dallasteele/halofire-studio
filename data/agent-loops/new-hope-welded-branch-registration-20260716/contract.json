@@ -1,0 +1,44 @@
+{
+  "name": "new-hope-welded-branch-registration-20260716",
+  "owner": "codex",
+  "goal": "Extract all 71 welded branch-unit labels and promote only the 15 units whose field/as-built centerline, native outlet stations, sprinkler-head coordinates, cut length, and label association close uniquely.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "tmp/pdfs/new-hope-live/field-install.pdf",
+    "tmp/pdfs/new-hope-live/as-builts.pdf",
+    "apps/autosprink/src/data/new-hope-native-fab-attachment-graph.json",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/data/new-hope-wet-level1-network-evidence.json",
+    "hal-brain episodes 156451, 149894, 149978"
+  ],
+  "exit_criteria": [
+    "all 71 welded branch-unit piece labels are retained from exact FP1.0 coordinates",
+    "all 67 heavy source centerlines replay exactly across field and as-built PDFs",
+    "15 uniquely closed units map 36 native outlet stations within 0.25 inch",
+    "56 welded branch units remain categorized holdouts",
+    "native station direction is distinct from hydraulic flow direction, grade, and installed Z",
+    "global piece mapping, fabrication, field release, and VPS release remain false",
+    "deterministic replay, focused tests, build, browser/source inspection, rulebook, loop guard, formal proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected field, as-built, listing, and native archive hashes",
+    "full artifact fingerprint",
+    "label-to-centerline distance and uniqueness gates",
+    "native outlet residual and cut-span closure gates",
+    "adversarial label, outlet, cut-vector, coverage, and false-promotion rejection",
+    "actual-PDF visual proof",
+    "production build and browser truth surface",
+    "formal scoped-versus-global invariant"
+  ],
+  "state_path": "data/agent-loops/new-hope-welded-branch-registration-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-wet-welded-branch-registration-evidence.json",
+    "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-welded-branch-registration-source.png",
+    "data/agent-loops/new-hope-welded-branch-registration-20260716/lean-proof.json"
+  ],
+  "max_iterations": 3,
+  "max_tokens": 50000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

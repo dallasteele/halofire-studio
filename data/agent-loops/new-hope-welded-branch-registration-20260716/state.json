@@ -1,0 +1,38 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "new-hope-welded-branch-registration-20260716",
+  "iteration": 1,
+  "status": "completed",
+  "brainPreflight": { "status": "passed", "episodes": [156451, 149894, 149978] },
+  "truth": {
+    "weldedBranchDefinitionCount": 69,
+    "weldedBranchUnitCount": 71,
+    "exactFieldPieceLabelCount": 71,
+    "fieldAsBuiltHeavyCenterlineCount": 67,
+    "registeredUnitCount": 15,
+    "mappedNativeOutletCount": 36,
+    "maxOutletResidualIn": 0.194824,
+    "unresolvedUnitCount": 56,
+    "globalListedUnitCount": 169,
+    "globallyUnmappedUnitCount": 154,
+    "scopedFabricationStationDirectionReady": true,
+    "hydraulicFlowDirectionReady": false,
+    "gradeReady": false,
+    "installedElevationReady": false,
+    "pieceToPlanVectorMappingReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "verification": {
+    "deterministicReplay": "JSON SHA256 4E8633EA1ECB217C5E79C9E9B74E7FBF1746A9372B4702E9B1381A94D6630D2D and PNG SHA256 3B6A8F33DE0527052D2EE61B4F7F186BF06EC9E79A15F98CC8B75B27B4AD99D7 replay identically",
+    "focusedTests": "30 passed across five files; label, outlet, cut-vector, coverage, and seven false-promotion mutations reject",
+    "build": "Vite production build passed",
+    "rulebook": "AGENTIC_RULES_VERIFY ok",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "lean": "three theorems verified by Lean 4.13.0 in 78 ms",
+    "visual": "actual FP1.0 overview inspected at 1421 by 1859; fifteen numbered source registrations are visible",
+    "browser": "HTTP 200; proof, label inventory, scoped mapping, and station direction true; 15 plan and 15 unresolved-3D vectors; global mapping, hydraulic direction, grade, quote, fabrication, and release false; zero errors and warnings",
+    "brainPostflight": "passed; episode 156509"
+  },
+  "nextAction": "Resolve the 38 geometry-closure holdouts using alternate centerline styles and the 10 low-anchor pieces using fittings or adjacent piece boundaries; retain eight label-association holdouts until uniquely registered."
+}

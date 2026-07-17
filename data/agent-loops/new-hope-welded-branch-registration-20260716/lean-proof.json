@@ -1,0 +1,14 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-welded-branch-registration-20260716/lean-request.json",
+  "theoremNames": ["weldedBranchCoveragePartitions", "scopedMappingDoesNotCompleteGlobalInventory", "stationDirectionDoesNotProveHydraulicRelease"],
+  "claim": "Fifteen registered plus 56 unresolved welded branch units partition 71, while 15 of 169 and native station direction cannot promote complete mapping or fabrication release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 78,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

@@ -32,6 +32,7 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(script).toContain('../../new-hope-wet-level1-network-evidence.json');
     expect(script).toContain('../../new-hope-fabrication-end-schedule.json');
     expect(script).toContain('../../new-hope-wet-quantity-placement-evidence.json');
+    expect(script).toContain('../../new-hope-wet-welded-branch-registration-evidence.json');
   });
 
   it('surfaces release-state truth in the DOM and hides the unreleased 3D source leg', () => {
@@ -46,6 +47,8 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(proofScript).toContain("root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady)");
     expect(proofScript).toContain("root.wetSystemListingDefinitionCrosswalkReady = String(result.wetSystemListingDefinitionCrosswalkReady)");
     expect(proofScript).toContain("root.wetSystemListingQuantityExpansionReady = String(result.wetSystemListingQuantityExpansionReady)");
+    expect(proofScript).toContain("root.wetSystemWeldedBranchLabelInventoryReady = String(result.wetSystemWeldedBranchLabelInventoryReady)");
+    expect(proofScript).toContain("root.wetSystemScopedFabricationStationDirectionReady = String(result.wetSystemScopedFabricationStationDirectionReady)");
     expect(proofScript).toContain("root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved)");
     expect(proofScript).toContain("root.quoteReady = String(result.quoteReady)");
     expect(viewer).toContain("sourceLeg.visible = false");
@@ -60,13 +63,15 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(html).toContain('../new-hope-truss-clearance/listing-complete-threaded-page42.png');
     expect(html).toContain('Native records to approved AutoSPRINK listing');
     expect(html).toContain('wet-quantity-placement-source.png');
+    expect(html).toContain('wet-welded-branch-registration-source.png');
     expect(fs.statSync(new URL('wet-quantity-placement-source.png', proofRoot)).size).toBeGreaterThan(100_000);
+    expect(fs.statSync(new URL('wet-welded-branch-registration-source.png', proofRoot)).size).toBeGreaterThan(1_000_000);
     expect(html).toContain('eight field/as-built head centers');
     expect(script).toContain('wetSystemQuantityExpandedEndpointMappingReady');
     expect(script).toContain('wetSystemScopedPieceToPlanMappingReady');
     expect(fs.statSync(new URL('wet-listing-crosswalk-browser.png', proofRoot)).size).toBeGreaterThan(100_000);
     expect(script).toContain("document.querySelector('#crosswalk-rows')");
-    expect(script).toContain('placement.metrics.mappedNativeOutletCount');
+    expect(script).toContain('branchRegistration.metrics.mappedNativeOutletCount');
   });
 
   it('describes primary cross-source and adversarial loops without an independent human gate', () => {

@@ -11,6 +11,7 @@ const urls = {
   wetLevel1NetworkEvidence: '../../new-hope-wet-level1-network-evidence.json',
   fabricationEndSchedule: '../../new-hope-fabrication-end-schedule.json',
   wetQuantityPlacementEvidence: '../../new-hope-wet-quantity-placement-evidence.json',
+  wetWeldedBranchRegistrationEvidence: '../../new-hope-wet-welded-branch-registration-evidence.json',
 };
 
 async function fetchJson(url) {
@@ -82,9 +83,9 @@ function renderProof(result) {
   const crosswalk = result.takeoff.wetLevel1NativeFabrication.listingCrosswalk;
   document.querySelector('#crosswalk-summary').textContent = `${crosswalk.metrics.nativePipeRecordCount} native records -> ${crosswalk.metrics.uniqueListingDefinitionCount} exact listing definitions -> ${crosswalk.metrics.listingFabricatedUnitCount} listed units. ${crosswalk.metrics.exactThreadedLengthMatchCount} threaded lengths reconcile exactly; both repeated definitions are expanded into four source-registered units.`;
   document.querySelector('#crosswalk-rows').innerHTML = crosswalk.rows.slice(0, 12).map((row) => `<tr><td>${row.nativePipeUniqueId}</td><td>${row.pieceId}</td><td>${row.listingDefinitionType}</td><td>${row.listingPhysicalPage}</td><td>${row.listingQuantity}</td><td>${row.lengthReconciliationStatus.replaceAll('-', ' ')}</td></tr>`).join('');
-  const placement = result.takeoff.wetLevel1NativeFabrication.quantityPlacement;
-  document.querySelector('#quantity-gaps').textContent = `${placement.metrics.quantityExpandedInstanceCount} BL34/BL35 units and ${placement.metrics.mappedNativeOutletCount} native outlets registered; maximum outlet residual ${placement.metrics.maxOutletResidualIn.toFixed(3)} inch`;
-  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions and native symbol types, all 167 native wet records mapped to 165 approved listing definitions, and four repeated BL34/BL35 units with eight registered outlets pass. Global piece-to-plan placement for the other 165 units, welded cross-source dimensions, fitting takeout, pipe direction/grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
+  const branchRegistration = result.takeoff.wetLevel1NativeFabrication.weldedBranchRegistration;
+  document.querySelector('#quantity-gaps').textContent = `${branchRegistration.metrics.registeredUnitCount} units and ${branchRegistration.metrics.mappedNativeOutletCount} native outlets registered; maximum outlet residual ${branchRegistration.metrics.maxOutletResidualIn.toFixed(3)} inch; ${branchRegistration.metrics.unresolvedUnitCount} welded branch units held`;
+  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions and native symbol types, all 167 native wet records mapped to 165 approved listing definitions, and fifteen welded branch units with 36 registered outlets pass. Global piece-to-plan placement for the other 154 listed units, welded cross-source dimensions, fitting takeout, hydraulic flow direction, grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
   document.querySelector('#gate-codes').textContent = result.systemDesignGate.blockers.join(' | ');
 
   const root = document.documentElement.dataset;
@@ -104,7 +105,9 @@ function renderProof(result) {
   root.wetSystemListingDefinitionCrosswalkReady = String(result.wetSystemListingDefinitionCrosswalkReady);
   root.wetSystemQuantityExpandedLineAnchorsReady = String(result.wetSystemQuantityExpandedLineAnchorsReady);
   root.wetSystemQuantityExpandedEndpointMappingReady = String(result.wetSystemQuantityExpandedEndpointMappingReady);
+  root.wetSystemWeldedBranchLabelInventoryReady = String(result.wetSystemWeldedBranchLabelInventoryReady);
   root.wetSystemScopedPieceToPlanMappingReady = String(result.wetSystemScopedPieceToPlanMappingReady);
+  root.wetSystemScopedFabricationStationDirectionReady = String(result.wetSystemScopedFabricationStationDirectionReady);
   root.wetSystemListingQuantityExpansionReady = String(result.wetSystemListingQuantityExpansionReady);
   root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved);
   root.quoteReady = String(result.quoteReady);
@@ -123,6 +126,7 @@ export const proofPromise = Promise.all(Object.values(urls).map(fetchJson)).then
   wetLevel1NetworkEvidence,
   fabricationEndSchedule,
   wetQuantityPlacementEvidence,
+  wetWeldedBranchRegistrationEvidence,
 ]) => buildNewHopeSystemBackboneEvidence({
   registration,
   operationalAnnotations,
@@ -132,6 +136,7 @@ export const proofPromise = Promise.all(Object.values(urls).map(fetchJson)).then
   wetLevel1NetworkEvidence,
   fabricationEndSchedule,
   wetQuantityPlacementEvidence,
+  wetWeldedBranchRegistrationEvidence,
 }));
 
 proofPromise.then((result) => {
