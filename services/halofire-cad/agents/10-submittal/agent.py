@@ -116,6 +116,36 @@ def export_glb(design: Design, out_path: Path) -> str:
 
     meshes: list = []
 
+    # Source-bound architectural/structural obstructions. These polygons already
+    # live in the same metric frame as the sprinkler design; extrude their measured
+    # plan envelope through the source level's vertical extent. Missing beam/joist
+    # widths remain absent upstream rather than becoming guessed 3D boxes here.
+    obstruction_mat = trimesh.visual.material.PBRMaterial(
+        baseColorFactor=(0.12, 0.55, 0.78, 0.72),
+        metallicFactor=0.15, roughnessFactor=0.65,
+    )
+    for level in design.building.levels:
+        for obstruction in level.obstructions:
+            if len(obstruction.polygon_m) < 3:
+                continue
+            xs = [point[0] for point in obstruction.polygon_m]
+            ys = [point[1] for point in obstruction.polygon_m]
+            width = max(xs) - min(xs)
+            depth = max(ys) - min(ys)
+            height = obstruction.top_z_m - obstruction.bottom_z_m
+            if width <= 0 or depth <= 0 or height <= 0:
+                continue
+            box = trimesh.creation.box(extents=(width, depth, height))
+            box.apply_translation([
+                (min(xs) + max(xs)) / 2,
+                (min(ys) + max(ys)) / 2,
+                level.elevation_m + obstruction.bottom_z_m + height / 2,
+            ])
+            box.visual = trimesh.visual.TextureVisuals(material=obstruction_mat)
+            box.metadata["halofire_name"] = f"obstruction:{level.id}:{obstruction.id}"
+            box.metadata["halofire_kind"] = obstruction.kind
+            meshes.append(box)
+
     # Heads as red spheres
     head_mat = trimesh.visual.material.PBRMaterial(
         baseColorFactor=(0.91, 0.26, 0.18, 1.0),
@@ -167,7 +197,10 @@ def export_glb(design: Design, out_path: Path) -> str:
     if not meshes:
         return ""
 
-    scene = trimesh.Scene(meshes)
+    scene = trimesh.Scene()
+    for index, mesh in enumerate(meshes):
+        name = str(mesh.metadata.get("halofire_name") or f"sprinkler-mesh:{index}")
+        scene.add_geometry(mesh, geom_name=name, node_name=name)
     scene.export(str(out_path), file_type="glb")
     return str(out_path)
 

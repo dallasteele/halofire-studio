@@ -8,16 +8,20 @@
     "E:/ClaudeBot/data/halofire/golden/1881/input/MANIFEST.json",
     "E:/ClaudeBot/data/halofire/golden/1881/input/Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
     "E:/ClaudeBot/data/halofire/golden/1881/input/GC - Bid Plans/1881 - Architecturals.pdf",
+    "E:/ClaudeBot/HaloFireBidDocs/1-Bid Documents/GC - Bid Plans/1881 - Structurals.pdf",
+    "apps/autosprink/src/engine/structure-from-plan.js",
     "services/halofire-cad/tests/golden/test_cruel_vs_truth.py",
     "services/halofire-cad/tests/golden/test_intake_real_plan.py",
     "services/halofire-cad/tests/golden/test_intake_phase_e.py",
-    "hal-brain episodes 64307 and 156960"
+    "hal-brain episodes 46659, 64307, 156960, and 157418"
   ],
   "exit_criteria": [
     "the sealed truth record is derived from protected proposal/workbook evidence and carries explicit provenance for every populated metric",
     "the real orchestrator runs against the exact 1881 architectural PDF and emits building_raw.json, building_classified.json, design.json, proposal.json, manifest.json, and pipeline_summary.json in the canonical deliverables directory",
     "the architectural outer boundary is stored in the same metric coordinate frame as pipeline polygon_m data, overlays a hash-bound real plan page, and passes the IoU gate without manual-review dependency",
     "the 30 formerly skipped CAD checks execute as assertions; resulting failures are repaired or remain explicit failing acceptance evidence rather than being skipped, weakened, or filled with synthetic data",
+    "source-extracted columns, beams, joists, and roof framing are hash-bound to exact structural PDF pages and registered to the independently source-derived architectural floor frame without scaling or fabricated grid members",
+    "every accepted structural member is visible on a rendered source-sheet overlay and propagates through CAD Level.obstructions into the 3D model; incomplete B/C coverage remains fail-closed",
     "primary source replay, cross-source totals, adversarial mutations, formal invariants, rendered PDF inspection, full CAD tests, loop guard, rulebook, and brain postflight are recorded",
     "no quote, compliance, fabrication, field-release, employee-use, cinematic-reveal, or VPS-release gate is promoted unless the newly active assertions pass"
   ],
@@ -26,6 +30,8 @@
     "workbook/proposal/head/floor/price totals reconcile across at least two source representations where available",
     "pipeline artifacts carry exact source PDF hash and deterministic manifest provenance",
     "the intake candidate boundary is valid and non-bbox, while the independent envelope GeoJSON is translated without scaling into the candidate's building-centroid metric frame and visually aligned on an actual architectural PDF raster",
+    "each structural sheet derives its own printed scale, carries exact source hash/page/sheet provenance, and passes labeled-grid rigid-registration residual thresholds",
+    "missing, altered, substituted, scale-less, page-mismatched, and incomplete structural manifests reject before obstruction acceptance",
     "missing, mutated, substituted, synthetic, and coordinate-shifted artifact attacks reject",
     "all formerly skipped tests are counted separately as passed, failed, or still skipped with exact reasons",
     "full services/halofire-cad test suite and focused cruel/intake suites run",
@@ -38,6 +44,8 @@
     "services/halofire-cad/tests/fixtures/intake/1881-outer-boundary.geojson",
     "output/visual-proof/1881-rejected-unregistered-source-overlay.png",
     "output/visual-proof/1881-a101-registered-source-overlay.png",
+    "services/halofire-cad/agents/00-intake/registered-geometry/1881-structurals.json",
+    "output/visual-proof/1881-structural-source-overlay-review.jpg",
     "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/state.json",
     "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/lean-proof.json"
   ],

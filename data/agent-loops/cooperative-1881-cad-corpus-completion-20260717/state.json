@@ -1,17 +1,18 @@
 {
   "name": "cooperative-1881-cad-corpus-completion-20260717",
-  "iteration": 3,
+  "iteration": 4,
   "status": "in_progress",
-  "updatedAt": "2026-07-17T01:59:12-07:00",
+  "updatedAt": "2026-07-17T02:27:19-07:00",
   "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY", "ITERATE"],
   "nextStage": "ITERATE",
   "brainPreflight": {
     "status": "passed",
-    "relevantEpisodes": [64307, 156960],
-    "decision": "Use the protected 1881 architectural PDF and completed proposal workbook as the corpus answer key, select floors from source sheet identity, preserve section elevations, and keep absent hydraulic supply fail-closed."
+    "relevantEpisodes": [46659, 64307, 156960, 157418],
+    "decision": "Continue the protected 1881 corpus with the exact structural PDF: derive scale from each structural sheet, detect only source vector members, rigid-register through shared labeled datums, require rendered overlay proof, propagate accepted members into 2D and 3D CAD, and keep incomplete obstruction coverage and hydraulic supply fail-closed."
   },
   "sourceReplay": {
     "architecturalPdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+    "structuralPdfSha256": "bdc561986ef710791ddb3c1928d445596b0a5de5cf131b6adf9d929dc5a36e80",
     "proposalWorkbookSha256": "54ad8651390a9cdc0fea23cc27b43ee06cec82eb20a3ef1c09e5e126598687ed",
     "selectedPdfPagesZeroBased": [7, 10, 13, 16, 19, 22, 25, 28],
     "levelElevationsM": [0.0, 3.048, 6.096, 9.4488, 12.4968, 15.5448, 18.5928, 21.6408],
@@ -24,7 +25,12 @@
     "bidUsd": 526461.97,
     "registeredAreaSqft": 173130.5,
     "a101RegisteredViewportCount": 2,
-    "a101RegistrationMaxResidualFt": 0.000425
+    "a101RegistrationMaxResidualFt": 0.000425,
+    "structuralRegisteredLevels": 8,
+    "structuralAreasPerLevel": ["B", "C"],
+    "structuralRegistrationMaxResidualFt": 0.0198,
+    "sourceColumnsPerLevelAfterPlateClip": [66, 49, 83, 73, 92, 90, 90, 104],
+    "sourceColumnMeshesInGlb": 588
   },
   "sealedTruth": {
     "levels": 8,
@@ -36,8 +42,12 @@
   },
   "verification": {
     "formerlyDormantCorpusChecks": "29 passed, 0 failed, 0 skipped",
-    "fullCadSuite": "394 passed, 0 failed, 0 skipped, 25 dependency deprecation warnings",
-    "focusedUnitAndOrchestrator": "45 passed, 0 failed, 0 skipped",
+    "fullCadSuite": "398 passed, 0 failed, 0 skipped, 25 dependency deprecation warnings",
+    "focusedCruelAndIntake": "29 passed, 0 failed, 0 skipped",
+    "registeredStructureAndViewAdversarial": "8 passed, 0 failed, 0 skipped",
+    "structureEngine": "33 passed, 0 failed, 0 skipped",
+    "submittalExporter": "7 passed, 0 failed, 0 skipped",
+    "actualGlbParse": "4656 geometry meshes including 588 named source obstruction meshes",
     "independentEnvelopeIou": 0.7363351986929664,
     "lean": "verified by Lean 4.13.0",
     "agentLoopGuard": "passed",
@@ -50,10 +60,20 @@
     "finding": "A-101 was decomposed into two source viewports and registered by shared X/Y grid bubbles; both source-derived wall sets and footprint extents visibly overlay their underlying architectural drawings.",
     "acceptedOverlayExists": true
   },
+  "structuralVisualGate": {
+    "status": "accepted-columns-framing-dimensions-fail-closed",
+    "evidence": "output/visual-proof/1881-structural-source-overlay-review.jpg",
+    "pngEvidence": "output/visual-proof/1881-structural-source-overlay.png",
+    "pngSha256": "c35a788bac7e94e07c72a6a44e5023691cdf351498a3e06694a4abf2419397a8",
+    "finding": "Rendered S-150.B/C and S-190.B/C source sheets visibly retain the underlying PDF. Cyan source marker envelopes align with structural column evidence. The first extraction leaked framing into partial plans/legends and was rejected; main-plan grid filtering plus endpoint body clipping corrected that. Untagged magenta/green framing remains centerline evidence only and is not promoted to physical 3D obstruction sections."
+  },
   "failClosedReleaseBoundary": {
     "flowTestRequired": true,
     "hydraulicResultsEmitted": false,
-    "sourceObstructionsRequired": true,
+    "sourceObstructionsRequired": false,
+    "sourceColumnGeometryPresent": true,
+    "sourceBeamJoistSectionsComplete": false,
+    "sourceObstructionDimensionsRequired": true,
     "nfpaRuleErrors": 217,
     "nfpaRuleWarnings": 12,
     "proposalHtmlError": "Design object has no attribute get",
@@ -69,7 +89,7 @@
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 157418,
-    "prePostflightCommit": "ae0ed5f4"
+    "episodeId": 157533,
+    "prePostflightCommit": "f8d7d286"
   }
 }

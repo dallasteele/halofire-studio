@@ -20,7 +20,7 @@ from shapely.ops import polygonize, unary_union
 # Ensure `cad/` is on the path when this file runs standalone
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from cad.schema import (  # noqa: E402
-    Building, Level, Room, Wall, Ceiling,
+    Building, Level, Room, Wall, Ceiling, Obstruction,
     PageIntakeResult, WallCandidate, RoomCandidate,
 )
 from cad.logging import get_logger, warn_swallowed  # noqa: E402
@@ -104,6 +104,21 @@ def _load_registered_views():
         return None
     mod = _iu.module_from_spec(_spec)
     sys.modules["_hf_registered_views"] = mod
+    _spec.loader.exec_module(mod)
+    return mod
+
+
+def _load_registered_structures():
+    """Load the exact-source structural adapter beside this intake agent."""
+    import importlib.util as _iu
+    _spec = _iu.spec_from_file_location(
+        "_hf_registered_structures",
+        Path(__file__).parent / "registered_structures.py",
+    )
+    if not _spec or not _spec.loader:
+        return None
+    mod = _iu.module_from_spec(_spec)
+    sys.modules["_hf_registered_structures"] = mod
     _spec.loader.exec_module(mod)
     return mod
 
@@ -1500,10 +1515,10 @@ def _canonicalize_floor_plates(
                 room.polygon_m = [
                     (x - cx, y - cy) for x, y in room.polygon_m
                 ]
-            # Do not invent a generic structural grid on a source-registered
-            # drawing. Obstructions must be extracted from drawing evidence
-            # or remain absent/fail-closed for later obstruction review.
-            lv.obstructions = []
+            for obstruction in lv.obstructions:
+                obstruction.polygon_m = [
+                    (x - cx, y - cy) for x, y in obstruction.polygon_m
+                ]
 
         metadata["issues"].append({
             "code": "INTAKE_REGISTERED_FLOOR_PLATES",
@@ -1516,19 +1531,53 @@ def _canonicalize_floor_plates(
             "refs": [lv.id for lv in levels],
             "source": Path(pdf_path).name,
         })
-        metadata["issues"].append({
-            "code": "SOURCE_OBSTRUCTIONS_REQUIRED",
-            "severity": "error",
-            "message": (
-                "Registered floor plans do not yet contain source-extracted "
-                "columns, beams, soffits, or other sprinkler obstructions. "
-                "The preliminary layout may run for measurement and pricing "
-                "comparison, but coverage and obstruction-clearance acceptance "
-                "is blocked; no generic column grid was fabricated."
-            ),
-            "refs": [lv.id for lv in levels],
-            "source": Path(pdf_path).name,
-        })
+        complete_source_columns = all(
+            lv.obstructions
+            and (lv.metadata or {}).get("registered_source_structure")
+            for lv in levels
+        )
+        if complete_source_columns:
+            metadata["issues"].append({
+                "code": "SOURCE_OBSTRUCTIONS_EXTRACTED",
+                "severity": "info",
+                "message": (
+                    "Hash-bound B/C structural sheets supplied measured vector "
+                    "column envelopes for every registered level; the same rigid "
+                    "floor translation was applied to architecture and structure."
+                ),
+                "refs": [lv.id for lv in levels],
+                "source": Path(pdf_path).name,
+            })
+            incomplete = [
+                lv.id for lv in levels
+                if not (lv.metadata or {}).get("structural_dimensional_gate_passed")
+            ]
+            if incomplete:
+                metadata["issues"].append({
+                    "code": "SOURCE_OBSTRUCTION_DIMENSIONS_REQUIRED",
+                    "severity": "error",
+                    "message": (
+                        "Column marker envelopes are source-measured, but one or "
+                        "more beam/joist centerlines lack a source member section. "
+                        "Their width/depth remains fail-closed; obstruction-clearance, "
+                        "code-compliance, and fabrication acceptance are blocked."
+                    ),
+                    "refs": incomplete,
+                    "source": Path(pdf_path).name,
+                })
+        else:
+            missing = [lv.id for lv in levels if not lv.obstructions]
+            metadata["issues"].append({
+                "code": "SOURCE_OBSTRUCTIONS_REQUIRED",
+                "severity": "error",
+                "message": (
+                    "One or more registered floor plans lack hash-bound source "
+                    "columns. Coverage and obstruction-clearance acceptance remains "
+                    "blocked; no generic column grid was fabricated."
+                ),
+                "refs": missing,
+                "source": Path(pdf_path).name,
+            })
         return levels
 
     def score(lv: Level) -> float:
@@ -1877,12 +1926,18 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
     metadata["total_page_count"] = n_pages
 
     registered_views = _load_registered_views()
+    registered_structures = _load_registered_structures()
     for i in plan_page_indices:
         tb_cls = get_page_classification(pdf_path, i)
         sheet_no = str(tb_cls.get("sheet_no") or "")
         registered = (
             registered_views.load_registered_sheet(pdf_path, i, sheet_no)
             if registered_views is not None and sheet_no
+            else None
+        )
+        registered_structure = (
+            registered_structures.load_registered_structure(pdf_path, i, sheet_no)
+            if registered_structures is not None and registered is not None and sheet_no
             else None
         )
         if registered is not None:
@@ -2075,6 +2130,34 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
                 "registered_source_pdf_sha256": registered.source_pdf_sha256,
                 "source_viewports": list(registered.source_viewports),
                 "sibling_registration": registered.registration,
+            })
+        if registered_structure is not None:
+            plate = Polygon(level.polygon_m).buffer(0.6) if len(level.polygon_m) >= 3 else None
+            source_columns: list[Obstruction] = []
+            for column in registered_structure.columns_ft:
+                polygon_m = [
+                    (float(point[0]) * 0.3048, float(point[1]) * 0.3048)
+                    for point in column["polygon_ft"]
+                ]
+                if plate is not None and not plate.intersects(Polygon(polygon_m)):
+                    continue
+                source_columns.append(Obstruction(
+                    id=str(column["id"]),
+                    kind="column",
+                    polygon_m=polygon_m,
+                    bottom_z_m=0.0,
+                    top_z_m=level.height_m,
+                ))
+            level.obstructions = source_columns
+            level.metadata.update({
+                "registered_source_structure": True,
+                "registered_structural_source_pdf_sha256": registered_structure.source_structural_pdf_sha256,
+                "registered_structural_source_pdf_path": registered_structure.source_structural_pdf_path,
+                "registered_structural_page_coverage": registered_structure.page_coverage_gate,
+                "structural_dimensional_gate_passed": registered_structure.dimensional_gate.get("passed") is True,
+                "source_column_count": len(source_columns),
+                "source_beam_centerline_count": len(registered_structure.beams_ft),
+                "source_joist_centerline_count": len(registered_structure.joists_ft),
             })
         levels.append(level)
 

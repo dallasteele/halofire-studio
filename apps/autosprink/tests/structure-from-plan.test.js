@@ -285,6 +285,11 @@ describe('buildStructureLayer + nearestMember', () => {
     expect(layer.counts.gridCols).toBe(2);
     expect(layer.counts.gridRows).toBe(2);
     expect(layer.counts.columns).toBeGreaterThanOrEqual(1);
+    expect(layer.columns[0].markerBoundsFt).toBeTruthy();
+    expect(layer.columns[0].measuredWidthFt).toBeGreaterThan(0);
+    expect(layer.columns[0].measuredHeightFt).toBeGreaterThan(0);
+    expect(Array.isArray(layer.markerColumns)).toBe(true);
+    expect(layer.counts.markerColumns).toBe(layer.markerColumns.length);
     expect(layer.counts.memberTags).toBe(1);
     expect(typeof layer.nearestMember).toBe('function');
     expect(layer.needsVerification).toBe(true);

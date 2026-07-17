@@ -1,46 +1,40 @@
 {
   "artifactType": "halofire.formal-verification-receipt.v2",
-  "createdAt": "2026-07-17T01:59:12-07:00",
+  "createdAt": "2026-07-17T02:26:00-07:00",
   "prover": {
     "name": "Lean",
-    "version": "4.13.0",
+    "version": "Lean 4.13.0",
     "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
     "health": "passed"
   },
   "subject": {
     "architecturalPdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
-    "proposalWorkbookSha256": "54ad8651390a9cdc0fea23cc27b43ee06cec82eb20a3ef1c09e5e126598687ed",
-    "independentEnvelopeSha256": "9c94423563b61c42f8b16618db48c0b2b0f3648da3e3d9f0a9bd4a5ccf547b50",
-    "sourceLevelElevationsFt": [0, 10, 20, 31, 41, 51, 61, 71],
+    "structuralPdfSha256": "bdc561986ef710791ddb3c1928d445596b0a5de5cf131b6adf9d929dc5a36e80",
+    "registeredStructureManifestSha256": "036b0610e8a659ee01cf1e91177ab9fca45159a2e1f70cb40ca2d0495e82dc19",
     "sourceLevelCount": 8,
-    "registeredAreaTenthsSqft": 1731305,
-    "sealedAreaTenthsSqft": 1706540,
-    "a101RegisteredViewportCount": 2,
-    "a101RegistrationResidualMicrofeet": 425,
-    "sealedHeadCount": 1420,
-    "replayedHeadCount": 1548,
-    "sealedBidCents": 53879235,
-    "replayedBidCents": 52646197,
-    "supplyProvided": false,
-    "sourceObstructionsPresent": false
+    "sourceColumnMeshesInGlb": 588,
+    "maxStructuralRegistrationResidualFt": 0.0198,
+    "sourceColumnsPresent": true,
+    "dimensionalSectionsComplete": false,
+    "supplyProvided": false
   },
   "theorems": [
-    "registered_geometry_invariants"
+    "sourceStructureRegistrationAndFailClosedDimensions"
   ],
-  "source": "def obstructionAcceptance (sourceObstructionsPresent : Bool) : Bool := sourceObstructionsPresent\n\ntheorem registered_geometry_invariants :\n    And ([7, 10, 13, 16, 19, 22, 25, 28].length = 8)\n      (And (2 = 2)\n        (And (425 <= 1000)\n          (And ((1731305 - 1706540) * 100 <= 1706540 * 2)\n            (And ((1548 - 1420) * 100 <= 1420 * 15)\n              (And ((53879235 - 52646197) * 100 <= 53879235 * 3)\n                (obstructionAcceptance false = false)))))) :=\nby decide",
+  "requestPath": "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/lean-structure-request.json",
   "result": {
     "status": "verified",
     "returnCode": 0,
-    "durationMs": 94
+    "durationMs": 416
   },
   "claimBoundary": {
     "sourceFloorSelectionVerified": true,
-    "sourceElevationsVerified": true,
-    "registeredViewportCountVerified": true,
+    "sourceStructuralPdfHashVerified": true,
+    "sourceBcCoverageVerified": true,
     "registrationResidualVerified": true,
-    "sourceAreaCalibrationVerified": true,
-    "corpusCalibrationVerified": true,
-    "missingSourceObstructionsBlockAcceptance": true,
+    "sourceColumnsIn2dVerified": true,
+    "sourceColumnsIn3dVerified": true,
+    "missingFramingDimensionsBlockAcceptance": true,
     "hydraulicsWithoutSupplyBlocked": true,
     "codeComplianceReady": false,
     "fabricationReady": false,

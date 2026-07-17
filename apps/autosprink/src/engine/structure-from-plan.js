@@ -437,11 +437,12 @@ export function detectColumns(grid, segments, members = [], opts = {}) {
   for (let ci = 0; ci < xs.length; ci++) {
     for (let ri = 0; ri < ys.length; ri++) {
       const gx = xs[ci], gy = ys[ri];
-      let n = 0;
+      const localMarkerSegments = [];
       for (const s of segs) {
         const [mx, my] = segMid(s);
-        if (Math.hypot(mx - gx, my - gy) <= markerRadiusFt) n += 1;
+        if (Math.hypot(mx - gx, my - gy) <= markerRadiusFt) localMarkerSegments.push(s);
       }
+      const n = localMarkerSegments.length;
       if (n < minMarkerSegs) continue; // no marker linework here -> no column (no fabrication)
       // Nearest member tag (prefer a column-role token; fall back to any member within tagRadius).
       const pick = (pool) => {
@@ -453,6 +454,12 @@ export function detectColumns(grid, segments, members = [], opts = {}) {
         return best;
       };
       const tag = pick(colMembers) || pick(anyMembers);
+      const markerBoundsFt = {
+        minX: round(Math.min(...localMarkerSegments.flatMap((s) => [s.x1, s.x2]))),
+        minY: round(Math.min(...localMarkerSegments.flatMap((s) => [s.y1, s.y2]))),
+        maxX: round(Math.max(...localMarkerSegments.flatMap((s) => [s.x1, s.x2]))),
+        maxY: round(Math.max(...localMarkerSegments.flatMap((s) => [s.y1, s.y2]))),
+      };
       columns.push({
         x: round(gx), y: round(gy),
         grid: { col: ci < (grid.labels && grid.labels.cols || []).length ? grid.labels.cols[ci] : String(ci + 1),
@@ -460,6 +467,9 @@ export function detectColumns(grid, segments, members = [], opts = {}) {
         size: tag ? tag.size : null,
         kind: tag ? tag.kind : null,
         markerSegs: n,
+        markerBoundsFt,
+        measuredWidthFt: round(markerBoundsFt.maxX - markerBoundsFt.minX),
+        measuredHeightFt: round(markerBoundsFt.maxY - markerBoundsFt.minY),
         confidence: tag ? 'medium' : 'low',
       });
     }
@@ -505,8 +515,8 @@ export function detectBeams(segments, members = [], grid = {}, opts = {}) {
   const bMinY = haveBody ? Math.min(...ys) - bodyMarginFt : -Infinity;
   const bMaxY = haveBody ? Math.max(...ys) + bodyMarginFt : Infinity;
   const inBody = (s) => {
-    const mx = (s.x1 + s.x2) / 2, my = (s.y1 + s.y2) / 2;
-    return mx >= bMinX && mx <= bMaxX && my >= bMinY && my <= bMaxY;
+    return s.x1 >= bMinX && s.x1 <= bMaxX && s.x2 >= bMinX && s.x2 <= bMaxX
+      && s.y1 >= bMinY && s.y1 <= bMaxY && s.y2 >= bMinY && s.y2 <= bMaxY;
   };
   const onGridLine = (s) => {
     const dx = Math.abs(s.x2 - s.x1), dy = Math.abs(s.y2 - s.y1);
@@ -591,7 +601,10 @@ export function buildStructureLayer(input, opts = {}) {
   }
 
   // 1) GRID from structural bubbles.
-  const grid = extractStructuralGrid(textItemsFt || []);
+  const grid = opts.gridOverride || extractStructuralGrid(textItemsFt || []);
+  if (!Array.isArray(grid.xs) || !Array.isArray(grid.ys) || grid.xs.length < 2 || grid.ys.length < 2) {
+    throw new Error('buildStructureLayer: structural grid override/extraction is incomplete');
+  }
 
   // 2) MEMBER TAGS.
   const { members, byRole } = parseMemberTags(textItemsFt || []);
@@ -603,6 +616,10 @@ export function buildStructureLayer(input, opts = {}) {
 
   // 4) COLUMNS at grid intersections (use FULL segments for marker density — markers are thin).
   const colRes = detectColumns(grid, segments, members, opts.columnOpts || {});
+  // Grid-labelled columns prove a marker cluster exists near a datum, but they do not retain
+  // measured width/height. Preserve the independent vector marker-box extraction so CAD
+  // obstruction geometry can use source dimensions instead of an invented default size.
+  const markerColRes = detectColumnMarkers(segments, opts.markerColumnOpts || {});
 
   // 5) BEAMS / JOISTS from the framing layer.
   const beamRes = detectBeams(framingSegs, members, grid, opts.beamOpts || {});
@@ -626,8 +643,42 @@ export function buildStructureLayer(input, opts = {}) {
   const shiftXY = (x, y) => [round(x + offset.dx), round(y + offset.dy)];
   const columns = colRes.columns.map((c) => {
     const [x, y] = shiftXY(c.x, c.y);
-    return { ...c, x, y };
+    const markerBoundsFt = c.markerBoundsFt ? {
+      minX: round(c.markerBoundsFt.minX + offset.dx),
+      minY: round(c.markerBoundsFt.minY + offset.dy),
+      maxX: round(c.markerBoundsFt.maxX + offset.dx),
+      maxY: round(c.markerBoundsFt.maxY + offset.dy),
+    } : null;
+    return { ...c, x, y, markerBoundsFt };
   });
+  const usedMarkerIndexes = new Set();
+  const markerColumns = [];
+  for (const labelled of colRes.columns) {
+    let bestIndex = -1;
+    let bestDistance = Infinity;
+    for (let index = 0; index < markerColRes.columns.length; index += 1) {
+      if (usedMarkerIndexes.has(index)) continue;
+      const marker = markerColRes.columns[index];
+      const distance = Math.hypot(marker.x - labelled.x, marker.y - labelled.y);
+      if (distance < bestDistance && distance <= 2.5) {
+        bestIndex = index;
+        bestDistance = distance;
+      }
+    }
+    if (bestIndex < 0) continue;
+    usedMarkerIndexes.add(bestIndex);
+    const marker = markerColRes.columns[bestIndex];
+    const [x, y] = shiftXY(marker.x, marker.y);
+    markerColumns.push({
+      ...marker,
+      x,
+      y,
+      grid: labelled.grid,
+      member: labelled.size,
+      memberKind: labelled.kind,
+      gridMarkerDistanceFt: round(bestDistance),
+    });
+  }
   const beams = beamRes.beams.map((b) => ({ ...b, a: shiftXY(b.a[0], b.a[1]), b: shiftXY(b.b[0], b.b[1]) }));
   const joists = beamRes.joists.map((j) => ({ ...j, a: shiftXY(j.a[0], j.a[1]), b: shiftXY(j.b[0], j.b[1]) }));
   const shiftedGrid = {
@@ -641,6 +692,7 @@ export function buildStructureLayer(input, opts = {}) {
     scaleText: scaleText || `feetPerUnit=${round(scaleFtPerUnit)}`,
     grid: shiftedGrid,
     columns,
+    markerColumns,
     beams,
     joists,
     members: members.map((m) => ({ size: m.size, kind: m.kind, role: m.role, xFt: round(m.xFt + offset.dx), yFt: round(m.yFt + offset.dy), raw: m.raw })),
@@ -650,6 +702,7 @@ export function buildStructureLayer(input, opts = {}) {
       segments: segments.length,
       framingSegments: framingSegs.length,
       columns: columns.length,
+      markerColumns: markerColumns.length,
       beams: beams.length,
       joists: joists.length,
       memberTags: members.length,
@@ -660,7 +713,7 @@ export function buildStructureLayer(input, opts = {}) {
     framingLayer: { method: wl.method, chosen: wl.chosen },
     provenance: PROVENANCE_BASE,
     needsVerification: true,
-    notes: { columns: colRes.note, beams: beamRes.note },
+    notes: { columns: colRes.note, markerColumns: markerColRes.note, beams: beamRes.note },
   };
 
   // Attach the nearestMember helper bound to THIS layer's beams + joists.

@@ -299,8 +299,13 @@ def test_1881_a101_records_two_axis_sibling_registration() -> None:
     assert metadata["registered_method"] == "registered-sibling-polygon-union"
     assert metadata["sibling_registration"]["shared_axes"] == ["x", "y"]
     assert metadata["sibling_registration"]["max_residual_ft"] <= 0.001
-    assert not a101.get("obstructions"), (
-        "registered architectural intake must not invent a generic column grid"
+    obstructions = a101.get("obstructions") or []
+    assert obstructions, "hash-bound structural sheets must supply source columns"
+    assert all(value["kind"] == "column" for value in obstructions)
+    assert metadata["registered_source_structure"] is True
+    assert metadata["source_column_count"] == len(obstructions)
+    assert not any(value["id"].startswith("col_") for value in obstructions), (
+        "registered intake must never fall back to the generic synthesized grid"
     )
 
 

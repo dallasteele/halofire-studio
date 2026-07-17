@@ -25,7 +25,7 @@ SUBMITTAL = importlib.util.module_from_spec(_SPEC)
 _SPEC.loader.exec_module(SUBMITTAL)
 
 from cad.schema import (  # noqa: E402
-    Building, Design, FlowTestData, Head, Level, PipeSegment, Project,
+    Building, Design, FlowTestData, Head, Level, Obstruction, PipeSegment, Project,
     RiserSpec, System,
 )
 
@@ -41,6 +41,11 @@ def tiny_design() -> Design:
         levels=[Level(
             id="l1", name="Level 1", elevation_m=0.0, height_m=3.0,
             use="residential",
+            obstructions=[Obstruction(
+                id="source-column-1", kind="column",
+                polygon_m=[(1.0, 1.0), (1.4, 1.0), (1.4, 1.4), (1.0, 1.4)],
+                bottom_z_m=0.0, top_z_m=3.0,
+            )],
         )],
     )
     system = System(
@@ -110,6 +115,9 @@ def test_glb_export_produces_readable_gltf(tiny_design, tmp_path: Path) -> None:
     # At least one mesh should be present (heads + pipes)
     mesh_count = len(scene.geometry) if hasattr(scene, "geometry") else 0
     assert mesh_count > 0, "GLB scene has no geometry"
+    assert any(name.startswith("obstruction:l1:source-column-1") for name in scene.geometry), (
+        "GLB must carry source obstruction geometry into the 3D model"
+    )
 
 
 def test_ifc_export_parses_as_valid_ifc(tiny_design, tmp_path: Path) -> None:
