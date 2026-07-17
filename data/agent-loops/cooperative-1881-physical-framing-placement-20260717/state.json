@@ -1,10 +1,10 @@
 {
   "name": "cooperative-1881-physical-framing-placement-20260717",
-  "iteration": 3,
+  "iteration": 4,
   "status": "in_progress",
-  "updatedAt": "2026-07-17T03:49:00-07:00",
+  "updatedAt": "2026-07-17T08:44:00-07:00",
   "completedStages": ["DISCOVER", "PLAN", "BUILD", "VERIFY"],
-  "nextStage": "SOURCE_EXACT_WOOD_DIMENSIONS_OR_EXPLICITLY_BOUNDED_OBSTRUCTION_POLICY",
+  "nextStage": "MATERIALIZE_SCOPED_STRUCTURAL_SUPPLIER_SUBMITTALS_AND_RERUN_SOURCE_DISCOVERY",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [157533, 46659, 120030, 60864],
@@ -56,5 +56,33 @@
       "tauriPackagingBlocker": "bin/halofire-pipeline-x86_64-pc-windows-msvc.exe missing"
     }
   },
-  "currentQuestion": "Which hash-bound specification, manufacturer submittal, or completed-bid evidence establishes exact dressed dimensions for the seven continuously roof-projectable wood members, so they can become physical solids without treating PS 20-20 minimum dimensions as field measurements?"
+  "corpusDiscovery": {
+    "artifact": "apps/autosprink/src/data/roof-framing-source-discovery.cooperative-1881.json",
+    "scanComplete": true,
+    "materializedFilesScanned": 577,
+    "relevantCandidates": 52,
+    "uniqueContentDocuments": 32,
+    "roofBoundedMembersChecked": 7,
+    "supplierOrTrussSubmittalCandidates": 0,
+    "issuedStructuralDesignDocuments": 2,
+    "sprinklerShopDrawingDocuments": 1,
+    "missingConfiguredRoot": "Y:/",
+    "physicalPromotionAllowed": false,
+    "reason": "The mounted corpus has issued structural plans, an RFI, and sprinkler shop drawings, but no materialized supplier/truss/lumber submittal. The discovery engine rejects document-name and member-tag matches as fabricated-part proof."
+  },
+  "roofFramingClearancePreflight": {
+    "artifact": "apps/autosprink/src/data/roof-framing-clearance-preflight.cooperative-1881.json",
+    "status": "blocked",
+    "boundedMemberCount": 7,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "reason": "The source-bounded wood traces are now an explicit routing input. They prohibit an automatic obstruction-clearance claim until exact member geometry is independently recovered."
+  },
+  "iteration4Verification": {
+    "agentLoopGuard": "passed",
+    "focusedJavaScript": "70 passed, 0 failed, 0 skipped",
+    "registeredStructurePython": "25 passed, 0 failed, 0 skipped",
+    "autosprinkProductionBuild": "passed"
+  },
+  "currentQuestion": "Materialize the project-scoped structural supplier/truss/lumber submittal roots from the shared drive, then require a hash-bound member tag, actual dressed dimensions, plan orientation, and vertical datum before any roof member can enter physical 3D obstruction, sprinkler-clearance, or fabrication output."
 }

@@ -1,0 +1,148 @@
+{
+  "artifactType": "halofire.roof-framing-clearance-preflight.v1",
+  "status": "blocked",
+  "sourceStructuralPdfSha256": "bdc561986ef710791ddb3c1928d445596b0a5de5cf131b6adf9d929dc5a36e80",
+  "roofEvidenceReceiptSha256": "a209ff4e9f95631c85def1cbc31bb48f17339505d13c8de3d87c25d6558598ef",
+  "boundedMemberCount": 7,
+  "obstructionInventoryStatus": "unresolved-source-bound-framing",
+  "automaticPipeRoutingAllowed": false,
+  "perHeadObstructionClearanceVerified": false,
+  "codeComplianceReady": false,
+  "fabricationReady": false,
+  "memberConstraints": [
+    {
+      "memberId": "S-190.B-beam-3",
+      "memberTag": "2X10",
+      "planCenterlineEndpointsFt": [
+        [
+          57.8661,
+          54.31672,
+          85.904973
+        ],
+        [
+          20.4927,
+          54.31672,
+          85.904973
+        ]
+      ],
+      "state": "source-bounded-not-physical",
+      "routingConstraint": "do-not-claim-obstruction-clearance-until-exact-geometry-is-extracted"
+    },
+    {
+      "memberId": "S-190.B-beam-4",
+      "memberTag": "2X10",
+      "planCenterlineEndpointsFt": [
+        [
+          57.8661,
+          52.31672,
+          86.238307
+        ],
+        [
+          20.4927,
+          52.31672,
+          86.238307
+        ]
+      ],
+      "state": "source-bounded-not-physical",
+      "routingConstraint": "do-not-claim-obstruction-clearance-until-exact-geometry-is-extracted"
+    },
+    {
+      "memberId": "S-190.B-beam-5",
+      "memberTag": "2X10",
+      "planCenterlineEndpointsFt": [
+        [
+          57.8661,
+          50.31672,
+          86.571641
+        ],
+        [
+          20.4927,
+          50.31672,
+          86.571641
+        ]
+      ],
+      "state": "source-bounded-not-physical",
+      "routingConstraint": "do-not-claim-obstruction-clearance-until-exact-geometry-is-extracted"
+    },
+    {
+      "memberId": "S-190.B-joist-2",
+      "memberTag": "2X10",
+      "planCenterlineEndpointsFt": [
+        [
+          38.5594,
+          56.31672,
+          85.571639
+        ],
+        [
+          20.4927,
+          56.31672,
+          85.571639
+        ]
+      ],
+      "state": "source-bounded-not-physical",
+      "routingConstraint": "do-not-claim-obstruction-clearance-until-exact-geometry-is-extracted"
+    },
+    {
+      "memberId": "S-190.C-joist-27",
+      "memberTag": "2X12",
+      "planCenterlineEndpointsFt": [
+        [
+          196.76101,
+          71.19335,
+          83.092196
+        ],
+        [
+          196.76101,
+          54.89995,
+          85.807768
+        ]
+      ],
+      "state": "source-bounded-not-physical",
+      "routingConstraint": "do-not-claim-obstruction-clearance-until-exact-geometry-is-extracted"
+    },
+    {
+      "memberId": "S-190.C-joist-28",
+      "memberTag": "2X12",
+      "planCenterlineEndpointsFt": [
+        [
+          198.76101,
+          71.19335,
+          83.092196
+        ],
+        [
+          198.76101,
+          54.89995,
+          85.807768
+        ]
+      ],
+      "state": "source-bounded-not-physical",
+      "routingConstraint": "do-not-claim-obstruction-clearance-until-exact-geometry-is-extracted"
+    },
+    {
+      "memberId": "S-190.C-joist-30",
+      "memberTag": "2X12",
+      "planCenterlineEndpointsFt": [
+        [
+          200.74771,
+          71.19335,
+          83.092196
+        ],
+        [
+          200.74771,
+          54.89995,
+          85.807768
+        ]
+      ],
+      "state": "source-bounded-not-physical",
+      "routingConstraint": "do-not-claim-obstruction-clearance-until-exact-geometry-is-extracted"
+    }
+  ],
+  "issues": [
+    {
+      "code": "ROOF_FRAMING_OBSTRUCTION_GEOMETRY_UNRESOLVED",
+      "severity": "blocking",
+      "message": "Automatic pipe/head clearance cannot use bounded roof framing until an exact supplier/truss/lumber source is materialized and extracted.",
+      "refs": []
+    }
+  ]
+}

@@ -91,3 +91,49 @@ The
 next loop must find source-specific exact wood dimensions or approve a
 separately labeled conservative obstruction-envelope policy; it may not relabel
 minimum dressed bounds as exact physical parts.
+
+## Iteration 4 materialized-corpus discovery gate
+
+A new bounded, deterministic source-discovery stage walks only configured,
+materialized corpus roots, content-hashes every candidate, ignores symlinks,
+and returns an explicit scan-budget failure instead of pretending that a huge
+shared drive was completely searched. It classifies filename-level candidates
+as an issued structural design, sprinkler shop drawing, or structural
+supplier/truss/lumber submittal. This is a discovery classification only: a
+document name or an extracted member tag never promotes a CAD solid.
+
+The current local run scanned 577 files from the Cooperative 1881 bid and
+golden roots. It found 52 project-token candidate paths representing 32 unique
+contents. The issued structural set, its RFI, and the completed sprinkler shop
+drawings are classified explicitly; duplicate structural/RFI copies are
+deduplicated by SHA-256 before member evidence is evaluated. The configured `Y:/` source root is not
+materialized in this session. No structural supplier/truss/lumber submittal was
+found. All seven continuously roof-projectable bounded wood members therefore
+remain non-physical, with explicit `physicalPromotionAllowed: false`; a
+sprinkler shop drawing is not structural fabrication evidence.
+
+- `apps/autosprink/src/data/roof-framing-source-discovery.cooperative-1881.json`
+  records 577 scanned files, 52 path candidates, 32 unique documents, 7 checked
+  roof members, 0 supplier candidates, and all release claims false.
+- `npm run build:1881-source-evidence-discovery` reruns the corpus gate.
+- Focused Vitest discovery and roof-framing lanes pass 8/8, including an
+  adversarial scan-budget exhaustion case and duplicate-source SHA collapse.
+
+The discovery artifact is consumed by
+`roof-framing-clearance-preflight.cooperative-1881.json`. The preflight binds
+the structural PDF SHA, requires a one-to-one member witness set, rejects any
+false physical-promotion flag, and returns a typed
+`ROOF_FRAMING_OBSTRUCTION_GEOMETRY_UNRESOLVED` blocker. Automatic pipe routing,
+per-head obstruction clearance, code compliance, and fabrication therefore stay
+false for the seven bounded members rather than being silently routed through.
+The direct discovery/roof-framing lane passes 11/11, including source-hash and
+member-set substitution adversaries. The broader focused JavaScript source,
+roof, coordination, and calibration lane passes 70/70 with zero skips;
+`test_registered_structures.py` passes 25/25, the AutoSprink production build
+passes, and the agent-loop contract validator passes.
+
+The next automated pass accepts `HALOFIRE_CORPUS_ROOTS` as a semicolon-delimited
+set of scoped, materialized Egnyte folders. It must locate an actual structural
+supplier submittal and then independently extract member-level actual dressed
+dimensions, orientation, and vertical datum before the existing continuous roof
+projection gate can promote a physical obstruction.
