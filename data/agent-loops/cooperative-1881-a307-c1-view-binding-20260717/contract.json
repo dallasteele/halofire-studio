@@ -1,0 +1,36 @@
+{
+  "name": "cooperative-1881-a307-c1-view-binding-20260717",
+  "owner": "codex",
+  "goal": "Bind the explicit A-121 C1/A-307 plan reference to its native A-307 paper-space drawing title and model-space viewport, then capture only the viewport-local roof profile and elevation annotation evidence.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "apps/autosprink/src/data/cooperative-1881-a121-section-cut-coverage.json",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/arch/A-307 BUILDING SECTIONS.dwg"
+  ],
+  "exit_criteria": [
+    "C1/A-307 is bound by matching native drawing-title attributes and a uniquely valid paper-title-to-viewport layout relationship, not by sheet name or nearest model geometry.",
+    "Every emitted roof segment and eave/ridge annotation is contained in the bound model-space viewport and retains native source handles.",
+    "The receipt rejects ambiguous title/viewport bindings, transformed source blocks, absent roof layers, missing exact story-marker identity, or annotations outside the selected viewport.",
+    "No roof plane, plan-region mapping, slope direction, member, sprinkler, pipe, clearance, fabrication, code, employee, or VPS claim is made."
+  ],
+  "verification_gates": [
+    "agent_loop_guard validate before implementation",
+    "focused Vitest coverage for viewport containment, title binding uniqueness, and false-promotion boundary",
+    "deterministic two-run artifact replay",
+    "Autosprink production build",
+    "GX10 prover health/check or explicit formal-proof blocker",
+    "Chrome screenshot capture and visual inspection of bound source view geometry and annotations",
+    "verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-a307-c1-view-binding-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/cooperative-1881-a307-c1-view-binding.json",
+    "output/visual-proof/1881-a307-c1-view-binding.svg",
+    "data/agent-loops/cooperative-1881-a307-c1-view-binding-20260717/evidence.md"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 30000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

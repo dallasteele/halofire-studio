@@ -1,0 +1,21 @@
+{
+  "name": "cooperative-1881-a307-c1-view-binding-20260717",
+  "iteration": 1,
+  "status": "completed",
+  "nextStage": "OPEN_A307_C1_PROFILE_EDGE_TO_ELEVATION_DATUM_GEOMETRIC_BINDING_LOOP",
+  "claims": {
+    "planReferenceToNativeViewBound": true,
+    "viewportLocalRoofProfileRegistered": true,
+    "viewportLocalRoofDatumAnnotationsRegistered": true,
+    "profileEdgeToDatumBound": false,
+    "slopeDirectionReady": false,
+    "planRegionToSectionViewReady": false,
+    "roofSurfaceReconstructionReady": false,
+    "perMemberVerticalDatumReady": false,
+    "automaticSprinklerPlacementAllowed": false,
+    "automaticPipeRoutingAllowed": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  }
+}
