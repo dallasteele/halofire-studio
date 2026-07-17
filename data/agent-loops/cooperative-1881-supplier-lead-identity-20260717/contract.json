@@ -30,6 +30,9 @@
     "apps/autosprink/src/data/roof-framing-clearance-preflight.cooperative-1881.json",
     "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration2.json",
     "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration3.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration4.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration5.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration6.json",
     "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/state.json"
   ],
   "max_iterations": 6,

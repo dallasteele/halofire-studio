@@ -1,8 +1,8 @@
 {
   "name": "cooperative-1881-supplier-lead-identity-20260717",
-  "iteration": 3,
-  "status": "in_progress",
-  "nextStage": "RESUME_SHARED_SUPPLIER_LEAD_DISCOVERY_FROM_ITERATION3_FRONTIER",
+  "iteration": 6,
+  "status": "successor_loop_required",
+  "nextStage": "OPEN_SHARED_SUPPLIER_LEAD_DISCOVERY_SUCCESSOR_FROM_ITERATION6_FRONTIER",
   "predecessor": "cooperative-1881-physical-framing-placement-20260717",
   "baseline": {
     "sharedDirectoryOffset": 1200,
@@ -48,6 +48,38 @@
     "sharedDirectoriesScanned": 300,
     "sharedNextFrontierEntries": 103,
     "projectIdentifiedDocuments": 32,
+    "supplierSubmittalCandidates": 0,
+    "physicalPromotionAllowed": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false
+  },
+  "iteration4Replay": {
+    "artifact": "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration4.json",
+    "artifactSha256": "e230533e7d840240f1b17d33bb1a4e786442605fa0f42f24e3fe66279eddd373",
+    "resumeInput": "iteration3 shared nextDirectoryFrontier",
+    "sharedFilesScanned": 786,
+    "sharedDirectoriesScanned": 300,
+    "sharedNextFrontierEntries": 94,
+    "supplierSubmittalCandidates": 0,
+    "physicalPromotionAllowed": false
+  },
+  "iteration5Replay": {
+    "artifact": "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration5.json",
+    "artifactSha256": "6827b249f1a94527644de0b363d26807ac6a1ca3e012f871c08ee02c4ffafb43",
+    "resumeInput": "iteration4 shared nextDirectoryFrontier",
+    "sharedFilesScanned": 259,
+    "sharedDirectoriesScanned": 300,
+    "sharedNextFrontierEntries": 107,
+    "supplierSubmittalCandidates": 0,
+    "physicalPromotionAllowed": false
+  },
+  "iteration6Replay": {
+    "artifact": "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration6.json",
+    "artifactSha256": "ad3d1d6f8368612a83c61e6705b27ad2dac48a9c374db0e621e117e2d50684e0",
+    "resumeInput": "iteration5 shared nextDirectoryFrontier",
+    "sharedFilesScanned": 380,
+    "sharedDirectoriesScanned": 300,
+    "sharedNextFrontierEntries": 90,
     "supplierSubmittalCandidates": 0,
     "physicalPromotionAllowed": false,
     "automaticPipeRoutingAllowed": false,
