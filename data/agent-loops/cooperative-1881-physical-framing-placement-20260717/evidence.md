@@ -190,3 +190,14 @@ Python tests, all passing with zero skips; the AutoSprink Vite production build,
 loop guard, and agentic rulebook check also pass. The formal prover health probe
 at `http://127.0.0.1:8810/api/provers/health` refused the connection, so no
 formal proof claim is made for this source-discovery slice.
+
+## Iteration 7 shared window 600
+
+The next live shared-drive window at offset 600 scanned 786 materialized files
+within its 300-directory budget and advanced the resumable cursor to 900. It
+again found no Cooperative 1881 project-token candidate and no structural
+supplier/truss/lumber submittal. This is not an absence claim about the
+unscanned tree; `SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED` remains present. The
+replayed clearance preflight remains blocked with
+`ROOF_FRAMING_OBSTRUCTION_GEOMETRY_UNRESOLVED`, automatic routing false, and
+per-head obstruction clearance false.

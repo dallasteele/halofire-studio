@@ -25,13 +25,13 @@
         "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
       ],
       "missingRoots": [],
-      "scannedFileCount": 221,
+      "scannedFileCount": 786,
       "scannedDirectoryCount": 300,
-      "traversedDirectoryCount": 601,
+      "traversedDirectoryCount": 901,
       "maxFiles": 15000,
       "maxDirectories": 300,
-      "directoryOffset": 300,
-      "nextDirectoryOffset": 600
+      "directoryOffset": 600,
+      "nextDirectoryOffset": 900
     }
   },
   "scannedRoots": [
@@ -41,9 +41,9 @@
     "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
   ],
   "missingRoots": [],
-  "scannedFileCount": 798,
+  "scannedFileCount": 1363,
   "scannedDirectoryCount": 410,
-  "traversedDirectoryCount": 711,
+  "traversedDirectoryCount": 1011,
   "candidates": [
     {
       "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf",
@@ -886,7 +886,7 @@
     {
       "code": "SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED",
       "severity": "blocking",
-      "message": "Discovery stopped after the 15000-file or 300-directory budget; narrow the corpus root or resume at directory offset 600.",
+      "message": "Discovery stopped after the 15000-file or 300-directory budget; narrow the corpus root or resume at directory offset 900.",
       "refs": [
         "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
       ],
