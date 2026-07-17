@@ -4,7 +4,7 @@ import { z } from 'zod'
 export const PlatformId = z.string().min(1).max(160)
 export const IsoTimestamp = z.string().datetime()
 export const SourceReceipt = z.object({
-  source_system: z.literal('halofire_bids.db'),
+  source_system: z.enum(['halofire_bids.db', 'halo_contact_list.xlsx']),
   source_table: z.string().min(1),
   source_row_id: z.number().int().positive(),
   source_sha256: z.string().regex(/^[a-f0-9]{64}$/),

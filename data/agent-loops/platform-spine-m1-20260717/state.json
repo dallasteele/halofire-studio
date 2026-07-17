@@ -1,8 +1,8 @@
 {
   "name": "platform-spine-m1-20260717",
-  "iteration": 1,
-  "status": "in_progress",
-  "nextStage": "ADD_MODULE_MANIFESTS_AND_ADR002_BEFORE_ANY_HARD_REVIEW_CLASS",
+  "iteration": 6,
+  "status": "completed",
+  "nextStage": "M2_SCHEMA_PROMOTION_WITH_ADDITIVE_CONSUMER_ADAPTERS",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [141704, 60905],
@@ -42,5 +42,12 @@
     "moduleContract": "ModuleContract schema",
     "hardGatePolicy": "no new hard review class until ADR-002 is supplied",
     "verification": "platform-core check-types and build passed"
+  },
+  "iteration6": {
+    "employeeRoster": "Y:/Shared/HaloOps/Z - General Documents & Forms/02-Employees/Employee Lists and Contacts/Halo Contact List.xlsx",
+    "employeeSourceSha256": "36bddd022b4ebd55789b0480de1d430d15e1c0553613bcc190060f0781c90af3",
+    "importedEmployees": 65,
+    "authorizationPolicy": "all imported records are unassigned and disabled; roster contact data never grants a role or login",
+    "verification": "real-copy apply imported 65 employees; rollback left 0 platform tables; source bid corpus SHA remained 5c2ac127b37d570edf73f097b1c4eeb1df338d65f4ef3c8f3046b867c2828546"
   }
 }
