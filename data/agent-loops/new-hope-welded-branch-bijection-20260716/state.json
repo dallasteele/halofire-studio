@@ -1,0 +1,45 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "new-hope-welded-branch-bijection-20260716",
+  "iteration": 2,
+  "status": "completed",
+  "brainPreflight": {
+    "status": "passed",
+    "episodes": [155544, 150555, 149978, 151026, 149894]
+  },
+  "truth": {
+    "weldedBranchUnitCount": 71,
+    "fieldAsBuiltHeavyCenterlineCount": 67,
+    "pieceVectorMappedUnitCount": 67,
+    "pieceVectorHoldoutCount": 4,
+    "pieceVectorMappedHeavyCenterlineCount": 67,
+    "maxPieceVectorCutSpanDeltaIn": 2.096517,
+    "maxPieceLabelToMappedCenterlineDistancePt": 53.334493,
+    "directionRegisteredUnitCount": 15,
+    "mappedNativeOutletCount": 36,
+    "maxOutletResidualIn": 0.194824,
+    "globalListedUnitCount": 169,
+    "globalPieceVectorUnmappedUnitCount": 102,
+    "hydraulicFlowDirectionReady": false,
+    "gradeReady": false,
+    "installedElevationReady": false,
+    "globalPieceToPlanVectorMappingReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "quoteReady": false,
+    "vpsReleaseReady": false
+  },
+  "verification": {
+    "deterministicReplay": "JSON SHA256 ACB1EED67B7681F7C763C02F10D7116FB287C2B2F2C90F420C6FBAC911F4C8FD and PNG SHA256 77B353B078FC82D823A6FB54B996033CC88A8E3E0ACA69098FC7DDB01E5C960F replay identically",
+    "focusedTests": "33 passed across five files; duplicate centerline, malformed holdout promotion, cut-span drift, label drift, outlet residual, direction coverage, and false release promotions reject",
+    "build": "Vite production build passed in 967 ms",
+    "rulebook": "AGENTIC_RULES_VERIFY ok",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "lean": "four theorems verified by Lean 4.13.0 in 111 ms",
+    "visual": "actual FP1.0 proof inspected and accepted; cyan mapped centerlines align with the PDF, magenta station-direction subset remains distinct, and four BL03/BL04 holdouts remain disclosed",
+    "browser": "HTTP 200; proofReady, bijection, scoped mapping, and station direction true; 67 plan and 67 unresolved-3D vectors; four holdouts; 102 global units unmapped; quote and field release false; zero console errors and warnings",
+    "browserScreenshot": "output/playwright/new-hope-67-piece-bijection-browser.png",
+    "brainPostflight": "passed; episode 156579"
+  },
+  "nextAction": "Resolve the four BL03/BL04 alternate-centerline pieces, then map the 67 threaded units to source vectors while retaining hydraulic direction, grade, fitting takeout, and installed Z as separate fail-closed gates."
+}

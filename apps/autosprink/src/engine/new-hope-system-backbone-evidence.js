@@ -384,17 +384,18 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
         pipeVectors: clone(wetNetwork.wetPipeVectors),
         sprinklerHeads: clone(wetNetwork.sprinklerHeads),
         sprinklerSchedule: clone(wetNetwork.sprinklerSchedule),
-        scopedFabricationPieceVectors: clone(wetWeldedBranchRegistration.registrations.map((instance) => ({
+        scopedFabricationPieceVectors: clone(wetWeldedBranchRegistration.pieceVectorMappings.map((instance) => ({
           instanceId: instance.instanceId,
           pieceId: instance.pieceId,
           nativePipeUniqueId: instance.nativePipeUniqueId,
           nativeCutLengthFt: instance.nativeCutLengthFt,
           sourceCenterline: instance.sourceCenterline,
-          fabricationCutVector: instance.fabricationCutVector,
-          mappedOutlets: instance.mappedOutlets,
-          maxOutletResidualIn: instance.maxOutletResidualIn,
           nativeStationDirection: instance.nativeStationDirection,
-          geometryStatus: 'exact-field-and-as-built-centerline-plus-native-outlet-registered-cut-vector',
+          nativeStationDirectionStatus: instance.nativeStationDirectionStatus,
+          sourceCenterlineVsCutSpanDeltaIn: instance.sourceCenterlineVsCutSpanDeltaIn,
+          geometryStatus: instance.nativeStationDirectionStatus === 'native-outlet-registered'
+            ? 'exact-field-and-as-built-centerline-plus-native-cut-length-and-station-direction'
+            : 'exact-field-and-as-built-centerline-plus-native-cut-length-station-direction-unresolved',
         }))),
         geometryStatus: 'exact-field-install-and-as-built-plan-xy',
       } : null,
@@ -441,20 +442,23 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
           headType: clone(head.headType),
           geometryStatus: 'exact-plan-xy-and-head-type-installed-z-unresolved',
         })),
-        scopedFabricationPieceVectors: wetWeldedBranchRegistration.registrations.map((instance) => ({
+        scopedFabricationPieceVectors: wetWeldedBranchRegistration.pieceVectorMappings.map((instance) => ({
           instanceId: instance.instanceId,
           pieceId: instance.pieceId,
-          fromPlanFt: clone(instance.fabricationCutVector.fromPlanFt),
-          toPlanFt: clone(instance.fabricationCutVector.toPlanFt),
+          fromPlanFt: clone(instance.sourceCenterline.fromPlanFt),
+          toPlanFt: clone(instance.sourceCenterline.toPlanFt),
           nativeStationDirection: instance.nativeStationDirection,
+          nativeStationDirectionStatus: instance.nativeStationDirectionStatus,
           installedElevationFt: null,
-          geometryStatus: 'exact-plan-xy-and-native-station-direction-installed-z-and-hydraulic-flow-unresolved',
+          geometryStatus: instance.nativeStationDirectionStatus === 'native-outlet-registered'
+            ? 'exact-plan-xy-native-cut-length-and-station-direction-installed-z-and-hydraulic-flow-unresolved'
+            : 'exact-plan-xy-and-native-cut-length-station-direction-installed-z-and-hydraulic-flow-unresolved',
         })),
       } : null,
     },
     systemDesignGate: { status: 'blocked', blockers },
     takeoff: evidenceReady ? {
-      status: wetNetworkReady ? 'native-records-to-approved-listing-definitions-and-quantity-expansion-reconciled-fifteen-units-source-registered-global-piece-to-plan-unresolved' : 'source-identities-only-no-route-quantities',
+      status: wetNetworkReady ? 'native-records-to-approved-listing-definitions-and-quantity-expansion-reconciled-sixty-seven-units-source-registered-global-piece-to-plan-unresolved' : 'source-identities-only-no-route-quantities',
       wetLevel1NativeFabrication: wetNetworkReady ? {
         metrics: clone(wetNetwork.metrics),
         lineFamilies: clone(wetNetwork.nativeFabricationLines),
@@ -490,6 +494,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     wetSystemQuantityExpandedLineAnchorsReady: evidenceReady && wetQuantityPlacement.quantityExpandedLineLabelAnchorsReady,
     wetSystemQuantityExpandedEndpointMappingReady: evidenceReady && wetQuantityPlacement.quantityExpandedPieceEndpointMappingReady,
     wetSystemWeldedBranchLabelInventoryReady: evidenceReady && wetWeldedBranchRegistration.weldedBranchLabelInventoryReady,
+    wetSystemWeldedBranchPieceVectorBijectionReady: evidenceReady && wetWeldedBranchRegistration.weldedBranchPieceVectorBijectionReady,
     wetSystemScopedPieceToPlanMappingReady: evidenceReady && wetWeldedBranchRegistration.scopedPieceToPlanVectorMappingReady,
     wetSystemScopedFabricationStationDirectionReady: evidenceReady && wetWeldedBranchRegistration.scopedFabricationStationDirectionReady,
     wetSystemThreadedCutLengthCrossSourceReady: evidenceReady && wetListingCrosswalk.threadedCutLengthCrossSourceReady,

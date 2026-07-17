@@ -1,5 +1,5 @@
 {
-  "artifactType": "halofire.new-hope-wet-welded-branch-registration-evidence.v1",
+  "artifactType": "halofire.new-hope-wet-welded-branch-registration-evidence.v2",
   "projectId": "new-hope-crisis-center-brigham-city-ut",
   "sources": {
     "fieldInstall": {
@@ -26,6 +26,7 @@
       1118.512451
     ],
     "outletResidualGateIn": 0.25,
+    "cutSpanGateIn": 3.0,
     "pieceLabelCenterlineDistanceGatePt": 12.0,
     "pieceLabelCenterlineUniquenessGapPt": 2.0
   },
@@ -1307,6 +1308,3247 @@
         798.818298,
         1251.929688
       ]
+    }
+  ],
+  "pieceVectorMappings": [
+    {
+      "instanceId": "BL01.01",
+      "pieceId": "BL01.01",
+      "lineName": "BL01",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1180.016357,
+        1055.780396,
+        1214.799927,
+        1076.215332
+      ],
+      "pieceLabelBoxPdfPt": [
+        884.044006,
+        1079.794312,
+        896.814209,
+        1092.79834
+      ],
+      "nativePipeUniqueId": 676,
+      "nativeCutLengthFt": 10.958333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38553,
+        "asBuiltDrawingIndex": 38529,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          970.19873,
+          1092.274536
+        ],
+        "toPdfPt": [
+          872.993652,
+          1092.274536
+        ],
+        "fromPlanFt": [
+          34.391574,
+          -2.915324
+        ],
+        "toPlanFt": [
+          23.59101,
+          -2.915324
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97821,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.893229,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL01.02",
+      "pieceId": "BL01.02",
+      "lineName": "BL01",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1180.016357,
+        1055.780396,
+        1214.799927,
+        1076.215332
+      ],
+      "pieceLabelBoxPdfPt": [
+        979.03656,
+        1079.794312,
+        991.806763,
+        1092.79834
+      ],
+      "nativePipeUniqueId": 678,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38241,
+        "asBuiltDrawingIndex": 38660,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1159.19873,
+          1092.274536
+        ],
+        "toPdfPt": [
+          971.69873,
+          1092.274536
+        ],
+        "fromPlanFt": [
+          55.391574,
+          -2.915324
+        ],
+        "toPlanFt": [
+          34.558241,
+          -2.915324
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97821,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL02.01",
+      "pieceId": "BL02.01",
+      "lineName": "BL02",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        678.149231,
+        974.067749,
+        712.932861,
+        994.502747
+      ],
+      "pieceLabelBoxPdfPt": [
+        824.334045,
+        955.097534,
+        837.104248,
+        968.101624
+      ],
+      "nativePipeUniqueId": 138,
+      "nativeCutLengthFt": 2.625,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38657,
+        "asBuiltDrawingIndex": 38666,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          842.125854,
+          1013.700012
+        ],
+        "toPdfPt": [
+          864.368652,
+          1013.700012
+        ],
+        "fromPlanFt": [
+          20.161255,
+          -11.645827
+        ],
+        "toPlanFt": [
+          22.632677,
+          -11.645827
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 53.334493,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.842936,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL02.02",
+      "pieceId": "BL02.02",
+      "lineName": "BL02",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        678.149231,
+        974.067749,
+        712.932861,
+        994.502747
+      ],
+      "pieceLabelBoxPdfPt": [
+        820.517761,
+        1001.219849,
+        833.287964,
+        1014.223938
+      ],
+      "nativePipeUniqueId": 144,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38230,
+        "asBuiltDrawingIndex": 38266,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          653.125854,
+          1013.700012
+        ],
+        "toPdfPt": [
+          840.625854,
+          1013.700012
+        ],
+        "fromPlanFt": [
+          -0.838745,
+          -11.645827
+        ],
+        "toPlanFt": [
+          19.994588,
+          -11.645827
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL05.01",
+      "pieceId": "BL05.01",
+      "lineName": "BL05",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        637.973694,
+        1214.911743,
+        672.757324,
+        1235.34668
+      ],
+      "pieceLabelBoxPdfPt": [
+        809.325378,
+        1238.925659,
+        822.095581,
+        1251.929688
+      ],
+      "nativePipeUniqueId": 696,
+      "nativeCutLengthFt": 6.125,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 55074,
+        "asBuiltDrawingIndex": 55035,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          807.656128,
+          1251.405762
+        ],
+        "toPdfPt": [
+          861.247253,
+          1251.405762
+        ],
+        "fromPlanFt": [
+          16.331285,
+          14.765923
+        ],
+        "toPlanFt": [
+          22.285855,
+          14.765923
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.045167,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL05.02",
+      "pieceId": "BL05.02",
+      "lineName": "BL05",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        637.973694,
+        1214.911743,
+        672.757324,
+        1235.34668
+      ],
+      "pieceLabelBoxPdfPt": [
+        786.048096,
+        1238.925659,
+        798.818298,
+        1251.929688
+      ],
+      "nativePipeUniqueId": 706,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 55067,
+        "asBuiltDrawingIndex": 55028,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          618.656128,
+          1251.405762
+        ],
+        "toPdfPt": [
+          806.156128,
+          1251.405762
+        ],
+        "fromPlanFt": [
+          -4.668715,
+          14.765923
+        ],
+        "toPlanFt": [
+          16.164619,
+          14.765923
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL06.01",
+      "pieceId": "BL06.01",
+      "lineName": "BL06",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1182.150757,
+        980.211182,
+        1216.934326,
+        1000.646179
+      ],
+      "pieceLabelBoxPdfPt": [
+        884.693848,
+        957.532349,
+        897.46405,
+        970.536438
+      ],
+      "nativePipeUniqueId": 631,
+      "nativeCutLengthFt": 19.375,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38254,
+        "asBuiltDrawingIndex": 38651,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1045.938354,
+          970.012512
+        ],
+        "toPdfPt": [
+          872.993652,
+          970.012512
+        ],
+        "fromPlanFt": [
+          42.807088,
+          -16.499993
+        ],
+        "toPlanFt": [
+          23.59101,
+          -16.499993
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.907064,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL06.02",
+      "pieceId": "BL06.02",
+      "lineName": "BL06",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1182.150757,
+        980.211182,
+        1216.934326,
+        1000.646179
+      ],
+      "pieceLabelBoxPdfPt": [
+        1033.132446,
+        1003.111084,
+        1046.136475,
+        1015.881287
+      ],
+      "nativePipeUniqueId": 634,
+      "nativeCutLengthFt": 4.125,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38251,
+        "asBuiltDrawingIndex": 38251,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1048.750854,
+          1008.462036
+        ],
+        "toPdfPt": [
+          1048.750854,
+          972.825012
+        ],
+        "fromPlanFt": [
+          43.119588,
+          -12.227824
+        ],
+        "toPlanFt": [
+          43.119588,
+          -16.187493
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 9.174862,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.983968,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL06.03",
+      "pieceId": "BL06.03",
+      "lineName": "BL06",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1182.150757,
+        980.211182,
+        1216.934326,
+        1000.646179
+      ],
+      "pieceLabelBoxPdfPt": [
+        1056.838623,
+        998.794373,
+        1069.609009,
+        1011.798462
+      ],
+      "nativePipeUniqueId": 636,
+      "nativeCutLengthFt": 12.125,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38243,
+        "asBuiltDrawingIndex": 38450,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1159.19873,
+          1011.274536
+        ],
+        "toPdfPt": [
+          1051.563354,
+          1011.274536
+        ],
+        "fromPlanFt": [
+          55.391574,
+          -11.915324
+        ],
+        "toPlanFt": [
+          43.432088,
+          -11.915324
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.986165,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL07.01",
+      "pieceId": "BL07.01",
+      "lineName": "BL07",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1185.396606,
+        1224.162598,
+        1220.180176,
+        1244.597534
+      ],
+      "pieceLabelBoxPdfPt": [
+        873.647644,
+        1248.176514,
+        886.417847,
+        1261.180542
+      ],
+      "nativePipeUniqueId": 640,
+      "nativeCutLengthFt": 11.916666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 54836,
+        "asBuiltDrawingIndex": 54818,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          975.578979,
+          1260.656738
+        ],
+        "toPdfPt": [
+          869.872253,
+          1260.656738
+        ],
+        "fromPlanFt": [
+          34.98938,
+          15.79381
+        ],
+        "toPlanFt": [
+          23.244188,
+          15.79381
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97821,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.057699,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL07.02",
+      "pieceId": "BL07.02",
+      "lineName": "BL07",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1185.396606,
+        1224.162598,
+        1220.180176,
+        1244.597534
+      ],
+      "pieceLabelBoxPdfPt": [
+        984.416809,
+        1248.176514,
+        997.187012,
+        1261.180542
+      ],
+      "nativePipeUniqueId": 654,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 54822,
+        "asBuiltDrawingIndex": 54804,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1164.578979,
+          1260.656738
+        ],
+        "toPdfPt": [
+          977.078979,
+          1260.656738
+        ],
+        "fromPlanFt": [
+          55.98938,
+          15.79381
+        ],
+        "toPlanFt": [
+          35.156046,
+          15.79381
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97821,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL08.01",
+      "pieceId": "BL08.01",
+      "lineName": "BL08",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        673.94342,
+        1278.331421,
+        708.727051,
+        1298.766357
+      ],
+      "pieceLabelBoxPdfPt": [
+        825.850586,
+        1302.345337,
+        838.620789,
+        1315.349365
+      ],
+      "nativePipeUniqueId": 133,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38219,
+        "asBuiltDrawingIndex": 38458,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          654.625854,
+          1314.825562
+        ],
+        "toPdfPt": [
+          842.396118,
+          1314.825562
+        ],
+        "fromPlanFt": [
+          -0.672079,
+          21.812568
+        ],
+        "toPlanFt": [
+          20.191284,
+          21.812568
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978211,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.639648,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL09.01",
+      "pieceId": "BL09.01",
+      "lineName": "BL09",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        564.91217,
+        886.830933,
+        599.695801,
+        907.26593
+      ],
+      "pieceLabelBoxPdfPt": [
+        813.624084,
+        910.844849,
+        826.394287,
+        923.848938
+      ],
+      "nativePipeUniqueId": 682,
+      "nativeCutLengthFt": 14.583333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38634,
+        "asBuiltDrawingIndex": 38196,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          734.594604,
+          923.325012
+        ],
+        "toPdfPt": [
+          864.368652,
+          923.325012
+        ],
+        "fromPlanFt": [
+          8.213338,
+          -21.687493
+        ],
+        "toPlanFt": [
+          22.632677,
+          -21.687493
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.967936,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL09.02",
+      "pieceId": "BL09.02",
+      "lineName": "BL09",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        564.91217,
+        886.830933,
+        599.695801,
+        907.26593
+      ],
+      "pieceLabelBoxPdfPt": [
+        712.986511,
+        910.844849,
+        725.756714,
+        923.848938
+      ],
+      "nativePipeUniqueId": 692,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38317,
+        "asBuiltDrawingIndex": 38598,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          545.594604,
+          923.325012
+        ],
+        "toPdfPt": [
+          733.094604,
+          923.325012
+        ],
+        "fromPlanFt": [
+          -12.786662,
+          -21.687493
+        ],
+        "toPlanFt": [
+          8.046671,
+          -21.687493
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL10.01",
+      "pieceId": "BL10.01",
+      "lineName": "BL10",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1180.016357,
+        1307.479614,
+        1214.799927,
+        1327.914551
+      ],
+      "pieceLabelBoxPdfPt": [
+        867.856567,
+        1331.49353,
+        880.62677,
+        1344.497559
+      ],
+      "nativePipeUniqueId": 618,
+      "nativeCutLengthFt": 13.416666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38532,
+        "asBuiltDrawingIndex": 38520,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          970.19873,
+          1343.973633
+        ],
+        "toPdfPt": [
+          851.021118,
+          1343.973633
+        ],
+        "fromPlanFt": [
+          34.391574,
+          25.051242
+        ],
+        "toPlanFt": [
+          21.149617,
+          25.051242
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.096517,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL10.02",
+      "pieceId": "BL10.02",
+      "lineName": "BL10",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1180.016357,
+        1307.479614,
+        1214.799927,
+        1327.914551
+      ],
+      "pieceLabelBoxPdfPt": [
+        979.03656,
+        1331.49353,
+        991.806763,
+        1344.497559
+      ],
+      "nativePipeUniqueId": 621,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38191,
+        "asBuiltDrawingIndex": 38316,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1159.19873,
+          1343.973633
+        ],
+        "toPdfPt": [
+          971.69873,
+          1343.973633
+        ],
+        "fromPlanFt": [
+          55.391574,
+          25.051242
+        ],
+        "toPlanFt": [
+          34.558241,
+          25.051242
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL11.01",
+      "pieceId": "BL11.01",
+      "lineName": "BL11",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1096.778809,
+        843.518433,
+        1130.67041,
+        863.95343
+      ],
+      "pieceLabelBoxPdfPt": [
+        907.15271,
+        889.927856,
+        919.922913,
+        902.931946
+      ],
+      "nativePipeUniqueId": 116,
+      "nativeCutLengthFt": 1.75,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38517,
+        "asBuiltDrawingIndex": 38525,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          887.407104,
+          880.012512
+        ],
+        "toPdfPt": [
+          872.993652,
+          880.012512
+        ],
+        "fromPlanFt": [
+          25.192505,
+          -26.499993
+        ],
+        "toPlanFt": [
+          23.59101,
+          -26.499993
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 30.86008,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.782064,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL11.02",
+      "pieceId": "BL11.02",
+      "lineName": "BL11",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1096.778809,
+        843.518433,
+        1130.67041,
+        863.95343
+      ],
+      "pieceLabelBoxPdfPt": [
+        891.965576,
+        867.532349,
+        904.735779,
+        880.536438
+      ],
+      "nativePipeUniqueId": 119,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38306,
+        "asBuiltDrawingIndex": 38177,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1076.407104,
+          880.012512
+        ],
+        "toPdfPt": [
+          888.907104,
+          880.012512
+        ],
+        "fromPlanFt": [
+          46.192505,
+          -26.499993
+        ],
+        "toPlanFt": [
+          25.359171,
+          -26.499993
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL12.01",
+      "pieceId": "BL12.01",
+      "lineName": "BL12",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        674.13092,
+        1375.409302,
+        708.914551,
+        1395.844238
+      ],
+      "pieceLabelBoxPdfPt": [
+        825.850586,
+        1399.423218,
+        838.620789,
+        1412.427246
+      ],
+      "nativePipeUniqueId": 126,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38208,
+        "asBuiltDrawingIndex": 38674,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          654.813354,
+          1411.90332
+        ],
+        "toPdfPt": [
+          842.396118,
+          1411.90332
+        ],
+        "fromPlanFt": [
+          -0.651245,
+          32.598985
+        ],
+        "toPlanFt": [
+          20.191284,
+          32.598985
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.889648,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL13.01",
+      "pieceId": "BL13.01",
+      "lineName": "BL13",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1167.653687,
+        1388.479614,
+        1202.437256,
+        1408.914551
+      ],
+      "pieceLabelBoxPdfPt": [
+        872.48468,
+        1412.49353,
+        885.254883,
+        1425.497559
+      ],
+      "nativePipeUniqueId": 590,
+      "nativeCutLengthFt": 13.416666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38540,
+        "asBuiltDrawingIndex": 38685,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          970.19873,
+          1424.973633
+        ],
+        "toPdfPt": [
+          851.021118,
+          1424.973633
+        ],
+        "fromPlanFt": [
+          34.391574,
+          34.051242
+        ],
+        "toPlanFt": [
+          21.149617,
+          34.051242
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.096517,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL13.02",
+      "pieceId": "BL13.02",
+      "lineName": "BL13",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1167.653687,
+        1388.479614,
+        1202.437256,
+        1408.914551
+      ],
+      "pieceLabelBoxPdfPt": [
+        979.03656,
+        1412.49353,
+        991.806763,
+        1425.497559
+      ],
+      "nativePipeUniqueId": 603,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38180,
+        "asBuiltDrawingIndex": 38481,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1159.19873,
+          1424.973633
+        ],
+        "toPdfPt": [
+          971.69873,
+          1424.973633
+        ],
+        "fromPlanFt": [
+          55.391574,
+          34.051242
+        ],
+        "toPlanFt": [
+          34.558241,
+          34.051242
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL14.01",
+      "pieceId": "BL14.01",
+      "lineName": "BL14",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        564.91217,
+        751.830933,
+        599.695801,
+        772.26593
+      ],
+      "pieceLabelBoxPdfPt": [
+        847.82312,
+        775.844849,
+        860.593323,
+        788.848938
+      ],
+      "nativePipeUniqueId": 608,
+      "nativeCutLengthFt": 14.583333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38608,
+        "asBuiltDrawingIndex": 38636,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          734.594604,
+          788.325012
+        ],
+        "toPdfPt": [
+          864.368652,
+          788.325012
+        ],
+        "fromPlanFt": [
+          8.213338,
+          -36.687493
+        ],
+        "toPlanFt": [
+          22.632677,
+          -36.687493
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.967936,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL14.02",
+      "pieceId": "BL14.02",
+      "lineName": "BL14",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        564.91217,
+        751.830933,
+        599.695801,
+        772.26593
+      ],
+      "pieceLabelBoxPdfPt": [
+        712.986511,
+        775.844849,
+        725.756714,
+        788.848938
+      ],
+      "nativePipeUniqueId": 614,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38325,
+        "asBuiltDrawingIndex": 38378,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          545.594604,
+          788.325012
+        ],
+        "toPdfPt": [
+          733.094604,
+          788.325012
+        ],
+        "fromPlanFt": [
+          -12.786662,
+          -36.687493
+        ],
+        "toPlanFt": [
+          8.046671,
+          -36.687493
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL15.01",
+      "pieceId": "BL15.01",
+      "lineName": "BL15",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        553.895325,
+        1486.833008,
+        588.678955,
+        1507.267944
+      ],
+      "pieceLabelBoxPdfPt": [
+        801.850647,
+        1510.846924,
+        814.62085,
+        1523.850952
+      ],
+      "nativePipeUniqueId": 583,
+      "nativeCutLengthFt": 13.375,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38603,
+        "asBuiltDrawingIndex": 38492,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          723.577759,
+          1523.327148
+        ],
+        "toPdfPt": [
+          842.396118,
+          1523.327148
+        ],
+        "fromPlanFt": [
+          6.989244,
+          44.979411
+        ],
+        "toPlanFt": [
+          20.191284,
+          44.979411
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97821,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.075521,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL15.02",
+      "pieceId": "BL15.02",
+      "lineName": "BL15",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        553.895325,
+        1486.833008,
+        588.678955,
+        1507.267944
+      ],
+      "pieceLabelBoxPdfPt": [
+        701.969727,
+        1510.846924,
+        714.739929,
+        1523.850952
+      ],
+      "nativePipeUniqueId": 585,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38197,
+        "asBuiltDrawingIndex": 38283,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          534.577759,
+          1523.327148
+        ],
+        "toPdfPt": [
+          722.077759,
+          1523.327148
+        ],
+        "fromPlanFt": [
+          -14.010756,
+          44.979411
+        ],
+        "toPlanFt": [
+          6.822578,
+          44.979411
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97821,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL16.01",
+      "pieceId": "BL16.01",
+      "lineName": "BL16",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1024.275513,
+        1535.393433,
+        1059.059082,
+        1555.828369
+      ],
+      "pieceLabelBoxPdfPt": [
+        854.796509,
+        1559.407349,
+        867.566711,
+        1572.411377
+      ],
+      "nativePipeUniqueId": 568,
+      "nativeCutLengthFt": 17.083333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38193,
+        "asBuiltDrawingIndex": 38697,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1003.457886,
+          1571.887451
+        ],
+        "toPdfPt": [
+          851.021118,
+          1571.887451
+        ],
+        "fromPlanFt": [
+          38.087036,
+          50.375
+        ],
+        "toPlanFt": [
+          21.149617,
+          50.375
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.750976,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL17.01",
+      "pieceId": "BL17.01",
+      "lineName": "BL17",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1168.801025,
+        690.632202,
+        1203.584595,
+        711.0672
+      ],
+      "pieceLabelBoxPdfPt": [
+        1040.464722,
+        738.889893,
+        1053.235107,
+        751.893982
+      ],
+      "nativePipeUniqueId": 100,
+      "nativeCutLengthFt": 0.625,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38515,
+        "asBuiltDrawingIndex": 38207,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1004.660217,
+          721.153137
+        ],
+        "toPdfPt": [
+          1000.264954,
+          721.153137
+        ],
+        "fromPlanFt": [
+          38.220628,
+          -44.151035
+        ],
+        "toPlanFt": [
+          37.732266,
+          -44.151035
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 48.65686,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.639648,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL17.02",
+      "pieceId": "BL17.02",
+      "lineName": "BL17",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1168.801025,
+        690.632202,
+        1203.584595,
+        711.0672
+      ],
+      "pieceLabelBoxPdfPt": [
+        1059.877441,
+        708.672974,
+        1072.647827,
+        721.677063
+      ],
+      "nativePipeUniqueId": 103,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38355,
+        "asBuiltDrawingIndex": 38105,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1193.660156,
+          721.153137
+        ],
+        "toPdfPt": [
+          1006.160217,
+          721.153137
+        ],
+        "fromPlanFt": [
+          59.220622,
+          -44.151035
+        ],
+        "toPlanFt": [
+          38.387295,
+          -44.151035
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.000081,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL18.01",
+      "pieceId": "BL18.01",
+      "lineName": "BL18",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        759.900452,
+        680.159058,
+        794.684082,
+        700.594055
+      ],
+      "pieceLabelBoxPdfPt": [
+        975.328796,
+        704.172974,
+        988.098999,
+        717.177063
+      ],
+      "nativePipeUniqueId": 572,
+      "nativeCutLengthFt": 7.083333333333333,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38587,
+        "asBuiltDrawingIndex": 38655,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          929.582886,
+          716.653137
+        ],
+        "toPdfPt": [
+          992.108704,
+          716.653137
+        ],
+        "fromPlanFt": [
+          29.878703,
+          -44.651035
+        ],
+        "toPlanFt": [
+          36.826016,
+          -44.651035
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.632243,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL18.02",
+      "pieceId": "BL18.02",
+      "lineName": "BL18",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        759.900452,
+        680.159058,
+        794.684082,
+        700.594055
+      ],
+      "pieceLabelBoxPdfPt": [
+        907.974792,
+        704.172974,
+        920.744995,
+        717.177063
+      ],
+      "nativePipeUniqueId": 578,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38333,
+        "asBuiltDrawingIndex": 38142,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          740.582886,
+          716.653137
+        ],
+        "toPdfPt": [
+          928.082886,
+          716.653137
+        ],
+        "fromPlanFt": [
+          8.878703,
+          -44.651035
+        ],
+        "toPlanFt": [
+          29.712036,
+          -44.651035
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL19.01",
+      "pieceId": "BL19.01",
+      "lineName": "BL19",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        564.91217,
+        1608.895508,
+        599.695801,
+        1629.330444
+      ],
+      "pieceLabelBoxPdfPt": [
+        809.365784,
+        1632.909424,
+        822.135986,
+        1645.913452
+      ],
+      "nativePipeUniqueId": 149,
+      "nativeCutLengthFt": 12.125,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38624,
+        "asBuiltDrawingIndex": 38054,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          734.594604,
+          1645.389648
+        ],
+        "toPdfPt": [
+          842.396118,
+          1645.389648
+        ],
+        "fromPlanFt": [
+          8.213338,
+          58.541911
+        ],
+        "toPlanFt": [
+          20.191284,
+          58.541911
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97821,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.764648,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL19.02",
+      "pieceId": "BL19.02",
+      "lineName": "BL19",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        564.91217,
+        1608.895508,
+        599.695801,
+        1629.330444
+      ],
+      "pieceLabelBoxPdfPt": [
+        712.986511,
+        1632.909424,
+        725.756714,
+        1645.913452
+      ],
+      "nativePipeUniqueId": 154,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38195,
+        "asBuiltDrawingIndex": 38477,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          545.594604,
+          1645.389648
+        ],
+        "toPdfPt": [
+          733.094604,
+          1645.389648
+        ],
+        "fromPlanFt": [
+          -12.786662,
+          58.541911
+        ],
+        "toPlanFt": [
+          8.046671,
+          58.541911
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97821,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL20.01",
+      "pieceId": "BL20.01",
+      "lineName": "BL20",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        807.44458,
+        615.024963,
+        842.228271,
+        635.459961
+      ],
+      "pieceLabelBoxPdfPt": [
+        929.417786,
+        667.61615,
+        942.187988,
+        680.620239
+      ],
+      "nativePipeUniqueId": 110,
+      "nativeCutLengthFt": 1.8333333333333333,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38632,
+        "asBuiltDrawingIndex": 38634,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          977.127014,
+          651.519043
+        ],
+        "toPdfPt": [
+          992.108704,
+          651.519043
+        ],
+        "fromPlanFt": [
+          35.161384,
+          -51.888156
+        ],
+        "toPlanFt": [
+          36.826016,
+          -51.888156
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 47.099948,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.024415,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL20.02",
+      "pieceId": "BL20.02",
+      "lineName": "BL20",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        807.44458,
+        615.024963,
+        842.228271,
+        635.459961
+      ],
+      "pieceLabelBoxPdfPt": [
+        945.9151,
+        639.03894,
+        958.685303,
+        652.04303
+      ],
+      "nativePipeUniqueId": 111,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38500,
+        "asBuiltDrawingIndex": 38575,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          788.127014,
+          651.519043
+        ],
+        "toPdfPt": [
+          975.627014,
+          651.519043
+        ],
+        "fromPlanFt": [
+          14.161384,
+          -51.888156
+        ],
+        "toPlanFt": [
+          34.994717,
+          -51.888156
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978058,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL21.01",
+      "pieceId": "BL21.01",
+      "lineName": "BL21",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1146.233398,
+        599.159058,
+        1181.016968,
+        619.594055
+      ],
+      "pieceLabelBoxPdfPt": [
+        1004.274719,
+        623.172974,
+        1017.044922,
+        636.177063
+      ],
+      "nativePipeUniqueId": 75,
+      "nativeCutLengthFt": 19.625,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38344,
+        "asBuiltDrawingIndex": 38348,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1175.660156,
+          635.653137
+        ],
+        "toPdfPt": [
+          1000.264954,
+          635.653137
+        ],
+        "fromPlanFt": [
+          57.220622,
+          -53.651035
+        ],
+        "toPlanFt": [
+          37.732266,
+          -53.651035
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.639729,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL22.01",
+      "pieceId": "BL22.01",
+      "lineName": "BL22",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        777.900452,
+        1657.830933,
+        812.684082,
+        1678.265869
+      ],
+      "pieceLabelBoxPdfPt": [
+        816.949463,
+        1681.844849,
+        829.719666,
+        1694.848877
+      ],
+      "nativePipeUniqueId": 82,
+      "nativeCutLengthFt": 9.458333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38118,
+        "asBuiltDrawingIndex": 38554,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          842.396118,
+          1694.324951
+        ],
+        "toPdfPt": [
+          758.582886,
+          1694.324951
+        ],
+        "fromPlanFt": [
+          20.191284,
+          63.979167
+        ],
+        "toPlanFt": [
+          10.878703,
+          63.979167
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.749024,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL23.01",
+      "pieceId": "BL23.01",
+      "lineName": "BL23",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1002.225281,
+        1663.959473,
+        1037.008911,
+        1684.394409
+      ],
+      "pieceLabelBoxPdfPt": [
+        859.234436,
+        1691.271118,
+        872.004639,
+        1704.275146
+      ],
+      "nativePipeUniqueId": 66,
+      "nativeCutLengthFt": 20.125,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38107,
+        "asBuiltDrawingIndex": 38359,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1030.852051,
+          1703.751221
+        ],
+        "toPdfPt": [
+          851.021118,
+          1703.751221
+        ],
+        "fromPlanFt": [
+          41.130832,
+          65.02653
+        ],
+        "toPlanFt": [
+          21.149617,
+          65.02653
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.725423,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL24.01",
+      "pieceId": "BL24.01",
+      "lineName": "BL24",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1052.416992,
+        1445.568481,
+        1072.851929,
+        1480.352051
+      ],
+      "pieceLabelBoxPdfPt": [
+        1078.903442,
+        1600.160034,
+        1091.907471,
+        1612.93042
+      ],
+      "nativePipeUniqueId": 87,
+      "nativeCutLengthFt": 15.333333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38176,
+        "asBuiltDrawingIndex": 38050,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1091.383667,
+          1480.153076
+        ],
+        "toPdfPt": [
+          1091.383667,
+          1616.940186
+        ],
+        "fromPlanFt": [
+          47.856567,
+          40.182292
+        ],
+        "toPlanFt": [
+          47.856567,
+          55.380859
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97821,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.617188,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL25.01",
+      "pieceId": "BL25.01",
+      "lineName": "BL25",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        805.328491,
+        1739.261719,
+        840.112183,
+        1759.696655
+      ],
+      "pieceLabelBoxPdfPt": [
+        788.477234,
+        1760.280029,
+        801.247437,
+        1773.284058
+      ],
+      "nativePipeUniqueId": 56,
+      "nativeCutLengthFt": 6.416666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38672,
+        "asBuiltDrawingIndex": 38122,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          842.396118,
+          1775.755737
+        ],
+        "toPdfPt": [
+          786.010925,
+          1775.755737
+        ],
+        "fromPlanFt": [
+          20.191284,
+          73.027032
+        ],
+        "toPlanFt": [
+          13.926263,
+          73.027032
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 8.973694,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.819743,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL26.01",
+      "pieceId": "BL26.01",
+      "lineName": "BL26",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1015.482239,
+        1762.320312,
+        1050.265869,
+        1782.755249
+      ],
+      "pieceLabelBoxPdfPt": [
+        854.796509,
+        1786.334229,
+        867.566711,
+        1799.338257
+      ],
+      "nativePipeUniqueId": 52,
+      "nativeCutLengthFt": 18.125,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38099,
+        "asBuiltDrawingIndex": 38586,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1012.852051,
+          1798.814331
+        ],
+        "toPdfPt": [
+          851.021118,
+          1798.814331
+        ],
+        "fromPlanFt": [
+          39.130832,
+          75.589098
+        ],
+        "toPlanFt": [
+          21.149617,
+          75.589098
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.725423,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL27.01",
+      "pieceId": "BL27.01",
+      "lineName": "BL27",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1132.891357,
+        1450.513428,
+        1153.326294,
+        1485.296997
+      ],
+      "pieceLabelBoxPdfPt": [
+        1149.087036,
+        1600.160034,
+        1162.091064,
+        1612.93042
+      ],
+      "nativePipeUniqueId": 555,
+      "nativeCutLengthFt": 15.666666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38155,
+        "asBuiltDrawingIndex": 38070,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1161.567261,
+          1477.387451
+        ],
+        "toPdfPt": [
+          1161.567261,
+          1616.940186
+        ],
+        "fromPlanFt": [
+          55.654744,
+          39.875
+        ],
+        "toPlanFt": [
+          55.654744,
+          55.380859
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978211,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.929688,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL28.01",
+      "pieceId": "BL28.01",
+      "lineName": "BL28",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1257.960815,
+        975.377808,
+        1292.744385,
+        995.812805
+      ],
+      "pieceLabelBoxPdfPt": [
+        1385.415527,
+        999.391724,
+        1398.185913,
+        1012.395813
+      ],
+      "nativePipeUniqueId": 71,
+      "nativeCutLengthFt": 18.333333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38256,
+        "asBuiltDrawingIndex": 38440,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1238.643188,
+          1011.871887
+        ],
+        "toPdfPt": [
+          1402.195557,
+          1011.871887
+        ],
+        "fromPlanFt": [
+          64.218736,
+          -11.848952
+        ],
+        "toPlanFt": [
+          82.391222,
+          -11.848952
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.930176,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL29.01",
+      "pieceId": "BL29.01",
+      "lineName": "BL29",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1177.134888,
+        924.706421,
+        1211.918457,
+        945.141418
+      ],
+      "pieceLabelBoxPdfPt": [
+        1385.415527,
+        948.720337,
+        1398.185913,
+        961.724426
+      ],
+      "nativePipeUniqueId": 559,
+      "nativeCutLengthFt": 6.291666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38598,
+        "asBuiltDrawingIndex": 38100,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1346.817261,
+          961.200562
+        ],
+        "toPdfPt": [
+          1402.195557,
+          961.200562
+        ],
+        "fromPlanFt": [
+          76.238078,
+          -17.479099
+        ],
+        "toPlanFt": [
+          82.391222,
+          -17.479099
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978181,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.662272,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL29.02",
+      "pieceId": "BL29.02",
+      "lineName": "BL29",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1177.134888,
+        924.706421,
+        1211.918457,
+        945.141418
+      ],
+      "pieceLabelBoxPdfPt": [
+        1325.209106,
+        948.720337,
+        1337.979492,
+        961.724426
+      ],
+      "nativePipeUniqueId": 563,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38264,
+        "asBuiltDrawingIndex": 38225,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1157.817261,
+          961.200562
+        ],
+        "toPdfPt": [
+          1345.317261,
+          961.200562
+        ],
+        "fromPlanFt": [
+          55.238078,
+          -17.479099
+        ],
+        "toPlanFt": [
+          76.071411,
+          -17.479099
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978181,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL30.01",
+      "pieceId": "BL30.01",
+      "lineName": "BL30",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1576.558594,
+        872.422119,
+        1611.342163,
+        892.857117
+      ],
+      "pieceLabelBoxPdfPt": [
+        1414.36145,
+        896.436035,
+        1427.131836,
+        909.440125
+      ],
+      "nativePipeUniqueId": 18,
+      "nativeCutLengthFt": 16.291666666666664,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38275,
+        "asBuiltDrawingIndex": 38626,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1555.740967,
+          908.91626
+        ],
+        "toPdfPt": [
+          1410.351807,
+          908.91626
+        ],
+        "fromPlanFt": [
+          99.451823,
+          -23.288466
+        ],
+        "toPlanFt": [
+          83.297472,
+          -23.288466
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.97818,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.647787,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL31.01",
+      "pieceId": "BL31.01",
+      "lineName": "BL31",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1177.134888,
+        827.018921,
+        1211.918457,
+        847.453918
+      ],
+      "pieceLabelBoxPdfPt": [
+        1385.415527,
+        851.032837,
+        1398.185913,
+        864.036926
+      ],
+      "nativePipeUniqueId": 91,
+      "nativeCutLengthFt": 6.291666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38619,
+        "asBuiltDrawingIndex": 38161,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1346.974731,
+          863.513062
+        ],
+        "toPdfPt": [
+          1402.195557,
+          863.513062
+        ],
+        "fromPlanFt": [
+          76.255574,
+          -28.333265
+        ],
+        "toPlanFt": [
+          82.391222,
+          -28.333265
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978181,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.872233,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL31.02",
+      "pieceId": "BL31.02",
+      "lineName": "BL31",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1177.134888,
+        827.018921,
+        1211.918457,
+        847.453918
+      ],
+      "pieceLabelBoxPdfPt": [
+        1325.366577,
+        851.032837,
+        1338.136963,
+        864.036926
+      ],
+      "nativePipeUniqueId": 95,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38295,
+        "asBuiltDrawingIndex": 38407,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1157.817261,
+          863.513062
+        ],
+        "toPdfPt": [
+          1345.474731,
+          863.513062
+        ],
+        "fromPlanFt": [
+          55.238078,
+          -28.333265
+        ],
+        "toPlanFt": [
+          76.088908,
+          -28.333265
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978181,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.790039,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL32.01",
+      "pieceId": "BL32.01",
+      "lineName": "BL32",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1531.343384,
+        830.299316,
+        1566.126953,
+        850.734314
+      ],
+      "pieceLabelBoxPdfPt": [
+        1414.36145,
+        833.407349,
+        1427.131836,
+        846.411438
+      ],
+      "nativePipeUniqueId": 14,
+      "nativeCutLengthFt": 11.708333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38283,
+        "asBuiltDrawingIndex": 38428,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1514.214966,
+          845.887512
+        ],
+        "toPdfPt": [
+          1410.351807,
+          845.887512
+        ],
+        "fromPlanFt": [
+          94.837823,
+          -30.29166
+        ],
+        "toPlanFt": [
+          83.297472,
+          -30.29166
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.015788,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL33.01",
+      "pieceId": "BL33.01",
+      "lineName": "BL33",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1248.536865,
+        1392.705444,
+        1283.320435,
+        1413.140381
+      ],
+      "pieceLabelBoxPdfPt": [
+        1385.415527,
+        1416.71936,
+        1398.185913,
+        1429.723389
+      ],
+      "nativePipeUniqueId": 60,
+      "nativeCutLengthFt": 19.375,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38147,
+        "asBuiltDrawingIndex": 38330,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1229.219238,
+          1429.199463
+        ],
+        "toPdfPt": [
+          1402.195557,
+          1429.199463
+        ],
+        "fromPlanFt": [
+          63.171631,
+          34.520779
+        ],
+        "toPlanFt": [
+          82.391222,
+          34.520779
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.864909,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL34.01-A",
+      "pieceId": "BL34.01",
+      "lineName": "BL34",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1564.134888,
+        756.518433,
+        1598.918457,
+        776.95343
+      ],
+      "pieceLabelBoxPdfPt": [
+        1426.057373,
+        780.532349,
+        1438.827759,
+        793.536438
+      ],
+      "nativePipeUniqueId": 539,
+      "nativeCutLengthFt": 14.916666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38291,
+        "asBuiltDrawingIndex": 38215,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1543.317261,
+          793.012512
+        ],
+        "toPdfPt": [
+          1410.351807,
+          793.012512
+        ],
+        "fromPlanFt": [
+          98.071411,
+          -36.16666
+        ],
+        "toPlanFt": [
+          83.297472,
+          -36.16666
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.712728,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL34.01-B",
+      "pieceId": "BL34.01",
+      "lineName": "BL34",
+      "lineOccurrence": 2,
+      "lineLabelBoxPdfPt": [
+        1564.134888,
+        1606.643433,
+        1598.918457,
+        1627.078369
+      ],
+      "pieceLabelBoxPdfPt": [
+        1493.633789,
+        1630.657349,
+        1506.404175,
+        1643.661377
+      ],
+      "nativePipeUniqueId": 539,
+      "nativeCutLengthFt": 14.916666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38129,
+        "asBuiltDrawingIndex": 38340,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1543.317261,
+          1643.137451
+        ],
+        "toPdfPt": [
+          1410.351807,
+          1643.137451
+        ],
+        "fromPlanFt": [
+          98.071411,
+          58.291667
+        ],
+        "toPlanFt": [
+          83.297472,
+          58.291667
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.712728,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL35.01-A",
+      "pieceId": "BL35.01",
+      "lineName": "BL35",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1549.503418,
+        681.097961,
+        1584.286987,
+        701.532959
+      ],
+      "pieceLabelBoxPdfPt": [
+        1414.36145,
+        705.111877,
+        1427.131836,
+        718.115967
+      ],
+      "nativePipeUniqueId": 535,
+      "nativeCutLengthFt": 13.291666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38293,
+        "asBuiltDrawingIndex": 38622,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1528.685791,
+          717.592041
+        ],
+        "toPdfPt": [
+          1410.351807,
+          717.592041
+        ],
+        "fromPlanFt": [
+          96.445692,
+          -44.546712
+        ],
+        "toPlanFt": [
+          83.297472,
+          -44.546712
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.721355,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL35.01-B",
+      "pieceId": "BL35.01",
+      "lineName": "BL35",
+      "lineOccurrence": 2,
+      "lineLabelBoxPdfPt": [
+        1510.326538,
+        1682.068359,
+        1545.110107,
+        1702.503296
+      ],
+      "pieceLabelBoxPdfPt": [
+        1428.421997,
+        1706.082275,
+        1441.192383,
+        1719.086304
+      ],
+      "nativePipeUniqueId": 535,
+      "nativeCutLengthFt": 13.291666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38089,
+        "asBuiltDrawingIndex": 38386,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1528.685791,
+          1718.562378
+        ],
+        "toPdfPt": [
+          1410.351807,
+          1718.562378
+        ],
+        "fromPlanFt": [
+          96.445692,
+          66.672214
+        ],
+        "toPlanFt": [
+          83.297472,
+          66.672214
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.721355,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL36.01",
+      "pieceId": "BL36.01",
+      "lineName": "BL36",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1264.890381,
+        681.097961,
+        1299.67395,
+        701.532959
+      ],
+      "pieceLabelBoxPdfPt": [
+        1362.772339,
+        705.111877,
+        1375.542725,
+        718.115967
+      ],
+      "nativePipeUniqueId": 47,
+      "nativeCutLengthFt": 17.541666666666664,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38372,
+        "asBuiltDrawingIndex": 38543,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1402.195557,
+          717.592041
+        ],
+        "toPdfPt": [
+          1245.572754,
+          717.592041
+        ],
+        "fromPlanFt": [
+          82.391222,
+          -44.546712
+        ],
+        "toPlanFt": [
+          64.988688,
+          -44.546712
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.669596,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL37.01",
+      "pieceId": "BL37.01",
+      "lineName": "BL37",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1501.266968,
+        1499.802734,
+        1536.050537,
+        1520.237671
+      ],
+      "pieceLabelBoxPdfPt": [
+        1414.36145,
+        1516.134399,
+        1427.131836,
+        1529.138428
+      ],
+      "nativePipeUniqueId": 8,
+      "nativeCutLengthFt": 16.291666666666664,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38139,
+        "asBuiltDrawingIndex": 38531,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1555.740967,
+          1528.614624
+        ],
+        "toPdfPt": [
+          1410.351807,
+          1528.614624
+        ],
+        "fromPlanFt": [
+          99.451823,
+          45.566908
+        ],
+        "toPlanFt": [
+          83.297472,
+          45.566908
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978211,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.647787,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL38.01",
+      "pieceId": "BL38.01",
+      "lineName": "BL38",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1275.443481,
+        1492.120483,
+        1310.227051,
+        1512.55542
+      ],
+      "pieceLabelBoxPdfPt": [
+        1385.415527,
+        1516.134399,
+        1398.185913,
+        1529.138428
+      ],
+      "nativePipeUniqueId": 42,
+      "nativeCutLengthFt": 16.375,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38157,
+        "asBuiltDrawingIndex": 38509,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1402.195557,
+          1528.614624
+        ],
+        "toPdfPt": [
+          1256.125854,
+          1528.614624
+        ],
+        "fromPlanFt": [
+          82.391222,
+          45.566908
+        ],
+        "toPlanFt": [
+          66.161255,
+          45.566908
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978211,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.740397,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL39.01",
+      "pieceId": "BL39.01",
+      "lineName": "BL39",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1276.71582,
+        615.865784,
+        1311.49939,
+        636.300781
+      ],
+      "pieceLabelBoxPdfPt": [
+        1385.415527,
+        639.8797,
+        1398.185913,
+        652.883789
+      ],
+      "nativePipeUniqueId": 22,
+      "nativeCutLengthFt": 16.25,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38385,
+        "asBuiltDrawingIndex": 38084,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1402.195557,
+          652.359863
+        ],
+        "toPdfPt": [
+          1257.398193,
+          652.359863
+        ],
+        "fromPlanFt": [
+          82.391222,
+          -51.794732
+        ],
+        "toPlanFt": [
+          66.302626,
+          -51.794732
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.936849,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL40.01",
+      "pieceId": "BL40.01",
+      "lineName": "BL40",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1521.980469,
+        1567.568359,
+        1556.764038,
+        1588.003296
+      ],
+      "pieceLabelBoxPdfPt": [
+        1414.36145,
+        1577.032349,
+        1427.131836,
+        1590.036377
+      ],
+      "nativePipeUniqueId": 4,
+      "nativeCutLengthFt": 11.708333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38131,
+        "asBuiltDrawingIndex": 38092,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1514.214966,
+          1589.512451
+        ],
+        "toPdfPt": [
+          1410.351807,
+          1589.512451
+        ],
+        "fromPlanFt": [
+          94.837823,
+          52.333333
+        ],
+        "toPlanFt": [
+          83.297472,
+          52.333333
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.015788,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL41.01",
+      "pieceId": "BL41.01",
+      "lineName": "BL41",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1266.536865,
+        1553.018433,
+        1301.320435,
+        1573.453369
+      ],
+      "pieceLabelBoxPdfPt": [
+        1368.72583,
+        1577.032349,
+        1381.496216,
+        1590.036377
+      ],
+      "nativePipeUniqueId": 28,
+      "nativeCutLengthFt": 17.375,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38168,
+        "asBuiltDrawingIndex": 38318,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1402.195557,
+          1589.512451
+        ],
+        "toPdfPt": [
+          1247.219238,
+          1589.512451
+        ],
+        "fromPlanFt": [
+          82.391222,
+          52.333333
+        ],
+        "toPlanFt": [
+          65.171631,
+          52.333333
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.864909,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL42.01",
+      "pieceId": "BL42.01",
+      "lineName": "BL42",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1540.44873,
+        551.87793,
+        1575.2323,
+        572.312927
+      ],
+      "pieceLabelBoxPdfPt": [
+        1414.36145,
+        575.891846,
+        1427.131836,
+        588.895935
+      ],
+      "nativePipeUniqueId": 527,
+      "nativeCutLengthFt": 12.291666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38393,
+        "asBuiltDrawingIndex": 38527,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1410.351807,
+          588.372009
+        ],
+        "toPdfPt": [
+          1519.631104,
+          588.372009
+        ],
+        "fromPlanFt": [
+          83.297472,
+          -58.904494
+        ],
+        "toPlanFt": [
+          95.439616,
+          -58.904494
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.794271,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-forward",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL43.01",
+      "pieceId": "BL43.01",
+      "lineName": "BL43",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1283.759521,
+        551.87793,
+        1318.543091,
+        572.312927
+      ],
+      "pieceLabelBoxPdfPt": [
+        1385.415527,
+        575.891846,
+        1398.185913,
+        588.895935
+      ],
+      "nativePipeUniqueId": 543,
+      "nativeCutLengthFt": 15.458333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38383,
+        "asBuiltDrawingIndex": 38338,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1402.195557,
+          588.372009
+        ],
+        "toPdfPt": [
+          1264.441895,
+          588.372009
+        ],
+        "fromPlanFt": [
+          82.391222,
+          -58.904494
+        ],
+        "toPlanFt": [
+          67.085259,
+          -58.904494
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978119,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.828451,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-forward",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL44.01",
+      "pieceId": "BL44.01",
+      "lineName": "BL44",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1101.628662,
+        1678.507202,
+        1136.412231,
+        1698.942139
+      ],
+      "pieceLabelBoxPdfPt": [
+        1360.119507,
+        1702.521118,
+        1372.889893,
+        1715.525146
+      ],
+      "nativePipeUniqueId": 38,
+      "nativeCutLengthFt": 14.708333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38091,
+        "asBuiltDrawingIndex": 38153,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1402.195557,
+          1715.001221
+        ],
+        "toPdfPt": [
+          1271.311035,
+          1715.001221
+        ],
+        "fromPlanFt": [
+          82.391222,
+          66.27653
+        ],
+        "toPlanFt": [
+          67.848497,
+          66.27653
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.987305,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL44.02",
+      "pieceId": "BL44.02",
+      "lineName": "BL44",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1101.628662,
+        1678.507202,
+        1136.412231,
+        1698.942139
+      ],
+      "pieceLabelBoxPdfPt": [
+        1211.830322,
+        1702.521118,
+        1224.600708,
+        1715.525146
+      ],
+      "nativePipeUniqueId": 32,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38653,
+        "asBuiltDrawingIndex": 38264,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1269.811035,
+          1715.001221
+        ],
+        "toPdfPt": [
+          1082.311035,
+          1715.001221
+        ],
+        "fromPlanFt": [
+          67.68183,
+          66.27653
+        ],
+        "toPlanFt": [
+          46.848497,
+          66.27653
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978089,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-forward",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL45.01",
+      "pieceId": "BL45.01",
+      "lineName": "BL45",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1119.628662,
+        1746.386719,
+        1154.412231,
+        1766.821655
+      ],
+      "pieceLabelBoxPdfPt": [
+        1385.415527,
+        1770.400635,
+        1398.185913,
+        1783.404663
+      ],
+      "nativePipeUniqueId": 548,
+      "nativeCutLengthFt": 12.708333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38655,
+        "asBuiltDrawingIndex": 38392,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1289.311035,
+          1782.880737
+        ],
+        "toPdfPt": [
+          1402.195557,
+          1782.880737
+        ],
+        "fromPlanFt": [
+          69.848497,
+          73.818698
+        ],
+        "toPlanFt": [
+          82.391222,
+          73.818698
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.987305,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL45.02",
+      "pieceId": "BL45.02",
+      "lineName": "BL45",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1119.628662,
+        1746.386719,
+        1154.412231,
+        1766.821655
+      ],
+      "pieceLabelBoxPdfPt": [
+        1267.702881,
+        1770.400635,
+        1280.473267,
+        1783.404663
+      ],
+      "nativePipeUniqueId": 550,
+      "nativeCutLengthFt": 21.0,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38078,
+        "asBuiltDrawingIndex": 38606,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1100.311035,
+          1782.880737
+        ],
+        "toPdfPt": [
+          1287.811035,
+          1782.880737
+        ],
+        "fromPlanFt": [
+          48.848497,
+          73.818698
+        ],
+        "toPlanFt": [
+          69.68183,
+          73.818698
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL46.01",
+      "pieceId": "BL46.01",
+      "lineName": "BL46",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1501.223755,
+        1812.079834,
+        1536.007324,
+        1832.514771
+      ],
+      "pieceLabelBoxPdfPt": [
+        1478.361084,
+        1831.181152,
+        1491.13147,
+        1844.185181
+      ],
+      "nativePipeUniqueId": 514,
+      "nativeCutLengthFt": 11.791666666666666,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38076,
+        "asBuiltDrawingIndex": 38188,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1515.22998,
+          1847.782471
+        ],
+        "toPdfPt": [
+          1410.351807,
+          1847.782471
+        ],
+        "fromPlanFt": [
+          94.950602,
+          81.030002
+        ],
+        "toPlanFt": [
+          83.297472,
+          81.030002
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 10.099305,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.662435,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-reverse",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    },
+    {
+      "instanceId": "BL47.01",
+      "pieceId": "BL47.01",
+      "lineName": "BL47",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1301.759521,
+        1811.28833,
+        1336.543091,
+        1831.723267
+      ],
+      "pieceLabelBoxPdfPt": [
+        1385.415527,
+        1835.302246,
+        1398.185913,
+        1848.306274
+      ],
+      "nativePipeUniqueId": 518,
+      "nativeCutLengthFt": 13.458333333333332,
+      "sourceCenterline": {
+        "fieldDrawingIndex": 38484,
+        "asBuiltDrawingIndex": 38565,
+        "itemIndex": 0,
+        "widthPt": 1.24059,
+        "fromPdfPt": [
+          1402.195557,
+          1847.782471
+        ],
+        "toPdfPt": [
+          1282.441895,
+          1847.782471
+        ],
+        "fromPlanFt": [
+          82.391222,
+          81.030002
+        ],
+        "toPlanFt": [
+          69.085259,
+          81.030002
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978211,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.828451,
+      "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+      "nativeStationDirection": "source-drawing-forward",
+      "nativeStationDirectionStatus": "native-outlet-registered"
+    }
+  ],
+  "pieceVectorHoldouts": [
+    {
+      "instanceId": "BL03.01",
+      "pieceId": "BL03.01",
+      "lineName": "BL03",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1185.396606,
+        1138.999146,
+        1220.180176,
+        1159.434082
+      ],
+      "pieceLabelBoxPdfPt": [
+        830.305664,
+        1172.123169,
+        843.075867,
+        1185.127197
+      ],
+      "nativePipeUniqueId": 658,
+      "nativeCutLengthFt": 10.5,
+      "compatibleHeavyCenterlineCount": 0,
+      "reason": "no-heavy-centerline-with-native-cut-length-closure"
+    },
+    {
+      "instanceId": "BL03.02",
+      "pieceId": "BL03.02",
+      "lineName": "BL03",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1185.396606,
+        1138.999146,
+        1220.180176,
+        1159.434082
+      ],
+      "pieceLabelBoxPdfPt": [
+        786.048096,
+        1172.123169,
+        798.818298,
+        1185.127197
+      ],
+      "nativePipeUniqueId": 672,
+      "nativeCutLengthFt": 21.0,
+      "compatibleHeavyCenterlineCount": 20,
+      "reason": "no-one-to-one-compatible-heavy-centerline"
+    },
+    {
+      "instanceId": "BL04.01",
+      "pieceId": "BL04.01",
+      "lineName": "BL04",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        637.973694,
+        1148.109131,
+        672.757324,
+        1168.544067
+      ],
+      "pieceLabelBoxPdfPt": [
+        886.211731,
+        1163.013306,
+        898.981934,
+        1176.017334
+      ],
+      "nativePipeUniqueId": 709,
+      "nativeCutLengthFt": 7.5,
+      "compatibleHeavyCenterlineCount": 0,
+      "reason": "no-heavy-centerline-with-native-cut-length-closure"
+    },
+    {
+      "instanceId": "BL04.02",
+      "pieceId": "BL04.02",
+      "lineName": "BL04",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        637.973694,
+        1148.109131,
+        672.757324,
+        1168.544067
+      ],
+      "pieceLabelBoxPdfPt": [
+        984.416809,
+        1163.013184,
+        997.187012,
+        1176.017212
+      ],
+      "nativePipeUniqueId": 727,
+      "nativeCutLengthFt": 21.0,
+      "compatibleHeavyCenterlineCount": 20,
+      "reason": "no-one-to-one-compatible-heavy-centerline"
     }
   ],
   "registrations": [
@@ -3971,6 +7213,11 @@
     "weldedBranchUnitCount": 71,
     "exactFieldPieceLabelCount": 71,
     "fieldAsBuiltHeavyCenterlineCount": 67,
+    "pieceVectorMappedUnitCount": 67,
+    "pieceVectorHoldoutCount": 4,
+    "pieceVectorMappedHeavyCenterlineCount": 67,
+    "maxPieceVectorCutSpanDeltaIn": 2.096517,
+    "maxPieceLabelToMappedCenterlineDistancePt": 53.334493,
     "registeredUnitCount": 15,
     "mappedNativeOutletCount": 36,
     "maxOutletResidualIn": 0.194824,
@@ -3980,11 +7227,13 @@
       "native-outlet-head-cut-vector-closure-not-unique": 38,
       "source-centerline-label-association-not-unique": 8
     },
-    "globalListedUnitCount": 169
+    "globalListedUnitCount": 169,
+    "globalPieceVectorUnmappedUnitCount": 102
   },
   "claims": {
     "weldedBranchLabelInventoryReady": true,
     "fieldAsBuiltHeavyCenterlineParityReady": true,
+    "weldedBranchPieceVectorBijectionReady": true,
     "scopedPieceToPlanVectorMappingReady": true,
     "scopedFabricationStationDirectionReady": true,
     "completeWeldedBranchPieceMappingReady": false,

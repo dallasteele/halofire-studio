@@ -1,0 +1,46 @@
+{
+  "name": "new-hope-welded-branch-bijection-20260716",
+  "owner": "codex",
+  "goal": "Register every welded branch unit that participates in the exact one-to-one native-cut-length and field/as-built heavy-centerline bijection, while keeping station direction, hydraulic flow, grade, installed Z, and the four no-centerline BL03/BL04 units independently fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "tmp/pdfs/new-hope-live/field-install.pdf",
+    "tmp/pdfs/new-hope-live/as-builts.pdf",
+    "apps/autosprink/src/data/new-hope-native-fab-attachment-graph.json",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/data/new-hope-wet-level1-network-evidence.json",
+    "apps/autosprink/src/data/new-hope-wet-welded-branch-registration-evidence.json",
+    "hal-brain episodes 155544, 150555, 149978, 151026, 149894"
+  ],
+  "exit_criteria": [
+    "all 71 welded branch-unit labels remain bound to exact FP1.0 coordinates",
+    "all 67 heavy source centerlines replay exactly across field and as-built PDFs",
+    "67 units form an exhaustive one-to-one mapping to all 67 heavy centerlines using native cut-length closure within three inches",
+    "BL03.01, BL03.02, BL04.01, and BL04.02 remain explicit no-one-to-one-compatible-heavy-centerline holdouts",
+    "the existing 15-unit and 36-outlet direction registration remains unchanged",
+    "piece-vector mapping is distinct from native station direction, hydraulic flow direction, grade, fitting takeout, and installed Z",
+    "global 169-unit mapping, fabrication, field release, and VPS release remain false",
+    "deterministic replay, focused tests, build, browser/source inspection, rulebook, loop guard, formal proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected field, as-built, listing, and native archive hashes",
+    "full artifact fingerprint",
+    "native cut-length to source-centerline closure gate",
+    "one source centerline per mapped instance and exhaustive 67-centerline coverage",
+    "adversarial duplicate, missing, over-tolerance, holdout-promotion, direction-promotion, and coverage rejection",
+    "actual-PDF visual proof",
+    "production build and browser truth surface",
+    "formal mapped-plus-holdout and scoped-versus-global invariants"
+  ],
+  "state_path": "data/agent-loops/new-hope-welded-branch-bijection-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-wet-welded-branch-registration-evidence.json",
+    "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-welded-branch-registration-source.png",
+    "data/agent-loops/new-hope-welded-branch-bijection-20260716/lean-proof.json"
+  ],
+  "max_iterations": 3,
+  "max_tokens": 50000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

@@ -30,6 +30,7 @@ AS_BUILT_SHA = "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B
 PDF_POINTS_PER_FOOT = 9.0
 PLAN_ORIGIN = (660.674561, 1118.512451)
 OUTLET_GATE_IN = 0.25
+CUT_SPAN_GATE_IN = 3.0
 LABEL_LINE_DISTANCE_GATE_PT = 12.0
 LABEL_LINE_UNIQUENESS_GAP_PT = 2.0
 PLAN_CLIP = fitz.Rect(500, 530, 1615, 1885)
@@ -158,6 +159,144 @@ def plan_ft(point: list[float]) -> list[float]:
     return [round((point[0] - PLAN_ORIGIN[0]) / PDF_POINTS_PER_FOOT, 6), round((point[1] - PLAN_ORIGIN[1]) / PDF_POINTS_PER_FOOT, 6)]
 
 
+def minimum_cost_assignment(costs: list[list[float]]) -> list[int]:
+    """Return a deterministic minimum-cost row-to-column assignment (n <= m)."""
+    row_count = len(costs)
+    column_count = len(costs[0]) if costs else 0
+    if not costs or row_count > column_count or any(len(row) != column_count for row in costs):
+        raise RuntimeError("assignment cost matrix must be rectangular with rows <= columns")
+    u = [0.0] * (row_count + 1)
+    v = [0.0] * (column_count + 1)
+    matched_row = [0] * (column_count + 1)
+    predecessor = [0] * (column_count + 1)
+    for row_index in range(1, row_count + 1):
+        matched_row[0] = row_index
+        column0 = 0
+        minimum = [math.inf] * (column_count + 1)
+        used = [False] * (column_count + 1)
+        while True:
+            used[column0] = True
+            current_row = matched_row[column0]
+            delta = math.inf
+            column1 = 0
+            for column in range(1, column_count + 1):
+                if used[column]:
+                    continue
+                candidate = costs[current_row - 1][column - 1] - u[current_row] - v[column]
+                if candidate < minimum[column]:
+                    minimum[column] = candidate
+                    predecessor[column] = column0
+                if minimum[column] < delta:
+                    delta = minimum[column]
+                    column1 = column
+            for column in range(column_count + 1):
+                if used[column]:
+                    u[matched_row[column]] += delta
+                    v[column] -= delta
+                else:
+                    minimum[column] -= delta
+            column0 = column1
+            if matched_row[column0] == 0:
+                break
+        while True:
+            column1 = predecessor[column0]
+            matched_row[column0] = matched_row[column1]
+            column0 = column1
+            if column0 == 0:
+                break
+    assignment = [-1] * row_count
+    for column in range(1, column_count + 1):
+        if matched_row[column]:
+            assignment[matched_row[column] - 1] = column - 1
+    return assignment
+
+
+def build_piece_vector_bijection(
+    label_instances: list[dict[str, object]],
+    centerlines: list[dict[str, object]],
+    as_built_by_segment: dict[tuple[float, float, float, float], dict[str, object]],
+    pipes: dict[str, dict[str, object]],
+) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
+    dummy_count = len(label_instances) - len(centerlines)
+    if dummy_count != 4:
+        raise RuntimeError("the welded branch inventory must retain exactly four non-centerline units")
+    incompatible_cost = 1_000_000_000.0
+    dummy_cost = 1_000_000.0
+    candidate_rows: list[list[dict[str, object]]] = []
+    costs: list[list[float]] = []
+    for label_index, instance in enumerate(label_instances):
+        box = instance["pieceLabelBoxPdfPt"]
+        point = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
+        pipe = pipes[instance["pieceId"]]
+        candidates: list[dict[str, object]] = []
+        row = []
+        for centerline_index, centerline in enumerate(centerlines):
+            cut_span_delta_in = pipe["lengthFt"] * 12 - centerline["lengthPt"] / PDF_POINTS_PER_FOOT * 12
+            distance = distance_to_segment(point, centerline)
+            compatible = 0 <= cut_span_delta_in <= CUT_SPAN_GATE_IN
+            candidates.append({
+                "centerlineIndex": centerline_index,
+                "distancePt": distance,
+                "cutSpanDeltaIn": cut_span_delta_in,
+                "compatible": compatible,
+            })
+            row.append(distance * 1_000 + cut_span_delta_in + centerline_index / 100_000 if compatible else incompatible_cost)
+        row.extend(dummy_cost + dummy_index / 100_000 + label_index / 10_000_000 for dummy_index in range(dummy_count))
+        candidate_rows.append(candidates)
+        costs.append(row)
+    assignment = minimum_cost_assignment(costs)
+    mappings = []
+    holdouts = []
+    for instance, candidates, assigned_column in zip(label_instances, candidate_rows, assignment):
+        pipe = pipes[instance["pieceId"]]
+        compatible_candidates = [candidate for candidate in candidates if candidate["compatible"]]
+        if assigned_column >= len(centerlines):
+            reason = (
+                "no-heavy-centerline-with-native-cut-length-closure"
+                if not compatible_candidates
+                else "no-one-to-one-compatible-heavy-centerline"
+            )
+            holdouts.append({
+                **instance,
+                "nativePipeUniqueId": pipe["uniqueId"],
+                "nativeCutLengthFt": pipe["lengthFt"],
+                "compatibleHeavyCenterlineCount": len(compatible_candidates),
+                "reason": reason,
+            })
+            continue
+        candidate = candidates[assigned_column]
+        if not candidate["compatible"]:
+            raise RuntimeError(f"incompatible centerline assigned to {instance['instanceId']}")
+        centerline = centerlines[assigned_column]
+        as_built = as_built_by_segment[centerline["normalized"]]
+        mappings.append({
+            **instance,
+            "nativePipeUniqueId": pipe["uniqueId"],
+            "nativeCutLengthFt": pipe["lengthFt"],
+            "sourceCenterline": {
+                "fieldDrawingIndex": centerline["drawingIndex"],
+                "asBuiltDrawingIndex": as_built["drawingIndex"],
+                "itemIndex": centerline["itemIndex"],
+                "widthPt": 1.24059,
+                "fromPdfPt": centerline["fromPdfPt"],
+                "toPdfPt": centerline["toPdfPt"],
+                "fromPlanFt": plan_ft(centerline["fromPdfPt"]),
+                "toPlanFt": plan_ft(centerline["toPdfPt"]),
+            },
+            "pieceLabelToCenterlineDistancePt": round(candidate["distancePt"], 6),
+            "sourceCenterlineVsCutSpanDeltaIn": round(candidate["cutSpanDeltaIn"], 6),
+            "mappingBasis": "exhaustive-one-to-one-native-cut-length-and-field-as-built-centerline-bijection",
+            "nativeStationDirection": None,
+            "nativeStationDirectionStatus": "unresolved",
+        })
+    mappings.sort(key=lambda row: row["instanceId"])
+    holdouts.sort(key=lambda row: row["instanceId"])
+    mapped_segments = [tuple(row["sourceCenterline"]["fromPdfPt"] + row["sourceCenterline"]["toPdfPt"]) for row in mappings]
+    if len(mappings) != 67 or len(set(mapped_segments)) != 67 or len(holdouts) != 4:
+        raise RuntimeError("the label/length assignment no longer forms the exact 67-centerline bijection")
+    return mappings, holdouts
+
+
 def heads_on_centerline(centerline: dict[str, object], heads: list[dict[str, object]]) -> list[dict[str, object]]:
     x1, y1 = centerline["fromPdfPt"]
     x2, y2 = centerline["toPdfPt"]
@@ -239,7 +378,7 @@ def font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(str(path), size) if path.exists() else ImageFont.load_default()
 
 
-def render_proof(page: fitz.Page, registrations: list[dict[str, object]], metrics: dict[str, object]) -> None:
+def render_proof(page: fitz.Page, piece_vector_mappings: list[dict[str, object]], registrations: list[dict[str, object]], piece_vector_holdouts: list[dict[str, object]], metrics: dict[str, object]) -> None:
     target_width = 1420
     scale = target_width / PLAN_CLIP.width
     pixmap = page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=PLAN_CLIP, alpha=False)
@@ -250,33 +389,39 @@ def render_proof(page: fitz.Page, registrations: list[dict[str, object]], metric
     def local(point: list[float]) -> tuple[float, float]:
         return (point[0] - PLAN_CLIP.x0) * scale, (point[1] - PLAN_CLIP.y0) * scale
 
-    for index, registration in enumerate(registrations, 1):
-        source = registration["sourceCenterline"]
-        cut = registration["fabricationCutVector"]
+    for mapping in piece_vector_mappings:
+        source = mapping["sourceCenterline"]
         source_a, source_b = local(source["fromPdfPt"]), local(source["toPdfPt"])
+        draw.line((*source_a, *source_b), fill=(53, 222, 255, 210), width=5)
+        box = mapping["pieceLabelBoxPdfPt"]
+        x0, y0 = local(box[:2])
+        x1, y1 = local(box[2:])
+        draw.rectangle((x0 - 2, y0 - 2, x1 + 2, y1 + 2), outline=(52, 211, 153, 235), width=2)
+    for index, registration in enumerate(registrations, 1):
+        cut = registration["fabricationCutVector"]
         cut_a, cut_b = local(cut["fromPdfPt"]), local(cut["toPdfPt"])
-        draw.line((*source_a, *source_b), fill=(53, 222, 255, 245), width=7)
         draw.line((*cut_a, *cut_b), fill=(255, 43, 214, 235), width=4)
         for mapped in registration["mappedOutlets"]:
             x, y = local(mapped["headPdfPt"])
             draw.ellipse((x - 7, y - 7, x + 7, y + 7), fill=(3, 12, 28, 220), outline=(255, 214, 74, 255), width=3)
-        box = registration["pieceLabelBoxPdfPt"]
-        x0, y0 = local(box[:2])
-        x1, y1 = local(box[2:])
-        draw.rectangle((x0 - 2, y0 - 2, x1 + 2, y1 + 2), outline=(52, 211, 153, 255), width=2)
-        label_x, label_y = local(source["toPdfPt"])
+        label_x, label_y = local(registration["sourceCenterline"]["toPdfPt"])
         draw.ellipse((label_x - 12, label_y - 12, label_x + 12, label_y + 12), fill=(3, 12, 28, 230), outline=(255, 255, 255, 180), width=2)
         text = str(index)
         draw.text((label_x - 5, label_y - 8), text, font=font(13, True), fill="white")
+    for holdout in piece_vector_holdouts:
+        box = holdout["pieceLabelBoxPdfPt"]
+        x0, y0 = local(box[:2])
+        x1, y1 = local(box[2:])
+        draw.rectangle((x0 - 4, y0 - 4, x1 + 4, y1 + 4), outline=(255, 86, 103, 255), width=4)
     plan = Image.alpha_composite(plan.convert("RGBA"), overlay).convert("RGB")
     header = 132
     canvas = Image.new("RGB", (plan.width, plan.height + header), (3, 10, 18))
     canvas.paste(plan, (0, header))
     draw = ImageDraw.Draw(canvas)
     draw.text((20, 17), "New Hope FP1.0 - welded branch piece registration", font=font(31, True), fill=(244, 251, 255))
-    draw.text((20, 57), "actual field PDF | cyan = exact field/as-built centerline | magenta = native cut vector | gold = mapped outlet", font=font(17), fill=(173, 220, 238))
-    draw.text((20, 86), f"{metrics['registeredUnitCount']} registered units | {metrics['mappedNativeOutletCount']} outlets | max residual {metrics['maxOutletResidualIn']:.3f} in | {metrics['unresolvedUnitCount']} branch units held", font=font(18, True), fill=(116, 255, 207))
-    draw.text((20, 111), "Station direction is proven for registered pieces; hydraulic flow direction, grade, fitting takeout, and installed Z remain unresolved.", font=font(16), fill=(255, 210, 122))
+    draw.text((20, 57), "actual field PDF | cyan = 67 label/length-mapped centerlines | magenta = 15 direction-registered cuts | red = four held labels", font=font(17), fill=(173, 220, 238))
+    draw.text((20, 86), f"{metrics['pieceVectorMappedUnitCount']}/71 piece vectors mapped | all 67 heavy centerlines consumed once | {metrics['registeredUnitCount']} station directions | {metrics['mappedNativeOutletCount']} outlets", font=font(18, True), fill=(116, 255, 207))
+    draw.text((20, 111), "Hydraulic flow, drainage grade, fitting takeout, installed Z, and 102 of 169 global listed units remain unresolved.", font=font(16), fill=(255, 210, 122))
     PROOF.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(PROOF, optimize=True)
 
@@ -312,6 +457,13 @@ def main() -> None:
     outlets_by_pipe: dict[int, list[dict[str, object]]] = defaultdict(list)
     for outlet in graph["records"]["outlets"]:
         outlets_by_pipe[outlet["parentId"]].append(outlet)
+
+    piece_vector_mappings, piece_vector_holdouts = build_piece_vector_bijection(
+        label_instances,
+        field_centerlines,
+        as_built_by_segment,
+        pipes,
+    )
 
     registrations = []
     unresolved = []
@@ -354,42 +506,60 @@ def main() -> None:
 
     registrations.sort(key=lambda row: row["instanceId"])
     unresolved.sort(key=lambda row: row["instanceId"])
+    registration_by_id = {row["instanceId"]: row for row in registrations}
+    for mapping in piece_vector_mappings:
+        registration = registration_by_id.get(mapping["instanceId"])
+        if registration:
+            mapping["nativeStationDirection"] = registration["nativeStationDirection"]
+            mapping["nativeStationDirectionStatus"] = "native-outlet-registered"
     reason_counts = dict(sorted(Counter(row["reason"] for row in unresolved).items()))
     metrics = {
         "weldedBranchDefinitionCount": 69,
         "weldedBranchUnitCount": 71,
         "exactFieldPieceLabelCount": len(label_instances),
         "fieldAsBuiltHeavyCenterlineCount": len(field_centerlines),
+        "pieceVectorMappedUnitCount": len(piece_vector_mappings),
+        "pieceVectorHoldoutCount": len(piece_vector_holdouts),
+        "pieceVectorMappedHeavyCenterlineCount": len({tuple(row["sourceCenterline"]["fromPdfPt"] + row["sourceCenterline"]["toPdfPt"]) for row in piece_vector_mappings}),
+        "maxPieceVectorCutSpanDeltaIn": max(row["sourceCenterlineVsCutSpanDeltaIn"] for row in piece_vector_mappings),
+        "maxPieceLabelToMappedCenterlineDistancePt": max(row["pieceLabelToCenterlineDistancePt"] for row in piece_vector_mappings),
         "registeredUnitCount": len(registrations),
         "mappedNativeOutletCount": sum(len(row["mappedOutlets"]) for row in registrations),
         "maxOutletResidualIn": max(row["maxOutletResidualIn"] for row in registrations),
         "unresolvedUnitCount": len(unresolved),
         "unresolvedReasonCounts": reason_counts,
         "globalListedUnitCount": 169,
+        "globalPieceVectorUnmappedUnitCount": 169 - len(piece_vector_mappings),
     }
     expected_registration_ids = {
         "BL01.02", "BL06.01", "BL10.02", "BL16.01", "BL19.02", "BL27.01",
         "BL34.01-A", "BL34.01-B", "BL35.01-A", "BL35.01-B", "BL42.01",
         "BL43.01", "BL44.02", "BL46.01", "BL47.01",
     }
+    expected_piece_vector_holdout_ids = {"BL03.01", "BL03.02", "BL04.01", "BL04.02"}
     if metrics["registeredUnitCount"] != 15 or metrics["mappedNativeOutletCount"] != 36 or metrics["unresolvedUnitCount"] != 56 or {row["instanceId"] for row in registrations} != expected_registration_ids:
         raise RuntimeError(f"registration coverage changed unexpectedly: {metrics}; ids={[row['instanceId'] for row in registrations]}")
+    if metrics["pieceVectorMappedUnitCount"] != 67 or metrics["pieceVectorMappedHeavyCenterlineCount"] != 67 or {row["instanceId"] for row in piece_vector_holdouts} != expected_piece_vector_holdout_ids:
+        raise RuntimeError(f"piece-vector bijection changed unexpectedly: {metrics}; holdouts={[row['instanceId'] for row in piece_vector_holdouts]}")
     evidence = {
-        "artifactType": "halofire.new-hope-wet-welded-branch-registration-evidence.v1",
+        "artifactType": "halofire.new-hope-wet-welded-branch-registration-evidence.v2",
         "projectId": "new-hope-crisis-center-brigham-city-ut",
         "sources": {
             "fieldInstall": {"fileName": "24-052_NHCC_INSTALL PLAN.pdf", "sheet": "FP1.0", "physicalPage": 3, "sha256": FIELD_SHA},
             "asBuilt": {"fileName": "New Hope BGC - Brigham City UT_as builts.pdf", "sheet": "FP1.0", "physicalPage": 3, "sha256": AS_BUILT_SHA},
             "nativeFab": {"archiveSha256": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9", "memberSha256": "0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135"},
         },
-        "registration": {"pdfPointsPerFoot": PDF_POINTS_PER_FOOT, "planOriginPdfPt": list(PLAN_ORIGIN), "outletResidualGateIn": OUTLET_GATE_IN, "pieceLabelCenterlineDistanceGatePt": LABEL_LINE_DISTANCE_GATE_PT, "pieceLabelCenterlineUniquenessGapPt": LABEL_LINE_UNIQUENESS_GAP_PT},
+        "registration": {"pdfPointsPerFoot": PDF_POINTS_PER_FOOT, "planOriginPdfPt": list(PLAN_ORIGIN), "outletResidualGateIn": OUTLET_GATE_IN, "cutSpanGateIn": CUT_SPAN_GATE_IN, "pieceLabelCenterlineDistanceGatePt": LABEL_LINE_DISTANCE_GATE_PT, "pieceLabelCenterlineUniquenessGapPt": LABEL_LINE_UNIQUENESS_GAP_PT},
         "labelInstances": label_instances,
+        "pieceVectorMappings": piece_vector_mappings,
+        "pieceVectorHoldouts": piece_vector_holdouts,
         "registrations": registrations,
         "unresolved": unresolved,
         "metrics": metrics,
         "claims": {
             "weldedBranchLabelInventoryReady": True,
             "fieldAsBuiltHeavyCenterlineParityReady": True,
+            "weldedBranchPieceVectorBijectionReady": True,
             "scopedPieceToPlanVectorMappingReady": True,
             "scopedFabricationStationDirectionReady": True,
             "completeWeldedBranchPieceMappingReady": False,
@@ -402,8 +572,8 @@ def main() -> None:
         },
     }
     OUTPUT.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8", newline="\n")
-    render_proof(field_page, registrations, metrics)
-    print(f"wrote {OUTPUT} ({len(registrations)} registrations)")
+    render_proof(field_page, piece_vector_mappings, registrations, piece_vector_holdouts, metrics)
+    print(f"wrote {OUTPUT} ({len(piece_vector_mappings)} vectors; {len(registrations)} direction registrations)")
     print(f"wrote {PROOF}")
 
 
