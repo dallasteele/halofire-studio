@@ -1,0 +1,68 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-approved-pipe-layout-proof.v1",
+  "projectId": "mit-riverside-building-j",
+  "projectName": "MIT Riverside - Transportation Building J",
+  "status": "passed-source-underlay-only",
+  "sources": {
+    "approved": {
+      "sha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+      "physicalPage": 2,
+      "pageIndex": 1,
+      "role": "approved-fire-sprinkler-piping-plan"
+    },
+    "asBuilt": {
+      "sha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+      "physicalPage": 2,
+      "pageIndex": 1,
+      "role": "as-built-fire-sprinkler-piping-plan"
+    },
+    "headEvidence": {
+      "file": "mit-riverside-building-j-head-coordinate-evidence.json",
+      "receiptSha256": "1c1ac44482e7a2bba7f8356a75277da3245306eb0d23429085e737f8ff2752bc",
+      "approvedAsBuiltVectorSymbolsIdentical": true
+    }
+  },
+  "render": {
+    "renderer": "PyMuPDF",
+    "scale": 4,
+    "rotatedRendererCrop": [
+      1250.0,
+      120.0,
+      2450.0,
+      1500.0
+    ],
+    "approvedAsBuiltPixelsIdentical": true,
+    "pixelWidth": 4800,
+    "pixelHeight": 5520
+  },
+  "headOverlay": {
+    "total": 68,
+    "upright": 53,
+    "pendent": 15,
+    "crossedValveExcluded": 1,
+    "coordinateBasis": "immutable approved/as-built FP-2 vector symbols"
+  },
+  "image": {
+    "file": "approved-fp2-pipe-underlay-head-overlay.png",
+    "sha256": "0f0c1ff230f6f8231d4c7bc791e16f1765360a38a5ac764d4e2aa0dde7732f3d",
+    "bytes": 2217957
+  },
+  "claims": {
+    "actualApprovedPipeworkVisible": true,
+    "approvedAsBuiltPipeUnderlayIdentical": true,
+    "exactHeadXyRegistered": true,
+    "semanticPipeNetworkExtracted": false,
+    "pipeSizesAndFittingsExtracted": false,
+    "pipeElevationsExtracted": false,
+    "hydraulicNetworkReady": false,
+    "codeComplianceReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "This is an approved-plan underlay proof, not a generated pipe-routing result.",
+    "Original pipe linework remains visible but is not yet decomposed into semantic mains, branch lines, fittings, sizes, elevations, or hydraulic graph edges.",
+    "No code, fabrication, field-release, employee-use, or VPS-release claim is made."
+  ]
+}

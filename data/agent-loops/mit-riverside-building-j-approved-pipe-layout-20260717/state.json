@@ -1,0 +1,39 @@
+{
+  "name": "mit-riverside-building-j-approved-pipe-layout-20260717",
+  "iteration": 1,
+  "status": "completed-source-underlay-only",
+  "updatedAt": "2026-07-17T19:46:00Z",
+  "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY"],
+  "nextStage": "EXTRACT_SEMANTIC_APPROVED_PIPE_NETWORK_WITH_SOURCE_LABELS",
+  "sourceReplay": {
+    "approvedSha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+    "asBuiltSha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+    "physicalPage": 2,
+    "sheetTitle": "FIRE SPRINKLER PIPING PLAN (TRANSPORTATION J)",
+    "approvedAsBuiltPixelsIdentical": true,
+    "headSymbols": { "upright": 53, "pendent": 15, "total": 68, "crossedValveExcluded": 1 }
+  },
+  "result": {
+    "actualApprovedPipeworkVisible": true,
+    "exactHeadXyRegistered": true,
+    "semanticPipeNetworkExtracted": false,
+    "pipeSizesAndFittingsExtracted": false,
+    "pipeElevationsExtracted": false,
+    "hydraulicNetworkReady": false,
+    "codeComplianceReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "verification": {
+    "focusedTests": "9 passed, 0 failed across approved-pipe proof, head registration, and source-underlay visual gates",
+    "approvedAsBuiltRender": "pixel-identical in the rendered FP-2 crop",
+    "imageSha256": "0f0c1ff230f6f8231d4c7bc791e16f1765360a38a5ac764d4e2aa0dde7732f3d"
+  },
+  "visualGate": {
+    "status": "accepted-source-underlay-visible",
+    "evidence": "output/playwright/mit-riverside-building-j-approved-pipe-layout.png",
+    "finding": "Browser rendering shows the real approved FP-2 piping plan beneath the exact cyan/orange head-coordinate rings and an explicit semantic-network hold."
+  },
+  "nextSourceRequirement": "Decompose only source-labeled approved FP-2 main/branch/fitting geometry into a semantic network; preserve unclassified vector linework as an explicit hold."
+}

@@ -1,0 +1,35 @@
+{
+  "name": "mit-riverside-building-j-approved-pipe-layout-20260717",
+  "owner": "codex",
+  "goal": "Publish an inspectable approved/as-built FP-2 Transportation J pipe-layout proof with the original piping plan visible beneath exact verified head coordinates, without fabricating pipe semantics or release claims.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/City Approved FS Plans/State Fire Marshal Approved Plan Set.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Field Operations/As Builts/State Fire Marshal Approved Plan Set_As Builts.pdf",
+    "apps/autosprink/src/data/mit-riverside-building-j-head-coordinate-evidence.json"
+  ],
+  "exit_criteria": [
+    "the actual approved FP-2 Transportation J piping plan is visibly retained as the proof underlay",
+    "all 68 approved/as-built-identical head coordinates are overlaid in their original PDF frame",
+    "source digest, page, crop, and underlay provenance are recorded",
+    "pipe semantics, elevations, hydraulics, compliance, fabrication, and release remain explicitly unpromoted"
+  ],
+  "verification_gates": [
+    "approved and as-built document SHA-256 values match sealed head evidence",
+    "physical page 2 raster is rendered from both source documents and is pixel-identical in the inspected crop",
+    "the proof asset hash matches its receipt",
+    "all 68 head overlays are accounted for and the crossed valve remains excluded",
+    "focused test, source replay, and browser rendering pass"
+  ],
+  "state_path": "data/agent-loops/mit-riverside-building-j-approved-pipe-layout-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-approved-pipe-layout/proof.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-approved-pipe-layout/index.html",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-approved-pipe-layout/approved-fp2-pipe-underlay-head-overlay.png"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 30000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
