@@ -1,0 +1,47 @@
+{
+  "name": "system-backbone-riser-pump-drain-20260716",
+  "owner": "codex",
+  "goal": "Make risers, service manifold, backflow, FDC, pump decisions, main drains, and auxiliary drains one source-bound design backbone shared by 2D plans, elevation/3D models, and AutoBid quantities so unresolved system infrastructure cannot silently underbid a project.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "C:/Users/dalla/Downloads/_autobid_transcript.txt",
+    "apps/autosprink/src/engine/system-backbone-design.js",
+    "apps/autosprink/src/engine/bid-scope.js",
+    "apps/autosprink/src/engine/wet-pipe-drainage-basins.js",
+    "apps/autosprink/src/data/new-hope-asbuilt-source-feed-riser-registration.json"
+  ],
+  "exit_criteria": [
+    "each sprinkler system has a stable riser, control valve, main drain, inspector's test and drain, source-bound nominal sizes, and an exact 3D feed route from the shared service manifold",
+    "current flow-test evidence and an explicit source-backed required or not-required pump decision are mandatory",
+    "dry and preaction systems explicitly drain to the riser, and every trapped basin over five gallons is assigned to a designed auxiliary drain",
+    "the same stable component and route identities appear in plan2d and model3d outputs",
+    "AutoBid component quantities are derived from the backbone rather than a one-riser one-drain default",
+    "missing geometry, catalog identity, pump duty, drain outlet, or basin disposition blocks system-design and quote readiness",
+    "primary, adversarial, live API, hydraulic, drainage, build, rulebook, loop-guard, formal invariant, and brain postflight checks pass"
+  ],
+  "verification_gates": [
+    "system-backbone primary and adversarial tests",
+    "full-scope live authenticated API regression",
+    "hydraulic-network and wet-pipe-drainage regression",
+    "AutoSPRINK production build",
+    "GX10 Lean formal invariant receipt",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate"
+  ],
+  "state_path": "data/agent-loops/system-backbone-riser-pump-drain-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/engine/system-backbone-design.js",
+    "apps/autosprink/tests/system-backbone-design.test.js",
+    "apps/autosprink/tests/full-scope-bid-api.test.js",
+    "data/agent-loops/system-backbone-riser-pump-drain-20260716/lean-request.json",
+    "data/agent-loops/system-backbone-riser-pump-drain-20260716/lean-proof.json",
+    "data/agent-loops/system-backbone-riser-pump-drain-20260716/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 120000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

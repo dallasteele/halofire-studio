@@ -39,6 +39,42 @@ const FLOOR_PLAN = {
   }],
 };
 
+const backboneComponent = (id, pointFt, sizeIn = 4) => ({
+  id,
+  pointFt,
+  sizeIn,
+  catalogIdentityReady: true,
+  sourceRef: `test-source:${id}`,
+});
+
+const ONE_SYSTEM_BACKBONE = {
+  projectId: 'FullScope Test',
+  waterSupply: { flowTest: { status: 'current', staticPsi: 75, residualPsi: 65, testFlowGpm: 1200 } },
+  service: {
+    entry: backboneComponent('entry-1', { x: 0, y: 0, z: 0 }, 6),
+    backflow: backboneComponent('backflow-1', { x: 1, y: 0, z: 0 }, 6),
+    fdc: backboneComponent('fdc-1', { x: 1, y: 1, z: 3 }, null),
+    manifold: backboneComponent('manifold-1', { x: 3, y: 0, z: 0 }, 6),
+  },
+  pump: { decision: 'not-required', basis: 'test hydraulic margin is positive' },
+  systems: [{
+    id: 'wet-1',
+    type: 'wet',
+    areaSqft: 2400,
+    riser: backboneComponent('riser-1', { x: 5, y: 0, z: 0 }, 4),
+    controlValve: backboneComponent('valve-1', { x: 5, y: 0, z: 3 }, 4),
+    mainDrain: backboneComponent('main-drain-1', { x: 5, y: 1, z: 1 }, 2),
+    inspectorsTestAndDrain: backboneComponent('itd-1', { x: 55, y: 35, z: 11 }, 1),
+    feedPathFt: [{ x: 3, y: 0, z: 0 }, { x: 5, y: 0, z: 0 }],
+    auxiliaryDrains: [],
+    drainage: {
+      mainDrainPathFt: [{ x: 5, y: 1, z: 1 }, { x: 0, y: 1, z: 0 }],
+      allPipeDrainsToRiser: true,
+      trappedBasins: [],
+    },
+  }],
+};
+
 async function waitForHealth() {
   const t0 = Date.now();
   while (Date.now() - t0 < 8000) {
@@ -98,6 +134,9 @@ describe('T22 full-scope bid wired into sprinkler-bid', () => {
     expect(fsb).toBeTruthy();
     expect(fsb.error).toBeUndefined();
     expect(fsb.estimate).toBe(true);
+    expect(fsb.systemDesignReady).toBe(false);
+    expect(fsb.quoteReady).toBe(false);
+    expect(fsb.systemDesignGate.blockers).toContain('SYSTEM_BACKBONE_DESIGN_REQUIRED');
     expect(typeof fsb.disclaimer).toBe('string');
     expect(fsb.disclaimer.toLowerCase()).toContain('best-effort');
 
@@ -131,6 +170,22 @@ describe('T22 full-scope bid wired into sprinkler-bid', () => {
     expect(fsb.parity).toBeUndefined();
     expect(fsb.approved).not.toBe(true);
     expect(fsb.submittalReady).not.toBe(true);
+  });
+
+  it('accepts a source-bound system backbone and derives riser pump and drain scope from it', async () => {
+    const res = await post(GENERIC, { floorPlan: FLOOR_PLAN, systemBackbone: ONE_SYSTEM_BACKBONE });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.systemBackbone.status).toBe('passed');
+    expect(body.systemBackbone.plan2dReady).toBe(true);
+    expect(body.systemBackbone.model3dReady).toBe(true);
+    expect(body.fullScopeBid.systemDesignReady).toBe(true);
+    expect(body.fullScopeBid.quoteReady).toBe(false);
+    const byKey = Object.fromEntries(body.fullScopeBid.systemComponentLines.map((line) => [line.key, line]));
+    expect(byKey.riser_trim.quantity).toBe(1);
+    expect(byKey.main_drain.quantity).toBe(1);
+    expect(byKey.inspectors_test_and_drain.quantity).toBe(1);
+    expect(byKey.fire_pump).toBeUndefined();
   });
 
   it('attaches an informational Home Depot calibration delta (not a parity claim)', async () => {

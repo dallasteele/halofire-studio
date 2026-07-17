@@ -176,6 +176,9 @@ describe('buildFullScopeBid', () => {
   it('stays fail-closed: always labelled estimate, never claims parity', () => {
     const full = buildFullScopeBid(baseBid, { totalHeadCount: 200, hazard: 'ordinary' });
     expect(full.estimate).toBe(true);
+    expect(full.systemDesignReady).toBe(false);
+    expect(full.quoteReady).toBe(false);
+    expect(full.systemDesignGate.blockers).toContain('SYSTEM_BACKBONE_DESIGN_REQUIRED');
     expect(full.disclaimer).toMatch(/estimate/i);
     expect(full.disclaimer).not.toMatch(/AHJ-approved|PE-reviewed|AutoSprink-parity/i);
   });

@@ -1,0 +1,41 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "system-backbone-riser-pump-drain-20260716",
+  "iteration": 1,
+  "status": "active",
+  "brainPreflight": {
+    "status": "passed",
+    "episodes": [60899, 60908, 129562, 60943]
+  },
+  "truth": {
+    "sharedBackboneEngineReady": true,
+    "plan2dModel3dIdentityParityGateReady": true,
+    "currentFlowTestGateReady": true,
+    "pumpDecisionAndDutyGateReady": true,
+    "perSystemRiserAndDrainTakeoffReady": true,
+    "overFiveGallonAuxiliaryDrainGateReady": true,
+    "dryPreactionDrainToRiserGateReady": true,
+    "liveAuthenticatedApiWiringReady": true,
+    "legacyOneRiserQuoteReleaseBlocked": true,
+    "newHopeProductionBackboneInstantiated": false,
+    "wholeSystemReleaseReady": false,
+    "vpsDeploymentAllowed": false
+  },
+  "verification": {
+    "focusedTests": "74 passed",
+    "adversarialCases": [
+      "stale flow test",
+      "unresolved pump decision",
+      "dry system not draining to riser",
+      "over-five-gallon basin without auxiliary drain",
+      "feed path not joined to manifold",
+      "missing catalog identity"
+    ],
+    "build": "passed",
+    "rulebook": "passed",
+    "loopGuard": "passed",
+    "lean": "verified by Lean 4.13.0; receipt lean-proof.json",
+    "brainPostflight": "passed; episode 155497"
+  },
+  "nextAction": "Instantiate the backbone from a real project source package, beginning with the New Hope riser/detail, current flow-test status, pump basis, and drainage basins; keep quote and VPS release blocked until every real component and route is source-bound."
+}

@@ -91,7 +91,36 @@ const SYSTEM_COMPONENT_DESCRIPTIONS = Object.freeze({
   inspectors_test_and_drain: "Inspector's test & drain",
   main_drain: 'Main drain',
   fire_pump: 'Fire pump + controller (when required)',
+  service_manifold: 'Riser manifold assembly',
+  dry_pipe_valve: 'Dry-pipe valve assembly',
+  preaction_valve: 'Preaction valve assembly',
+  deluge_valve: 'Deluge valve assembly',
+  auxiliary_drain: 'Auxiliary drain assembly',
 });
+
+export function evaluateSystemDesignGate(opts = {}) {
+  const backbone = opts.systemBackbone;
+  if (!backbone) {
+    return {
+      status: 'blocked',
+      blockers: [
+        'SYSTEM_BACKBONE_DESIGN_REQUIRED',
+        'RISER_AND_MANIFOLD_COUNT_REQUIRED',
+        'PUMP_DECISION_REQUIRED',
+        'MAIN_AND_AUXILIARY_DRAIN_DESIGN_REQUIRED',
+      ],
+    };
+  }
+  if (backbone.artifactType !== 'halofire.system-backbone-design.v1') {
+    return { status: 'blocked', blockers: ['SYSTEM_BACKBONE_SCHEMA_INVALID'] };
+  }
+  const blockers = Array.isArray(backbone.issues) ? backbone.issues.map((entry) => entry.code) : [];
+  if (backbone.quoteReady !== true || backbone.plan2dReady !== true || backbone.model3dReady !== true) {
+    if (!blockers.length) blockers.push('SYSTEM_BACKBONE_NOT_RELEASE_READY');
+    return { status: 'blocked', blockers: [...new Set(blockers)] };
+  }
+  return { status: 'passed', blockers: [] };
+}
 
 /**
  * Decide whether a fire pump is warranted.
@@ -117,6 +146,17 @@ function firePumpWarranted({ firePumpRequired, requiredPressure, availablePressu
  * @returns {Array<{key:string, description:string, unit:'EA', quantity:number}>}
  */
 export function buildSystemComponents(opts = {}) {
+  const backboneRows = opts.systemBackbone?.takeoff?.systemComponents;
+  if (Array.isArray(backboneRows) && backboneRows.length) {
+    return backboneRows.map((row) => ({
+      key: row.key,
+      description: row.description || SYSTEM_COMPONENT_DESCRIPTIONS[row.key] || row.key,
+      unit: row.unit || 'EA',
+      quantity: row.quantity,
+      systemIds: Array.isArray(row.systemIds) ? row.systemIds : [],
+      source: 'system-backbone-design',
+    }));
+  }
   const core = [
     'alarm_check_valve',
     'fdc',
@@ -173,18 +213,19 @@ function priceSystemComponents(components, priceResolver) {
   const lines = components.map((item) => {
     const resolved = priceResolver(item.key);
     const usable = typeof resolved === 'number' && resolved >= 0;
-    const unitCost = usable ? resolved : (SYSTEM_COMPONENT_FALLBACK_COSTS[item.key] ?? 0);
+    const hasFallback = Object.hasOwn(SYSTEM_COMPONENT_FALLBACK_COSTS, item.key);
+    const unitCost = usable ? resolved : (hasFallback ? SYSTEM_COMPONENT_FALLBACK_COSTS[item.key] : 0);
     return {
       ...item,
       unitCost: round(unitCost),
       lineTotal: round(unitCost * item.quantity),
-      priceSource: usable ? 'pricebook' : 'fallback_estimate',
+      priceSource: usable ? 'pricebook' : (hasFallback ? 'fallback_estimate' : 'unpriced'),
     };
   });
   return {
     lines,
     componentCost: round(lines.reduce((sum, l) => sum + l.lineTotal, 0)),
-    anyEstimated: lines.some((l) => l.priceSource === 'fallback_estimate'),
+    anyEstimated: lines.some((l) => l.priceSource !== 'pricebook'),
   };
 }
 
@@ -336,6 +377,10 @@ export function buildFullScopeBid(pricedBid, opts = {}) {
 
   const components = buildSystemComponents(opts);
   const priced = priceSystemComponents(components, priceResolver);
+  const systemDesignGate = evaluateSystemDesignGate(opts);
+  const unpricedSystemComponentKeys = priced.lines
+    .filter((line) => line.priceSource === 'unpriced')
+    .map((line) => line.key);
 
   // T23: detailed hours-based field labor from physical drivers.
   const labor = buildLaborScope(
@@ -373,6 +418,13 @@ export function buildFullScopeBid(pricedBid, opts = {}) {
     // The full scope ALWAYS contains assumption-priced lines (field labor +
     // OH&P are documented assumptions), so estimated pricing is always flagged.
     anyEstimated: true,
+    systemDesignGate,
+    systemDesignReady: systemDesignGate.status === 'passed',
+    unpricedSystemComponentKeys,
+    quoteReady: systemDesignGate.status === 'passed'
+      && unpricedSystemComponentKeys.length === 0
+      && priced.lines.every((line) => line.priceSource === 'pricebook')
+      && opts.pricingVerified === true,
     disclaimer: FULL_SCOPE_DISCLAIMER,
   };
 }

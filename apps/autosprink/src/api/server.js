@@ -19,6 +19,7 @@ import 'dotenv/config';
 import { createLogger } from '../core/logger.js';
 import { generateSprinklerBid, buildEsfrSystemScope, priceBid, polygonArea } from '../engine/sprinkler-layout.js';
 import { buildFullScopeBid } from '../engine/bid-scope.js';
+import { buildSystemBackbone } from '../engine/system-backbone-design.js';
 import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
 import { floorPlanFromSvg, floorPlanFromDxf, normalizeFloorPlan, buildingFromSvg, buildingFromDxf } from '../engine/floorplan-import.js';
@@ -22600,7 +22601,14 @@ function runSprinklerPipeline(req, prebuilt = null) {
   // This is NOT a complete/quoted bid and clears NO gate. Fail-closed: if the
   // build throws we surface { error } rather than fabricating a number.
   let fullScopeBid = null;
+  let systemBackbone = null;
   try {
+    if (req.body?.systemBackbone) {
+      if (req.body.systemBackbone.projectId !== projectName) {
+        throw new Error('systemBackbone.projectId must match the requested project name');
+      }
+      systemBackbone = buildSystemBackbone(req.body.systemBackbone);
+    }
     // T23: feed the detailed field-labor model from the bid BOM. branch_pipe is
     // priced per-FT (quantity = pipe footage); fitting quantity = fitting count.
     const bomItems = Array.isArray(bid.bom) ? bid.bom : [];
@@ -22612,6 +22620,7 @@ function runSprinklerPipeline(req, prebuilt = null) {
       pipeFootage,
       fittingCount,
       hazard,
+      systemBackbone,
       // Required pressure from the single-path estimate (when it ran) lets the
       // fire-pump conditional evaluate honestly. availablePressure is left
       // undefined for generic projects so NO fire pump is fabricated.
@@ -22744,7 +22753,7 @@ function runSprinklerPipeline(req, prebuilt = null) {
     fullScopeBid = { error: e.message };
   }
 
-  return { projectName, floorPlan, building, replayInput, suppliedDocumentBidTruth, bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid };
+  return { projectName, floorPlan, building, replayInput, suppliedDocumentBidTruth, bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, systemBackbone, fullScopeBid };
 }
 
 function round2(n) {
@@ -22758,7 +22767,7 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, async (req, res) =
     const prebuilt = await resolvePdfFloorPlan(req);
     const out = runSprinklerPipeline(req, prebuilt);
     if (out.httpError) return res.status(out.httpError.status).json({ error: out.httpError.error });
-    const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, building, replayInput, floorPlan, suppliedDocumentBidTruth } = out;
+    const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, systemBackbone, fullScopeBid, building, replayInput, floorPlan, suppliedDocumentBidTruth } = out;
     res.json({
       bid,
       floorPlan,
@@ -22768,6 +22777,7 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, async (req, res) =
       hydraulics,
       hydraulicNetwork,
       compliance,
+      systemBackbone,
       fullScopeBid,
       isBuilding: !!building,
       ...(replayInput ? { replayInput, roomBoundaryReplay: replayInput } : {}),
