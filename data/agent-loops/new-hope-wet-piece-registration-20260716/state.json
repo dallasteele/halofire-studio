@@ -1,0 +1,33 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "new-hope-wet-piece-registration-20260716",
+  "iteration": 1,
+  "status": "completed",
+  "brainPreflight": { "status": "passed", "episodes": [156373, 149894, 150639] },
+  "truth": {
+    "quantityExpandedDefinitionCount": 2,
+    "quantityExpandedInstanceCount": 4,
+    "mappedNativeOutletCount": 8,
+    "maxOutletResidualIn": 0.010417,
+    "quantityExpandedPieceEndpointMappingReady": true,
+    "scopedPieceToPlanVectorMappingReady": true,
+    "listingQuantityExpansionReady": true,
+    "globalListedUnitCount": 169,
+    "scopedMappedUnitCount": 4,
+    "pieceToPlanVectorMappingReady": false,
+    "fittingTakeoutReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  },
+  "verification": {
+    "focusedTests": "24 passed across four files; moved label, missing instance, moved outlet, collapsed cut vector, and three false-promotion mutations reject",
+    "build": "Vite production build passed",
+    "rulebook": "AGENTIC_RULES_VERIFY ok",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "lean": "verified by Lean 4.13.0 in 81 ms",
+    "visual": "actual FP1.0 overlay inspected at 1164 by 584; SHA256 75FEC923AAA1E60A9F8327836957D9D2C483625CA564F8A23DA98C5FDD4AEFC4",
+    "browser": "proofReady, endpoint mapping, scoped mapping, and quantity expansion true; four scoped vectors; quote and field release false; zero errors and zero warnings",
+    "brainPostflight": "passed; episode 156451"
+  },
+  "nextAction": "Complete verification, then continue the remaining 165 piece registrations, direction, grade, fitting takeout, and installed-elevation work."
+}

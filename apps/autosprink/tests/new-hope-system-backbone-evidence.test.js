@@ -65,7 +65,6 @@ describe('New Hope source-bound system backbone evidence', () => {
       blockers: expect.arrayContaining([
         'BACKBONE_NEW_QUOTE_FLOW_TEST_REQUIRED',
         'NH_WET_SYSTEM_PIECE_TO_PLAN_MAPPING_REQUIRED',
-        'NH_WET_SYSTEM_LISTING_QUANTITY_EXPANSION_REQUIRED',
         'NH_WET_SYSTEM_WELDED_LISTING_DIMENSION_RECONCILIATION_REQUIRED',
         'NH_WET_SYSTEM_DIRECTION_AND_GRADE_REQUIRED',
         'NH_WET_SYSTEM_INSTALLATION_3D_PATH_REQUIRED',
@@ -89,14 +88,22 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.nativeFabricationTakeoffReady).toBe(true);
     expect(result.wetSystemListingDefinitionCrosswalkReady).toBe(true);
     expect(result.wetSystemQuantityExpandedLineAnchorsReady).toBe(true);
-    expect(result.wetSystemQuantityExpandedEndpointMappingReady).toBe(false);
+    expect(result.wetSystemQuantityExpandedEndpointMappingReady).toBe(true);
+    expect(result.wetSystemScopedPieceToPlanMappingReady).toBe(true);
     expect(result.wetSystemThreadedCutLengthCrossSourceReady).toBe(true);
-    expect(result.wetSystemListingQuantityExpansionReady).toBe(false);
+    expect(result.wetSystemListingQuantityExpansionReady).toBe(true);
     expect(result.wetSystemWeldedCutLengthCrossSourceReady).toBe(false);
     expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED');
     expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_HEAD_TYPE_ASSIGNMENT_REQUIRED');
+    expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_LISTING_QUANTITY_EXPANSION_REQUIRED');
     expect(result.plan2d.wetLevel1.pipeVectors).toHaveLength(300);
     expect(result.plan2d.wetLevel1.sprinklerHeads).toHaveLength(174);
+    expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors).toHaveLength(4);
+    expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors[0]).toEqual(expect.objectContaining({
+      pieceId: 'BL34.01',
+      maxOutletResidualIn: 0,
+      geometryStatus: 'exact-field-and-as-built-centerline-plus-native-outlet-registered-cut-vector',
+    }));
     expect(result.model3d.unresolvedWetLevel1.pipeVectors).toHaveLength(300);
     expect(result.model3d.unresolvedWetLevel1.pipeVectors[0].installedElevationFt).toBeNull();
     expect(result.model3d.unresolvedWetLevel1.sprinklerHeads.find((head) => head.headType.sin === 'V3506')).toBeTruthy();

@@ -1,10 +1,16 @@
 {
-  "artifactType": "halofire.new-hope-wet-quantity-placement-evidence.v1",
+  "artifactType": "halofire.new-hope-wet-quantity-placement-evidence.v2",
   "projectId": "new-hope-crisis-center-brigham-city-ut",
   "sources": {
     "fieldInstall": { "fileName": "24-052_NHCC_INSTALL PLAN.pdf", "sheet": "FP1.0", "physicalPage": 3, "sha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5" },
+    "asBuilt": { "fileName": "New Hope BGC - Brigham City UT_as builts.pdf", "sheet": "FP1.0", "physicalPage": 3, "sha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B" },
     "approvedListing": { "fileName": "24-052_NHCC_LIST.PDF", "sha256": "2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734" },
     "nativeFab": { "archiveSha256": "A449B6C8670CEE52955C3D3D57F8169E3091CFA34C943C6723785724F06DDED9", "memberSha256": "0B64077B62673459C11D2CBC303258C1DD3F0C75735A07BFFA903BAEE79D6135" }
+  },
+  "registration": {
+    "pdfPointsPerFoot": 9,
+    "planOriginPdfPt": [660.674561, 1118.512451],
+    "outletResidualGateIn": 0.25
   },
   "definitions": [
     {
@@ -13,12 +19,40 @@
       "listingPhysicalPage": 32,
       "listingQuantity": 2,
       "nativePipeUniqueId": 539,
-      "nativeCutLengthFt": 14.916667,
+      "nativeCutLengthFt": 14.916666666666666,
       "printedDimensionText": "14'-11",
       "printedDimensionIn": 179,
+      "nativeOutlets": [
+        { "uniqueId": 541, "distanceFt": 4.4281093808796825 },
+        { "uniqueId": 540, "distanceFt": 14.428109380879683 }
+      ],
       "instances": [
-        { "instanceId": "BL34.01-A", "lineLabelBoxPdfPt": [1564.134888, 756.518433, 1598.918457, 776.95343], "dimensionBoxPdfPt": [1463.744751, 781.661804, 1486.596191, 793.427429] },
-        { "instanceId": "BL34.01-B", "lineLabelBoxPdfPt": [1564.134888, 1606.643433, 1598.918457, 1627.078369], "dimensionBoxPdfPt": [1463.744751, 1631.786865, 1486.596191, 1643.552368] }
+        {
+          "instanceId": "BL34.01-A",
+          "lineLabelBoxPdfPt": [1564.134888, 756.518433, 1598.918457, 776.95343],
+          "dimensionBoxPdfPt": [1463.744751, 781.661804, 1486.596191, 793.427429],
+          "sourceCenterline": { "fieldDrawingIndex": 38291, "asBuiltDrawingIndex": 38215, "itemIndex": 0, "widthPt": 1.24059, "fromPdfPt": [1410.351807, 793.012512], "toPdfPt": [1543.317261, 793.012512] },
+          "mappedOutletHeads": [
+            { "outletUniqueId": 541, "headId": "wet-head-156", "pdfPt": [1449.567261, 793.012512], "crossSourceResidualPt": 0 },
+            { "outletUniqueId": 540, "headId": "wet-head-171", "pdfPt": [1539.567261, 793.012512], "crossSourceResidualPt": 0 }
+          ],
+          "fabricationCutVector": { "fromPdfPt": [1409.714277, 793.012512], "toPdfPt": [1543.964277, 793.012512] },
+          "maxOutletResidualIn": 0,
+          "sourceCenterlineVsCutSpanDeltaIn": 1.712728
+        },
+        {
+          "instanceId": "BL34.01-B",
+          "lineLabelBoxPdfPt": [1564.134888, 1606.643433, 1598.918457, 1627.078369],
+          "dimensionBoxPdfPt": [1463.744751, 1631.786865, 1486.596191, 1643.552368],
+          "sourceCenterline": { "fieldDrawingIndex": 38129, "asBuiltDrawingIndex": 38340, "itemIndex": 0, "widthPt": 1.24059, "fromPdfPt": [1410.351807, 1643.137451], "toPdfPt": [1543.317261, 1643.137451] },
+          "mappedOutletHeads": [
+            { "outletUniqueId": 541, "headId": "wet-head-158", "pdfPt": [1449.567261, 1643.137451], "crossSourceResidualPt": 0 },
+            { "outletUniqueId": 540, "headId": "wet-head-172", "pdfPt": [1539.567261, 1643.137451], "crossSourceResidualPt": 0 }
+          ],
+          "fabricationCutVector": { "fromPdfPt": [1409.714277, 1643.137451], "toPdfPt": [1543.964277, 1643.137451] },
+          "maxOutletResidualIn": 0,
+          "sourceCenterlineVsCutSpanDeltaIn": 1.712728
+        }
       ]
     },
     {
@@ -27,19 +61,57 @@
       "listingPhysicalPage": 33,
       "listingQuantity": 2,
       "nativePipeUniqueId": 535,
-      "nativeCutLengthFt": 13.291667,
+      "nativeCutLengthFt": 13.291666666666666,
       "printedDimensionText": "13'-3½",
       "printedDimensionIn": 159.5,
+      "nativeOutlets": [
+        { "uniqueId": 537, "distanceFt": 6.010725202188409 },
+        { "uniqueId": 536, "distanceFt": 12.802391868855075 }
+      ],
       "instances": [
-        { "instanceId": "BL35.01-A", "lineLabelBoxPdfPt": [1549.503418, 681.097961, 1584.286987, 701.532959], "dimensionBoxPdfPt": [1474.101074, 706.241333, 1499.776733, 718.006958] },
-        { "instanceId": "BL35.01-B", "lineLabelBoxPdfPt": [1510.326538, 1682.068359, 1545.110107, 1702.503296], "dimensionBoxPdfPt": [1465.707642, 1707.211792, 1491.383301, 1718.977295] }
+        {
+          "instanceId": "BL35.01-A",
+          "lineLabelBoxPdfPt": [1549.503418, 681.097961, 1584.286987, 701.532959],
+          "dimensionBoxPdfPt": [1474.101074, 706.241333, 1499.776733, 718.006958],
+          "sourceCenterline": { "fieldDrawingIndex": 38293, "asBuiltDrawingIndex": 38622, "itemIndex": 0, "widthPt": 1.24059, "fromPdfPt": [1410.351807, 717.592041], "toPdfPt": [1528.685791, 717.592041] },
+          "mappedOutletHeads": [
+            { "outletUniqueId": 537, "headId": "wet-head-159", "pdfPt": [1463.826416, 717.592041], "crossSourceResidualPt": 0 },
+            { "outletUniqueId": 536, "headId": "wet-head-169", "pdfPt": [1524.935791, 717.592041], "crossSourceResidualPt": 0 }
+          ],
+          "fabricationCutVector": { "fromPdfPt": [1409.722077, 717.592041], "toPdfPt": [1529.347077, 717.592041] },
+          "maxOutletResidualIn": 0.010417,
+          "sourceCenterlineVsCutSpanDeltaIn": 1.721355
+        },
+        {
+          "instanceId": "BL35.01-B",
+          "lineLabelBoxPdfPt": [1510.326538, 1682.068359, 1545.110107, 1702.503296],
+          "dimensionBoxPdfPt": [1465.707642, 1707.211792, 1491.383301, 1718.977295],
+          "sourceCenterline": { "fieldDrawingIndex": 38089, "asBuiltDrawingIndex": 38386, "itemIndex": 0, "widthPt": 1.24059, "fromPdfPt": [1410.351807, 1718.562378], "toPdfPt": [1528.685791, 1718.562378] },
+          "mappedOutletHeads": [
+            { "outletUniqueId": 537, "headId": "wet-head-160", "pdfPt": [1463.826416, 1718.562378], "crossSourceResidualPt": 0 },
+            { "outletUniqueId": 536, "headId": "wet-head-170", "pdfPt": [1524.935791, 1718.562378], "crossSourceResidualPt": 0 }
+          ],
+          "fabricationCutVector": { "fromPdfPt": [1409.722077, 1718.562378], "toPdfPt": [1529.347077, 1718.562378] },
+          "maxOutletResidualIn": 0.010417,
+          "sourceCenterlineVsCutSpanDeltaIn": 1.721355
+        }
       ]
     }
   ],
+  "metrics": {
+    "quantityExpandedDefinitionCount": 2,
+    "quantityExpandedInstanceCount": 4,
+    "mappedNativeOutletCount": 8,
+    "maxOutletResidualIn": 0.010417,
+    "globalListedUnitCount": 169,
+    "scopedMappedUnitCount": 4
+  },
   "claims": {
     "quantityExpandedLineLabelAnchorsReady": true,
     "quantityExpandedPrintedDimensionsReady": true,
-    "quantityExpandedPieceEndpointMappingReady": false,
+    "quantityExpandedPieceEndpointMappingReady": true,
+    "scopedPieceToPlanVectorMappingReady": true,
+    "listingQuantityExpansionReady": true,
     "pieceToPlanVectorMappingReady": false,
     "fabricationReady": false,
     "fieldReleaseReady": false

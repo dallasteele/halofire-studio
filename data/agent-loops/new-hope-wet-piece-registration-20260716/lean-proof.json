@@ -1,0 +1,14 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-wet-piece-registration-20260716/lean-request.json",
+  "theoremNames": ["scopedOutletRegistrationCloses", "scopedMappingDoesNotPromoteGlobalRelease"],
+  "claim": "Four scoped BL34/BL35 units and eight outlets close while four of 169 listed units cannot promote global piece mapping or fabrication release.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 81,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

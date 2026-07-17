@@ -80,10 +80,11 @@ function renderProof(result) {
   document.querySelector('#supply-results').innerHTML = result.approvedWaterSupply.calculationAreas.map((area) => `<div><b>Area ${area.id}</b><span>${area.totalFlowGpm.toFixed(1)} gpm at ${area.totalPressurePsi.toFixed(1)} psi</span><em>+${area.safetyMarginPsi.toFixed(1)} psi margin</em></div>`).join('');
   document.querySelector('#pump-basis').textContent = `NO FIRE PUMP - completed approved configuration; minimum source margin ${result.pumpDecision.minimumSafetyMarginPsi.toFixed(1)} psi. A new quote still requires a current flow test.`;
   const crosswalk = result.takeoff.wetLevel1NativeFabrication.listingCrosswalk;
-  document.querySelector('#crosswalk-summary').textContent = `${crosswalk.metrics.nativePipeRecordCount} native records -> ${crosswalk.metrics.uniqueListingDefinitionCount} exact listing definitions -> ${crosswalk.metrics.listingFabricatedUnitCount} listed units. ${crosswalk.metrics.exactThreadedLengthMatchCount} threaded lengths reconcile exactly; ${crosswalk.metrics.unexpandedListingUnitCount} listed units still require quantity expansion.`;
+  document.querySelector('#crosswalk-summary').textContent = `${crosswalk.metrics.nativePipeRecordCount} native records -> ${crosswalk.metrics.uniqueListingDefinitionCount} exact listing definitions -> ${crosswalk.metrics.listingFabricatedUnitCount} listed units. ${crosswalk.metrics.exactThreadedLengthMatchCount} threaded lengths reconcile exactly; both repeated definitions are expanded into four source-registered units.`;
   document.querySelector('#crosswalk-rows').innerHTML = crosswalk.rows.slice(0, 12).map((row) => `<tr><td>${row.nativePipeUniqueId}</td><td>${row.pieceId}</td><td>${row.listingDefinitionType}</td><td>${row.listingPhysicalPage}</td><td>${row.listingQuantity}</td><td>${row.lengthReconciliationStatus.replaceAll('-', ' ')}</td></tr>`).join('');
-  document.querySelector('#quantity-gaps').textContent = crosswalk.quantityExpansionGaps.map((gap) => `${gap.pieceId}: native records ${gap.nativePipeRecordCount}, listing quantity ${gap.listingQuantity}`).join(' | ');
-  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions and native symbol types, and all 167 native wet records mapped to 165 approved listing definitions pass. Listing quantity expansion, welded cross-source dimensions, piece-to-plan placement, pipe direction/grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
+  const placement = result.takeoff.wetLevel1NativeFabrication.quantityPlacement;
+  document.querySelector('#quantity-gaps').textContent = `${placement.metrics.quantityExpandedInstanceCount} BL34/BL35 units and ${placement.metrics.mappedNativeOutletCount} native outlets registered; maximum outlet residual ${placement.metrics.maxOutletResidualIn.toFixed(3)} inch`;
+  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions and native symbol types, all 167 native wet records mapped to 165 approved listing definitions, and four repeated BL34/BL35 units with eight registered outlets pass. Global piece-to-plan placement for the other 165 units, welded cross-source dimensions, fitting takeout, pipe direction/grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
   document.querySelector('#gate-codes').textContent = result.systemDesignGate.blockers.join(' | ');
 
   const root = document.documentElement.dataset;
@@ -102,6 +103,8 @@ function renderProof(result) {
   root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady);
   root.wetSystemListingDefinitionCrosswalkReady = String(result.wetSystemListingDefinitionCrosswalkReady);
   root.wetSystemQuantityExpandedLineAnchorsReady = String(result.wetSystemQuantityExpandedLineAnchorsReady);
+  root.wetSystemQuantityExpandedEndpointMappingReady = String(result.wetSystemQuantityExpandedEndpointMappingReady);
+  root.wetSystemScopedPieceToPlanMappingReady = String(result.wetSystemScopedPieceToPlanMappingReady);
   root.wetSystemListingQuantityExpansionReady = String(result.wetSystemListingQuantityExpansionReady);
   root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved);
   root.quoteReady = String(result.quoteReady);

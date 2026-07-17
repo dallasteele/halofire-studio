@@ -1,0 +1,42 @@
+{
+  "name": "new-hope-wet-piece-registration-20260716",
+  "owner": "codex",
+  "goal": "Register the two BL34.01 and two BL35.01 FP1.0 source centerlines and native fabrication cut vectors from exact Project.seidb outlet stations and field/as-built sprinkler-head coordinates without promoting the remaining 165 listed units or release claims.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "tmp/pdfs/new-hope-live/field-install.pdf",
+    "tmp/pdfs/new-hope-live/as-builts.pdf",
+    "apps/autosprink/src/data/new-hope-native-fab-attachment-graph.json",
+    "apps/autosprink/src/data/new-hope-wet-level1-network-evidence.json",
+    "apps/autosprink/src/data/new-hope-wet-quantity-placement-evidence.json",
+    "hal-brain episodes 156373, 149894, 150639"
+  ],
+  "exit_criteria": [
+    "four source centerlines replay identically from exact field and as-built PDF drawing indices",
+    "eight native outlet stations uniquely close to eight source sprinkler-head centers within 0.25 inch",
+    "native cut vectors remain distinct from drawn centerline spans and expose the fitting-takeout delta",
+    "the two repeated listing definitions expand to four registered units",
+    "global piece-to-plan mapping, fitting takeout, direction, grade, installed Z, fabrication, and field release remain false",
+    "focused tests, production build, browser/source visual inspection, rulebook, loop guard, formal proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "exact field, as-built, listing, and native archive hashes",
+    "fixed full-evidence fingerprint",
+    "field-to-as-built source-vector replay",
+    "native outlet-to-head residual gate",
+    "adversarial moved-head, collapsed-cut-vector, moved-label, missing-instance, and false-promotion rejection",
+    "actual-PDF visual inspection",
+    "production build",
+    "formal scoped-versus-global fail-closed proof"
+  ],
+  "state_path": "data/agent-loops/new-hope-wet-piece-registration-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-quantity-placement-source.png",
+    "data/agent-loops/new-hope-wet-piece-registration-20260716/lean-proof.json"
+  ],
+  "max_iterations": 3,
+  "max_tokens": 40000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

@@ -1,0 +1,3 @@
+{
+  "theorem": "theorem scopedOutletRegistrationCloses :\n    let mappedInstances : Nat := 4\n    let mappedOutlets : Nat := 8\n    let expectedInstances : Nat := 4\n    let expectedOutlets : Nat := 8\n    And (mappedInstances = expectedInstances) (mappedOutlets = expectedOutlets) :=\nby decide\n\ntheorem scopedMappingDoesNotPromoteGlobalRelease :\n    let globalListedUnits : Nat := 169\n    let scopedMappedUnits : Nat := 4\n    let pieceToPlanVectorMappingReady : Bool := globalListedUnits == scopedMappedUnits\n    let fittingTakeoutReady : Bool := false\n    let fabricationReady := pieceToPlanVectorMappingReady && fittingTakeoutReady\n    And (pieceToPlanVectorMappingReady = false) (fabricationReady = false) :=\nby decide"
+}

@@ -61,9 +61,12 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(html).toContain('Native records to approved AutoSPRINK listing');
     expect(html).toContain('wet-quantity-placement-source.png');
     expect(fs.statSync(new URL('wet-quantity-placement-source.png', proofRoot)).size).toBeGreaterThan(100_000);
+    expect(html).toContain('eight field/as-built head centers');
+    expect(script).toContain('wetSystemQuantityExpandedEndpointMappingReady');
+    expect(script).toContain('wetSystemScopedPieceToPlanMappingReady');
     expect(fs.statSync(new URL('wet-listing-crosswalk-browser.png', proofRoot)).size).toBeGreaterThan(100_000);
     expect(script).toContain("document.querySelector('#crosswalk-rows')");
-    expect(script).toContain('crosswalk.quantityExpansionGaps');
+    expect(script).toContain('placement.metrics.mappedNativeOutletCount');
   });
 
   it('describes primary cross-source and adversarial loops without an independent human gate', () => {
