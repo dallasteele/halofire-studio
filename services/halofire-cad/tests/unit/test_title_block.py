@@ -45,7 +45,7 @@ def test_classify_page_detects_level_from_name() -> None:
     ])
     assert result["level_name"] == "LEVEL 3"
     assert result["level_use"] == "residential"
-    assert result["elevation_ft"] == 44
+    assert result["elevation_ft"] is None
 
 
 def test_classify_page_detects_garage_level() -> None:
@@ -53,7 +53,20 @@ def test_classify_page_detects_garage_level() -> None:
         _frag("A-101"), _frag("GROUND FLOOR PARKING PLAN"),
     ])
     assert result["level_use"] == "garage"
-    assert result["elevation_ft"] == 0
+    assert result["elevation_ft"] is None
+
+
+def test_extract_level_elevations_from_section_callouts() -> None:
+    result = TB.extract_level_elevations(
+        '±0" 1 FIRST FLOOR +10\'-0" 2 SECOND FLOOR '
+        '+20\'-0" 3 THIRD FLOOR +31\'-0" 4 FOURTH FLOOR '
+        '+41\'-0" 5 FIFTH FLOOR +51\'-0" 6 SIXTH FLOOR '
+        '+61\'-0" 7 SEVENTH FLOOR +71\'-0" 8 EIGHTH FLOOR',
+    )
+    assert result == {
+        1: 0.0, 2: 10.0, 3: 20.0, 4: 31.0,
+        5: 41.0, 6: 51.0, 7: 61.0, 8: 71.0,
+    }
 
 
 def test_classify_page_empty_returns_unknown() -> None:

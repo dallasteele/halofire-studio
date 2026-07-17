@@ -8,6 +8,7 @@ during Phase 2 of the plan.
 from __future__ import annotations
 
 import math
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -98,7 +99,14 @@ def _classify_plan_pages(
     _tb = _load_title_block()
     if _tb is None:
         return list(range(min(n_pages, hard_cap)))
+    fast_result = _classify_plan_pages_fitz(
+        pdf_path, n_pages, hard_cap, _tb,
+    )
+    if fast_result is not None:
+        return fast_result
     keep: list[int] = []
+    overall_floor_pages: dict[int, int] = {}
+    section_elevations: dict[int, float] = {}
     rejects: list[tuple[int, str, str | None]] = []
     classified_any = False
     # Phase E: stash every classification so intake_file can later
@@ -108,7 +116,10 @@ def _classify_plan_pages(
     _PAGE_CLASSIFICATION_CACHE[pdf_path] = page_cls
     try:
         with pdfplumber.open(pdf_path) as pdf:
-            for i in range(min(n_pages, hard_cap * 2)):  # scan wider
+            # Scan the complete sheet set. Stopping after an early page window
+            # loses upper floors on large architectural packages (1881's
+            # eighth-floor overall plan is page 29 of 110).
+            for i in range(n_pages):
                 try:
                     page = pdf.pages[i]
                     w = float(page.width or 612)
@@ -152,6 +163,7 @@ def _classify_plan_pages(
                     # produced no elevation, re-run classify_page over
                     # the full-page text so we can still mine an
                     # elevation + level_name from the sheet title.
+                    full_words: list[dict[str, Any]] = []
                     if not cls.get("elevation_ft"):
                         try:
                             full_words = page.extract_words() or []
@@ -178,6 +190,30 @@ def _classify_plan_pages(
                                 float(cls.get("confidence") or 0.0),
                                 min(float(full_cls.get("confidence") or 0.0), 0.55),
                             )
+                    full_text = " ".join(
+                        str(wd.get("text") or "") for wd in full_words
+                    )
+                    identity = _tb.floor_identity_from_text(full_text)
+                    if identity is not None:
+                        floor_index, canonical_name = identity
+                        cls["floor_index"] = floor_index
+                        cls["level_name"] = canonical_name
+                        # A full-title match is stronger than a stray sheet
+                        # number found elsewhere in the title-block crop.
+                        if re.search(
+                            rf"\bOVERALL\s+{canonical_name}\s+PLAN\b",
+                            " ".join(full_text.upper().split()),
+                        ):
+                            cls["kind"] = "floor_plan"
+                            cls["is_overall_floor_plan"] = True
+                            cls["confidence"] = max(
+                                float(cls.get("confidence") or 0.0), 0.95,
+                            )
+                            overall_floor_pages.setdefault(floor_index, i)
+                    for floor_index, elevation_ft in (
+                        _tb.extract_level_elevations(full_text).items()
+                    ):
+                        section_elevations.setdefault(floor_index, elevation_ft)
                 except (IOError, ValueError, KeyError, AttributeError):
                     cls = {"kind": "unknown", "confidence": 0.0,
                            "sheet_no": None}
@@ -185,8 +221,6 @@ def _classify_plan_pages(
                 classified_any = classified_any or bool(cls.get("sheet_no"))
                 if cls["kind"] in _PLAN_KINDS:
                     keep.append(i)
-                    if len(keep) >= hard_cap:
-                        break
                 else:
                     rejects.append((i, cls["kind"], cls.get("sheet_no")))
     except (IOError, OSError, ValueError) as e:
@@ -195,6 +229,21 @@ def _classify_plan_pages(
             pdf_path=pdf_path,
         )
         return list(range(min(n_pages, hard_cap)))
+
+    for cls in page_cls.values():
+        floor_index = cls.get("floor_index")
+        if floor_index in section_elevations:
+            cls["elevation_ft"] = section_elevations[floor_index]
+            cls["elevation_evidence_source"] = "section"
+            cls["confidence"] = max(float(cls.get("confidence") or 0.0), 0.95)
+
+    if overall_floor_pages:
+        keep = [
+            page_index
+            for _floor_index, page_index in sorted(overall_floor_pages.items())
+        ][:hard_cap]
+    else:
+        keep = keep[:hard_cap]
 
     if not classified_any and not keep:
         # No text layer / scanned set — behave like the legacy scanner.
@@ -215,6 +264,224 @@ def _classify_plan_pages(
             },
         )
     return keep
+
+
+def _classify_plan_pages_fitz(
+    pdf_path: str, n_pages: int, hard_cap: int, title_block: Any,
+) -> list[int] | None:
+    """Fast full-set title scan using PyMuPDF when available.
+
+    pdfminer/pdfplumber remains the geometry engine, but parsing every drawing
+    object merely to read 110 title blocks takes minutes. PyMuPDF's word pass
+    produces the same classifier inputs in seconds. The existing pdfplumber
+    implementation remains the dependency/fake-page fallback.
+    """
+    if not Path(pdf_path).exists():
+        return None
+    try:
+        import fitz  # type: ignore
+    except ImportError:
+        return None
+
+    page_cls: dict[int, dict] = {}
+    keep: list[int] = []
+    rejects: list[tuple[int, str, str | None]] = []
+    overall_floor_pages: dict[int, int] = {}
+    section_elevations: dict[int, float] = {}
+    classified_any = False
+    try:
+        doc = fitz.open(pdf_path)
+        try:
+            for i in range(min(n_pages, doc.page_count)):
+                page = doc.load_page(i)
+                words = page.get_text("words") or []
+                width = float(page.rect.width)
+                height = float(page.rect.height)
+                full_fragments = [
+                    {"text": word[4], "x0": word[0], "y0": word[1]}
+                    for word in words
+                ]
+                br_fragments = [
+                    fragment for fragment in full_fragments
+                    if float(fragment["x0"]) > width * 0.65
+                    and float(fragment["y0"]) > height * 0.65
+                ]
+                cls = title_block.classify_page(br_fragments)
+                full_cls = title_block.classify_page(full_fragments)
+                if full_cls.get("level_name"):
+                    cls["level_name"] = full_cls["level_name"]
+                    cls["level_use"] = full_cls.get("level_use")
+                full_text = " ".join(
+                    str(fragment["text"]) for fragment in full_fragments
+                )
+                identity = title_block.floor_identity_from_text(full_text)
+                if identity is not None:
+                    floor_index, canonical_name = identity
+                    cls["floor_index"] = floor_index
+                    cls["level_name"] = canonical_name
+                    normalized = " ".join(full_text.upper().split())
+                    if re.search(
+                        rf"\bOVERALL\s+{canonical_name}\s+PLAN\b", normalized,
+                    ):
+                        cls["kind"] = "floor_plan"
+                        cls["is_overall_floor_plan"] = True
+                        cls["confidence"] = max(
+                            float(cls.get("confidence") or 0.0), 0.95,
+                        )
+                        overall_floor_pages.setdefault(floor_index, i)
+                    area_match = re.search(
+                        rf"\b{canonical_name}\s+PLAN\s*-\s*AREA\s+([A-Z])\b",
+                        " ".join(full_text.upper().split()),
+                    )
+                    if area_match:
+                        cls["plan_area"] = area_match.group(1)
+                section_elevations.update(
+                    title_block.extract_level_elevations(full_text),
+                )
+                page_cls[i] = cls
+                classified_any = classified_any or bool(cls.get("sheet_no"))
+                if cls.get("kind") in _PLAN_KINDS:
+                    keep.append(i)
+                else:
+                    rejects.append((
+                        i, str(cls.get("kind") or "unknown"), cls.get("sheet_no"),
+                    ))
+        finally:
+            doc.close()
+    except (RuntimeError, ValueError, OSError) as exc:
+        warn_swallowed(
+            log, code="CANDIDATE_PAGES_FITZ_FAILED", err=exc,
+            pdf_path=pdf_path,
+        )
+        return None
+
+    for cls in page_cls.values():
+        floor_index = cls.get("floor_index")
+        if floor_index in section_elevations:
+            cls["elevation_ft"] = section_elevations[floor_index]
+            cls["elevation_evidence_source"] = "section"
+            cls["confidence"] = max(float(cls.get("confidence") or 0.0), 0.95)
+    _PAGE_CLASSIFICATION_CACHE[pdf_path] = page_cls
+
+    if overall_floor_pages:
+        keep = [page for _floor, page in sorted(overall_floor_pages.items())]
+    keep = keep[:hard_cap]
+    if not classified_any and not keep:
+        return list(range(min(n_pages, hard_cap)))
+    if rejects:
+        log.info(
+            "candidate_pages.filtered",
+            extra={
+                "pdf": Path(pdf_path).name,
+                "kept": keep,
+                "rejected": rejects[:20],
+                "rejected_count": len(rejects),
+                "scanner": "pymupdf",
+            },
+        )
+    return keep
+
+
+def _enrich_levels_from_area_plans(
+    levels: list[Level], pdf_path: str, metadata: dict[str, Any],
+) -> list[Level]:
+    """Attach Area A/B room geometry to its parent overall floor.
+
+    Area sheets are higher-detail child views, not extra storeys. Their room
+    polygons are registered into equal-width zones of the overall floor plate
+    while the overall sheet remains authoritative for the outer boundary and
+    wall frame.
+    """
+    classifications = _PAGE_CLASSIFICATION_CACHE.get(pdf_path, {})
+    detail_pages = [
+        (page_index, int(cls["floor_index"]), str(cls["plan_area"]))
+        for page_index, cls in classifications.items()
+        if cls.get("floor_index") is not None and cls.get("plan_area")
+    ]
+    if not detail_pages or not levels:
+        return levels
+    by_floor = {
+        int((level.metadata or {}).get("floor_index")): level
+        for level in levels
+        if (level.metadata or {}).get("floor_index") is not None
+    }
+    grouped_areas: dict[int, list[str]] = {}
+    for _page, floor_index, area_name in detail_pages:
+        grouped_areas.setdefault(floor_index, []).append(area_name)
+    added = 0
+    for page_index, floor_index, area_name in detail_pages:
+        level = by_floor.get(floor_index)
+        if level is None or len(level.polygon_m) < 3:
+            continue
+        page_result = intake_pdf_page(pdf_path, page_index).model_dump()
+        rooms = page_result.get("rooms") or []
+        if not rooms:
+            continue
+        source_points = [
+            point
+            for room in rooms
+            for point in room.get("polygon_pt") or []
+        ]
+        if not source_points:
+            continue
+        source_x = [float(point[0]) for point in source_points]
+        source_y = [float(point[1]) for point in source_points]
+        source_min_x, source_max_x = min(source_x), max(source_x)
+        source_min_y, source_max_y = min(source_y), max(source_y)
+        source_width = max(source_max_x - source_min_x, 1e-6)
+        source_height = max(source_max_y - source_min_y, 1e-6)
+
+        target_x = [float(point[0]) for point in level.polygon_m]
+        target_y = [float(point[1]) for point in level.polygon_m]
+        floor_min_x, floor_max_x = min(target_x), max(target_x)
+        floor_min_y, floor_max_y = min(target_y), max(target_y)
+        area_names = sorted(set(grouped_areas.get(floor_index) or [area_name]))
+        area_slot = area_names.index(area_name)
+        area_count = len(area_names)
+        zone_width = (floor_max_x - floor_min_x) / max(area_count, 1)
+        zone_min_x = floor_min_x + zone_width * area_slot
+        zone_max_x = zone_min_x + zone_width
+        scale = min(
+            zone_width / source_width,
+            (floor_max_y - floor_min_y) / source_height,
+        )
+        used_width = source_width * scale
+        used_height = source_height * scale
+        offset_x = zone_min_x + (zone_max_x - zone_min_x - used_width) / 2.0
+        offset_y = floor_min_y + (floor_max_y - floor_min_y - used_height) / 2.0
+
+        for room_index, room in enumerate(rooms):
+            polygon = [
+                (
+                    offset_x + (float(point[0]) - source_min_x) * scale,
+                    offset_y + (float(point[1]) - source_min_y) * scale,
+                )
+                for point in room.get("polygon_pt") or []
+            ]
+            if len(polygon) < 3:
+                continue
+            area_sqm = float(Polygon(polygon).area)
+            if area_sqm < 2.0:
+                continue
+            level.rooms.append(Room(
+                id=f"r_p{page_index}_{room_index}",
+                name=f"Area {area_name} Room {room_index + 1}",
+                polygon_m=polygon,
+                area_sqm=area_sqm,
+            ))
+            added += 1
+    if added:
+        metadata["issues"].append({
+            "code": "INTAKE_AREA_PLANS_REGISTERED",
+            "severity": "info",
+            "message": (
+                f"Registered {added} room polygons from Area detail sheets "
+                "into their parent overall floors."
+            ),
+            "refs": [level.id for level in levels],
+            "source": Path(pdf_path).name,
+        })
+    return levels
 
 # Snap tolerance for orthogonality (degrees)
 ORTHO_TOL_DEG = 3.0
@@ -1106,9 +1373,12 @@ def _fill_floor_gaps(
                 r.id = f"r_p{page}s_{clone.rooms.index(r)}"
             out.append(clone)
             synthetic_count += 1
-    # Renumber elevation contiguously
+    # Preserve drawing-derived elevations. Only levels that lack section or
+    # title-block evidence may receive the synthetic contiguous fallback.
     for idx, lv in enumerate(out):
-        lv.elevation_m = float(idx) * 3.0
+        elevation_source = (lv.metadata or {}).get("elevation_source")
+        if elevation_source == "synthetic":
+            lv.elevation_m = float(idx) * 3.0
         # Renumber stair/elevator shaft elevations too
         for sh in (lv.stair_shafts + lv.elevator_shafts):
             sh.bottom_z_m = lv.elevation_m
@@ -1119,13 +1389,6 @@ def _fill_floor_gaps(
     # different shape, producing a Jenga tower of mismatched slabs
     # in the viewer. Pick the BEST polygon for each tier and reuse it.
     out = _canonicalize_floor_plates(out, metadata, pdf_path)
-
-    # Truth-driven level cap + elevation alignment. If we have a
-    # truth record for this project, force the kept-level count and
-    # per-level elevations to match the real building. Otherwise we
-    # over-/under-count by 2-7 levels and the cruel-test scoreboard
-    # is misleading. Reads from services/halofire-cad/truth/db.py.
-    out = _align_levels_to_truth(out, metadata, pdf_path)
 
     if synthetic_count:
         metadata["issues"].append({
@@ -1173,7 +1436,7 @@ def _canonicalize_floor_plates(
             return -1
         if len(lv.rooms) < 1:
             return -1
-        if len(lv.walls) < 40 or len(lv.walls) > 250:
+        if len(lv.walls) < 40 or len(lv.walls) > 300:
             return -1
         # Prefer levels closer to 2000 sqm (typical residential floor)
         # and with more rooms (more semantic content).
@@ -1334,6 +1597,9 @@ def _align_levels_to_truth(
         too many, clone-from-template if too few.
       * Overwrite each level's name + elevation_m with truth's value.
     """
+    raise RuntimeError(
+        "retired: answer-key truth must never mutate source-derived intake",
+    )
     try:
         # Truth DB lives in services/halofire-cad/truth — relative to
         # this file's grandparent. We import lazily so a missing
@@ -1537,12 +1803,15 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
         # agents can tell the difference.
         tb_cls = get_page_classification(pdf_path, i)
         tb_elev_ft = tb_cls.get("elevation_ft")
+        tb_elev_source = tb_cls.get("elevation_evidence_source")
         tb_name = tb_cls.get("level_name")
         tb_conf = float(tb_cls.get("confidence") or 0.0)
         if tb_elev_ft is not None and tb_conf >= 0.6:
             level_elev_m = float(tb_elev_ft) * 0.3048
             level_name = tb_name or f"Floor plan (page {i + 1})"
-            elev_source = "title-block"
+            elev_source = (
+                "section" if tb_elev_source == "section" else "title-block"
+            )
         elif tb_elev_ft is not None and tb_conf >= 0.4:
             # Full-page matches are capped at 0.55 by the classifier
             # second-pass above — keep them, but tag as uncertain so
@@ -1654,6 +1923,8 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
         level.metadata["title_block_confidence"] = tb_conf
         if tb_cls.get("sheet_no"):
             level.metadata["sheet_no"] = tb_cls["sheet_no"]
+        if tb_cls.get("floor_index") is not None:
+            level.metadata["floor_index"] = int(tb_cls["floor_index"])
         levels.append(level)
 
     # Gap-fill: when a contiguous span of pages was rejected between
@@ -1662,6 +1933,9 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
     # level for each missing page so the level_count + head_count
     # tracks reality. Estimator can correct details upstairs.
     levels = _fill_floor_gaps(levels, plan_page_indices, metadata, pdf_path)
+    # Register child-detail rooms after canonicalization so Area A/B
+    # geometry lands in the overall floor's authoritative coordinate frame.
+    levels = _enrich_levels_from_area_plans(levels, pdf_path, metadata)
 
     if levels:
         confidence = 0.82 if any(l.rooms for l in levels) else 0.52

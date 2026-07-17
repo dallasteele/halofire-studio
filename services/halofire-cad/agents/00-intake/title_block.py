@@ -41,19 +41,97 @@ _SHEET_PATTERNS: list[tuple[str, str]] = [
     (r"^L-?\d", "landscape"),
 ]
 
-_LEVEL_NAME_PATTERNS: list[tuple[str, tuple[str, int]]] = [
-    # (regex, (use, elevation_ft))
-    (r"\bground\s+floor\s+parking\b|\bparking\s+level\s*(?:p|1)?\b|\bpark(?:ing)?\s*1\b", ("garage", 0)),
-    (r"\bsecond\s+floor\s+parking\b|\bparking\s+level\s*2\b|\bpark(?:ing)?\s*2\b", ("garage", 12)),
-    (r"\blevel\s+1\b|\bfirst\s+floor\b|\b1st\s+floor\b", ("residential", 24)),
-    (r"\blevel\s+2\b|\bsecond\s+floor\b|\b2nd\s+floor\b", ("residential", 34)),
-    (r"\blevel\s+3\b|\bthird\s+floor\b|\b3rd\s+floor\b", ("residential", 44)),
-    (r"\blevel\s+4\b|\bfourth\s+floor\b|\b4th\s+floor\b", ("residential", 54)),
-    (r"\blevel\s+5\b|\bfifth\s+floor\b|\b5th\s+floor\b", ("residential", 64)),
-    (r"\broof\s+plan\b|\broof\s+level\b", ("roof", 74)),
-    (r"\bpenthouse\b", ("other", 84)),
-    (r"\bbasement\b|\bb\s?1\b", ("other", -12)),
+_LEVEL_NAME_PATTERNS: list[tuple[str, str]] = [
+    # A level name identifies a storey; it does not prove its Z elevation.
+    # Elevations are extracted separately from section/elevation callouts.
+    (r"\bground\s+floor\s+parking\b|\bparking\s+level\s*(?:p|1)?\b|\bpark(?:ing)?\s*1\b", "garage"),
+    (r"\bsecond\s+floor\s+parking\b|\bparking\s+level\s*2\b|\bpark(?:ing)?\s*2\b", "garage"),
+    (r"\blevel\s+1\b|\bfirst\s+floor\b|\b1st\s+floor\b", "residential"),
+    (r"\blevel\s+2\b|\bsecond\s+floor\b|\b2nd\s+floor\b", "residential"),
+    (r"\blevel\s+3\b|\bthird\s+floor\b|\b3rd\s+floor\b", "residential"),
+    (r"\blevel\s+4\b|\bfourth\s+floor\b|\b4th\s+floor\b", "residential"),
+    (r"\blevel\s+5\b|\bfifth\s+floor\b|\b5th\s+floor\b", "residential"),
+    (r"\blevel\s+6\b|\bsixth\s+floor\b|\b6th\s+floor\b", "residential"),
+    (r"\blevel\s+7\b|\bseventh\s+floor\b|\b7th\s+floor\b", "residential"),
+    (r"\blevel\s+8\b|\beighth\s+floor\b|\b8th\s+floor\b", "residential"),
+    (r"\blevel\s+9\b|\bninth\s+floor\b|\b9th\s+floor\b", "residential"),
+    (r"\blevel\s+10\b|\btenth\s+floor\b|\b10th\s+floor\b", "residential"),
+    (r"\broof\s+plan\b|\broof\s+level\b", "roof"),
+    (r"\bpenthouse\b", "other"),
+    (r"\bbasement\b|\bb\s?1\b", "other"),
 ]
+
+_FLOOR_WORD_TO_INDEX = {
+    "first": 1,
+    "second": 2,
+    "third": 3,
+    "fourth": 4,
+    "fifth": 5,
+    "sixth": 6,
+    "seventh": 7,
+    "eighth": 8,
+    "ninth": 9,
+    "tenth": 10,
+}
+
+
+def floor_identity_from_text(text: str) -> tuple[int, str] | None:
+    """Return ``(floor_index, canonical_name)`` from a plan title.
+
+    This deliberately does not infer elevation. The same floor number can
+    sit at different elevations on different buildings.
+    """
+    lower = " ".join(text.lower().split())
+    for word, index in _FLOOR_WORD_TO_INDEX.items():
+        if re.search(rf"\b{word}\s+floor\b", lower):
+            return index, f"{word.upper()} FLOOR"
+    match = re.search(r"\blevel\s+(\d{1,2})\b", lower)
+    if match:
+        index = int(match.group(1))
+        return index, f"LEVEL {index}"
+    return None
+
+
+def _feet_value(feet: str, inches: str | None, fraction: str | None) -> float:
+    total_inches = float(inches or 0)
+    if fraction:
+        numerator, denominator = fraction.split("/", 1)
+        total_inches += float(numerator) / float(denominator)
+    sign = -1.0 if feet.strip().startswith("-") else 1.0
+    feet_value = abs(float(feet.replace("+", "").replace("±", "0")))
+    return sign * (feet_value + total_inches / 12.0)
+
+
+_SECTION_LEVEL_RE = re.compile(
+    r"(?P<feet>[+\-±]?\d+)\s*'\s*-?\s*"
+    r"(?P<inches>\d{1,2})?\s*(?P<fraction>\d+\s*/\s*\d+)?\s*[\"”]?\s+"
+    r"(?:\d{1,2}\s+)?"
+    r"(?P<name>FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH)\s+FLOOR\b",
+    re.IGNORECASE,
+)
+
+
+def extract_level_elevations(text: str) -> dict[int, float]:
+    """Extract floor elevations in feet from a building section.
+
+    Example: ``+31'-0\" 4 FOURTH FLOOR`` becomes ``{4: 31.0}``.
+    Duplicate elevation callouts on the same sheet collapse idempotently.
+    """
+    normalized = " ".join(text.replace("\n", " ").split())
+    # Architectural datum is commonly printed as ``±0\"`` rather than
+    # ``+0'-0\"``. Normalize only that exact zero-datum form.
+    normalized = re.sub(r"±\s*0\s*[\"”]", "+0'-0\"", normalized)
+    elevations: dict[int, float] = {}
+    for match in _SECTION_LEVEL_RE.finditer(normalized):
+        word = match.group("name").lower()
+        index = _FLOOR_WORD_TO_INDEX[word]
+        value = _feet_value(
+            match.group("feet"), match.group("inches"), match.group("fraction"),
+        )
+        prior = elevations.get(index)
+        if prior is None or abs(prior - value) < 0.01:
+            elevations[index] = value
+    return elevations
 
 
 def classify_page(text_fragments: list[dict[str, Any]]) -> dict[str, Any]:
@@ -98,12 +176,11 @@ def classify_page(text_fragments: list[dict[str, Any]]) -> dict[str, Any]:
                 break
 
     # Level name + use + elevation
-    for pattern, (use, elev) in _LEVEL_NAME_PATTERNS:
+    for pattern, use in _LEVEL_NAME_PATTERNS:
         m = re.search(pattern, lower)
         if m:
             result["level_name"] = m.group(0).upper()
             result["level_use"] = use
-            result["elevation_ft"] = elev
             result["confidence"] = max(result["confidence"], 0.75)
             break
 

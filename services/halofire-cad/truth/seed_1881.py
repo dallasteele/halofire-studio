@@ -1,23 +1,8 @@
-"""Seed the truth DB with the 1881 Cooperative reference bid.
-
-Numbers pulled from Halo's submitted-and-approved bid package
-(Brain decision `halo-fire-v2-rebuild-shipped-end-to-end-to-vps`
-cites real 1881 Cooperative total: $538,792.35 and legacy 1303-head artifacts).
-
-Stream D canonical head-count lock for 1881 is 1,420 heads (Workbook
-Building (1)!B9), enforced via Halo Forge golden fixtures. This seed
-is aligned to that canonical head count to avoid cross-stream truth
-conflicts.
-
-This is a MINIMAL seed. Full per-level outlines + BOM comparison
-come later as Phase 1b (needs DWG parsing of the as-built sheet
-set). For now we ingest the numbers every cruel test references.
-
-Run:
-    python services/halofire-cad/truth/seed_1881.py
-"""
+"""Verify and seed the sealed Cooperative 1881 truth fixture."""
 from __future__ import annotations
 
+import hashlib
+import json
 import sys
 from pathlib import Path
 
@@ -26,81 +11,57 @@ sys.path.insert(0, str(_HERE.parent))
 
 from truth.db import LevelTruth, TruthRecord, open_db  # noqa: E402
 
+_FIXTURE = _HERE / "fixtures" / "1881-cooperative.json"
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _load_verified_fixture() -> dict:
+    payload = json.loads(_FIXTURE.read_text(encoding="utf-8"))
+    for evidence in payload["evidence"]:
+        path = Path(evidence["path"])
+        if not path.exists():
+            raise FileNotFoundError(f"sealed evidence missing: {path}")
+        actual = _sha256(path)
+        expected = evidence["sha256"].lower()
+        if actual != expected:
+            raise ValueError(
+                f"sealed evidence hash mismatch for {path}: "
+                f"expected {expected}, got {actual}",
+            )
+    return payload
+
 
 def main() -> None:
-    # CORRECTED 2026-04-20: real building has 6 levels (2 below-grade
-    # parking + 4 above-grade residential), each ~28 443 sf
-    # (~2 642 sqm). Elevations from the project's Level Plans:
-    #   -12 ft  Ground Floor Parking      (28 443 sf)
-    #     0 ft  Second Floor Parking      (28 443 sf)
-    #    12 ft  Level 1 — Amenity + Resi  (28 443 sf)
-    #    24 ft  Level 2 — Residential     (28 443 sf)
-    #    34 ft  Level 3 — Residential     (28 443 sf)
-    #    44 ft  Level 4 — Residential     (28 443 sf)
-    # Total area 170 658 sf. Previous seed said 12 levels which is
-    # what made every cruel test scoreboard "level_count=13 vs 12 ≈
-    # PASS" — but truth was actually 6, so we were 117 % over.
-    LEVELS = [
-        ("Ground Floor Parking",       -3.66,  2_642.0),  # -12 ft
-        ("Second Floor Parking",        0.00,  2_642.0),  #   0 ft
-        ("Level 1 — Amenity + Resi",    3.66,  2_642.0),  #  12 ft
-        ("Level 2 — Residential",       7.32,  2_642.0),  #  24 ft (≈ 10 ft floor-to-floor)
-        ("Level 3 — Residential",      10.36,  2_642.0),  #  34 ft
-        ("Level 4 — Residential",      13.41,  2_642.0),  #  44 ft
-    ]
-    rec = TruthRecord(
-        project_id="1881-cooperative",
-        project_name="The Cooperative 1881 — Phase I",
-        architect_pdf_path=(
-            "E:/ClaudeBot/HaloFireBidDocs/1-Bid Documents/"
-            "GC - Bid Plans/1881 - Architecturals.pdf"
-        ),
-        as_built_pdf_path=None,
-        permit_reviewed=True,
-        total_bid_usd=538_792.35,
-        head_count=1420,
-        pipe_count=None,
-        pipe_total_ft=None,
-        system_count=7,
-        level_count=len(LEVELS),
-        hydraulic_gpm=None,
-        hydraulic_psi=None,
-        signed_off_at="2025-12-01",
-        notes=(
-            "Reference bid for HaloFire CAD Studio self-training. "
-            "Real building: 6 levels (2 below-grade parking + 4 "
-            "above-grade residential), each ~28 443 sf. Cruel-test "
-            "level_count was incorrectly seeded as 12 until "
-            "2026-04-20."
-        ),
-    )
+    payload = _load_verified_fixture()
+    record_fields = TruthRecord.__dataclass_fields__
+    record = TruthRecord(**{
+        key: value for key, value in payload.items() if key in record_fields
+    })
     with open_db() as db:
-        db.upsert(rec)
-        # Idempotent: drop any prior per-level rows for this project
-        # so re-running the seed doesn't accumulate stale levels.
-        # (Caught 2026-04-20: prior seed inserted 12 placeholders;
-        # the new seed only added 6 more, total 18, breaking the
-        # truth-aligned intake count.)
         db._con.execute(
             "DELETE FROM bids_level_truth WHERE project_id = ?",
-            [rec.project_id],
+            [record.project_id],
         )
-        for i, (name, elev_m, area) in enumerate(LEVELS):
+        db.upsert(record)
+        for level in payload["levels"]:
             db.upsert_level(LevelTruth(
-                project_id=rec.project_id,
-                level_index=i,
-                level_name=name,
-                elevation_m=elev_m,
-                outline_polygon_wkt=None,
-                area_sqm=area,
-                room_count=None,
-                head_count=None,
+                project_id=record.project_id,
+                level_index=int(level["level_index"]),
+                level_name=level["level_name"],
+                elevation_m=float(level["elevation_m"]),
             ))
-        print(
-            f"seeded {rec.project_id}: heads={rec.head_count}, "
-            f"systems={rec.system_count}, "
-            f"bid=${rec.total_bid_usd:,.2f}",
-        )
+    print(
+        f"seeded {record.project_id}: levels={record.level_count}, "
+        f"heads={record.head_count}, systems={record.system_count}, "
+        f"bid=${record.total_bid_usd:,.2f}",
+    )
 
 
 if __name__ == "__main__":

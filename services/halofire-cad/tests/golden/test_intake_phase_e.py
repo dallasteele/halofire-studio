@@ -11,9 +11,11 @@ independently of whether the full pipeline has been re-run.
 Source of truth:
   * PDF: E:/ClaudeBot/data/halofire/golden/1881/input/GC - Bid Plans/
          1881 - Architecturals.pdf
-  * Ground-truth polygon: hand-drawn in
-    tests/fixtures/intake/1881-outer-boundary.geojson (see commit).
-    If the GeoJSON is missing the IoU test SKIPs rather than fails.
+  * Ground-truth envelope: independently derived from the sealed wall-ensemble
+    sources named and hash-bound in
+    tests/fixtures/intake/1881-outer-boundary.geojson. The source drawing
+    envelope is translated, without scaling, to the building-centroid frame
+    used by ``polygon_m``. A missing fixture is a hard failure.
 
 Expected baseline (before Phase E): 140 rooms, polygon = 16-vert bbox.
 Expected after Phase E:
@@ -60,7 +62,7 @@ def _get_building() -> dict:
     if _CACHED_BUILDING is not None:
         return _CACHED_BUILDING
     if not PDF_1881.exists():
-        pytest.skip(f"1881 architecturals PDF missing: {PDF_1881}")
+        pytest.fail(f"1881 architecturals PDF missing: {PDF_1881}")
     bldg = INTAKE.intake_file(str(PDF_1881), "test_phase_e")
     _CACHED_BUILDING = bldg.model_dump()
     return _CACHED_BUILDING
@@ -175,7 +177,7 @@ def test_intake_boundary_iou_against_ground_truth() -> None:
     purpose is to light up once someone traces the architect's
     outline on page 1)."""
     if not GROUND_TRUTH.exists():
-        pytest.skip(
+        pytest.fail(
             f"ground-truth polygon missing: {GROUND_TRUTH.name}. "
             "Trace the 1881 building outer wall loop on page 1 of "
             "the architecturals PDF and save as GeoJSON Polygon."
@@ -229,11 +231,11 @@ def test_intake_elevation_source_metadata_present() -> None:
 
 @pytest.mark.slow
 @pytest.mark.golden
-def test_intake_elevation_from_title_block_or_synthetic() -> None:
+def test_intake_elevation_from_source_or_synthetic() -> None:
     """Valid sources are ``title-block``, ``ocr-uncertain``, or
     ``synthetic``. Any other value = a bug in the Phase E pipeline."""
     raw = _get_building()
-    valid = {"title-block", "ocr-uncertain", "synthetic"}
+    valid = {"section", "title-block", "ocr-uncertain", "synthetic"}
     bad: list[tuple[str, str]] = []
     for lvl in raw.get("levels") or []:
         src = (lvl.get("metadata") or {}).get("elevation_source")
@@ -242,7 +244,22 @@ def test_intake_elevation_from_title_block_or_synthetic() -> None:
     assert not bad, f"invalid elevation_source values: {bad}"
 
 
-def test_intake_elevation_sources_from_multiple_pdfs() -> None:
+@pytest.mark.slow
+@pytest.mark.golden
+def test_1881_section_elevations_are_preserved() -> None:
+    raw = _get_building()
+    actual = [
+        round(float(level.get("elevation_m") or 0.0), 4)
+        for level in raw.get("levels") or []
+    ]
+    expected_ft = [0.0, 10.0, 20.0, 31.0, 41.0, 51.0, 61.0, 71.0]
+    expected = [round(value * 0.3048, 4) for value in expected_ft]
+    assert actual == expected, (
+        f"floor elevations {actual} do not match AS-005 section {expected}"
+    )
+
+
+def test_intake_elevations_require_explicit_section_callouts() -> None:
     """Run classify_page directly against the title-block text of 3
     reference pages and confirm ≥ 80% carry a parsable elevation.
     This stands in for OCR-over-N-architect-sets when we don't have
@@ -263,12 +280,12 @@ def test_intake_elevation_sources_from_multiple_pdfs() -> None:
         [{"text": "NOTES, LEGEND, KEYNOTES", "x0": 0, "y0": 0}],
     ]
     parsed = [tb.classify_page(s) for s in samples]
-    with_elev = [c for c in parsed[:3] if c.get("elevation_ft") is not None]
-    coverage = len(with_elev) / 3.0
-    assert coverage >= 0.8, (
-        f"elevation OCR coverage {coverage * 100:.0f}% < 80% on 3 "
-        "reference title-block strings"
+    assert all(c.get("elevation_ft") is None for c in parsed)
+    exact = tb.extract_level_elevations(
+        '±0" 1 FIRST FLOOR +10\'-0" 2 SECOND FLOOR '
+        '+20\'-0" 3 THIRD FLOOR',
     )
+    assert exact == {1: 0.0, 2: 10.0, 3: 20.0}
     # Ambiguous sample must NOT carry a fabricated elevation.
     assert parsed[3].get("elevation_ft") is None, (
         "classifier invented an elevation for a page with no level name"

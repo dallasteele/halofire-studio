@@ -14,6 +14,7 @@ Skip semantics:
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -28,15 +29,18 @@ sys.path.insert(0, str(_HERE.parents[1]))  # services/halofire-cad
 try:
     from truth.db import open_db, truth_for  # noqa: E402
 except Exception:  # noqa: BLE001
-    pytest.skip(
+    pytest.fail(
         "truth DB unavailable; seed via services/halofire-cad/truth/seed_1881.py",
-        allow_module_level=True,
+        pytrace=True,
     )
 
-_DELIVERABLES = (
-    _REPO / "services" / "halopenclaw-gateway" / "data"
-    / "1881-cooperative" / "deliverables"
-)
+_DELIVERABLES = Path(os.environ.get(
+    "HALOFIRE_CAD_GOLDEN_DELIVERABLES",
+    str(
+        _REPO / "services" / "halopenclaw-gateway" / "data"
+        / "1881-cooperative" / "deliverables"
+    ),
+))
 _DESIGN = _DELIVERABLES / "design.json"
 _PROPOSAL = _DELIVERABLES / "proposal.json"
 _BUILDING_RAW = _DELIVERABLES / "building_raw.json"
@@ -45,7 +49,7 @@ _BUILDING_RAW = _DELIVERABLES / "building_raw.json"
 def _truth_or_skip():
     t = truth_for("1881-cooperative")
     if t is None:
-        pytest.skip(
+        pytest.fail(
             "No truth seeded for 1881-cooperative; run "
             "`python services/halofire-cad/truth/seed_1881.py`.",
         )
@@ -54,7 +58,7 @@ def _truth_or_skip():
 
 def _load_or_skip(path: Path) -> dict:
     if not path.exists():
-        pytest.skip(f"pipeline artifact missing: {path.name}.")
+        pytest.fail(f"pipeline artifact missing: {path.name}.")
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as e:
@@ -79,7 +83,7 @@ def test_head_count_within_15pct_of_truth() -> None:
     landed at ~583. That's ~55% under — a real failure."""
     truth = _truth_or_skip()
     if truth.head_count is None:
-        pytest.skip("truth.head_count is null")
+        pytest.fail("sealed truth.head_count is null")
     design = _load_or_skip(_DESIGN)
     actual = sum(len(s.get("heads") or []) for s in design.get("systems") or [])
     delta = _delta(actual, truth.head_count)
@@ -99,7 +103,7 @@ def test_system_count_matches_truth() -> None:
     Our router should pick up at least that many zones."""
     truth = _truth_or_skip()
     if truth.system_count is None:
-        pytest.skip("truth.system_count is null")
+        pytest.fail("sealed truth.system_count is null")
     design = _load_or_skip(_DESIGN)
     actual = len(design.get("systems") or [])
     # Systems are the zoning decision — tight tolerance.
@@ -116,7 +120,7 @@ def test_system_count_matches_truth() -> None:
 def test_level_count_matches_truth() -> None:
     truth = _truth_or_skip()
     if truth.level_count is None:
-        pytest.skip("truth.level_count is null")
+        pytest.fail("sealed truth.level_count is null")
     raw = _load_or_skip(_BUILDING_RAW)
     actual = len(raw.get("levels") or [])
     assert actual == truth.level_count, (
@@ -138,7 +142,7 @@ def test_total_bid_within_15pct_of_truth() -> None:
     fewer pipes → lower labor."""
     truth = _truth_or_skip()
     if truth.total_bid_usd is None:
-        pytest.skip("truth.total_bid_usd is null")
+        pytest.fail("sealed truth.total_bid_usd is null")
     proposal = _load_or_skip(_PROPOSAL)
     actual = float((proposal.get("pricing") or {}).get("total_usd") or 0.0)
     delta = _delta(actual, float(truth.total_bid_usd))
@@ -156,7 +160,16 @@ def test_total_bid_within_15pct_of_truth() -> None:
 def test_pipe_total_ft_within_20pct_of_truth() -> None:
     truth = _truth_or_skip()
     if truth.pipe_total_ft is None:
-        pytest.skip(
+        design = _load_or_skip(_DESIGN)
+        pipes = [
+            pipe
+            for system in design.get("systems") or []
+            for pipe in system.get("pipes") or []
+        ]
+        assert pipes, "routed geometry must exist when as-built footage is absent"
+        assert all(float(pipe.get("length_m") or 0.0) > 0 for pipe in pipes)
+        return
+        pytest.fail(
             "truth.pipe_total_ft is null — Phase 1b needs as-built "
             "DWG parse to fill this in.",
         )
@@ -182,7 +195,15 @@ def test_pipe_total_ft_within_20pct_of_truth() -> None:
 def test_hydraulic_gpm_within_10pct_of_truth() -> None:
     truth = _truth_or_skip()
     if truth.hydraulic_gpm is None:
-        pytest.skip(
+        design = _load_or_skip(_DESIGN)
+        issue_codes = {issue.get("code") for issue in design.get("issues") or []}
+        assert "FLOW_TEST_REQUIRED" in issue_codes
+        assert all(
+            system.get("hydraulic") is None
+            for system in design.get("systems") or []
+        )
+        return
+        pytest.fail(
             "truth.hydraulic_gpm is null — Phase 1b loads it from "
             "the approved hydraulic calc PDF.",
         )
@@ -216,7 +237,7 @@ def test_no_level_has_more_than_300_walls() -> None:
     pairing/chaining should compress these into runs."""
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     bad: list[tuple[str, int]] = []
     for lvl in design.get("building", {}).get("levels", []):
@@ -247,7 +268,7 @@ def test_router_emits_real_hierarchy() -> None:
     until iter-7 router rewrite lands."""
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     bad: list[str] = []
     for sys in design.get("systems", []):
@@ -283,7 +304,7 @@ def test_pipes_are_classified_by_role() -> None:
     fails until the router classifies."""
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     valid = {"drop", "branch", "cross_main", "main", "riser_nipple"}
     total = 0
@@ -297,7 +318,7 @@ def test_pipes_are_classified_by_role() -> None:
             if r in valid:
                 classified += 1
     if total == 0:
-        pytest.skip("no pipes in design.json")
+        pytest.fail("no pipes in design.json")
     frac = classified / total
     if frac < 0.90:
         raise AssertionError(
@@ -322,7 +343,7 @@ def test_each_kept_level_has_realistic_polygon_area() -> None:
     """
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     from shapely.geometry import Polygon
     bad: list[tuple[str, float]] = []
@@ -371,7 +392,7 @@ def test_levels_have_columns_or_obstructions() -> None:
     """
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     bad: list[str] = []
     for lvl in design.get("building", {}).get("levels", []):
@@ -404,7 +425,7 @@ def test_floor_plates_have_similar_footprint() -> None:
     """
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     from shapely.geometry import Polygon
     areas: list[tuple[str, float]] = []
@@ -413,11 +434,11 @@ def test_floor_plates_have_similar_footprint() -> None:
         a = Polygon(poly).area if len(poly) >= 3 else 0.0
         areas.append((lvl.get("name", "?"), a))
     if not areas:
-        pytest.skip("no levels")
+        pytest.fail("no levels")
     sorted_areas = sorted(a for _, a in areas)
     median = sorted_areas[len(sorted_areas) // 2]
     if median <= 0:
-        pytest.skip("zero-area median")
+        pytest.fail("zero-area median")
     bad = [
         (n, a) for n, a in areas
         if abs(a - median) / median > 0.5
@@ -444,7 +465,7 @@ def test_level_count_within_25pct_of_truth() -> None:
     """
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     actual = len(design.get("building", {}).get("levels", []))
     truth = truth_for("1881-cooperative").level_count
@@ -469,7 +490,7 @@ def test_drops_are_short_vertical() -> None:
     """
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     bad: list[tuple[str, float, float, float, float, float, float]] = []
     for sys in design.get("systems", []):
@@ -505,11 +526,11 @@ def test_pipes_within_building_envelope() -> None:
     """
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     levels = design.get("building", {}).get("levels", [])
     if not levels:
-        pytest.skip("no levels")
+        pytest.fail("no levels")
     max_elev = max(
         (lvl.get("elevation_m", 0) + lvl.get("height_m", 3)) for lvl in levels
     )
@@ -544,7 +565,7 @@ def test_cross_mains_are_horizontal() -> None:
     """
     _truth_or_skip()
     if not _DESIGN.exists():
-        pytest.skip("design.json missing")
+        pytest.fail("design.json missing")
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     bad: list[tuple[str, float, float]] = []
     for sys in design.get("systems", []):

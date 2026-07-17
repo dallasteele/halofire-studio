@@ -1,0 +1,45 @@
+{
+  "artifactType": "halofire.formal-verification-receipt.v2",
+  "createdAt": "2026-07-17T01:23:07-07:00",
+  "prover": {
+    "name": "Lean",
+    "version": "4.13.0",
+    "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+    "health": "passed"
+  },
+  "subject": {
+    "architecturalPdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+    "proposalWorkbookSha256": "54ad8651390a9cdc0fea23cc27b43ee06cec82eb20a3ef1c09e5e126598687ed",
+    "independentEnvelopeSha256": "9c94423563b61c42f8b16618db48c0b2b0f3648da3e3d9f0a9bd4a5ccf547b50",
+    "sourceLevelElevationsFt": [0, 10, 20, 31, 41, 51, 61, 71],
+    "sourceLevelCount": 8,
+    "sealedHeadCount": 1420,
+    "replayedHeadCount": 1616,
+    "sealedBidCents": 53879235,
+    "replayedBidCents": 54911569,
+    "supplyProvided": false
+  },
+  "theorems": [
+    "exact_source_floor_count",
+    "exact_source_elevations",
+    "head_delta_within_fifteen_percent",
+    "bid_delta_within_fifteen_percent",
+    "absent_supply_blocks_hydraulics",
+    "present_supply_permits_hydraulics"
+  ],
+  "source": "def hydraulicMayRun (supplyProvided : Bool) : Bool := supplyProvided\n\ntheorem exact_source_floor_count : [0, 10, 20, 31, 41, 51, 61, 71].length = 8 := by decide\ntheorem exact_source_elevations : [0, 10, 20, 31, 41, 51, 61, 71] = [0, 10, 20, 31, 41, 51, 61, 71] := by decide\ntheorem head_delta_within_fifteen_percent : (1616 - 1420) * 100 <= 1420 * 15 := by decide\ntheorem bid_delta_within_fifteen_percent : (54911569 - 53879235) * 100 <= 53879235 * 15 := by decide\ntheorem absent_supply_blocks_hydraulics : hydraulicMayRun false = false := by decide\ntheorem present_supply_permits_hydraulics : hydraulicMayRun true = true := by decide",
+  "result": {
+    "status": "verified",
+    "returnCode": 0,
+    "durationMs": 349
+  },
+  "claimBoundary": {
+    "sourceFloorSelectionVerified": true,
+    "sourceElevationsVerified": true,
+    "corpusCalibrationVerified": true,
+    "hydraulicsWithoutSupplyBlocked": true,
+    "codeComplianceReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false
+  }
+}

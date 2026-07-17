@@ -1,0 +1,34 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "project_id": "1881-cooperative",
+        "sheet": "A-101",
+        "units": "meters",
+        "method": "independent wall-ensemble and vector/VLM envelope",
+        "source": "E:/ClaudeBot/halofire-autobid/samples/seg-1881/fuse-summary.json",
+        "source_sha256": "8221f36519759d5cc8a0e20d6bc4878cd0bc74a6374741fe989d6d1e893a67cf",
+        "adversarial_source": "E:/ClaudeBot/out/halofire-wallpipe/plan-walls.cooperative-1881-L1.json",
+        "adversarial_source_sha256": "6aec2e79092e2bd40bb3ffbd2cf2d5dcadef0284b58857366dbfb46ad68d9ea8",
+        "coordinate_frame": "building-centroid origin; source envelope translated only",
+        "source_centroid_m": [48.86701428, 23.40062376]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-55.10294796, -12.48591864],
+          [0.0, -12.48591864],
+          [55.10294796, -12.48591864],
+          [55.10294796, 0.0],
+          [55.10294796, 12.48591864],
+          [0.0, 12.48591864],
+          [-55.10294796, 12.48591864],
+          [-55.10294796, 0.0],
+          [-55.10294796, -12.48591864]
+        ]]
+      }
+    }
+  ]
+}

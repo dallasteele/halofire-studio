@@ -18,7 +18,7 @@ assert _SPEC is not None and _SPEC.loader is not None
 CLASSIFIER = importlib.util.module_from_spec(_SPEC)
 _SPEC.loader.exec_module(CLASSIFIER)
 
-from cad.schema import Ceiling, Room  # noqa: E402
+from cad.schema import Building, Ceiling, Level, Room  # noqa: E402
 
 
 def _room(name: str, use: str = "unknown", area: float = 20.0) -> Room:
@@ -74,6 +74,21 @@ def test_classify_building_mutates_in_place(tiny_building) -> None:
     for lvl in tiny_building.levels:
         for room in lvl.rooms:
             assert room.hazard_class is not None
+
+
+def test_unlabeled_room_on_residential_level_uses_residential_listing() -> None:
+    building = Building(
+        project_id="residential-source-test",
+        levels=[Level(
+            id="l1",
+            name="FIFTH FLOOR",
+            elevation_m=12.0,
+            use="residential",
+            rooms=[_room("Area A Room 1", use="unknown")],
+        )],
+    )
+    CLASSIFIER.classify_building(building)
+    assert building.levels[0].rooms[0].hazard_class == "residential"
 
 
 def test_classify_level_use_detects_garage(medium_building) -> None:

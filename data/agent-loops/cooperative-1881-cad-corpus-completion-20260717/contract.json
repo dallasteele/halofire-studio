@@ -1,0 +1,48 @@
+{
+  "name": "cooperative-1881-cad-corpus-completion-20260717",
+  "owner": "codex",
+  "goal": "Convert the 30 Cooperative 1881 CAD skips into runnable, source-backed acceptance checks by running the real pipeline, sealing exact bid truth from the protected workbook and proposal, and creating a visually verified architectural outer-boundary fixture without suppressing any resulting design failure.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/data/halofire/golden/1881/expected.json",
+    "E:/ClaudeBot/data/halofire/golden/1881/input/MANIFEST.json",
+    "E:/ClaudeBot/data/halofire/golden/1881/input/Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
+    "E:/ClaudeBot/data/halofire/golden/1881/input/GC - Bid Plans/1881 - Architecturals.pdf",
+    "services/halofire-cad/tests/golden/test_cruel_vs_truth.py",
+    "services/halofire-cad/tests/golden/test_intake_real_plan.py",
+    "services/halofire-cad/tests/golden/test_intake_phase_e.py",
+    "hal-brain episodes 64307 and 156960"
+  ],
+  "exit_criteria": [
+    "the sealed truth record is derived from protected proposal/workbook evidence and carries explicit provenance for every populated metric",
+    "the real orchestrator runs against the exact 1881 architectural PDF and emits building_raw.json, building_classified.json, design.json, proposal.json, manifest.json, and pipeline_summary.json in the canonical deliverables directory",
+    "the architectural outer boundary is stored in the same metric coordinate frame as pipeline polygon_m data, overlays a hash-bound real plan page, and passes the IoU gate without manual-review dependency",
+    "the 30 formerly skipped CAD checks execute as assertions; resulting failures are repaired or remain explicit failing acceptance evidence rather than being skipped, weakened, or filled with synthetic data",
+    "primary source replay, cross-source totals, adversarial mutations, formal invariants, rendered PDF inspection, full CAD tests, loop guard, rulebook, and brain postflight are recorded",
+    "no quote, compliance, fabrication, field-release, employee-use, cinematic-reveal, or VPS-release gate is promoted unless the newly active assertions pass"
+  ],
+  "verification_gates": [
+    "protected source hashes exactly match the golden input manifest",
+    "workbook/proposal/head/floor/price totals reconcile across at least two source representations where available",
+    "pipeline artifacts carry exact source PDF hash and deterministic manifest provenance",
+    "the intake candidate boundary is valid and non-bbox, while the independent envelope GeoJSON is translated without scaling into the candidate's building-centroid metric frame and visually aligned on an actual architectural PDF raster",
+    "missing, mutated, substituted, synthetic, and coordinate-shifted artifact attacks reject",
+    "all formerly skipped tests are counted separately as passed, failed, or still skipped with exact reasons",
+    "full services/halofire-cad test suite and focused cruel/intake suites run",
+    "Lean proves the sealed count and artifact-state invariants"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/state.json",
+  "evidence_paths": [
+    "services/halofire-cad/truth/truth.duckdb",
+    "services/halopenclaw-gateway/data/1881-cooperative/deliverables/manifest.json",
+    "services/halofire-cad/tests/fixtures/intake/1881-outer-boundary.geojson",
+    "output/visual-proof/1881-rejected-unregistered-source-overlay.png",
+    "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/state.json",
+    "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/lean-proof.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

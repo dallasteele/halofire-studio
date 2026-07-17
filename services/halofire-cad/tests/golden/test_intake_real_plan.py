@@ -31,6 +31,7 @@ if the output is empty.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -39,10 +40,13 @@ import pytest
 # tests/golden/…py → parents[0]=golden, [1]=tests, [2]=halofire-cad,
 # [3]=services, [4]=halofire-studio (repo root).
 _REPO = Path(__file__).resolve().parents[4]
-_DELIVERABLES = (
-    _REPO / "services" / "halopenclaw-gateway" / "data"
-    / "1881-cooperative" / "deliverables"
-)
+_DELIVERABLES = Path(os.environ.get(
+    "HALOFIRE_CAD_GOLDEN_DELIVERABLES",
+    str(
+        _REPO / "services" / "halopenclaw-gateway" / "data"
+        / "1881-cooperative" / "deliverables"
+    ),
+))
 _BUILDING_RAW = _DELIVERABLES / "building_raw.json"
 _BUILDING_CLASSIFIED = _DELIVERABLES / "building_classified.json"
 _DESIGN = _DELIVERABLES / "design.json"
@@ -51,7 +55,7 @@ _MANIFEST = _DELIVERABLES / "manifest.json"
 
 def _load_or_skip(path: Path) -> dict:
     if not path.exists():
-        pytest.skip(
+        pytest.fail(
             f"pipeline artifact missing: {path.name}. Run Auto-Design "
             "against the 1881 architectural PDF first.",
         )
@@ -253,8 +257,7 @@ def test_classified_hazards_cover_levels() -> None:
     `hazard_class`."""
     cls = _load_or_skip(_BUILDING_CLASSIFIED)
     levels = cls.get("levels") or []
-    if not levels:
-        pytest.skip("no levels in building_classified.json")
+    assert levels, "no levels in building_classified.json"
     covered = [
         lvl for lvl in levels
         if (

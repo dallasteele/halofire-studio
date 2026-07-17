@@ -75,14 +75,6 @@ def _default_project(project_id: str) -> Project:
     )
 
 
-def _default_supply() -> FlowTestData:
-    """Standard municipal-supply assumption when no flow test is in hand."""
-    return FlowTestData(
-        static_psi=75, residual_psi=55, flow_gpm=1000,
-        test_date=None, location=None,
-    )
-
-
 def run_pipeline(
     pdf_path: str,
     project_id: str = "demo",
@@ -102,7 +94,7 @@ def run_pipeline(
     out_dir = out_dir or (Path.cwd() / "out" / project_id)
     out_dir.mkdir(parents=True, exist_ok=True)
     project = project or _default_project(project_id)
-    supply = supply or _default_supply()
+    supply_provided = supply is not None
 
     summary: dict[str, Any] = {"project_id": project_id, "steps": [], "files": {}}
 
@@ -184,9 +176,10 @@ def run_pipeline(
     })
 
     # 5. HYDRAULIC — per-system calc
-    for s in systems:
-        hazard = _system_hazard(bldg, s)
-        s.hydraulic = HYDRAULIC.calc_system(s, supply, hazard)
+    if supply is not None:
+        for s in systems:
+            hazard = _system_hazard(bldg, s)
+            s.hydraulic = HYDRAULIC.calc_system(s, supply, hazard)
     _emit_step({
         "step": "hydraulic",
         "system_count": len(systems),
@@ -207,10 +200,26 @@ def run_pipeline(
             ingest=ingest_confidence,
             classification=0.72,
             layout=0.70 if systems else 0.15,
-            hydraulic=0.72 if all(s.hydraulic for s in systems) else 0.0,
+            hydraulic=(
+                0.72
+                if supply_provided and all(s.hydraulic for s in systems)
+                else 0.0
+            ),
         ),
         metadata=_capability_metadata("alpha"),
     )
+    if not supply_provided:
+        design.issues.append(DesignIssue(
+            code="FLOW_TEST_REQUIRED",
+            severity="blocking",
+            message=(
+                "No project flow test was supplied. Hydraulic demand and "
+                "supply margin remain uncalculated; no assumed municipal "
+                "curve may be used for a compliance claim."
+            ),
+            refs=[project_id],
+            source="hydraulic",
+        ))
     for s in systems:
         if s.hydraulic and s.hydraulic.safety_margin_psi < 5:
             design.issues.append(DesignIssue(
@@ -247,7 +256,11 @@ def run_pipeline(
                 "Loop/grid hydraulic solving is not supported in Internal Alpha; "
                 "tree systems only."
             ),
-        }],
+        }, *([{
+            "code": "FLOW_TEST_REQUIRED",
+            "severity": "blocking",
+            "message": "Project flow-test data is required for hydraulics.",
+        }] if not supply_provided else [])],
     }
     (out_dir / "design.json").write_text(
         json.dumps(design.model_dump(), indent=2, default=str), encoding="utf-8",

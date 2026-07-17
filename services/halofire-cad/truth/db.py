@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass
+import json
 from pathlib import Path
 from typing import Iterator, Optional
 
@@ -32,6 +33,7 @@ except ImportError as e:  # pragma: no cover
 _HERE = Path(__file__).resolve().parent
 _SCHEMA = (_HERE / "schema.sql").read_text(encoding="utf-8")
 _DEFAULT_PATH = _HERE / "truth.duckdb"
+_FIXTURES = _HERE / "fixtures"
 
 
 @dataclass
@@ -191,9 +193,19 @@ def open_db(path: Path | str | None = None) -> Iterator[TruthDB]:
 
 
 def truth_for(project_id: str) -> Optional[TruthRecord]:
-    """Public shortcut used by cruel tests."""
+    """Return DB truth, falling back to a committed sealed fixture."""
     with open_db() as db:
-        return db.get(project_id)
+        record = db.get(project_id)
+    if record is not None:
+        return record
+    fixture_path = _FIXTURES / f"{project_id}.json"
+    if not fixture_path.exists():
+        return None
+    payload = json.loads(fixture_path.read_text(encoding="utf-8"))
+    fields = TruthRecord.__dataclass_fields__
+    return TruthRecord(**{
+        key: value for key, value in payload.items() if key in fields
+    })
 
 
 __all__ = [

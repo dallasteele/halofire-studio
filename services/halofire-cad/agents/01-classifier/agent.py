@@ -135,6 +135,16 @@ def classify_building(building: Building) -> Building:
     for level in building.levels:
         for room in level.rooms:
             hazard, source, conf = classify_room(room)
+            # Unlabeled rooms on a source-classified residential level use
+            # listed-residential spacing. Treating them as generic light
+            # hazard silently expands the grid to 225 ft²/head and badly
+            # undercounts compartmented apartment floors.
+            if (
+                (level.use or "").lower() == "residential"
+                and hazard == "light"
+                and source == "default"
+            ):
+                hazard, source, conf = "residential", "level_use", 0.85
             room.hazard_class = hazard
             by_source[source] = by_source.get(source, 0) + 1
             n_classified += 1
