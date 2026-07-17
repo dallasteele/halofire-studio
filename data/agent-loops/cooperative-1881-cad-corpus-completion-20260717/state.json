@@ -1,14 +1,14 @@
 {
   "name": "cooperative-1881-cad-corpus-completion-20260717",
-  "iteration": 5,
-  "status": "in_progress",
-  "updatedAt": "2026-07-17T02:49:32-07:00",
+  "iteration": 6,
+  "status": "successor_loop_required",
+  "updatedAt": "2026-07-17T03:09:01-07:00",
   "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY", "ITERATE"],
-  "nextStage": "ITERATE",
+  "nextStage": "OPEN_SUCCESSOR_LOOP",
   "brainPreflight": {
     "status": "passed",
-    "relevantEpisodes": [46659, 64307, 156960, 157418],
-    "decision": "Continue the protected 1881 corpus with the exact structural PDF: derive scale from each structural sheet, detect only source vector members, rigid-register through shared labeled datums, require rendered overlay proof, propagate accepted members into 2D and 3D CAD, and keep incomplete obstruction coverage and hydraulic supply fail-closed."
+    "relevantEpisodes": [157533, 46659, 120030, 60864],
+    "decision": "Resolve source-tagged member sections from the exact structural sheets and authoritative AISC/NIST dimensions, recover full LVL callouts, keep minimum-dressed wood distinct from field measurements, and expose the whole-corpus unresolved count instead of the prior one-floor subset."
   },
   "sourceReplay": {
     "architecturalPdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
@@ -30,7 +30,11 @@
     "structuralAreasPerLevel": ["B", "C"],
     "structuralRegistrationMaxResidualFt": 0.0198,
     "sourceColumnsPerLevelAfterPlateClip": [66, 49, 83, 73, 92, 90, 90, 104],
-    "sourceColumnMeshesInGlb": 588
+    "sourceColumnMeshesInGlb": 588,
+    "sourceExactOrSteelDatabaseSections": 241,
+    "sourceBoundedDryMinimumDressedWoodSections": 258,
+    "sourceUnresolvedMemberSections": 1453,
+    "sectionCountScope": "all columns, beams, and joists across all eight registered floors"
   },
   "sealedTruth": {
     "levels": 8,
@@ -42,9 +46,9 @@
   },
   "verification": {
     "formerlyDormantCorpusChecks": "29 passed, 0 failed, 0 skipped",
-    "fullCadSuite": "401 passed, 0 failed, 0 skipped, 25 dependency deprecation warnings",
-    "focusedCruelAndIntake": "29 passed, 0 failed, 0 skipped",
-    "registeredStructureAndViewAdversarial": "8 passed, 0 failed, 0 skipped",
+    "fullCadSuite": "419 passed, 0 failed, 0 skipped in 29.229 seconds",
+    "focusedCruelAndIntake": "67 passed, 0 failed, 0 skipped",
+    "registeredStructureAndViewAdversarial": "included in the 67-test focused lane; altered condition hash/page rejects",
     "structureEngine": "33 passed, 0 failed, 0 skipped",
     "submittalExporter": "13 passed, 0 failed, 0 skipped; typed proposal/DWG focused lane 18 passed",
     "deliverableNativeParsers": "5 PDFs opened (106 pages total), XLSX 3 sheets, DXF 5590 entities/13 layers, GLB 4656 geometries, IFC 40133 entities",
@@ -91,7 +95,7 @@
     "sourceColumnGeometryPresent": true,
     "sourceBeamJoistSectionsComplete": false,
     "sourceObstructionDimensionsRequired": true,
-    "nfpaRuleErrors": 217,
+    "nfpaRuleErrors": 671,
     "nfpaRuleWarnings": 12,
     "proposalHtmlError": null,
     "submittalError": null,
@@ -99,6 +103,7 @@
     "dwgIsPlaceholder": false,
     "dwgError": "ODA File Converter not on PATH; no DWG emitted; validated DXF retained",
     "cutSheetsStubbed": 11,
+    "missingPriceSkus": 5,
     "splitViewRegistrationRequired": false,
     "employeeUseReady": false,
     "vpsReleaseReady": false,
@@ -107,7 +112,12 @@
   },
   "brainPostflight": {
     "status": "passed",
-    "episodeId": 157630,
-    "prePostflightCommit": "4fa5b64f"
+    "wikiPath": "decisions/cooperative-1881-structural-section-truth-iteration-6.md",
+    "prePostflightCommit": "9f2115a4"
+  },
+  "successorReason": {
+    "goalBlocked": false,
+    "iterationBudgetReached": true,
+    "finding": "The 30 skipped checks are executable, but the contract cannot honestly pass while 1453 whole-corpus member sections and beam/joist vertical placement/orientation remain unresolved. Continue in a bounded successor loop rather than weakening the gate."
   }
 }

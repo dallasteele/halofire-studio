@@ -2148,6 +2148,25 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
                     bottom_z_m=0.0,
                     top_z_m=level.height_m,
                 ))
+            structural_members = [
+                *registered_structure.columns_ft,
+                *registered_structure.beams_ft,
+                *registered_structure.joists_ft,
+            ]
+            exact_section_count = sum(
+                1 for value in structural_members
+                if (value.get("section") or {}).get("status")
+                in {"standards-resolved-section", "source-resolved-section"}
+            )
+            bounded_section_count = sum(
+                1 for value in structural_members
+                if (value.get("section") or {}).get("status")
+                in {
+                    "standard-size-bounds-source-condition-required",
+                    "source-bounded-dry-minimum-dressed-section",
+                }
+            )
+            unresolved_section_count = len(structural_members) - exact_section_count - bounded_section_count
             level.obstructions = source_columns
             level.metadata.update({
                 "registered_source_structure": True,
@@ -2158,6 +2177,20 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
                 "source_column_count": len(source_columns),
                 "source_beam_centerline_count": len(registered_structure.beams_ft),
                 "source_joist_centerline_count": len(registered_structure.joists_ft),
+                "source_exact_section_count": exact_section_count,
+                "source_bounded_section_count": bounded_section_count,
+                "source_unresolved_section_count": unresolved_section_count,
+                "source_member_section_gate": {
+                    "passed": unresolved_section_count == 0 and bounded_section_count == 0,
+                    "exact": exact_section_count,
+                    "bounded": bounded_section_count,
+                    "unresolved": unresolved_section_count,
+                    "reason": (
+                        "Wood sections are PS 20-20 minimum dressed dimensions rather than field measurements, and some framing centerlines omit complete member tags."
+                        if bounded_section_count or unresolved_section_count else None
+                    ),
+                },
+                "source_material_conditions": registered_structure.material_conditions,
             })
         levels.append(level)
 

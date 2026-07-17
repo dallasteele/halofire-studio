@@ -68,13 +68,23 @@ const MEMBER_KINDS = Object.freeze([
   { kind: 'steel-wf', role: 'beam', re: /\bW\d{1,2}\s?[xX]\s?\d{1,3}\b/ },
   { kind: 'steel-channel', role: 'beam', re: /\bC\d{1,2}\s?[xX]\s?\d{1,3}(?:\.\d)?\b/ },
   { kind: 'steel-angle', role: 'brace', re: /\bL\d\s?[xX]\s?\d(?:\s?[xX]\s?\d\/?\d{0,2})?\b/ },
-  { kind: 'engineered', role: 'beam', re: /\b(GLB|GLULAM|LVL|PSL)\b/i },
+  { kind: 'engineered', role: 'beam', re: /\b(GLB|GLULAM|PSL)\b/i },
   { kind: 'wood-sawn', role: 'beam', re: /\b\d{1,2}\s?[xX]\s?\d{1,2}\b/ },
 ]);
 
 /** PURE. Classify a single text token to a member {kind, role, size} or null. */
 export function classifyMember(text) {
   const t = String(text || '');
+  // Preserve the complete source dimension for LVL tags. A bare "LVL" in a
+  // note (for example, "side of main floor LVL joist") is not a member size.
+  const lvl = t.match(/\((\d+)\)\s*(\d+)\s+(\d+)\/(\d+)\s*[xX]\s*(\d+)\s+(\d+)\/(\d+)\s*LVL\b/i);
+  if (lvl) {
+    return {
+      kind: 'engineered',
+      role: 'beam',
+      size: `(${lvl[1]})${lvl[2]}-${lvl[3]}/${lvl[4]}X${lvl[5]}-${lvl[6]}/${lvl[7]}LVL`,
+    };
+  }
   for (const { kind, role, re } of MEMBER_KINDS) {
     const m = t.match(re);
     if (m) return { kind, role, size: m[0].replace(/\s+/g, '').toUpperCase() };

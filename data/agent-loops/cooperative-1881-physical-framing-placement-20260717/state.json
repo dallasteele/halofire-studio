@@ -1,0 +1,27 @@
+{
+  "name": "cooperative-1881-physical-framing-placement-20260717",
+  "iteration": 1,
+  "status": "in_progress",
+  "updatedAt": "2026-07-17T03:09:01-07:00",
+  "completedStages": ["DISCOVER"],
+  "nextStage": "PLAN",
+  "brainPreflight": {
+    "status": "passed",
+    "relevantEpisodes": [157533, 46659, 120030, 60864],
+    "decision": "Continue from exact section recovery into physical placement only where the structural plan and section/elevation sources jointly provide orientation and vertical datum."
+  },
+  "baseline": {
+    "exactSourceOrSteelDatabaseSections": 241,
+    "boundedDryMinimumDressedWoodSections": 258,
+    "unresolvedMemberSections": 1453,
+    "sourceColumnMeshesInGlb": 588,
+    "promotedBeamOrJoistSolids": 0,
+    "nfpaRuleErrors": 671,
+    "nfpaRuleWarnings": 12,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false,
+    "codeComplianceReady": false,
+    "fabricationReady": false
+  },
+  "currentQuestion": "Which structural plan line conventions and section/elevation callouts provide defensible beam/joist orientation and top/bottom Z per floor without reusing a nominal floor height as structural truth?"
+}

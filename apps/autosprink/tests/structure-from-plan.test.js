@@ -22,7 +22,10 @@ describe('classifyMember', () => {
     expect(classifyMember('W12x26')).toMatchObject({ kind: 'steel-wf', role: 'beam', size: 'W12X26' });
   });
   it('classifies engineered + sawn wood beams', () => {
-    expect(classifyMember('(1)1 3/4x11 7/8 LVL')).toMatchObject({ kind: 'engineered', role: 'beam' });
+    expect(classifyMember('(1)1 3/4x11 7/8 LVL')).toEqual({
+      kind: 'engineered', role: 'beam', size: '(1)1-3/4X11-7/8LVL',
+    });
+    expect(classifyMember('WALL TO SIDE OF MAIN FLOOR LVL JOIST.')).toBeNull();
     expect(classifyMember('6x12')).toMatchObject({ kind: 'wood-sawn', role: 'beam', size: '6X12' });
   });
   it('returns null for non-member text', () => {

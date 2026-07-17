@@ -71,3 +71,40 @@ currently mounted source set. Those facts do not create a supply curve, so
 hydraulics remain fail-closed. Eleven cut sheets are still stubs, ODA is absent,
 beam/joist sections remain incomplete, and rule/design/riser/drain acceptance is
 not promoted.
+
+## Iteration 6 - source-tagged structural section truth
+
+The old structural dimensional status was materially incomplete: its displayed
+`82` unresolved count came only from one floor's beam/joist subset. The complete
+eight-floor replay now reports every registered column, beam, and joist:
+
+- 241 exact source-printed LVL or AISC-resolved steel sections;
+- 258 source-bounded dry-service minimum-dressed sawn-wood sections; and
+- 1,453 unresolved members whose complete section is not present in extracted
+  source evidence.
+
+The parser previously reduced full labels such as `(3)1 3/4x11 7/8 LVL` to the
+bare word `LVL` and also misclassified prose like `LVL JOIST` as a section. It
+now retains ply count, ply thickness, and depth, while bare LVL prose rejects.
+The structural PDF's page-3 dry-service/19%-maximum-moisture note is bound by
+page and PDF SHA-256. AISC Shapes Database v16.0 dimensions resolve W10X30,
+W12X45, and W18X50; HSS/angle dimensions remain tied to the complete printed
+tag; NIST PS 20-20 dry and green minimum dressed sizes remain distinct and are
+not mislabeled as field measurements.
+
+Adversarial tests reject a substituted material-condition hash or page. The
+canonical replay remains fail-closed: exact section identity alone does not
+invent beam/joist elevation, rotation, bearing, or connection geometry, so the
+new section evidence is not promoted to fabrication solids. The current replay
+surfaces 671 rule errors, 12 warnings, five unpriced SKUs, eleven cut-sheet
+stubs, and the same missing hydraulic supply curve.
+
+- Full CAD suite: 419 passed, 0 failed, 0 skipped (29.229 seconds).
+- Focused golden/registered/adversarial lane: 67 passed, 0 failed, 0 skipped.
+- Structure parser lane: 33 passed, 0 failed, 0 skipped.
+- Brain postflight:
+  `decisions/cooperative-1881-structural-section-truth-iteration-6.md`.
+
+This loop reached its six-iteration budget without weakening acceptance. The
+goal is not blocked; physical placement/orientation and obstruction propagation
+continue in a successor closed loop.

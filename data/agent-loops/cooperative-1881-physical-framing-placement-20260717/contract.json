@@ -1,0 +1,48 @@
+{
+  "name": "cooperative-1881-physical-framing-placement-20260717",
+  "owner": "codex",
+  "goal": "Convert only source-supported Cooperative 1881 structural members into dimensioned 2D obstruction envelopes and vertically placed 3D framing solids, then rerun sprinkler clearance/layout checks without inventing orientation, elevation, bearing, or connection geometry.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/HaloFireBidDocs/1-Bid Documents/GC - Bid Plans/1881 - Structurals.pdf",
+    "E:/ClaudeBot/data/halofire/golden/1881/input/GC - Bid Plans/1881 - Architecturals.pdf",
+    "services/halofire-cad/agents/00-intake/registered-geometry/1881-structurals.json",
+    "services/halofire-cad/agents/00-intake/registered_structures.py",
+    "apps/autosprink/src/engine/structure-from-plan.js",
+    "data/agent-loops/cooperative-1881-cad-corpus-completion-20260717/evidence.md",
+    "hal-brain episodes 157533, 46659, 120030, 60864 and decision cooperative-1881-structural-section-truth-iteration-6"
+  ],
+  "exit_criteria": [
+    "every promoted beam, joist, and column has hash-bound source XY, a resolved section, source-supported plan orientation, and source-supported vertical datum/elevation",
+    "members lacking any required physical placement field remain explicit unresolved evidence and are absent from fabrication or compliance solids",
+    "2D plan proof overlays promoted physical envelopes on the exact structural PDF pages with member tags visible",
+    "3D proof shows floor-by-floor architecture, structural framing, pipes, and heads in the same registered coordinate frame",
+    "obstruction-aware placement/routing reruns against promoted members and reports all remaining NFPA errors without waivers",
+    "DXF, GLB, IFC, submittal PDF, and canonical JSON carry matching member counts and provenance",
+    "focused, adversarial, full-suite, native-parser, visual, loop, rulebook, and brain postflight gates pass"
+  ],
+  "verification_gates": [
+    "structural source PDF and manifest hashes match before use",
+    "printed member tag, plan centerline, section dimension, orientation, and vertical datum are independently required for solid promotion",
+    "altered member tag, source hash, source page, endpoint, floor binding, orientation, or elevation rejects",
+    "source PDF overlay proves 2D member envelope alignment",
+    "3D render proves architecture/structure/sprinkler co-registration floor by floor",
+    "unresolved count cannot decrease unless new source evidence is recorded",
+    "all formerly skipped and full CAD tests report explicit pass/fail/skip counts",
+    "VPS/employee/code/fabrication release remains false until all separate release gates pass"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-physical-framing-placement-20260717/state.json",
+  "evidence_paths": [
+    "services/halofire-cad/agents/00-intake/registered-geometry/1881-structurals.json",
+    "services/halopenclaw-gateway/data/1881-cooperative/deliverables/building_raw.json",
+    "services/halopenclaw-gateway/data/1881-cooperative/deliverables/design.glb",
+    "output/visual-proof/1881-physical-framing-source-overlay.png",
+    "output/visual-proof/1881-physical-framing-3d.png",
+    "data/agent-loops/cooperative-1881-physical-framing-placement-20260717/evidence.md"
+  ],
+  "max_iterations": 8,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

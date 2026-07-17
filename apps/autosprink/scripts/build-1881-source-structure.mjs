@@ -259,7 +259,10 @@ async function main() {
     const beams = uniqueByGeometry([...overheadB.projected.beams, ...overheadC.projected.beams]);
     const joists = uniqueByGeometry([...overheadB.projected.joists, ...overheadC.projected.joists]);
     const lineRows = [...beams, ...joists];
-    const unresolvedLineDimensions = lineRows.filter((row) => !row.member).length;
+    const exactLineSections = lineRows.filter((row) => row.member
+      && /^(?:HSS|W\d|L\d|\(\d+\).+LVL)/i.test(row.member)).length;
+    const dryStandardMinimumLineSections = lineRows.filter((row) => /^\d+X\d+$/i.test(row.member || '')).length;
+    const unresolvedLineDimensions = lineRows.length - exactLineSections - dryStandardMinimumLineSections;
     levels[spec.sheet] = {
       architectural_page_index: architecturalManifest.sheets[spec.sheet].page_index,
       coordinate_frame: 'registered-architectural-plan-feet',
@@ -280,8 +283,10 @@ async function main() {
       dimensional_gate: {
         passed: false,
         column_geometry: 'source vector marker envelopes retained',
+        exact_source_or_steel_database_beam_or_joist_sections: exactLineSections,
+        dry_ps20_minimum_dressed_beam_or_joist_sections: dryStandardMinimumLineSections,
         unresolved_beam_or_joist_sections: unresolvedLineDimensions,
-        reason: 'Framing centerlines without a source member tag cannot be assigned an invented physical width/depth.',
+        reason: 'Untagged framing centerlines remain unresolved; dry PS20 sizes are minimum dressed dimensions, not field measurements.',
       },
     };
   }
@@ -294,6 +299,16 @@ async function main() {
     source_architectural_pdf_sha256: architecturalSha256,
     source_structural_pdf_path: STRUCT_PDF,
     source_structural_pdf_sha256: structuralSha256,
+    material_conditions: {
+      wood_service_condition: 'dry',
+      maximum_sawn_lumber_moisture_percent: 19,
+      source: {
+        pdf_sha256: structuralSha256,
+        page_index: 2,
+        page_number: 3,
+        text: 'Dry service conditions assumed. Max moisture content of 19% for Sawn Lumber and Connections.',
+      },
+    },
     architectural_registration_manifest_sha256: await sha256(ARCH_MANIFEST),
     generator: 'apps/autosprink/scripts/build-1881-source-structure.mjs',
     claims: {
