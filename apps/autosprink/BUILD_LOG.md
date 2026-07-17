@@ -1,5 +1,30 @@
 # HaloFire Build Log
 
+## 2026-07-17 - Cooperative 1881 native issued structural DWG geometry receipt
+
+- Started a separate closed-loop source lane after locating the active-project
+  native structural CAD directory with S-190 roof framing, S-201/S-202
+  elevations, and S-301/S-302/S-303 building sections. The lane is explicitly
+  hash-bound and read-only: issued design DWGs can supply observed geometry,
+  but are not supplier fabrication proof and cannot clear framing, sprinkler
+  clearance, code, employee, or VPS claims.
+- Replayed the six sealed native DWGs with `@mlightcad/libredwg-web@0.7.7`:
+  all have `unknownEntityCount: 0`. S-190 yields 2,261 structural/grid source
+  lines and 27 grid labels; S-201/S-202/S-301/S-302/S-303 retain their own
+  source text controls without inventing cross-sheet associations. The receipt
+  reproduced exactly on a second run (`6B651694AFC25F80FF81F749BF740B295455085DEA1AB262CE3E5BEAF0ED280B`).
+- Rendered and inspected the native S-190 linework directly in a browser. The
+  proof shows both real roof-plan bodies and explicitly labels itself as a
+  source-only CAD receipt: no PDF overlay, sprinkler, fabricated member,
+  clearance, or code claim. Focused source/roof geometry tests pass 80/80;
+  production build, loop guard, and agentic-rules verifier pass. GX10 prover
+  health is unavailable, so no formal-proof claim is made.
+- Next: build a separate cross-sheet member-context gate. It must bind a
+  member tag, actual source dimensions/profile, plan orientation, vertical
+  datum, and plan-to-section/elevation context before physical framing or any
+  obstruction calculation changes. Supplier source remains separately required
+  for fabrication/connection claims.
+
 ## 2026-07-15 - New Hope CMI.06 fitting and exact vertical-outlet registration
 
 - Rendered and visually inspected the exact New Hope field-set FP2.0 crop (`4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5`) beside fabrication-listing page 15 (`2E01CB3C2C39289846DF0A17A758E6D1DE4F5A682ED139556BD864BF6F8BD734`). Both identify CMI.06 as the 3-inch, 21-foot cross-main piece; the listing proves four 3 x 1 threaded outlets Up:0 plus one 3 x 2-1/2 grooved outlet Toward:90.

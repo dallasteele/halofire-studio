@@ -17,9 +17,10 @@ const localRootPaths = process.env.HALOFIRE_CORPUS_ROOTS
 const sharedRootPaths = process.env.HALOFIRE_SHARED_CORPUS_ROOTS
   ? process.env.HALOFIRE_SHARED_CORPUS_ROOTS.split(';').map((entry) => entry.trim()).filter(Boolean)
   : [
-    // The shared-drive bid log identifies Cooperative 1881 as a Kier Construction bid.
-    // Keep this narrow; a whole-drive crawl is neither deterministic nor evidence-complete.
-    'Y:/Shared/HaloOps/01-Bids/Kier',
+    // The bid log identifies Kier Construction and the active-job corpus contains
+    // the exact Cooperative 1881 project folder. Keep discovery project-scoped;
+    // a contractor-wide or whole-drive crawl is neither deterministic nor complete.
+    'Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT',
   ];
 const sharedDirectoryOffset = Number.parseInt(process.env.HALOFIRE_SHARED_CORPUS_DIRECTORY_OFFSET || process.env.HALOFIRE_CORPUS_DIRECTORY_OFFSET || '0', 10);
 const candidates = JSON.parse(fs.readFileSync(path.join(APP, 'src/data/registered-roof-framing.cooperative-1881.json'), 'utf8'));

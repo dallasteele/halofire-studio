@@ -13,6 +13,7 @@
     "build:1881-structure": "node scripts/build-1881-source-structure.mjs",
     "build:1881-roof-framing": "node scripts/build-1881-roof-framing-placement.mjs",
     "build:1881-source-evidence-discovery": "node scripts/build-1881-source-evidence-discovery.mjs",
+    "build:1881-issued-structural-dwg-geometry": "node scripts/extract-cooperative-1881-issued-structural-dwg-geometry.mjs",
     "build:1881-roof-framing-clearance-preflight": "node scripts/build-1881-roof-framing-clearance-preflight.mjs",
     "audit:new-hope-support-cad": "node scripts/audit-new-hope-support-cad-corpus.mjs",
     "audit:victaulic-ab2-cad": "node scripts/audit-victaulic-ab2-dxf.mjs",

@@ -1,0 +1,40 @@
+{
+  "name": "cooperative-1881-issued-structural-dwg-geometry-20260717",
+  "iteration": 1,
+  "status": "completed",
+  "updatedAt": "2026-07-17T11:12:00-07:00",
+  "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY"],
+  "nextStage": "OPEN_CROSS_SHEET_MEMBER_CONTEXT_SUCCESSOR_LOOP",
+  "sourceDiscovery": {
+    "status": "passed",
+    "structuralRoot": "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural",
+    "requiredSheets": ["S-190", "S-201", "S-202", "S-301", "S-302", "S-303"],
+    "missingSheets": []
+  },
+  "claims": {
+    "issuedStructuralDwgLocated": true,
+    "nativeGeometryExtracted": true,
+    "exactPhysicalFramingPromoted": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "fabricationReady": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "knownResiduals": [
+    "The historical supplier-lead loop remains a valid source for fabrication/connection evidence; this issued-design DWG loop does not weaken that rule.",
+    "Native structural plan/elevation/section files must still be parsed and cross-bound before they can become geometry observations.",
+    "Exact member dimensions, truss profiles, connections, selected sprinklers, and NFPA obstruction criteria remain unresolved until explicitly source-bound."
+  ],
+  "verification": {
+    "agentLoopGuard": "passed",
+    "nativeDwgReplay": "passed twice with identical cooperative-1881-issued-structural-dwg-geometry.json SHA-256 6B651694AFC25F80FF81F749BF740B295455085DEA1AB262CE3E5BEAF0ED280B",
+    "nativeDwgSources": "S-190, S-201, S-202, S-301, S-302, and S-303 each parsed with unknownEntityCount 0",
+    "focusedJavaScript": "80 passed, 0 failed, 0 skipped",
+    "autosprinkProductionBuild": "passed",
+    "agenticRulebook": "passed",
+    "sourceVisual": "passed as a source-only native DWG receipt at output/visual-proof/1881-issued-structural-dwg-geometry.svg; visible browser inspection showed both S-190 roof-plan bodies and no sprinkler overlay",
+    "formalProof": "GX10_PROVER_UNAVAILABLE: http://127.0.0.1:8810/api/provers/health refused connection"
+  }
+}

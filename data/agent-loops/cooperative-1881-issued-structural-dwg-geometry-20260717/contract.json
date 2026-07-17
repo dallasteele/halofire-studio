@@ -1,0 +1,46 @@
+{
+  "name": "cooperative-1881-issued-structural-dwg-geometry-20260717",
+  "owner": "codex",
+  "goal": "Extract only hash-bound, source-supported Cooperative 1881 roof framing plan and elevation/section geometry from the native issued structural DWGs, then expose the exact residual blockers without treating issued design drawings as supplier fabrication proof or sprinkler-clearance proof.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-190 - OVERALL ROOF FRAMING PLAN.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-201 - ELEVATIONS.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-202 - ELEVATIONS.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-301 - BUILDING SECTIONS.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-302 - BUILDING SECTIONS.dwg",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/structural/240069_1881 W North Temple_ST25-Sheet - S-303 - BUILDING SECTIONS.dwg",
+    "apps/autosprink/scripts/inspect-dwg-registration-candidates.mjs",
+    "apps/autosprink/src/engine/source-evidence-corpus.js",
+    "apps/autosprink/src/data/registered-roof-framing.cooperative-1881.json",
+    "apps/autosprink/src/data/roof-framing-placement.cooperative-1881.json"
+  ],
+  "exit_criteria": [
+    "each issued DWG source has a recorded byte length, SHA-256, LibreDWG parser receipt, unknown-entity count, and bounded text/layer/entity evidence",
+    "a roof-plan member or roof-plane claim is emitted only when its source handle, text, layer, and coordinate evidence are recorded",
+    "elevation/section controls are kept separate from plan controls and only linked when their explicit source evidence identifies the same structural context",
+    "the output explicitly distinguishes source-proven geometry observations from unresolved dimensional, connection, supplier, sprinkler-clearance, fabrication, code, employee, and VPS release gates",
+    "source-hash substitution, source-sheet substitution, text/handle omission, parser-unknown regression, and false-promotion mutations reject",
+    "the native-DWG source artifact can be rendered as visual evidence without using an invented PDF or geometry overlay"
+  ],
+  "verification_gates": [
+    "all six native DWGs are readable through the pinned LibreDWG parser",
+    "source hash and parser receipts reproduce across two runs",
+    "bounded plan/elevation/section extraction records no fabricated dimensional conversion",
+    "existing roof-framing clearance preflight remains fail-closed unless a later exact member geometry and sprinkler-criteria gate passes",
+    "focused adversarial tests, production build, agent-loop guard, agentic-rule check, source visual inspection, formal-prover health/proof, and brain postflight are recorded"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-issued-structural-dwg-geometry-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/roof-framing-source-discovery.cooperative-1881.json",
+    "apps/autosprink/src/data/cooperative-1881-issued-structural-dwg-geometry.json",
+    "output/visual-proof/1881-issued-structural-dwg-geometry.svg",
+    "data/agent-loops/cooperative-1881-issued-structural-dwg-geometry-20260717/state.json",
+    "data/agent-loops/cooperative-1881-issued-structural-dwg-geometry-20260717/evidence.md"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
