@@ -1,9 +1,9 @@
 {
   "artifactType": "halofire.agent-loop-state.v1",
   "loop": "new-hope-system-backbone-20260716",
-  "iteration": 5,
+  "iteration": 6,
   "status": "active",
-  "brainPreflight": { "status": "passed", "episodes": [150514, 150555, 149978, 155497] },
+  "brainPreflight": { "status": "passed", "episodes": [150514, 150555, 149978, 155497, 150639] },
   "truth": {
     "newHopeDrySystemEvidenceAdapterReady": true,
     "actualApprovedPlanUnderlayReady": true,
@@ -30,6 +30,15 @@
     "nativeWetOutletCount": 217,
     "nativeWetFittingRecordCount": 67,
     "nativeWetCutLengthFt": 1477.333333,
+    "nativeWetPipeRecordCount": 167,
+    "uniqueApprovedListingDefinitionCount": 165,
+    "approvedListingFabricatedUnitCount": 169,
+    "nativeRowToApprovedListingDefinitionReady": true,
+    "threadedCutLengthCrossSourceReady": true,
+    "exactThreadedCutLengthMatchCount": 67,
+    "listingQuantityExpansionReady": false,
+    "unexpandedApprovedListingUnitCount": 2,
+    "weldedCutLengthCrossSourceReady": false,
     "pieceToPlanVectorMappingReady": false,
     "headTypeAssignmentReady": true,
     "ty3231PendentHeadCount": 164,
@@ -48,14 +57,14 @@
     "vpsDeploymentAllowed": false
   },
   "verification": {
-    "focusedTests": "25 passed across 3 files; pipe-vector, head-coordinate, per-head type, proven-claim demotion, native-piece-length, source-hash, hydraulic-margin, and seven false-promotion mutations reject",
+    "focusedTests": "31 passed across 4 files; pipe-vector, head-coordinate, per-head type, native-piece-length, listing hash, missing listing definition, listing page, threaded length, hydraulic margin, and false-promotion mutations reject",
     "build": "passed",
     "loopGuard": "passed",
     "rulebook": "passed",
-    "lean": "verified by Lean 4.13.0 in 113 ms; 164 plus 6 plus 4 closes the 174-head schedule while remaining geometry gaps still block installed 3D and fabrication; receipt lean-proof.json",
-    "deterministicVisual": "passed; wet-level1-source-network.png inspected at original resolution over actual FP1.0 with three type colors and exact 164/6/4 caption",
-    "browser": "prior iteration passed; iteration 5 interactive audit still unavailable because the in-app browser runtime exposed zero controllable browsers; local HTTP served typed HTML and exact evidence receipt 4fdd05ed323869a47e0a968a1c4f568a85a5f8d9fefcdaaf142e3e4bc29686e5 with 164/6/4 types true and piece mapping/installed elevation false",
-    "brainPostflight": "passed; episode 156335"
+    "lean": "verified by Lean 4.13.0 in 75 ms; 167 native records, 165 unique listing definitions, 169 listed units, and two unexpanded units are formally distinct, and missing welded length, quantity expansion, and plan placement keep fabrication false; receipt lean-listing-crosswalk-proof.json",
+    "deterministicVisual": "passed; wet-level1-source-network.png and wet-listing-crosswalk-browser.png inspected at original resolution over actual FP1.0 and actual approved listing renders; screenshot SHA256 1DD922B7396BA12CFC01318EDA9041E83F5DF03AA5AFC1074A1D2F585BAD075F",
+    "browser": "passed through Playwright CLI at local HTTP 127.0.0.1:3312; proofReady true, crosswalk true, quantity expansion false, quote/field release false, 12 sample rows rendered, and console reported zero errors and zero warnings",
+    "brainPostflight": "passed; episode 156373"
   },
-  "nextAction": "Resolve exact piece-to-plan mapping, pipe direction/grade, and installed elevations from the source corpus; the field sheet exposes only 98 visible piece-label anchors for 167 native pieces, so use the listing package rather than guessing the missing registrations. Then resolve field drain and source-feed route geometry. Use Addendum 02 for the auth-gated client reveal only after the shared real geometry is release-worthy; require a current flow test for every new quote."
+  "nextAction": "Recover welded listing dimensions and quantity-expanded plan placements for BL34.01 and BL35.01 from the protected listing/source sheets or a traceable completed-project calibration without guessing. Then resolve the remaining exact piece-to-plan mapping, pipe direction/grade, installed elevations, field drain routes, and source-feed route geometry. Use Addendum 02 for the auth-gated client reveal only after the shared real geometry is release-worthy; require a current flow test for every new quote."
 }

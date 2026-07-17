@@ -1,0 +1,17 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-system-backbone-20260716/lean-listing-crosswalk-request.json",
+  "theoremNames": [
+    "nativeRecordsReconcileWithoutFlatteningListedUnits",
+    "listingCrosswalkDoesNotPromoteFabrication"
+  ],
+  "claim": "The 167 native wet pipe records reconcile to 165 unique approved listing definitions while the listing expands to 169 fabricated units, leaving two quantity units explicitly unexpanded. Even with 67 exact threaded length matches, missing welded cross-source lengths, quantity expansion, and piece-to-plan placement keep fabrication false.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 75,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

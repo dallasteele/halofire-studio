@@ -1,17 +1,20 @@
 {
   "artifactType": "halofire.visual-review-receipt.v1",
   "surface": "new-hope-system-backbone",
-  "url": "http://127.0.0.1:3301/apps/autosprink/src/data/proofs/new-hope-system-backbone/index.html",
+  "url": "http://127.0.0.1:3312/apps/autosprink/src/data/proofs/new-hope-system-backbone/index.html",
   "viewport": { "width": 1440, "height": 1000 },
   "sourceUnderlays": {
     "approvedFp20": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/approved-fp20-full-underlay.png",
     "asBuiltFp10RiserSection": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/asbuilt-fp10-riser-section.png",
-    "fieldInstallFp10WetNetwork": "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-level1-source-network.png"
+    "fieldInstallFp10WetNetwork": "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-level1-source-network.png",
+    "approvedWeldedListing": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/listing-complete-welded-page20.png",
+    "approvedThreadedListing": "apps/autosprink/src/data/proofs/new-hope-truss-clearance/listing-complete-threaded-page42.png"
   },
   "screenshots": [
     "output/visual-proof/new-hope-system-backbone-supply.png",
     "output/visual-proof/new-hope-system-backbone-wet-dry-riser.png",
-    "output/visual-proof/new-hope-system-backbone-3d-current.png"
+    "output/visual-proof/new-hope-system-backbone-3d-current.png",
+    "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-listing-crosswalk-browser.png"
   ],
   "compositionAudit": {
     "layout": "raw flow-test crop, approved water table, actual plan, and wet/dry riser section dominate; proof annotations remain subordinate",
@@ -35,6 +38,14 @@
     "currentFlowTestReady": false,
     "wetRiserAndDrainEvidenceReady": true,
     "fieldDrainRoutesResolved": false,
+    "wetSystemListingDefinitionCrosswalkReady": true,
+    "wetSystemListingQuantityExpansionReady": false,
+    "crosswalkRenderedRowCount": 12,
+    "nativePipeRecordCount": 167,
+    "uniqueListingDefinitionCount": 165,
+    "listingFabricatedUnitCount": 169,
+    "exactThreadedLengthMatchCount": 67,
+    "unexpandedListingUnitCount": 2,
     "quoteReady": false,
     "canvasReady": true,
     "releasedRouteCount": 0,
@@ -53,14 +64,21 @@
     "headCrossSourceMaxResidualPt": 0.0094,
     "headTypeCounts": { "TY3231": 164, "V3506": 6, "TY3131": 4 },
     "headTypeColorKey": { "TY3231": "magenta", "V3506": "amber", "TY3131": "green" },
-    "interactiveBrowserAudit": "pending; in-app browser runtime exposed no controllable browser on iteration 4"
+    "interactiveBrowserAudit": "passed through Playwright CLI on iteration 6; proofReady true, exact crosswalk metrics rendered, 12 sample rows present, release gates false, and console reported zero errors and zero warnings",
+    "listingCrosswalkScreenshot": {
+      "path": "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-listing-crosswalk-browser.png",
+      "bytes": 344011,
+      "sha256": "1DD922B7396BA12CFC01318EDA9041E83F5DF03AA5AFC1074A1D2F585BAD075F",
+      "inspection": "passed at original resolution; actual welded and threaded listing renders, exact record-definition-unit counts, sample row identities, and explicit BL34.01/BL35.01 quantity gaps are legible without overlap or clipping"
+    }
   },
   "iterations": [
     { "iteration": 1, "decision": "rejected", "reason": "riser and node-118 labels collided at their real close spacing" },
     { "iteration": 2, "decision": "passed", "reason": "optical label offsets separate both identities while preserving exact marker coordinates" },
     { "iteration": 3, "decision": "passed-for-bounded-evidence", "reason": "live Egnyte supply and as-built sources prove the historical no-pump decision and wet-riser identities while unreleased wet-network and field routes remain visibly absent" },
     { "iteration": 4, "decision": "passed-for-deterministic-source-render", "reason": "the complete field-install wet layout was replayed over the actual FP1.0 source and inspected at original resolution; new interactive browser audit remains pending because no browser binding was exposed" },
-    { "iteration": 5, "decision": "passed-for-native-head-type-assignment", "reason": "four open-circle center-mark symbols, six quadrant-fill symbols, and 164 radial-fill symbols reconcile exactly across field-install, as-built, and the 164/6/4 source schedule; the proof image uses distinct type colors without changing source geometry" }
+    { "iteration": 5, "decision": "passed-for-native-head-type-assignment", "reason": "four open-circle center-mark symbols, six quadrant-fill symbols, and 164 radial-fill symbols reconcile exactly across field-install, as-built, and the 164/6/4 source schedule; the proof image uses distinct type colors without changing source geometry" },
+    { "iteration": 6, "decision": "passed-for-listing-definition-crosswalk", "reason": "all 167 native wet pipe records reconcile to 165 exact definitions in the protected listing, 67 threaded lengths match exactly, and the browser proof explicitly preserves the 169-unit listing total plus two unexpanded quantity units without promoting plan placement or fabrication" }
   ],
   "decision": "passed-for-source-evidence-only",
   "releaseDecision": "blocked"

@@ -11,6 +11,7 @@ const sources = () => ({
   hydraulicRoutes: ['2-1', '2-2', '2-3'].map((id) => load(`../src/data/new-hope-approved-fp20-hydraulic-route-${id}.json`)),
   waterSupplyAndWetRiser: load('../src/data/new-hope-approved-water-supply-wet-riser-evidence.json'),
   wetLevel1NetworkEvidence: load('../src/data/new-hope-wet-level1-network-evidence.json'),
+  fabricationEndSchedule: load('../src/data/new-hope-fabrication-end-schedule.json'),
 });
 
 describe('New Hope source-bound system backbone evidence', () => {
@@ -63,6 +64,8 @@ describe('New Hope source-bound system backbone evidence', () => {
       blockers: expect.arrayContaining([
         'BACKBONE_NEW_QUOTE_FLOW_TEST_REQUIRED',
         'NH_WET_SYSTEM_PIECE_TO_PLAN_MAPPING_REQUIRED',
+        'NH_WET_SYSTEM_LISTING_QUANTITY_EXPANSION_REQUIRED',
+        'NH_WET_SYSTEM_WELDED_LISTING_DIMENSION_RECONCILIATION_REQUIRED',
         'NH_WET_SYSTEM_DIRECTION_AND_GRADE_REQUIRED',
         'NH_WET_SYSTEM_INSTALLATION_3D_PATH_REQUIRED',
         'NH_FIELD_ROUTE_DRUM_DRIP_GEOMETRY_REQUIRED',
@@ -83,6 +86,10 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.sprinklerHeadPositions2dReady).toBe(true);
     expect(result.wetSystemHeadTypeAssignmentReady).toBe(true);
     expect(result.nativeFabricationTakeoffReady).toBe(true);
+    expect(result.wetSystemListingDefinitionCrosswalkReady).toBe(true);
+    expect(result.wetSystemThreadedCutLengthCrossSourceReady).toBe(true);
+    expect(result.wetSystemListingQuantityExpansionReady).toBe(false);
+    expect(result.wetSystemWeldedCutLengthCrossSourceReady).toBe(false);
     expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED');
     expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_HEAD_TYPE_ASSIGNMENT_REQUIRED');
     expect(result.plan2d.wetLevel1.pipeVectors).toHaveLength(300);
@@ -97,6 +104,13 @@ describe('New Hope source-bound system backbone evidence', () => {
       outletCount: 217,
       fittingRecordCount: 67,
       totalCutLengthFt: 1477.333333,
+    }));
+    expect(result.takeoff.wetLevel1NativeFabrication.listingCrosswalk.metrics).toEqual(expect.objectContaining({
+      nativePipeRecordCount: 167,
+      uniqueListingDefinitionCount: 165,
+      exactThreadedLengthMatchCount: 67,
+      listingFabricatedUnitCount: 169,
+      unexpandedListingUnitCount: 2,
     }));
     expect(result.takeoff.systemComponents).toEqual(expect.arrayContaining([
       expect.objectContaining({ key: 'wet_test_and_drain_prv', quantity: 1 }),

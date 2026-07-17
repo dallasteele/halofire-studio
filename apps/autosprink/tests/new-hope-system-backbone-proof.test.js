@@ -30,6 +30,7 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-3.json');
     expect(script).toContain('../../new-hope-approved-water-supply-wet-riser-evidence.json');
     expect(script).toContain('../../new-hope-wet-level1-network-evidence.json');
+    expect(script).toContain('../../new-hope-fabrication-end-schedule.json');
   });
 
   it('surfaces release-state truth in the DOM and hides the unreleased 3D source leg', () => {
@@ -42,11 +43,24 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(proofScript).toContain("root.sprinklerHeadPositions2dReady = String(result.sprinklerHeadPositions2dReady)");
     expect(proofScript).toContain("root.wetSystemHeadTypeAssignmentReady = String(result.wetSystemHeadTypeAssignmentReady)");
     expect(proofScript).toContain("root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady)");
+    expect(proofScript).toContain("root.wetSystemListingDefinitionCrosswalkReady = String(result.wetSystemListingDefinitionCrosswalkReady)");
+    expect(proofScript).toContain("root.wetSystemListingQuantityExpansionReady = String(result.wetSystemListingQuantityExpansionReady)");
     expect(proofScript).toContain("root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved)");
     expect(proofScript).toContain("root.quoteReady = String(result.quoteReady)");
     expect(viewer).toContain("sourceLeg.visible = false");
     expect(viewer).toContain("canvas.dataset.releasedRouteCount = String(result.model3d.releasedRoutes.length)");
     expect(viewer).toContain('0 released installation routes');
+  });
+
+  it('shows actual listing pages and the runtime native-to-listing crosswalk', () => {
+    const html = read('index.html');
+    const script = read('proof.js');
+    expect(html).toContain('../new-hope-truss-clearance/listing-complete-welded-page20.png');
+    expect(html).toContain('../new-hope-truss-clearance/listing-complete-threaded-page42.png');
+    expect(html).toContain('Native records to approved AutoSPRINK listing');
+    expect(fs.statSync(new URL('wet-listing-crosswalk-browser.png', proofRoot)).size).toBeGreaterThan(100_000);
+    expect(script).toContain("document.querySelector('#crosswalk-rows')");
+    expect(script).toContain('crosswalk.quantityExpansionGaps');
   });
 
   it('describes primary cross-source and adversarial loops without an independent human gate', () => {

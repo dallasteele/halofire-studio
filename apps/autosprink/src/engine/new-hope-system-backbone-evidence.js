@@ -1,4 +1,5 @@
 import { validateNewHopeWetLevel1NetworkEvidence } from './new-hope-wet-level1-network-evidence.js';
+import { buildNewHopeWetListingCrosswalk } from './new-hope-wet-listing-crosswalk.js';
 
 const PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut';
 const APPROVED_PLAN_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5';
@@ -162,10 +163,18 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     hydraulicRoutes,
     waterSupplyAndWetRiser,
     wetLevel1NetworkEvidence,
+    fabricationEndSchedule,
   } = inputs;
   const wetNetwork = validateNewHopeWetLevel1NetworkEvidence(wetLevel1NetworkEvidence);
+  const wetListingCrosswalk = buildNewHopeWetListingCrosswalk({
+    wetLevel1NetworkEvidence,
+    fabricationEndSchedule,
+  });
   if (wetNetwork.status !== 'passed') {
     issues.push(...wetNetwork.issues);
+  }
+  if (wetListingCrosswalk.status !== 'passed') {
+    issues.push(...wetListingCrosswalk.issues);
   }
 
   if (
@@ -308,6 +317,8 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     'BACKBONE_NEW_QUOTE_FLOW_TEST_REQUIRED',
     ...(wetNetworkReady ? [] : ['NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED']),
     'NH_WET_SYSTEM_PIECE_TO_PLAN_MAPPING_REQUIRED',
+    'NH_WET_SYSTEM_LISTING_QUANTITY_EXPANSION_REQUIRED',
+    'NH_WET_SYSTEM_WELDED_LISTING_DIMENSION_RECONCILIATION_REQUIRED',
     'NH_WET_SYSTEM_DIRECTION_AND_GRADE_REQUIRED',
     'NH_WET_SYSTEM_INSTALLATION_3D_PATH_REQUIRED',
     'NH_FIELD_ROUTE_DRUM_DRIP_GEOMETRY_REQUIRED',
@@ -326,6 +337,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       hydrantFlowTest: { physicalPage: 1, sha256: FLOW_TEST_SHA, testDate: '2024-12-10' },
       approvedDesignSupply: clone(waterSupplyAndWetRiser.sourceBindings.hydraulicCalculation.approvedDesignSupply),
       wetLevel1Network: clone(wetNetwork.sourceBindings),
+      approvedFabricationListing: clone(wetListingCrosswalk.source),
     } : null,
     systems: evidenceReady ? [
       {
@@ -411,11 +423,12 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     },
     systemDesignGate: { status: 'blocked', blockers },
     takeoff: evidenceReady ? {
-      status: wetNetworkReady ? 'native-fabrication-quantities-piece-to-plan-mapping-unresolved' : 'source-identities-only-no-route-quantities',
+      status: wetNetworkReady ? 'native-records-to-approved-listing-definitions-reconciled-quantity-expansion-and-piece-to-plan-unresolved' : 'source-identities-only-no-route-quantities',
       wetLevel1NativeFabrication: wetNetworkReady ? {
         metrics: clone(wetNetwork.metrics),
         lineFamilies: clone(wetNetwork.nativeFabricationLines),
         sprinklerSchedule: clone(wetNetwork.sprinklerSchedule),
+        listingCrosswalk: clone(wetListingCrosswalk),
       } : null,
       systemComponents: [
         { key: 'wet_riser_manifold', description: '3-inch wet riser manifold', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
@@ -440,6 +453,10 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     wetSystemNetwork2dReady: wetNetworkReady,
     sprinklerHeadPositions2dReady: wetNetworkReady,
     nativeFabricationTakeoffReady: wetNetworkReady,
+    wetSystemListingDefinitionCrosswalkReady: evidenceReady && wetListingCrosswalk.nativeRowToListingDefinitionReady,
+    wetSystemThreadedCutLengthCrossSourceReady: evidenceReady && wetListingCrosswalk.threadedCutLengthCrossSourceReady,
+    wetSystemListingQuantityExpansionReady: false,
+    wetSystemWeldedCutLengthCrossSourceReady: false,
     wetSystemPieceToPlanMappingReady: false,
     wetSystemHeadTypeAssignmentReady: wetNetworkReady && wetNetwork.headTypeAssignmentReady,
     wetSystemDirectionReady: false,
