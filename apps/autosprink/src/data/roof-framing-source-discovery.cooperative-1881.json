@@ -1,21 +1,49 @@
 {
-  "artifactType": "halofire.cooperative-1881-roof-framing-source-discovery.v1",
+  "artifactType": "halofire.cooperative-1881-roof-framing-source-discovery.v2",
   "status": "blocked",
   "scanComplete": false,
+  "scanWindows": {
+    "local": {
+      "scanComplete": true,
+      "scannedRoots": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881",
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents"
+      ],
+      "missingRoots": [],
+      "scannedFileCount": 577,
+      "scannedDirectoryCount": 110,
+      "traversedDirectoryCount": 110,
+      "maxFiles": 15000,
+      "maxDirectories": 5000,
+      "directoryOffset": 0,
+      "nextDirectoryOffset": null
+    },
+    "shared": {
+      "scanComplete": false,
+      "scannedRoots": [
+        "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
+      ],
+      "missingRoots": [],
+      "scannedFileCount": 221,
+      "scannedDirectoryCount": 300,
+      "traversedDirectoryCount": 601,
+      "maxFiles": 15000,
+      "maxDirectories": 300,
+      "directoryOffset": 300,
+      "nextDirectoryOffset": 600
+    }
+  },
   "scannedRoots": [
+    "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents",
     "E:\\ClaudeBot\\data\\halofire\\bids\\1881",
     "E:\\ClaudeBot\\data\\halofire\\golden\\1881",
-    "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents",
     "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
   ],
   "missingRoots": [],
-  "scannedFileCount": 776,
-  "scannedDirectoryCount": 300,
-  "traversedDirectoryCount": 301,
-  "maxFiles": 15000,
-  "maxDirectories": 300,
-  "directoryOffset": 0,
-  "nextDirectoryOffset": 300,
+  "scannedFileCount": 798,
+  "scannedDirectoryCount": 410,
+  "traversedDirectoryCount": 711,
   "candidates": [
     {
       "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf",
@@ -28,6 +56,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -41,6 +72,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -54,6 +88,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -67,6 +104,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -80,6 +120,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -93,6 +136,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -106,6 +152,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -119,6 +168,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -132,6 +184,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -145,6 +200,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -158,6 +216,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -171,6 +232,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -184,6 +248,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -197,6 +264,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -210,6 +280,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -223,6 +296,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -236,6 +312,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -249,6 +328,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -262,6 +344,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -275,6 +360,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -288,6 +376,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -301,6 +392,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -314,6 +408,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -327,6 +424,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -340,6 +440,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -353,6 +456,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -366,6 +472,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -379,6 +488,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -392,6 +504,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -406,6 +521,9 @@
       "projectTokenMatches": [
         "1881",
         "cooperative"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -420,6 +538,9 @@
       "projectTokenMatches": [
         "1881",
         "cooperative"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -433,6 +554,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -446,6 +570,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -459,6 +586,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -472,6 +602,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -485,6 +618,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -498,6 +634,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -511,6 +650,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -524,6 +666,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -537,6 +682,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -550,6 +698,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -563,6 +714,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -576,6 +730,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -589,6 +746,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -602,6 +762,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -615,6 +778,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -628,6 +794,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -641,6 +810,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -654,6 +826,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -667,6 +842,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -681,6 +859,9 @@
       "projectTokenMatches": [
         "1881",
         "cooperative"
+      ],
+      "scanScopes": [
+        "local"
       ]
     },
     {
@@ -695,6 +876,9 @@
       "projectTokenMatches": [
         "1881",
         "cooperative"
+      ],
+      "scanScopes": [
+        "local"
       ]
     }
   ],
@@ -702,13 +886,11 @@
     {
       "code": "SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED",
       "severity": "blocking",
-      "message": "Discovery stopped after the 15000-file or 300-directory budget; narrow the corpus root or resume at directory offset 300.",
+      "message": "Discovery stopped after the 15000-file or 300-directory budget; narrow the corpus root or resume at directory offset 600.",
       "refs": [
-        "E:\\ClaudeBot\\data\\halofire\\bids\\1881",
-        "E:\\ClaudeBot\\data\\halofire\\golden\\1881",
-        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents",
         "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
-      ]
+      ],
+      "scanScope": "shared"
     },
     {
       "code": "STRUCTURAL_SUPPLIER_SUBMITTAL_NOT_MATERIALIZED",
@@ -719,6 +901,10 @@
   ],
   "projectName": "Cooperative 1881",
   "sourceStructuralPdfSha256": "bdc561986ef710791ddb3c1928d445596b0a5de5cf131b6adf9d929dc5a36e80",
+  "extractionPolicy": {
+    "maxPdfTextPages": 4,
+    "note": "Discovery text is deliberately bounded. A truncated document can identify a candidate but cannot supply exact member dimensions, orientation, or vertical-datum proof."
+  },
   "documents": [
     {
       "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf",
@@ -732,8 +918,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf"
       ],
@@ -751,8 +939,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_shop_drawings.pdf"
       ],
@@ -769,6 +959,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ],
       "extractedTextStatus": "not-pdf",
       "aliases": [
@@ -788,6 +981,9 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "scanScopes": [
+        "local"
+      ],
       "extractedTextStatus": "not-pdf",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\design.dxf"
@@ -805,6 +1001,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ],
       "extractedTextStatus": "not-pdf",
       "aliases": [
@@ -824,6 +1023,9 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "scanScopes": [
+        "local"
+      ],
       "extractedTextStatus": "not-pdf",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\cad_model_promote\\reviewed-cad-model.dxf"
@@ -841,6 +1043,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ],
       "extractedTextStatus": "not-pdf",
       "aliases": [
@@ -861,8 +1066,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\013566.13-RIB-Sustainability Certification Project Procedures - Enterprise Green 7-22-2025 3-38-55 AM.pdf"
       ],
@@ -880,8 +1087,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\062000-RIB-Finish Carpentry-07-22-2025.pdf"
       ],
@@ -899,8 +1108,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Architecturals.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Architecturals.pdf"
@@ -919,8 +1130,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Civils.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Civils.pdf"
@@ -939,8 +1152,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Electrical.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Electrical.pdf"
@@ -959,8 +1174,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Generals.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Generals.pdf"
@@ -979,8 +1196,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Geopiers.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Geopiers.pdf"
@@ -999,8 +1218,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Landscape.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Landscape.pdf"
@@ -1019,8 +1240,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Mechanical.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Mechanical.pdf"
@@ -1039,8 +1262,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Plumbing.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Plumbing.pdf"
@@ -1059,13 +1284,18 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "passed",
+      "pageCount": 104,
+      "extractedPageCount": 4,
+      "extractedTextComplete": false,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Structurals.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Structurals.pdf"
       ],
-      "extractedTextSha256": null
+      "extractedTextSha256": "4f986bbc86cd797fff514689c9ab7dc14b353a15733eb49020fcf59d0bb0779b"
     },
     {
       "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Architecture RFI's.pdf",
@@ -1079,8 +1309,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Architecture RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Architecture RFI's.pdf"
@@ -1099,8 +1331,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Civil RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Civil RFI's.pdf"
@@ -1119,8 +1353,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Electrical RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Electrical RFI's.pdf"
@@ -1139,8 +1375,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Fire RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Fire RFI's.pdf"
@@ -1159,8 +1397,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Landscape RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Landscape RFI's.pdf"
@@ -1179,8 +1419,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 MP RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 MP RFI's.pdf"
@@ -1199,13 +1441,18 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "passed",
+      "pageCount": 2,
+      "extractedPageCount": 2,
+      "extractedTextComplete": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Structural RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Structural RFI's.pdf"
       ],
-      "extractedTextSha256": null
+      "extractedTextSha256": "8a563e4fa47bca149e17ea0d394faaa46ca5ad0833fee97998246c141c6ddbc6"
     },
     {
       "path": "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
@@ -1219,8 +1466,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf"
@@ -1239,8 +1488,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 02 Draft Cover Page.pdf"
       ],
@@ -1258,8 +1509,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 1 Memo.pdf"
       ],
@@ -1278,8 +1531,10 @@
         "1881",
         "cooperative"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf"
@@ -1298,6 +1553,9 @@
       "projectTokenMatches": [
         "1881",
         "cooperative"
+      ],
+      "scanScopes": [
+        "local"
       ],
       "extractedTextStatus": "not-pdf",
       "aliases": [
@@ -1318,8 +1576,10 @@
       "projectTokenMatches": [
         "1881"
       ],
-      "extractedTextStatus": "blocked",
-      "extractedTextError": "Invalid factory url: \"E:\\ClaudeBot\\.codex-work\\halofire-live-release-20260711\\apps\\autosprink\\node_modules\\pdfjs-dist\\standard_fonts\\\" must include trailing slash.",
+      "scanScopes": [
+        "local"
+      ],
+      "extractedTextStatus": "not-requested",
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025 copy.pdf"
       ],
@@ -1336,6 +1596,9 @@
       ],
       "projectTokenMatches": [
         "1881"
+      ],
+      "scanScopes": [
+        "local"
       ],
       "extractedTextStatus": "not-pdf",
       "aliases": [

@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { buildRoofFramingClearancePreflight, classifyMaterializedSourceDocument, classifyStructuralMemberEvidence, discoverMaterializedSourceEvidence } from '../src/engine/source-evidence-corpus.js';
+import { buildRoofFramingClearancePreflight, classifyMaterializedSourceDocument, classifyStructuralMemberEvidence, discoverMaterializedSourceEvidence, mergeMaterializedSourceEvidenceDiscoveries } from '../src/engine/source-evidence-corpus.js';
 
 const tempRoots = [];
 function makeRoot() {
@@ -60,6 +60,22 @@ describe('materialized structural source discovery', () => {
     expect(result.nextDirectoryOffset).toBeNull();
   });
 
+  it('keeps canonical local evidence while resuming an independent shared-drive window', () => {
+    const local = makeRoot();
+    const shared = makeRoot();
+    fs.writeFileSync(path.join(local, '1881 structurals.pdf'), 'local');
+    fs.mkdirSync(path.join(shared, 'child'));
+    fs.writeFileSync(path.join(shared, 'child', '1881 truss supplier.pdf'), 'shared');
+    const localDiscovery = discoverMaterializedSourceEvidence({ roots: [local], projectTokens: ['1881'], maxFiles: 10, maxDirectories: 10 });
+    const resumedSharedDiscovery = discoverMaterializedSourceEvidence({ roots: [shared], projectTokens: ['1881'], maxFiles: 10, maxDirectories: 10, directoryOffset: 1 });
+    const result = mergeMaterializedSourceEvidenceDiscoveries({ discoveries: { local: localDiscovery, shared: resumedSharedDiscovery } });
+    expect(result.candidates.map((entry) => path.basename(entry.path)).sort()).toEqual(['1881 structurals.pdf', '1881 truss supplier.pdf']);
+    expect(result.scanWindows.local.directoryOffset).toBe(0);
+    expect(result.scanWindows.shared.directoryOffset).toBe(1);
+    expect(result.candidates.find((entry) => entry.path.endsWith('1881 structurals.pdf')).scanScopes).toEqual(['local']);
+    expect(result.candidates.find((entry) => entry.path.endsWith('1881 truss supplier.pdf')).scanScopes).toEqual(['shared']);
+  });
+
   it('does not promote issued plans or sprinkler drawings as exact fabrication evidence', () => {
     const result = classifyStructuralMemberEvidence({
       members: [{ id: 'J1', member: '2X10' }],
@@ -86,6 +102,11 @@ describe('materialized structural source discovery', () => {
   it('can recover a cautiously classified supplier candidate from PDF text when a shared-drive filename is generic', () => {
     expect(classifyMaterializedSourceDocument({ path: 'E:/bid/1881/Attachment-14.pdf', extractedText: 'Engineered roof truss supplier submittal for 2X10 members.' }))
       .toContain('structural-supplier-submittal');
+  });
+
+  it('does not mistake a structural plan mentioning suppliers for a supplier submittal', () => {
+    expect(classifyMaterializedSourceDocument({ path: 'E:/bid/1881/structurals.pdf', extractedText: 'Structural drawings: lumber supplier shall verify all framing dimensions before ordering.' }))
+      .not.toContain('structural-supplier-submittal');
   });
 
   it('blocks automatic pipe routing when source-bounded roof framing lacks materialized supplier evidence', () => {

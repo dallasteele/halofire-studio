@@ -157,3 +157,36 @@ Focused source evidence tests pass 9/9, including an empty cloud-directory
 budget adversary and a deterministic resumed-window adversary. The broader
 source/roof lane passes 72/72 with zero skips; structural registration passes
 25/25; the production build and loop-contract guard pass.
+
+## Iteration 6 independent local/shared cursor and shared window 300
+
+Discovery no longer applies a shared-drive resume cursor to the canonical local
+sources. `mergeMaterializedSourceEvidenceDiscoveries` now records a named local
+window and a named shared window, preserving local hash-bound candidates while
+the shared Egnyte tree advances. The focused adversary proves that a resumed
+shared window retains the local structural candidate instead of silently
+dropping it.
+
+The local window completed with 577 materialized files and 110 directories.
+The shared `Y:/Shared/HaloOps/01-Bids/Kier` window at offset 300 traversed the
+next 300 directories (221 files) and emitted the next cursor at 600. It found
+no project-token candidate and no structural supplier/truss/lumber submittal.
+This is a partial-search result only; `SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED`
+remains explicit.
+
+The PDF reader had an invalid standard-font path. It now uses a trailing-slash
+file URL, and candidate text is limited to four cover/index pages so discovery
+stays bounded. Exact member extraction remains a separate full-document gate.
+An adversarial plan that merely says a lumber supplier must verify framing is
+now rejected as a supplier submittal; the resulting artifact records
+`structuralSupplierSubmittalMaterialized: false` and the clearance preflight
+continues to block automatic routing and per-head clearance.
+
+Focused source and roof-framing tests pass 15/15 with no skips. The next window
+is `HALOFIRE_SHARED_CORPUS_DIRECTORY_OFFSET=600`.
+
+The final regression is 74 JavaScript tests and 25 structural-registration
+Python tests, all passing with zero skips; the AutoSprink Vite production build,
+loop guard, and agentic rulebook check also pass. The formal prover health probe
+at `http://127.0.0.1:8810/api/provers/health` refused the connection, so no
+formal proof claim is made for this source-discovery slice.

@@ -23,9 +23,11 @@ export function classifyMaterializedSourceDocument(document) {
   const pathRoles = roleForPath(document?.path || '');
   const text = String(document?.extractedText || '').toLowerCase();
   const roles = new Set(pathRoles.filter((role) => role !== 'unclassified'));
-  if (/(supplier|fabricator).{0,48}(truss|lumber|framing)|(truss|lumber|framing).{0,48}(supplier|fabricator|submittal|manufacturer)/s.test(text)) roles.add('structural-supplier-submittal');
+  const supplierSubmittalText = /(?:truss|lumber|framing).{0,32}(?:supplier|fabricator|manufacturer).{0,48}(?:submittal|shop\s*drawing)|(?:supplier|fabricator|manufacturer).{0,32}(?:truss|lumber|framing).{0,48}(?:submittal|shop\s*drawing)|(?:submittal|shop\s*drawing).{0,48}(?:truss|lumber|framing).{0,32}(?:supplier|fabricator|manufacturer)/s;
+  const sprinklerShopText = /(?:fire\s+sprinkler|sprinkler\s+system).{0,48}(?:shop\s*drawing|submittal)|(?:shop\s*drawing|submittal).{0,48}(?:fire\s+sprinkler|sprinkler\s+system)/s;
+  if (supplierSubmittalText.test(text)) roles.add('structural-supplier-submittal');
   if (/(structural drawings|structural general notes|\bs-\d{3}\b)/.test(text)) roles.add('issued-structural-design');
-  if (/(fire sprinkler|sprinkler system|fire protection)/.test(text)) roles.add('sprinkler-shop-drawing');
+  if (sprinklerShopText.test(text)) roles.add('sprinkler-shop-drawing');
   return roles.size ? [...roles].sort() : ['unclassified'];
 }
 
@@ -129,6 +131,72 @@ export function discoverMaterializedSourceEvidence(input) {
     maxDirectories,
     directoryOffset,
     nextDirectoryOffset: budgetExhausted ? directoryOffset + scannedDirectoryCount : null,
+    candidates,
+    issues,
+  };
+}
+
+/**
+ * Combines separately bounded source scans without letting a remote-corpus
+ * resume cursor suppress canonical local evidence.  Candidates remain evidence
+ * leads only: their content hash and role are recorded, but no physical member
+ * may be promoted by this function.
+ */
+export function mergeMaterializedSourceEvidenceDiscoveries(input) {
+  const discoveries = input?.discoveries && typeof input.discoveries === 'object' ? input.discoveries : {};
+  const scanWindows = {};
+  const candidatesByPath = new Map();
+  const issues = [];
+  const scannedRoots = [];
+  const missingRoots = [];
+  let scannedFileCount = 0;
+  let scannedDirectoryCount = 0;
+  let traversedDirectoryCount = 0;
+
+  for (const scope of Object.keys(discoveries).sort()) {
+    const discovery = discoveries[scope] || {};
+    scanWindows[scope] = {
+      scanComplete: discovery.scanComplete === true,
+      scannedRoots: [...(discovery.scannedRoots || [])],
+      missingRoots: [...(discovery.missingRoots || [])],
+      scannedFileCount: Number(discovery.scannedFileCount || 0),
+      scannedDirectoryCount: Number(discovery.scannedDirectoryCount || 0),
+      traversedDirectoryCount: Number(discovery.traversedDirectoryCount || 0),
+      maxFiles: discovery.maxFiles ?? null,
+      maxDirectories: discovery.maxDirectories ?? null,
+      directoryOffset: discovery.directoryOffset ?? 0,
+      nextDirectoryOffset: discovery.nextDirectoryOffset ?? null,
+    };
+    scannedRoots.push(...(discovery.scannedRoots || []));
+    missingRoots.push(...(discovery.missingRoots || []));
+    scannedFileCount += Number(discovery.scannedFileCount || 0);
+    scannedDirectoryCount += Number(discovery.scannedDirectoryCount || 0);
+    traversedDirectoryCount += Number(discovery.traversedDirectoryCount || 0);
+    for (const sourceIssue of discovery.issues || []) issues.push({ ...sourceIssue, scanScope: scope });
+    for (const candidate of discovery.candidates || []) {
+      const key = String(candidate?.path || '');
+      if (!key) continue;
+      const existing = candidatesByPath.get(key);
+      candidatesByPath.set(key, existing ? {
+        ...existing,
+        roles: [...new Set([...(existing.roles || []), ...(candidate.roles || [])])].sort(),
+        projectTokenMatches: [...new Set([...(existing.projectTokenMatches || []), ...(candidate.projectTokenMatches || [])])].sort(),
+        scanScopes: [...new Set([...(existing.scanScopes || []), scope])].sort(),
+      } : { ...candidate, scanScopes: [scope] });
+    }
+  }
+
+  const candidates = [...candidatesByPath.values()].sort((left, right) => left.path.localeCompare(right.path));
+  return {
+    artifactType: 'halofire.materialized-source-evidence-discovery.v2',
+    status: issues.length ? 'blocked' : 'passed',
+    scanComplete: Object.values(scanWindows).every((window) => window.scanComplete),
+    scanWindows,
+    scannedRoots: [...new Set(scannedRoots)].sort(),
+    missingRoots: [...new Set(missingRoots)].sort(),
+    scannedFileCount,
+    scannedDirectoryCount,
+    traversedDirectoryCount,
     candidates,
     issues,
   };

@@ -1,10 +1,10 @@
 {
   "name": "cooperative-1881-physical-framing-placement-20260717",
-  "iteration": 5,
+  "iteration": 6,
   "status": "in_progress",
-  "updatedAt": "2026-07-17T08:57:00-07:00",
+  "updatedAt": "2026-07-17T09:07:54-07:00",
   "completedStages": ["DISCOVER", "PLAN", "BUILD", "VERIFY"],
-  "nextStage": "RESUME_SCOPED_EGNYTE_KIER_CORPUS_DISCOVERY_AT_DIRECTORY_OFFSET_300",
+  "nextStage": "RESUME_SCOPED_EGNYTE_KIER_CORPUS_DISCOVERY_AT_DIRECTORY_OFFSET_600",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [157533, 46659, 120030, 60864],
@@ -59,10 +59,22 @@
   "corpusDiscovery": {
     "artifact": "apps/autosprink/src/data/roof-framing-source-discovery.cooperative-1881.json",
     "scanComplete": false,
-    "materializedFilesScanned": 776,
-    "directoriesScanned": 300,
-    "directoryOffset": 0,
-    "nextDirectoryOffset": 300,
+    "materializedFilesScanned": 798,
+    "directoriesScanned": 410,
+    "localWindow": {
+      "scanComplete": true,
+      "materializedFilesScanned": 577,
+      "directoriesScanned": 110,
+      "directoryOffset": 0,
+      "nextDirectoryOffset": null
+    },
+    "sharedWindow": {
+      "root": "Y:/Shared/HaloOps/01-Bids/Kier",
+      "materializedFilesScanned": 221,
+      "directoriesScanned": 300,
+      "directoryOffset": 300,
+      "nextDirectoryOffset": 600
+    },
     "relevantCandidates": 52,
     "uniqueContentDocuments": 32,
     "roofBoundedMembersChecked": 7,
@@ -71,7 +83,7 @@
     "sprinklerShopDrawingDocuments": 1,
     "sharedDriveRoot": "Y:/Shared/HaloOps/01-Bids/Kier",
     "physicalPromotionAllowed": false,
-    "reason": "The Egnyte client restored the verified Kier shared-drive root. The first bounded 300-directory window has no supplier/truss/lumber candidate; the resumable cursor prevents a massive cloud tree from becoming an unbounded or silently incomplete scan. The engine rejects document-name and member-tag matches as fabricated-part proof."
+    "reason": "The local canonical corpus is replayed to completion on every run while the verified Kier shared-drive root advances independently. Shared window 300-599 found no project-token candidate or supplier/truss/lumber submittal. PDF text discovery is cover/index bounded and cannot promote a member; a plan's incidental supplier wording is explicitly rejected as supplier-submittal evidence."
   },
   "roofFramingClearancePreflight": {
     "artifact": "apps/autosprink/src/data/roof-framing-clearance-preflight.cooperative-1881.json",
@@ -92,6 +104,16 @@
     "focusedJavaScript": "72 passed, 0 failed, 0 skipped",
     "registeredStructurePython": "25 passed, 0 failed, 0 skipped",
     "autosprinkProductionBuild": "passed"
+  },
+  "iteration6Verification": {
+    "agentLoopGuard": "passed before implementation",
+    "focusedJavaScript": "74 passed, 0 failed, 0 skipped",
+    "registeredStructurePython": "25 passed, 0 failed, 0 skipped",
+    "autosprinkProductionBuild": "passed",
+    "agenticRulebook": "passed",
+    "formalProof": "GX10_PROVER_UNAVAILABLE: http://127.0.0.1:8810/api/provers/health refused connection",
+    "sourceDiscovery": "local corpus complete; shared cursor 300 advanced to 600; no shared project-token candidates; structural supplier materialization false",
+    "roofClearancePreflight": "blocked as expected; automatic routing and per-head clearance remain false"
   },
   "currentQuestion": "Materialize the project-scoped structural supplier/truss/lumber submittal roots from the shared drive, then require a hash-bound member tag, actual dressed dimensions, plan orientation, and vertical datum before any roof member can enter physical 3D obstruction, sprinkler-clearance, or fabrication output."
 }
