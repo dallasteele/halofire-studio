@@ -1,0 +1,940 @@
+{
+  "artifactType": "halofire.cooperative-1881-roof-slope-registration.v1",
+  "projectName": "The Cooperative 1881 - Salt Lake City UT",
+  "cadRoot": "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files",
+  "status": "passed",
+  "sources": {
+    "architectural": {
+      "fileName": "A-121 ROOF PLAN.dwg",
+      "sha256": "FD3DB45D18C2970F0F67BE1C668188ABD1962C0D3CD56A7EDE67545F53F42606",
+      "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+      "unknownEntityCount": 0
+    },
+    "structural": {
+      "fileName": "240069_1881 W North Temple_ST25-Sheet - S-190 - OVERALL ROOF FRAMING PLAN.dwg",
+      "sha256": "539C3A39BDC2995D2BF427C82F732768117D11E08654697AD722C9F6BD38D3E4",
+      "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+      "unknownEntityCount": 0
+    }
+  },
+  "gridRegistration": {
+    "numericPairs": [
+      {
+        "label": "3",
+        "source": 7545.617936343112,
+        "target": 7576.026311224641,
+        "architecturalHandles": [
+          "7562",
+          "7563"
+        ],
+        "structuralHandles": [
+          "4530",
+          "4532"
+        ]
+      },
+      {
+        "label": "5",
+        "source": 7281.617936343115,
+        "target": 7312.026311224647,
+        "architecturalHandles": [
+          "7598",
+          "7599"
+        ],
+        "structuralHandles": [
+          "452A",
+          "452C"
+        ]
+      },
+      {
+        "label": "8",
+        "source": 6885.617936343113,
+        "target": 6916.02631122465,
+        "architecturalHandles": [
+          "75CE",
+          "75CF"
+        ],
+        "structuralHandles": [
+          "4524",
+          "4526"
+        ]
+      },
+      {
+        "label": "11",
+        "source": 6489.617936343115,
+        "target": 6520.02631122466,
+        "architecturalHandles": [
+          "7604",
+          "7605"
+        ],
+        "structuralHandles": [
+          "451E",
+          "4520"
+        ]
+      },
+      {
+        "label": "14",
+        "source": 6093.617936343115,
+        "target": 6124.026311224661,
+        "architecturalHandles": [
+          "764C",
+          "764D"
+        ],
+        "structuralHandles": [
+          "4518",
+          "451A"
+        ]
+      },
+      {
+        "label": "17",
+        "source": 5697.617936343114,
+        "target": 5728.026311224665,
+        "architecturalHandles": [
+          "7682",
+          "7683"
+        ],
+        "structuralHandles": [
+          "4512",
+          "4514"
+        ]
+      },
+      {
+        "label": "20",
+        "source": 5301.6179363431165,
+        "target": 5332.02631122467,
+        "architecturalHandles": [
+          "76B8",
+          "76B9"
+        ],
+        "structuralHandles": [
+          "450C",
+          "450E"
+        ]
+      },
+      {
+        "label": "23",
+        "source": 4905.617936343119,
+        "target": 4936.0263112246785,
+        "architecturalHandles": [
+          "76EE",
+          "76EF"
+        ],
+        "structuralHandles": [
+          "4506",
+          "4508"
+        ]
+      },
+      {
+        "label": "25",
+        "source": 4641.742936343112,
+        "target": 4672.151311224677,
+        "architecturalHandles": [
+          "7712",
+          "7713"
+        ],
+        "structuralHandles": [
+          "4500",
+          "4502"
+        ]
+      },
+      {
+        "label": "28.1",
+        "source": 4192.742936343116,
+        "target": 4223.151311224688,
+        "architecturalHandles": [
+          "7820",
+          "7821"
+        ],
+        "structuralHandles": [
+          "44FA",
+          "44FC"
+        ]
+      },
+      {
+        "label": "0",
+        "source": 7941.617936343113,
+        "target": 7972.026311224637,
+        "architecturalHandles": [
+          "7832",
+          "7833"
+        ],
+        "structuralHandles": [
+          "4536",
+          "4538"
+        ]
+      },
+      {
+        "label": "30.8",
+        "source": 3853.1225081538846,
+        "target": 3883.5308830354543,
+        "architecturalHandles": [
+          "7881",
+          "7882"
+        ],
+        "structuralHandles": [
+          "44F3",
+          "44F5"
+        ]
+      }
+    ],
+    "letterPairs": [
+      {
+        "label": "F",
+        "source": 517.8458307470589,
+        "target": -519.4013114011098,
+        "architecturalHandles": [
+          "776C",
+          "776D"
+        ],
+        "structuralHandles": [
+          "4540"
+        ]
+      },
+      {
+        "label": "A",
+        "source": 100.43957958476648,
+        "target": -101.99506023882269,
+        "architecturalHandles": [
+          "77EA",
+          "77EB"
+        ],
+        "structuralHandles": [
+          "453C"
+        ]
+      },
+      {
+        "label": "L",
+        "source": 935.2520819093518,
+        "target": -936.8075625633974,
+        "architecturalHandles": [
+          "77FC",
+          "77FD"
+        ],
+        "structuralHandles": [
+          "4544"
+        ]
+      }
+    ],
+    "transform": {
+      "x": {
+        "scale": 1,
+        "offset": 30.408375,
+        "pairCount": 12,
+        "rmsResidual": 0,
+        "maxResidual": 0,
+        "residuals": [
+          {
+            "label": "3",
+            "source": 7545.617936343112,
+            "target": 7576.026311224641,
+            "architecturalHandles": [
+              "7562",
+              "7563"
+            ],
+            "structuralHandles": [
+              "4530",
+              "4532"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "5",
+            "source": 7281.617936343115,
+            "target": 7312.026311224647,
+            "architecturalHandles": [
+              "7598",
+              "7599"
+            ],
+            "structuralHandles": [
+              "452A",
+              "452C"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "8",
+            "source": 6885.617936343113,
+            "target": 6916.02631122465,
+            "architecturalHandles": [
+              "75CE",
+              "75CF"
+            ],
+            "structuralHandles": [
+              "4524",
+              "4526"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "11",
+            "source": 6489.617936343115,
+            "target": 6520.02631122466,
+            "architecturalHandles": [
+              "7604",
+              "7605"
+            ],
+            "structuralHandles": [
+              "451E",
+              "4520"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "14",
+            "source": 6093.617936343115,
+            "target": 6124.026311224661,
+            "architecturalHandles": [
+              "764C",
+              "764D"
+            ],
+            "structuralHandles": [
+              "4518",
+              "451A"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "17",
+            "source": 5697.617936343114,
+            "target": 5728.026311224665,
+            "architecturalHandles": [
+              "7682",
+              "7683"
+            ],
+            "structuralHandles": [
+              "4512",
+              "4514"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "20",
+            "source": 5301.6179363431165,
+            "target": 5332.02631122467,
+            "architecturalHandles": [
+              "76B8",
+              "76B9"
+            ],
+            "structuralHandles": [
+              "450C",
+              "450E"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "23",
+            "source": 4905.617936343119,
+            "target": 4936.0263112246785,
+            "architecturalHandles": [
+              "76EE",
+              "76EF"
+            ],
+            "structuralHandles": [
+              "4506",
+              "4508"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "25",
+            "source": 4641.742936343112,
+            "target": 4672.151311224677,
+            "architecturalHandles": [
+              "7712",
+              "7713"
+            ],
+            "structuralHandles": [
+              "4500",
+              "4502"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "28.1",
+            "source": 4192.742936343116,
+            "target": 4223.151311224688,
+            "architecturalHandles": [
+              "7820",
+              "7821"
+            ],
+            "structuralHandles": [
+              "44FA",
+              "44FC"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "0",
+            "source": 7941.617936343113,
+            "target": 7972.026311224637,
+            "architecturalHandles": [
+              "7832",
+              "7833"
+            ],
+            "structuralHandles": [
+              "4536",
+              "4538"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "30.8",
+            "source": 3853.1225081538846,
+            "target": 3883.5308830354543,
+            "architecturalHandles": [
+              "7881",
+              "7882"
+            ],
+            "structuralHandles": [
+              "44F3",
+              "44F5"
+            ],
+            "residual": 0
+          }
+        ]
+      },
+      "y": {
+        "scale": -1,
+        "offset": -1.555481,
+        "pairCount": 3,
+        "rmsResidual": 0,
+        "maxResidual": 0,
+        "residuals": [
+          {
+            "label": "F",
+            "source": 517.8458307470589,
+            "target": -519.4013114011098,
+            "architecturalHandles": [
+              "776C",
+              "776D"
+            ],
+            "structuralHandles": [
+              "4540"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "A",
+            "source": 100.43957958476648,
+            "target": -101.99506023882269,
+            "architecturalHandles": [
+              "77EA",
+              "77EB"
+            ],
+            "structuralHandles": [
+              "453C"
+            ],
+            "residual": 0
+          },
+          {
+            "label": "L",
+            "source": 935.2520819093518,
+            "target": -936.8075625633974,
+            "architecturalHandles": [
+              "77FC",
+              "77FD"
+            ],
+            "structuralHandles": [
+              "4544"
+            ],
+            "residual": 0
+          }
+        ]
+      }
+    }
+  },
+  "callouts": [
+    {
+      "label": {
+        "handle": "8073",
+        "text": "SLOPE 1/2\" PER FOOT",
+        "point": {
+          "x": 384.6072794249886,
+          "y": 5597.347902255959,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8074",
+        "target": {
+          "x": 445.56645488023446,
+          "y": 5597.933178212091,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.5,
+      "structuralPoint": {
+        "x": 5628.341553,
+        "y": -447.121936,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "807C",
+        "text": "SLOPE 1/2\" PER FOOT",
+        "point": {
+          "x": 384.6072794249884,
+          "y": 4720.065578104519,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "807D",
+        "target": {
+          "x": 445.5664548802343,
+          "y": 4720.650854060651,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.5,
+      "structuralPoint": {
+        "x": 4751.059229,
+        "y": -447.121936,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "807E",
+        "text": "SLOPE 1/2\" PER FOOT",
+        "point": {
+          "x": 384.6072794249886,
+          "y": 6505.6452580693185,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "807F",
+        "target": {
+          "x": 445.56645488023446,
+          "y": 6506.230534025451,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.5,
+      "structuralPoint": {
+        "x": 6536.638909,
+        "y": -447.121936,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8080",
+        "text": "SLOPE 1/2\" PER FOOT",
+        "point": {
+          "x": 384.60727942498863,
+          "y": 7336.405034727879,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8081",
+        "target": {
+          "x": 445.5664548802345,
+          "y": 7336.990310684011,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.5,
+      "structuralPoint": {
+        "x": 7367.398686,
+        "y": -447.121936,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8082",
+        "text": "SLOPE 2\" PER FOOT",
+        "point": {
+          "x": 384.6072794249887,
+          "y": 7716.5342464191945,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8083",
+        "target": {
+          "x": 445.5664548802346,
+          "y": 7717.119532576039,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 2,
+      "structuralPoint": {
+        "x": 7747.527908,
+        "y": -447.121936,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8084",
+        "text": "SLOPE 2\" PER FOOT",
+        "point": {
+          "x": 651.0843717318545,
+          "y": 7716.5342464191945,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8085",
+        "target": {
+          "x": 590.1251962766087,
+          "y": 7717.119532576039,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 2,
+      "structuralPoint": {
+        "x": 7747.527908,
+        "y": -591.680677,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8086",
+        "text": "SLOPE 2\" PER FOOT",
+        "point": {
+          "x": 651.0843717318544,
+          "y": 6814.597129697773,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8087",
+        "target": {
+          "x": 590.1251962766086,
+          "y": 6815.182415854618,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 2,
+      "structuralPoint": {
+        "x": 6845.590791,
+        "y": -591.680677,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8088",
+        "text": "SLOPE 2\" PER FOOT",
+        "point": {
+          "x": 651.0843717318542,
+          "y": 5491.59158252655,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8089",
+        "target": {
+          "x": 590.1251962766082,
+          "y": 5492.176868683395,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 2,
+      "structuralPoint": {
+        "x": 5522.585244,
+        "y": -591.680677,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "808A",
+        "text": "SLOPE 2\" PER FOOT",
+        "point": {
+          "x": 651.0843717318539,
+          "y": 4558.87267177084,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "808B",
+        "target": {
+          "x": 590.1251962766081,
+          "y": 4559.457957927684,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 2,
+      "structuralPoint": {
+        "x": 4589.866333,
+        "y": -591.680677,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "808C",
+        "text": "SLOPE 2\" PER FOOT",
+        "point": {
+          "x": 384.60727942498806,
+          "y": 4439.802172525429,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "808D",
+        "target": {
+          "x": 445.56645488023395,
+          "y": 4440.387458682274,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 2,
+      "structuralPoint": {
+        "x": 4470.795834,
+        "y": -447.121936,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "808E",
+        "text": "SLOPE 1/4\" PER FOOT",
+        "point": {
+          "x": 530.0239593832613,
+          "y": 4356.780227030895,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "808F",
+        "target": {
+          "x": 530.6092344113151,
+          "y": 4604.100095831736,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.25,
+      "structuralPoint": {
+        "x": 4634.508471,
+        "y": -532.164715,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8090",
+        "text": "SLOPE 1/4\" PER FOOT",
+        "point": {
+          "x": 503.0319719508885,
+          "y": 5155.134389561874,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8091",
+        "target": {
+          "x": 503.6172469789423,
+          "y": 5402.454258362715,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.25,
+      "structuralPoint": {
+        "x": 5432.862633,
+        "y": -505.172728,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8092",
+        "text": "SLOPE 1/4\" PER FOOT",
+        "point": {
+          "x": 503.03197195088853,
+          "y": 4903.489766286881,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8093",
+        "target": {
+          "x": 503.6172469789423,
+          "y": 4835.244931592411,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.25,
+      "structuralPoint": {
+        "x": 4865.653307,
+        "y": -505.172728,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8094",
+        "text": "SLOPE 1/4\" PER FOOT",
+        "point": {
+          "x": 503.0319719508886,
+          "y": 6063.342722773526,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8095",
+        "target": {
+          "x": 503.61724697894243,
+          "y": 6310.662591574368,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.25,
+      "structuralPoint": {
+        "x": 6341.070967,
+        "y": -505.172728,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8096",
+        "text": "SLOPE 1/4\" PER FOOT",
+        "point": {
+          "x": 503.03197195088865,
+          "y": 5811.698099498533,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8097",
+        "target": {
+          "x": 503.61724697894243,
+          "y": 5743.453264804063,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.25,
+      "structuralPoint": {
+        "x": 5773.86164,
+        "y": -505.172728,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "8098",
+        "text": "SLOPE 1/4\" PER FOOT",
+        "point": {
+          "x": 503.03197195088865,
+          "y": 6971.551055985185,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "8099",
+        "target": {
+          "x": 503.6172469789425,
+          "y": 7218.870924786027,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.25,
+      "structuralPoint": {
+        "x": 7249.2793,
+        "y": -505.172728,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "809A",
+        "text": "SLOPE 1/4\" PER FOOT",
+        "point": {
+          "x": 503.0319719508887,
+          "y": 6719.906432710192,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "809B",
+        "target": {
+          "x": 503.6172469789425,
+          "y": 6651.661598015722,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.25,
+      "structuralPoint": {
+        "x": 6682.069973,
+        "y": -505.172728,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "80A9",
+        "text": "SLOPE 1/4\" PER FOOT",
+        "point": {
+          "x": 530.0239593832615,
+          "y": 7548.35383342906,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "80AA",
+        "target": {
+          "x": 530.6092344113154,
+          "y": 7480.10899873459,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 0.25,
+      "structuralPoint": {
+        "x": 7510.517374,
+        "y": -532.164715,
+        "z": 0
+      }
+    },
+    {
+      "label": {
+        "handle": "80E1",
+        "text": "SLOPE 2\" PER FOOT",
+        "point": {
+          "x": 640.7067143481712,
+          "y": 6225.03265018627,
+          "z": 0
+        }
+      },
+      "leader": {
+        "handle": "80E2",
+        "target": {
+          "x": 579.7475388929253,
+          "y": 6225.617936343115,
+          "z": 0
+        }
+      },
+      "inchesPerFoot": 2,
+      "structuralPoint": {
+        "x": 6256.026311,
+        "y": -581.30302,
+        "z": 0
+      }
+    }
+  ],
+  "issues": [],
+  "claims": {
+    "crossPlanGridRegistrationReady": true,
+    "sourceSlopeCalloutsRegistered": true,
+    "roofSurfaceReconstructionReady": false,
+    "perMemberVerticalDatumReady": false,
+    "exactPhysicalFramingPromoted": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "fabricationReady": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "A slope callout leader identifies a source target location, not a roof-face boundary or a slope direction vector.",
+    "This registration does not infer roof surface geometry, member association, elevation, obstruction clearance, pipe route, fabrication, code, employee, or VPS release."
+  ]
+}

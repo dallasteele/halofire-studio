@@ -1,0 +1,44 @@
+{
+  "name": "cooperative-1881-plan-section-context-20260717",
+  "iteration": 2,
+  "status": "completed",
+  "updatedAt": "2026-07-17T11:38:00-07:00",
+  "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY"],
+  "nextStage": "OPEN_A121_SLOPE_TARGET_TO_ROOF_FACE_BOUNDARY_LOOP",
+  "claims": {
+    "crossPlanGridRegistrationReady": true,
+    "sourceSlopeCalloutsRegistered": true,
+    "roofSurfaceReconstructionReady": false,
+    "perMemberVerticalDatumReady": false,
+    "exactPhysicalFramingPromoted": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "fabricationReady": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "sourceRegistration": {
+    "a121Sha256": "FD3DB45D18C2970F0F67BE1C668188ABD1962C0D3CD56A7EDE67545F53F42606",
+    "s190Sha256": "539C3A39BDC2995D2BF427C82F732768117D11E08654697AD722C9F6BD38D3E4",
+    "numericGridPairs": 12,
+    "letterGridPairs": 3,
+    "xAxisMaxResidualNativeUnits": 0,
+    "yAxisMaxResidualNativeUnits": 0,
+    "slopeCallouts": {"oneQuarterInPerFoot": 8, "oneHalfInPerFoot": 4, "twoInPerFoot": 7}
+  },
+  "knownResiduals": [
+    "A slope callout leader identifies only a source target location; it does not define a roof-face boundary or slope direction vector.",
+    "No source-bound roof surface, per-member elevation, structural member profile, obstruction clearance, or sprinkler route is emitted.",
+    "Supplier/manufacturer evidence remains separately required for fabricated parts and connections."
+  ],
+  "verification": {
+    "agentLoopGuard": "passed",
+    "focusedJavaScript": "29 passed, 0 failed, 0 skipped across slope registration plus adjacent issued-DWG/source-bound framing tests",
+    "nativeDwgExtractor": "passed twice identically: 19 callouts, zero registration issues, receipt SHA-256 8FBC35C33E4552580A170C1DCA0C32920C4D889D812106FCED3EA969E0FD67B8",
+    "autosprinkProductionBuild": "passed",
+    "agenticRulebook": "passed",
+    "sourceVisual": "accepted after a rejected annotation-overlap pass: Chrome raster has readable count legend and distinct source markers",
+    "formalProof": "GX10_PROVER_UNAVAILABLE: http://127.0.0.1:8810/api/provers/health -> Unable to connect to the remote server; source registration has a meaningful invariant but no formal proof is claimed"
+  }
+}

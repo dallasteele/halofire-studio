@@ -1,5 +1,26 @@
 # HaloFire Build Log
 
+## 2026-07-17 - Cooperative 1881 A-121 to S-190 roof slope registration
+
+- Replaced the false choice between an ungrounded roof model and a generic
+  blocker: the issued A-121 architectural roof-plan DWG contains 19 explicit
+  `SLOPE ... PER FOOT` callouts with source leaders, while issued S-190
+  supplies matching structural grid controls. The new read-only extractor
+  hash-binds both native sources, maps source leader targets only, and refuses
+  any slope direction, roof-face boundary, member elevation, clearance, or
+  sprinkler claim.
+- The registration uses 12 shared numeric grids and three shared letter grids,
+  anchored to the actual grid line geometry rather than label offset text. Both
+  axes replay with zero native-unit residual. It carries eight `1/4 in/ft`,
+  four `1/2 in/ft`, and seven `2 in/ft` A-121 target callouts onto S-190.
+- Focused tests, extractor replay, loop guard, rulebook verification, and a
+  fresh Chrome raster inspection passed. The first visual receipt was rejected
+  because full annotation text collided over the source plan; the accepted
+  proof uses distinct rate-colored source markers and a count legend, with the
+  complete handle/text mapping retained in the JSON receipt. Roof surfaces,
+  per-member elevations, physical framing, pipe routing, clearance,
+  fabrication, code, employee, and VPS claims remain false.
+
 ## 2026-07-17 - Cooperative 1881 cross-sheet roof datum consensus
 
 - Began the successor gate that reads repeated roof-eave and roof-ridge labels
