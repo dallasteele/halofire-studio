@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS platform_documents (id TEXT PRIMARY KEY, job_id TEXT,
 CREATE TABLE IF NOT EXISTS platform_audit_events (id TEXT PRIMARY KEY, actor_employee_id TEXT, action TEXT NOT NULL, entity_kind TEXT NOT NULL, entity_id TEXT NOT NULL, payload_sha256 TEXT, created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS platform_review_items (id TEXT PRIMARY KEY, job_id TEXT, module_id TEXT NOT NULL, kind TEXT NOT NULL, severity TEXT NOT NULL CHECK(severity IN ('advisory','hard')), status TEXT NOT NULL CHECK(status IN ('open','resolved','dismissed')), evidence_sha256 TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS platform_module_registry (module_id TEXT PRIMARY KEY, display_name TEXT NOT NULL, nav_path TEXT NOT NULL, enabled INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS platform_autobid_links (source_table TEXT NOT NULL, source_row_id INTEGER NOT NULL, platform_job_id TEXT NOT NULL REFERENCES platform_jobs(id), source_sha256 TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY(source_table, source_row_id));
 """
 
 def digest(path: Path) -> str:
@@ -47,8 +48,15 @@ def apply(source: Path, target: Path, receipt: Path) -> dict[str, object]:
             conn.execute("INSERT OR IGNORE INTO platform_jobs VALUES (?,?,?,?,?,?,?,?,?)", (f"autobid:jobs:{row_id}", customer_id, None, name, "bidding", "jobs", row_id, source_sha, now))
         for row_id, job_id, rel_path, filename in conn.execute("SELECT id, job_id, rel_path, filename FROM documents WHERE rel_path IS NOT NULL ORDER BY id"):
             conn.execute("INSERT OR IGNORE INTO platform_documents VALUES (?,?,?,?,?,?,?,?,?)", (f"autobid:documents:{row_id}", f"autobid:jobs:{job_id}" if job_id is not None else None, rel_path, None, filename or "document", "documents", row_id, source_sha, now))
+        for table, query in {
+            "intake_bids": "SELECT i.id, j.id FROM intake_bids i JOIN builders b ON b.name=i.builder JOIN jobs j ON j.builder_id=b.id AND j.name=i.job",
+            "ready_bids": "SELECT r.id, d.job_id FROM ready_bids r JOIN documents d ON d.id=r.document_id WHERE d.job_id IS NOT NULL",
+            "bid_summary": "SELECT s.id, d.job_id FROM bid_summary s JOIN documents d ON d.id=s.document_id WHERE d.job_id IS NOT NULL",
+        }.items():
+            for source_row_id, job_id in conn.execute(query):
+                conn.execute("INSERT OR IGNORE INTO platform_autobid_links VALUES (?,?,?,?,?)", (table, source_row_id, f"autobid:jobs:{job_id}", source_sha, now))
         conn.execute("INSERT OR REPLACE INTO platform_migrations VALUES (?,?,?)", (MIGRATION_ID, source_sha, now)); conn.commit()
-        counts = {name: conn.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0] for name in ("platform_customers", "platform_jobs", "platform_documents", "platform_sites", "platform_employees")}
+        counts = {name: conn.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0] for name in ("platform_customers", "platform_jobs", "platform_documents", "platform_sites", "platform_employees", "platform_autobid_links")}
     finally: conn.close()
     result = {"migration": MIGRATION_ID, "source": str(source), "target": str(target), "source_sha256": source_sha, "target_sha256": digest(target), "counts": counts, "source_writable": False}
     receipt.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8"); return result
@@ -59,7 +67,7 @@ def rollback(target: Path) -> dict[str, object]:
     try:
         applied = conn.execute("SELECT source_sha256 FROM platform_migrations WHERE id=?", (MIGRATION_ID,)).fetchone()
         if applied is None: raise ValueError("PLATFORM_MIGRATION_NOT_APPLIED")
-        for table in ("platform_module_registry", "platform_review_items", "platform_audit_events", "platform_documents", "platform_employees", "platform_jobs", "platform_sites", "platform_customers", "platform_migrations"):
+        for table in ("platform_autobid_links", "platform_module_registry", "platform_review_items", "platform_audit_events", "platform_documents", "platform_employees", "platform_jobs", "platform_sites", "platform_customers", "platform_migrations"):
             conn.execute(f"DROP TABLE {table}")
         conn.commit()
         remaining = conn.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name LIKE 'platform_%'").fetchone()[0]

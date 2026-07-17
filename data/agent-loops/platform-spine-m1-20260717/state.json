@@ -2,7 +2,7 @@
   "name": "platform-spine-m1-20260717",
   "iteration": 1,
   "status": "in_progress",
-  "nextStage": "BIND_AUTOBID_PRIVATE_TABLES_TO_PLATFORM_LINKS",
+  "nextStage": "PROMOTE_PLATFORM_SCHEMA_AND_DEFINE_REVIEW_QUEUE_CONTRACT",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [141704, 60905],
@@ -29,5 +29,12 @@
     "remainingPlatformTables": 0,
     "sourceDigestUnchanged": "5c2ac127b37d570edf73f097b1c4eeb1df338d65f4ef3c8f3046b867c2828546",
     "verification": "apply plus rollback on disposable copy passed"
+  },
+  "iteration4": {
+    "autobidLinkTable": "platform_autobid_links",
+    "sourceBackedLinks": 1050,
+    "linkSources": ["intake_bids", "ready_bids", "bid_summary"],
+    "unlinkedRowsPolicy": "remain unlinked until a source-backed Job association exists",
+    "verification": "real-copy apply and rollback passed"
   }
 }
