@@ -1,0 +1,49 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-fp2-riser-reference.v1",
+  "projectId": "mit-riverside-building-j",
+  "status": "passed-cross-sheet-reference-only",
+  "sources": {
+    "approved": {
+      "sha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421"
+    },
+    "asBuilt": {
+      "sha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207"
+    },
+    "fp2": {
+      "physicalPage": 2,
+      "sheet": "FP-2"
+    },
+    "fp7": {
+      "physicalPage": 7,
+      "sheet": "FP-7"
+    }
+  },
+  "observedSourceReference": {
+    "fp2Callout": "3 in FIRE RISER REFER TO FP7 FOR DETAIL",
+    "fp7Title": "FIRE RISER DETAIL",
+    "fp2RiserNominalIn": 3,
+    "fp7GenericBasePipeIn": 4,
+    "approvedAsBuiltFp2CropIdentical": true,
+    "approvedAsBuiltFp7CropIdentical": true
+  },
+  "claims": {
+    "fp2ToFp7RiserReferenceReady": true,
+    "installedRiserGeometryReady": false,
+    "installedRiserLocationBoundToCenterline": false,
+    "installedRiserElevationReady": false,
+    "fieldDrainRouteReady": false,
+    "hydraulicClosureReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "FP-7 is a generic wet-riser detail. Its visible 4 in base-pipe notation conflicts with the FP-2 project callout's 3 in riser notation and is not propagated into project geometry.",
+    "No installed riser endpoint, elevation, pipe material, fittings, drain route, hydraulic connection, fabrication, employee-use, or release claim is made."
+  ],
+  "image": {
+    "file": "fp2-to-fp7-riser-reference.png",
+    "sha256": "00d678646d14aa30bcd7bc5967a4464b3136d390e7f2170e4388be62411a6237",
+    "bytes": 888664
+  }
+}

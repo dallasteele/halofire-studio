@@ -1,0 +1,47 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "name": "mit-riverside-building-j-fp2-riser-reference-20260717",
+  "iteration": 1,
+  "status": "completed-cross-sheet-reference-only",
+  "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY"],
+  "nextStage": "SOURCE_BOUND_INSTALLED_RISER_AND_DRAIN_GEOMETRY",
+  "sourceReplay": {
+    "approvedSha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+    "asBuiltSha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+    "fp2PhysicalPage": 2,
+    "fp7PhysicalPage": 7,
+    "approvedAsBuiltFp2CropIdentical": true,
+    "approvedAsBuiltFp7CropIdentical": true
+  },
+  "result": {
+    "fp2RiserCallout": "3 in FIRE RISER REFER TO FP7 FOR DETAIL",
+    "fp2RiserNominalIn": 3,
+    "fp7Title": "FIRE RISER DETAIL",
+    "fp7GenericBasePipeIn": 4,
+    "fp2ToFp7RiserReferenceReady": true,
+    "installedRiserGeometryReady": false,
+    "installedRiserLocationBoundToCenterline": false,
+    "installedRiserElevationReady": false,
+    "fieldDrainRouteReady": false,
+    "hydraulicClosureReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "verification": {
+    "focusedTests": "2 Vitest assertions passed",
+    "crossArtifactRegression": "6 focused Vitest assertions passed across the FP-2/FP-7 reference, approved pipe layout, and head-registered centerline proofs",
+    "sourceReplay": "approved/as-built FP-2 and FP-7 source crops are pixel-identical",
+    "workspaceBuild": "turbo build passed",
+    "loopGuard": "AGENT_LOOP_GUARD passed",
+    "agenticRules": "AGENTIC_RULES verification passed",
+    "visual": "Playwright rendered the source-reference proof with no console errors or warnings; screenshot inspected at output/playwright/mit-riverside-building-j-fp2-riser-reference.png",
+    "formal": "unavailable: GX10 formal prover endpoint at 127.0.0.1:8810 did not accept a connection"
+  },
+  "visualGate": {
+    "status": "accepted-source-reference-only",
+    "evidence": "apps/autosprink/src/data/proofs/mit-riverside-building-j-fp2-riser-reference/fp2-to-fp7-riser-reference.png",
+    "finding": "FP-2 visibly names a 3 in fire riser and refers to FP-7. FP-7 visibly supplies a generic wet-riser detail with a 4 in base pipe; the conflict is preserved as a hold and not propagated into installed project geometry."
+  },
+  "nextSourceRequirement": "Find an installed/as-built riser elevation, endpoint, material, fitting, drain route, and hydraulic tie-in record that resolves the project-specific FP-2/FP-7 size/detail ambiguity before promoting any riser or drain geometry."
+}

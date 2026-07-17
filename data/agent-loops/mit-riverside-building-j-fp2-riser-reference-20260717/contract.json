@@ -1,0 +1,40 @@
+{
+  "name": "mit-riverside-building-j-fp2-riser-reference-20260717",
+  "owner": "codex",
+  "goal": "Bind the visible Transportation J FP-2 three-inch fire-riser callout to the actual FP-7 Fire Riser Detail source sheet, preserving both source crops and refusing to infer installed riser geometry, drain routing, elevations, hydraulics, fabrication, or release semantics.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/City Approved FS Plans/State Fire Marshal Approved Plan Set.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Field Operations/As Builts/State Fire Marshal Approved Plan Set_As Builts.pdf",
+    "apps/autosprink/src/data/mit-riverside-building-j-head-registered-pipe-centerlines.json"
+  ],
+  "exit_criteria": [
+    "approved/as-built source digests match the sealed Building J records",
+    "the physical FP-2 plan crop visibly retains the three-inch fire-riser reference to FP-7",
+    "the physical FP-7 crop visibly retains the Fire Riser Detail title and the source detail",
+    "the proof records the source-reference link while explicitly holding installed location, pipe elevation, drains, hydraulic closure, fabrication, employee-use, and VPS-release claims false"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "approved/as-built document hash replay",
+    "approved/as-built FP-2 and FP-7 crop pixel comparison",
+    "cross-reference proof image hash",
+    "focused test and AutoSprink production build",
+    "actual-PDF visual/browser inspection",
+    "formal prover check or exact unavailable receipt",
+    "authoritative rulebook verification",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/mit-riverside-building-j-fp2-riser-reference-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/scripts/build-mit-riverside-building-j-fp2-riser-reference-proof.py",
+    "apps/autosprink/src/data/mit-riverside-building-j-fp2-riser-reference.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-fp2-riser-reference",
+    "apps/autosprink/tests/mit-riverside-building-j-fp2-riser-reference.test.js"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 30000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
