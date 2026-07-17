@@ -1,0 +1,1107 @@
+{
+  "artifactType": "halofire.cooperative-1881-a121-roof-face-boundaries.v1",
+  "projectName": "The Cooperative 1881 - Salt Lake City UT",
+  "status": "passed",
+  "sources": {
+    "architectural": {
+      "fileName": "A-121 ROOF PLAN.dwg",
+      "sha256": "FD3DB45D18C2970F0F67BE1C668188ABD1962C0D3CD56A7EDE67545F53F42606",
+      "expectedSha256": "FD3DB45D18C2970F0F67BE1C668188ABD1962C0D3CD56A7EDE67545F53F42606",
+      "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+      "unknownEntityCount": 0
+    }
+  },
+  "roofBlockRecordCount": 30,
+  "roofBlockInsertCount": 30,
+  "boundaries": [
+    {
+      "id": "Roof_1_2:1",
+      "roofBlockName": "Roof_1_2",
+      "roofBlockRecordHandle": "7315",
+      "roofBlockInsertHandle": "7320",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7318"
+      ],
+      "vertices": [
+        {
+          "x": 994.845831,
+          "y": 4150.117937,
+          "z": 0
+        },
+        {
+          "x": 994.845831,
+          "y": 6137.287574,
+          "z": 0
+        },
+        {
+          "x": 906.970831,
+          "y": 6137.287574,
+          "z": 0
+        },
+        {
+          "x": 906.970831,
+          "y": 5965.742936,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 5965.742936,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 4150.117937,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 830063.15649
+    },
+    {
+      "id": "Roof_2_2:1",
+      "roofBlockName": "Roof_2_2",
+      "roofBlockRecordHandle": "7322",
+      "roofBlockInsertHandle": "732B",
+      "layer": "New_A _ Roofs.3D",
+      "source": "LWPOLYLINE_LOOP",
+      "handles": [
+        "7326",
+        "7328",
+        "7329",
+        "732A"
+      ],
+      "vertices": [
+        {
+          "x": 994.845831,
+          "y": 5957.742936,
+          "z": 0
+        },
+        {
+          "x": 671.845832,
+          "y": 5957.742936,
+          "z": 0
+        },
+        {
+          "x": 671.845832,
+          "y": 6137.287574,
+          "z": 0
+        },
+        {
+          "x": 994.845831,
+          "y": 6137.287574,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 57992.917894
+    },
+    {
+      "id": "Roof_3_2:1",
+      "roofBlockName": "Roof_3_2",
+      "roofBlockRecordHandle": "732C",
+      "roofBlockInsertHandle": "7333",
+      "layer": "New_A _ Roofs.3D",
+      "source": "LWPOLYLINE_LOOP",
+      "handles": [
+        "732F",
+        "7330",
+        "7331",
+        "7332"
+      ],
+      "vertices": [
+        {
+          "x": 545.970831,
+          "y": 7402.992936,
+          "z": 0
+        },
+        {
+          "x": 489.720831,
+          "y": 7402.992936,
+          "z": 0
+        },
+        {
+          "x": 489.720831,
+          "y": 7959.617936,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 7959.617936,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 31310.15625
+    },
+    {
+      "id": "Roof_4_2:1",
+      "roofBlockName": "Roof_4_2",
+      "roofBlockRecordHandle": "7334",
+      "roofBlockInsertHandle": "733B",
+      "layer": "New_A _ Roofs.3D",
+      "source": "LWPOLYLINE_LOOP",
+      "handles": [
+        "7337",
+        "7338",
+        "7339",
+        "733A"
+      ],
+      "vertices": [
+        {
+          "x": 489.720831,
+          "y": 4186.490708,
+          "z": 0
+        },
+        {
+          "x": 489.720831,
+          "y": 4654.367937,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 4654.367937,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 4186.490708,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 26318.094131
+    },
+    {
+      "id": "Roof_5_2:1",
+      "roofBlockName": "Roof_5_2",
+      "roofBlockRecordHandle": "733C",
+      "roofBlockInsertHandle": "7343",
+      "layer": "New_A _ Roofs.3D",
+      "source": "LWPOLYLINE_LOOP",
+      "handles": [
+        "733F",
+        "7340",
+        "7341",
+        "7342"
+      ],
+      "vertices": [
+        {
+          "x": 545.791236,
+          "y": 7402.992936,
+          "z": 0
+        },
+        {
+          "x": 545.791236,
+          "y": 4654.367937,
+          "z": 0
+        },
+        {
+          "x": 149.916235,
+          "y": 4654.367937,
+          "z": 0
+        },
+        {
+          "x": 149.916235,
+          "y": 7402.992936,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 1088111.924228
+    },
+    {
+      "id": "Roof_6_2:1",
+      "roofBlockName": "Roof_6_2",
+      "roofBlockRecordHandle": "7344",
+      "roofBlockInsertHandle": "73D2",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7347"
+      ],
+      "vertices": [
+        {
+          "x": 545.970831,
+          "y": 6137.287573,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 5957.742938,
+          "z": 0
+        },
+        {
+          "x": 671.845832,
+          "y": 5957.742938,
+          "z": 0
+        },
+        {
+          "x": 671.845832,
+          "y": 6137.287573,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 22600.18111
+    },
+    {
+      "id": "Roof_6_2:2",
+      "roofBlockName": "Roof_6_2",
+      "roofBlockRecordHandle": "7344",
+      "roofBlockInsertHandle": "73D2",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7347"
+      ],
+      "vertices": [
+        {
+          "x": 548.740507,
+          "y": 6027.47973,
+          "z": 0
+        },
+        {
+          "x": 548.768685,
+          "y": 6028.832536,
+          "z": 0
+        },
+        {
+          "x": 548.768685,
+          "y": 6053.918832,
+          "z": 0
+        },
+        {
+          "x": 643.844304,
+          "y": 6053.918832,
+          "z": 0
+        },
+        {
+          "x": 643.854992,
+          "y": 6054.431941,
+          "z": 0
+        },
+        {
+          "x": 646.799058,
+          "y": 6054.431941,
+          "z": 0
+        },
+        {
+          "x": 646.816453,
+          "y": 6053.596777,
+          "z": 0
+        },
+        {
+          "x": 646.403504,
+          "y": 6033.770915,
+          "z": 0
+        },
+        {
+          "x": 646.403504,
+          "y": 6016.344027,
+          "z": 0
+        },
+        {
+          "x": 646.321269,
+          "y": 6016.344257,
+          "z": 0
+        },
+        {
+          "x": 646.322321,
+          "y": 6015.950327,
+          "z": 0
+        },
+        {
+          "x": 548.768685,
+          "y": 6015.950327,
+          "z": 0
+        },
+        {
+          "x": 548.768685,
+          "y": 6027.131323,
+          "z": 0
+        },
+        {
+          "x": 548.747765,
+          "y": 6027.131323,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 3712.785106
+    },
+    {
+      "id": "Roof_7_2:1",
+      "roofBlockName": "Roof_7_2",
+      "roofBlockRecordHandle": "73D3",
+      "roofBlockInsertHandle": "73DE",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "73D6"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 4678.925784,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 4938.830436,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 4938.830436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607033
+    },
+    {
+      "id": "Roof_8_2:1",
+      "roofBlockName": "Roof_8_2",
+      "roofBlockRecordHandle": "73DF",
+      "roofBlockInsertHandle": "73E9",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "73E2"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 5198.735089,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 4938.830436,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 4938.830436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607098
+    },
+    {
+      "id": "Roof_9_2:1",
+      "roofBlockName": "Roof_9_2",
+      "roofBlockRecordHandle": "73EA",
+      "roofBlockInsertHandle": "73F1",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "73ED"
+      ],
+      "vertices": [
+        {
+          "x": 546.249758,
+          "y": 6494.784603,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 6495.342451,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 6494.784603,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 0.077799
+    },
+    {
+      "id": "Roof_10_2:1",
+      "roofBlockName": "Roof_10_2",
+      "roofBlockRecordHandle": "73F2",
+      "roofBlockInsertHandle": "73F9",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "73F5"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 7378.992936,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 7378.435088,
+          "z": 0
+        },
+        {
+          "x": 546.249758,
+          "y": 7378.992936,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 0.077799
+    },
+    {
+      "id": "Roof_11_2:1",
+      "roofBlockName": "Roof_11_2",
+      "roofBlockRecordHandle": "73FA",
+      "roofBlockInsertHandle": "7401",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "73FD"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 6470.784603,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 6470.226755,
+          "z": 0
+        },
+        {
+          "x": 546.249758,
+          "y": 6470.784603,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 0.077799
+    },
+    {
+      "id": "Roof_12_2:1",
+      "roofBlockName": "Roof_12_2",
+      "roofBlockRecordHandle": "7402",
+      "roofBlockInsertHandle": "7409",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7405"
+      ],
+      "vertices": [
+        {
+          "x": 546.249758,
+          "y": 5586.57627,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 5587.134118,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 5586.57627,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 0.077799
+    },
+    {
+      "id": "Roof_13_2:1",
+      "roofBlockName": "Roof_13_2",
+      "roofBlockRecordHandle": "740A",
+      "roofBlockInsertHandle": "7411",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "740D"
+      ],
+      "vertices": [
+        {
+          "x": 546.249758,
+          "y": 4678.367937,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 4678.925784,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 4678.367937,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 0.077798
+    },
+    {
+      "id": "Roof_14_2:1",
+      "roofBlockName": "Roof_14_2",
+      "roofBlockRecordHandle": "7412",
+      "roofBlockInsertHandle": "7419",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7415"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 5562.57627,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 5562.018422,
+          "z": 0
+        },
+        {
+          "x": 546.249758,
+          "y": 5562.57627,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 0.077799
+    },
+    {
+      "id": "Roof_15_2:1",
+      "roofBlockName": "Roof_15_2",
+      "roofBlockRecordHandle": "741A",
+      "roofBlockInsertHandle": "7424",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "741D"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 5223.850784,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 5483.755436,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 5483.755436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607033
+    },
+    {
+      "id": "Roof_16_2:1",
+      "roofBlockName": "Roof_16_2",
+      "roofBlockRecordHandle": "7425",
+      "roofBlockInsertHandle": "742F",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7428"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 5743.660089,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 5483.755436,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 5483.755436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607098
+    },
+    {
+      "id": "Roof_17_2:1",
+      "roofBlockName": "Roof_17_2",
+      "roofBlockRecordHandle": "7430",
+      "roofBlockInsertHandle": "743A",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7433"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 5768.775784,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 6028.680436,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 6028.680436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607033
+    },
+    {
+      "id": "Roof_18_2:1",
+      "roofBlockName": "Roof_18_2",
+      "roofBlockRecordHandle": "743B",
+      "roofBlockInsertHandle": "7445",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "743E"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 6288.585089,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 6028.680436,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 6028.680436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607098
+    },
+    {
+      "id": "Roof_19_2:1",
+      "roofBlockName": "Roof_19_2",
+      "roofBlockRecordHandle": "7446",
+      "roofBlockInsertHandle": "7450",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7449"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 6313.700784,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 6573.605436,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 6573.605436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607033
+    },
+    {
+      "id": "Roof_20_2:1",
+      "roofBlockName": "Roof_20_2",
+      "roofBlockRecordHandle": "7451",
+      "roofBlockInsertHandle": "745B",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7454"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 6833.510088,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 6573.605436,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 6573.605436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607033
+    },
+    {
+      "id": "Roof_21_2:1",
+      "roofBlockName": "Roof_21_2",
+      "roofBlockRecordHandle": "745C",
+      "roofBlockInsertHandle": "7466",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "745F"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 6858.625784,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 7118.530436,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 7118.530436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607033
+    },
+    {
+      "id": "Roof_22_2:1",
+      "roofBlockName": "Roof_22_2",
+      "roofBlockRecordHandle": "7467",
+      "roofBlockInsertHandle": "7471",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "746A"
+      ],
+      "vertices": [
+        {
+          "x": 545.970834,
+          "y": 7378.435088,
+          "z": 0
+        },
+        {
+          "x": 416.018508,
+          "y": 7118.530436,
+          "z": 0
+        },
+        {
+          "x": 545.970834,
+          "y": 7118.530436,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 16887.607033
+    },
+    {
+      "id": "Roof_23_2:1",
+      "roofBlockName": "Roof_23_2",
+      "roofBlockRecordHandle": "7472",
+      "roofBlockInsertHandle": "747B",
+      "layer": "New_A _ Roofs.3D",
+      "source": "LWPOLYLINE_LOOP",
+      "handles": [
+        "7475",
+        "7476",
+        "7477",
+        "7478",
+        "7479",
+        "747A"
+      ],
+      "vertices": [
+        {
+          "x": 906.970831,
+          "y": 6137.287574,
+          "z": 0
+        },
+        {
+          "x": 994.845831,
+          "y": 6137.287574,
+          "z": 0
+        },
+        {
+          "x": 994.845831,
+          "y": 4150.117937,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 4150.117937,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 5965.742936,
+          "z": 0
+        },
+        {
+          "x": 906.970831,
+          "y": 5965.742936,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 830063.15649
+    },
+    {
+      "id": "Roof_24_2:1",
+      "roofBlockName": "Roof_24_2",
+      "roofBlockRecordHandle": "747C",
+      "roofBlockInsertHandle": "7484",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "747F"
+      ],
+      "vertices": [
+        {
+          "x": 489.720831,
+          "y": 4150.117937,
+          "z": 0
+        },
+        {
+          "x": 489.720831,
+          "y": 4651.305436,
+          "z": 0
+        },
+        {
+          "x": 40.845831,
+          "y": 4651.305436,
+          "z": 0
+        },
+        {
+          "x": 40.845831,
+          "y": 4150.117937,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 224970.538614
+    },
+    {
+      "id": "Roof_25_2:1",
+      "roofBlockName": "Roof_25_2",
+      "roofBlockRecordHandle": "7485",
+      "roofBlockInsertHandle": "748C",
+      "layer": "New_A _ Roofs.3D",
+      "source": "LWPOLYLINE_LOOP",
+      "handles": [
+        "7488",
+        "7489",
+        "748A",
+        "748B"
+      ],
+      "vertices": [
+        {
+          "x": 40.845831,
+          "y": 4651.305436,
+          "z": 0
+        },
+        {
+          "x": 489.720831,
+          "y": 4651.305436,
+          "z": 0
+        },
+        {
+          "x": 489.720831,
+          "y": 4150.117937,
+          "z": 0
+        },
+        {
+          "x": 40.845831,
+          "y": 4150.117937,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 224970.538614
+    },
+    {
+      "id": "Roof_26_2:1",
+      "roofBlockName": "Roof_26_2",
+      "roofBlockRecordHandle": "748D",
+      "roofBlockInsertHandle": "7495",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7490"
+      ],
+      "vertices": [
+        {
+          "x": 545.970831,
+          "y": 8021.117936,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 6361.492936,
+          "z": 0
+        },
+        {
+          "x": 994.845831,
+          "y": 6361.492936,
+          "z": 0
+        },
+        {
+          "x": 994.845831,
+          "y": 8021.117936,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 744964.171875
+    },
+    {
+      "id": "Roof_27_2:1",
+      "roofBlockName": "Roof_27_2",
+      "roofBlockRecordHandle": "7496",
+      "roofBlockInsertHandle": "749D",
+      "layer": "New_A _ Roofs.3D",
+      "source": "LWPOLYLINE_LOOP",
+      "handles": [
+        "7499",
+        "749A",
+        "749B",
+        "749C"
+      ],
+      "vertices": [
+        {
+          "x": 994.845831,
+          "y": 6353.492936,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 6353.492936,
+          "z": 0
+        },
+        {
+          "x": 545.970831,
+          "y": 8021.117936,
+          "z": 0
+        },
+        {
+          "x": 994.845831,
+          "y": 8021.117936,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 748555.171875
+    },
+    {
+      "id": "Roof_28_2:1",
+      "roofBlockName": "Roof_28_2",
+      "roofBlockRecordHandle": "749E",
+      "roofBlockInsertHandle": "74A6",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "74A1"
+      ],
+      "vertices": [
+        {
+          "x": 40.845831,
+          "y": 8021.117936,
+          "z": 0
+        },
+        {
+          "x": 40.845831,
+          "y": 7404.055436,
+          "z": 0
+        },
+        {
+          "x": 489.720831,
+          "y": 7404.055436,
+          "z": 0
+        },
+        {
+          "x": 489.720831,
+          "y": 8021.117936,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 276983.929688
+    },
+    {
+      "id": "Roof_29_2:1",
+      "roofBlockName": "Roof_29_2",
+      "roofBlockRecordHandle": "74A7",
+      "roofBlockInsertHandle": "74AE",
+      "layer": "New_A _ Roofs.3D",
+      "source": "LWPOLYLINE_LOOP",
+      "handles": [
+        "74AA",
+        "74AB",
+        "74AC",
+        "74AD"
+      ],
+      "vertices": [
+        {
+          "x": 489.720831,
+          "y": 7404.055436,
+          "z": 0
+        },
+        {
+          "x": 40.845831,
+          "y": 7404.055436,
+          "z": 0
+        },
+        {
+          "x": 40.845831,
+          "y": 8021.117936,
+          "z": 0
+        },
+        {
+          "x": 489.720831,
+          "y": 8021.117936,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 276983.929687
+    },
+    {
+      "id": "Roof_30_2:1",
+      "roofBlockName": "Roof_30_2",
+      "roofBlockRecordHandle": "7532",
+      "roofBlockInsertHandle": "753A",
+      "layer": "New_A _ Roofs.3D",
+      "source": "HATCH_BOUNDARY",
+      "handles": [
+        "7535"
+      ],
+      "vertices": [
+        {
+          "x": 547.845831,
+          "y": 6361.492936,
+          "z": 0
+        },
+        {
+          "x": 547.845831,
+          "y": 6137.287574,
+          "z": 0
+        },
+        {
+          "x": 1016.845831,
+          "y": 6137.287574,
+          "z": 0
+        },
+        {
+          "x": 1016.845831,
+          "y": 6361.492936,
+          "z": 0
+        }
+      ],
+      "areaNativeSq": 105152.314778
+    }
+  ],
+  "issues": [],
+  "claims": {
+    "sourceRoofFaceBoundariesRegistered": true,
+    "roofSurfaceReconstructionReady": false,
+    "slopeDirectionReady": false,
+    "perMemberVerticalDatumReady": false,
+    "exactPhysicalFramingPromoted": false,
+    "automaticSprinklerPlacementAllowed": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "fabricationReady": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "A source-bound plan boundary is not a roof plane, slope direction vector, or elevation.",
+    "No boundary is associated with a structural member, sprinkler, pipe, fitting, clearance, fabrication, code decision, employee workflow, or VPS release."
+  ]
+}

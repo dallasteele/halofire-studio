@@ -1,0 +1,37 @@
+{
+  "name": "cooperative-1881-a121-roof-face-boundaries-20260717",
+  "owner": "codex",
+  "goal": "Register each issued A-121 native Roof_*_2 block as a source-bound closed plan boundary, without inferring slope direction, elevation, sprinkler placement, or pipe routing.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/arch/A-121 ROOF PLAN.dwg",
+    "apps/autosprink/src/data/cooperative-1881-roof-slope-registration.json",
+    "apps/autosprink/scripts/extract-cooperative-1881-roof-slope-registration.mjs"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-a121-roof-face-boundaries-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/cooperative-1881-a121-roof-face-boundaries.json",
+    "output/visual-proof/1881-a121-roof-face-boundaries.svg",
+    "data/agent-loops/cooperative-1881-a121-roof-face-boundaries-20260717/evidence.md"
+  ],
+  "exit_criteria": [
+    "The sealed A-121 DWG hash and zero-unknown-entity condition are checked before extraction.",
+    "Every emitted boundary is built only from a named Roof_*_2 block instance and its native LWPOLYLINE/HATCH source handles.",
+    "Only closed, non-degenerate plan loops are emitted; non-closed or conflicting block geometry is retained as a typed issue.",
+    "The artifact explicitly leaves roof slope direction, roof elevation, member association, sprinkler placement, pipe routing, clearance, fabrication, code, employee, and VPS claims false."
+  ],
+  "verification_gates": [
+    "agent_loop_guard validate before implementation",
+    "focused Vitest coverage for source-bound loop reconstruction and false-promotion rejection",
+    "deterministic two-run artifact replay",
+    "Autosprink production build",
+    "GX10 prover health/check or explicit formal-proof blocker",
+    "Chrome screenshot capture and visual inspection of the source-bound plan proof",
+    "verify_agentic_rules.py"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 30000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

@@ -16,6 +16,7 @@
     "build:1881-issued-structural-dwg-geometry": "node scripts/extract-cooperative-1881-issued-structural-dwg-geometry.mjs",
     "build:1881-issued-roof-datum-consensus": "node scripts/extract-cooperative-1881-issued-roof-datum-consensus.mjs",
     "build:1881-roof-slope-registration": "node scripts/extract-cooperative-1881-roof-slope-registration.mjs",
+    "build:1881-a121-roof-face-boundaries": "node scripts/extract-cooperative-1881-a121-roof-face-boundaries.mjs",
     "build:1881-roof-framing-clearance-preflight": "node scripts/build-1881-roof-framing-clearance-preflight.mjs",
     "audit:new-hope-support-cad": "node scripts/audit-new-hope-support-cad-corpus.mjs",
     "audit:victaulic-ab2-cad": "node scripts/audit-victaulic-ab2-dxf.mjs",

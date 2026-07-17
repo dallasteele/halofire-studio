@@ -1,0 +1,16 @@
+{
+  "name": "cooperative-1881-a121-roof-face-boundaries-20260717",
+  "iteration": 1,
+  "status": "completed",
+  "stages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY"],
+  "nextStage": "OPEN_ROOF_BOUNDARY_TO_SLOPE_DIRECTION_AND_VERTICAL_DATUM_ASSOCIATION_LOOP",
+  "claims": {
+    "sourceRoofFaceBoundariesRegistered": true,
+    "roofSurfaceReconstructionReady": false,
+    "perMemberVerticalDatumReady": false,
+    "automaticPipeRoutingAllowed": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  }
+}
