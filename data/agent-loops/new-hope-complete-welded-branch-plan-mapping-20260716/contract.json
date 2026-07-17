@@ -1,0 +1,48 @@
+{
+  "name": "new-hope-complete-welded-branch-plan-mapping-20260716",
+  "owner": "codex",
+  "goal": "Complete the source-bound top-down plan-vector mapping for all 71 New Hope welded branch units by resolving BL03 and BL04 from their alternate black/white-twin PDF centerlines, while keeping station direction, hydraulic flow, grade, installed Z, threaded pieces, global fabrication, and release independently fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "tmp/pdfs/new-hope-live/field-install.pdf",
+    "tmp/pdfs/new-hope-live/as-builts.pdf",
+    "apps/autosprink/src/data/new-hope-native-fab-attachment-graph.json",
+    "apps/autosprink/src/data/new-hope-fabrication-end-schedule.json",
+    "apps/autosprink/src/data/new-hope-wet-level1-network-evidence.json",
+    "apps/autosprink/src/data/new-hope-wet-welded-branch-registration-evidence.json",
+    "hal-brain episodes 156579, 150639"
+  ],
+  "exit_criteria": [
+    "all 71 welded branch-unit labels remain bound to exact FP1.0 coordinates",
+    "67 heavy source centerlines replay exactly across field and as-built PDFs",
+    "the BL03 and BL04 suffix labels are associated to their line labels by exact source-space grouping instead of PDF text order",
+    "four alternate centerlines have identical black and white twin geometry in each source PDF and replay exactly across field and as-built PDFs",
+    "all 71 welded branch units have a unique source-plan vector within three inches of native cut length and no welded holdouts remain",
+    "the existing 15-unit and 36-outlet station-direction registration remains unchanged",
+    "the other 98 globally listed wet-system units and all hydraulic flow, grade, fitting takeout, installed Z, riser, drain, and pump claims remain unresolved",
+    "global fabrication, field release, quote release, and VPS release remain false",
+    "deterministic replay, focused adversarial tests, build, actual-PDF visual inspection, browser inspection, rulebook, loop guard, formal proof, and brain postflight pass"
+  ],
+  "verification_gates": [
+    "protected field and as-built PDF hashes",
+    "full evidence-artifact fingerprint",
+    "exact BL03 and BL04 source-spatial label association",
+    "black/white twin geometry parity in both PDFs and exact cross-source replay",
+    "native cut-length closure within three inches and label-to-segment distance within twelve PDF points",
+    "71 unique piece instances and 71 unique source segments partitioned as 67 heavy plus four alternate",
+    "adversarial source-label, twin-parity, duplicate, missing, tolerance, direction-promotion, and release-promotion rejection",
+    "actual-PDF overlay and browser truth surface",
+    "formal scoped-versus-global and readiness invariants"
+  ],
+  "state_path": "data/agent-loops/new-hope-complete-welded-branch-plan-mapping-20260716/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/new-hope-wet-welded-branch-registration-evidence.json",
+    "apps/autosprink/src/data/proofs/new-hope-system-backbone/wet-welded-branch-registration-source.png",
+    "data/agent-loops/new-hope-complete-welded-branch-plan-mapping-20260716/lean-proof.json"
+  ],
+  "max_iterations": 3,
+  "max_tokens": 50000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

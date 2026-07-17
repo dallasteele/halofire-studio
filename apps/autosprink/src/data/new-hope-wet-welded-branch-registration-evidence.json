@@ -1,5 +1,5 @@
 {
-  "artifactType": "halofire.new-hope-wet-welded-branch-registration-evidence.v2",
+  "artifactType": "halofire.new-hope-wet-welded-branch-registration-evidence.v3",
   "projectId": "new-hope-crisis-center-brigham-city-ut",
   "sources": {
     "fieldInstall": {
@@ -47,7 +47,8 @@
         1079.794312,
         896.814209,
         1092.79834
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL01.02",
@@ -65,7 +66,8 @@
         1079.794312,
         991.806763,
         1092.79834
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL06.01",
@@ -83,7 +85,8 @@
         957.532349,
         897.46405,
         970.536438
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL06.02",
@@ -101,7 +104,8 @@
         1003.111084,
         1046.136475,
         1015.881287
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL06.03",
@@ -119,7 +123,8 @@
         998.794373,
         1069.609009,
         1011.798462
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL09.01",
@@ -137,7 +142,8 @@
         910.844849,
         826.394287,
         923.848938
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL09.02",
@@ -155,7 +161,8 @@
         910.844849,
         725.756714,
         923.848938
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL10.01",
@@ -173,7 +180,8 @@
         1331.49353,
         880.62677,
         1344.497559
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL10.02",
@@ -191,7 +199,8 @@
         1331.49353,
         991.806763,
         1344.497559
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL13.01",
@@ -209,7 +218,8 @@
         1412.49353,
         885.254883,
         1425.497559
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL13.02",
@@ -227,7 +237,8 @@
         1412.49353,
         991.806763,
         1425.497559
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL14.01",
@@ -245,7 +256,8 @@
         775.844849,
         860.593323,
         788.848938
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL14.02",
@@ -263,7 +275,8 @@
         775.844849,
         725.756714,
         788.848938
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL15.01",
@@ -281,7 +294,8 @@
         1510.846924,
         814.62085,
         1523.850952
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL15.02",
@@ -299,7 +313,8 @@
         1510.846924,
         714.739929,
         1523.850952
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL16.01",
@@ -317,7 +332,8 @@
         1559.407349,
         867.566711,
         1572.411377
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL18.01",
@@ -335,7 +351,8 @@
         704.172974,
         988.098999,
         717.177063
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL18.02",
@@ -353,7 +370,8 @@
         704.172974,
         920.744995,
         717.177063
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL27.01",
@@ -371,7 +389,8 @@
         1600.160034,
         1162.091064,
         1612.93042
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL29.01",
@@ -389,7 +408,8 @@
         948.720337,
         1398.185913,
         961.724426
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL29.02",
@@ -407,7 +427,8 @@
         948.720337,
         1337.979492,
         961.724426
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL34.01-A",
@@ -425,7 +446,8 @@
         780.532349,
         1438.827759,
         793.536438
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL35.01-A",
@@ -443,7 +465,8 @@
         705.111877,
         1427.131836,
         718.115967
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL34.01-B",
@@ -461,7 +484,8 @@
         1630.657349,
         1506.404175,
         1643.661377
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL42.01",
@@ -479,7 +503,8 @@
         575.891846,
         1427.131836,
         588.895935
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL43.01",
@@ -497,7 +522,8 @@
         575.891846,
         1398.185913,
         588.895935
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL35.01-B",
@@ -515,7 +541,8 @@
         1706.082275,
         1441.192383,
         1719.086304
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL45.01",
@@ -533,7 +560,8 @@
         1770.400635,
         1398.185913,
         1783.404663
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL45.02",
@@ -551,7 +579,8 @@
         1770.400635,
         1280.473267,
         1783.404663
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL46.01",
@@ -569,7 +598,8 @@
         1831.181152,
         1491.13147,
         1844.185181
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL47.01",
@@ -587,7 +617,8 @@
         1835.302246,
         1398.185913,
         1848.306274
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL19.01",
@@ -605,7 +636,8 @@
         1632.909424,
         822.135986,
         1645.913452
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL19.02",
@@ -623,7 +655,8 @@
         1632.909424,
         725.756714,
         1645.913452
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL02.01",
@@ -641,7 +674,8 @@
         955.097534,
         837.104248,
         968.101624
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL02.02",
@@ -659,7 +693,8 @@
         1001.219849,
         833.287964,
         1014.223938
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL08.01",
@@ -677,7 +712,8 @@
         1302.345337,
         838.620789,
         1315.349365
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL11.01",
@@ -695,7 +731,8 @@
         889.927856,
         919.922913,
         902.931946
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL11.02",
@@ -713,7 +750,8 @@
         867.532349,
         904.735779,
         880.536438
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL12.01",
@@ -731,7 +769,8 @@
         1399.423218,
         838.620789,
         1412.427246
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL17.01",
@@ -749,7 +788,8 @@
         738.889893,
         1053.235107,
         751.893982
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL17.02",
@@ -767,7 +807,8 @@
         708.672974,
         1072.647827,
         721.677063
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL20.01",
@@ -785,7 +826,8 @@
         667.61615,
         942.187988,
         680.620239
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL20.02",
@@ -803,7 +845,8 @@
         639.03894,
         958.685303,
         652.04303
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL21.01",
@@ -821,7 +864,8 @@
         623.172974,
         1017.044922,
         636.177063
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL22.01",
@@ -839,7 +883,8 @@
         1681.844849,
         829.719666,
         1694.848877
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL23.01",
@@ -857,7 +902,8 @@
         1691.271118,
         872.004639,
         1704.275146
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL24.01",
@@ -875,7 +921,8 @@
         1600.160034,
         1091.907471,
         1612.93042
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL25.01",
@@ -893,7 +940,8 @@
         1760.280029,
         801.247437,
         1773.284058
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL26.01",
@@ -911,7 +959,8 @@
         1786.334229,
         867.566711,
         1799.338257
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL28.01",
@@ -929,7 +978,8 @@
         999.391724,
         1398.185913,
         1012.395813
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL30.01",
@@ -947,7 +997,8 @@
         896.436035,
         1427.131836,
         909.440125
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL31.01",
@@ -965,7 +1016,8 @@
         851.032837,
         1398.185913,
         864.036926
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL31.02",
@@ -983,7 +1035,8 @@
         851.032837,
         1338.136963,
         864.036926
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL32.01",
@@ -1001,7 +1054,8 @@
         833.407349,
         1427.131836,
         846.411438
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL33.01",
@@ -1019,7 +1073,8 @@
         1416.71936,
         1398.185913,
         1429.723389
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL36.01",
@@ -1037,7 +1092,8 @@
         705.111877,
         1375.542725,
         718.115967
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL37.01",
@@ -1055,7 +1111,8 @@
         1516.134399,
         1427.131836,
         1529.138428
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL38.01",
@@ -1073,7 +1130,8 @@
         1516.134399,
         1398.185913,
         1529.138428
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL39.01",
@@ -1091,7 +1149,8 @@
         639.8797,
         1398.185913,
         652.883789
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL40.01",
@@ -1109,7 +1168,8 @@
         1577.032349,
         1427.131836,
         1590.036377
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL41.01",
@@ -1127,7 +1187,8 @@
         1577.032349,
         1381.496216,
         1590.036377
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL44.01",
@@ -1145,7 +1206,8 @@
         1702.521118,
         1372.889893,
         1715.525146
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL44.02",
@@ -1163,7 +1225,8 @@
         1702.521118,
         1224.600708,
         1715.525146
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL07.01",
@@ -1181,7 +1244,8 @@
         1248.176514,
         886.417847,
         1261.180542
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL07.02",
@@ -1199,7 +1263,8 @@
         1248.176514,
         997.187012,
         1261.180542
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL03.01",
@@ -1213,11 +1278,12 @@
         1159.434082
       ],
       "pieceLabelBoxPdfPt": [
-        830.305664,
-        1172.123169,
-        843.075867,
-        1185.127197
-      ]
+        886.211731,
+        1163.013306,
+        898.981934,
+        1176.017334
+      ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping"
     },
     {
       "instanceId": "BL03.02",
@@ -1231,11 +1297,12 @@
         1159.434082
       ],
       "pieceLabelBoxPdfPt": [
-        786.048096,
-        1172.123169,
-        798.818298,
-        1185.127197
-      ]
+        984.416809,
+        1163.013184,
+        997.187012,
+        1176.017212
+      ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping"
     },
     {
       "instanceId": "BL04.01",
@@ -1249,11 +1316,12 @@
         1168.544067
       ],
       "pieceLabelBoxPdfPt": [
-        886.211731,
-        1163.013306,
-        898.981934,
-        1176.017334
-      ]
+        830.305664,
+        1172.123169,
+        843.075867,
+        1185.127197
+      ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping"
     },
     {
       "instanceId": "BL04.02",
@@ -1267,11 +1335,12 @@
         1168.544067
       ],
       "pieceLabelBoxPdfPt": [
-        984.416809,
-        1163.013184,
-        997.187012,
-        1176.017212
-      ]
+        786.048096,
+        1172.123169,
+        798.818298,
+        1185.127197
+      ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping"
     },
     {
       "instanceId": "BL05.01",
@@ -1289,7 +1358,8 @@
         1238.925659,
         822.095581,
         1251.929688
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     },
     {
       "instanceId": "BL05.02",
@@ -1307,7 +1377,8 @@
         1238.925659,
         798.818298,
         1251.929688
-      ]
+      ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback"
     }
   ],
   "pieceVectorMappings": [
@@ -1328,6 +1399,7 @@
         896.814209,
         1092.79834
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 676,
       "nativeCutLengthFt": 10.958333333333332,
       "sourceCenterline": {
@@ -1375,6 +1447,7 @@
         991.806763,
         1092.79834
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 678,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -1422,6 +1495,7 @@
         837.104248,
         968.101624
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 138,
       "nativeCutLengthFt": 2.625,
       "sourceCenterline": {
@@ -1469,6 +1543,7 @@
         833.287964,
         1014.223938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 144,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -1500,6 +1575,222 @@
       "nativeStationDirectionStatus": "unresolved"
     },
     {
+      "instanceId": "BL03.01",
+      "pieceId": "BL03.01",
+      "lineName": "BL03",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1185.396606,
+        1138.999146,
+        1220.180176,
+        1159.434082
+      ],
+      "pieceLabelBoxPdfPt": [
+        886.211731,
+        1163.013306,
+        898.981934,
+        1176.017334
+      ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping",
+      "nativePipeUniqueId": 658,
+      "nativeCutLengthFt": 10.5,
+      "compatibleHeavyCenterlineCount": 0,
+      "reason": "no-heavy-centerline-with-native-cut-length-closure",
+      "sourceCenterline": {
+        "fieldBlackDrawingIndex": 54796,
+        "fieldWhiteDrawingIndex": 54723,
+        "asBuiltBlackDrawingIndex": 54779,
+        "asBuiltWhiteDrawingIndex": 54719,
+        "blackItemIndex": 0,
+        "whiteItemIndex": 0,
+        "widthPt": 0.01389,
+        "representation": "black-white-twin-centerline",
+        "fromPdfPt": [
+          882.436401,
+          1175.493408
+        ],
+        "toPdfPt": [
+          975.578979,
+          1175.493408
+        ],
+        "fromPlanFt": [
+          24.640204,
+          6.331217
+        ],
+        "toPlanFt": [
+          34.98938,
+          6.331217
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.809896,
+      "mappingBasis": "exact-source-spatial-label-native-cut-length-black-white-twin-centerline-cross-source",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL03.02",
+      "pieceId": "BL03.02",
+      "lineName": "BL03",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        1185.396606,
+        1138.999146,
+        1220.180176,
+        1159.434082
+      ],
+      "pieceLabelBoxPdfPt": [
+        984.416809,
+        1163.013184,
+        997.187012,
+        1176.017212
+      ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping",
+      "nativePipeUniqueId": 672,
+      "nativeCutLengthFt": 21.0,
+      "compatibleHeavyCenterlineCount": 20,
+      "reason": "no-one-to-one-compatible-heavy-centerline",
+      "sourceCenterline": {
+        "fieldBlackDrawingIndex": 54886,
+        "fieldWhiteDrawingIndex": 54732,
+        "asBuiltBlackDrawingIndex": 54865,
+        "asBuiltWhiteDrawingIndex": 54728,
+        "blackItemIndex": 0,
+        "whiteItemIndex": 0,
+        "widthPt": 0.01389,
+        "representation": "black-white-twin-centerline",
+        "fromPdfPt": [
+          977.078979,
+          1175.493408
+        ],
+        "toPdfPt": [
+          1164.578979,
+          1175.493286
+        ],
+        "fromPlanFt": [
+          35.156046,
+          6.331217
+        ],
+        "toPlanFt": [
+          55.98938,
+          6.331204
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978201,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exact-source-spatial-label-native-cut-length-black-white-twin-centerline-cross-source",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL04.01",
+      "pieceId": "BL04.01",
+      "lineName": "BL04",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        637.973694,
+        1148.109131,
+        672.757324,
+        1168.544067
+      ],
+      "pieceLabelBoxPdfPt": [
+        830.305664,
+        1172.123169,
+        843.075867,
+        1185.127197
+      ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping",
+      "nativePipeUniqueId": 709,
+      "nativeCutLengthFt": 7.5,
+      "compatibleHeavyCenterlineCount": 0,
+      "reason": "no-heavy-centerline-with-native-cut-length-closure",
+      "sourceCenterline": {
+        "fieldBlackDrawingIndex": 55006,
+        "fieldWhiteDrawingIndex": 54940,
+        "asBuiltBlackDrawingIndex": 54975,
+        "asBuiltWhiteDrawingIndex": 54917,
+        "blackItemIndex": 0,
+        "whiteItemIndex": 0,
+        "widthPt": 0.01389,
+        "representation": "black-white-twin-centerline",
+        "fromPdfPt": [
+          807.656128,
+          1184.603271
+        ],
+        "toPdfPt": [
+          873.811401,
+          1184.603271
+        ],
+        "fromPlanFt": [
+          16.331285,
+          7.343424
+        ],
+        "toPlanFt": [
+          23.681871,
+          7.343424
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 1.792969,
+      "mappingBasis": "exact-source-spatial-label-native-cut-length-black-white-twin-centerline-cross-source",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
+      "instanceId": "BL04.02",
+      "pieceId": "BL04.02",
+      "lineName": "BL04",
+      "lineOccurrence": 1,
+      "lineLabelBoxPdfPt": [
+        637.973694,
+        1148.109131,
+        672.757324,
+        1168.544067
+      ],
+      "pieceLabelBoxPdfPt": [
+        786.048096,
+        1172.123169,
+        798.818298,
+        1185.127197
+      ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping",
+      "nativePipeUniqueId": 727,
+      "nativeCutLengthFt": 21.0,
+      "compatibleHeavyCenterlineCount": 20,
+      "reason": "no-one-to-one-compatible-heavy-centerline",
+      "sourceCenterline": {
+        "fieldBlackDrawingIndex": 55051,
+        "fieldWhiteDrawingIndex": 54943,
+        "asBuiltBlackDrawingIndex": 55018,
+        "asBuiltWhiteDrawingIndex": 54920,
+        "blackItemIndex": 0,
+        "whiteItemIndex": 0,
+        "widthPt": 0.01389,
+        "representation": "black-white-twin-centerline",
+        "fromPdfPt": [
+          618.656128,
+          1184.603271
+        ],
+        "toPdfPt": [
+          806.156128,
+          1184.603271
+        ],
+        "fromPlanFt": [
+          -4.668715,
+          7.343424
+        ],
+        "toPlanFt": [
+          16.164619,
+          7.343424
+        ]
+      },
+      "pieceLabelToCenterlineDistancePt": 5.978088,
+      "sourceCenterlineVsCutSpanDeltaIn": 2.0,
+      "mappingBasis": "exact-source-spatial-label-native-cut-length-black-white-twin-centerline-cross-source",
+      "nativeStationDirection": null,
+      "nativeStationDirectionStatus": "unresolved"
+    },
+    {
       "instanceId": "BL05.01",
       "pieceId": "BL05.01",
       "lineName": "BL05",
@@ -1516,6 +1807,7 @@
         822.095581,
         1251.929688
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 696,
       "nativeCutLengthFt": 6.125,
       "sourceCenterline": {
@@ -1563,6 +1855,7 @@
         798.818298,
         1251.929688
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 706,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -1610,6 +1903,7 @@
         897.46405,
         970.536438
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 631,
       "nativeCutLengthFt": 19.375,
       "sourceCenterline": {
@@ -1657,6 +1951,7 @@
         1046.136475,
         1015.881287
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 634,
       "nativeCutLengthFt": 4.125,
       "sourceCenterline": {
@@ -1704,6 +1999,7 @@
         1069.609009,
         1011.798462
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 636,
       "nativeCutLengthFt": 12.125,
       "sourceCenterline": {
@@ -1751,6 +2047,7 @@
         886.417847,
         1261.180542
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 640,
       "nativeCutLengthFt": 11.916666666666666,
       "sourceCenterline": {
@@ -1798,6 +2095,7 @@
         997.187012,
         1261.180542
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 654,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -1845,6 +2143,7 @@
         838.620789,
         1315.349365
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 133,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -1892,6 +2191,7 @@
         826.394287,
         923.848938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 682,
       "nativeCutLengthFt": 14.583333333333332,
       "sourceCenterline": {
@@ -1939,6 +2239,7 @@
         725.756714,
         923.848938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 692,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -1986,6 +2287,7 @@
         880.62677,
         1344.497559
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 618,
       "nativeCutLengthFt": 13.416666666666666,
       "sourceCenterline": {
@@ -2033,6 +2335,7 @@
         991.806763,
         1344.497559
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 621,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2080,6 +2383,7 @@
         919.922913,
         902.931946
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 116,
       "nativeCutLengthFt": 1.75,
       "sourceCenterline": {
@@ -2127,6 +2431,7 @@
         904.735779,
         880.536438
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 119,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2174,6 +2479,7 @@
         838.620789,
         1412.427246
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 126,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2221,6 +2527,7 @@
         885.254883,
         1425.497559
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 590,
       "nativeCutLengthFt": 13.416666666666666,
       "sourceCenterline": {
@@ -2268,6 +2575,7 @@
         991.806763,
         1425.497559
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 603,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2315,6 +2623,7 @@
         860.593323,
         788.848938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 608,
       "nativeCutLengthFt": 14.583333333333332,
       "sourceCenterline": {
@@ -2362,6 +2671,7 @@
         725.756714,
         788.848938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 614,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2409,6 +2719,7 @@
         814.62085,
         1523.850952
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 583,
       "nativeCutLengthFt": 13.375,
       "sourceCenterline": {
@@ -2456,6 +2767,7 @@
         714.739929,
         1523.850952
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 585,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2503,6 +2815,7 @@
         867.566711,
         1572.411377
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 568,
       "nativeCutLengthFt": 17.083333333333332,
       "sourceCenterline": {
@@ -2550,6 +2863,7 @@
         1053.235107,
         751.893982
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 100,
       "nativeCutLengthFt": 0.625,
       "sourceCenterline": {
@@ -2597,6 +2911,7 @@
         1072.647827,
         721.677063
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 103,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2644,6 +2959,7 @@
         988.098999,
         717.177063
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 572,
       "nativeCutLengthFt": 7.083333333333333,
       "sourceCenterline": {
@@ -2691,6 +3007,7 @@
         920.744995,
         717.177063
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 578,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2738,6 +3055,7 @@
         822.135986,
         1645.913452
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 149,
       "nativeCutLengthFt": 12.125,
       "sourceCenterline": {
@@ -2785,6 +3103,7 @@
         725.756714,
         1645.913452
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 154,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2832,6 +3151,7 @@
         942.187988,
         680.620239
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 110,
       "nativeCutLengthFt": 1.8333333333333333,
       "sourceCenterline": {
@@ -2879,6 +3199,7 @@
         958.685303,
         652.04303
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 111,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -2926,6 +3247,7 @@
         1017.044922,
         636.177063
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 75,
       "nativeCutLengthFt": 19.625,
       "sourceCenterline": {
@@ -2973,6 +3295,7 @@
         829.719666,
         1694.848877
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 82,
       "nativeCutLengthFt": 9.458333333333332,
       "sourceCenterline": {
@@ -3020,6 +3343,7 @@
         872.004639,
         1704.275146
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 66,
       "nativeCutLengthFt": 20.125,
       "sourceCenterline": {
@@ -3067,6 +3391,7 @@
         1091.907471,
         1612.93042
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 87,
       "nativeCutLengthFt": 15.333333333333332,
       "sourceCenterline": {
@@ -3114,6 +3439,7 @@
         801.247437,
         1773.284058
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 56,
       "nativeCutLengthFt": 6.416666666666666,
       "sourceCenterline": {
@@ -3161,6 +3487,7 @@
         867.566711,
         1799.338257
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 52,
       "nativeCutLengthFt": 18.125,
       "sourceCenterline": {
@@ -3208,6 +3535,7 @@
         1162.091064,
         1612.93042
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 555,
       "nativeCutLengthFt": 15.666666666666666,
       "sourceCenterline": {
@@ -3255,6 +3583,7 @@
         1398.185913,
         1012.395813
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 71,
       "nativeCutLengthFt": 18.333333333333332,
       "sourceCenterline": {
@@ -3302,6 +3631,7 @@
         1398.185913,
         961.724426
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 559,
       "nativeCutLengthFt": 6.291666666666666,
       "sourceCenterline": {
@@ -3349,6 +3679,7 @@
         1337.979492,
         961.724426
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 563,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -3396,6 +3727,7 @@
         1427.131836,
         909.440125
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 18,
       "nativeCutLengthFt": 16.291666666666664,
       "sourceCenterline": {
@@ -3443,6 +3775,7 @@
         1398.185913,
         864.036926
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 91,
       "nativeCutLengthFt": 6.291666666666666,
       "sourceCenterline": {
@@ -3490,6 +3823,7 @@
         1338.136963,
         864.036926
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 95,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -3537,6 +3871,7 @@
         1427.131836,
         846.411438
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 14,
       "nativeCutLengthFt": 11.708333333333332,
       "sourceCenterline": {
@@ -3584,6 +3919,7 @@
         1398.185913,
         1429.723389
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 60,
       "nativeCutLengthFt": 19.375,
       "sourceCenterline": {
@@ -3631,6 +3967,7 @@
         1438.827759,
         793.536438
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 539,
       "nativeCutLengthFt": 14.916666666666666,
       "sourceCenterline": {
@@ -3678,6 +4015,7 @@
         1506.404175,
         1643.661377
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 539,
       "nativeCutLengthFt": 14.916666666666666,
       "sourceCenterline": {
@@ -3725,6 +4063,7 @@
         1427.131836,
         718.115967
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 535,
       "nativeCutLengthFt": 13.291666666666666,
       "sourceCenterline": {
@@ -3772,6 +4111,7 @@
         1441.192383,
         1719.086304
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 535,
       "nativeCutLengthFt": 13.291666666666666,
       "sourceCenterline": {
@@ -3819,6 +4159,7 @@
         1375.542725,
         718.115967
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 47,
       "nativeCutLengthFt": 17.541666666666664,
       "sourceCenterline": {
@@ -3866,6 +4207,7 @@
         1427.131836,
         1529.138428
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 8,
       "nativeCutLengthFt": 16.291666666666664,
       "sourceCenterline": {
@@ -3913,6 +4255,7 @@
         1398.185913,
         1529.138428
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 42,
       "nativeCutLengthFt": 16.375,
       "sourceCenterline": {
@@ -3960,6 +4303,7 @@
         1398.185913,
         652.883789
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 22,
       "nativeCutLengthFt": 16.25,
       "sourceCenterline": {
@@ -4007,6 +4351,7 @@
         1427.131836,
         1590.036377
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 4,
       "nativeCutLengthFt": 11.708333333333332,
       "sourceCenterline": {
@@ -4054,6 +4399,7 @@
         1381.496216,
         1590.036377
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 28,
       "nativeCutLengthFt": 17.375,
       "sourceCenterline": {
@@ -4101,6 +4447,7 @@
         1427.131836,
         588.895935
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 527,
       "nativeCutLengthFt": 12.291666666666666,
       "sourceCenterline": {
@@ -4148,6 +4495,7 @@
         1398.185913,
         588.895935
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 543,
       "nativeCutLengthFt": 15.458333333333332,
       "sourceCenterline": {
@@ -4195,6 +4543,7 @@
         1372.889893,
         1715.525146
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 38,
       "nativeCutLengthFt": 14.708333333333332,
       "sourceCenterline": {
@@ -4242,6 +4591,7 @@
         1224.600708,
         1715.525146
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 32,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -4289,6 +4639,7 @@
         1398.185913,
         1783.404663
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 548,
       "nativeCutLengthFt": 12.708333333333332,
       "sourceCenterline": {
@@ -4336,6 +4687,7 @@
         1280.473267,
         1783.404663
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 550,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -4383,6 +4735,7 @@
         1491.13147,
         1844.185181
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 514,
       "nativeCutLengthFt": 11.791666666666666,
       "sourceCenterline": {
@@ -4430,6 +4783,7 @@
         1398.185913,
         1848.306274
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 518,
       "nativeCutLengthFt": 13.458333333333332,
       "sourceCenterline": {
@@ -4461,96 +4815,7 @@
       "nativeStationDirectionStatus": "native-outlet-registered"
     }
   ],
-  "pieceVectorHoldouts": [
-    {
-      "instanceId": "BL03.01",
-      "pieceId": "BL03.01",
-      "lineName": "BL03",
-      "lineOccurrence": 1,
-      "lineLabelBoxPdfPt": [
-        1185.396606,
-        1138.999146,
-        1220.180176,
-        1159.434082
-      ],
-      "pieceLabelBoxPdfPt": [
-        830.305664,
-        1172.123169,
-        843.075867,
-        1185.127197
-      ],
-      "nativePipeUniqueId": 658,
-      "nativeCutLengthFt": 10.5,
-      "compatibleHeavyCenterlineCount": 0,
-      "reason": "no-heavy-centerline-with-native-cut-length-closure"
-    },
-    {
-      "instanceId": "BL03.02",
-      "pieceId": "BL03.02",
-      "lineName": "BL03",
-      "lineOccurrence": 1,
-      "lineLabelBoxPdfPt": [
-        1185.396606,
-        1138.999146,
-        1220.180176,
-        1159.434082
-      ],
-      "pieceLabelBoxPdfPt": [
-        786.048096,
-        1172.123169,
-        798.818298,
-        1185.127197
-      ],
-      "nativePipeUniqueId": 672,
-      "nativeCutLengthFt": 21.0,
-      "compatibleHeavyCenterlineCount": 20,
-      "reason": "no-one-to-one-compatible-heavy-centerline"
-    },
-    {
-      "instanceId": "BL04.01",
-      "pieceId": "BL04.01",
-      "lineName": "BL04",
-      "lineOccurrence": 1,
-      "lineLabelBoxPdfPt": [
-        637.973694,
-        1148.109131,
-        672.757324,
-        1168.544067
-      ],
-      "pieceLabelBoxPdfPt": [
-        886.211731,
-        1163.013306,
-        898.981934,
-        1176.017334
-      ],
-      "nativePipeUniqueId": 709,
-      "nativeCutLengthFt": 7.5,
-      "compatibleHeavyCenterlineCount": 0,
-      "reason": "no-heavy-centerline-with-native-cut-length-closure"
-    },
-    {
-      "instanceId": "BL04.02",
-      "pieceId": "BL04.02",
-      "lineName": "BL04",
-      "lineOccurrence": 1,
-      "lineLabelBoxPdfPt": [
-        637.973694,
-        1148.109131,
-        672.757324,
-        1168.544067
-      ],
-      "pieceLabelBoxPdfPt": [
-        984.416809,
-        1163.013184,
-        997.187012,
-        1176.017212
-      ],
-      "nativePipeUniqueId": 727,
-      "nativeCutLengthFt": 21.0,
-      "compatibleHeavyCenterlineCount": 20,
-      "reason": "no-one-to-one-compatible-heavy-centerline"
-    }
-  ],
+  "pieceVectorHoldouts": [],
   "registrations": [
     {
       "instanceId": "BL01.02",
@@ -4569,6 +4834,7 @@
         991.806763,
         1092.79834
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 678,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -4656,6 +4922,7 @@
         897.46405,
         970.536438
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 631,
       "nativeCutLengthFt": 19.375,
       "sourceCenterline": {
@@ -4743,6 +5010,7 @@
         991.806763,
         1344.497559
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 621,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -4830,6 +5098,7 @@
         867.566711,
         1572.411377
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 568,
       "nativeCutLengthFt": 17.083333333333332,
       "sourceCenterline": {
@@ -4917,6 +5186,7 @@
         725.756714,
         1645.913452
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 154,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -5014,6 +5284,7 @@
         1162.091064,
         1612.93042
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 555,
       "nativeCutLengthFt": 15.666666666666666,
       "sourceCenterline": {
@@ -5101,6 +5372,7 @@
         1438.827759,
         793.536438
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 539,
       "nativeCutLengthFt": 14.916666666666666,
       "sourceCenterline": {
@@ -5188,6 +5460,7 @@
         1506.404175,
         1643.661377
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 539,
       "nativeCutLengthFt": 14.916666666666666,
       "sourceCenterline": {
@@ -5275,6 +5548,7 @@
         1427.131836,
         718.115967
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 535,
       "nativeCutLengthFt": 13.291666666666666,
       "sourceCenterline": {
@@ -5362,6 +5636,7 @@
         1441.192383,
         1719.086304
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 535,
       "nativeCutLengthFt": 13.291666666666666,
       "sourceCenterline": {
@@ -5449,6 +5724,7 @@
         1427.131836,
         588.895935
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 527,
       "nativeCutLengthFt": 12.291666666666666,
       "sourceCenterline": {
@@ -5536,6 +5812,7 @@
         1398.185913,
         588.895935
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 543,
       "nativeCutLengthFt": 15.458333333333332,
       "sourceCenterline": {
@@ -5633,6 +5910,7 @@
         1224.600708,
         1715.525146
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 32,
       "nativeCutLengthFt": 21.0,
       "sourceCenterline": {
@@ -5750,6 +6028,7 @@
         1491.13147,
         1844.185181
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 514,
       "nativeCutLengthFt": 11.791666666666666,
       "sourceCenterline": {
@@ -5837,6 +6116,7 @@
         1398.185913,
         1848.306274
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 518,
       "nativeCutLengthFt": 13.458333333333332,
       "sourceCenterline": {
@@ -5936,6 +6216,7 @@
         896.814209,
         1092.79834
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 676,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -5959,6 +6240,7 @@
         837.104248,
         968.101624
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 138,
       "uniqueNativeOutletStationCount": 1,
       "reason": "source-centerline-label-association-not-unique",
@@ -5982,6 +6264,7 @@
         833.287964,
         1014.223938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 144,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6000,16 +6283,17 @@
         1159.434082
       ],
       "pieceLabelBoxPdfPt": [
-        830.305664,
-        1172.123169,
-        843.075867,
-        1185.127197
+        886.211731,
+        1163.013306,
+        898.981934,
+        1176.017334
       ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping",
       "nativePipeUniqueId": 658,
       "uniqueNativeOutletStationCount": 1,
       "reason": "source-centerline-label-association-not-unique",
-      "nearestCenterlineDistancePt": 72.780579,
-      "nearestCenterlineUniquenessGapPt": 6.145822
+      "nearestCenterlineDistancePt": 77.240784,
+      "nearestCenterlineUniquenessGapPt": 10.44525
     },
     {
       "instanceId": "BL03.02",
@@ -6023,16 +6307,17 @@
         1159.434082
       ],
       "pieceLabelBoxPdfPt": [
-        786.048096,
-        1172.123169,
-        798.818298,
-        1185.127197
+        984.416809,
+        1163.013184,
+        997.187012,
+        1176.017212
       ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping",
       "nativePipeUniqueId": 672,
       "uniqueNativeOutletStationCount": 2,
       "reason": "source-centerline-label-association-not-unique",
-      "nearestCenterlineDistancePt": 72.780579,
-      "nearestCenterlineUniquenessGapPt": 1.574988
+      "nearestCenterlineDistancePt": 77.240662,
+      "nearestCenterlineUniquenessGapPt": 2.700635
     },
     {
       "instanceId": "BL04.01",
@@ -6046,16 +6331,17 @@
         1168.544067
       ],
       "pieceLabelBoxPdfPt": [
-        886.211731,
-        1163.013306,
-        898.981934,
-        1176.017334
+        830.305664,
+        1172.123169,
+        843.075867,
+        1185.127197
       ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping",
       "nativePipeUniqueId": 709,
       "uniqueNativeOutletStationCount": 1,
       "reason": "source-centerline-label-association-not-unique",
-      "nearestCenterlineDistancePt": 77.240784,
-      "nearestCenterlineUniquenessGapPt": 10.44525
+      "nearestCenterlineDistancePt": 72.780579,
+      "nearestCenterlineUniquenessGapPt": 6.145822
     },
     {
       "instanceId": "BL04.02",
@@ -6069,16 +6355,17 @@
         1168.544067
       ],
       "pieceLabelBoxPdfPt": [
-        984.416809,
-        1163.013184,
-        997.187012,
-        1176.017212
+        786.048096,
+        1172.123169,
+        798.818298,
+        1185.127197
       ],
+      "labelAssociationBasis": "exact-source-spatial-line-grouping",
       "nativePipeUniqueId": 727,
       "uniqueNativeOutletStationCount": 3,
       "reason": "source-centerline-label-association-not-unique",
-      "nearestCenterlineDistancePt": 77.240662,
-      "nearestCenterlineUniquenessGapPt": 2.700635
+      "nearestCenterlineDistancePt": 72.780579,
+      "nearestCenterlineUniquenessGapPt": 1.574988
     },
     {
       "instanceId": "BL05.01",
@@ -6097,6 +6384,7 @@
         822.095581,
         1251.929688
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 696,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -6120,6 +6408,7 @@
         798.818298,
         1251.929688
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 706,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -6143,6 +6432,7 @@
         1046.136475,
         1015.881287
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 634,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -6166,6 +6456,7 @@
         1069.609009,
         1011.798462
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 636,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6189,6 +6480,7 @@
         886.417847,
         1261.180542
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 640,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -6212,6 +6504,7 @@
         997.187012,
         1261.180542
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 654,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6235,6 +6528,7 @@
         838.620789,
         1315.349365
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 133,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6258,6 +6552,7 @@
         826.394287,
         923.848938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 682,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6281,6 +6576,7 @@
         725.756714,
         923.848938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 692,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6304,6 +6600,7 @@
         880.62677,
         1344.497559
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 618,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6327,6 +6624,7 @@
         919.922913,
         902.931946
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 116,
       "uniqueNativeOutletStationCount": 0,
       "reason": "source-centerline-label-association-not-unique",
@@ -6350,6 +6648,7 @@
         904.735779,
         880.536438
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 119,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6373,6 +6672,7 @@
         838.620789,
         1412.427246
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 126,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6396,6 +6696,7 @@
         885.254883,
         1425.497559
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 590,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6419,6 +6720,7 @@
         991.806763,
         1425.497559
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 603,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6442,6 +6744,7 @@
         860.593323,
         788.848938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 608,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6465,6 +6768,7 @@
         725.756714,
         788.848938
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 614,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6488,6 +6792,7 @@
         814.62085,
         1523.850952
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 583,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -6511,6 +6816,7 @@
         714.739929,
         1523.850952
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 585,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6534,6 +6840,7 @@
         1053.235107,
         751.893982
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 100,
       "uniqueNativeOutletStationCount": 0,
       "reason": "source-centerline-label-association-not-unique",
@@ -6557,6 +6864,7 @@
         1072.647827,
         721.677063
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 103,
       "uniqueNativeOutletStationCount": 5,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6580,6 +6888,7 @@
         988.098999,
         717.177063
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 572,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -6603,6 +6912,7 @@
         920.744995,
         717.177063
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 578,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6626,6 +6936,7 @@
         822.135986,
         1645.913452
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 149,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6649,6 +6960,7 @@
         942.187988,
         680.620239
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 110,
       "uniqueNativeOutletStationCount": 0,
       "reason": "source-centerline-label-association-not-unique",
@@ -6672,6 +6984,7 @@
         958.685303,
         652.04303
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 111,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6695,6 +7008,7 @@
         1017.044922,
         636.177063
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 75,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6718,6 +7032,7 @@
         829.719666,
         1694.848877
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 82,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6741,6 +7056,7 @@
         872.004639,
         1704.275146
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 66,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6764,6 +7080,7 @@
         1091.907471,
         1612.93042
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 87,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6787,6 +7104,7 @@
         801.247437,
         1773.284058
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 56,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6810,6 +7128,7 @@
         867.566711,
         1799.338257
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 52,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6833,6 +7152,7 @@
         1398.185913,
         1012.395813
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 71,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6856,6 +7176,7 @@
         1398.185913,
         961.724426
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 559,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -6879,6 +7200,7 @@
         1337.979492,
         961.724426
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 563,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6902,6 +7224,7 @@
         1427.131836,
         909.440125
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 18,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6925,6 +7248,7 @@
         1398.185913,
         864.036926
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 91,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -6948,6 +7272,7 @@
         1338.136963,
         864.036926
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 95,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6971,6 +7296,7 @@
         1427.131836,
         846.411438
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 14,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -6994,6 +7320,7 @@
         1398.185913,
         1429.723389
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 60,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -7017,6 +7344,7 @@
         1375.542725,
         718.115967
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 47,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -7040,6 +7368,7 @@
         1427.131836,
         1529.138428
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 8,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -7063,6 +7392,7 @@
         1398.185913,
         1529.138428
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 42,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -7086,6 +7416,7 @@
         1398.185913,
         652.883789
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 22,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -7109,6 +7440,7 @@
         1427.131836,
         1590.036377
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 4,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -7132,6 +7464,7 @@
         1381.496216,
         1590.036377
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 28,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -7155,6 +7488,7 @@
         1372.889893,
         1715.525146
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 38,
       "uniqueNativeOutletStationCount": 2,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -7178,6 +7512,7 @@
         1398.185913,
         1783.404663
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 548,
       "uniqueNativeOutletStationCount": 1,
       "reason": "fewer-than-two-unique-native-outlet-stations",
@@ -7201,6 +7536,7 @@
         1280.473267,
         1783.404663
       ],
+      "labelAssociationBasis": "pdf-text-order-with-line-label-fallback",
       "nativePipeUniqueId": 550,
       "uniqueNativeOutletStationCount": 3,
       "reason": "native-outlet-head-cut-vector-closure-not-unique",
@@ -7213,9 +7549,11 @@
     "weldedBranchUnitCount": 71,
     "exactFieldPieceLabelCount": 71,
     "fieldAsBuiltHeavyCenterlineCount": 67,
-    "pieceVectorMappedUnitCount": 67,
-    "pieceVectorHoldoutCount": 4,
+    "fieldAsBuiltAlternateTwinCenterlineCount": 71,
+    "pieceVectorMappedUnitCount": 71,
+    "pieceVectorHoldoutCount": 0,
     "pieceVectorMappedHeavyCenterlineCount": 67,
+    "pieceVectorMappedAlternateCenterlineCount": 4,
     "maxPieceVectorCutSpanDeltaIn": 2.096517,
     "maxPieceLabelToMappedCenterlineDistancePt": 53.334493,
     "registeredUnitCount": 15,
@@ -7228,15 +7566,16 @@
       "source-centerline-label-association-not-unique": 8
     },
     "globalListedUnitCount": 169,
-    "globalPieceVectorUnmappedUnitCount": 102
+    "globalPieceVectorUnmappedUnitCount": 98
   },
   "claims": {
     "weldedBranchLabelInventoryReady": true,
     "fieldAsBuiltHeavyCenterlineParityReady": true,
+    "fieldAsBuiltAlternateTwinCenterlineParityReady": true,
     "weldedBranchPieceVectorBijectionReady": true,
     "scopedPieceToPlanVectorMappingReady": true,
     "scopedFabricationStationDirectionReady": true,
-    "completeWeldedBranchPieceMappingReady": false,
+    "completeWeldedBranchPieceMappingReady": true,
     "pieceToPlanVectorMappingReady": false,
     "hydraulicFlowDirectionReady": false,
     "gradeReady": false,

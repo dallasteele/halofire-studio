@@ -76,6 +76,82 @@ def extract_heavy_centerlines(page: fitz.Page) -> list[dict[str, object]]:
     return centerlines
 
 
+def extract_black_white_twin_centerlines(page: fitz.Page) -> list[dict[str, object]]:
+    """Return thin segments drawn once in black and once in white at identical source coordinates."""
+    by_segment: dict[tuple[float, float, float, float], dict[str, list[dict[str, object]]]] = defaultdict(lambda: defaultdict(list))
+    for drawing_index, drawing in enumerate(page.get_drawings()):
+        color = drawing.get("color")
+        if color not in {(0.0, 0.0, 0.0), (1.0, 1.0, 1.0)} or abs(float(drawing.get("width") or 0) - 0.01389) > 0.00001 or drawing.get("fill") is not None:
+            continue
+        color_name = "black" if color == (0.0, 0.0, 0.0) else "white"
+        for item_index, item in enumerate(drawing["items"]):
+            if item[0] != "l":
+                continue
+            a, b = item[1], item[2]
+            length = math.hypot(b.x - a.x, b.y - a.y)
+            if length < 3 or max(a.x, b.x) < 300 or min(a.x, b.x) > 1650 or max(a.y, b.y) < 450 or min(a.y, b.y) > 1900:
+                continue
+            normalized = normalized_segment(a, b)
+            by_segment[normalized][color_name].append({
+                "drawingIndex": drawing_index,
+                "itemIndex": item_index,
+                "fromPdfPt": [normalized[0], normalized[1]],
+                "toPdfPt": [normalized[2], normalized[3]],
+                "normalized": normalized,
+                "lengthPt": round(length, 6),
+            })
+    twins = []
+    for normalized, colors in sorted(by_segment.items()):
+        if set(colors) != {"black", "white"}:
+            continue
+        black = colors["black"][0]
+        white = colors["white"][0]
+        twins.append({
+            "normalized": normalized,
+            "fromPdfPt": black["fromPdfPt"],
+            "toPdfPt": black["toPdfPt"],
+            "lengthPt": black["lengthPt"],
+            "blackDrawingIndex": black["drawingIndex"],
+            "blackItemIndex": black["itemIndex"],
+            "blackRepresentationCount": len(colors["black"]),
+            "whiteDrawingIndex": white["drawingIndex"],
+            "whiteItemIndex": white["itemIndex"],
+            "whiteRepresentationCount": len(colors["white"]),
+        })
+    return twins
+
+
+def apply_bl03_bl04_source_spatial_association(occurrences: list[dict[str, object]]) -> None:
+    """Correct PDF text-order drift using exact left/right line-label source space."""
+    source_rows = [row for row in occurrences if row["lineName"] in {"BL03", "BL04"}]
+    selected = {row["lineName"]: row for row in source_rows}
+    if len(source_rows) != 2 or set(selected) != {"BL03", "BL04"}:
+        raise RuntimeError("BL03 and BL04 source labels must each occur exactly once")
+    expected_line_boxes = {
+        "BL03": [1185.396606, 1138.999146, 1220.180176, 1159.434082],
+        "BL04": [637.973694, 1148.109131, 672.757324, 1168.544067],
+    }
+    if any(selected[line]["lineLabelBoxPdfPt"] != box for line, box in expected_line_boxes.items()):
+        raise RuntimeError("BL03 or BL04 line-label source coordinates changed")
+    expected_suffix_boxes = {
+        (830.305664, 1172.123169, 843.075867, 1185.127197),
+        (786.048096, 1172.123169, 798.818298, 1185.127197),
+        (886.211731, 1163.013306, 898.981934, 1176.017334),
+        (984.416809, 1163.013184, 997.187012, 1176.017212),
+    }
+    pooled = selected["BL03"]["found"] + selected["BL04"]["found"]
+    if len(pooled) != 4 or {tuple(rounded_box(word)) for _, word in pooled} != expected_suffix_boxes:
+        raise RuntimeError("BL03 or BL04 suffix-label source coordinates changed")
+    left_group = [entry for entry in pooled if (entry[1][0] + entry[1][2]) / 2 < 850]
+    right_group = [entry for entry in pooled if (entry[1][0] + entry[1][2]) / 2 > 850]
+    if len(left_group) != 2 or len(right_group) != 2:
+        raise RuntimeError("BL03 and BL04 source-spatial suffix groups are no longer unique")
+    selected["BL04"]["found"] = sorted(left_group, key=lambda entry: int(entry[1][4][1:]))
+    selected["BL03"]["found"] = sorted(right_group, key=lambda entry: int(entry[1][4][1:]))
+    selected["BL03"]["labelAssociationBasis"] = "exact-source-spatial-line-grouping"
+    selected["BL04"]["labelAssociationBasis"] = "exact-source-spatial-line-grouping"
+
+
 def extract_label_instances(page: fitz.Page, expected: dict[str, list[str]]) -> list[dict[str, object]]:
     words = page.get_text("words")
     wet_lines = set(expected)
@@ -127,6 +203,8 @@ def extract_label_instances(page: fitz.Page, expected: dict[str, list[str]]) -> 
     if unassigned:
         raise RuntimeError(f"unassigned branch piece suffix labels remain: {[word[4] for _, word in unassigned]}")
 
+    apply_bl03_bl04_source_spatial_association(occurrences)
+
     instances = []
     total_occurrences = Counter(occurrence["lineName"] for occurrence in occurrences)
     for occurrence in occurrences:
@@ -142,6 +220,7 @@ def extract_label_instances(page: fitz.Page, expected: dict[str, list[str]]) -> 
                 "lineOccurrence": occurrence["occurrence"],
                 "lineLabelBoxPdfPt": occurrence["lineLabelBoxPdfPt"],
                 "pieceLabelBoxPdfPt": rounded_box(word),
+                "labelAssociationBasis": occurrence.get("labelAssociationBasis", "pdf-text-order-with-line-label-fallback"),
             })
     return instances
 
@@ -297,6 +376,60 @@ def build_piece_vector_bijection(
     return mappings, holdouts
 
 
+def resolve_alternate_piece_vectors(
+    holdouts: list[dict[str, object]],
+    field_twins: list[dict[str, object]],
+    as_built_by_segment: dict[tuple[float, float, float, float], dict[str, object]],
+    pipes: dict[str, dict[str, object]],
+) -> list[dict[str, object]]:
+    mappings = []
+    used_segments = set()
+    for instance in holdouts:
+        box = instance["pieceLabelBoxPdfPt"]
+        point = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
+        pipe = pipes[instance["pieceId"]]
+        candidates = []
+        for centerline in field_twins:
+            cut_span_delta_in = pipe["lengthFt"] * 12 - centerline["lengthPt"] / PDF_POINTS_PER_FOOT * 12
+            distance = distance_to_segment(point, centerline)
+            if 0 <= cut_span_delta_in <= CUT_SPAN_GATE_IN and distance <= LABEL_LINE_DISTANCE_GATE_PT:
+                candidates.append((distance, cut_span_delta_in, centerline))
+        if len(candidates) != 1:
+            raise RuntimeError(f"{instance['instanceId']} requires exactly one alternate twin-centerline candidate; found {len(candidates)}")
+        distance, cut_span_delta_in, centerline = candidates[0]
+        if centerline["normalized"] in used_segments:
+            raise RuntimeError(f"alternate twin centerline reused by {instance['instanceId']}")
+        used_segments.add(centerline["normalized"])
+        as_built = as_built_by_segment.get(centerline["normalized"])
+        if as_built is None:
+            raise RuntimeError(f"alternate twin centerline for {instance['instanceId']} does not replay in as-built PDF")
+        mappings.append({
+            **instance,
+            "nativePipeUniqueId": pipe["uniqueId"],
+            "nativeCutLengthFt": pipe["lengthFt"],
+            "sourceCenterline": {
+                "fieldBlackDrawingIndex": centerline["blackDrawingIndex"],
+                "fieldWhiteDrawingIndex": centerline["whiteDrawingIndex"],
+                "asBuiltBlackDrawingIndex": as_built["blackDrawingIndex"],
+                "asBuiltWhiteDrawingIndex": as_built["whiteDrawingIndex"],
+                "blackItemIndex": centerline["blackItemIndex"],
+                "whiteItemIndex": centerline["whiteItemIndex"],
+                "widthPt": 0.01389,
+                "representation": "black-white-twin-centerline",
+                "fromPdfPt": centerline["fromPdfPt"],
+                "toPdfPt": centerline["toPdfPt"],
+                "fromPlanFt": plan_ft(centerline["fromPdfPt"]),
+                "toPlanFt": plan_ft(centerline["toPdfPt"]),
+            },
+            "pieceLabelToCenterlineDistancePt": round(distance, 6),
+            "sourceCenterlineVsCutSpanDeltaIn": round(cut_span_delta_in, 6),
+            "mappingBasis": "exact-source-spatial-label-native-cut-length-black-white-twin-centerline-cross-source",
+            "nativeStationDirection": None,
+            "nativeStationDirectionStatus": "unresolved",
+        })
+    return sorted(mappings, key=lambda row: row["instanceId"])
+
+
 def heads_on_centerline(centerline: dict[str, object], heads: list[dict[str, object]]) -> list[dict[str, object]]:
     x1, y1 = centerline["fromPdfPt"]
     x2, y2 = centerline["toPdfPt"]
@@ -392,7 +525,8 @@ def render_proof(page: fitz.Page, piece_vector_mappings: list[dict[str, object]]
     for mapping in piece_vector_mappings:
         source = mapping["sourceCenterline"]
         source_a, source_b = local(source["fromPdfPt"]), local(source["toPdfPt"])
-        draw.line((*source_a, *source_b), fill=(53, 222, 255, 210), width=5)
+        alternate = source.get("representation") == "black-white-twin-centerline"
+        draw.line((*source_a, *source_b), fill=(255, 168, 56, 245) if alternate else (53, 222, 255, 210), width=7 if alternate else 5)
         box = mapping["pieceLabelBoxPdfPt"]
         x0, y0 = local(box[:2])
         x1, y1 = local(box[2:])
@@ -419,9 +553,9 @@ def render_proof(page: fitz.Page, piece_vector_mappings: list[dict[str, object]]
     canvas.paste(plan, (0, header))
     draw = ImageDraw.Draw(canvas)
     draw.text((20, 17), "New Hope FP1.0 - welded branch piece registration", font=font(31, True), fill=(244, 251, 255))
-    draw.text((20, 57), "actual field PDF | cyan = 67 label/length-mapped centerlines | magenta = 15 direction-registered cuts | red = four held labels", font=font(17), fill=(173, 220, 238))
-    draw.text((20, 86), f"{metrics['pieceVectorMappedUnitCount']}/71 piece vectors mapped | all 67 heavy centerlines consumed once | {metrics['registeredUnitCount']} station directions | {metrics['mappedNativeOutletCount']} outlets", font=font(18, True), fill=(116, 255, 207))
-    draw.text((20, 111), "Hydraulic flow, drainage grade, fitting takeout, installed Z, and 102 of 169 global listed units remain unresolved.", font=font(16), fill=(255, 210, 122))
+    draw.text((20, 57), "actual field PDF | cyan = 67 heavy centerlines | orange = 4 black/white-twin centerlines | magenta = 15 direction-registered cuts", font=font(17), fill=(173, 220, 238))
+    draw.text((20, 86), f"{metrics['pieceVectorMappedUnitCount']}/71 welded piece vectors mapped | 67 heavy + 4 alternate | {metrics['registeredUnitCount']} station directions | {metrics['mappedNativeOutletCount']} outlets", font=font(18, True), fill=(116, 255, 207))
+    draw.text((20, 111), "Hydraulic flow, drainage grade, fitting takeout, installed Z, and 98 of 169 global listed units remain unresolved.", font=font(16), fill=(255, 210, 122))
     PROOF.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(PROOF, optimize=True)
 
@@ -447,6 +581,11 @@ def main() -> None:
     as_built_by_segment = {centerline["normalized"]: centerline for centerline in as_built_centerlines}
     if len(field_centerlines) != 67 or len(as_built_centerlines) != 67 or set(centerline["normalized"] for centerline in field_centerlines) != set(as_built_by_segment):
         raise RuntimeError("the 67 heavy branch centerlines no longer replay exactly across both PDFs")
+    field_twin_centerlines = extract_black_white_twin_centerlines(field_page)
+    as_built_twin_centerlines = extract_black_white_twin_centerlines(as_built_page)
+    as_built_twins_by_segment = {centerline["normalized"]: centerline for centerline in as_built_twin_centerlines}
+    if len(field_twin_centerlines) != 71 or len(as_built_twin_centerlines) != 71 or set(centerline["normalized"] for centerline in field_twin_centerlines) != set(as_built_twins_by_segment):
+        raise RuntimeError("the 71 alternate black/white-twin centerlines no longer replay exactly across both PDFs")
 
     line_records = {record["uniqueId"]: record for record in graph["records"]["lines"] if record["lineName"] in wet_lines}
     pipes = {
@@ -458,12 +597,20 @@ def main() -> None:
     for outlet in graph["records"]["outlets"]:
         outlets_by_pipe[outlet["parentId"]].append(outlet)
 
-    piece_vector_mappings, piece_vector_holdouts = build_piece_vector_bijection(
+    heavy_piece_vector_mappings, heavy_piece_vector_holdouts = build_piece_vector_bijection(
         label_instances,
         field_centerlines,
         as_built_by_segment,
         pipes,
     )
+    alternate_piece_vector_mappings = resolve_alternate_piece_vectors(
+        heavy_piece_vector_holdouts,
+        field_twin_centerlines,
+        as_built_twins_by_segment,
+        pipes,
+    )
+    piece_vector_mappings = sorted(heavy_piece_vector_mappings + alternate_piece_vector_mappings, key=lambda row: row["instanceId"])
+    piece_vector_holdouts: list[dict[str, object]] = []
 
     registrations = []
     unresolved = []
@@ -518,9 +665,11 @@ def main() -> None:
         "weldedBranchUnitCount": 71,
         "exactFieldPieceLabelCount": len(label_instances),
         "fieldAsBuiltHeavyCenterlineCount": len(field_centerlines),
+        "fieldAsBuiltAlternateTwinCenterlineCount": len(field_twin_centerlines),
         "pieceVectorMappedUnitCount": len(piece_vector_mappings),
         "pieceVectorHoldoutCount": len(piece_vector_holdouts),
-        "pieceVectorMappedHeavyCenterlineCount": len({tuple(row["sourceCenterline"]["fromPdfPt"] + row["sourceCenterline"]["toPdfPt"]) for row in piece_vector_mappings}),
+        "pieceVectorMappedHeavyCenterlineCount": sum(row["sourceCenterline"]["widthPt"] == 1.24059 for row in piece_vector_mappings),
+        "pieceVectorMappedAlternateCenterlineCount": sum(row["sourceCenterline"]["widthPt"] == 0.01389 for row in piece_vector_mappings),
         "maxPieceVectorCutSpanDeltaIn": max(row["sourceCenterlineVsCutSpanDeltaIn"] for row in piece_vector_mappings),
         "maxPieceLabelToMappedCenterlineDistancePt": max(row["pieceLabelToCenterlineDistancePt"] for row in piece_vector_mappings),
         "registeredUnitCount": len(registrations),
@@ -536,13 +685,12 @@ def main() -> None:
         "BL34.01-A", "BL34.01-B", "BL35.01-A", "BL35.01-B", "BL42.01",
         "BL43.01", "BL44.02", "BL46.01", "BL47.01",
     }
-    expected_piece_vector_holdout_ids = {"BL03.01", "BL03.02", "BL04.01", "BL04.02"}
     if metrics["registeredUnitCount"] != 15 or metrics["mappedNativeOutletCount"] != 36 or metrics["unresolvedUnitCount"] != 56 or {row["instanceId"] for row in registrations} != expected_registration_ids:
         raise RuntimeError(f"registration coverage changed unexpectedly: {metrics}; ids={[row['instanceId'] for row in registrations]}")
-    if metrics["pieceVectorMappedUnitCount"] != 67 or metrics["pieceVectorMappedHeavyCenterlineCount"] != 67 or {row["instanceId"] for row in piece_vector_holdouts} != expected_piece_vector_holdout_ids:
+    if metrics["pieceVectorMappedUnitCount"] != 71 or metrics["pieceVectorMappedHeavyCenterlineCount"] != 67 or metrics["pieceVectorMappedAlternateCenterlineCount"] != 4 or piece_vector_holdouts:
         raise RuntimeError(f"piece-vector bijection changed unexpectedly: {metrics}; holdouts={[row['instanceId'] for row in piece_vector_holdouts]}")
     evidence = {
-        "artifactType": "halofire.new-hope-wet-welded-branch-registration-evidence.v2",
+        "artifactType": "halofire.new-hope-wet-welded-branch-registration-evidence.v3",
         "projectId": "new-hope-crisis-center-brigham-city-ut",
         "sources": {
             "fieldInstall": {"fileName": "24-052_NHCC_INSTALL PLAN.pdf", "sheet": "FP1.0", "physicalPage": 3, "sha256": FIELD_SHA},
@@ -559,10 +707,11 @@ def main() -> None:
         "claims": {
             "weldedBranchLabelInventoryReady": True,
             "fieldAsBuiltHeavyCenterlineParityReady": True,
+            "fieldAsBuiltAlternateTwinCenterlineParityReady": True,
             "weldedBranchPieceVectorBijectionReady": True,
             "scopedPieceToPlanVectorMappingReady": True,
             "scopedFabricationStationDirectionReady": True,
-            "completeWeldedBranchPieceMappingReady": False,
+            "completeWeldedBranchPieceMappingReady": True,
             "pieceToPlanVectorMappingReady": False,
             "hydraulicFlowDirectionReady": False,
             "gradeReady": False,

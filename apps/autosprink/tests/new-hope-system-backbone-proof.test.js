@@ -49,6 +49,7 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(proofScript).toContain("root.wetSystemListingQuantityExpansionReady = String(result.wetSystemListingQuantityExpansionReady)");
     expect(proofScript).toContain("root.wetSystemWeldedBranchLabelInventoryReady = String(result.wetSystemWeldedBranchLabelInventoryReady)");
     expect(proofScript).toContain("root.wetSystemWeldedBranchPieceVectorBijectionReady = String(result.wetSystemWeldedBranchPieceVectorBijectionReady)");
+    expect(proofScript).toContain("root.wetSystemCompleteWeldedBranchPieceMappingReady = String(result.wetSystemCompleteWeldedBranchPieceMappingReady)");
     expect(proofScript).toContain("root.wetSystemScopedFabricationStationDirectionReady = String(result.wetSystemScopedFabricationStationDirectionReady)");
     expect(proofScript).toContain("root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved)");
     expect(proofScript).toContain("root.quoteReady = String(result.quoteReady)");
@@ -65,7 +66,7 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(html).toContain('Native records to approved AutoSPRINK listing');
     expect(html).toContain('wet-quantity-placement-source.png');
     expect(html).toContain('wet-welded-branch-registration-source.png');
-    expect(html).toContain('Sixty-seven of 71 welded branch units');
+    expect(html).toContain('All 71 welded branch units');
     expect(fs.statSync(new URL('wet-quantity-placement-source.png', proofRoot)).size).toBeGreaterThan(100_000);
     expect(fs.statSync(new URL('wet-welded-branch-registration-source.png', proofRoot)).size).toBeGreaterThan(1_000_000);
     expect(html).toContain('eight field/as-built head centers');

@@ -1,0 +1,46 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "loop": "new-hope-complete-welded-branch-plan-mapping-20260716",
+  "iteration": 2,
+  "status": "completed",
+  "brainPreflight": {
+    "status": "passed",
+    "episodes": [156579, 150639]
+  },
+  "truth": {
+    "weldedBranchUnitCount": 71,
+    "fieldAsBuiltHeavyCenterlineCount": 67,
+    "fieldAsBuiltAlternateTwinCenterlineCount": 71,
+    "pieceVectorMappedUnitCount": 71,
+    "pieceVectorHoldoutCount": 0,
+    "pieceVectorMappedHeavyCenterlineCount": 67,
+    "pieceVectorMappedAlternateCenterlineCount": 4,
+    "maxPieceVectorCutSpanDeltaIn": 2.096517,
+    "directionRegisteredUnitCount": 15,
+    "mappedNativeOutletCount": 36,
+    "maxOutletResidualIn": 0.194824,
+    "globalListedUnitCount": 169,
+    "globalPieceVectorUnmappedUnitCount": 98,
+    "hydraulicFlowDirectionReady": false,
+    "gradeReady": false,
+    "installedElevationReady": false,
+    "globalPieceToPlanVectorMappingReady": false,
+    "fabricationReady": false,
+    "fieldReleaseReady": false,
+    "quoteReady": false,
+    "vpsReleaseReady": false
+  },
+  "verification": {
+    "deterministicReplay": "JSON SHA256 869902B20B1F217C9EC942D9BD442159E6FCB6D0725F7B50EF6366A0313DC9FE and PNG SHA256 C8B995BAE3C9E0C9A9D4FDB4CBB1F4C71B9D3C7CA4DA97A2A85E49929DB67AA9 replay identically",
+    "focusedTests": "49 passed across six files; broken twin parity, source-spatial label regression, duplicate segment, missing alternate, cut-span drift, direction drift, and false global release promotions reject",
+    "build": "Vite production build passed in 963 ms",
+    "rulebook": "AGENTIC_RULES_VERIFY ok",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "lean": "four theorems verified by Lean 4.13.0 in 361 ms",
+    "visual": "actual FP1.0 proof inspected; cyan 67-heavy, orange four-alternate, and magenta 15-direction layers remain source-aligned on the PDF underlay",
+    "browser": "HTTP 200; proofReady and complete welded mapping true; 71 plan and 71 unresolved-3D scoped vectors; zero welded holdouts; 98 global units unmapped; quote and field release false; zero application console errors, four Chromium GL-driver performance warnings",
+    "browserScreenshot": "output/playwright/new-hope-71-welded-piece-browser.png",
+    "brainPostflight": "passed; episode 156636"
+  },
+  "nextAction": "Map the remaining 98 global wet-system listed units through source topology and elevation evidence; retain direction, grade, riser/drain route, installation 3D, fabrication, quote, field, and VPS gates until independently source-closed by system-owned loops."
+}

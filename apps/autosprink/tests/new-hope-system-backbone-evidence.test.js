@@ -102,8 +102,13 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_LISTING_QUANTITY_EXPANSION_REQUIRED');
     expect(result.plan2d.wetLevel1.pipeVectors).toHaveLength(300);
     expect(result.plan2d.wetLevel1.sprinklerHeads).toHaveLength(174);
-    expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors).toHaveLength(67);
-    expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors.find((row) => row.instanceId === 'BL03.01')).toBeUndefined();
+    expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors).toHaveLength(71);
+    expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors.find((row) => row.instanceId === 'BL03.01')).toEqual(expect.objectContaining({
+      nativeStationDirection: null,
+      nativeStationDirectionStatus: 'unresolved',
+      sourceCenterline: expect.objectContaining({ representation: 'black-white-twin-centerline', widthPt: 0.01389 }),
+      geometryStatus: 'exact-field-and-as-built-centerline-plus-native-cut-length-station-direction-unresolved',
+    }));
     expect(result.plan2d.wetLevel1.scopedFabricationPieceVectors.find((row) => row.instanceId === 'BL02.01')).toEqual(expect.objectContaining({
       nativeStationDirection: null,
       nativeStationDirectionStatus: 'unresolved',
@@ -115,7 +120,7 @@ describe('New Hope source-bound system backbone evidence', () => {
       geometryStatus: 'exact-field-and-as-built-centerline-plus-native-cut-length-and-station-direction',
     }));
     expect(result.model3d.unresolvedWetLevel1.pipeVectors).toHaveLength(300);
-    expect(result.model3d.unresolvedWetLevel1.scopedFabricationPieceVectors).toHaveLength(67);
+    expect(result.model3d.unresolvedWetLevel1.scopedFabricationPieceVectors).toHaveLength(71);
     expect(result.model3d.unresolvedWetLevel1.scopedFabricationPieceVectors[0].installedElevationFt).toBeNull();
     expect(result.model3d.unresolvedWetLevel1.pipeVectors[0].installedElevationFt).toBeNull();
     expect(result.model3d.unresolvedWetLevel1.sprinklerHeads.find((head) => head.headType.sin === 'V3506')).toBeTruthy();
@@ -137,13 +142,17 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.takeoff.wetLevel1NativeFabrication.quantityPlacement.definitions.flatMap((row) => row.instances)).toHaveLength(4);
     expect(result.takeoff.wetLevel1NativeFabrication.weldedBranchRegistration.metrics).toEqual(expect.objectContaining({
       weldedBranchUnitCount: 71,
-      pieceVectorMappedUnitCount: 67,
-      pieceVectorHoldoutCount: 4,
+      pieceVectorMappedUnitCount: 71,
+      pieceVectorHoldoutCount: 0,
+      pieceVectorMappedHeavyCenterlineCount: 67,
+      pieceVectorMappedAlternateCenterlineCount: 4,
       registeredUnitCount: 15,
       mappedNativeOutletCount: 36,
       unresolvedUnitCount: 56,
-      globalPieceVectorUnmappedUnitCount: 102,
+      globalPieceVectorUnmappedUnitCount: 98,
     }));
+    expect(result.wetSystemCompleteWeldedBranchPieceMappingReady).toBe(true);
+    expect(result.wetSystemPieceToPlanMappingReady).toBe(false);
     expect(result.takeoff.systemComponents).toEqual(expect.arrayContaining([
       expect.objectContaining({ key: 'wet_test_and_drain_prv', quantity: 1 }),
       expect.objectContaining({ key: 'fire_pump', quantity: 0 }),

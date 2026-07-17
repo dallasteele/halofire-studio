@@ -1,0 +1,19 @@
+{
+  "artifactType": "halofire.formal-proof-receipt.v1",
+  "prover": "lean4",
+  "gateway": "http://100.116.75.108:8810/api/provers/lean/check",
+  "requestPath": "data/agent-loops/new-hope-complete-welded-branch-plan-mapping-20260716/lean-request.json",
+  "theoremNames": [
+    "completeWeldedBranchVectorCoverage",
+    "noWeldedBranchPlanHoldoutsRemain",
+    "completeWeldedSubsetDoesNotCompleteGlobalInventory",
+    "topDownVectorsDoNotProveInstallationRelease"
+  ],
+  "claim": "Sixty-seven heavy plus four alternate source vectors map all 71 welded branch units with zero welded plan holdouts; 98 of 169 globally listed units remain unmapped; top-down vectors cannot promote fabrication without flow direction, grade, and installed elevation.",
+  "result": {
+    "status": "verified",
+    "elapsedMs": 361,
+    "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
+    "returncode": 0
+  }
+}

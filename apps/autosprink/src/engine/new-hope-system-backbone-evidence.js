@@ -458,7 +458,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     },
     systemDesignGate: { status: 'blocked', blockers },
     takeoff: evidenceReady ? {
-      status: wetNetworkReady ? 'native-records-to-approved-listing-definitions-and-quantity-expansion-reconciled-sixty-seven-units-source-registered-global-piece-to-plan-unresolved' : 'source-identities-only-no-route-quantities',
+      status: wetNetworkReady ? 'native-records-to-approved-listing-definitions-and-quantity-expansion-reconciled-seventy-one-welded-branch-units-source-registered-global-piece-to-plan-unresolved' : 'source-identities-only-no-route-quantities',
       wetLevel1NativeFabrication: wetNetworkReady ? {
         metrics: clone(wetNetwork.metrics),
         lineFamilies: clone(wetNetwork.nativeFabricationLines),
@@ -495,6 +495,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     wetSystemQuantityExpandedEndpointMappingReady: evidenceReady && wetQuantityPlacement.quantityExpandedPieceEndpointMappingReady,
     wetSystemWeldedBranchLabelInventoryReady: evidenceReady && wetWeldedBranchRegistration.weldedBranchLabelInventoryReady,
     wetSystemWeldedBranchPieceVectorBijectionReady: evidenceReady && wetWeldedBranchRegistration.weldedBranchPieceVectorBijectionReady,
+    wetSystemCompleteWeldedBranchPieceMappingReady: evidenceReady && wetWeldedBranchRegistration.completeWeldedBranchPieceMappingReady,
     wetSystemScopedPieceToPlanMappingReady: evidenceReady && wetWeldedBranchRegistration.scopedPieceToPlanVectorMappingReady,
     wetSystemScopedFabricationStationDirectionReady: evidenceReady && wetWeldedBranchRegistration.scopedFabricationStationDirectionReady,
     wetSystemThreadedCutLengthCrossSourceReady: evidenceReady && wetListingCrosswalk.threadedCutLengthCrossSourceReady,
