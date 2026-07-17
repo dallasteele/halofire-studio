@@ -1,0 +1,834 @@
+{
+  "artifactType": "halofire.cooperative-1881-a307-c1-profile-datum-contact.v1",
+  "projectName": "The Cooperative 1881 - Salt Lake City UT",
+  "status": "passed",
+  "sources": {
+    "architectural": {
+      "fileName": "A-307 BUILDING SECTIONS.dwg",
+      "sha256": "070F4766DB2FCD0D62E828AE70418BD205722FE9DC79EF95DDBDB61174B69162",
+      "expectedSha256": "070F4766DB2FCD0D62E828AE70418BD205722FE9DC79EF95DDBDB61174B69162",
+      "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+      "unknownEntityCount": 0
+    },
+    "parentBinding": {
+      "fileName": "cooperative-1881-a307-c1-view-binding.json",
+      "sourceSha256": "070F4766DB2FCD0D62E828AE70418BD205722FE9DC79EF95DDBDB61174B69162",
+      "artifactType": "halofire.cooperative-1881-a307-c1-view-binding.v1"
+    }
+  },
+  "sourceView": {
+    "detailReference": "C1",
+    "sheetReference": "A-307",
+    "viewportSourceHandle": "14672",
+    "storyMarkerName": "LONGITUDINAL SECTION B_STORY_MARKER",
+    "storyMarkerSourceHandle": "143D3"
+  },
+  "roofProfileSegments": [
+    {
+      "sourceBlockName": "Section Element_232_1",
+      "sourceBlockRecordHandle": "7661",
+      "sourceInsertHandle": "766A",
+      "sourceLineHandle": "7664",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 407.115278,
+        "y": 1138.675765,
+        "z": 0
+      },
+      "end": {
+        "x": 407.115278,
+        "y": 1120.810887,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_232_1",
+      "sourceBlockRecordHandle": "7661",
+      "sourceInsertHandle": "766A",
+      "sourceLineHandle": "7665",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 407.115278,
+        "y": 1138.675765,
+        "z": 0
+      },
+      "end": {
+        "x": 874.992507,
+        "y": 1128.928322,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_232_1",
+      "sourceBlockRecordHandle": "7661",
+      "sourceInsertHandle": "766A",
+      "sourceLineHandle": "7666",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 874.992507,
+        "y": 1128.928322,
+        "z": 0
+      },
+      "end": {
+        "x": 874.992507,
+        "y": 1123.404232,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_232_1",
+      "sourceBlockRecordHandle": "7661",
+      "sourceInsertHandle": "766A",
+      "sourceLineHandle": "7667",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 407.115278,
+        "y": 1120.810887,
+        "z": 0
+      },
+      "end": {
+        "x": 874.992507,
+        "y": 1111.063445,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_232_1",
+      "sourceBlockRecordHandle": "7661",
+      "sourceInsertHandle": "766A",
+      "sourceLineHandle": "7668",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 874.992507,
+        "y": 1118.808323,
+        "z": 0
+      },
+      "end": {
+        "x": 874.992507,
+        "y": 1111.063445,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_234_1",
+      "sourceBlockRecordHandle": "76A2",
+      "sourceInsertHandle": "76A8",
+      "sourceLineHandle": "76A5",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 927.955353,
+        "y": 1122.858582,
+        "z": 0
+      },
+      "end": {
+        "x": 927.397499,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_234_1",
+      "sourceBlockRecordHandle": "76A2",
+      "sourceInsertHandle": "76A8",
+      "sourceLineHandle": "76A6",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1159.455007,
+        "y": 1127.681492,
+        "z": 0
+      },
+      "end": {
+        "x": 927.955353,
+        "y": 1122.858582,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_234_1",
+      "sourceBlockRecordHandle": "76A2",
+      "sourceInsertHandle": "76A8",
+      "sourceLineHandle": "76A7",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1159.455007,
+        "y": 1109.816614,
+        "z": 0
+      },
+      "end": {
+        "x": 927.397499,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_235_1",
+      "sourceBlockRecordHandle": "76A9",
+      "sourceInsertHandle": "76AF",
+      "sourceLineHandle": "76AC",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1159.455007,
+        "y": 1127.681492,
+        "z": 0
+      },
+      "end": {
+        "x": 1390.95466,
+        "y": 1122.858582,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_235_1",
+      "sourceBlockRecordHandle": "76A9",
+      "sourceInsertHandle": "76AF",
+      "sourceLineHandle": "76AD",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1159.455007,
+        "y": 1109.816614,
+        "z": 0
+      },
+      "end": {
+        "x": 1391.512514,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_235_1",
+      "sourceBlockRecordHandle": "76A9",
+      "sourceInsertHandle": "76AF",
+      "sourceLineHandle": "76AE",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1390.95466,
+        "y": 1122.858582,
+        "z": 0
+      },
+      "end": {
+        "x": 1391.512514,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_237_1",
+      "sourceBlockRecordHandle": "76B9",
+      "sourceInsertHandle": "76BF",
+      "sourceLineHandle": "76BC",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1472.880353,
+        "y": 1122.858582,
+        "z": 0
+      },
+      "end": {
+        "x": 1472.322499,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_237_1",
+      "sourceBlockRecordHandle": "76B9",
+      "sourceInsertHandle": "76BF",
+      "sourceLineHandle": "76BD",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1704.380007,
+        "y": 1127.681492,
+        "z": 0
+      },
+      "end": {
+        "x": 1472.880353,
+        "y": 1122.858582,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_237_1",
+      "sourceBlockRecordHandle": "76B9",
+      "sourceInsertHandle": "76BF",
+      "sourceLineHandle": "76BE",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1704.380007,
+        "y": 1109.816614,
+        "z": 0
+      },
+      "end": {
+        "x": 1472.322499,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_238_1",
+      "sourceBlockRecordHandle": "76C0",
+      "sourceInsertHandle": "76C6",
+      "sourceLineHandle": "76C3",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1704.380007,
+        "y": 1127.681492,
+        "z": 0
+      },
+      "end": {
+        "x": 1935.87966,
+        "y": 1122.858582,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_238_1",
+      "sourceBlockRecordHandle": "76C0",
+      "sourceInsertHandle": "76C6",
+      "sourceLineHandle": "76C4",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1704.380007,
+        "y": 1109.816614,
+        "z": 0
+      },
+      "end": {
+        "x": 1936.437514,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_238_1",
+      "sourceBlockRecordHandle": "76C0",
+      "sourceInsertHandle": "76C6",
+      "sourceLineHandle": "76C5",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 1935.87966,
+        "y": 1122.858582,
+        "z": 0
+      },
+      "end": {
+        "x": 1936.437514,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_239_1",
+      "sourceBlockRecordHandle": "76C7",
+      "sourceInsertHandle": "76CD",
+      "sourceLineHandle": "76CA",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2017.805353,
+        "y": 1122.858582,
+        "z": 0
+      },
+      "end": {
+        "x": 2017.247499,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_239_1",
+      "sourceBlockRecordHandle": "76C7",
+      "sourceInsertHandle": "76CD",
+      "sourceLineHandle": "76CB",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2249.305006,
+        "y": 1127.681492,
+        "z": 0
+      },
+      "end": {
+        "x": 2017.805353,
+        "y": 1122.858582,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_239_1",
+      "sourceBlockRecordHandle": "76C7",
+      "sourceInsertHandle": "76CD",
+      "sourceLineHandle": "76CC",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2249.305006,
+        "y": 1109.816614,
+        "z": 0
+      },
+      "end": {
+        "x": 2017.247499,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_240_1",
+      "sourceBlockRecordHandle": "76CE",
+      "sourceInsertHandle": "76D4",
+      "sourceLineHandle": "76D1",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2249.305006,
+        "y": 1127.681492,
+        "z": 0
+      },
+      "end": {
+        "x": 2480.80466,
+        "y": 1122.858582,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_240_1",
+      "sourceBlockRecordHandle": "76CE",
+      "sourceInsertHandle": "76D4",
+      "sourceLineHandle": "76D2",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2249.305006,
+        "y": 1109.816614,
+        "z": 0
+      },
+      "end": {
+        "x": 2481.362514,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_240_1",
+      "sourceBlockRecordHandle": "76CE",
+      "sourceInsertHandle": "76D4",
+      "sourceLineHandle": "76D3",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2480.80466,
+        "y": 1122.858582,
+        "z": 0
+      },
+      "end": {
+        "x": 2481.362514,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_241_1",
+      "sourceBlockRecordHandle": "76D5",
+      "sourceInsertHandle": "76DB",
+      "sourceLineHandle": "76D8",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2562.730353,
+        "y": 1122.858582,
+        "z": 0
+      },
+      "end": {
+        "x": 2562.172499,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_241_1",
+      "sourceBlockRecordHandle": "76D5",
+      "sourceInsertHandle": "76DB",
+      "sourceLineHandle": "76D9",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2794.230006,
+        "y": 1127.681492,
+        "z": 0
+      },
+      "end": {
+        "x": 2562.730353,
+        "y": 1122.858582,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_241_1",
+      "sourceBlockRecordHandle": "76D5",
+      "sourceInsertHandle": "76DB",
+      "sourceLineHandle": "76DA",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2794.230006,
+        "y": 1109.816614,
+        "z": 0
+      },
+      "end": {
+        "x": 2562.172499,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_242_1",
+      "sourceBlockRecordHandle": "76DC",
+      "sourceInsertHandle": "76E2",
+      "sourceLineHandle": "76DF",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2794.230006,
+        "y": 1127.681492,
+        "z": 0
+      },
+      "end": {
+        "x": 3025.72966,
+        "y": 1122.858582,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_242_1",
+      "sourceBlockRecordHandle": "76DC",
+      "sourceInsertHandle": "76E2",
+      "sourceLineHandle": "76E0",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 2794.230006,
+        "y": 1109.816614,
+        "z": 0
+      },
+      "end": {
+        "x": 3026.287514,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_242_1",
+      "sourceBlockRecordHandle": "76DC",
+      "sourceInsertHandle": "76E2",
+      "sourceLineHandle": "76E1",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 3025.72966,
+        "y": 1122.858582,
+        "z": 0
+      },
+      "end": {
+        "x": 3026.287514,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_243_1",
+      "sourceBlockRecordHandle": "76E3",
+      "sourceInsertHandle": "76EA",
+      "sourceLineHandle": "76E7",
+      "layer": "New_A _ Roofs.3D_Pen_No__1",
+      "start": {
+        "x": 3107.655353,
+        "y": 1122.858582,
+        "z": 0
+      },
+      "end": {
+        "x": 3107.097499,
+        "y": 1104.982083,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_566_1",
+      "sourceBlockRecordHandle": "8AF7",
+      "sourceInsertHandle": "8B02",
+      "sourceLineHandle": "8AFA",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 871.930006,
+        "y": 1140.524677,
+        "z": 0
+      },
+      "end": {
+        "x": 871.930006,
+        "y": 1150.927396,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_566_1",
+      "sourceBlockRecordHandle": "8AF7",
+      "sourceInsertHandle": "8B02",
+      "sourceLineHandle": "8AFC",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 370.742507,
+        "y": 1150.927396,
+        "z": 0
+      },
+      "end": {
+        "x": 370.742507,
+        "y": 1140.524677,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_566_1",
+      "sourceBlockRecordHandle": "8AF7",
+      "sourceInsertHandle": "8B02",
+      "sourceLineHandle": "8AFD",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 370.742507,
+        "y": 1140.524677,
+        "z": 0
+      },
+      "end": {
+        "x": 871.930006,
+        "y": 1140.524677,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_566_1",
+      "sourceBlockRecordHandle": "8AF7",
+      "sourceInsertHandle": "8B02",
+      "sourceLineHandle": "8AFE",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 370.742507,
+        "y": 1121.675477,
+        "z": 0
+      },
+      "end": {
+        "x": 370.742507,
+        "y": 1140.524677,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_566_1",
+      "sourceBlockRecordHandle": "8AF7",
+      "sourceInsertHandle": "8B02",
+      "sourceLineHandle": "8AFF",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 405.055006,
+        "y": 1121.675477,
+        "z": 0
+      },
+      "end": {
+        "x": 370.742507,
+        "y": 1121.675477,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_566_1",
+      "sourceBlockRecordHandle": "8AF7",
+      "sourceInsertHandle": "8B02",
+      "sourceLineHandle": "8B00",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 871.930006,
+        "y": 1140.524677,
+        "z": 0
+      },
+      "end": {
+        "x": 871.930006,
+        "y": 1128.992124,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_566_1",
+      "sourceBlockRecordHandle": "8AF7",
+      "sourceInsertHandle": "8B02",
+      "sourceLineHandle": "8B01",
+      "layer": "New_A _ Roofs.3D_Pen_No__5",
+      "start": {
+        "x": 871.930006,
+        "y": 1150.927396,
+        "z": 0
+      },
+      "end": {
+        "x": 370.742507,
+        "y": 1150.927396,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_567_1",
+      "sourceBlockRecordHandle": "8B03",
+      "sourceInsertHandle": "8B0B",
+      "sourceLineHandle": "8B06",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 370.742507,
+        "y": 1121.168276,
+        "z": 0
+      },
+      "end": {
+        "x": 370.742507,
+        "y": 1120.837567,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_567_1",
+      "sourceBlockRecordHandle": "8B03",
+      "sourceInsertHandle": "8B0B",
+      "sourceLineHandle": "8B07",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 370.742507,
+        "y": 1120.837567,
+        "z": 0
+      },
+      "end": {
+        "x": 405.055006,
+        "y": 1120.837567,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_567_1",
+      "sourceBlockRecordHandle": "8B03",
+      "sourceInsertHandle": "8B0B",
+      "sourceLineHandle": "8B08",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 370.742507,
+        "y": 1120.587567,
+        "z": 0
+      },
+      "end": {
+        "x": 370.742507,
+        "y": 1120.837567,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_567_1",
+      "sourceBlockRecordHandle": "8B03",
+      "sourceInsertHandle": "8B0B",
+      "sourceLineHandle": "8B09",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 405.055006,
+        "y": 1120.587567,
+        "z": 0
+      },
+      "end": {
+        "x": 370.742507,
+        "y": 1120.587567,
+        "z": 0
+      }
+    },
+    {
+      "sourceBlockName": "Section Element_567_1",
+      "sourceBlockRecordHandle": "8B03",
+      "sourceInsertHandle": "8B0B",
+      "sourceLineHandle": "8B0A",
+      "layer": "New_A _ Roofs.3D_Pen_No__11",
+      "start": {
+        "x": 417.834659,
+        "y": 1120.587567,
+        "z": 0
+      },
+      "end": {
+        "x": 415.367506,
+        "y": 1120.587567,
+        "z": 0
+      }
+    }
+  ],
+  "datumBindings": [
+    {
+      "kind": "roof-eave",
+      "elevationText": "+81'-0\"",
+      "signedFeet": 81,
+      "annotationSourceHandle": "144A4",
+      "levelLine": {
+        "sourceLineHandle": "144A2",
+        "sourceCircleHandle": "144A3",
+        "sourceVerticalGuideHandle": "144A1",
+        "start": {
+          "x": 126.44522,
+          "y": 1081.683323,
+          "z": 0
+        },
+        "end": {
+          "x": 251.012653,
+          "y": 1081.683323,
+          "z": 0
+        }
+      },
+      "profileContacts": []
+    },
+    {
+      "kind": "roof-ridge",
+      "elevationText": "+89'-6 3/4\"",
+      "signedFeet": 89.5625,
+      "annotationSourceHandle": "144B8",
+      "levelLine": {
+        "sourceLineHandle": "144B6",
+        "sourceCircleHandle": "144B7",
+        "sourceVerticalGuideHandle": "144B5",
+        "start": {
+          "x": 71.432936,
+          "y": 1184.482074,
+          "z": 0
+        },
+        "end": {
+          "x": 251.012653,
+          "y": 1184.482074,
+          "z": 0
+        }
+      },
+      "profileContacts": []
+    }
+  ],
+  "counts": {
+    "datums": 2,
+    "nativeLevelLines": 2,
+    "exactContacts": 0
+  },
+  "holds": [
+    {
+      "code": "A307_C1_DATUM_PROFILE_NO_EXACT_CONTACT",
+      "severity": "hold",
+      "message": "The native datum level line does not geometrically contact a native C1 roof-profile edge; proximity cannot promote a roof plane.",
+      "refs": [
+        "144A4",
+        "144A2"
+      ]
+    },
+    {
+      "code": "A307_C1_DATUM_PROFILE_NO_EXACT_CONTACT",
+      "severity": "hold",
+      "message": "The native datum level line does not geometrically contact a native C1 roof-profile edge; proximity cannot promote a roof plane.",
+      "refs": [
+        "144B8",
+        "144B6"
+      ]
+    }
+  ],
+  "issues": [],
+  "claims": {
+    "nativeDatumLevelLineRegistered": true,
+    "exactDatumToProfileContactRegistered": false,
+    "profileEdgeToDatumBound": false,
+    "slopeDirectionReady": false,
+    "planRegionToSectionViewReady": false,
+    "roofSurfaceReconstructionReady": false,
+    "perMemberVerticalDatumReady": false,
+    "automaticSprinklerPlacementAllowed": false,
+    "automaticPipeRoutingAllowed": false,
+    "fabricationReady": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "Exact contact is required; a level line that is merely near a roof profile does not establish an elevation-to-edge binding.",
+    "This receipt does not assign a section to any plural-covered plan region or derive a plan slope direction.",
+    "No roof surface, structural member, sprinkler, pipe, clearance, fabrication, code, employee-use, or VPS-release claim is made."
+  ]
+}

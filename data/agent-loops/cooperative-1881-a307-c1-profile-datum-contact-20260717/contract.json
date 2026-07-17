@@ -1,0 +1,33 @@
+{
+  "name": "cooperative-1881-a307-c1-profile-datum-contact-20260717",
+  "owner": "codex",
+  "goal": "Derive only native A-307 C1 story-marker level-line to roof-profile contacts, reject proximity as a datum tie, and preserve the resulting hold before any pitched-roof plane or sprinkler/pipe promotion.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "apps/autosprink/src/data/cooperative-1881-a307-c1-view-binding.json",
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/arch/A-307 BUILDING SECTIONS.dwg"
+  ],
+  "exit_criteria": [
+    "each A-307 C1 eave/ridge annotation is linked only to its exact native story-marker level line",
+    "only exact source segment contact can bind a datum to a roof-profile edge",
+    "no-contact evidence remains explicit and blocks roof-plane, sprinkler, pipe, fabrication, and release claims",
+    "the rendered receipt shows native profile and datum geometry without a synthetic roof surface"
+  ],
+  "verification_gates": [
+    "parent C1 binding and A-307 source hash remain sealed",
+    "annotation-to-level-line association rejects non-consecutive marker geometry",
+    "segment contact uses exact geometric intersection rather than nearest-edge inference",
+    "mutated marker structure and source drift reject",
+    "focused tests, deterministic artifact replay, and rendered visual inspection pass"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-a307-c1-profile-datum-contact-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/cooperative-1881-a307-c1-profile-datum-contact.json",
+    "output/visual-proof/1881-a307-c1-profile-datum-contact.svg"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 30000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

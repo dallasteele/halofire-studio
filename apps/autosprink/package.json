@@ -20,6 +20,7 @@
     "build:1881-a121-slope-boundary-association": "node scripts/extract-cooperative-1881-a121-slope-boundary-association.mjs",
     "build:1881-a121-section-cut-coverage": "node scripts/extract-cooperative-1881-a121-section-cut-coverage.mjs",
     "build:1881-a307-c1-view-binding": "node scripts/extract-cooperative-1881-a307-c1-view-binding.mjs",
+    "build:1881-a307-c1-profile-datum-contact": "node scripts/extract-cooperative-1881-a307-c1-profile-datum-contact.mjs",
     "build:1881-roof-framing-clearance-preflight": "node scripts/build-1881-roof-framing-clearance-preflight.mjs",
     "audit:new-hope-support-cad": "node scripts/audit-new-hope-support-cad-corpus.mjs",
     "audit:victaulic-ab2-cad": "node scripts/audit-victaulic-ab2-dxf.mjs",

@@ -1,0 +1,51 @@
+{
+  "name": "cooperative-1881-a307-c1-profile-datum-contact-20260717",
+  "iteration": 1,
+  "status": "completed-hold-preserved",
+  "updatedAt": "2026-07-17T19:31:00Z",
+  "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY"],
+  "nextStage": "CONTINUE_SOURCE_PROVEN_SECTION_TO_PLAN_ASSIGNMENT",
+  "sourceReplay": {
+    "architecturalSheet": "A-307 BUILDING SECTIONS.dwg",
+    "architecturalSha256": "070F4766DB2FCD0D62E828AE70418BD205722FE9DC79EF95DDBDB61174B69162",
+    "view": "C1/A-307 LONGITUDINAL SECTION B",
+    "storyMarker": "LONGITUDINAL SECTION B_STORY_MARKER",
+    "roofProfileSegments": 42,
+    "datums": {
+      "roofEave": { "annotationHandle": "144A4", "levelLineHandle": "144A2" },
+      "roofRidge": { "annotationHandle": "144B8", "levelLineHandle": "144B6" }
+    }
+  },
+  "result": {
+    "nativeDatumLevelLines": 2,
+    "exactDatumProfileContacts": 0,
+    "holdCode": "A307_C1_DATUM_PROFILE_NO_EXACT_CONTACT",
+    "claimsPromoted": [],
+    "claimsRetainedFalse": [
+      "profileEdgeToDatumBound",
+      "slopeDirectionReady",
+      "planRegionToSectionViewReady",
+      "roofSurfaceReconstructionReady",
+      "perMemberVerticalDatumReady",
+      "automaticSprinklerPlacementAllowed",
+      "automaticPipeRoutingAllowed",
+      "fabricationReady",
+      "codeComplianceReady",
+      "employeeUseReady",
+      "vpsReleaseReady"
+    ]
+  },
+  "verification": {
+    "focusedTests": "48 passed, 0 failed across 10 source/roof/section test files",
+    "productionBuild": "vite build passed",
+    "adversarialParentSourceDrift": "rejected by A307_C1_PARENT_BINDING_UNVERIFIED",
+    "markerSequenceMutation": "rejected by MARKER_LEVEL_LINE_SEQUENCE_UNVERIFIED",
+    "proximityOnly": "rejected by exact closed-segment contact gate"
+  },
+  "visualGate": {
+    "status": "accepted-hold-visible",
+    "evidence": "output/playwright/1881-a307-c1-profile-datum-contact.png",
+    "finding": "The browser-rendered receipt shows two dashed amber native datum level lines separated from the cyan native C1 roof profiles and reports zero exact contacts. No synthetic roof plane or sprinkler/pipe layout is shown."
+  },
+  "nextSourceRequirement": "Find a source view that supplies both an unambiguous plan-region-to-section assignment and exact datum-to-profile contact before reconstructing a pitched roof plane."
+}
