@@ -12,12 +12,15 @@ const rootPaths = process.env.HALOFIRE_CORPUS_ROOTS
     'E:/ClaudeBot/data/halofire/bids/1881',
     'E:/ClaudeBot/data/halofire/golden/1881',
     'E:/ClaudeBot/HaloFireBidDocs/1-Bid Documents',
-    'Y:/',
+    // The shared-drive bid log identifies Cooperative 1881 as a Kier Construction bid.
+    // Keep this narrow; a whole-drive crawl is neither deterministic nor evidence-complete.
+    'Y:/Shared/HaloOps/01-Bids/Kier',
   ];
+const directoryOffset = Number.parseInt(process.env.HALOFIRE_CORPUS_DIRECTORY_OFFSET || '0', 10);
 const candidates = JSON.parse(fs.readFileSync(path.join(APP, 'src/data/registered-roof-framing.cooperative-1881.json'), 'utf8'));
 const placement = JSON.parse(fs.readFileSync(path.join(APP, 'src/data/roof-framing-placement.cooperative-1881.json'), 'utf8'));
 const outputPath = path.join(APP, 'src/data/roof-framing-source-discovery.cooperative-1881.json');
-const discovery = discoverMaterializedSourceEvidence({ roots: rootPaths, projectTokens: ['1881', 'cooperative'], maxFiles: 15_000 });
+const discovery = discoverMaterializedSourceEvidence({ roots: rootPaths, projectTokens: ['1881', 'cooperative'], maxFiles: 15_000, maxDirectories: 300, directoryOffset: Number.isFinite(directoryOffset) ? directoryOffset : 0 });
 
 async function extractPdfText(document) {
   if (document.extension !== '.pdf') return { ...document, extractedTextStatus: 'not-pdf', extractedText: '' };
@@ -82,4 +85,4 @@ const output = {
   },
 };
 fs.writeFileSync(outputPath, `${JSON.stringify(output, null, 2)}\n`);
-console.log(JSON.stringify({ outputPath, status: output.status, counts: { files: output.scannedFileCount, candidates: output.candidates.length, boundedMembers: output.memberEvidence.witnesses.length, supplierCandidates: output.documents.filter((document) => document.roles.includes('structural-supplier-submittal')).length }, issues: output.issues }, null, 2));
+console.log(JSON.stringify({ outputPath, status: output.status, scanWindow: { directoryOffset: output.directoryOffset, nextDirectoryOffset: output.nextDirectoryOffset }, counts: { files: output.scannedFileCount, directories: output.scannedDirectoryCount, candidates: output.candidates.length, boundedMembers: output.memberEvidence.witnesses.length, supplierCandidates: output.documents.filter((document) => document.roles.includes('structural-supplier-submittal')).length }, issues: output.issues }, null, 2));

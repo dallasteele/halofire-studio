@@ -137,3 +137,23 @@ set of scoped, materialized Egnyte folders. It must locate an actual structural
 supplier submittal and then independently extract member-level actual dressed
 dimensions, orientation, and vertical datum before the existing continuous roof
 projection gate can promote a physical obstruction.
+
+## Iteration 5 live-Egnyte corpus windowing
+
+The authenticated Egnyte Drive client was started and restored the `Y:` Halo
+Fire share. The live bid log identifies the awarded record as `The Cooperative
+1881 Salt Lake City UT`, contractor `Kier Construction`, and the source discovery
+now uses the project-scoped Kier bid root instead of a whole-drive `Y:/` crawl.
+
+The first live 300-directory window scanned 776 files across local source roots
+plus `Y:/Shared/HaloOps/01-Bids/Kier`. It did not find a structural supplier,
+truss, or lumber submittal. The previous scan only bounded files, which could
+hang on an empty virtual cloud tree; discovery now bounds and records directory
+traversal, sorts entries deterministically, and emits a resumable directory
+offset. The exact next window is offset 300. This remains an explicit source
+search state, not a negative claim about folders that have not been scanned.
+
+Focused source evidence tests pass 9/9, including an empty cloud-directory
+budget adversary and a deterministic resumed-window adversary. The broader
+source/roof lane passes 72/72 with zero skips; structural registration passes
+25/25; the production build and loop-contract guard pass.

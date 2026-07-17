@@ -40,6 +40,26 @@ describe('materialized structural source discovery', () => {
     expect(result.issues.map((entry) => entry.code)).toContain('SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED');
   });
 
+  it('also bounds empty cloud-directory traversal before a file can be encountered', () => {
+    const root = makeRoot();
+    fs.mkdirSync(path.join(root, 'a', 'b', 'c'), { recursive: true });
+    const result = discoverMaterializedSourceEvidence({ roots: [root], projectTokens: ['1881'], maxFiles: 10, maxDirectories: 2 });
+    expect(result.scanComplete).toBe(false);
+    expect(result.scannedDirectoryCount).toBe(2);
+    expect(result.issues.map((entry) => entry.code)).toContain('SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED');
+  });
+
+  it('resumes a deterministic directory window without rescanning prior files as candidates', () => {
+    const root = makeRoot();
+    fs.writeFileSync(path.join(root, '1881-root.pdf'), 'root');
+    fs.mkdirSync(path.join(root, 'child'));
+    fs.writeFileSync(path.join(root, 'child', '1881-truss-supplier.pdf'), 'child');
+    const result = discoverMaterializedSourceEvidence({ roots: [root], projectTokens: ['1881'], maxFiles: 10, maxDirectories: 1, directoryOffset: 1 });
+    expect(result.directoryOffset).toBe(1);
+    expect(result.candidates.map((entry) => path.basename(entry.path))).toEqual(['1881-truss-supplier.pdf']);
+    expect(result.nextDirectoryOffset).toBeNull();
+  });
+
   it('does not promote issued plans or sprinkler drawings as exact fabrication evidence', () => {
     const result = classifyStructuralMemberEvidence({
       members: [{ id: 'J1', member: '2X10' }],

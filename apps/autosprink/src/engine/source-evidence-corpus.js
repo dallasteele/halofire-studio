@@ -40,10 +40,14 @@ export function discoverMaterializedSourceEvidence(input) {
     .map((token) => String(token).trim().toLowerCase()).filter(Boolean);
   const extensions = new Set((input?.extensions || [...DEFAULT_EXTENSIONS]).map((extension) => String(extension).toLowerCase()));
   const maxFiles = Number.isInteger(input?.maxFiles) ? Math.max(1, Math.min(input.maxFiles, 50_000)) : 10_000;
+  const maxDirectories = Number.isInteger(input?.maxDirectories) ? Math.max(1, Math.min(input.maxDirectories, 50_000)) : 5_000;
+  const directoryOffset = Number.isInteger(input?.directoryOffset) ? Math.max(0, input.directoryOffset) : 0;
   const candidates = [];
   const missingRoots = [];
   const scannedRoots = [];
   let scannedFileCount = 0;
+  let scannedDirectoryCount = 0;
+  let traversedDirectoryCount = 0;
   let budgetExhausted = false;
 
   for (const configuredRoot of roots) {
@@ -61,7 +65,19 @@ export function discoverMaterializedSourceEvidence(input) {
     const pending = [root];
     while (pending.length && !budgetExhausted) {
       const directory = pending.pop();
-      for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      traversedDirectoryCount += 1;
+      if (traversedDirectoryCount <= directoryOffset) {
+        for (const entry of fs.readdirSync(directory, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+          if (entry.isDirectory() && !entry.isSymbolicLink()) pending.push(path.join(directory, entry.name));
+        }
+        continue;
+      }
+      if (scannedDirectoryCount >= maxDirectories) {
+        budgetExhausted = true;
+        break;
+      }
+      scannedDirectoryCount += 1;
+      for (const entry of fs.readdirSync(directory, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
         const filePath = path.join(directory, entry.name);
         if (entry.isSymbolicLink()) continue;
         if (entry.isDirectory()) {
@@ -96,7 +112,7 @@ export function discoverMaterializedSourceEvidence(input) {
   candidates.sort((left, right) => left.path.localeCompare(right.path));
   const issues = [];
   if (!scannedRoots.length) issues.push(issue('SOURCE_CORPUS_ROOT_UNAVAILABLE', 'None of the configured corpus roots is materialized and readable.', missingRoots));
-  if (budgetExhausted) issues.push(issue('SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED', `Discovery stopped after the ${maxFiles}-file budget; narrow the corpus root and rerun.`, scannedRoots));
+  if (budgetExhausted) issues.push(issue('SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED', `Discovery stopped after the ${maxFiles}-file or ${maxDirectories}-directory budget; narrow the corpus root or resume at directory offset ${directoryOffset + scannedDirectoryCount}.`, scannedRoots));
   if (!candidates.some((entry) => entry.roles.includes('structural-supplier-submittal'))) {
     issues.push(issue('STRUCTURAL_SUPPLIER_SUBMITTAL_NOT_MATERIALIZED', 'No candidate structural supplier/truss/lumber submittal is materialized in the scanned corpus.'));
   }
@@ -107,7 +123,12 @@ export function discoverMaterializedSourceEvidence(input) {
     scannedRoots,
     missingRoots,
     scannedFileCount,
+    scannedDirectoryCount,
+    traversedDirectoryCount,
     maxFiles,
+    maxDirectories,
+    directoryOffset,
+    nextDirectoryOffset: budgetExhausted ? directoryOffset + scannedDirectoryCount : null,
     candidates,
     issues,
   };

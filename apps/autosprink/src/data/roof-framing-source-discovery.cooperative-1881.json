@@ -1,17 +1,21 @@
 {
   "artifactType": "halofire.cooperative-1881-roof-framing-source-discovery.v1",
   "status": "blocked",
-  "scanComplete": true,
+  "scanComplete": false,
   "scannedRoots": [
     "E:\\ClaudeBot\\data\\halofire\\bids\\1881",
     "E:\\ClaudeBot\\data\\halofire\\golden\\1881",
-    "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents"
+    "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents",
+    "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
   ],
-  "missingRoots": [
-    "Y:\\"
-  ],
-  "scannedFileCount": 577,
+  "missingRoots": [],
+  "scannedFileCount": 776,
+  "scannedDirectoryCount": 300,
+  "traversedDirectoryCount": 301,
   "maxFiles": 15000,
+  "maxDirectories": 300,
+  "directoryOffset": 0,
+  "nextDirectoryOffset": 300,
   "candidates": [
     {
       "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf",
@@ -695,6 +699,17 @@
     }
   ],
   "issues": [
+    {
+      "code": "SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED",
+      "severity": "blocking",
+      "message": "Discovery stopped after the 15000-file or 300-directory budget; narrow the corpus root or resume at directory offset 300.",
+      "refs": [
+        "E:\\ClaudeBot\\data\\halofire\\bids\\1881",
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881",
+        "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents",
+        "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
+      ]
+    },
     {
       "code": "STRUCTURAL_SUPPLIER_SUBMITTAL_NOT_MATERIALIZED",
       "severity": "blocking",
@@ -1415,7 +1430,7 @@
     ]
   },
   "claims": {
-    "sourceDiscoveryComplete": true,
+    "sourceDiscoveryComplete": false,
     "structuralSupplierSubmittalMaterialized": false,
     "roofBoundedMemberCount": 7,
     "exactPhysicalFramingPromoted": false,

@@ -1,10 +1,10 @@
 {
   "name": "cooperative-1881-physical-framing-placement-20260717",
-  "iteration": 4,
+  "iteration": 5,
   "status": "in_progress",
-  "updatedAt": "2026-07-17T08:44:00-07:00",
+  "updatedAt": "2026-07-17T08:57:00-07:00",
   "completedStages": ["DISCOVER", "PLAN", "BUILD", "VERIFY"],
-  "nextStage": "MATERIALIZE_SCOPED_STRUCTURAL_SUPPLIER_SUBMITTALS_AND_RERUN_SOURCE_DISCOVERY",
+  "nextStage": "RESUME_SCOPED_EGNYTE_KIER_CORPUS_DISCOVERY_AT_DIRECTORY_OFFSET_300",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [157533, 46659, 120030, 60864],
@@ -58,17 +58,20 @@
   },
   "corpusDiscovery": {
     "artifact": "apps/autosprink/src/data/roof-framing-source-discovery.cooperative-1881.json",
-    "scanComplete": true,
-    "materializedFilesScanned": 577,
+    "scanComplete": false,
+    "materializedFilesScanned": 776,
+    "directoriesScanned": 300,
+    "directoryOffset": 0,
+    "nextDirectoryOffset": 300,
     "relevantCandidates": 52,
     "uniqueContentDocuments": 32,
     "roofBoundedMembersChecked": 7,
     "supplierOrTrussSubmittalCandidates": 0,
     "issuedStructuralDesignDocuments": 2,
     "sprinklerShopDrawingDocuments": 1,
-    "missingConfiguredRoot": "Y:/",
+    "sharedDriveRoot": "Y:/Shared/HaloOps/01-Bids/Kier",
     "physicalPromotionAllowed": false,
-    "reason": "The mounted corpus has issued structural plans, an RFI, and sprinkler shop drawings, but no materialized supplier/truss/lumber submittal. The discovery engine rejects document-name and member-tag matches as fabricated-part proof."
+    "reason": "The Egnyte client restored the verified Kier shared-drive root. The first bounded 300-directory window has no supplier/truss/lumber candidate; the resumable cursor prevents a massive cloud tree from becoming an unbounded or silently incomplete scan. The engine rejects document-name and member-tag matches as fabricated-part proof."
   },
   "roofFramingClearancePreflight": {
     "artifact": "apps/autosprink/src/data/roof-framing-clearance-preflight.cooperative-1881.json",
@@ -81,6 +84,12 @@
   "iteration4Verification": {
     "agentLoopGuard": "passed",
     "focusedJavaScript": "70 passed, 0 failed, 0 skipped",
+    "registeredStructurePython": "25 passed, 0 failed, 0 skipped",
+    "autosprinkProductionBuild": "passed"
+  },
+  "iteration5Verification": {
+    "agentLoopGuard": "passed",
+    "focusedJavaScript": "72 passed, 0 failed, 0 skipped",
     "registeredStructurePython": "25 passed, 0 failed, 0 skipped",
     "autosprinkProductionBuild": "passed"
   },
