@@ -60,6 +60,9 @@ export function discoverMaterializedSourceEvidence(input) {
   const maxDirectories = Number.isInteger(input?.maxDirectories) ? Math.max(1, Math.min(input.maxDirectories, 50_000)) : 5_000;
   const directoryOffset = Number.isInteger(input?.directoryOffset) ? Math.max(0, input.directoryOffset) : 0;
   const includeSupplierLeadsWithoutProjectToken = input?.includeSupplierLeadsWithoutProjectToken === true;
+  const requestedDirectoryFrontier = input?.directoryFrontier && typeof input.directoryFrontier === 'object'
+    ? input.directoryFrontier
+    : null;
   const readDirectory = typeof input?.readDirectory === 'function' ? input.readDirectory : (directory) => fs.readdirSync(directory, { withFileTypes: true });
   const candidates = [];
   const missingRoots = [];
@@ -69,6 +72,7 @@ export function discoverMaterializedSourceEvidence(input) {
   let scannedDirectoryCount = 0;
   let traversedDirectoryCount = 0;
   let budgetExhausted = false;
+  const nextDirectoryFrontier = {};
 
   const entriesForDirectory = (directory) => {
     try {
@@ -79,7 +83,8 @@ export function discoverMaterializedSourceEvidence(input) {
     }
   };
 
-  for (const configuredRoot of roots) {
+  for (let rootIndex = 0; rootIndex < roots.length; rootIndex += 1) {
+    const configuredRoot = roots[rootIndex];
     const root = path.resolve(String(configuredRoot));
     if (!fs.existsSync(root)) {
       missingRoots.push(root);
@@ -91,7 +96,25 @@ export function discoverMaterializedSourceEvidence(input) {
       continue;
     }
     scannedRoots.push(root);
-    const pending = [root];
+    const suppliedFrontier = requestedDirectoryFrontier?.[root];
+    const pending = [];
+    if (Array.isArray(suppliedFrontier)) {
+      for (const candidate of suppliedFrontier) {
+        const directory = path.resolve(String(candidate));
+        const insideRoot = directory === root || directory.startsWith(`${root}${path.sep}`);
+        try {
+          const candidateStat = insideRoot ? fs.lstatSync(directory) : null;
+          if (!insideRoot || !candidateStat.isDirectory() || candidateStat.isSymbolicLink()) {
+            throw new Error('outside-root-or-not-directory');
+          }
+          pending.push(directory);
+        } catch (error) {
+          unreadableDirectories.push({ path: directory, code: 'SOURCE_CORPUS_FRONTIER_INVALID', message: 'A resumed source-discovery frontier entry must be a readable non-symlink directory beneath its configured root.' });
+        }
+      }
+    } else {
+      pending.push(root);
+    }
     while (pending.length && !budgetExhausted) {
       const directory = pending.pop();
       traversedDirectoryCount += 1;
@@ -104,6 +127,9 @@ export function discoverMaterializedSourceEvidence(input) {
         continue;
       }
       if (scannedDirectoryCount >= maxDirectories) {
+        // `directory` was popped to inspect the old offset before the budget
+        // check. Put it back so a frontier resume cannot silently discard it.
+        pending.push(directory);
         budgetExhausted = true;
         break;
       }
@@ -144,6 +170,14 @@ export function discoverMaterializedSourceEvidence(input) {
         });
       }
     }
+    if (budgetExhausted) {
+      nextDirectoryFrontier[root] = [...pending];
+      for (let remainingIndex = rootIndex + 1; remainingIndex < roots.length; remainingIndex += 1) {
+        const remainingRoot = path.resolve(String(roots[remainingIndex]));
+        nextDirectoryFrontier[remainingRoot] = [remainingRoot];
+      }
+      break;
+    }
   }
   candidates.sort((left, right) => left.path.localeCompare(right.path));
   const issues = [];
@@ -167,6 +201,7 @@ export function discoverMaterializedSourceEvidence(input) {
     maxDirectories,
     directoryOffset,
     nextDirectoryOffset: budgetExhausted ? directoryOffset + scannedDirectoryCount : unreadableDirectories.length ? directoryOffset : null,
+    nextDirectoryFrontier: Object.keys(nextDirectoryFrontier).length ? nextDirectoryFrontier : null,
     candidates,
     issues,
   };
@@ -202,6 +237,7 @@ export function mergeMaterializedSourceEvidenceDiscoveries(input) {
       maxDirectories: discovery.maxDirectories ?? null,
       directoryOffset: discovery.directoryOffset ?? 0,
       nextDirectoryOffset: discovery.nextDirectoryOffset ?? null,
+      nextDirectoryFrontier: discovery.nextDirectoryFrontier ?? null,
     };
     scannedRoots.push(...(discovery.scannedRoots || []));
     missingRoots.push(...(discovery.missingRoots || []));

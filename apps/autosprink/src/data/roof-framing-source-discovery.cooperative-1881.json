@@ -17,7 +17,8 @@
       "maxFiles": 15000,
       "maxDirectories": 5000,
       "directoryOffset": 0,
-      "nextDirectoryOffset": null
+      "nextDirectoryOffset": null,
+      "nextDirectoryFrontier": null
     },
     "shared": {
       "scanComplete": true,
@@ -25,13 +26,14 @@
         "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT"
       ],
       "missingRoots": [],
-      "scannedFileCount": 380,
-      "scannedDirectoryCount": 82,
-      "traversedDirectoryCount": 82,
+      "scannedFileCount": 323,
+      "scannedDirectoryCount": 73,
+      "traversedDirectoryCount": 73,
       "maxFiles": 15000,
       "maxDirectories": 300,
       "directoryOffset": 0,
-      "nextDirectoryOffset": null
+      "nextDirectoryOffset": null,
+      "nextDirectoryFrontier": null
     }
   },
   "scannedRoots": [
@@ -41,9 +43,9 @@
     "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT"
   ],
   "missingRoots": [],
-  "scannedFileCount": 957,
-  "scannedDirectoryCount": 192,
-  "traversedDirectoryCount": 192,
+  "scannedFileCount": 900,
+  "scannedDirectoryCount": 183,
+  "traversedDirectoryCount": 183,
   "candidates": [
     {
       "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf",
@@ -934,978 +936,6 @@
       ]
     },
     {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - ARCHITECTURAL.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - ARCHITECTURAL.pdf",
-      "extension": ".pdf",
-      "bytes": 218855685,
-      "sha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - CIVILS.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - CIVILS.pdf",
-      "extension": ".pdf",
-      "bytes": 11582293,
-      "sha256": "cead041173570de6553de8c698f9c2c324abc9794d7da219c12a059ef53e86ca",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - GENERALS.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - GENERALS.pdf",
-      "extension": ".pdf",
-      "bytes": 30343040,
-      "sha256": "f83c5b79ac4d69d03d7aae6e1e2591730d37787859290e2c5581cea79c742e55",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - MEP'S.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - MEP'S.pdf",
-      "extension": ".pdf",
-      "bytes": 124021883,
-      "sha256": "56ee069667ceac63be2012bc3a93fb2e3806cb502bcc963cf05b39097a39b4bc",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - STRUCTURAL.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - STRUCTURAL.pdf",
-      "extension": ".pdf",
-      "bytes": 26693130,
-      "sha256": "5a4ae0199c01e092bc43dff85b6689cc5660fc46601558c8abe691f0702bb361",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\building sections highlighted.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/building sections highlighted.pdf",
-      "extension": ".pdf",
-      "bytes": 5088515,
-      "sha256": "a504a46a0f04d7a14e7b6c7cfdf6f361152ad86b49b5c2b66c81abab20e920ff",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\fifth floor framing plan S-150 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/fifth floor framing plan S-150 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 2018183,
-      "sha256": "3a68fff663e0fdafa6c227e90ad6a38fa591a8db458a28df29ed4a21e7683a23",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\floor assemblies G-202.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/floor assemblies G-202.pdf",
-      "extension": ".pdf",
-      "bytes": 2172885,
-      "sha256": "c43b1862bda9bcc26f91bd98b95a25a908a704ff343492edc5772c154489ccd9",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\fourth floor slab plan S-141 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/fourth floor slab plan S-141 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 1640740,
-      "sha256": "fcd8fee2f97618220acbca09138c67f541df2afe372a7de48a8d9cde75c9b5a4",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\roof & insulation details A-502 - 503.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/roof & insulation details A-502 - 503.pdf",
-      "extension": ".pdf",
-      "bytes": 2781686,
-      "sha256": "cbd0bab1d77f3df74a78ac29c4251f2634554923785636143090496dfb4fea6a",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\roof framing plans S-190 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/roof framing plans S-190 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 1836505,
-      "sha256": "1079c5b91fe6f9a849ab2793247a846d1364991624078f34b63cc158c0d76648",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\second floor slab plans S-121 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/second floor slab plans S-121 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 1857738,
-      "sha256": "d9e893778f8fba6d3d230037807163aec86d3d1afcbd88d0b359fcb49cd93d5b",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\sprinkler layout - level 3 - 8.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/sprinkler layout - level 3 - 8.pdf",
-      "extension": ".pdf",
-      "bytes": 3094133,
-      "sha256": "8bf8cd124aa9e4c75bd33ef0d214da8bcc55124ecd63c6bf414183c959412180",
-      "roles": [
-        "sprinkler-shop-drawing"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\sprinkler layout- level 1 and 2.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/sprinkler layout- level 1 and 2.pdf",
-      "extension": ".pdf",
-      "bytes": 2043560,
-      "sha256": "911842f121b51d6392bebfe0aaa38ad21837fbd097a0215dc62e9d55957f3325",
-      "roles": [
-        "sprinkler-shop-drawing"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\standpipe system layout pages.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/standpipe system layout pages.pdf",
-      "extension": ".pdf",
-      "bytes": 7101702,
-      "sha256": "e9eba365f1ac652f80235e2ee2fff9731a0f4259d46eaf92f2e10e1d3d5bf426",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\structural building sections.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/structural building sections.pdf",
-      "extension": ".pdf",
-      "bytes": 1866755,
-      "sha256": "48a5f508eda66e5f2e0ec00421d84fb10025516d162e68128c80ac0c5eaa6eee",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\third floor slab plans S-131 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/third floor slab plans S-131 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 1995039,
-      "sha256": "bd6b47e73766fad9487d3d572fa49c1e2583bcba81f0be233e57afa432509f11",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\utility plan highlighted C-303.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/utility plan highlighted C-303.pdf",
-      "extension": ".pdf",
-      "bytes": 2443127,
-      "sha256": "fbc56bceff63bfd468f850c0091eb9cbb2838c7380a3e14cbbe146a25f897ba5",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Specs\\Cooperative 1881 Specs.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Specs/Cooperative 1881 Specs.pdf",
-      "extension": ".pdf",
-      "bytes": 4452840,
-      "sha256": "ae7b263697577c8616831957d873a93d366cb4817f325451efe7e55cc43ba48c",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Specs\\Finish Requirements.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Specs/Finish Requirements.pdf",
-      "extension": ".pdf",
-      "bytes": 206149,
-      "sha256": "ad3e56367aecf170ec7795d2154e3f2498e190eab0a32598af4732e7269f5838",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
-      "relativeToRoot": "1-Bid Documents/Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
-      "extension": ".pdf",
-      "bytes": 309726,
-      "sha256": "43f3c37e5b9246c0c6656ca249d4bd5dc3681167d211037303b8f763173fc693",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
-      "relativeToRoot": "1-Bid Documents/Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
-      "extension": ".xlsx",
-      "bytes": 1506703,
-      "sha256": "e0688a6a22f6cd890bad1d72411b8285f805b62bd749efb5c617486e468db9e0",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\Statement of Qualifications 2025 copy.pdf",
-      "relativeToRoot": "1-Bid Documents/Statement of Qualifications 2025 copy.pdf",
-      "extension": ".pdf",
-      "bytes": 203048,
-      "sha256": "a77691661ad5fb22f76e9bfe01f1dcde71ea3a45ba714b14b1743a4dcc2d9bdf",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\Statement of Qualifications 2025.docx",
-      "relativeToRoot": "1-Bid Documents/Statement of Qualifications 2025.docx",
-      "extension": ".docx",
-      "bytes": 193900,
-      "sha256": "8ca28ecc0950317df1c2f9e57acbe6332098c8ce431700b09ba233ef0146b549",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\~$proposal-cooperative 1881-salt lake city ut-9-18-25.xlsx",
-      "relativeToRoot": "2-Internal Ops/~$proposal-cooperative 1881-salt lake city ut-9-18-25.xlsx",
-      "extension": ".xlsx",
-      "bytes": 165,
-      "sha256": "5fec7785b563b2836cc45de8b0462e328bdb7ec7def98bfc65bf33ee61f3edeb",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\01-Project Folder Handoff Forms.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/01-Project Folder Handoff Forms.pdf",
-      "extension": ".pdf",
-      "bytes": 561287,
-      "sha256": "69dd45c44629bd967db45b8fa1cc800aa955065ab6f78b0edf1d389d6c7312c1",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Contract Clarification Email.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Contract Clarification Email.pdf",
-      "extension": ".pdf",
-      "bytes": 173771,
-      "sha256": "9cb8338ff8809a252a27b517bb8caf833fd763176056afa7b65bb7e1181e8965",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Halo Contract Comments - 5-20-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Halo Contract Comments - 5-20-26.pdf",
-      "extension": ".pdf",
-      "bytes": 1525698,
-      "sha256": "5138e692244800056b4ab0a5ad2d09b48284cf6b22f81b5a03bc17d498a534d1",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-1-9-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-1-9-26.pdf",
-      "extension": ".pdf",
-      "bytes": 117094,
-      "sha256": "175dcd9bfe07be660a66a0135fe8ba4978d2c5be570e904c3b57bec20f33b876",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-10-31-25.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-10-31-25.pdf",
-      "extension": ".pdf",
-      "bytes": 113791,
-      "sha256": "7305d8eaad40f9c54f625832587b93956fe5bfc47615f40d889b375313499d61",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-11-13-25.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-11-13-25.pdf",
-      "extension": ".pdf",
-      "bytes": 159435,
-      "sha256": "c6212277e21d1a219a39662870ef0dc0faabf0e666aa5c07fbebcaee86587a6a",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-12-05-25.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-12-05-25.pdf",
-      "extension": ".pdf",
-      "bytes": 127489,
-      "sha256": "5bdd43ae04e4ed17639699c48da5b4e77fa8c582c4f73ad0c237351625e256e1",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-2-27-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-2-27-26.pdf",
-      "extension": ".pdf",
-      "bytes": 159609,
-      "sha256": "d6e32581c805cc08260d98da7aed7f24f1d13dc21778197114a8e123f9ba972a",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-4-8-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-4-8-26.pdf",
-      "extension": ".pdf",
-      "bytes": 159996,
-      "sha256": "1d06734b7a790c7dac5d6e477907703ce542f32a65339c17e968e557ce624e00",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\Increase Letters - Pipe & Fittings.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/Increase Letters - Pipe & Fittings.pdf",
-      "extension": ".pdf",
-      "bytes": 1407403,
-      "sha256": "acf2aa88a85c913c9575034183cece9e98b5fc91df8bd9861911ba68c5ce10c1",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\Potter-2026-Price-Increase-11-3-25.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/Potter-2026-Price-Increase-11-3-25.pdf",
-      "extension": ".pdf",
-      "bytes": 197710,
-      "sha256": "6a152290dc064e20e3d6e963fbac5a7ea612e1efe8730146f46ded025224db3b",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\TYCO-Price Increase-1-5-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/TYCO-Price Increase-1-5-26.pdf",
-      "extension": ".pdf",
-      "bytes": 190449,
-      "sha256": "400de465ccf2eb3180f6fc2774d0410b423b8f15f38df358e42de32f5e8cbf7c",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\Watts-Increase 12-15-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/Watts-Increase 12-15-26.pdf",
-      "extension": ".pdf",
-      "bytes": 265571,
-      "sha256": "3af915c31e933cbb109b900a4a99d3be15601df2dbe610b2fddd6079a4907bdc",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Subcontractor Contact Form.xlsx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Subcontractor Contact Form.xlsx",
-      "extension": ".xlsx",
-      "bytes": 20438,
-      "sha256": "a58fff19fe87224401210c7c8bfbcdf3f2afebd51907ca97c7f400eb6d37d784",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Completion Checklist - AHJ Submittal.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Completion Checklist - AHJ Submittal.pdf",
-      "extension": ".pdf",
-      "bytes": 66228,
-      "sha256": "8a84982eede19fafa21a848c76ab42fa3da187eff8e5969332c6d7121655bd58",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Completion Checklist - Field Set.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Completion Checklist - Field Set.pdf",
-      "extension": ".pdf",
-      "bytes": 63269,
-      "sha256": "904b04d20e956c48a7d8e89fed454c843c6236fa2028c3b8cf79fb23981ed258",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Completion Checklist - Listings.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Completion Checklist - Listings.pdf",
-      "extension": ".pdf",
-      "bytes": 66840,
-      "sha256": "dcc843e5628e65e7eea332410f32f78fe53edcf1ec43142ac93b6727c4c6ecb6",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Release Form.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Release Form.pdf",
-      "extension": ".pdf",
-      "bytes": 87461,
-      "sha256": "267d6d7cde191c9dce00408e939bd47631bdc1434eda9e0214184e912dc41c46",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Release Meeting Agenda.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Release Meeting Agenda.pdf",
-      "extension": ".pdf",
-      "bytes": 71001,
-      "sha256": "1b464b317ea0251a1edf941975049c8a31ae797e1907c97fb4894a0be56b9c50",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Estimator Hand Off Meeting Agenda.xlsx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Estimator Hand Off Meeting Agenda.xlsx",
-      "extension": ".xlsx",
-      "bytes": 16728,
-      "sha256": "b6c4bd1917695e07b927e06cc996b55ceb52035da759d41f106cb2d25ea05a4d",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\GC-Kick-off Meeting Agenda.docx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/GC-Kick-off Meeting Agenda.docx",
-      "extension": ".docx",
-      "bytes": 58511,
-      "sha256": "baa67353e28b8814cbb39cc87a819a4b6e40fd04d629ec846c39669afa2dcbf2",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\GC-Kick-off Meeting Agenda.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/GC-Kick-off Meeting Agenda.pdf",
-      "extension": ".pdf",
-      "bytes": 73539,
-      "sha256": "93a87962d08ac9e30f31d76d5900e0599f26743cc45b1b0587ea2cbb3ab2fe1f",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Master Services Agreement .docx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Master Services Agreement .docx",
-      "extension": ".docx",
-      "bytes": 62846,
-      "sha256": "c3c3dcfb65d18b6532a67c711f0070bc0d1499b163010ad6ab06dd5b4451ab53",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Pre-Construction Foreman Agenda.docx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Pre-Construction Foreman Agenda.docx",
-      "extension": ".docx",
-      "bytes": 58453,
-      "sha256": "982b8cc398b7ff9742fdfe291a814c1167aea5fa3c4ddc7532156292c5ca33d6",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Pre-Construction Foreman Agenda.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Pre-Construction Foreman Agenda.pdf",
-      "extension": ".pdf",
-      "bytes": 70336,
-      "sha256": "915eee1828c96112e2636e7a034a8a6f73e0e1d5385682e2dfee309118146e54",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Project Milestone Checklist.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Project Milestone Checklist.pdf",
-      "extension": ".pdf",
-      "bytes": 67128,
-      "sha256": "7f71d4908f74cf03a16e59a191bf278beb397bcd5ea3f3a3c0d07c76a311371c",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Schedule 7-15-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Schedule 7-15-26.pdf",
-      "extension": ".pdf",
-      "bytes": 286493,
-      "sha256": "7e1211432a6bd57c049aaa811a21396f893bf001b85b97a05006f5f95e4fc3fc",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\03-Hydrant Flow Test Data\\1881 W North Temple St - FF Results.pdf",
-      "relativeToRoot": "2-Internal Ops/01-Design/03-Hydrant Flow Test Data/1881 W North Temple St - FF Results.pdf",
-      "extension": ".pdf",
-      "bytes": 152443,
-      "sha256": "08b7034cddbd62cee33226a211ae8862164e895c06b4a6ac5ebc8a992238bebd",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\03-Hydrant Flow Test Data\\Hydrant Flow Test Report.pdf",
-      "relativeToRoot": "2-Internal Ops/01-Design/03-Hydrant Flow Test Data/Hydrant Flow Test Report.pdf",
-      "extension": ".pdf",
-      "bytes": 735034,
-      "sha256": "7b02841863478d3e1116373f3cf61ca32cb4a8bbc48318ee88d8079ca1752b46",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
       "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Design Review Form.xlsx",
       "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Design Review Form.xlsx",
       "extension": ".xlsx",
@@ -2379,42 +1409,6 @@
       "extension": ".pdf",
       "bytes": 269064,
       "sha256": "846aaa8d68a6ea9dbf73fd227fb7dacc2e6c91cf30c0886efbd4aaa9dcd832ee",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\ASI 5\\ASI 5 Plans.pdf",
-      "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/ASI 5/ASI 5 Plans.pdf",
-      "extension": ".pdf",
-      "bytes": 396632045,
-      "sha256": "32eda83106302c3ec63631399b06e03a0a319faa4724a4349a0178897da20143",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ]
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\ASI 6\\ASI 6 Plans.pdf",
-      "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/ASI 6/ASI 6 Plans.pdf",
-      "extension": ".pdf",
-      "bytes": 99100977,
-      "sha256": "29e5bb9898048493e4945879ae8b5dacd865071c3c6733528120c1f4a51963f1",
       "roles": [
         "unclassified"
       ],
@@ -6623,7 +5617,7 @@
       "1881",
       "cooperative"
     ],
-    "projectIdentifiedDocumentCount": 282,
+    "projectIdentifiedDocumentCount": 236,
     "unverifiedSupplierLeadCount": 0,
     "note": "A generic supplier lead is not project evidence unless its path or bounded extracted source text identifies the project."
   },
@@ -7493,7 +6487,6 @@
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
         "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf"
       ],
       "extractedTextSha256": null
@@ -7553,8 +6546,7 @@
       "projectIdentityStatus": "path-token-match",
       "projectIdentified": true,
       "aliases": [
-        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025 copy.pdf",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\Statement of Qualifications 2025 copy.pdf"
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025 copy.pdf"
       ],
       "extractedTextSha256": null
     },
@@ -7582,1699 +6574,7 @@
       "projectIdentityStatus": "path-token-match",
       "projectIdentified": true,
       "aliases": [
-        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025.docx",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\Statement of Qualifications 2025.docx"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - ARCHITECTURAL.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - ARCHITECTURAL.pdf",
-      "extension": ".pdf",
-      "bytes": 218855685,
-      "sha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 112,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - ARCHITECTURAL.pdf",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - ARCHITECTURAL.pdf"
-      ],
-      "extractedTextSha256": "e1fdf445191f95bd73971201edf89a89b1347dd680e7693cb0630b651b214a3b"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - CIVILS.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - CIVILS.pdf",
-      "extension": ".pdf",
-      "bytes": 11582293,
-      "sha256": "cead041173570de6553de8c698f9c2c324abc9794d7da219c12a059ef53e86ca",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 15,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - CIVILS.pdf",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - CIVILS.pdf"
-      ],
-      "extractedTextSha256": "b2ba94a6e526691c65fbc4829a272cfff692a5297e8147e34a06cb3a5417f50f"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - GENERALS.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - GENERALS.pdf",
-      "extension": ".pdf",
-      "bytes": 30343040,
-      "sha256": "f83c5b79ac4d69d03d7aae6e1e2591730d37787859290e2c5581cea79c742e55",
-      "roles": [
-        "issued-structural-design",
-        "sprinkler-shop-drawing"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 38,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - GENERALS.pdf",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - GENERALS.pdf"
-      ],
-      "extractedTextSha256": "dba1213cd3248b83c0ea237d17649d5815c41257d8733c7f5d52d59bf9b92385"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - MEP'S.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - MEP'S.pdf",
-      "extension": ".pdf",
-      "bytes": 124021883,
-      "sha256": "56ee069667ceac63be2012bc3a93fb2e3806cb502bcc963cf05b39097a39b4bc",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 90,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - MEP'S.pdf",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - MEP'S.pdf"
-      ],
-      "extractedTextSha256": "2e2d4723fca8924455c0123054bb3387f32b72b42c7ff2f93b279e246751fbf3"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - STRUCTURAL.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/Building/1881 UPDATED - STRUCTURAL.pdf",
-      "extension": ".pdf",
-      "bytes": 26693130,
-      "sha256": "5a4ae0199c01e092bc43dff85b6689cc5660fc46601558c8abe691f0702bb361",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 102,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\Building\\1881 UPDATED - STRUCTURAL.pdf",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - STRUCTURAL.pdf"
-      ],
-      "extractedTextSha256": "b75a0da56701457d9250a69cd8ed700647193089d8deba7b06f37c947cf9bf2f"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\building sections highlighted.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/building sections highlighted.pdf",
-      "extension": ".pdf",
-      "bytes": 5088515,
-      "sha256": "a504a46a0f04d7a14e7b6c7cfdf6f361152ad86b49b5c2b66c81abab20e920ff",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 4,
-      "extractedPageCount": 4,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\building sections highlighted.pdf"
-      ],
-      "extractedTextSha256": "6a3cf5192354f71615ac51034b3e97c20eda99643fcaf5bbe6d41ad59bd12167"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\fifth floor framing plan S-150 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/fifth floor framing plan S-150 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 2018183,
-      "sha256": "3a68fff663e0fdafa6c227e90ad6a38fa591a8db458a28df29ed4a21e7683a23",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\fifth floor framing plan S-150 b,c.pdf"
-      ],
-      "extractedTextSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\floor assemblies G-202.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/floor assemblies G-202.pdf",
-      "extension": ".pdf",
-      "bytes": 2172885,
-      "sha256": "c43b1862bda9bcc26f91bd98b95a25a908a704ff343492edc5772c154489ccd9",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\floor assemblies G-202.pdf"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\fourth floor slab plan S-141 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/fourth floor slab plan S-141 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 1640740,
-      "sha256": "fcd8fee2f97618220acbca09138c67f541df2afe372a7de48a8d9cde75c9b5a4",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\fourth floor slab plan S-141 b,c.pdf"
-      ],
-      "extractedTextSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\roof & insulation details A-502 - 503.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/roof & insulation details A-502 - 503.pdf",
-      "extension": ".pdf",
-      "bytes": 2781686,
-      "sha256": "cbd0bab1d77f3df74a78ac29c4251f2634554923785636143090496dfb4fea6a",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\roof & insulation details A-502 - 503.pdf"
-      ],
-      "extractedTextSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\roof framing plans S-190 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/roof framing plans S-190 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 1836505,
-      "sha256": "1079c5b91fe6f9a849ab2793247a846d1364991624078f34b63cc158c0d76648",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\roof framing plans S-190 b,c.pdf"
-      ],
-      "extractedTextSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\second floor slab plans S-121 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/second floor slab plans S-121 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 1857738,
-      "sha256": "d9e893778f8fba6d3d230037807163aec86d3d1afcbd88d0b359fcb49cd93d5b",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\second floor slab plans S-121 b,c.pdf"
-      ],
-      "extractedTextSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\sprinkler layout - level 3 - 8.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/sprinkler layout - level 3 - 8.pdf",
-      "extension": ".pdf",
-      "bytes": 3094133,
-      "sha256": "8bf8cd124aa9e4c75bd33ef0d214da8bcc55124ecd63c6bf414183c959412180",
-      "roles": [
-        "sprinkler-shop-drawing"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "not-requested",
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\sprinkler layout - level 3 - 8.pdf"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\sprinkler layout- level 1 and 2.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/sprinkler layout- level 1 and 2.pdf",
-      "extension": ".pdf",
-      "bytes": 2043560,
-      "sha256": "911842f121b51d6392bebfe0aaa38ad21837fbd097a0215dc62e9d55957f3325",
-      "roles": [
-        "sprinkler-shop-drawing"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "not-requested",
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\sprinkler layout- level 1 and 2.pdf"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\standpipe system layout pages.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/standpipe system layout pages.pdf",
-      "extension": ".pdf",
-      "bytes": 7101702,
-      "sha256": "e9eba365f1ac652f80235e2ee2fff9731a0f4259d46eaf92f2e10e1d3d5bf426",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 4,
-      "extractedPageCount": 4,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\standpipe system layout pages.pdf"
-      ],
-      "extractedTextSha256": "6a3cf5192354f71615ac51034b3e97c20eda99643fcaf5bbe6d41ad59bd12167"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\structural building sections.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/structural building sections.pdf",
-      "extension": ".pdf",
-      "bytes": 1866755,
-      "sha256": "48a5f508eda66e5f2e0ec00421d84fb10025516d162e68128c80ac0c5eaa6eee",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 3,
-      "extractedPageCount": 3,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\structural building sections.pdf"
-      ],
-      "extractedTextSha256": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\third floor slab plans S-131 b,c.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/third floor slab plans S-131 b,c.pdf",
-      "extension": ".pdf",
-      "bytes": 1995039,
-      "sha256": "bd6b47e73766fad9487d3d572fa49c1e2583bcba81f0be233e57afa432509f11",
-      "roles": [
-        "issued-structural-design"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\third floor slab plans S-131 b,c.pdf"
-      ],
-      "extractedTextSha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\utility plan highlighted C-303.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Plans/handoff meeting pages/utility plan highlighted C-303.pdf",
-      "extension": ".pdf",
-      "bytes": 2443127,
-      "sha256": "fbc56bceff63bfd468f850c0091eb9cbb2838c7380a3e14cbbe146a25f897ba5",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Plans\\handoff meeting pages\\utility plan highlighted C-303.pdf"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Specs\\Cooperative 1881 Specs.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Specs/Cooperative 1881 Specs.pdf",
-      "extension": ".pdf",
-      "bytes": 4452840,
-      "sha256": "ae7b263697577c8616831957d873a93d366cb4817f325451efe7e55cc43ba48c",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 170,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Specs\\Cooperative 1881 Specs.pdf"
-      ],
-      "extractedTextSha256": "6d895ebba82705e1f7ca2ce0fbedf50fb05473a1658d2972ac54cac5ec9770b2"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Specs\\Finish Requirements.pdf",
-      "relativeToRoot": "1-Bid Documents/GC - Bid Specs/Finish Requirements.pdf",
-      "extension": ".pdf",
-      "bytes": 206149,
-      "sha256": "ad3e56367aecf170ec7795d2154e3f2498e190eab0a32598af4732e7269f5838",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 8,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\GC - Bid Specs\\Finish Requirements.pdf"
-      ],
-      "extractedTextSha256": "a9a6bd627eaa8446ff046936814b649919da072850de2faa24789bf758fb244a"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
-      "relativeToRoot": "1-Bid Documents/Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
-      "extension": ".xlsx",
-      "bytes": 1506703,
-      "sha256": "e0688a6a22f6cd890bad1d72411b8285f805b62bd749efb5c617486e468db9e0",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "not-pdf",
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\~$proposal-cooperative 1881-salt lake city ut-9-18-25.xlsx",
-      "relativeToRoot": "2-Internal Ops/~$proposal-cooperative 1881-salt lake city ut-9-18-25.xlsx",
-      "extension": ".xlsx",
-      "bytes": 165,
-      "sha256": "5fec7785b563b2836cc45de8b0462e328bdb7ec7def98bfc65bf33ee61f3edeb",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "not-pdf",
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\~$proposal-cooperative 1881-salt lake city ut-9-18-25.xlsx"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\01-Project Folder Handoff Forms.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/01-Project Folder Handoff Forms.pdf",
-      "extension": ".pdf",
-      "bytes": 561287,
-      "sha256": "69dd45c44629bd967db45b8fa1cc800aa955065ab6f78b0edf1d389d6c7312c1",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 9,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\01-Project Folder Handoff Forms.pdf"
-      ],
-      "extractedTextSha256": "e94649ba844704bb9b8828177451603d259c019ee391bca548f1189043e228e5"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Contract Clarification Email.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Contract Clarification Email.pdf",
-      "extension": ".pdf",
-      "bytes": 173771,
-      "sha256": "9cb8338ff8809a252a27b517bb8caf833fd763176056afa7b65bb7e1181e8965",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Contract Clarification Email.pdf"
-      ],
-      "extractedTextSha256": "6fb0d96884e75c9fdbc72e900118b4798be8bcaad4d27011db495f87dd8fe59b"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Halo Contract Comments - 5-20-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Halo Contract Comments - 5-20-26.pdf",
-      "extension": ".pdf",
-      "bytes": 1525698,
-      "sha256": "5138e692244800056b4ab0a5ad2d09b48284cf6b22f81b5a03bc17d498a534d1",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 48,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Halo Contract Comments - 5-20-26.pdf"
-      ],
-      "extractedTextSha256": "df59029cfc4f67fa4c3260ed23b405ba934d54188af4e858c3f3cb22118ba922"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-1-9-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-1-9-26.pdf",
-      "extension": ".pdf",
-      "bytes": 117094,
-      "sha256": "175dcd9bfe07be660a66a0135fe8ba4978d2c5be570e904c3b57bec20f33b876",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-1-9-26.pdf"
-      ],
-      "extractedTextSha256": "59709b5ad43eeef8aa6f6562ccc7bb8a7fd9b11c655ff4af84e7ee7be7bcb0d3"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-10-31-25.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-10-31-25.pdf",
-      "extension": ".pdf",
-      "bytes": 113791,
-      "sha256": "7305d8eaad40f9c54f625832587b93956fe5bfc47615f40d889b375313499d61",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-10-31-25.pdf"
-      ],
-      "extractedTextSha256": "bfa4759b260bd82ff48894efeec35e75bf5526f92b94991164927abbed254709"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-11-13-25.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-11-13-25.pdf",
-      "extension": ".pdf",
-      "bytes": 159435,
-      "sha256": "c6212277e21d1a219a39662870ef0dc0faabf0e666aa5c07fbebcaee86587a6a",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-11-13-25.pdf"
-      ],
-      "extractedTextSha256": "4607cc2caa91a37b19f00aedf213a160ed6888b1f9d6a12b5c8ed3c34e3d5fa5"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-12-05-25.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-12-05-25.pdf",
-      "extension": ".pdf",
-      "bytes": 127489,
-      "sha256": "5bdd43ae04e4ed17639699c48da5b4e77fa8c582c4f73ad0c237351625e256e1",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-12-05-25.pdf"
-      ],
-      "extractedTextSha256": "27f71fb0c2ffb522c63b80ac089de1e7a4517b818087cffedeb418f257f947c5"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-2-27-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-2-27-26.pdf",
-      "extension": ".pdf",
-      "bytes": 159609,
-      "sha256": "d6e32581c805cc08260d98da7aed7f24f1d13dc21778197114a8e123f9ba972a",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-2-27-26.pdf"
-      ],
-      "extractedTextSha256": "eaae2fedeb4621576fa718edf42eef08d7473d28b2847e300ab701084c496228"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-4-8-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/BMT Price Increase-4-8-26.pdf",
-      "extension": ".pdf",
-      "bytes": 159996,
-      "sha256": "1d06734b7a790c7dac5d6e477907703ce542f32a65339c17e968e557ce624e00",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\BMT Price Increase-4-8-26.pdf"
-      ],
-      "extractedTextSha256": "23d2974faebc5d7fe094ce1bf6acdc340a3b38f286eab375019f6f502c82a77f"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\Increase Letters - Pipe & Fittings.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/Increase Letters - Pipe & Fittings.pdf",
-      "extension": ".pdf",
-      "bytes": 1407403,
-      "sha256": "acf2aa88a85c913c9575034183cece9e98b5fc91df8bd9861911ba68c5ce10c1",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 10,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\Increase Letters - Pipe & Fittings.pdf"
-      ],
-      "extractedTextSha256": "3cbaf27571f3262e43917964e84ad251cdbe735bf53416f3d8183af542d92e6a"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\Potter-2026-Price-Increase-11-3-25.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/Potter-2026-Price-Increase-11-3-25.pdf",
-      "extension": ".pdf",
-      "bytes": 197710,
-      "sha256": "6a152290dc064e20e3d6e963fbac5a7ea612e1efe8730146f46ded025224db3b",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\Potter-2026-Price-Increase-11-3-25.pdf"
-      ],
-      "extractedTextSha256": "b51229baa4579ae1e85420692d6f7ffe354fa8534c4344770fdfc1414cb1ccaa"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\TYCO-Price Increase-1-5-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/TYCO-Price Increase-1-5-26.pdf",
-      "extension": ".pdf",
-      "bytes": 190449,
-      "sha256": "400de465ccf2eb3180f6fc2774d0410b423b8f15f38df358e42de32f5e8cbf7c",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\TYCO-Price Increase-1-5-26.pdf"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\Watts-Increase 12-15-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Price Increases Since Bid on 9-18-25/Watts-Increase 12-15-26.pdf",
-      "extension": ".pdf",
-      "bytes": 265571,
-      "sha256": "3af915c31e933cbb109b900a4a99d3be15601df2dbe610b2fddd6079a4907bdc",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Price Increases Since Bid on 9-18-25\\Watts-Increase 12-15-26.pdf"
-      ],
-      "extractedTextSha256": "d30104c70adb914e122986a3cd009a3c51ae6cbd0eee0c901ecf667226e9c22b"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Subcontractor Contact Form.xlsx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Contracts/Subcontractor Contact Form.xlsx",
-      "extension": ".xlsx",
-      "bytes": 20438,
-      "sha256": "a58fff19fe87224401210c7c8bfbcdf3f2afebd51907ca97c7f400eb6d37d784",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "not-pdf",
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Contracts\\Subcontractor Contact Form.xlsx"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Completion Checklist - AHJ Submittal.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Completion Checklist - AHJ Submittal.pdf",
-      "extension": ".pdf",
-      "bytes": 66228,
-      "sha256": "8a84982eede19fafa21a848c76ab42fa3da187eff8e5969332c6d7121655bd58",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Completion Checklist - AHJ Submittal.pdf",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\Z-Forms\\Design Completion Checklist - AHJ Submittal.pdf"
-      ],
-      "extractedTextSha256": "49467babc54d25707a590180a4293dced3e9cf46760780a8b1d9c84d5168f9f4"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Completion Checklist - Field Set.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Completion Checklist - Field Set.pdf",
-      "extension": ".pdf",
-      "bytes": 63269,
-      "sha256": "904b04d20e956c48a7d8e89fed454c843c6236fa2028c3b8cf79fb23981ed258",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Completion Checklist - Field Set.pdf",
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\Z-Forms\\Design Completion Checklist - Field Set.pdf"
-      ],
-      "extractedTextSha256": "a4bd00f2db74b33f2f91d0116fbebe0d66704c4eeebd7b9e620351dc2c13dbe7"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Completion Checklist - Listings.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Completion Checklist - Listings.pdf",
-      "extension": ".pdf",
-      "bytes": 66840,
-      "sha256": "dcc843e5628e65e7eea332410f32f78fe53edcf1ec43142ac93b6727c4c6ecb6",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Completion Checklist - Listings.pdf"
-      ],
-      "extractedTextSha256": "1c7df1215747f884514d5ce93cd459697bc748eab1870526317071cb69dc1e82"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Release Form.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Release Form.pdf",
-      "extension": ".pdf",
-      "bytes": 87461,
-      "sha256": "267d6d7cde191c9dce00408e939bd47631bdc1434eda9e0214184e912dc41c46",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 2,
-      "extractedPageCount": 2,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Release Form.pdf"
-      ],
-      "extractedTextSha256": "22f422a130e6e0bfe13f09bfcee8b446f6a011a654afa00558ff58711937e6d1"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Release Meeting Agenda.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Design Release Meeting Agenda.pdf",
-      "extension": ".pdf",
-      "bytes": 71001,
-      "sha256": "1b464b317ea0251a1edf941975049c8a31ae797e1907c97fb4894a0be56b9c50",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Design Release Meeting Agenda.pdf"
-      ],
-      "extractedTextSha256": "9200d3385285892e3db79b728f47e3fc7d0fa1e13a62c7db39c706e445b8e9f9"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Estimator Hand Off Meeting Agenda.xlsx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Estimator Hand Off Meeting Agenda.xlsx",
-      "extension": ".xlsx",
-      "bytes": 16728,
-      "sha256": "b6c4bd1917695e07b927e06cc996b55ceb52035da759d41f106cb2d25ea05a4d",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "not-pdf",
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Estimator Hand Off Meeting Agenda.xlsx"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\GC-Kick-off Meeting Agenda.docx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/GC-Kick-off Meeting Agenda.docx",
-      "extension": ".docx",
-      "bytes": 58511,
-      "sha256": "baa67353e28b8814cbb39cc87a819a4b6e40fd04d629ec846c39669afa2dcbf2",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "not-pdf",
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\GC-Kick-off Meeting Agenda.docx"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\GC-Kick-off Meeting Agenda.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/GC-Kick-off Meeting Agenda.pdf",
-      "extension": ".pdf",
-      "bytes": 73539,
-      "sha256": "93a87962d08ac9e30f31d76d5900e0599f26743cc45b1b0587ea2cbb3ab2fe1f",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\GC-Kick-off Meeting Agenda.pdf"
-      ],
-      "extractedTextSha256": "9c0bdd3db1ea205de8b53844dfabda67fe90b05cc515b314d2684120b1ec3288"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Master Services Agreement .docx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Master Services Agreement .docx",
-      "extension": ".docx",
-      "bytes": 62846,
-      "sha256": "c3c3dcfb65d18b6532a67c711f0070bc0d1499b163010ad6ab06dd5b4451ab53",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "not-pdf",
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Master Services Agreement .docx"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Pre-Construction Foreman Agenda.docx",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Pre-Construction Foreman Agenda.docx",
-      "extension": ".docx",
-      "bytes": 58453,
-      "sha256": "982b8cc398b7ff9742fdfe291a814c1167aea5fa3c4ddc7532156292c5ca33d6",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "not-pdf",
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Pre-Construction Foreman Agenda.docx"
-      ],
-      "extractedTextSha256": null
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Pre-Construction Foreman Agenda.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Pre-Construction Foreman Agenda.pdf",
-      "extension": ".pdf",
-      "bytes": 70336,
-      "sha256": "915eee1828c96112e2636e7a034a8a6f73e0e1d5385682e2dfee309118146e54",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Pre-Construction Foreman Agenda.pdf"
-      ],
-      "extractedTextSha256": "375bd3478068b4d32767813baab6b000d34eab9be4262ac05cd815fdb68a59d2"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Project Milestone Checklist.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Project Milestone Checklist.pdf",
-      "extension": ".pdf",
-      "bytes": 67128,
-      "sha256": "7f71d4908f74cf03a16e59a191bf278beb397bcd5ea3f3a3c0d07c76a311371c",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Project Milestone Checklist.pdf"
-      ],
-      "extractedTextSha256": "3001bfaeadaba04e4051f33dfd71769e66258b26726a1c6160ca844f736dac02"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Schedule 7-15-26.pdf",
-      "relativeToRoot": "2-Internal Ops/00-Contracts & Schedule/Schedule 7-15-26.pdf",
-      "extension": ".pdf",
-      "bytes": 286493,
-      "sha256": "7e1211432a6bd57c049aaa811a21396f893bf001b85b97a05006f5f95e4fc3fc",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 16,
-      "extractedPageCount": 4,
-      "extractedTextComplete": false,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\00-Contracts & Schedule\\Schedule 7-15-26.pdf"
-      ],
-      "extractedTextSha256": "1c9d65500203816ccf81f1447422a0728755f89c4352eef852c2f753630a83ce"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\03-Hydrant Flow Test Data\\1881 W North Temple St - FF Results.pdf",
-      "relativeToRoot": "2-Internal Ops/01-Design/03-Hydrant Flow Test Data/1881 W North Temple St - FF Results.pdf",
-      "extension": ".pdf",
-      "bytes": 152443,
-      "sha256": "08b7034cddbd62cee33226a211ae8862164e895c06b4a6ac5ebc8a992238bebd",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [
-        "1881"
-      ],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\03-Hydrant Flow Test Data\\1881 W North Temple St - FF Results.pdf"
-      ],
-      "extractedTextSha256": "71d3ddebf7c0cbe85940eda56bf8f33851d43535b7a42cdee430a7db75252152"
-    },
-    {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\03-Hydrant Flow Test Data\\Hydrant Flow Test Report.pdf",
-      "relativeToRoot": "2-Internal Ops/01-Design/03-Hydrant Flow Test Data/Hydrant Flow Test Report.pdf",
-      "extension": ".pdf",
-      "bytes": 735034,
-      "sha256": "7b02841863478d3e1116373f3cf61ca32cb4a8bbc48318ee88d8079ca1752b46",
-      "roles": [
-        "unclassified"
-      ],
-      "projectTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "supplierLeadWithoutPathIdentity": false,
-      "scanScopes": [
-        "shared"
-      ],
-      "extractedTextStatus": "passed",
-      "pageCount": 1,
-      "extractedPageCount": 1,
-      "extractedTextComplete": true,
-      "pathTokenMatches": [
-        "1881",
-        "cooperative"
-      ],
-      "textTokenMatches": [],
-      "projectIdentityStatus": "path-token-match",
-      "projectIdentified": true,
-      "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\03-Hydrant Flow Test Data\\Hydrant Flow Test Report.pdf"
+        "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025.docx"
       ],
       "extractedTextSha256": null
     },
@@ -9309,11 +6609,11 @@
       "extractedTextSha256": null
     },
     {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\ASI 5\\ASI 5 Plans.pdf",
-      "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/ASI 5/ASI 5 Plans.pdf",
+      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - ARCHITECTURAL.pdf",
+      "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/1881 UPDATED - ARCHITECTURAL.pdf",
       "extension": ".pdf",
-      "bytes": 396632045,
-      "sha256": "32eda83106302c3ec63631399b06e03a0a319faa4724a4349a0178897da20143",
+      "bytes": 218855685,
+      "sha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
       "roles": [
         "unclassified"
       ],
@@ -9326,7 +6626,7 @@
         "shared"
       ],
       "extractedTextStatus": "passed",
-      "pageCount": 305,
+      "pageCount": 112,
       "extractedPageCount": 4,
       "extractedTextComplete": false,
       "pathTokenMatches": [
@@ -9340,16 +6640,16 @@
       "projectIdentityStatus": "path-token-match",
       "projectIdentified": true,
       "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\ASI 5\\ASI 5 Plans.pdf"
+        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - ARCHITECTURAL.pdf"
       ],
-      "extractedTextSha256": "3005e31430022018d8682aa16e3d190653ce50a91b82168db9dd8845ad0374c1"
+      "extractedTextSha256": "e1fdf445191f95bd73971201edf89a89b1347dd680e7693cb0630b651b214a3b"
     },
     {
-      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\ASI 6\\ASI 6 Plans.pdf",
-      "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/ASI 6/ASI 6 Plans.pdf",
+      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - CIVILS.pdf",
+      "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/1881 UPDATED - CIVILS.pdf",
       "extension": ".pdf",
-      "bytes": 99100977,
-      "sha256": "29e5bb9898048493e4945879ae8b5dacd865071c3c6733528120c1f4a51963f1",
+      "bytes": 11582293,
+      "sha256": "cead041173570de6553de8c698f9c2c324abc9794d7da219c12a059ef53e86ca",
       "roles": [
         "unclassified"
       ],
@@ -9362,7 +6662,7 @@
         "shared"
       ],
       "extractedTextStatus": "passed",
-      "pageCount": 50,
+      "pageCount": 15,
       "extractedPageCount": 4,
       "extractedTextComplete": false,
       "pathTokenMatches": [
@@ -9376,9 +6676,117 @@
       "projectIdentityStatus": "path-token-match",
       "projectIdentified": true,
       "aliases": [
-        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\ASI 6\\ASI 6 Plans.pdf"
+        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - CIVILS.pdf"
       ],
-      "extractedTextSha256": "38a827004151827dc358faa3a98fbdc3d2b5846a5240f41cf0a77cd8261ae26e"
+      "extractedTextSha256": "b2ba94a6e526691c65fbc4829a272cfff692a5297e8147e34a06cb3a5417f50f"
+    },
+    {
+      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - GENERALS.pdf",
+      "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/1881 UPDATED - GENERALS.pdf",
+      "extension": ".pdf",
+      "bytes": 30343040,
+      "sha256": "f83c5b79ac4d69d03d7aae6e1e2591730d37787859290e2c5581cea79c742e55",
+      "roles": [
+        "issued-structural-design",
+        "sprinkler-shop-drawing"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "shared"
+      ],
+      "extractedTextStatus": "passed",
+      "pageCount": 38,
+      "extractedPageCount": 4,
+      "extractedTextComplete": false,
+      "pathTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "textTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - GENERALS.pdf"
+      ],
+      "extractedTextSha256": "dba1213cd3248b83c0ea237d17649d5815c41257d8733c7f5d52d59bf9b92385"
+    },
+    {
+      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - MEP'S.pdf",
+      "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/1881 UPDATED - MEP'S.pdf",
+      "extension": ".pdf",
+      "bytes": 124021883,
+      "sha256": "56ee069667ceac63be2012bc3a93fb2e3806cb502bcc963cf05b39097a39b4bc",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "shared"
+      ],
+      "extractedTextStatus": "passed",
+      "pageCount": 90,
+      "extractedPageCount": 4,
+      "extractedTextComplete": false,
+      "pathTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "textTokenMatches": [
+        "1881"
+      ],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - MEP'S.pdf"
+      ],
+      "extractedTextSha256": "2e2d4723fca8924455c0123054bb3387f32b72b42c7ff2f93b279e246751fbf3"
+    },
+    {
+      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - STRUCTURAL.pdf",
+      "relativeToRoot": "2-Internal Ops/01-Design/04-GC PDF Plans & Specs/Plans/1881 UPDATED - STRUCTURAL.pdf",
+      "extension": ".pdf",
+      "bytes": 26693130,
+      "sha256": "5a4ae0199c01e092bc43dff85b6689cc5660fc46601558c8abe691f0702bb361",
+      "roles": [
+        "issued-structural-design"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "shared"
+      ],
+      "extractedTextStatus": "passed",
+      "pageCount": 102,
+      "extractedPageCount": 4,
+      "extractedTextComplete": false,
+      "pathTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "textTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\1881 UPDATED - STRUCTURAL.pdf"
+      ],
+      "extractedTextSha256": "b75a0da56701457d9250a69cd8ed700647193089d8deba7b06f37c947cf9bf2f"
     },
     {
       "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\04-GC PDF Plans & Specs\\Plans\\S-001_ GENERAL STRUCTURAL Rev.3 markup.pdf",
@@ -14415,6 +11823,72 @@
         "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\Electronic Release Template Signed.pdf"
       ],
       "extractedTextSha256": "1592f8dff9bed3b1428d48413973c9fb1c4ea424a12c95a2c5007dfe448f2819"
+    },
+    {
+      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\Z-Forms\\Design Completion Checklist - AHJ Submittal.pdf",
+      "relativeToRoot": "2-Internal Ops/01-Design/Z-Forms/Design Completion Checklist - AHJ Submittal.pdf",
+      "extension": ".pdf",
+      "bytes": 66228,
+      "sha256": "8a84982eede19fafa21a848c76ab42fa3da187eff8e5969332c6d7121655bd58",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "shared"
+      ],
+      "extractedTextStatus": "passed",
+      "pageCount": 1,
+      "extractedPageCount": 1,
+      "extractedTextComplete": true,
+      "pathTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\Z-Forms\\Design Completion Checklist - AHJ Submittal.pdf"
+      ],
+      "extractedTextSha256": "49467babc54d25707a590180a4293dced3e9cf46760780a8b1d9c84d5168f9f4"
+    },
+    {
+      "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\Z-Forms\\Design Completion Checklist - Field Set.pdf",
+      "relativeToRoot": "2-Internal Ops/01-Design/Z-Forms/Design Completion Checklist - Field Set.pdf",
+      "extension": ".pdf",
+      "bytes": 63269,
+      "sha256": "904b04d20e956c48a7d8e89fed454c843c6236fa2028c3b8cf79fb23981ed258",
+      "roles": [
+        "unclassified"
+      ],
+      "projectTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "supplierLeadWithoutPathIdentity": false,
+      "scanScopes": [
+        "shared"
+      ],
+      "extractedTextStatus": "passed",
+      "pageCount": 1,
+      "extractedPageCount": 1,
+      "extractedTextComplete": true,
+      "pathTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
+      "aliases": [
+        "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\Z-Forms\\Design Completion Checklist - Field Set.pdf"
+      ],
+      "extractedTextSha256": "a4bd00f2db74b33f2f91d0116fbebe0d66704c4eeebd7b9e620351dc2c13dbe7"
     },
     {
       "path": "Y:\\Shared\\HaloOps\\02-Active jobs\\Kier\\The Cooperative 1881 - Salt Lake City UT\\2-Internal Ops\\01-Design\\Z-Forms\\Design Completion Checklist - Listings.pdf",

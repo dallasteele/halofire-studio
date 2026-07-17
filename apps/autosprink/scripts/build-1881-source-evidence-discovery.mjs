@@ -7,6 +7,7 @@ import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { classifyMaterializedSourceDocument, classifyProjectIdentity, classifyStructuralMemberEvidence, discoverMaterializedSourceEvidence, mergeMaterializedSourceEvidenceDiscoveries } from '../src/engine/source-evidence-corpus.js';
 
 const APP = path.resolve(import.meta.dirname, '..');
+const REPOSITORY = path.resolve(APP, '..', '..');
 const localRootPaths = process.env.HALOFIRE_CORPUS_ROOTS
   ? process.env.HALOFIRE_CORPUS_ROOTS.split(';').map((entry) => entry.trim()).filter(Boolean)
   : [
@@ -23,15 +24,24 @@ const sharedRootPaths = process.env.HALOFIRE_SHARED_CORPUS_ROOTS
     'Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT',
   ];
 const sharedDirectoryOffset = Number.parseInt(process.env.HALOFIRE_SHARED_CORPUS_DIRECTORY_OFFSET || process.env.HALOFIRE_CORPUS_DIRECTORY_OFFSET || '0', 10);
+const sharedDirectoryFrontier = process.env.HALOFIRE_SHARED_CORPUS_DIRECTORY_FRONTIER_JSON
+  ? JSON.parse(process.env.HALOFIRE_SHARED_CORPUS_DIRECTORY_FRONTIER_JSON)
+  : null;
 const candidates = JSON.parse(fs.readFileSync(path.join(APP, 'src/data/registered-roof-framing.cooperative-1881.json'), 'utf8'));
 const placement = JSON.parse(fs.readFileSync(path.join(APP, 'src/data/roof-framing-placement.cooperative-1881.json'), 'utf8'));
-const outputPath = path.join(APP, 'src/data/roof-framing-source-discovery.cooperative-1881.json');
+const defaultOutputPath = path.join(APP, 'src/data/roof-framing-source-discovery.cooperative-1881.json');
+const outputPath = process.env.HALOFIRE_SOURCE_DISCOVERY_OUTPUT_PATH
+  ? path.resolve(process.env.HALOFIRE_SOURCE_DISCOVERY_OUTPUT_PATH)
+  : defaultOutputPath;
+if (outputPath !== REPOSITORY && !outputPath.startsWith(`${REPOSITORY}${path.sep}`)) {
+  throw new Error('HALOFIRE_SOURCE_DISCOVERY_OUTPUT_PATH must stay inside the checked-out repository.');
+}
 const standardFontDataUrl = pathToFileURL(`${path.join(APP, 'node_modules/pdfjs-dist/standard_fonts')}${path.sep}`).href;
 const requestedPdfTextPages = Number.parseInt(process.env.HALOFIRE_CORPUS_PDF_TEXT_MAX_PAGES || '4', 10);
 const maxPdfTextPages = Number.isFinite(requestedPdfTextPages) ? Math.max(1, Math.min(requestedPdfTextPages, 250)) : 4;
 const localDiscovery = discoverMaterializedSourceEvidence({ roots: localRootPaths, projectTokens: ['1881', 'cooperative'], maxFiles: 15_000, maxDirectories: 5_000 });
 const projectIdentityTokens = ['1881', 'cooperative'];
-const sharedDiscovery = discoverMaterializedSourceEvidence({ roots: sharedRootPaths, projectTokens: projectIdentityTokens, maxFiles: 15_000, maxDirectories: 300, directoryOffset: Number.isFinite(sharedDirectoryOffset) ? sharedDirectoryOffset : 0, includeSupplierLeadsWithoutProjectToken: true });
+const sharedDiscovery = discoverMaterializedSourceEvidence({ roots: sharedRootPaths, projectTokens: projectIdentityTokens, maxFiles: 15_000, maxDirectories: 300, directoryOffset: Number.isFinite(sharedDirectoryOffset) ? sharedDirectoryOffset : 0, directoryFrontier: sharedDirectoryFrontier, includeSupplierLeadsWithoutProjectToken: true });
 const discovery = mergeMaterializedSourceEvidenceDiscoveries({ discoveries: { local: localDiscovery, shared: sharedDiscovery } });
 
 function requiresCandidateTextExtraction(document) {
@@ -123,4 +133,12 @@ const output = {
   },
 };
 fs.writeFileSync(outputPath, `${JSON.stringify(output, null, 2)}\n`);
-console.log(JSON.stringify({ outputPath, status: output.status, scanWindows: output.scanWindows, counts: { files: output.scannedFileCount, directories: output.scannedDirectoryCount, candidates: output.candidates.length, boundedMembers: output.memberEvidence.witnesses.length, supplierCandidates: output.documents.filter((document) => document.roles.includes('structural-supplier-submittal')).length }, issues: output.issues }, null, 2));
+const scanWindowSummary = Object.fromEntries(Object.entries(output.scanWindows).map(([scope, window]) => [scope, {
+  scanComplete: window.scanComplete,
+  scannedRoots: window.scannedRoots,
+  scannedFileCount: window.scannedFileCount,
+  scannedDirectoryCount: window.scannedDirectoryCount,
+  nextDirectoryOffset: window.nextDirectoryOffset,
+  frontierEntries: Object.values(window.nextDirectoryFrontier || {}).reduce((count, frontier) => count + frontier.length, 0),
+}]));
+console.log(JSON.stringify({ outputPath, status: output.status, scanWindows: scanWindowSummary, counts: { files: output.scannedFileCount, directories: output.scannedDirectoryCount, candidates: output.candidates.length, boundedMembers: output.memberEvidence.witnesses.length, supplierCandidates: output.documents.filter((document) => document.roles.includes('structural-supplier-submittal')).length }, issues: output.issues }, null, 2));

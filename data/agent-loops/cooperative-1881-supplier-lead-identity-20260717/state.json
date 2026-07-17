@@ -1,8 +1,8 @@
 {
   "name": "cooperative-1881-supplier-lead-identity-20260717",
-  "iteration": 1,
+  "iteration": 3,
   "status": "in_progress",
-  "nextStage": "RESUME_SHARED_SUPPLIER_LEAD_DISCOVERY_AT_CURSOR_1200",
+  "nextStage": "RESUME_SHARED_SUPPLIER_LEAD_DISCOVERY_FROM_ITERATION3_FRONTIER",
   "predecessor": "cooperative-1881-physical-framing-placement-20260717",
   "baseline": {
     "sharedDirectoryOffset": 1200,
@@ -25,6 +25,31 @@
     "projectIdentifiedDocuments": 32,
     "unverifiedSupplierLeads": 0,
     "structuralSupplierSubmittalMaterialized": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false
+  },
+  "iteration2Replay": {
+    "artifact": "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration2.json",
+    "artifactSha256": "97ca830a38384b08263d46eb61366aedf1e02f9b77386fc419223e54b3a467fa",
+    "sharedRoot": "Y:/Shared/HaloOps/01-Bids/Kier",
+    "sharedDirectoryOffset": 0,
+    "sharedFilesScanned": 245,
+    "sharedDirectoriesScanned": 300,
+    "sharedNextFrontierEntries": 110,
+    "projectIdentifiedDocuments": 32,
+    "supplierSubmittalCandidates": 0,
+    "physicalPromotionAllowed": false
+  },
+  "iteration3Replay": {
+    "artifact": "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/shared-source-discovery-iteration3.json",
+    "artifactSha256": "9af9204f0ba20d7339b7121a03dc1c9725a28a3e8cc4c9875914abbb0a04f2f4",
+    "resumeInput": "iteration2 shared nextDirectoryFrontier",
+    "sharedFilesScanned": 221,
+    "sharedDirectoriesScanned": 300,
+    "sharedNextFrontierEntries": 103,
+    "projectIdentifiedDocuments": 32,
+    "supplierSubmittalCandidates": 0,
+    "physicalPromotionAllowed": false,
     "automaticPipeRoutingAllowed": false,
     "perHeadObstructionClearanceVerified": false
   },

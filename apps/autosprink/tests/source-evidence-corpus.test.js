@@ -91,6 +91,29 @@ describe('materialized structural source discovery', () => {
     expect(result.nextDirectoryOffset).toBeNull();
   });
 
+  it('resumes an exact pending-directory frontier without replaying the prior traversal', () => {
+    const root = makeRoot();
+    fs.mkdirSync(path.join(root, 'a'));
+    fs.mkdirSync(path.join(root, 'b'));
+    fs.writeFileSync(path.join(root, 'a', '1881-first.pdf'), 'first');
+    fs.writeFileSync(path.join(root, 'b', '1881-truss-supplier.pdf'), 'second');
+    const first = discoverMaterializedSourceEvidence({ roots: [root], projectTokens: ['1881'], maxFiles: 10, maxDirectories: 2 });
+    expect(first.nextDirectoryFrontier?.[root]).toEqual([path.join(root, 'a')]);
+    const resumed = discoverMaterializedSourceEvidence({ roots: [root], projectTokens: ['1881'], maxFiles: 10, maxDirectories: 10, directoryFrontier: first.nextDirectoryFrontier });
+    expect(resumed.scanComplete).toBe(true);
+    expect(resumed.traversedDirectoryCount).toBe(1);
+    expect(resumed.candidates.map((entry) => path.basename(entry.path))).toEqual(['1881-first.pdf']);
+  });
+
+  it('rejects a substituted frontier outside the configured source root', () => {
+    const root = makeRoot();
+    const outside = makeRoot();
+    const result = discoverMaterializedSourceEvidence({ roots: [root], projectTokens: ['1881'], maxFiles: 10, directoryFrontier: { [root]: [outside] } });
+    expect(result.scanComplete).toBe(false);
+    expect(result.unreadableDirectories).toEqual(expect.arrayContaining([expect.objectContaining({ path: outside, code: 'SOURCE_CORPUS_FRONTIER_INVALID' })]));
+    expect(result.issues.map((entry) => entry.code)).toContain('SOURCE_CORPUS_DIRECTORY_UNREADABLE');
+  });
+
   it('keeps canonical local evidence while resuming an independent shared-drive window', () => {
     const local = makeRoot();
     const shared = makeRoot();
