@@ -5,15 +5,15 @@
     {
       "id": "roof-plan-A121",
       "binding": {
-        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
-        "physicalPageNumber": 36,
-        "pageIndex": 35,
-        "renderedPageSha256": "658402dc30c2ff57c0bc95c81ce1d5e23f9efe5b6c899296e7d8391c29ddc1fa",
+        "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+        "physicalPageNumber": 32,
+        "pageIndex": 31,
+        "renderedPageSha256": "4c95d21463f7f8acd801f74f06b42ed88a296ff430ee694c14a8ff6279714aab",
         "sheetId": "A-121",
         "coordinateSpace": "pdf-points",
         "renderProfile": {
-          "renderer": "PyMuPDF",
-          "rendererVersion": "1.27.2.2",
+          "renderer": "pdfjs-dist",
+          "rendererVersion": "6.1.200",
           "matrixScale": 2.5,
           "colorspace": "rgb",
           "alpha": false
@@ -23,15 +23,15 @@
     {
       "id": "mechanical-M109",
       "binding": {
-        "sourcePdfSha256": "56ee069667ceac63be2012bc3a93fb2e3806cb502bcc963cf05b39097a39b4bc",
-        "physicalPageNumber": 10,
-        "pageIndex": 9,
-        "renderedPageSha256": "f252bd4539461bdbcb7e45b9c94855ba9f6f8a7a5714b5c4a02f93e674fbadd9",
+        "sourcePdfSha256": "f2aa3329951b29ea7829fa56ff30866c0f3fa7e46ecd7f8c0377556da1e4a3d7",
+        "physicalPageNumber": 13,
+        "pageIndex": 12,
+        "renderedPageSha256": "17dcc6157b019b12807b9b2413ffd222bc306f317b072c72037440debc96de12",
         "sheetId": "M109",
         "coordinateSpace": "pdf-points",
         "renderProfile": {
-          "renderer": "PyMuPDF",
-          "rendererVersion": "1.27.2.2",
+          "renderer": "pdfjs-dist",
+          "rendererVersion": "6.1.200",
           "matrixScale": 2.5,
           "colorspace": "rgb",
           "alpha": false
@@ -41,15 +41,15 @@
     {
       "id": "plumbing-P109",
       "binding": {
-        "sourcePdfSha256": "56ee069667ceac63be2012bc3a93fb2e3806cb502bcc963cf05b39097a39b4bc",
-        "physicalPageNumber": 69,
-        "pageIndex": 68,
-        "renderedPageSha256": "b55701c3c985cff21015d6a9822776991ce0da59a49bebab4ac44e1488275545",
+        "sourcePdfSha256": "eb9cfb0410f1b022b7b445c24e241c54ca9ffa858c914e5a471cd46323ee89c2",
+        "physicalPageNumber": 10,
+        "pageIndex": 9,
+        "renderedPageSha256": "01535ccb60d74338a0e694bf2651bbf58a1f8248807baed042b5ec2c19987b9c",
         "sheetId": "P109",
         "coordinateSpace": "pdf-points",
         "renderProfile": {
-          "renderer": "PyMuPDF",
-          "rendererVersion": "1.27.2.2",
+          "renderer": "pdfjs-dist",
+          "rendererVersion": "6.1.200",
           "matrixScale": 2.5,
           "colorspace": "rgb",
           "alpha": false
@@ -7249,5 +7249,5 @@
     "oneToOneMatching": true,
     "syntheticFeaturesAdded": false
   },
-  "evidenceReceiptSha256": "1adbdb39f5b36f284976b4a091bc11604b08804e71869dbe7ccc7eabea3fb8c1"
+  "evidenceReceiptSha256": "996ad937a2822de4ce721b5b07278d0ae1bd915c9854c4997445a7c4aa7f9678"
 }

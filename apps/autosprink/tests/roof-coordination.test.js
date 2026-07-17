@@ -20,6 +20,18 @@ describe('Cooperative 1881 issued MEP roof registration', () => {
     expect(model.vents).toHaveLength(83);
     expect(model.counts.unmatchedMechanicalLabels).toBe(5);
     expect(model.counts.unmatchedVentLabels).toBe(6);
+    expect(model.sourceBindings.find((entry) => entry.id === 'roof-plan-A121').binding.sourcePdfSha256)
+      .toBe('bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f');
+    expect(model.sourceBindings.find((entry) => entry.id === 'mechanical-M109').binding).toMatchObject({
+      sourcePdfSha256: 'f2aa3329951b29ea7829fa56ff30866c0f3fa7e46ecd7f8c0377556da1e4a3d7',
+      physicalPageNumber: 13,
+      sheetId: 'M109',
+    });
+    expect(model.sourceBindings.find((entry) => entry.id === 'plumbing-P109').binding).toMatchObject({
+      sourcePdfSha256: 'eb9cfb0410f1b022b7b445c24e241c54ca9ffa858c914e5a471cd46323ee89c2',
+      physicalPageNumber: 10,
+      sheetId: 'P109',
+    });
     expect(Math.max(...model.transforms.map((item) => item.maxResidualFt))).toBeLessThan(1 / 6);
     expect(model.coverage.complete).toBe(false);
     expect(model.complianceReady).toBe(false);

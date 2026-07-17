@@ -47,16 +47,21 @@ describe('source-bound pitched roof reconstruction', () => {
       'mep-feature-specific-clearances-and-equipment-heights',
       'mep-unmatched-label-residuals',
       'level-8-ceiling-versus-attic-protection-basis',
-      'submitted-output-node-by-node-comparison',
+      'completed-bid-source-files-not-materialized-from-egnyte',
     ]);
     expect(model.exclusions.map((entry) => entry.id)).toContain('central-south-open-core');
     expect(model.features).toHaveLength(11);
     expect(model.features.filter((entry) => entry.type === 'roof-hatch')).toHaveLength(1);
     expect(model.planes.every((plane) => plane.sourceBindingRefs.join(',') === 'elevation-A201,roof-plan-A121')).toBe(true);
-    expect(model.coordinationEvidence).toHaveLength(5);
+    expect(model.coordinationEvidence).toHaveLength(3);
     expect(model.coordinationEvidence.find((entry) => entry.id === 'roof-mechanical-coordination').registration.status).toBe('registered');
     expect(model.coordinationEvidence.find((entry) => entry.id === 'roof-plumbing-coordination').registration.status).toBe('registered');
-    expect(model.coordinationEvidence.find((entry) => entry.id === 'submitted-sprinkler-calibration').approvalStatus).toBe('submittal-only-not-approved');
+    expect(model.sourceBindings.find((entry) => entry.id === 'roof-plan-A121').binding).toMatchObject({
+      sourcePdfSha256: 'bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f',
+      physicalPageNumber: 32,
+      pageIndex: 31,
+      sheetId: 'A-121',
+    });
     const projection = projectCadModelToRoof({
       cadModel: { solids: [{ kind: 'head', name: 'partial-scope-head', position: [100, 100, 80] }] },
       roofModel: model,

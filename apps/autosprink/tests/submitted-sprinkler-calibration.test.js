@@ -34,6 +34,11 @@ describe('Cooperative 1881 submitted FP-8 / DA-3 calibration', () => {
     expect(packet.viewRegistrations.every((entry) => entry.controls.planXRmsResidualFt <= 0.2)).toBe(true);
     expect(packet.viewRegistrations.every((entry) => entry.controls.planYRmsResidualFt <= 0.2)).toBe(true);
     expect(packet.submittedElevationView.hydraulicNodes.map((entry) => entry.elevationFt)).toContain(89.416667);
+    expect(packet.sourceBindings.find((entry) => entry.id === 'target-roof-A121').binding).toMatchObject({
+      sourcePdfSha256: 'bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f',
+      physicalPageNumber: 32,
+      pageIndex: 31,
+    });
   });
 
   it('proves the finished Level 8 reference is not a blind pitched-roof projection', async () => {

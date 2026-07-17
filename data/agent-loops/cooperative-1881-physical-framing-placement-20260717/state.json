@@ -1,10 +1,10 @@
 {
   "name": "cooperative-1881-physical-framing-placement-20260717",
-  "iteration": 1,
+  "iteration": 2,
   "status": "in_progress",
-  "updatedAt": "2026-07-17T03:09:01-07:00",
-  "completedStages": ["DISCOVER"],
-  "nextStage": "PLAN",
+  "updatedAt": "2026-07-17T03:34:00-07:00",
+  "completedStages": ["DISCOVER", "PLAN"],
+  "nextStage": "BUILD",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [157533, 46659, 120030, 60864],
@@ -23,5 +23,15 @@
     "codeComplianceReady": false,
     "fabricationReady": false
   },
-  "currentQuestion": "Which structural plan line conventions and section/elevation callouts provide defensible beam/joist orientation and top/bottom Z per floor without reusing a nominal floor height as structural truth?"
+  "roofSourceRegistration": {
+    "architecturalPdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+    "roofPlan": { "sheet": "A-121", "physicalPageNumber": 32, "registeredPlanes": 15, "registeredFeatures": 11 },
+    "elevation": { "sheet": "A-201", "physicalPageNumber": 58 },
+    "section": { "sheet": "A-301", "physicalPageNumber": 62 },
+    "mechanicalEquipmentFootprints": 139,
+    "plumbingVentPoints": 83,
+    "sourceReceiptVerification": "passed",
+    "physicalFramingPromoted": 0
+  },
+  "currentQuestion": "Which S-190 roof framing centerlines can be registered to the now-current A-121 planes and A-201/A-301 vertical datums with an explicit member orientation and top/bottom Z, while leaving truss profile, bearing, and connections unresolved unless directly shown?"
 }

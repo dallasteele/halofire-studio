@@ -7,15 +7,15 @@
     {
       "id": "target-architectural-A108",
       "binding": {
-        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
+        "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
         "physicalPageNumber": 29,
         "pageIndex": 28,
-        "renderedPageSha256": "50dfcc5dcf3a63845e5adef6ff95ab317731760b0ea2034d9476972209927e6b",
+        "renderedPageSha256": "689f5eebd371c1e3770f36d17f7c3d8966f30961d45bce3ae4ca7b91a9993146",
         "sheetId": "A-108",
         "coordinateSpace": "pdf-points",
         "renderProfile": {
-          "renderer": "PyMuPDF",
-          "rendererVersion": "1.27.2.2",
+          "renderer": "pdfjs-dist",
+          "rendererVersion": "6.1.200",
           "matrixScale": 2.5,
           "colorspace": "rgb",
           "alpha": false
@@ -25,15 +25,15 @@
     {
       "id": "target-roof-A121",
       "binding": {
-        "sourcePdfSha256": "179a572ea380be805131aabdeb7c3a3a041f9c2f5aaf55d2fcde673289ab6d53",
-        "physicalPageNumber": 36,
-        "pageIndex": 35,
-        "renderedPageSha256": "658402dc30c2ff57c0bc95c81ce1d5e23f9efe5b6c899296e7d8391c29ddc1fa",
+        "sourcePdfSha256": "bb3c85c8ae6a7709cb45d200b2aa38b26a75ec82870c01ba70346b2c1814008f",
+        "physicalPageNumber": 32,
+        "pageIndex": 31,
+        "renderedPageSha256": "4c95d21463f7f8acd801f74f06b42ed88a296ff430ee694c14a8ff6279714aab",
         "sheetId": "A-121",
         "coordinateSpace": "pdf-points",
         "renderProfile": {
-          "renderer": "PyMuPDF",
-          "rendererVersion": "1.27.2.2",
+          "renderer": "pdfjs-dist",
+          "rendererVersion": "6.1.200",
           "matrixScale": 2.5,
           "colorspace": "rgb",
           "alpha": false
@@ -6887,5 +6887,5 @@
     ]
   },
   "claimStatus": "completed-bid-calibration-reference-not-code-compliance-or-approval",
-  "evidenceReceiptSha256": "8c6c0ccc421b14c25ad18b22f1157cf0c4853c9835e5b9ee5a9b7f07cb47a645"
+  "evidenceReceiptSha256": "6671f9de4926e3575bfd3673474b40a310a89c4a5b8ce1d138f7c81e9aac4ba6"
 }
