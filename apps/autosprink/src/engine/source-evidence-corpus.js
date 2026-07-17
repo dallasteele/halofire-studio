@@ -31,6 +31,21 @@ export function classifyMaterializedSourceDocument(document) {
   return roles.size ? [...roles].sort() : ['unclassified'];
 }
 
+export function classifyProjectIdentity(input) {
+  const projectTokens = (Array.isArray(input?.projectTokens) ? input.projectTokens : [])
+    .map((token) => String(token).trim().toLowerCase()).filter(Boolean);
+  const pathValue = String(input?.path || '').toLowerCase();
+  const textValue = String(input?.extractedText || '').toLowerCase();
+  const pathTokenMatches = projectTokens.filter((token) => pathValue.includes(token));
+  const textTokenMatches = projectTokens.filter((token) => textValue.includes(token));
+  return {
+    pathTokenMatches,
+    textTokenMatches,
+    projectIdentityStatus: pathTokenMatches.length ? 'path-token-match' : textTokenMatches.length ? 'text-token-match' : 'unverified',
+    projectIdentified: !projectTokens.length || pathTokenMatches.length > 0 || textTokenMatches.length > 0,
+  };
+}
+
 /**
  * Bounded, deterministic discovery for materialized bid-corpus files.  It records
  * candidate evidence but intentionally does not infer a fabrication dimension from a
@@ -44,13 +59,25 @@ export function discoverMaterializedSourceEvidence(input) {
   const maxFiles = Number.isInteger(input?.maxFiles) ? Math.max(1, Math.min(input.maxFiles, 50_000)) : 10_000;
   const maxDirectories = Number.isInteger(input?.maxDirectories) ? Math.max(1, Math.min(input.maxDirectories, 50_000)) : 5_000;
   const directoryOffset = Number.isInteger(input?.directoryOffset) ? Math.max(0, input.directoryOffset) : 0;
+  const includeSupplierLeadsWithoutProjectToken = input?.includeSupplierLeadsWithoutProjectToken === true;
+  const readDirectory = typeof input?.readDirectory === 'function' ? input.readDirectory : (directory) => fs.readdirSync(directory, { withFileTypes: true });
   const candidates = [];
   const missingRoots = [];
+  const unreadableDirectories = [];
   const scannedRoots = [];
   let scannedFileCount = 0;
   let scannedDirectoryCount = 0;
   let traversedDirectoryCount = 0;
   let budgetExhausted = false;
+
+  const entriesForDirectory = (directory) => {
+    try {
+      return readDirectory(directory).sort((left, right) => left.name.localeCompare(right.name));
+    } catch (error) {
+      unreadableDirectories.push({ path: directory, code: error?.code || 'UNKNOWN', message: String(error?.message || error) });
+      return null;
+    }
+  };
 
   for (const configuredRoot of roots) {
     const root = path.resolve(String(configuredRoot));
@@ -69,7 +96,9 @@ export function discoverMaterializedSourceEvidence(input) {
       const directory = pending.pop();
       traversedDirectoryCount += 1;
       if (traversedDirectoryCount <= directoryOffset) {
-        for (const entry of fs.readdirSync(directory, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+        const entries = entriesForDirectory(directory);
+        if (!entries) continue;
+        for (const entry of entries) {
           if (entry.isDirectory() && !entry.isSymbolicLink()) pending.push(path.join(directory, entry.name));
         }
         continue;
@@ -79,7 +108,9 @@ export function discoverMaterializedSourceEvidence(input) {
         break;
       }
       scannedDirectoryCount += 1;
-      for (const entry of fs.readdirSync(directory, { withFileTypes: true }).sort((left, right) => left.name.localeCompare(right.name))) {
+      const entries = entriesForDirectory(directory);
+      if (!entries) continue;
+      for (const entry of entries) {
         const filePath = path.join(directory, entry.name);
         if (entry.isSymbolicLink()) continue;
         if (entry.isDirectory()) {
@@ -95,9 +126,11 @@ export function discoverMaterializedSourceEvidence(input) {
         const extension = path.extname(entry.name).toLowerCase();
         if (!extensions.has(extension)) continue;
         const normalizedPath = filePath.toLowerCase();
-        const matchesProject = !projectTokens.length || projectTokens.some((token) => normalizedPath.includes(token));
         const roles = roleForPath(filePath);
-        if (!matchesProject) continue;
+        const pathProjectTokenMatches = projectTokens.filter((token) => normalizedPath.includes(token));
+        const matchesProject = !projectTokens.length || pathProjectTokenMatches.length > 0;
+        const supplierLead = includeSupplierLeadsWithoutProjectToken && roles.includes('structural-supplier-submittal');
+        if (!matchesProject && !supplierLead) continue;
         const statForFile = fs.statSync(filePath);
         candidates.push({
           path: filePath,
@@ -106,7 +139,8 @@ export function discoverMaterializedSourceEvidence(input) {
           bytes: statForFile.size,
           sha256: sha256File(filePath),
           roles,
-          projectTokenMatches: projectTokens.filter((token) => normalizedPath.includes(token)),
+          projectTokenMatches: pathProjectTokenMatches,
+          supplierLeadWithoutPathIdentity: supplierLead && !matchesProject,
         });
       }
     }
@@ -114,6 +148,7 @@ export function discoverMaterializedSourceEvidence(input) {
   candidates.sort((left, right) => left.path.localeCompare(right.path));
   const issues = [];
   if (!scannedRoots.length) issues.push(issue('SOURCE_CORPUS_ROOT_UNAVAILABLE', 'None of the configured corpus roots is materialized and readable.', missingRoots));
+  if (unreadableDirectories.length) issues.push(issue('SOURCE_CORPUS_DIRECTORY_UNREADABLE', 'One or more materialized corpus directories could not be read; retry the same cursor after the shared drive is available.', unreadableDirectories.map((entry) => entry.path)));
   if (budgetExhausted) issues.push(issue('SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED', `Discovery stopped after the ${maxFiles}-file or ${maxDirectories}-directory budget; narrow the corpus root or resume at directory offset ${directoryOffset + scannedDirectoryCount}.`, scannedRoots));
   if (!candidates.some((entry) => entry.roles.includes('structural-supplier-submittal'))) {
     issues.push(issue('STRUCTURAL_SUPPLIER_SUBMITTAL_NOT_MATERIALIZED', 'No candidate structural supplier/truss/lumber submittal is materialized in the scanned corpus.'));
@@ -121,16 +156,17 @@ export function discoverMaterializedSourceEvidence(input) {
   return {
     artifactType: 'halofire.materialized-source-evidence-discovery.v1',
     status: issues.length ? 'blocked' : 'passed',
-    scanComplete: !budgetExhausted,
+    scanComplete: !budgetExhausted && unreadableDirectories.length === 0,
     scannedRoots,
     missingRoots,
+    unreadableDirectories,
     scannedFileCount,
     scannedDirectoryCount,
     traversedDirectoryCount,
     maxFiles,
     maxDirectories,
     directoryOffset,
-    nextDirectoryOffset: budgetExhausted ? directoryOffset + scannedDirectoryCount : null,
+    nextDirectoryOffset: budgetExhausted ? directoryOffset + scannedDirectoryCount : unreadableDirectories.length ? directoryOffset : null,
     candidates,
     issues,
   };

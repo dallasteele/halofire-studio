@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { buildRoofFramingClearancePreflight, classifyMaterializedSourceDocument, classifyStructuralMemberEvidence, discoverMaterializedSourceEvidence, mergeMaterializedSourceEvidenceDiscoveries } from '../src/engine/source-evidence-corpus.js';
+import { buildRoofFramingClearancePreflight, classifyMaterializedSourceDocument, classifyProjectIdentity, classifyStructuralMemberEvidence, discoverMaterializedSourceEvidence, mergeMaterializedSourceEvidenceDiscoveries } from '../src/engine/source-evidence-corpus.js';
 
 const tempRoots = [];
 function makeRoot() {
@@ -40,6 +40,24 @@ describe('materialized structural source discovery', () => {
     expect(result.issues.map((entry) => entry.code)).toContain('SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED');
   });
 
+  it('admits only supplier-named generic shared leads when explicitly enabled', () => {
+    const root = makeRoot();
+    fs.writeFileSync(path.join(root, 'Attachment-14.pdf'), 'not a supplier');
+    fs.writeFileSync(path.join(root, 'Roof truss supplier package.pdf'), 'supplier lead');
+    const defaultResult = discoverMaterializedSourceEvidence({ roots: [root], projectTokens: ['1881'], maxFiles: 10 });
+    const leadResult = discoverMaterializedSourceEvidence({ roots: [root], projectTokens: ['1881'], maxFiles: 10, includeSupplierLeadsWithoutProjectToken: true });
+    expect(defaultResult.candidates).toHaveLength(0);
+    expect(leadResult.candidates).toHaveLength(1);
+    expect(leadResult.candidates[0]).toMatchObject({ supplierLeadWithoutPathIdentity: true, projectTokenMatches: [] });
+  });
+
+  it('requires source path or text project identity before a generic supplier lead is project evidence', () => {
+    expect(classifyProjectIdentity({ path: 'Y:/Shared/Attachment-14.pdf', extractedText: 'Roof truss supplier submittal — Cooperative 1881.', projectTokens: ['1881', 'cooperative'] }))
+      .toMatchObject({ projectIdentified: true, projectIdentityStatus: 'text-token-match', pathTokenMatches: [], textTokenMatches: ['1881', 'cooperative'] });
+    expect(classifyProjectIdentity({ path: 'Y:/Shared/Attachment-14.pdf', extractedText: 'Roof truss supplier submittal — unrelated project.', projectTokens: ['1881', 'cooperative'] }))
+      .toMatchObject({ projectIdentified: false, projectIdentityStatus: 'unverified' });
+  });
+
   it('also bounds empty cloud-directory traversal before a file can be encountered', () => {
     const root = makeRoot();
     fs.mkdirSync(path.join(root, 'a', 'b', 'c'), { recursive: true });
@@ -47,6 +65,19 @@ describe('materialized structural source discovery', () => {
     expect(result.scanComplete).toBe(false);
     expect(result.scannedDirectoryCount).toBe(2);
     expect(result.issues.map((entry) => entry.code)).toContain('SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED');
+  });
+
+  it('records an unreadable shared directory as a resumable blocker instead of crashing', () => {
+    const root = makeRoot();
+    const result = discoverMaterializedSourceEvidence({
+      roots: [root],
+      projectTokens: ['1881'],
+      maxFiles: 10,
+      directoryOffset: 7,
+      readDirectory: () => { const error = new Error('Egnyte unavailable'); error.code = 'UNKNOWN'; throw error; },
+    });
+    expect(result).toMatchObject({ scanComplete: false, nextDirectoryOffset: 7, unreadableDirectories: [{ path: root, code: 'UNKNOWN' }] });
+    expect(result.issues.map((entry) => entry.code)).toContain('SOURCE_CORPUS_DIRECTORY_UNREADABLE');
   });
 
   it('resumes a deterministic directory window without rescanning prior files as candidates', () => {

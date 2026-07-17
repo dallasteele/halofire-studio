@@ -4,7 +4,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 
-import { classifyMaterializedSourceDocument, classifyStructuralMemberEvidence, discoverMaterializedSourceEvidence, mergeMaterializedSourceEvidenceDiscoveries } from '../src/engine/source-evidence-corpus.js';
+import { classifyMaterializedSourceDocument, classifyProjectIdentity, classifyStructuralMemberEvidence, discoverMaterializedSourceEvidence, mergeMaterializedSourceEvidenceDiscoveries } from '../src/engine/source-evidence-corpus.js';
 
 const APP = path.resolve(import.meta.dirname, '..');
 const localRootPaths = process.env.HALOFIRE_CORPUS_ROOTS
@@ -29,7 +29,8 @@ const standardFontDataUrl = pathToFileURL(`${path.join(APP, 'node_modules/pdfjs-
 const requestedPdfTextPages = Number.parseInt(process.env.HALOFIRE_CORPUS_PDF_TEXT_MAX_PAGES || '4', 10);
 const maxPdfTextPages = Number.isFinite(requestedPdfTextPages) ? Math.max(1, Math.min(requestedPdfTextPages, 250)) : 4;
 const localDiscovery = discoverMaterializedSourceEvidence({ roots: localRootPaths, projectTokens: ['1881', 'cooperative'], maxFiles: 15_000, maxDirectories: 5_000 });
-const sharedDiscovery = discoverMaterializedSourceEvidence({ roots: sharedRootPaths, projectTokens: ['1881', 'cooperative'], maxFiles: 15_000, maxDirectories: 300, directoryOffset: Number.isFinite(sharedDirectoryOffset) ? sharedDirectoryOffset : 0 });
+const projectIdentityTokens = ['1881', 'cooperative'];
+const sharedDiscovery = discoverMaterializedSourceEvidence({ roots: sharedRootPaths, projectTokens: projectIdentityTokens, maxFiles: 15_000, maxDirectories: 300, directoryOffset: Number.isFinite(sharedDirectoryOffset) ? sharedDirectoryOffset : 0, includeSupplierLeadsWithoutProjectToken: true });
 const discovery = mergeMaterializedSourceEvidenceDiscoveries({ discoveries: { local: localDiscovery, shared: sharedDiscovery } });
 
 function requiresCandidateTextExtraction(document) {
@@ -64,7 +65,10 @@ async function extractPdfText(document) {
 }
 
 const extractedDocuments = [];
-for (const candidate of discovery.candidates) extractedDocuments.push(await extractPdfText(candidate));
+for (const candidate of discovery.candidates) {
+  const document = await extractPdfText(candidate);
+  extractedDocuments.push({ ...document, ...classifyProjectIdentity({ ...document, projectTokens: projectIdentityTokens }) });
+}
 const documentsByHash = new Map();
 for (const document of extractedDocuments) {
   const existing = documentsByHash.get(document.sha256);
@@ -75,14 +79,17 @@ for (const document of extractedDocuments) {
   } : { ...document, aliases: [document.path] });
 }
 const documents = [...documentsByHash.values()];
+const projectIdentifiedDocuments = documents.filter((document) => document.projectIdentified === true);
 const roofBoundedIds = new Set(placement.boundedMembers.map((member) => member.id));
 const memberEvidence = classifyStructuralMemberEvidence({
   members: [...candidates.beams, ...candidates.joists].filter((member) => roofBoundedIds.has(member.id) && member?.section?.status === 'source-bounded-dry-minimum-dressed-section'),
-  documents,
+  documents: projectIdentifiedDocuments,
 });
-const supplierMaterialized = documents.some((document) => document.roles.includes('structural-supplier-submittal'));
+const supplierMaterialized = projectIdentifiedDocuments.some((document) => document.roles.includes('structural-supplier-submittal'));
 const issues = discovery.issues.filter((entry) => entry.code !== 'STRUCTURAL_SUPPLIER_SUBMITTAL_NOT_MATERIALIZED');
 if (!supplierMaterialized) issues.push({ code: 'STRUCTURAL_SUPPLIER_SUBMITTAL_NOT_MATERIALIZED', severity: 'blocking', message: 'No candidate structural supplier/truss/lumber submittal is materialized in the scanned corpus.', refs: [] });
+const unverifiedSupplierLeads = documents.filter((document) => document.supplierLeadWithoutPathIdentity && document.projectIdentified !== true);
+if (unverifiedSupplierLeads.length) issues.push({ code: 'STRUCTURAL_SUPPLIER_LEAD_PROJECT_IDENTITY_UNVERIFIED', severity: 'blocking', message: 'Generic supplier lead(s) were found, but their extracted source text does not identify Cooperative 1881.', refs: unverifiedSupplierLeads.map((document) => document.sha256) });
 const output = {
   ...discovery,
   artifactType: 'halofire.cooperative-1881-roof-framing-source-discovery.v2',
@@ -91,6 +98,12 @@ const output = {
   extractionPolicy: {
     maxPdfTextPages,
     note: 'Discovery text is deliberately bounded. A truncated document can identify a candidate but cannot supply exact member dimensions, orientation, or vertical-datum proof.',
+  },
+  projectIdentity: {
+    tokens: projectIdentityTokens,
+    projectIdentifiedDocumentCount: projectIdentifiedDocuments.length,
+    unverifiedSupplierLeadCount: unverifiedSupplierLeads.length,
+    note: 'A generic supplier lead is not project evidence unless its path or bounded extracted source text identifies the project.',
   },
   documents: documents.map(({ extractedText, ...document }) => ({ ...document, extractedTextSha256: extractedText ? crypto.createHash('sha256').update(extractedText).digest('hex') : null })),
   memberEvidence,

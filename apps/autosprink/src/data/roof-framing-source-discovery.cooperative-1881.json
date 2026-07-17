@@ -25,13 +25,13 @@
         "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
       ],
       "missingRoots": [],
-      "scannedFileCount": 786,
+      "scannedFileCount": 259,
       "scannedDirectoryCount": 300,
-      "traversedDirectoryCount": 901,
+      "traversedDirectoryCount": 1201,
       "maxFiles": 15000,
       "maxDirectories": 300,
-      "directoryOffset": 600,
-      "nextDirectoryOffset": 900
+      "directoryOffset": 900,
+      "nextDirectoryOffset": 1200
     }
   },
   "scannedRoots": [
@@ -41,9 +41,9 @@
     "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
   ],
   "missingRoots": [],
-  "scannedFileCount": 1363,
+  "scannedFileCount": 836,
   "scannedDirectoryCount": 410,
-  "traversedDirectoryCount": 1011,
+  "traversedDirectoryCount": 1311,
   "candidates": [
     {
       "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf",
@@ -57,6 +57,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -73,6 +74,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -89,6 +91,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -105,6 +108,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -121,6 +125,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -137,6 +142,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -153,6 +159,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -169,6 +176,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -185,6 +193,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -201,6 +210,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -217,6 +227,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -233,6 +244,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -249,6 +261,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -265,6 +278,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -281,6 +295,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -297,6 +312,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -313,6 +329,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -329,6 +346,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -345,6 +363,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -361,6 +380,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -377,6 +397,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -393,6 +414,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -409,6 +431,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -425,6 +448,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -441,6 +465,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -457,6 +482,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -473,6 +499,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -489,6 +516,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -505,6 +533,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -522,6 +551,7 @@
         "1881",
         "cooperative"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -539,6 +569,7 @@
         "1881",
         "cooperative"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -555,6 +586,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -571,6 +603,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -587,6 +620,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -603,6 +637,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -619,6 +654,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -635,6 +671,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -651,6 +688,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -667,6 +705,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -683,6 +722,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -699,6 +739,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -715,6 +756,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -731,6 +773,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -747,6 +790,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -763,6 +807,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -779,6 +824,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -795,6 +841,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -811,6 +858,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -827,6 +875,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -843,6 +892,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -860,6 +910,7 @@
         "1881",
         "cooperative"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -877,6 +928,7 @@
         "1881",
         "cooperative"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ]
@@ -886,7 +938,7 @@
     {
       "code": "SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED",
       "severity": "blocking",
-      "message": "Discovery stopped after the 15000-file or 300-directory budget; narrow the corpus root or resume at directory offset 900.",
+      "message": "Discovery stopped after the 15000-file or 300-directory budget; narrow the corpus root or resume at directory offset 1200.",
       "refs": [
         "Y:\\Shared\\HaloOps\\01-Bids\\Kier"
       ],
@@ -905,6 +957,15 @@
     "maxPdfTextPages": 4,
     "note": "Discovery text is deliberately bounded. A truncated document can identify a candidate but cannot supply exact member dimensions, orientation, or vertical-datum proof."
   },
+  "projectIdentity": {
+    "tokens": [
+      "1881",
+      "cooperative"
+    ],
+    "projectIdentifiedDocumentCount": 32,
+    "unverifiedSupplierLeadCount": 0,
+    "note": "A generic supplier lead is not project evidence unless its path or bounded extracted source text identifies the project."
+  },
   "documents": [
     {
       "path": "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf",
@@ -918,10 +979,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_proposal.pdf"
       ],
@@ -939,10 +1007,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881_shop_drawings.pdf"
       ],
@@ -960,10 +1035,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\1881.xlsx"
       ],
@@ -981,10 +1063,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\design.dxf"
       ],
@@ -1002,10 +1091,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\artifacts\\design.ifc"
       ],
@@ -1023,10 +1119,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\cad_model_promote\\reviewed-cad-model.dxf"
       ],
@@ -1044,10 +1147,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\kernel_artifact_determinism_probe\\probe_runs\\run_0001\\run1\\cad_model_promote\\reviewed-cad-model.dxf",
         "E:\\ClaudeBot\\data\\halofire\\bids\\1881\\halo_forge\\kernel_artifact_determinism_probe\\probe_runs\\run_0001\\run2\\cad_model_promote\\reviewed-cad-model.dxf"
@@ -1066,10 +1176,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\013566.13-RIB-Sustainability Certification Project Procedures - Enterprise Green 7-22-2025 3-38-55 AM.pdf"
       ],
@@ -1087,10 +1204,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\062000-RIB-Finish Carpentry-07-22-2025.pdf"
       ],
@@ -1108,10 +1232,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Architecturals.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Architecturals.pdf"
@@ -1130,10 +1261,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Civils.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Civils.pdf"
@@ -1152,10 +1290,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Electrical.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Electrical.pdf"
@@ -1174,10 +1319,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Generals.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Generals.pdf"
@@ -1196,10 +1348,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Geopiers.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Geopiers.pdf"
@@ -1218,10 +1377,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Landscape.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Landscape.pdf"
@@ -1240,10 +1406,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Mechanical.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Mechanical.pdf"
@@ -1262,10 +1435,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Plumbing.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Plumbing.pdf"
@@ -1284,6 +1464,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
@@ -1291,6 +1472,15 @@
       "pageCount": 104,
       "extractedPageCount": 4,
       "extractedTextComplete": false,
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 - Structurals.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 - Structurals.pdf"
@@ -1309,10 +1499,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Architecture RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Architecture RFI's.pdf"
@@ -1331,10 +1528,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Civil RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Civil RFI's.pdf"
@@ -1353,10 +1557,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Electrical RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Electrical RFI's.pdf"
@@ -1375,10 +1586,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Fire RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Fire RFI's.pdf"
@@ -1397,10 +1615,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Landscape RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Landscape RFI's.pdf"
@@ -1419,10 +1644,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 MP RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 MP RFI's.pdf"
@@ -1441,6 +1673,7 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
@@ -1448,6 +1681,14 @@
       "pageCount": 2,
       "extractedPageCount": 2,
       "extractedTextComplete": true,
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [
+        "1881"
+      ],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\1881 Structural RFI's.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\1881 Structural RFI's.pdf"
@@ -1466,10 +1707,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\GC - Bid Plans\\900283-1881 West North Temple Apartments Geotechnical Study -addendum.pdf"
@@ -1488,10 +1736,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 02 Draft Cover Page.pdf"
       ],
@@ -1509,10 +1764,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\GC - Bid Plans\\Addendum 1 Memo.pdf"
       ],
@@ -1531,10 +1793,18 @@
         "1881",
         "cooperative"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf"
@@ -1554,10 +1824,18 @@
         "1881",
         "cooperative"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881",
+        "cooperative"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx",
         "E:\\ClaudeBot\\HaloFireBidDocs\\1-Bid Documents\\Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx"
@@ -1576,10 +1854,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-requested",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025 copy.pdf"
       ],
@@ -1597,10 +1882,17 @@
       "projectTokenMatches": [
         "1881"
       ],
+      "supplierLeadWithoutPathIdentity": false,
       "scanScopes": [
         "local"
       ],
       "extractedTextStatus": "not-pdf",
+      "pathTokenMatches": [
+        "1881"
+      ],
+      "textTokenMatches": [],
+      "projectIdentityStatus": "path-token-match",
+      "projectIdentified": true,
       "aliases": [
         "E:\\ClaudeBot\\data\\halofire\\golden\\1881\\input\\Statement of Qualifications 2025.docx"
       ],

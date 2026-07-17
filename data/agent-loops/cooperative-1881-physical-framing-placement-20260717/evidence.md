@@ -201,3 +201,18 @@ unscanned tree; `SOURCE_CORPUS_SCAN_BUDGET_EXHAUSTED` remains present. The
 replayed clearance preflight remains blocked with
 `ROOF_FRAMING_OBSTRUCTION_GEOMETRY_UNRESOLVED`, automatic routing false, and
 per-head obstruction clearance false.
+
+## Iteration 8 shared window 900 and successor requirement
+
+The final current-loop window at offset 900 scanned 259 materialized files and
+advanced to cursor 1200. No project-token path candidate or structural supplier
+source appeared. This is still a bounded partial-search result, not proof that
+the project source does not exist.
+
+The pass exposed a real discovery limitation: a supplier package can use a
+generic filename and live in a folder whose path omits the project name, which
+the current project-path filter excludes before text extraction. The successor
+loop must admit only supplier/truss/lumber-named shared-drive leads without a
+path match, extract their cover/index text, and require the Cooperative 1881
+identity in that text before treating them as project candidates. It must not
+promote a generic supplier lead or use it as physical member proof.

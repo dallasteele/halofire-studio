@@ -1,0 +1,39 @@
+{
+  "name": "cooperative-1881-supplier-lead-identity-20260717",
+  "iteration": 1,
+  "status": "in_progress",
+  "nextStage": "RESUME_SHARED_SUPPLIER_LEAD_DISCOVERY_AT_CURSOR_1200",
+  "predecessor": "cooperative-1881-physical-framing-placement-20260717",
+  "baseline": {
+    "sharedDirectoryOffset": 1200,
+    "structuralSupplierSubmittalMaterialized": false,
+    "physicalPromotionAllowed": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "implementation": {
+    "identityRule": "A shared-drive file outside the project path is admitted only if its name is a structural supplier/truss/lumber lead; it is project evidence only when a configured project token appears in the path or bounded extracted source text.",
+    "egnyteReadFailure": "SOURCE_CORPUS_DIRECTORY_UNREADABLE is typed and resumable instead of a process crash."
+  },
+  "iteration1Replay": {
+    "sharedDirectoryOffset": 900,
+    "sharedNextDirectoryOffset": 1200,
+    "localFilesScanned": 577,
+    "sharedFilesScanned": 259,
+    "projectIdentifiedDocuments": 32,
+    "unverifiedSupplierLeads": 0,
+    "structuralSupplierSubmittalMaterialized": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false
+  },
+  "verification": {
+    "focusedJavaScript": "77 passed, 0 failed, 0 skipped",
+    "registeredStructurePython": "25 passed, 0 failed, 0 skipped",
+    "autosprinkProductionBuild": "passed",
+    "agentLoopGuard": "passed",
+    "agenticRulebook": "passed",
+    "formalProof": "GX10_PROVER_UNAVAILABLE: http://127.0.0.1:8810/api/provers/health refused connection"
+  }
+}

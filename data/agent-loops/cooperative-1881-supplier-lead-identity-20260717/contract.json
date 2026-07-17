@@ -1,0 +1,38 @@
+{
+  "name": "cooperative-1881-supplier-lead-identity-20260717",
+  "owner": "codex",
+  "goal": "Recover only project-identified Cooperative 1881 structural supplier/truss/lumber leads from the materialized shared corpus when their paths are generic, without treating generic files as physical-member proof.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/01-Bids/Kier",
+    "apps/autosprink/src/engine/source-evidence-corpus.js",
+    "apps/autosprink/scripts/build-1881-source-evidence-discovery.mjs",
+    "apps/autosprink/src/data/registered-roof-framing.cooperative-1881.json",
+    "data/agent-loops/cooperative-1881-physical-framing-placement-20260717/state.json"
+  ],
+  "exit_criteria": [
+    "generic shared-drive supplier/truss/lumber leads can be boundedly discovered without admitting arbitrary project files",
+    "a generic lead becomes a Cooperative 1881 candidate only when its extracted source text contains a configured project identity token",
+    "path-matched and text-matched identities are separately recorded with source hashes",
+    "no lead clears physical member, routing, clearance, fabrication, code, employee, or VPS gates",
+    "adversarial identity omission, substituted hash, and supplier-language plan mutations reject"
+  ],
+  "verification_gates": [
+    "local canonical evidence is preserved across every shared cursor window",
+    "unmatched non-supplier files remain excluded",
+    "generic supplier leads lacking project text remain explicit non-project leads",
+    "shared source scan remains directory and file bounded with a resumable cursor",
+    "focused source tests, production build, loop guard, rulebook, and brain postflight pass"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/roof-framing-source-discovery.cooperative-1881.json",
+    "apps/autosprink/src/data/roof-framing-clearance-preflight.cooperative-1881.json",
+    "data/agent-loops/cooperative-1881-supplier-lead-identity-20260717/state.json"
+  ],
+  "max_iterations": 6,
+  "max_tokens": 60000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

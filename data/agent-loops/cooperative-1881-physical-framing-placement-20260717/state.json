@@ -1,10 +1,10 @@
 {
   "name": "cooperative-1881-physical-framing-placement-20260717",
-  "iteration": 7,
-  "status": "in_progress",
-  "updatedAt": "2026-07-17T09:11:01-07:00",
+  "iteration": 8,
+  "status": "successor_loop_required",
+  "updatedAt": "2026-07-17T09:13:27-07:00",
   "completedStages": ["DISCOVER", "PLAN", "BUILD", "VERIFY"],
-  "nextStage": "RESUME_SCOPED_EGNYTE_KIER_CORPUS_DISCOVERY_AT_DIRECTORY_OFFSET_900",
+  "nextStage": "OPEN_PROJECT_IDENTITY_AWARE_SUPPLIER_LEAD_SUCCESSOR_LOOP",
   "brainPreflight": {
     "status": "passed",
     "relevantEpisodes": [157533, 46659, 120030, 60864],
@@ -59,7 +59,7 @@
   "corpusDiscovery": {
     "artifact": "apps/autosprink/src/data/roof-framing-source-discovery.cooperative-1881.json",
     "scanComplete": false,
-    "materializedFilesScanned": 1363,
+    "materializedFilesScanned": 836,
     "directoriesScanned": 410,
     "localWindow": {
       "scanComplete": true,
@@ -70,10 +70,10 @@
     },
     "sharedWindow": {
       "root": "Y:/Shared/HaloOps/01-Bids/Kier",
-      "materializedFilesScanned": 786,
+      "materializedFilesScanned": 259,
       "directoriesScanned": 300,
-      "directoryOffset": 600,
-      "nextDirectoryOffset": 900
+      "directoryOffset": 900,
+      "nextDirectoryOffset": 1200
     },
     "relevantCandidates": 52,
     "uniqueContentDocuments": 32,
@@ -83,7 +83,7 @@
     "sprinklerShopDrawingDocuments": 1,
     "sharedDriveRoot": "Y:/Shared/HaloOps/01-Bids/Kier",
     "physicalPromotionAllowed": false,
-    "reason": "The local canonical corpus is replayed to completion on every run while the verified Kier shared-drive root advances independently. Shared windows 300-599 and 600-899 found no project-token candidate or supplier/truss/lumber submittal. PDF text discovery is cover/index bounded and cannot promote a member; a plan's incidental supplier wording is explicitly rejected as supplier-submittal evidence."
+    "reason": "The local canonical corpus is replayed to completion on every run while the verified Kier shared-drive root advances independently. Shared windows 300-599, 600-899, and 900-1199 found no project-token candidate or supplier/truss/lumber submittal. The current path-token filter can miss a generically named supplier file, so the successor must admit only supplier-named shared-drive leads and then require project identity inside extracted source text."
   },
   "roofFramingClearancePreflight": {
     "artifact": "apps/autosprink/src/data/roof-framing-clearance-preflight.cooperative-1881.json",
@@ -119,5 +119,9 @@
     "sourceDiscovery": "shared cursor 600 advanced to 900 after scanning 786 files in the 300-directory window; no shared project-token candidate; structural supplier materialization false",
     "roofClearancePreflight": "blocked as expected; automatic routing and per-head clearance remain false"
   },
-  "currentQuestion": "Materialize the project-scoped structural supplier/truss/lumber submittal roots from the shared drive, then require a hash-bound member tag, actual dressed dimensions, plan orientation, and vertical datum before any roof member can enter physical 3D obstruction, sprinkler-clearance, or fabrication output."
+  "iteration8Verification": {
+    "sourceDiscovery": "shared cursor 900 advanced to 1200 after scanning 259 files in the 300-directory window; no shared project-token candidate; structural supplier materialization false",
+    "roofClearancePreflight": "blocked as expected; automatic routing and per-head clearance remain false"
+  },
+  "currentQuestion": "Materialize a Cooperative 1881 structural supplier/truss/lumber source using project identity in a source path or extracted source text, then require a hash-bound member tag, actual dressed dimensions, plan orientation, and vertical datum before any roof member can enter physical 3D obstruction, sprinkler-clearance, or fabrication output."
 }
