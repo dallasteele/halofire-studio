@@ -1,0 +1,1703 @@
+{
+  "artifactType": "halofire.cooperative-1881-a121-section-cut-coverage.v1",
+  "projectName": "The Cooperative 1881 - Salt Lake City UT",
+  "status": "passed",
+  "sources": {
+    "architectural": {
+      "fileName": "A-121 ROOF PLAN.dwg",
+      "sha256": "FD3DB45D18C2970F0F67BE1C668188ABD1962C0D3CD56A7EDE67545F53F42606",
+      "expectedSha256": "FD3DB45D18C2970F0F67BE1C668188ABD1962C0D3CD56A7EDE67545F53F42606",
+      "parser": "@mlightcad/libredwg-web@0.7.7 (LibreDWG)",
+      "unknownEntityCount": 0
+    },
+    "canonicalRegionAssociation": {
+      "fileName": "cooperative-1881-a121-slope-boundary-association.json",
+      "sourceSha256": "FD3DB45D18C2970F0F67BE1C668188ABD1962C0D3CD56A7EDE67545F53F42606"
+    }
+  },
+  "cuttingPlanes": [
+    {
+      "id": "a121-cutting-plane-1-2",
+      "sourceBlockName": "Cutting Plane_1_2",
+      "sourceBlockRecordHandle": "7EEB",
+      "sourceInsertHandle": "7F0A",
+      "detailReference": "C1",
+      "sheetReference": "A-307",
+      "line": {
+        "handle": "7EEF",
+        "start": {
+          "x": 531.768335,
+          "y": 4113.944198,
+          "z": 0
+        },
+        "end": {
+          "x": 531.768335,
+          "y": 8111.44318,
+          "z": 0
+        },
+        "lengthNative": 3997.498982
+      }
+    },
+    {
+      "id": "a121-cutting-plane-2-2",
+      "sourceBlockName": "Cutting Plane_2_2",
+      "sourceBlockRecordHandle": "7F0C",
+      "sourceInsertHandle": "7F26",
+      "detailReference": "C3",
+      "sheetReference": "G-006",
+      "line": {
+        "handle": "7F0F",
+        "start": {
+          "x": 54.839421,
+          "y": 4546.388654,
+          "z": 0
+        },
+        "end": {
+          "x": 1038.980193,
+          "y": 4546.388654,
+          "z": 0
+        },
+        "lengthNative": 984.140772
+      }
+    },
+    {
+      "id": "a121-cutting-plane-3-2",
+      "sourceBlockName": "Cutting Plane_3_2",
+      "sourceBlockRecordHandle": "7F27",
+      "sourceInsertHandle": "7F41",
+      "detailReference": "A3",
+      "sheetReference": "A-302",
+      "line": {
+        "handle": "7F2A",
+        "start": {
+          "x": 20.275629,
+          "y": 6270.049316,
+          "z": 0
+        },
+        "end": {
+          "x": 1061.74377,
+          "y": 6270.049316,
+          "z": 0
+        },
+        "lengthNative": 1041.468142
+      }
+    },
+    {
+      "id": "a121-cutting-plane-4-2",
+      "sourceBlockName": "Cutting Plane_4_2",
+      "sourceBlockRecordHandle": "7F42",
+      "sourceInsertHandle": "7F5C",
+      "detailReference": "A3",
+      "sheetReference": "A-304",
+      "line": {
+        "handle": "7F45",
+        "start": {
+          "x": 20.275629,
+          "y": 7440.584116,
+          "z": 0
+        },
+        "end": {
+          "x": 1061.74377,
+          "y": 7440.584116,
+          "z": 0
+        },
+        "lengthNative": 1041.468142
+      }
+    },
+    {
+      "id": "a121-cutting-plane-5-2",
+      "sourceBlockName": "Cutting Plane_5_2",
+      "sourceBlockRecordHandle": "7F5D",
+      "sourceInsertHandle": "7F77",
+      "detailReference": "C1",
+      "sheetReference": "A-305",
+      "line": {
+        "handle": "7F60",
+        "start": {
+          "x": 280.512584,
+          "y": 4113.944198,
+          "z": 0
+        },
+        "end": {
+          "x": 280.512584,
+          "y": 8111.44318,
+          "z": 0
+        },
+        "lengthNative": 3997.498982
+      }
+    },
+    {
+      "id": "a121-cutting-plane-6-2",
+      "sourceBlockName": "Cutting Plane_6_2",
+      "sourceBlockRecordHandle": "7F78",
+      "sourceInsertHandle": "7F92",
+      "detailReference": "C1",
+      "sheetReference": "A-306",
+      "line": {
+        "handle": "7F7B",
+        "start": {
+          "x": 842.674492,
+          "y": 4113.944198,
+          "z": 0
+        },
+        "end": {
+          "x": 842.674492,
+          "y": 8111.44318,
+          "z": 0
+        },
+        "lengthNative": 3997.498982
+      }
+    },
+    {
+      "id": "a121-cutting-plane-7-2",
+      "sourceBlockName": "Cutting Plane_7_2",
+      "sourceBlockRecordHandle": "7F93",
+      "sourceInsertHandle": "7FAD",
+      "detailReference": "A3",
+      "sheetReference": "A-301",
+      "line": {
+        "handle": "7F96",
+        "start": {
+          "x": 20.275629,
+          "y": 6027.057928,
+          "z": 0
+        },
+        "end": {
+          "x": 1061.74377,
+          "y": 6027.057928,
+          "z": 0
+        },
+        "lengthNative": 1041.468142
+      }
+    },
+    {
+      "id": "a121-cutting-plane-8-2",
+      "sourceBlockName": "Cutting Plane_8_2",
+      "sourceBlockRecordHandle": "7FAE",
+      "sourceInsertHandle": "7FC8",
+      "detailReference": "A2",
+      "sheetReference": "A-453",
+      "line": {
+        "handle": "7FB1",
+        "start": {
+          "x": -2.487948,
+          "y": 4604.823815,
+          "z": 0
+        },
+        "end": {
+          "x": 1038.980193,
+          "y": 4604.823815,
+          "z": 0
+        },
+        "lengthNative": 1041.468142
+      }
+    },
+    {
+      "id": "a121-cutting-plane-9-2",
+      "sourceBlockName": "Cutting Plane_9_2",
+      "sourceBlockRecordHandle": "7FC9",
+      "sourceInsertHandle": "7FE3",
+      "detailReference": "A2",
+      "sheetReference": "A-455",
+      "line": {
+        "handle": "7FCC",
+        "start": {
+          "x": 20.275629,
+          "y": 7499.06772,
+          "z": 0
+        },
+        "end": {
+          "x": 1061.74377,
+          "y": 7499.06772,
+          "z": 0
+        },
+        "lengthNative": 1041.468142
+      }
+    },
+    {
+      "id": "a121-cutting-plane-10-2",
+      "sourceBlockName": "Cutting Plane_10_2",
+      "sourceBlockRecordHandle": "7FE4",
+      "sourceInsertHandle": "7FF3",
+      "detailReference": "A1",
+      "sheetReference": "A-407a",
+      "line": {
+        "handle": "7FEF",
+        "start": {
+          "x": 430.74649,
+          "y": 7723.039708,
+          "z": 0
+        },
+        "end": {
+          "x": 430.74649,
+          "y": 7662.699929,
+          "z": 0
+        },
+        "lengthNative": 60.339779
+      }
+    }
+  ],
+  "canonicalRegionCoverage": [
+    {
+      "canonicalRegionId": "region-00B5A39C26DE",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-6-2",
+          "detailReference": "C1",
+          "sheetReference": "A-306",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.461238,
+                "to": 0.506152
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.625627,
+                "to": 0.935766
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-02621899ACEA",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.478984,
+                "to": 0.536895
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.495865,
+                "to": 0.504764
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-16A653DE2632",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.693705,
+                "to": 0.751617
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-3EEB49A86D5A",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-2-2",
+          "detailReference": "C3",
+          "sheetReference": "G-006",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.499046,
+                "to": 0.955154
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-6-2",
+          "detailReference": "C1",
+          "sheetReference": "A-306",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.009049,
+                "to": 0.463239
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.85139,
+                "to": 0.935766
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-8-2",
+          "detailReference": "A2",
+          "sheetReference": "A-453",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.526621,
+                "to": 0.957623
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-510638271F99",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-4-2",
+          "detailReference": "A3",
+          "sheetReference": "A-304",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.504764,
+                "to": 0.935766
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-6-2",
+          "detailReference": "C1",
+          "sheetReference": "A-306",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.562239,
+                "to": 0.977405
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-9-2",
+          "detailReference": "A2",
+          "sheetReference": "A-455",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.504764,
+                "to": 0.935766
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-5A0F100506AA",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.751617,
+                "to": 0.809528
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-5CD4D2BAF257",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.148439,
+                "to": 0.206351
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-6C78925F5C01",
+      "interiorCoverage": [],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-6D059EF1C5B1",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.557389,
+                "to": 0.6153
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-7541220E073A",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.822777,
+                "to": 0.96202
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-4-2",
+          "detailReference": "A3",
+          "sheetReference": "A-304",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.450753,
+                "to": 0.504764
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-9-2",
+          "detailReference": "A2",
+          "sheetReference": "A-455",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.450753,
+                "to": 0.504764
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-79D748E6C0FE",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.6153,
+                "to": 0.673211
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-7FB4F13E1A1C",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.421072,
+                "to": 0.478984
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.380765,
+                "to": 0.504764
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-8C6D4ED1137F",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.206351,
+                "to": 0.264262
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-956182508A1F",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.506564,
+                "to": 0.95689
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-6-2",
+          "detailReference": "C1",
+          "sheetReference": "A-306",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.506152,
+                "to": 0.562239
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-9B262BAE6A34",
+      "interiorCoverage": [],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-A2F7AAACB8C9",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.018148,
+                "to": 0.13519
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-2-2",
+          "detailReference": "C3",
+          "sheetReference": "G-006",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.441889,
+                "to": 0.499046
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-8-2",
+          "detailReference": "A2",
+          "sheetReference": "A-453",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.472611,
+                "to": 0.526621
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-B92826771770",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-2-2",
+          "detailReference": "C3",
+          "sheetReference": "G-006",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0,
+                "to": 0.441889
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.009049,
+                "to": 0.134424
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-8-2",
+          "detailReference": "A2",
+          "sheetReference": "A-453",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.041608,
+                "to": 0.472611
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-BC4770091CAC",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-4-2",
+          "detailReference": "A3",
+          "sheetReference": "A-304",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.019751,
+                "to": 0.450753
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.823042,
+                "to": 0.977405
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-9-2",
+          "detailReference": "A2",
+          "sheetReference": "A-455",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.019751,
+                "to": 0.450753
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-10-2",
+          "detailReference": "A1",
+          "sheetReference": "A-407a",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0,
+                "to": 1
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-BFAF16017C2F",
+      "interiorCoverage": [],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-C35A68067E1D",
+      "interiorCoverage": [],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-C7550BBC8974",
+      "interiorCoverage": [],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-DD46F9EFD67E",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-4-2",
+          "detailReference": "A3",
+          "sheetReference": "A-304",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.504764,
+                "to": 0.935766
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-6-2",
+          "detailReference": "C1",
+          "sheetReference": "A-306",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.560237,
+                "to": 0.977405
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-9-2",
+          "detailReference": "A2",
+          "sheetReference": "A-455",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.504764,
+                "to": 0.935766
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-E0FA492256B2",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.284756,
+                "to": 0.342667
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-EFCCAF91160C",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.50745,
+                "to": 0.601197
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-F0EEF052BB73",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.504764,
+                "to": 0.625627
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-F3C0D85F4ED3",
+      "interiorCoverage": [],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-F6AB92136F44",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.13519,
+                "to": 0.822777
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.124479,
+                "to": 0.504591
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.13519,
+                "to": 0.822777
+              }
+            ]
+          }
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.124479,
+                "to": 0.504591
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    },
+    {
+      "canonicalRegionId": "region-F6C408BA0F86",
+      "interiorCoverage": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307",
+          "contact": {
+            "kind": "interior",
+            "intervals": [
+              {
+                "from": 0.342667,
+                "to": 0.400578
+              }
+            ]
+          }
+        }
+      ],
+      "boundaryOnlyContacts": []
+    }
+  ],
+  "slopeTargetSectionCoverage": [
+    {
+      "slopeLabelHandle": "8073",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-F6AB92136F44",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307"
+        },
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302"
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305"
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "8073",
+            "region-F6AB92136F44",
+            "a121-cutting-plane-1-2",
+            "a121-cutting-plane-3-2",
+            "a121-cutting-plane-5-2",
+            "a121-cutting-plane-7-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "807C",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-F6AB92136F44",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307"
+        },
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302"
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305"
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "807C",
+            "region-F6AB92136F44",
+            "a121-cutting-plane-1-2",
+            "a121-cutting-plane-3-2",
+            "a121-cutting-plane-5-2",
+            "a121-cutting-plane-7-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "807E",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-F6AB92136F44",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307"
+        },
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302"
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305"
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "807E",
+            "region-F6AB92136F44",
+            "a121-cutting-plane-1-2",
+            "a121-cutting-plane-3-2",
+            "a121-cutting-plane-5-2",
+            "a121-cutting-plane-7-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8080",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-F6AB92136F44",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307"
+        },
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302"
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305"
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "8080",
+            "region-F6AB92136F44",
+            "a121-cutting-plane-1-2",
+            "a121-cutting-plane-3-2",
+            "a121-cutting-plane-5-2",
+            "a121-cutting-plane-7-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8082",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-BC4770091CAC",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-4-2",
+          "detailReference": "A3",
+          "sheetReference": "A-304"
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305"
+        },
+        {
+          "planeId": "a121-cutting-plane-9-2",
+          "detailReference": "A2",
+          "sheetReference": "A-455"
+        },
+        {
+          "planeId": "a121-cutting-plane-10-2",
+          "detailReference": "A1",
+          "sheetReference": "A-407a"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "8082",
+            "region-BC4770091CAC",
+            "a121-cutting-plane-4-2",
+            "a121-cutting-plane-5-2",
+            "a121-cutting-plane-9-2",
+            "a121-cutting-plane-10-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8084",
+      "associationStatus": "blocked",
+      "status": "blocked-region-association",
+      "sectionReferences": [],
+      "issues": [
+        {
+          "code": "A121_SLOPE_TARGET_NONIDENTICAL_BOUNDARY_OVERLAP",
+          "severity": "blocking",
+          "message": "Slope target lies inside multiple non-identical canonical source boundaries; no region is selected.",
+          "refs": [
+            "8084",
+            "8085",
+            "region-510638271F99",
+            "region-DD46F9EFD67E"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8086",
+      "associationStatus": "blocked",
+      "status": "blocked-region-association",
+      "sectionReferences": [],
+      "issues": [
+        {
+          "code": "A121_SLOPE_TARGET_NONIDENTICAL_BOUNDARY_OVERLAP",
+          "severity": "blocking",
+          "message": "Slope target lies inside multiple non-identical canonical source boundaries; no region is selected.",
+          "refs": [
+            "8086",
+            "8087",
+            "region-510638271F99",
+            "region-DD46F9EFD67E"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8088",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-3EEB49A86D5A",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-2-2",
+          "detailReference": "C3",
+          "sheetReference": "G-006"
+        },
+        {
+          "planeId": "a121-cutting-plane-6-2",
+          "detailReference": "C1",
+          "sheetReference": "A-306"
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301"
+        },
+        {
+          "planeId": "a121-cutting-plane-8-2",
+          "detailReference": "A2",
+          "sheetReference": "A-453"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "8088",
+            "region-3EEB49A86D5A",
+            "a121-cutting-plane-2-2",
+            "a121-cutting-plane-6-2",
+            "a121-cutting-plane-7-2",
+            "a121-cutting-plane-8-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "808A",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-3EEB49A86D5A",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-2-2",
+          "detailReference": "C3",
+          "sheetReference": "G-006"
+        },
+        {
+          "planeId": "a121-cutting-plane-6-2",
+          "detailReference": "C1",
+          "sheetReference": "A-306"
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301"
+        },
+        {
+          "planeId": "a121-cutting-plane-8-2",
+          "detailReference": "A2",
+          "sheetReference": "A-453"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "808A",
+            "region-3EEB49A86D5A",
+            "a121-cutting-plane-2-2",
+            "a121-cutting-plane-6-2",
+            "a121-cutting-plane-7-2",
+            "a121-cutting-plane-8-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "808C",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-B92826771770",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-2-2",
+          "detailReference": "C3",
+          "sheetReference": "G-006"
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305"
+        },
+        {
+          "planeId": "a121-cutting-plane-8-2",
+          "detailReference": "A2",
+          "sheetReference": "A-453"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "808C",
+            "region-B92826771770",
+            "a121-cutting-plane-2-2",
+            "a121-cutting-plane-5-2",
+            "a121-cutting-plane-8-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "808E",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-A2F7AAACB8C9",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307"
+        },
+        {
+          "planeId": "a121-cutting-plane-2-2",
+          "detailReference": "C3",
+          "sheetReference": "G-006"
+        },
+        {
+          "planeId": "a121-cutting-plane-8-2",
+          "detailReference": "A2",
+          "sheetReference": "A-453"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "808E",
+            "region-A2F7AAACB8C9",
+            "a121-cutting-plane-1-2",
+            "a121-cutting-plane-2-2",
+            "a121-cutting-plane-8-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8090",
+      "associationStatus": "blocked",
+      "status": "blocked-region-association",
+      "sectionReferences": [],
+      "issues": [
+        {
+          "code": "A121_SLOPE_TARGET_NONIDENTICAL_BOUNDARY_OVERLAP",
+          "severity": "blocking",
+          "message": "Slope target lies inside multiple non-identical canonical source boundaries; no region is selected.",
+          "refs": [
+            "8090",
+            "8091",
+            "region-E0FA492256B2",
+            "region-F6AB92136F44"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8092",
+      "associationStatus": "blocked",
+      "status": "blocked-region-association",
+      "sectionReferences": [],
+      "issues": [
+        {
+          "code": "A121_SLOPE_TARGET_NONIDENTICAL_BOUNDARY_OVERLAP",
+          "severity": "blocking",
+          "message": "Slope target lies inside multiple non-identical canonical source boundaries; no region is selected.",
+          "refs": [
+            "8092",
+            "8093",
+            "region-5CD4D2BAF257",
+            "region-F6AB92136F44"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8094",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-F6AB92136F44",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307"
+        },
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302"
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305"
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "8094",
+            "region-F6AB92136F44",
+            "a121-cutting-plane-1-2",
+            "a121-cutting-plane-3-2",
+            "a121-cutting-plane-5-2",
+            "a121-cutting-plane-7-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8096",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-F6AB92136F44",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307"
+        },
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302"
+        },
+        {
+          "planeId": "a121-cutting-plane-5-2",
+          "detailReference": "C1",
+          "sheetReference": "A-305"
+        },
+        {
+          "planeId": "a121-cutting-plane-7-2",
+          "detailReference": "A3",
+          "sheetReference": "A-301"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "8096",
+            "region-F6AB92136F44",
+            "a121-cutting-plane-1-2",
+            "a121-cutting-plane-3-2",
+            "a121-cutting-plane-5-2",
+            "a121-cutting-plane-7-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "8098",
+      "associationStatus": "blocked",
+      "status": "blocked-region-association",
+      "sectionReferences": [],
+      "issues": [
+        {
+          "code": "A121_SLOPE_TARGET_NONIDENTICAL_BOUNDARY_OVERLAP",
+          "severity": "blocking",
+          "message": "Slope target lies inside multiple non-identical canonical source boundaries; no region is selected.",
+          "refs": [
+            "8098",
+            "8099",
+            "region-5A0F100506AA",
+            "region-F6AB92136F44"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "809A",
+      "associationStatus": "blocked",
+      "status": "blocked-region-association",
+      "sectionReferences": [],
+      "issues": [
+        {
+          "code": "A121_SLOPE_TARGET_NONIDENTICAL_BOUNDARY_OVERLAP",
+          "severity": "blocking",
+          "message": "Slope target lies inside multiple non-identical canonical source boundaries; no region is selected.",
+          "refs": [
+            "809A",
+            "809B",
+            "region-79D748E6C0FE",
+            "region-F6AB92136F44"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "80A9",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-7541220E073A",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-1-2",
+          "detailReference": "C1",
+          "sheetReference": "A-307"
+        },
+        {
+          "planeId": "a121-cutting-plane-4-2",
+          "detailReference": "A3",
+          "sheetReference": "A-304"
+        },
+        {
+          "planeId": "a121-cutting-plane-9-2",
+          "detailReference": "A2",
+          "sheetReference": "A-455"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "80A9",
+            "region-7541220E073A",
+            "a121-cutting-plane-1-2",
+            "a121-cutting-plane-4-2",
+            "a121-cutting-plane-9-2"
+          ]
+        }
+      ]
+    },
+    {
+      "slopeLabelHandle": "80E1",
+      "associationStatus": "resolved",
+      "canonicalRegionId": "region-956182508A1F",
+      "status": "blocked-non-unique",
+      "sectionReferences": [
+        {
+          "planeId": "a121-cutting-plane-3-2",
+          "detailReference": "A3",
+          "sheetReference": "A-302"
+        },
+        {
+          "planeId": "a121-cutting-plane-6-2",
+          "detailReference": "C1",
+          "sheetReference": "A-306"
+        }
+      ],
+      "issues": [
+        {
+          "code": "A121_SLOPE_REGION_SECTION_REFERENCE_NON_UNIQUE",
+          "severity": "blocking",
+          "message": "Multiple issued cutting-plane references cross the associated source region; no section is selected.",
+          "refs": [
+            "80E1",
+            "region-956182508A1F",
+            "a121-cutting-plane-3-2",
+            "a121-cutting-plane-6-2"
+          ]
+        }
+      ]
+    }
+  ],
+  "issues": [],
+  "claims": {
+    "sourceCuttingPlanesRegistered": true,
+    "canonicalRegionInteriorCoverageReady": true,
+    "sourceSlopeRegionSectionCoverageReady": true,
+    "uniqueSectionReferenceReady": false,
+    "slopeDirectionReady": false,
+    "roofSurfaceReconstructionReady": false,
+    "perMemberVerticalDatumReady": false,
+    "exactPhysicalFramingPromoted": false,
+    "automaticSprinklerPlacementAllowed": false,
+    "automaticPipeRoutingAllowed": false,
+    "perHeadObstructionClearanceVerified": false,
+    "fabricationReady": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "A cutting-plane line records a source plan cut and its view reference only; it does not identify a roof-face direction or a vertical datum.",
+    "Plural coverage is intentionally not reduced with nearest-line, source-sheet-name, area, or visual heuristics.",
+    "Blocked slope-region associations remain blocked and receive no section-coverage assignment.",
+    "No roof plane, structural member, sprinkler, pipe, clearance, fabrication, code, employee, or VPS claim is made."
+  ]
+}

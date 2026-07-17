@@ -482,3 +482,10 @@
 - Classified all 19 issued slope callout targets: 13 have exactly one canonical source region; 6 remain blocked by `A121_SLOPE_TARGET_NONIDENTICAL_BOUNDARY_OVERLAP`. No heuristic chooses an inner, outer, smaller, or larger region. The receipt keeps slope direction, roof plane/elevation, member association, heads, pipes, clearance, fabrication, code, employee use, and VPS release false.
 - Visual proof uses green for unique source-region associations and red for overlap holds. It was inspected and accepted after Chrome capture.
 - Verified with 37 focused source-bound Cooperative 1881 tests, deterministic replay SHA-256 `52A4F2860A1C460DEFC99E60B635964CDFF48090B65480BA1040144976AB8462`, Vite build, loop guard, and `verify_agentic_rules.py`. `GX10_PROVER_UNAVAILABLE`: `http://127.0.0.1:8810/api/provers/health` was unreachable; no formal proof is claimed.
+
+## 2026-07-17 - Cooperative 1881 A-121 cutting-plane coverage
+
+- Added a sealed native-DWG receipt for all ten explicit A-121 `Cutting Plane_*_2` references. The extractor verifies hash, parser completeness, identity transforms, line/reference presence, and exact source handles before recording each plan-cut/view reference.
+- The receipt intersects every native source cut with each canonical roof region by non-zero strict-interior segment interval. It rejects boundary-only contact and does not use nearest-cut or source-name heuristics. All 13 uniquely localized slope targets have two to four source cut references, so each remains explicitly blocked as non-unique; the six region-overlap holds receive no coverage assignment.
+- Visual proof was captured and inspected in Chrome. It overlays ten distinct source cutting-plane lines and their native reference legend on the canonical plan regions and labels exactly what remains blocked.
+- Verified with 40 focused source-bound Cooperative 1881 tests, deterministic replay SHA-256 `A89867D072EAD36BFC33753C13B6A420A6E3BD9F897273D3C46DD5B0801655C1`, Vite production build, loop guard, and `verify_agentic_rules.py`. `GX10_PROVER_UNAVAILABLE`: `http://127.0.0.1:8810/api/provers/health` was unreachable; no formal proof is claimed.

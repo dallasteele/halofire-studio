@@ -1,0 +1,37 @@
+{
+  "name": "cooperative-1881-a121-section-cut-coverage-20260717",
+  "owner": "codex",
+  "goal": "Extract explicit native A-121 cutting-plane lines and view references, then report their source-geometric coverage of canonical roof regions without selecting a section, direction, elevation, or physical roof plane.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/Kier/The Cooperative 1881 - Salt Lake City UT/2-Internal Ops/01-Design/05-CAD Files/arch/A-121 ROOF PLAN.dwg",
+    "apps/autosprink/src/data/cooperative-1881-a121-slope-boundary-association.json",
+    "apps/autosprink/src/data/cooperative-1881-a121-roof-face-boundaries.json"
+  ],
+  "exit_criteria": [
+    "Every native Cutting Plane_*_2 INSERT is either represented with its exact handle, source line, and detail/sheet reference or carries a typed extraction issue.",
+    "Each canonical roof region reports every intersecting cutting-plane reference using source geometry, never a nearest-line or label heuristic.",
+    "Resolved slope targets inherit only their canonical region's coverage and remain blocked from a unique section selection when coverage is zero or plural.",
+    "The artifact makes no slope direction, roof plane, vertical datum, member, sprinkler, pipe, clearance, fabrication, code, employee, or VPS claim."
+  ],
+  "verification_gates": [
+    "agent_loop_guard validate before implementation",
+    "focused Vitest coverage for source segment/polygon intersection and zero/plural coverage holds",
+    "deterministic two-run artifact replay",
+    "Autosprink production build",
+    "GX10 prover health/check or explicit formal-proof blocker",
+    "Chrome screenshot capture and visual inspection of section lines against source roof regions",
+    "verify_agentic_rules.py"
+  ],
+  "state_path": "data/agent-loops/cooperative-1881-a121-section-cut-coverage-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/cooperative-1881-a121-section-cut-coverage.json",
+    "output/visual-proof/1881-a121-section-cut-coverage.svg",
+    "data/agent-loops/cooperative-1881-a121-section-cut-coverage-20260717/evidence.md"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 30000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

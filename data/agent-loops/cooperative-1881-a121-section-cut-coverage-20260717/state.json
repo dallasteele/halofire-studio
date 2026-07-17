@@ -1,0 +1,20 @@
+{
+  "name": "cooperative-1881-a121-section-cut-coverage-20260717",
+  "iteration": 1,
+  "status": "completed",
+  "nextStage": "OPEN_REFERENCED_ARCHITECTURAL_SECTION_VIEW_GEOMETRY_AND_ELEVATION_CALIBRATION_LOOP",
+  "claims": {
+    "sourceCuttingPlanesRegistered": true,
+    "canonicalRegionInteriorCoverageReady": true,
+    "sourceSlopeRegionSectionCoverageReady": true,
+    "uniqueSectionReferenceReady": false,
+    "slopeDirectionReady": false,
+    "roofSurfaceReconstructionReady": false,
+    "perMemberVerticalDatumReady": false,
+    "automaticSprinklerPlacementAllowed": false,
+    "automaticPipeRoutingAllowed": false,
+    "codeComplianceReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  }
+}
