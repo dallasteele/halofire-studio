@@ -1,0 +1,2006 @@
+{
+  "artifactType": "halofire.mit-riverside-building-j-head-registered-pipe-centerlines.v1",
+  "projectId": "mit-riverside-building-j",
+  "status": "passed-source-registered-centerlines-only",
+  "sources": {
+    "approved": {
+      "sha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+      "physicalPage": 2,
+      "pageIndex": 1
+    },
+    "asBuilt": {
+      "sha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+      "physicalPage": 2,
+      "pageIndex": 1
+    },
+    "headEvidence": {
+      "file": "mit-riverside-building-j-head-coordinate-evidence.json",
+      "receiptSha256": "1c1ac44482e7a2bba7f8356a75277da3245306eb0d23429085e737f8ff2752bc"
+    }
+  },
+  "selection": {
+    "pipeStrokeColorRgb": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "pipeStrokeWidthPt": 0.722,
+    "minimumSegmentLengthPt": 8.0,
+    "headContactTolerancePt": 8.0,
+    "connectivityTolerancePt": 0.25,
+    "pointsPerFoot": 9.0,
+    "colorOnlySelectionAllowed": false,
+    "approvedAsBuiltEligibleVectorCandidatesIdentical": true,
+    "eligibleCandidateCount": 420,
+    "headContactSeedCount": 63,
+    "acceptedCenterlineCount": 77,
+    "unselectedEligibleCandidateCount": 343,
+    "coveredImmutableHeadCount": 68
+  },
+  "centerlines": [
+    {
+      "id": "MIT-J-FP2-CL-001",
+      "sourceDrawingIndex": 45793,
+      "sourceItemIndex": 0,
+      "startPt": [
+        313.859985,
+        962.459961
+      ],
+      "endPt": [
+        313.859985,
+        872.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-001",
+        "MIT-J-U-002"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-002",
+      "sourceDrawingIndex": 45799,
+      "sourceItemIndex": 0,
+      "startPt": [
+        409.859985,
+        962.459961
+      ],
+      "endPt": [
+        409.859985,
+        872.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-007",
+        "MIT-J-U-008"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-003",
+      "sourceDrawingIndex": 45805,
+      "sourceItemIndex": 0,
+      "startPt": [
+        505.859985,
+        962.459961
+      ],
+      "endPt": [
+        505.859985,
+        872.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-013",
+        "MIT-J-U-014"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-004",
+      "sourceDrawingIndex": 45808,
+      "sourceItemIndex": 0,
+      "startPt": [
+        313.859985,
+        872.459961
+      ],
+      "endPt": [
+        313.859985,
+        782.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-002",
+        "MIT-J-U-003"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-005",
+      "sourceDrawingIndex": 45810,
+      "sourceItemIndex": 0,
+      "startPt": [
+        313.859985,
+        782.459961
+      ],
+      "endPt": [
+        313.859985,
+        692.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-003",
+        "MIT-J-U-004"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-006",
+      "sourceDrawingIndex": 45812,
+      "sourceItemIndex": 0,
+      "startPt": [
+        313.859985,
+        692.459961
+      ],
+      "endPt": [
+        313.859985,
+        681.179932
+      ],
+      "lengthPt": 11.280029,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-004"
+      ],
+      "planLengthFt": 1.253337,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-007",
+      "sourceDrawingIndex": 45814,
+      "sourceItemIndex": 0,
+      "startPt": [
+        313.859985,
+        602.459961
+      ],
+      "endPt": [
+        313.859985,
+        512.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-005",
+        "MIT-J-U-006"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-008",
+      "sourceDrawingIndex": 45816,
+      "sourceItemIndex": 0,
+      "startPt": [
+        409.859985,
+        872.459961
+      ],
+      "endPt": [
+        409.859985,
+        782.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-008",
+        "MIT-J-U-009"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-009",
+      "sourceDrawingIndex": 45818,
+      "sourceItemIndex": 0,
+      "startPt": [
+        409.859985,
+        782.459961
+      ],
+      "endPt": [
+        409.859985,
+        692.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-009",
+        "MIT-J-U-010"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-010",
+      "sourceDrawingIndex": 45820,
+      "sourceItemIndex": 0,
+      "startPt": [
+        409.859985,
+        692.459961
+      ],
+      "endPt": [
+        409.859985,
+        681.179932
+      ],
+      "lengthPt": 11.280029,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-010"
+      ],
+      "planLengthFt": 1.253337,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-011",
+      "sourceDrawingIndex": 45822,
+      "sourceItemIndex": 0,
+      "startPt": [
+        409.859985,
+        602.459961
+      ],
+      "endPt": [
+        409.859985,
+        512.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-011",
+        "MIT-J-U-012"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-012",
+      "sourceDrawingIndex": 45824,
+      "sourceItemIndex": 0,
+      "startPt": [
+        505.859985,
+        872.459961
+      ],
+      "endPt": [
+        505.859985,
+        782.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-014",
+        "MIT-J-U-015"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-013",
+      "sourceDrawingIndex": 45826,
+      "sourceItemIndex": 0,
+      "startPt": [
+        505.859985,
+        782.459961
+      ],
+      "endPt": [
+        505.859985,
+        692.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-015",
+        "MIT-J-U-016"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-014",
+      "sourceDrawingIndex": 45828,
+      "sourceItemIndex": 0,
+      "startPt": [
+        505.859985,
+        692.459961
+      ],
+      "endPt": [
+        505.859985,
+        681.179932
+      ],
+      "lengthPt": 11.280029,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-016"
+      ],
+      "planLengthFt": 1.253337,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-015",
+      "sourceDrawingIndex": 45830,
+      "sourceItemIndex": 0,
+      "startPt": [
+        505.859985,
+        602.459961
+      ],
+      "endPt": [
+        505.859985,
+        512.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-017",
+        "MIT-J-U-018"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-016",
+      "sourceDrawingIndex": 45862,
+      "sourceItemIndex": 0,
+      "startPt": [
+        800.940002,
+        962.459961
+      ],
+      "endPt": [
+        800.940002,
+        872.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-031",
+        "MIT-J-U-032"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-017",
+      "sourceDrawingIndex": 45865,
+      "sourceItemIndex": 0,
+      "startPt": [
+        800.940002,
+        872.459961
+      ],
+      "endPt": [
+        800.940002,
+        782.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-032",
+        "MIT-J-U-033"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-018",
+      "sourceDrawingIndex": 45867,
+      "sourceItemIndex": 0,
+      "startPt": [
+        800.940002,
+        782.459961
+      ],
+      "endPt": [
+        800.940002,
+        692.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-033",
+        "MIT-J-U-034"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-019",
+      "sourceDrawingIndex": 45869,
+      "sourceItemIndex": 0,
+      "startPt": [
+        800.940002,
+        692.459961
+      ],
+      "endPt": [
+        800.940002,
+        681.179932
+      ],
+      "lengthPt": 11.280029,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-034"
+      ],
+      "planLengthFt": 1.253337,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-020",
+      "sourceDrawingIndex": 45871,
+      "sourceItemIndex": 0,
+      "startPt": [
+        800.940002,
+        602.459961
+      ],
+      "endPt": [
+        800.940002,
+        512.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-035",
+        "MIT-J-U-036"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-021",
+      "sourceDrawingIndex": 45885,
+      "sourceItemIndex": 0,
+      "startPt": [
+        704.940002,
+        962.459961
+      ],
+      "endPt": [
+        704.940002,
+        872.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-025",
+        "MIT-J-U-026"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-022",
+      "sourceDrawingIndex": 45888,
+      "sourceItemIndex": 0,
+      "startPt": [
+        704.940002,
+        872.459961
+      ],
+      "endPt": [
+        704.940002,
+        782.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-026",
+        "MIT-J-U-027"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-023",
+      "sourceDrawingIndex": 45890,
+      "sourceItemIndex": 0,
+      "startPt": [
+        704.940002,
+        782.459961
+      ],
+      "endPt": [
+        704.940002,
+        692.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-027",
+        "MIT-J-U-028"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-024",
+      "sourceDrawingIndex": 45892,
+      "sourceItemIndex": 0,
+      "startPt": [
+        704.940002,
+        692.459961
+      ],
+      "endPt": [
+        704.940002,
+        681.179932
+      ],
+      "lengthPt": 11.280029,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-028"
+      ],
+      "planLengthFt": 1.253337,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-025",
+      "sourceDrawingIndex": 45894,
+      "sourceItemIndex": 0,
+      "startPt": [
+        704.940002,
+        602.459961
+      ],
+      "endPt": [
+        704.940002,
+        512.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-029",
+        "MIT-J-U-030"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-026",
+      "sourceDrawingIndex": 45908,
+      "sourceItemIndex": 0,
+      "startPt": [
+        608.940002,
+        962.459961
+      ],
+      "endPt": [
+        608.940002,
+        872.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-019",
+        "MIT-J-U-020"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-027",
+      "sourceDrawingIndex": 45911,
+      "sourceItemIndex": 0,
+      "startPt": [
+        608.940002,
+        872.459961
+      ],
+      "endPt": [
+        608.940002,
+        782.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-020",
+        "MIT-J-U-021"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-028",
+      "sourceDrawingIndex": 45913,
+      "sourceItemIndex": 0,
+      "startPt": [
+        608.940002,
+        782.459961
+      ],
+      "endPt": [
+        608.940002,
+        692.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-021",
+        "MIT-J-U-022"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-029",
+      "sourceDrawingIndex": 45916,
+      "sourceItemIndex": 0,
+      "startPt": [
+        608.940002,
+        602.459961
+      ],
+      "endPt": [
+        608.940002,
+        512.459961
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-023",
+        "MIT-J-U-024"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-030",
+      "sourceDrawingIndex": 45927,
+      "sourceItemIndex": 0,
+      "startPt": [
+        313.859985,
+        681.180054
+      ],
+      "endPt": [
+        313.859985,
+        602.460083
+      ],
+      "lengthPt": 78.719971,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-005"
+      ],
+      "planLengthFt": 8.746663,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-031",
+      "sourceDrawingIndex": 45928,
+      "sourceItemIndex": 0,
+      "startPt": [
+        409.859985,
+        681.180054
+      ],
+      "endPt": [
+        409.859985,
+        602.460083
+      ],
+      "lengthPt": 78.719971,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-011"
+      ],
+      "planLengthFt": 8.746663,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-032",
+      "sourceDrawingIndex": 45929,
+      "sourceItemIndex": 0,
+      "startPt": [
+        505.859985,
+        681.180054
+      ],
+      "endPt": [
+        505.859985,
+        602.460083
+      ],
+      "lengthPt": 78.719971,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-017"
+      ],
+      "planLengthFt": 8.746663,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-033",
+      "sourceDrawingIndex": 45930,
+      "sourceItemIndex": 0,
+      "startPt": [
+        704.940002,
+        681.180054
+      ],
+      "endPt": [
+        704.940002,
+        602.460083
+      ],
+      "lengthPt": 78.719971,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-029"
+      ],
+      "planLengthFt": 8.746663,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-034",
+      "sourceDrawingIndex": 45931,
+      "sourceItemIndex": 0,
+      "startPt": [
+        800.940002,
+        681.180054
+      ],
+      "endPt": [
+        800.940002,
+        602.460083
+      ],
+      "lengthPt": 78.719971,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-035"
+      ],
+      "planLengthFt": 8.746663,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-035",
+      "sourceDrawingIndex": 45932,
+      "sourceItemIndex": 0,
+      "startPt": [
+        867.780029,
+        675.180054
+      ],
+      "endPt": [
+        867.780029,
+        546.540039
+      ],
+      "lengthPt": 128.640015,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 14.293335,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-036",
+      "sourceDrawingIndex": 45933,
+      "sourceItemIndex": 0,
+      "startPt": [
+        842.580017,
+        681.180054
+      ],
+      "endPt": [
+        704.940002,
+        681.180054
+      ],
+      "lengthPt": 137.640015,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 15.293335,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-037",
+      "sourceDrawingIndex": 45934,
+      "sourceItemIndex": 0,
+      "startPt": [
+        608.940002,
+        681.180054
+      ],
+      "endPt": [
+        313.860016,
+        681.180054
+      ],
+      "lengthPt": 295.079987,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 32.786665,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-038",
+      "sourceDrawingIndex": 45944,
+      "sourceItemIndex": 0,
+      "startPt": [
+        608.940002,
+        681.180054
+      ],
+      "endPt": [
+        704.940002,
+        681.180054
+      ],
+      "lengthPt": 96.0,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 10.666667,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-039",
+      "sourceDrawingIndex": 45945,
+      "sourceItemIndex": 0,
+      "startPt": [
+        608.940002,
+        692.460083
+      ],
+      "endPt": [
+        608.940002,
+        602.460083
+      ],
+      "lengthPt": 90.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-022",
+        "MIT-J-U-023"
+      ],
+      "planLengthFt": 10.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-040",
+      "sourceDrawingIndex": 45946,
+      "sourceItemIndex": 0,
+      "startPt": [
+        867.780029,
+        675.180054
+      ],
+      "endPt": [
+        842.580017,
+        675.180054
+      ],
+      "lengthPt": 25.200012,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 2.800001,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-041",
+      "sourceDrawingIndex": 46223,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1105.02002,
+        377.700012
+      ],
+      "endPt": [
+        1105.02002,
+        529.97998
+      ],
+      "lengthPt": 152.279968,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-052",
+        "MIT-J-U-053"
+      ],
+      "planLengthFt": 16.919996,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-042",
+      "sourceDrawingIndex": 46224,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1105.02002,
+        796.97998
+      ],
+      "endPt": [
+        1105.02002,
+        546.539978
+      ],
+      "lengthPt": 250.440002,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-050",
+        "MIT-J-U-051"
+      ],
+      "planLengthFt": 27.826667,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-043",
+      "sourceDrawingIndex": 46225,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1117.380005,
+        719.219971
+      ],
+      "endPt": [
+        1105.02002,
+        719.219971
+      ],
+      "lengthPt": 12.359985,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-012"
+      ],
+      "planLengthFt": 1.373332,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-044",
+      "sourceDrawingIndex": 46226,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1117.140015,
+        796.97998
+      ],
+      "endPt": [
+        1105.02002,
+        796.97998
+      ],
+      "lengthPt": 12.119995,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-011"
+      ],
+      "planLengthFt": 1.346666,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-045",
+      "sourceDrawingIndex": 46227,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1118.579956,
+        421.97998
+      ],
+      "endPt": [
+        1105.019897,
+        421.97998
+      ],
+      "lengthPt": 13.560059,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-015"
+      ],
+      "planLengthFt": 1.506673,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-046",
+      "sourceDrawingIndex": 46228,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1118.579956,
+        529.97998
+      ],
+      "endPt": [
+        1105.019897,
+        529.97998
+      ],
+      "lengthPt": 13.560059,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-014"
+      ],
+      "planLengthFt": 1.506673,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-047",
+      "sourceDrawingIndex": 46229,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1118.579956,
+        637.97998
+      ],
+      "endPt": [
+        1105.019897,
+        637.97998
+      ],
+      "lengthPt": 13.560059,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-013"
+      ],
+      "planLengthFt": 1.506673,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-048",
+      "sourceDrawingIndex": 46230,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1019.579956,
+        377.699982
+      ],
+      "endPt": [
+        1019.579956,
+        529.97998
+      ],
+      "lengthPt": 152.279999,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-008",
+        "MIT-J-P-009",
+        "MIT-J-U-048",
+        "MIT-J-U-049"
+      ],
+      "planLengthFt": 16.92,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-049",
+      "sourceDrawingIndex": 46231,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1019.579956,
+        647.699951
+      ],
+      "endPt": [
+        1019.579956,
+        546.539917
+      ],
+      "lengthPt": 101.160034,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-007",
+        "MIT-J-U-046",
+        "MIT-J-U-047"
+      ],
+      "planLengthFt": 11.240004,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-050",
+      "sourceDrawingIndex": 46237,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1019.579956,
+        647.700012
+      ],
+      "endPt": [
+        1019.579956,
+        832.26001
+      ],
+      "lengthPt": 184.559998,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-044",
+        "MIT-J-U-045",
+        "MIT-J-U-046"
+      ],
+      "planLengthFt": 20.506666,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-051",
+      "sourceDrawingIndex": 46268,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1105.02002,
+        796.97998
+      ],
+      "endPt": [
+        1105.02002,
+        828.539978
+      ],
+      "lengthPt": 31.559998,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 3.506666,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-052",
+      "sourceDrawingIndex": 46273,
+      "sourceItemIndex": 0,
+      "startPt": [
+        911.580017,
+        737.700012
+      ],
+      "endPt": [
+        911.580017,
+        832.26001
+      ],
+      "lengthPt": 94.559998,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-038",
+        "MIT-J-U-039"
+      ],
+      "planLengthFt": 10.506666,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-053",
+      "sourceDrawingIndex": 46311,
+      "sourceItemIndex": 0,
+      "startPt": [
+        911.580017,
+        737.700012
+      ],
+      "endPt": [
+        911.580017,
+        546.540039
+      ],
+      "lengthPt": 191.159973,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-003",
+        "MIT-J-P-004",
+        "MIT-J-U-039",
+        "MIT-J-U-040"
+      ],
+      "planLengthFt": 21.239997,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-054",
+      "sourceDrawingIndex": 46312,
+      "sourceItemIndex": 0,
+      "startPt": [
+        911.580017,
+        503.700012
+      ],
+      "endPt": [
+        911.580017,
+        391.980011
+      ],
+      "lengthPt": 111.720001,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-041",
+        "MIT-J-U-042",
+        "MIT-J-U-043"
+      ],
+      "planLengthFt": 12.413333,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-055",
+      "sourceDrawingIndex": 46313,
+      "sourceItemIndex": 0,
+      "startPt": [
+        884.580017,
+        422.460022
+      ],
+      "endPt": [
+        911.580017,
+        422.460022
+      ],
+      "lengthPt": 27.0,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 3.0,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-056",
+      "sourceDrawingIndex": 46316,
+      "sourceItemIndex": 1,
+      "startPt": [
+        911.580017,
+        889.740051
+      ],
+      "endPt": [
+        911.580017,
+        970.740051
+      ],
+      "lengthPt": 81.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-001",
+        "MIT-J-P-002"
+      ],
+      "planLengthFt": 9.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-057",
+      "sourceDrawingIndex": 46320,
+      "sourceItemIndex": 1,
+      "startPt": [
+        1019.580017,
+        889.73999
+      ],
+      "endPt": [
+        1019.580017,
+        970.73999
+      ],
+      "lengthPt": 81.0,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-005",
+        "MIT-J-P-006"
+      ],
+      "planLengthFt": 9.0,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-058",
+      "sourceDrawingIndex": 46336,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1019.580017,
+        546.540039
+      ],
+      "endPt": [
+        1019.580017,
+        529.980042
+      ],
+      "lengthPt": 16.559998,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-008"
+      ],
+      "planLengthFt": 1.84,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-059",
+      "sourceDrawingIndex": 46337,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1105.02002,
+        546.540039
+      ],
+      "endPt": [
+        1105.02002,
+        529.980042
+      ],
+      "lengthPt": 16.559998,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 1.84,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-060",
+      "sourceDrawingIndex": 46338,
+      "sourceItemIndex": 0,
+      "startPt": [
+        911.580017,
+        546.540039
+      ],
+      "endPt": [
+        911.580017,
+        503.700043
+      ],
+      "lengthPt": 42.839996,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-041"
+      ],
+      "planLengthFt": 4.76,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-061",
+      "sourceDrawingIndex": 46339,
+      "sourceItemIndex": 0,
+      "startPt": [
+        867.780029,
+        546.540039
+      ],
+      "endPt": [
+        867.780029,
+        345.420044
+      ],
+      "lengthPt": 201.119995,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 22.346666,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-062",
+      "sourceDrawingIndex": 46340,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1105.02002,
+        546.540039
+      ],
+      "endPt": [
+        867.780029,
+        546.540039
+      ],
+      "lengthPt": 237.23999,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 26.359999,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-063",
+      "sourceDrawingIndex": 46355,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1045.380005,
+        719.219971
+      ],
+      "endPt": [
+        1019.580017,
+        719.219971
+      ],
+      "lengthPt": 25.799988,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-010"
+      ],
+      "planLengthFt": 2.866665,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-064",
+      "sourceDrawingIndex": 46588,
+      "sourceItemIndex": 0,
+      "startPt": [
+        884.580017,
+        391.97998
+      ],
+      "endPt": [
+        884.580017,
+        422.459991
+      ],
+      "lengthPt": 30.480011,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-037"
+      ],
+      "planLengthFt": 3.386668,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-065",
+      "sourceDrawingIndex": 48732,
+      "sourceItemIndex": 0,
+      "startPt": [
+        313.859985,
+        962.460022
+      ],
+      "endPt": [
+        313.859985,
+        999.300049
+      ],
+      "lengthPt": 36.840027,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-001"
+      ],
+      "planLengthFt": 4.093336,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-066",
+      "sourceDrawingIndex": 48732,
+      "sourceItemIndex": 1,
+      "startPt": [
+        313.859985,
+        999.300049
+      ],
+      "endPt": [
+        269.339996,
+        999.300049
+      ],
+      "lengthPt": 44.519989,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 4.946665,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-067",
+      "sourceDrawingIndex": 48751,
+      "sourceItemIndex": 0,
+      "startPt": [
+        800.940002,
+        840.060059
+      ],
+      "endPt": [
+        800.940002,
+        860.700073
+      ],
+      "lengthPt": 20.640015,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 2.293335,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-068",
+      "sourceDrawingIndex": 48762,
+      "sourceItemIndex": 0,
+      "startPt": [
+        911.580017,
+        827.699951
+      ],
+      "endPt": [
+        911.580017,
+        794.579956
+      ],
+      "lengthPt": 33.119995,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-038"
+      ],
+      "planLengthFt": 3.679999,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-069",
+      "sourceDrawingIndex": 48786,
+      "sourceItemIndex": 0,
+      "startPt": [
+        796.5,
+        681.180054
+      ],
+      "endPt": [
+        727.02002,
+        681.180054
+      ],
+      "lengthPt": 69.47998,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 7.719998,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-070",
+      "sourceDrawingIndex": 48799,
+      "sourceItemIndex": 0,
+      "startPt": [
+        608.940002,
+        778.02002
+      ],
+      "endPt": [
+        608.940002,
+        751.140015
+      ],
+      "lengthPt": 26.880005,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-021"
+      ],
+      "planLengthFt": 2.986667,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-071",
+      "sourceDrawingIndex": 48811,
+      "sourceItemIndex": 0,
+      "startPt": [
+        505.859985,
+        607.02002
+      ],
+      "endPt": [
+        505.859985,
+        628.73999
+      ],
+      "lengthPt": 21.719971,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-017"
+      ],
+      "planLengthFt": 2.41333,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-072",
+      "sourceDrawingIndex": 48823,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1105.02002,
+        652.26001
+      ],
+      "endPt": [
+        1105.02002,
+        673.380005
+      ],
+      "lengthPt": 21.119995,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-050"
+      ],
+      "planLengthFt": 2.346666,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-073",
+      "sourceDrawingIndex": 48836,
+      "sourceItemIndex": 0,
+      "startPt": [
+        974.340027,
+        546.539978
+      ],
+      "endPt": [
+        997.380005,
+        546.539978
+      ],
+      "lengthPt": 23.039978,
+      "headIdsWithinContactTolerance": [],
+      "planLengthFt": 2.559998,
+      "selection": "geometric-connector-to-head-registered-network",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-074",
+      "sourceDrawingIndex": 50213,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1019.580017,
+        832.26001
+      ],
+      "endPt": [
+        1019.580017,
+        864.419983
+      ],
+      "lengthPt": 32.159973,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-044"
+      ],
+      "planLengthFt": 3.57333,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-075",
+      "sourceDrawingIndex": 50220,
+      "sourceItemIndex": 0,
+      "startPt": [
+        1019.580017,
+        889.73999
+      ],
+      "endPt": [
+        1019.580017,
+        864.419983
+      ],
+      "lengthPt": 25.320007,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-006"
+      ],
+      "planLengthFt": 2.813334,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-076",
+      "sourceDrawingIndex": 50227,
+      "sourceItemIndex": 0,
+      "startPt": [
+        911.580017,
+        832.26001
+      ],
+      "endPt": [
+        911.580017,
+        864.419983
+      ],
+      "lengthPt": 32.159973,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-U-038"
+      ],
+      "planLengthFt": 3.57333,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    },
+    {
+      "id": "MIT-J-FP2-CL-077",
+      "sourceDrawingIndex": 50231,
+      "sourceItemIndex": 0,
+      "startPt": [
+        911.580017,
+        889.73999
+      ],
+      "endPt": [
+        911.580017,
+        864.419983
+      ],
+      "lengthPt": 25.320007,
+      "headIdsWithinContactTolerance": [
+        "MIT-J-P-002"
+      ],
+      "planLengthFt": 2.813334,
+      "selection": "head-contact-seed",
+      "role": "unknown-source-registered-centerline",
+      "pipeSize": null,
+      "fitting": null,
+      "flowDirection": null,
+      "elevation": null,
+      "grade": null
+    }
+  ],
+  "claims": {
+    "sourceRegisteredPipeCenterlinesReady": true,
+    "allImmutableHeadsCovered": true,
+    "semanticPipeNetworkExtracted": false,
+    "pipeRolesExtracted": false,
+    "pipeSizesAndFittingsExtracted": false,
+    "pipeElevationsExtracted": false,
+    "gradeDirectionExtracted": false,
+    "drainsAndRisersExtracted": false,
+    "hydraulicNetworkReady": false,
+    "codeComplianceReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "limitations": [
+    "This identifies source-registered vector centerlines only; it does not assign semantic pipe roles.",
+    "A candidate must match the approved/as-built vector signature and have a head-contact or geometric connection to the seeded head-registered set; color alone is rejected.",
+    "Pipe sizes, fittings, flow direction, elevation, grade, drainage, riser closure, hydraulics, compliance, fabrication, employee use, and release remain unavailable from this artifact."
+  ],
+  "image": {
+    "file": "approved-fp2-head-registered-centerlines.png",
+    "sha256": "7c3844110e760b6218de334a3b204c54f95b073c16934b420292bb96551377a1",
+    "bytes": 2215819
+  }
+}

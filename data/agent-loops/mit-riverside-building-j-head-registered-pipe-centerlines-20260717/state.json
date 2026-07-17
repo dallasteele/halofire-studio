@@ -1,0 +1,50 @@
+{
+  "artifactType": "halofire.agent-loop-state.v1",
+  "name": "mit-riverside-building-j-head-registered-pipe-centerlines-20260717",
+  "iteration": 1,
+  "status": "completed-source-registered-centerlines-only",
+  "completedStages": ["DISCOVER", "PLAN", "EXECUTE", "VERIFY"],
+  "nextStage": "SOURCE_LABEL_AND_ELEVATION_BINDING",
+  "sourceReplay": {
+    "approvedSha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+    "asBuiltSha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+    "physicalPage": 2,
+    "approvedAsBuiltEligibleVectorCandidatesIdentical": true
+  },
+  "result": {
+    "eligibleCandidateCount": 420,
+    "headContactSeedCount": 63,
+    "acceptedCenterlineCount": 77,
+    "unselectedEligibleCandidateCount": 343,
+    "coveredImmutableHeadCount": 68,
+    "sourceRegisteredPipeCenterlinesReady": true,
+    "semanticPipeNetworkExtracted": false,
+    "pipeRolesExtracted": false,
+    "pipeSizesAndFittingsExtracted": false,
+    "pipeElevationsExtracted": false,
+    "gradeDirectionExtracted": false,
+    "drainsAndRisersExtracted": false,
+    "hydraulicNetworkReady": false,
+    "codeComplianceReady": false,
+    "fabricationReady": false,
+    "employeeUseReady": false,
+    "vpsReleaseReady": false
+  },
+  "verification": {
+    "primaryReplay": "approved/as-built source SHA-256 and all 420 eligible vector signatures matched exactly",
+    "headCoverage": "77 accepted centerlines cover all 68 immutable approved/as-built head coordinates",
+    "adversarial": "2 Python checks passed: cyan color-only and wrong-width vectors reject; tampered head coordinate and changed approved digest reject",
+    "focusedTests": "11 Vitest assertions passed across centerlines, head registration, approved underlay, and source-underlay proof; 2 Python adversarial checks passed",
+    "productionBuild": "Vite build passed",
+    "loopGuard": "AGENT_LOOP_GUARD ok",
+    "rulebook": "AGENTIC_RULES_VERIFY ok",
+    "formal": "GX10_PROVER_UNAVAILABLE: Unable to connect to the remote server"
+  },
+  "visualGate": {
+    "status": "accepted",
+    "route": "http://127.0.0.1:3301/src/data/proofs/mit-riverside-building-j-head-registered-pipe-centerlines/index.html",
+    "evidence": "output/playwright/mit-riverside-building-j-head-registered-pipe-centerlines.png",
+    "finding": "Browser rendering visibly retains the actual approved FP-2 piping plan under 77 green source-registered centerlines, 68 exact head rings, source-selection accounting, and explicit held semantic fields. The final browser snapshot had zero console errors."
+  },
+  "nextSourceRequirement": "Associate each accepted centerline with source labels and coordinated vertical evidence before assigning pipe role, nominal size, fitting, flow, elevation, grade, drain, riser, hydraulic, fabrication, employee-use, or release semantics."
+}

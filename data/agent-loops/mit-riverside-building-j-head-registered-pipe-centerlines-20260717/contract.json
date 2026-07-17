@@ -1,0 +1,43 @@
+{
+  "name": "mit-riverside-building-j-head-registered-pipe-centerlines-20260717",
+  "owner": "codex",
+  "goal": "Extract only the approved/as-built-identical FP-2 vector centerlines that are geometrically registered to the 68 immutable Building J sprinkler heads, retain their source coordinates and topology evidence, and leave unsupported pipe semantics and release claims fail-closed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Engineering/City Approved FS Plans/State Fire Marshal Approved Plan Set.pdf",
+    "Y:/Shared/HaloOps/02-Active jobs/03-Closed/Adolfson & Peterson/MIT Riverside - Phoenix AZ/Field Operations/As Builts/State Fire Marshal Approved Plan Set_As Builts.pdf",
+    "apps/autosprink/src/data/mit-riverside-building-j-head-coordinate-evidence.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-approved-pipe-layout/proof.json"
+  ],
+  "exit_criteria": [
+    "approved and as-built FP-2 source digests and extracted eligible vectors are identical",
+    "every accepted centerline has exact source endpoints, rendering attributes, selection provenance, and a deterministic edge identifier",
+    "the seed-and-connectivity selection covers every one of the 68 immutable head coordinates without promoting unrelated plan vectors",
+    "an actual FP-2 underlay visibly shows the accepted source centerlines and exact head evidence",
+    "role, size, fitting, flow, elevation, grade, drain, riser, hydraulic, compliance, fabrication, employee-use, and VPS-release claims remain explicitly false"
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "approved/as-built SHA-256 replay",
+    "exact eligible-vector replay across both documents",
+    "head-coverage and unselected-candidate accounting",
+    "adversarial rejection of color-only, changed-width, altered-head, and changed-source attacks",
+    "focused Vitest regression and AutoSprink production build",
+    "actual-PDF visual inspection",
+    "formal prover check or exact unavailable receipt",
+    "authoritative agentic-rule verification",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/mit-riverside-building-j-head-registered-pipe-centerlines-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/mit-riverside-building-j-head-registered-pipe-centerlines.json",
+    "apps/autosprink/src/data/proofs/mit-riverside-building-j-head-registered-pipe-centerlines",
+    "apps/autosprink/scripts/build-mit-riverside-building-j-head-registered-pipe-centerlines.py",
+    "apps/autosprink/tests/mit-riverside-building-j-head-registered-pipe-centerlines.test.js"
+  ],
+  "max_iterations": 4,
+  "max_tokens": 60000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}
