@@ -1,0 +1,70 @@
+{
+  "artifactType": "halofire.field-drain-source-capabilities.v1",
+  "receipts": [
+    {
+      "artifactType": "halofire.field-drain-source-capability-receipt.v1",
+      "projectId": "mit-riverside-building-j",
+      "sourceDocuments": [
+        {
+          "id": "approved-fp2",
+          "sha256": "6da51cbd5bdbf34861502630311f8d0e3d4c8e3dcb61896ba614ff634fde8421",
+          "role": "approved-plan-fp2"
+        },
+        {
+          "id": "as-built-fp2",
+          "sha256": "b7a8c3c2faceacba6c41437f773af650cdcc84eddc44cc5a88e1e563ac052207",
+          "role": "as-built-plan-fp2"
+        },
+        {
+          "id": "transportation-hydraulics",
+          "sha256": "2eaa513af17071a822f98d6be7afb909533bcb7ce2578466414cfc7563f2fce5",
+          "role": "hydraulic-calculations"
+        }
+      ],
+      "drainEvidence": {
+        "state": "no-project-drain-evidence",
+        "sourceRefs": [],
+        "labels": [],
+        "routeSegments": []
+      },
+      "limitations": [
+        "No Building J project-specific field-plan, fabrication-listing, or drain-route source is present in this receipt.",
+        "The hydraulic riser trace does not establish a drain route."
+      ]
+    },
+    {
+      "artifactType": "halofire.field-drain-source-capability-receipt.v1",
+      "projectId": "new-hope-community-church",
+      "sourceDocuments": [
+        {
+          "id": "approved-fp20",
+          "sha256": "5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5",
+          "role": "approved-plan-fp20"
+        },
+        {
+          "id": "field-set-fp20",
+          "sha256": "4A47F9A45256DEBB9E5185396BC15526532A3EF420BCBF40EC0BCC0DC5F902B5",
+          "role": "field-set-fp20"
+        },
+        {
+          "id": "as-built-fp20",
+          "sha256": "ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B",
+          "role": "as-built-plan-fp20"
+        }
+      ],
+      "drainEvidence": {
+        "state": "field-resolution-required",
+        "sourceRefs": ["approved-fp20", "field-set-fp20", "as-built-fp20"],
+        "labels": [
+          "LOW POINT TIE IN DRAIN",
+          "FIELD ROUTE / LOCATE LOW POINT DRUM DRIP DRAIN"
+        ],
+        "routeSegments": []
+      },
+      "limitations": [
+        "Two source-marked drum-drip drains require field routing and low-point location before exact route geometry may be emitted.",
+        "This receipt calibrates source capability only; it cannot supply geometry to another project."
+      ]
+    }
+  ]
+}

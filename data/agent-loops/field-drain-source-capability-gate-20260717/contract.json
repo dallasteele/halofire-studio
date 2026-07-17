@@ -1,0 +1,38 @@
+{
+  "name": "field-drain-source-capability-gate-20260717",
+  "owner": "codex",
+  "goal": "Add a deterministic, project-isolated intake gate that blocks drain geometry when a project has no drain source or when its source explicitly requires field resolution, while allowing only same-project, digest-bound, source-resolved geometry to proceed.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "apps/autosprink/src/data/mit-riverside-building-j-hydraulic-riser-trace.json",
+    "apps/autosprink/src/data/new-hope-approved-fp20-operational-annotations.json",
+    "apps/autosprink/src/engine/approved-fp20-governed-skeleton.js",
+    "apps/autosprink/src/engine/new-hope-proper-pipe-layout.js"
+  ],
+  "exit_criteria": [
+    "Building J is blocked with a specific no-project-drain-evidence issue and cannot receive any drain geometry.",
+    "New Hope preserves its two field-resolution-required drain intents and cannot promote them into an exact route.",
+    "A candidate route from another project is rejected even when its geometry is otherwise well formed.",
+    "A future source-resolved route requires same-project identity, a source digest present in the receipt, and finite source-bound segments."
+  ],
+  "verification_gates": [
+    "agent loop guard validation",
+    "focused happy-path and adversarial unit tests",
+    "existing New Hope and Building J regression tests",
+    "AutoSprink production build",
+    "formal prover check or exact unavailable receipt",
+    "authoritative rulebook verification",
+    "brain preflight and postflight"
+  ],
+  "state_path": "data/agent-loops/field-drain-source-capability-gate-20260717/state.json",
+  "evidence_paths": [
+    "apps/autosprink/src/data/field-drain-source-capabilities.json",
+    "apps/autosprink/src/engine/field-drain-source-capability.js",
+    "apps/autosprink/tests/field-drain-source-capability.test.js"
+  ],
+  "max_iterations": 2,
+  "max_tokens": 20000,
+  "model_tier": "local",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

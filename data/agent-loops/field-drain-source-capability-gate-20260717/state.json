@@ -1,0 +1,34 @@
+{
+  "name": "field-drain-source-capability-gate-20260717",
+  "status": "passed",
+  "iteration": 1,
+  "completedAt": "2026-07-17",
+  "outcomes": {
+    "mit-riverside-building-j": {
+      "status": "blocked",
+      "requiredIssue": "FIELD_DRAIN_SOURCE_EVIDENCE_ABSENT",
+      "routeGeometryReady": false
+    },
+    "new-hope-community-church": {
+      "status": "blocked",
+      "requiredIssue": "FIELD_DRAIN_ROUTE_FIELD_RESOLUTION_REQUIRED",
+      "routeGeometryReady": false
+    },
+    "crossProjectCandidate": {
+      "status": "blocked",
+      "requiredIssue": "FIELD_DRAIN_CROSS_PROJECT_GEOMETRY_REJECTED"
+    }
+  },
+  "verification": {
+    "agentLoopGuard": "passed",
+    "focusedVitest": "passed: 4 files, 23 tests",
+    "autosprinkBuild": "passed: vite build",
+    "agenticRules": "passed",
+    "formalProver": "unavailable: GX10_PROVER_UNAVAILABLE: Unable to connect to the remote server",
+    "diffCheck": "passed"
+  },
+  "limitations": [
+    "This receipt gate prevents unsupported geometry. It does not create a drain route.",
+    "No source-resolved drain route was claimed because the corpus samples are either source-absent or explicitly field-resolution-required."
+  ]
+}
