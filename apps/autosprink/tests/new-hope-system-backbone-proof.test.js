@@ -14,6 +14,9 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(fs.statSync(new URL('asbuilt-fp10-riser-section.png', sourceRoot)).size).toBeGreaterThan(500_000);
     expect(fs.statSync(new URL('hydrant-flow-test-data.png', proofRoot)).size).toBeGreaterThan(200_000);
     expect(fs.statSync(new URL('approved-water-supply-table.png', proofRoot)).size).toBeGreaterThan(200_000);
+    expect(fs.statSync(new URL('wet-level1-source-network.png', proofRoot)).size).toBeGreaterThan(1_000_000);
+    expect(html).toContain('Complete Level 1 wet layout on the actual field drawing');
+    expect(html).toContain('wet-level1-source-network.png');
   });
 
   it('loads every source-bound input through the project evaluator', () => {
@@ -26,6 +29,7 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-2.json');
     expect(script).toContain('../../new-hope-approved-fp20-hydraulic-route-2-3.json');
     expect(script).toContain('../../new-hope-approved-water-supply-wet-riser-evidence.json');
+    expect(script).toContain('../../new-hope-wet-level1-network-evidence.json');
   });
 
   it('surfaces release-state truth in the DOM and hides the unreleased 3D source leg', () => {
@@ -34,6 +38,9 @@ describe('New Hope system-backbone visual proof surface', () => {
     expect(proofScript).toContain("root.pumpDecisionReady = String(result.pumpDecisionReady)");
     expect(proofScript).toContain("root.approvedDesignWaterSupplyReady = String(result.approvedDesignWaterSupplyReady)");
     expect(proofScript).toContain("root.wetRiserAndDrainEvidenceReady = String(result.wetRiserAndDrainEvidenceReady)");
+    expect(proofScript).toContain("root.wetSystemNetwork2dReady = String(result.wetSystemNetwork2dReady)");
+    expect(proofScript).toContain("root.sprinklerHeadPositions2dReady = String(result.sprinklerHeadPositions2dReady)");
+    expect(proofScript).toContain("root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady)");
     expect(proofScript).toContain("root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved)");
     expect(proofScript).toContain("root.quoteReady = String(result.quoteReady)");
     expect(viewer).toContain("sourceLeg.visible = false");

@@ -1,3 +1,5 @@
+import { validateNewHopeWetLevel1NetworkEvidence } from './new-hope-wet-level1-network-evidence.js';
+
 const PROJECT_ID = 'new-hope-crisis-center-brigham-city-ut';
 const APPROVED_PLAN_SHA = '5A770222363228C2766605A695FEE9B6CB1F7B49C296204E09B691100253D9D5';
 const ASBUILT_SHA = 'ED00E9530C02217BC50EAD2FC3391938E731253949B728B31ED1336F8000F34B';
@@ -153,7 +155,18 @@ function validateWaterSupplyAndWetRiser(evidence, registration, issues) {
  */
 export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
   const issues = [];
-  const { registration, operationalAnnotations, planGraph, hydraulicRoutes, waterSupplyAndWetRiser } = inputs;
+  const {
+    registration,
+    operationalAnnotations,
+    planGraph,
+    hydraulicRoutes,
+    waterSupplyAndWetRiser,
+    wetLevel1NetworkEvidence,
+  } = inputs;
+  const wetNetwork = validateNewHopeWetLevel1NetworkEvidence(wetLevel1NetworkEvidence);
+  if (wetNetwork.status !== 'passed') {
+    issues.push(...wetNetwork.issues);
+  }
 
   if (
     registration?.projectId !== PROJECT_ID
@@ -290,9 +303,13 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
   }
 
   const evidenceReady = issues.length === 0;
+  const wetNetworkReady = evidenceReady && wetNetwork.wetSystemNetwork2dReady;
   const blockers = [
     'BACKBONE_NEW_QUOTE_FLOW_TEST_REQUIRED',
-    'NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED',
+    ...(wetNetworkReady ? [] : ['NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED']),
+    'NH_WET_SYSTEM_PIECE_TO_PLAN_MAPPING_REQUIRED',
+    'NH_WET_SYSTEM_HEAD_TYPE_ASSIGNMENT_REQUIRED',
+    'NH_WET_SYSTEM_DIRECTION_AND_GRADE_REQUIRED',
     'NH_WET_SYSTEM_INSTALLATION_3D_PATH_REQUIRED',
     'NH_FIELD_ROUTE_DRUM_DRIP_GEOMETRY_REQUIRED',
     'NH_SOURCE_FEED_INSTALLATION_3D_PATH_REQUIRED',
@@ -309,6 +326,7 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       hydraulicCalculation: { sha256: CALC_SHA, remoteAreaIds: routes.map((route) => route.remoteAreaId) },
       hydrantFlowTest: { physicalPage: 1, sha256: FLOW_TEST_SHA, testDate: '2024-12-10' },
       approvedDesignSupply: clone(waterSupplyAndWetRiser.sourceBindings.hydraulicCalculation.approvedDesignSupply),
+      wetLevel1Network: clone(wetNetwork.sourceBindings),
     } : null,
     systems: evidenceReady ? [
       {
@@ -340,6 +358,13 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       components: evidenceReady ? planComponents : [],
       releasedRoutes: [],
       sourceReferenceVectors: evidenceReady ? clone(operationalAnnotations.operationalReferenceVectors ?? []) : [],
+      wetLevel1: wetNetworkReady ? {
+        sourceSheet: 'FP1.0',
+        pipeVectors: clone(wetNetwork.wetPipeVectors),
+        sprinklerHeads: clone(wetNetwork.sprinklerHeads),
+        sprinklerSchedule: clone(wetNetwork.sprinklerSchedule),
+        geometryStatus: 'exact-field-install-and-as-built-plan-xy',
+      } : null,
     },
     elevation2d: {
       sourceSheet: 'FP1.0',
@@ -368,10 +393,31 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
       sourceIntersectionPoints: evidenceReady ? modelPoints : [],
       releasedRoutes: [],
       unresolvedPlanIntents: evidenceReady ? planComponents.filter((component) => component.geometryStatus.includes('unresolved')) : [],
+      unresolvedWetLevel1: wetNetworkReady ? {
+        pipeVectors: wetNetwork.wetPipeVectors.map((vector) => ({
+          id: vector.id,
+          fromPlanFt: clone(vector.fromPlanFt),
+          toPlanFt: clone(vector.toPlanFt),
+          installedElevationFt: null,
+          geometryStatus: 'exact-plan-xy-installed-z-unresolved',
+        })),
+        sprinklerHeads: wetNetwork.sprinklerHeads.map((head) => ({
+          id: head.id,
+          planFt: clone(head.planFt),
+          installedElevationFt: null,
+          headType: null,
+          geometryStatus: 'exact-plan-xy-installed-z-and-type-unresolved',
+        })),
+      } : null,
     },
     systemDesignGate: { status: 'blocked', blockers },
     takeoff: evidenceReady ? {
-      status: 'source-identities-only-no-route-quantities',
+      status: wetNetworkReady ? 'native-fabrication-quantities-piece-to-plan-mapping-unresolved' : 'source-identities-only-no-route-quantities',
+      wetLevel1NativeFabrication: wetNetworkReady ? {
+        metrics: clone(wetNetwork.metrics),
+        lineFamilies: clone(wetNetwork.nativeFabricationLines),
+        sprinklerSchedule: clone(wetNetwork.sprinklerSchedule),
+      } : null,
       systemComponents: [
         { key: 'wet_riser_manifold', description: '3-inch wet riser manifold', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
         { key: 'wet_flow_switch', description: '3-inch wet-system flow switch', unit: 'EA', quantity: 1, systemIds: ['new-hope-wet-level-1'] },
@@ -392,6 +438,13 @@ export function buildNewHopeSystemBackboneEvidence(inputs = {}) {
     pumpDecisionReady: evidenceReady,
     pumpDecisionScope: evidenceReady ? 'completed-approved-new-hope-configuration' : null,
     wetRiserAndDrainEvidenceReady: evidenceReady,
+    wetSystemNetwork2dReady: wetNetworkReady,
+    sprinklerHeadPositions2dReady: wetNetworkReady,
+    nativeFabricationTakeoffReady: wetNetworkReady,
+    wetSystemPieceToPlanMappingReady: false,
+    wetSystemHeadTypeAssignmentReady: false,
+    wetSystemDirectionReady: false,
+    wetSystemGradeReady: false,
     wetSystemBackboneReady: false,
     fieldDrainRoutesResolved: false,
     sourceFeed3dPathReady: false,

@@ -1,7 +1,7 @@
 {
   "artifactType": "halofire.agent-loop-state.v1",
   "loop": "new-hope-system-backbone-20260716",
-  "iteration": 3,
+  "iteration": 4,
   "status": "active",
   "brainPreflight": { "status": "passed", "episodes": [150514, 150555, 149978, 155497] },
   "truth": {
@@ -22,6 +22,19 @@
     "pumpDecisionReady": true,
     "pumpDecisionScope": "completed-approved-new-hope-configuration",
     "wetRiserAndDrainIdentityReady": true,
+    "wetSystemNetwork2dReady": true,
+    "wetPipeVectorCount": 300,
+    "sprinklerHeadPositionCount": 174,
+    "nativeWetLineFamilyCount": 50,
+    "nativeWetPieceCount": 167,
+    "nativeWetOutletCount": 217,
+    "nativeWetFittingRecordCount": 67,
+    "nativeWetCutLengthFt": 1477.333333,
+    "pieceToPlanVectorMappingReady": false,
+    "headTypeAssignmentReady": false,
+    "pipeDirectionReady": false,
+    "pipeGradeReady": false,
+    "installedElevationReady": false,
     "wetSystemBackboneReady": false,
     "fieldDrainRoutesResolved": false,
     "sourceFeed3dPathReady": false,
@@ -32,13 +45,14 @@
     "vpsDeploymentAllowed": false
   },
   "verification": {
-    "focusedTests": "43 passed across 5 files; 11 source-proof tests include mutated hash and negative-margin rejection",
+    "focusedTests": "24 passed across 3 files; pipe-vector, head-coordinate, native-piece-length, source-hash, hydraulic-margin, and eight false-promotion mutations reject",
     "build": "passed",
     "loopGuard": "passed",
     "rulebook": "passed",
-    "lean": "verified by Lean 4.13.0 in 428 ms; conservative supply and historical-vs-current release boundary; receipt lean-proof.json",
-    "browser": "passed; zero console errors/warnings, proof dataset audited, three bounded screenshots visually inspected",
-    "brainPostflight": "passed; episode 155643"
+    "lean": "verified by Lean 4.13.0 in 391 ms; complete 2D plan and native takeoff cannot promote unresolved installed 3D, quote, or fabrication; receipt lean-proof.json",
+    "deterministicVisual": "passed; wet-level1-source-network.png inspected at original resolution over actual FP1.0",
+    "browser": "prior iteration passed; iteration 4 interactive audit pending because the in-app browser runtime exposed zero controllable browsers; local HTTP served HTML, PNG, JSON, and validator with 200 responses and exact evidence receipt b365141f3175e516a68c7940d09a66c1dc8e56d69c6deb8ec5a493d2cf528c1b",
+    "brainPostflight": "passed; episode 156286"
   },
-  "nextAction": "Extract the Level 1 wet-system 2D network and its exact 3D installation path from the approved/as-built corpus, then resolve field drain and source-feed route geometry; require a current flow test for every new quote."
+  "nextAction": "Resolve exact piece-to-plan mapping, per-head type assignment, pipe direction/grade, and installed elevations from the source corpus; then resolve field drain and source-feed route geometry. Use Addendum 02 for the auth-gated client reveal only after the shared real geometry is release-worthy; require a current flow test for every new quote."
 }

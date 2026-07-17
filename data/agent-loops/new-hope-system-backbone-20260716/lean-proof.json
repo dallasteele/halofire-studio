@@ -6,14 +6,15 @@
   "theoremNames": [
     "conservativeApprovedSupplyClearsWorstDemand",
     "historicalPumpDecisionDoesNotReleaseNewQuote",
-    "wetRiserIdentityDoesNotProveWetNetworkGeometry",
+    "completePlanDoesNotInventInstalledThreeDimensionalPath",
+    "sourceTakeoffWithoutPlanMappingDoesNotReleaseFabrication",
     "twoExactPointsDoNotProveAReleasedRoute",
     "unresolvedFieldDrainBlocksRelease"
   ],
-  "claim": "The reduced 79 psi approved supply clears the worst 73.6 psi demand by 5.4 psi for the completed configuration; that historical no-pump decision and wet-riser identity evidence cannot release a new quote, a wet-network model, or unresolved field drains.",
+  "claim": "The reduced 79 psi approved supply clears the worst 73.6 psi demand by 5.4 psi for the completed configuration. Even with 300 exact plan vectors, 174 head positions, 50 native line families, 167 cut pieces, 217 outlets, and 67 fitting records, missing current flow, piece-to-plan mapping, head-type assignment, direction/grade, installed elevation, and field drain routes keep 3D installation, quote, fabrication, and field release false.",
   "result": {
     "status": "verified",
-    "elapsedMs": 428,
+    "elapsedMs": 391,
     "version": "Lean (version 4.13.0, aarch64-unknown-linux-gnu, commit 6d22e0e5cc5a, Release)",
     "returncode": 0
   }

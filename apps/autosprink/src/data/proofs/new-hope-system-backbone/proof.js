@@ -8,6 +8,7 @@ const urls = {
   route22: '../../new-hope-approved-fp20-hydraulic-route-2-2.json',
   route23: '../../new-hope-approved-fp20-hydraulic-route-2-3.json',
   waterSupplyAndWetRiser: '../../new-hope-approved-water-supply-wet-riser-evidence.json',
+  wetLevel1NetworkEvidence: '../../new-hope-wet-level1-network-evidence.json',
 };
 
 async function fetchJson(url) {
@@ -76,7 +77,7 @@ function renderProof(result) {
   document.querySelector('#section-identities').innerHTML = `<b>Source section identities</b><br>${result.elevation2d.sectionIdentities.join('<br>')}`;
   document.querySelector('#supply-results').innerHTML = result.approvedWaterSupply.calculationAreas.map((area) => `<div><b>Area ${area.id}</b><span>${area.totalFlowGpm.toFixed(1)} gpm at ${area.totalPressurePsi.toFixed(1)} psi</span><em>+${area.safetyMarginPsi.toFixed(1)} psi margin</em></div>`).join('');
   document.querySelector('#pump-basis').textContent = `NO FIRE PUMP - completed approved configuration; minimum source margin ${result.pumpDecision.minimumSafetyMarginPsi.toFixed(1)} psi. A new quote still requires a current flow test.`;
-  document.querySelector('#gate-copy').textContent = 'The historical pump decision and wet-riser identities pass. New-quote flow freshness, wet-network extraction, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
+  document.querySelector('#gate-copy').textContent = 'The historical pump decision, wet-riser identities, all 300 wet pipe plan vectors, all 174 head positions, and the native fabrication takeoff pass. New-quote flow freshness, piece-to-plan mapping, per-head type assignment, pipe direction/grade, installed elevations, field-routed drains, and complete installation geometry remain blocked. Nothing on this page authorizes pricing, fabrication, permitting, or field installation.';
   document.querySelector('#gate-codes').textContent = result.systemDesignGate.blockers.join(' | ');
 
   const root = document.documentElement.dataset;
@@ -89,6 +90,9 @@ function renderProof(result) {
   root.approvedDesignWaterSupplyReady = String(result.approvedDesignWaterSupplyReady);
   root.pumpDecisionReady = String(result.pumpDecisionReady);
   root.wetRiserAndDrainEvidenceReady = String(result.wetRiserAndDrainEvidenceReady);
+  root.wetSystemNetwork2dReady = String(result.wetSystemNetwork2dReady);
+  root.sprinklerHeadPositions2dReady = String(result.sprinklerHeadPositions2dReady);
+  root.nativeFabricationTakeoffReady = String(result.nativeFabricationTakeoffReady);
   root.fieldDrainRoutesResolved = String(result.fieldDrainRoutesResolved);
   root.quoteReady = String(result.quoteReady);
   root.fieldReleaseReady = String(result.fieldReleaseReady);
@@ -103,12 +107,14 @@ export const proofPromise = Promise.all(Object.values(urls).map(fetchJson)).then
   route22,
   route23,
   waterSupplyAndWetRiser,
+  wetLevel1NetworkEvidence,
 ]) => buildNewHopeSystemBackboneEvidence({
   registration,
   operationalAnnotations,
   planGraph,
   hydraulicRoutes: [route21, route22, route23],
   waterSupplyAndWetRiser,
+  wetLevel1NetworkEvidence,
 }));
 
 proofPromise.then((result) => {

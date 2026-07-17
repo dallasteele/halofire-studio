@@ -10,6 +10,7 @@ const sources = () => ({
   planGraph: load('../src/data/new-hope-approved-fp20-plan-graph.json'),
   hydraulicRoutes: ['2-1', '2-2', '2-3'].map((id) => load(`../src/data/new-hope-approved-fp20-hydraulic-route-${id}.json`)),
   waterSupplyAndWetRiser: load('../src/data/new-hope-approved-water-supply-wet-riser-evidence.json'),
+  wetLevel1NetworkEvidence: load('../src/data/new-hope-wet-level1-network-evidence.json'),
 });
 
 describe('New Hope source-bound system backbone evidence', () => {
@@ -55,13 +56,15 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.model3d.releasedRoutes).toEqual([]);
   });
 
-  it('proves the historical no-pump decision but keeps new quotes and unextracted installation geometry blocked', () => {
+  it('proves the historical no-pump decision and complete wet plan while keeping new quotes and installation geometry blocked', () => {
     const result = buildNewHopeSystemBackboneEvidence(sources());
     expect(result.systemDesignGate).toEqual({
       status: 'blocked',
       blockers: expect.arrayContaining([
         'BACKBONE_NEW_QUOTE_FLOW_TEST_REQUIRED',
-        'NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED',
+        'NH_WET_SYSTEM_PIECE_TO_PLAN_MAPPING_REQUIRED',
+        'NH_WET_SYSTEM_HEAD_TYPE_ASSIGNMENT_REQUIRED',
+        'NH_WET_SYSTEM_DIRECTION_AND_GRADE_REQUIRED',
         'NH_WET_SYSTEM_INSTALLATION_3D_PATH_REQUIRED',
         'NH_FIELD_ROUTE_DRUM_DRIP_GEOMETRY_REQUIRED',
         'NH_SOURCE_FEED_INSTALLATION_3D_PATH_REQUIRED',
@@ -77,7 +80,22 @@ describe('New Hope source-bound system backbone evidence', () => {
       minimumSafetyMarginPsi: 5.4,
     }));
     expect(result.wetRiserAndDrainEvidenceReady).toBe(true);
+    expect(result.wetSystemNetwork2dReady).toBe(true);
+    expect(result.sprinklerHeadPositions2dReady).toBe(true);
+    expect(result.nativeFabricationTakeoffReady).toBe(true);
+    expect(result.systemDesignGate.blockers).not.toContain('NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED');
+    expect(result.plan2d.wetLevel1.pipeVectors).toHaveLength(300);
+    expect(result.plan2d.wetLevel1.sprinklerHeads).toHaveLength(174);
+    expect(result.model3d.unresolvedWetLevel1.pipeVectors).toHaveLength(300);
+    expect(result.model3d.unresolvedWetLevel1.pipeVectors[0].installedElevationFt).toBeNull();
     expect(result.wetSystemBackboneReady).toBe(false);
+    expect(result.takeoff.wetLevel1NativeFabrication.metrics).toEqual(expect.objectContaining({
+      lineFamilyCount: 50,
+      pieceCount: 167,
+      outletCount: 217,
+      fittingRecordCount: 67,
+      totalCutLengthFt: 1477.333333,
+    }));
     expect(result.takeoff.systemComponents).toEqual(expect.arrayContaining([
       expect.objectContaining({ key: 'wet_test_and_drain_prv', quantity: 1 }),
       expect.objectContaining({ key: 'fire_pump', quantity: 0 }),
@@ -132,5 +150,15 @@ describe('New Hope source-bound system backbone evidence', () => {
     expect(result.status).toBe('blocked');
     expect(result.issues.map((entry) => entry.code)).toContain('NH_BACKBONE_HYDRAULIC_LEG_INVALID');
     expect(result.model3dInstallationReady).toBe(false);
+  });
+
+  it('rejects a mutated wet-plan vector and restores the extraction blocker', () => {
+    const input = sources();
+    input.wetLevel1NetworkEvidence.wetPipeVectors[0].toPdfPt.x += 1;
+    const result = buildNewHopeSystemBackboneEvidence(input);
+    expect(result.status).toBe('blocked');
+    expect(result.issues.map((entry) => entry.code)).toContain('NH_WET_LEVEL1_PIPE_GEOMETRY_INVALID');
+    expect(result.wetSystemNetwork2dReady).toBe(false);
+    expect(result.systemDesignGate.blockers).toContain('NH_WET_SYSTEM_NETWORK_2D_EXTRACTION_REQUIRED');
   });
 });
